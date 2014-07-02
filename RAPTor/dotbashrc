@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Source uber dotcshrc
+cd ..
+source dotbashrc
+cd -
+
+# General set up
+export RAPTOR_HOME=`pwd`
+
+# Ray tracer environment variables
+export RAYTRACER_HOME=$RAPTOR_HOME/raytracer
+export RAYTRACER_TOOLS=$RAYTRACER_HOME/tools
+export RAYTRACER_REF_PIC=$RAYTRACER_HOME/reference_pictures
+
+export RAYTRACER_SCENES=$RAYTRACER_HOME/scenes
+export RAYTRACER_MGF_SCENES=$RAYTRACER_HOME/scenes/mgf_scenes
+export RAYTRACER_SDP_SCENES=$RAYTRACER_HOME/scenes/spd3_14
+
+# Physics engine environment variables
+export PHYSICS_ENGINE_HOME=$RAPTOR_HOME/physics_engine
+
+# Set library search path
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${RAYTRACER_HOME}
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PHYSICS_ENGINE_HOME}
+
+# Set up path
+export PATH=$RAYTRACER_TOOLS:$PATH

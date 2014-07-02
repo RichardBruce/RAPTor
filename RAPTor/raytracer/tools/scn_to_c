@@ -1,0 +1,353 @@
+#!/usr/bin/env perl
+
+use strict;
+use Getopt::Long;
+
+my ($in_file, $out_file, $line, $light, @words);
+my $shape = 0;
+my $help = "";
+
+GetOptions (
+    "scn:s"       => \$in_file,
+    "c:s"         => \$out_file,
+    "help"        => \$help
+    );
+    
+if ($help)
+{
+    print "Usage scn_to_c --scn [input] -c [output]\n";
+    print "\n";
+}
+
+open(SCENE, "< $in_file")  || die "Can't open scene file $in_file\n";
+open(CODE,  "> $out_file") || die "Can't open output file $out_file\n";
+
+# Print asserts that this worked
+print CODE "#include \"scene.h\"
+
+/* Auto generated init function do not edit directly */
+void scene_init(
+    list<shape *> &lights, 
+    list<shape *> &objects, 
+    list<shape *> &everything,
+    point_t  *eye,
+    vector_t *x_vec,
+    vector_t *y_vec,
+    vector_t *z_vec)
+{
+    point_t centre;
+";
+
+
+while ($line = <SCENE>)
+{
+    my $variable_length = 0;
+
+    # Strip commas and quotes
+    $line  =~ s/\#.*$//;
+    $line  =~ s/\,/ /g;
+    if    (($line  =~ s/}/ } /g) and ($line  =~ s/{/ { /g)) { $variable_length = 1; }
+    elsif (($line  =~ s/}/ } /g) or  ($line  =~ s/{/ { /g)) { die "Error: Unmatched { or }\n"; }
+    $line  =~ s/\s+/ /g;
+    
+    # Look out for lights
+    $light = "";
+    if ($line =~ m/light/)
+    {
+        $light = "true";
+        $line =~ s/light//;
+    }
+    
+    @words = split(' ', $line);
+    # Declare centre struct
+    if ($#words <= 0)
+    {
+        next;
+    }
+    
+    # Construct classes
+    if (@words[0] =~ m/aab/)
+    {
+        #aab a3(texture(0.0,0.0,0.0,0.0,0.0,0.0,1.53, 0.1), centre, 50, 50, 50);
+        print CODE "    centre.x=@words[1];centre.y=@words[2];centre.z=@words[3];\n";
+        print CODE "    aab *a$shape = new aab(texture(@words[7],@words[8],@words[9]";
+        
+        if ($#words > 9)
+        {
+            my $i = 10;
+            for ($i; $i <= $#words; $i++)
+            {
+                print CODE ",@words[$i]";
+            }
+        }
+        
+        print CODE "),centre,@words[4],@words[5],@words[6]";
+        light("a");
+        print CODE "    everything.push_front(a$shape);\n\n";
+        $shape++;
+    
+    }
+    elsif (@words[0] =~ m/cylinder/)
+    {
+        #cylinder c11(texture(255.0,218.0,185.0),centre,100.0,100.0, 50.0,vector_t(1.0,0.0,1.0),0.5*PI);
+        print CODE "    centre.x=@words[1];centre.y=@words[2];centre.z=@words[3];\n";
+
+        # Collect the variable bit        
+        my $variable_bit  = "";
+        my $texture_start = 5;
+        if ($variable_length)
+        {
+            $variable_bit = ", @words[7]";
+            $texture_start = 9;
+            if (@words[8] !~ m/}/)
+            {
+                $variable_bit = $variable_bit . ",vector_t(@words[8],@words[9],@words[10]),@words[11]";
+                if (@words[12] !~ m/}/) { die "Error: No }\n"; }
+                $texture_start = 13;
+            }
+        }
+
+        # Print the texture
+        print CODE "    cylinder *cy$shape = new cylinder(texture(@words[$texture_start],@words[$texture_start+1],@words[$texture_start+2]";
+        if ($#words > $texture_start+2)
+        {
+            my $i = $texture_start+3;
+            for ($i; $i <= $#words; $i++)
+            {
+                print CODE ",@words[$i]";
+            }
+        }
+
+        # Print initialiser with variable bit
+        print CODE "),centre,@words[4],@words[5]";
+        if ($variable_bit)
+        {
+            print CODE "$variable_bit";        
+        }
+
+        light("cy");
+        print CODE "    everything.push_front(cy$shape);\n\n";
+        $shape++;
+    }
+    elsif (@words[0] =~ m/cone/)
+    {
+        #cone c12(texture(255.0,218.0,185.0),centre,50.0,150.0, 100.0,vector_t(1.0,0.0,0.0),1.2*PI);
+        print CODE "    centre.x=@words[1];centre.y=@words[2];centre.z=@words[3];\n";
+
+        # Collect the variable bit        
+        my $variable_bit  = "";
+        my $texture_start = 5;
+        if ($variable_length)
+        {
+            $variable_bit = ", @words[7]";
+            $texture_start = 9;
+            if (@words[8] !~ m/}/)
+            {
+                $variable_bit = $variable_bit . ",vector_t(@words[8],@words[9],@words[10]),@words[11]";
+                if (@words[12] !~ m/}/) { die "Error: No }\n"; }
+                $texture_start = 13;
+            }
+        }
+
+        # Print the texture
+        print CODE "    cone *co$shape = new cone(texture(@words[$texture_start],@words[$texture_start+1],@words[$texture_start+2]";
+        if ($#words > $texture_start+2)
+        {
+            my $i = $texture_start+3;
+            for ($i; $i <= $#words; $i++)
+            {
+                print CODE ",@words[$i]";
+            }
+        }
+
+        # Print initialiser with variable bit
+        print CODE "),centre,@words[4],@words[5]";
+        if ($variable_bit)
+        {
+            print CODE "$variable_bit";        
+        }
+
+        light("co");
+        print CODE "    everything.push_front(co$shape);\n\n";
+        $shape++;
+    }
+    elsif (@words[0] =~ m/ellipse/)
+    {
+        #ellipse e11(texture(255.0,218.0,185.0),centre,100.0,50.0, 3.0, 20.0,vector_t(1.0,1.0,1.0),0.3*PI);
+        print CODE "    centre.x=@words[1];centre.y=@words[2];centre.z=@words[3];\n";
+
+        # Collect the variable bit        
+        my $variable_bit  = "";
+        my $texture_start = 5;
+        if ($variable_length)
+        {
+            $variable_bit = ", @words[7]";
+            $texture_start = 9;
+            if (@words[8] !~ m/}/)
+            {
+                $variable_bit = $variable_bit . ",@words[8]";
+                $texture_start = 10;
+    
+                if (@words[9] !~ m/}/)
+                {
+                    $variable_bit = $variable_bit . ",vector_t(@words[9],@words[10],@words[11]),@words[12]";
+                    if (@words[13] !~ m/}/) { die "Error: No }\n"; }
+                    $texture_start = 14;
+                }
+            }
+        }
+
+        # Print the texture
+        print CODE "    ellipse *e$shape = new ellipse(texture(@words[$texture_start],@words[$texture_start+1],@words[$texture_start+2]";
+        if ($#words > $texture_start+2)
+        {
+            my $i = $texture_start+3;
+            for ($i; $i <= $#words; $i++)
+            {
+                print CODE ",@words[$i]";
+            }
+        }
+
+        # Print initialiser with variable bit
+        print CODE "),centre,@words[4],@words[5]";
+        if ($variable_bit)
+        {
+            print CODE "$variable_bit";        
+        }
+
+        light("e");
+        print CODE "    everything.push_front(e$shape);\n\n";
+        $shape++;
+    }
+    elsif (@words[0] =~ m/plane/)
+    {
+        #plane p4(texture(255.0,218.0,185.0,0.55,0.10), centre, 0.0, 1.0, 0.0);
+        print CODE "    centre.x=@words[1];centre.y=@words[2];centre.z=@words[3];\n";
+        print CODE "    plane *p$shape = new plane(texture(@words[7],@words[8],@words[9]";
+        
+        if ($#words > 9)
+        {
+            my $i = 10;
+            for ($i; $i <= $#words; $i++)
+            {
+                print CODE ", @words[$i]";
+            }
+        }
+        
+
+        print CODE "),centre,@words[4],@words[5],@words[6]";
+        light("p");
+        print CODE "    everything.push_front(p$shape);\n\n";
+        $shape++;
+    }
+    elsif (@words[0] =~ m/sphere/)
+    {
+        #sphere s0(texture(0.0,0.0,0.0,0.0,0.0,0.0,1.53, 0.0), centre, 50);
+        print CODE "    centre.x=@words[1];centre.y=@words[2];centre.z=@words[3];\n";
+        print CODE "    sphere *s$shape = new sphere(texture(@words[5],@words[6],@words[7]";
+        
+        if ($#words > 7)
+        {
+            my $i = 8;
+            for ($i; $i <= $#words; $i++)
+            {
+                print CODE ",@words[$i]";
+            }
+        }
+
+        print CODE "),centre,@words[4]";
+        light("s");
+        print CODE "    everything.push_front(s$shape);\n\n";
+        $shape++;
+    }
+    elsif (@words[0] =~ m/eye/)
+    {
+        print CODE "    eye->x = @words[1];\n";
+        print CODE "    eye->y = @words[2];\n";
+        print CODE "    eye->z = @words[3];\n";
+        print CODE "\n";
+    
+        if ($#words > 3)
+        {
+            print CODE "    z_vec->x = @words[4];\n";
+            print CODE "    z_vec->y = @words[5];\n";
+            print CODE "    z_vec->z = @words[6];\n";
+            print CODE "    /* Normalise z_vec */\n";
+            print CODE "    double size = sqrt((z_vec->x * z_vec->x) + (z_vec->y * z_vec->y) + (z_vec->z * z_vec->z));\n";
+            print CODE "    assert(size > 0);\n";
+            print CODE "    z_vec->x /= size;\n";
+            print CODE "    z_vec->y /= size;\n";
+            print CODE "    z_vec->z /= size;\n";
+            print CODE "\n";
+        }
+        if ($#words > 6)
+        {
+            print CODE "    y_vec->x= @words[7];\n";
+            print CODE "    y_vec->y= @words[8];\n";
+            print CODE "    y_vec->z= @words[9];\n";
+            print CODE "    /* Normalise y_vec */\n";
+            print CODE "    size = sqrt((y_vec->x * y_vec->x) + (y_vec->y * y_vec->y) + (y_vec->z * y_vec->z));\n";
+            print CODE "    assert(size > 0);\n";
+            print CODE "    y_vec->x /= size;\n";
+            print CODE "    y_vec->y /= size;\n";
+            print CODE "    y_vec->z /= size;\n";
+            print CODE "\n";
+        }
+        print CODE "\n";
+    }
+    else
+    {
+        die "Unknown shape @words[0]\n";
+    }
+
+}
+
+
+# Print asserts that this worked
+print CODE "
+    /* Assert there must be some objects to trace */
+    assert(!objects.empty());
+    
+    /* Assert there must be some lights to light the scene */
+    assert(!lights.empty());
+
+    /* Assert there is an imagine to trace */
+    assert(!everything.empty());
+    
+    return;
+}
+
+void scene_clean(list<shape *> &everything)
+{
+    while (!everything.empty())
+    {
+        delete everything.front();
+        everything.pop_front();
+    }
+    return;
+}
+";
+
+
+close(SCENE);
+close(CODE);
+
+exit 0;
+
+# Sub routine to write if the object is a light and 
+# add it to the appropriate list
+sub light
+{
+    my $prefix = shift(@_);
+    
+    if ($light)
+    {
+        print CODE ",$light);\n";
+        print CODE "    lights.push_front($prefix$shape);\n";
+    }
+    else
+    {
+        print CODE ");\n";
+        print CODE "    objects.push_front($prefix$shape);\n";
+    }
+}

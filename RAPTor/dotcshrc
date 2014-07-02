@@ -1,0 +1,44 @@
+#!/usr/bin/env csh
+
+# Source uber dotcshrc
+cd ..
+source dotcshrc
+cd -
+
+# General set up
+setenv RAPTOR_HOME `pwd`
+setenv RAPTOR_LIBS $RAPTOR_HOME/lib
+
+# Library version numbers
+setenv SDL_VER 1.2.13
+setenv SPD_VER 3_14
+setenv TBB_VER 22_20090809oss
+setenv FFTW_VER 3.2.2
+
+# Ray tracer environment variables
+setenv RAYTRACER_HOME $RAPTOR_HOME/raytracer
+setenv RAYTRACER_TOOLS $RAYTRACER_HOME/tools
+setenv RAYTRACER_REF_PIC $RAYTRACER_HOME/reference_pictures
+
+setenv RAYTRACER_SCENES $RAYTRACER_HOME/scenes
+setenv RAYTRACER_MGF_SCENES $RAYTRACER_HOME/scenes/mgf_scenes
+setenv RAYTRACER_SDP_SCENES $RAYTRACER_HOME/scenes/spd3_14
+
+# Physics engine environment variables
+setenv PHYSICS_ENGINE_HOME $RAPTOR_HOME/physics_engine
+
+# Set library search path
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${RAYTRACER_HOME}
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${PHYSICS_ENGINE_HOME}
+
+# Thread Building Blocks setup
+setenv TBB_INSTALL_DIR ${RAPTOR_LIBS}/tbb${TBB_VER}
+if ( ! -e $TBB_INSTALL_DIR ) then
+    ( cd $RAPTOR_LIBS ; make tbb$TBB_VER )
+endif
+source $TBB_INSTALL_DIR/build/build_release/tbbvars.csh
+
+
+# Set up path
+set path = ( $RAYTRACER_TOOLS $path )
+set path = ( $RAPTOR_LIBS/SDL-$SDL_VER/bin $path )

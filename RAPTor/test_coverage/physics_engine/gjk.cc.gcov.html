@@ -1,0 +1,379 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Test Coverage - physics_engine/gjk.cc</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">physics_engine</a> - gjk.cc<span style="font-size: 80%;"> (source / <a href="gjk.cc.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Test Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">65</td>
+            <td class="headerCovTableEntry">132</td>
+            <td class="headerCovTableEntryLo">49.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2014-01-16</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryMed">80.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #include &quot;gjk.h&quot;</a>
+<span class="lineNum">       2 </span>            : #include &quot;physics_common.h&quot;
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : 
+<a name="5"><span class="lineNum">       5 </span>            : namespace raptor_physics</a>
+<span class="lineNum">       6 </span>            : {              
+<span class="lineNum">       7 </span><span class="lineCov">        480 : bool gjk::find_minimum_distance(point_t *const dist, const point_t &amp;fixed_rel_disp, const point_t &amp;float_rel_disp, const bool force_disp)</span>
+<span class="lineNum">       8 </span>            : {
+<span class="lineNum">       9 </span><span class="lineCov">        480 :     METHOD_LOG;</span>
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span><span class="lineCov">        480 :     point_t dir;</span>
+<span class="lineNum">      12 </span><span class="lineCov">        480 :     point_t c_space[4];</span>
+<span class="lineNum">      13 </span>            :     int min_verts[4];
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span><span class="lineCov">        960 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Fixed relative displacement: &quot; &lt;&lt; fixed_rel_disp;</span>
+<span class="lineNum">      16 </span><span class="lineCov">        960 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Floating relative displacement: &quot; &lt;&lt; float_rel_disp;</span>
+<span class="lineNum">      17 </span>            :     
+<span class="lineNum">      18 </span>            :    //cout &lt;&lt; &quot;Object a:&quot; &lt;&lt; endl;
+<span class="lineNum">      19 </span>            :    //_a.dump();
+<span class="lineNum">      20 </span>            :    //cout &lt;&lt; &quot;Object b:&quot; &lt;&lt; endl;
+<span class="lineNum">      21 </span>            :    //_b.dump();
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            :     /* Until converged */
+<span class="lineNum">      24 </span>            :     while (true)
+<span class="lineNum">      25 </span>            :     {
+<span class="lineNum">      26 </span>            :         /* Sample c space at the vertices of the current simplices */
+<span class="lineNum">      27 </span><span class="lineCov">       1440 :         _a_simplex-&gt;compute_c_space(*_b_simplex, c_space, fixed_rel_disp, float_rel_disp);</span>
+<span class="lineNum">      28 </span>            :         
+<span class="lineNum">      29 </span>            :         /* Search c space for the closest point to the origin */
+<span class="lineNum">      30 </span>            :         /* Return the closest feature and a line to it from the origin */
+<span class="lineNum">      31 </span><span class="lineCov">       1440 :         const int min_simplex = find_closest_feature_to_origin(c_space, min_verts, &amp;dir);</span>
+<span class="lineNum">      32 </span><span class="lineCov">       2880 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Minimum simplex size: &quot; &lt;&lt; min_simplex;</span>
+<span class="lineNum">      33 </span><span class="lineCov">       2880 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Direction: &quot; &lt;&lt; dir;</span>
+<span class="lineNum">      34 </span>            :         
+<span class="lineNum">      35 </span>            :         /* The origin is contained within the simplices */
+<span class="lineNum">      36 </span><span class="lineCov">       1440 :         if ((min_simplex == 4) || (magnitude(dir) &lt; raptor_physics::EPSILON))</span>
+<span class="lineNum">      37 </span>            :         {
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :             (*dist) = point_t(0.0, 0.0, 0.0);</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :             BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Hit&quot;;</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :             return true;</span>
+<span class="lineNum">      41 </span>            :         }
+<span class="lineNum">      42 </span>            :         
+<span class="lineNum">      43 </span>            :         /* Update the simplices */
+<span class="lineNum">      44 </span><span class="lineCov">       1440 :         const int a_sup = find_support_vertex(_a, -dir, float_rel_disp, force_disp);</span>
+<span class="lineNum">      45 </span><span class="lineCov">       1440 :         const int b_sup = raptor_physics::find_support_vertex(_b,  dir);</span>
+<span class="lineNum">      46 </span><span class="lineCov">       2880 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Support vertex search found: &quot; &lt;&lt; a_sup &lt;&lt; &quot; &quot; &lt;&lt; b_sup;</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">       1440 :         const bool improve = _a_simplex-&gt;is_new_pair(*_b_simplex, a_sup, b_sup);</span>
+<span class="lineNum">      49 </span><span class="lineCov">       1440 :         _a_simplex-&gt;retain_vertices(min_verts, min_simplex);</span>
+<span class="lineNum">      50 </span><span class="lineCov">       1440 :         _b_simplex-&gt;retain_vertices(min_verts, min_simplex);</span>
+<span class="lineNum">      51 </span><span class="lineCov">       1440 :         if (!improve)</span>
+<span class="lineNum">      52 </span>            :         {
+<span class="lineNum">      53 </span><span class="lineCov">        480 :             (*dist) = dir;</span>
+<span class="lineNum">      54 </span><span class="lineCov">        960 :             BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;No hit, distance: &quot; &lt;&lt; (*dist);</span>
+<span class="lineNum">      55 </span><span class="lineCov">        480 :             return false;</span>
+<span class="lineNum">      56 </span>            :         }
+<span class="lineNum">      57 </span>            :         
+<span class="lineNum">      58 </span><span class="lineCov">        960 :         _a_simplex-&gt;add(a_sup);</span>
+<span class="lineNum">      59 </span><span class="lineCov">        960 :         _b_simplex-&gt;add(b_sup);</span>
+<span class="lineNum">      60 </span><span class="lineCov">        480 :     }</span>
+<a name="61"><span class="lineNum">      61 </span>            : }</a>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineCov">       1440 : int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const verts, point_t *const dir) const</span>
+<span class="lineNum">      64 </span>            : {
+<span class="lineNum">      65 </span><span class="lineCov">       1440 :     METHOD_LOG;</span>
+<span class="lineNum">      66 </span>            :     
+<span class="lineNum">      67 </span>            :     /* Find the closest point to the origin */
+<span class="lineNum">      68 </span><span class="lineCov">       1440 :     unsigned int size = _a_simplex-&gt;size();</span>
+<span class="lineNum">      69 </span><span class="lineCov">       1440 :     if (size == 1)</span>
+<span class="lineNum">      70 </span>            :     {
+<span class="lineNum">      71 </span>            :         /* Simple case, this must be the closest point */
+<span class="lineNum">      72 </span><span class="lineCov">        480 :         verts[0] = 0;</span>
+<span class="lineNum">      73 </span><span class="lineCov">        480 :         (*dir) = c_space[0];</span>
+<span class="lineNum">      74 </span><span class="lineCov">        480 :         return 1;</span>
+<span class="lineNum">      75 </span>            :     }
+<span class="lineNum">      76 </span>            :         
+<span class="lineNum">      77 </span>            :     /* Build edges of the simplex */
+<span class="lineNum">      78 </span>            :     /* Output is: [ 0,       Q1 - Q2, Q1 - Q3, Q1 - Q4] */
+<span class="lineNum">      79 </span>            :     /*            [ Q2 - Q1, 0,       Q2 - Q3, Q2 - Q4] */
+<span class="lineNum">      80 </span>            :     /*            [ Q3 - Q1, Q3 - Q2, 0        Q3 - Q4] */
+<span class="lineNum">      81 </span>            :     /*            [ Q4 - Q1, Q4 - Q2, Q4 - Q3, 0      ] */
+<span class="lineNum">      82 </span><span class="lineCov">        960 :     point_t diffs[16];</span>
+<span class="lineNum">      83 </span><span class="lineCov">       3024 :     for (unsigned int i = 0; i &lt; size; i++)</span>
+<span class="lineNum">      84 </span>            :     {
+<span class="lineNum">      85 </span><span class="lineCov">       3312 :         for (unsigned int j = i + 1; j &lt; size; j++)</span>
+<span class="lineNum">      86 </span>            :         {
+<span class="lineNum">      87 </span><span class="lineCov">       1248 :             diffs[(i &lt;&lt; 2) + j] = c_space[i] - c_space[j];</span>
+<span class="lineNum">      88 </span><span class="lineCov">       1248 :             diffs[(j &lt;&lt; 2) + i] = -diffs[(i &lt;&lt; 2) + j];</span>
+<span class="lineNum">      89 </span>            :         }
+<span class="lineNum">      90 </span>            :     }
+<span class="lineNum">      91 </span>            :         
+<span class="lineNum">      92 </span>            :     /* Take dot product of points and edges */
+<span class="lineNum">      93 </span>            :     /* Output is: [0,               Q1 . (Q1 - Q2), Q1 . (Q1 - Q3), Q1 . (Q1 - Q4)] */
+<span class="lineNum">      94 </span>            :     /*            [ Q2 . (Q2 - Q1), 0             , Q2 . (Q2 - Q3), Q2 . (Q2 - Q4)] */
+<span class="lineNum">      95 </span>            :     /*            [ Q3 . (Q3 - Q1), Q3 . (Q3 - Q2), 0,              Q3 . (Q3 - Q4)] */
+<span class="lineNum">      96 </span>            :     /*            [ Q4 . (Q4 - Q1), Q4 . (Q4 - Q2), Q4 . (Q4 - Q3), 0             ] */
+<span class="lineNum">      97 </span>            :     fp_t dot_prods[16];
+<span class="lineNum">      98 </span><span class="lineCov">       3024 :     for (unsigned int i = 0; i &lt; size; i++)</span>
+<span class="lineNum">      99 </span>            :     {
+<span class="lineNum">     100 </span><span class="lineCov">       6624 :         for (unsigned int j = 0; j &lt; size; j++)</span>
+<span class="lineNum">     101 </span>            :         {
+<span class="lineNum">     102 </span><span class="lineCov">       4560 :             if (i != j)</span>
+<span class="lineNum">     103 </span>            :             {
+<span class="lineNum">     104 </span><span class="lineCov">       2496 :                 dot_prods[(i &lt;&lt; 2) + j] = dot_product(c_space[i], diffs[(i &lt;&lt; 2) + j]);</span>
+<span class="lineNum">     105 </span>            :             }
+<span class="lineNum">     106 </span>            :         }
+<span class="lineNum">     107 </span>            :     }
+<span class="lineNum">     108 </span>            :     
+<span class="lineNum">     109 </span>            :     /* Check vertices */
+<span class="lineNum">     110 </span><span class="lineCov">       2688 :     for (unsigned int i = 0; i &lt; size; i++)</span>
+<span class="lineNum">     111 </span>            :     {
+<span class="lineNum">     112 </span><span class="lineCov">       2064 :         bool this_vert = true;</span>
+<span class="lineNum">     113 </span><span class="lineCov">       6624 :         for (unsigned int j = 0; j &lt; size; j++)</span>
+<span class="lineNum">     114 </span>            :         {
+<span class="lineNum">     115 </span><span class="lineCov">       4560 :             this_vert &amp;= ((i == j) || (dot_prods[(i &lt;&lt; 2) + j] &lt;= 0.0));</span>
+<span class="lineNum">     116 </span>            :         }
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            :         /* Return this vert as the closest */
+<span class="lineNum">     119 </span><span class="lineCov">       2064 :         if (this_vert)</span>
+<span class="lineNum">     120 </span>            :         {
+<span class="lineNum">     121 </span><span class="lineCov">        336 :             verts[0] = i;</span>
+<span class="lineNum">     122 </span><span class="lineCov">        336 :             (*dir) = c_space[i];</span>
+<span class="lineNum">     123 </span><span class="lineCov">        336 :             return 1;</span>
+<span class="lineNum">     124 </span>            :         }
+<span class="lineNum">     125 </span>            :     }
+<span class="lineNum">     126 </span>            :     
+<span class="lineNum">     127 </span>            :     /* Its not a vertex and there's only 2 vertices so it must be an edge */
+<span class="lineNum">     128 </span><span class="lineCov">        624 :     if (size == 2)</span>
+<span class="lineNum">     129 </span>            :     {
+<span class="lineNum">     130 </span><span class="lineCov">        480 :         verts[0] = 0;</span>
+<span class="lineNum">     131 </span><span class="lineCov">        480 :         verts[1] = 1;</span>
+<span class="lineNum">     132 </span><span class="lineCov">        480 :         const fp_t magn_diff = dot_product(diffs[1], diffs[1]);</span>
+<span class="lineNum">     133 </span><span class="lineCov">        480 :         const fp_t dot_prod = dot_product(c_space[0], diffs[1]);</span>
+<span class="lineNum">     134 </span><span class="lineCov">        480 :         (*dir) = c_space[0] - ((diffs[1] * dot_prod) / magn_diff);</span>
+<span class="lineNum">     135 </span><span class="lineCov">        480 :         return 2;</span>
+<span class="lineNum">     136 </span>            :     }
+<span class="lineNum">     137 </span>            :         
+<span class="lineNum">     138 </span>            :     /* Build face normals */
+<span class="lineNum">     139 </span><span class="lineCov">        144 :     point_t norms[4];</span>
+<span class="lineNum">     140 </span><span class="lineCov">        144 :     cross_product(diffs[ 4], diffs[8], &amp;norms[0]); /* n123 = (Q2 - Q1) x (Q3 - Q1) */</span>
+<span class="lineNum">     141 </span><span class="lineCov">        144 :     if (size == 3)</span>
+<span class="lineNum">     142 </span>            :     {
+<span class="lineNum">     143 </span><span class="lineCov">        144 :         norms[1] = -norms[0];</span>
+<span class="lineNum">     144 </span><span class="lineCov">        144 :         norms[2] =  norms[1];</span>
+<span class="lineNum">     145 </span><span class="lineCov">        144 :         norms[3] =  norms[1];</span>
+<span class="lineNum">     146 </span>            :     }
+<span class="lineNum">     147 </span>            :     else
+<span class="lineNum">     148 </span>            :     {
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :         cross_product(diffs[12], diffs[4], &amp;norms[1]); /* n142 = (Q4 - Q1) x (Q2 - Q1) */</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :         cross_product(diffs[14], diffs[2], &amp;norms[2]); /* n341 = (Q4 - Q3) x (Q1 - Q3) */</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :         cross_product(diffs[13], diffs[9], &amp;norms[3]); /* n243 = (Q4 - Q2) x (Q3 - Q2) */</span>
+<span class="lineNum">     152 </span>            :     }
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :     /* Check edges */
+<span class="lineNum">     155 </span>            :     /* Q1 . (Q1 - Q2) &gt;= 0.0 */
+<span class="lineNum">     156 </span>            :     /* Q2 . (Q2 - Q1) &gt;= 0.0 */
+<span class="lineNum">     157 </span>            :     /* Q1 . ((Q1 - Q2) x n123) &gt;= 0.0 */
+<span class="lineNum">     158 </span>            :     /* Q1 . (n142 x (Q1 - Q2)) &gt;= 0.0 */
+<span class="lineNum">     159 </span>            :     /* Q1 to Q3 */
+<span class="lineNum">     160 </span><span class="lineCov">        144 :     if (test_edge(norms[2], norms[0], dot_prods[2], dot_prods[ 8], diffs[2], c_space[0], 0, 2, verts, dir))</span>
+<span class="lineNum">     161 </span>            :     {
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :         return 2;</span>
+<span class="lineNum">     163 </span>            :     }
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :     /* Q2 to Q3 */
+<span class="lineNum">     166 </span><span class="lineCov">        144 :     if (test_edge(norms[0], norms[3], dot_prods[6], dot_prods[ 9], diffs[6], c_space[1], 1, 2, verts, dir))</span>
+<span class="lineNum">     167 </span>            :     {
+<span class="lineNum">     168 </span><span class="lineCov">        144 :         return 2;</span>
+<span class="lineNum">     169 </span>            :     }
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            :     /* Q1 to Q3 and Q4 */
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :     if (test_edge(norms[0], norms[1], dot_prods[1], dot_prods[ 4], diffs[1], c_space[0], 0, 1, verts, dir))</span>
+<span class="lineNum">     173 </span>            :     {
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :         return 2;</span>
+<span class="lineNum">     175 </span>            :     }
+<span class="lineNum">     176 </span>            :     
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :     if ((size != 3) &amp;&amp; test_edge(norms[1], norms[2], dot_prods[3], dot_prods[12], diffs[3], c_space[0], 0,  3, verts, dir))</span>
+<span class="lineNum">     178 </span>            :     {
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :         return 2;</span>
+<span class="lineNum">     180 </span>            :     }
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            :     /* Q2 to Q4 */
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :     if ((size != 3) &amp;&amp; test_edge(norms[3], norms[1], dot_prods[7], dot_prods[13], diffs[7], c_space[1], 1, 3, verts, dir))</span>
+<span class="lineNum">     184 </span>            :     {
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :         return 2;</span>
+<span class="lineNum">     186 </span>            :     }
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            :     /* Q3 to Q4 */
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :     if ((size != 3) &amp;&amp; test_edge(norms[2], norms[3], dot_prods[11], dot_prods[14], diffs[11], c_space[2], 2, 3, verts, dir))</span>
+<span class="lineNum">     190 </span>            :     {
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :         return 2;</span>
+<span class="lineNum">     192 </span>            :     }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            :     /* Its not a vertex or an edge and there's only 3 vertices so it must be a face */
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :     if (size == 3)</span>
+<span class="lineNum">     196 </span>            :     {
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :         const fp_t a = dot_product(norms[0], c_space[0]);</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :         verts[1] = 1;</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :         if (a &lt; 0.0)</span>
+<span class="lineNum">     200 </span>            :         {
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :             verts[0] = 2;</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :             verts[2] = 0;</span>
+<span class="lineNum">     203 </span>            :         }
+<span class="lineNum">     204 </span>            :         else
+<span class="lineNum">     205 </span>            :         {
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :             verts[0] = 0;</span>
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :             verts[2] = 2;</span>
+<span class="lineNum">     208 </span>            :         }
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :         const fp_t b = dot_product(norms[0], norms[0]);</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :         (*dir) = norms[0] * (a / b);</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :         return 3;</span>
+<span class="lineNum">     213 </span>            :     }
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            :     /* Check faces */
+<span class="lineNum">     216 </span>            :     /* The first 6 checks make sure the origin is within the face */
+<span class="lineNum">     217 </span>            :     /* This is normally covered by the edge checks unless you have co-planar */
+<span class="lineNum">     218 </span>            :     /* or close to co-planar faces */
+<span class="lineNum">     219 </span>            :     /* Return faces in reverse order to reverse the normal and ensure integrity */
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :     if ((dot_product(c_space[1], norms[1]) &lt; 0.0) &amp;&amp;</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :         in_triangle(norms[1], diffs[1], diffs[13], c_space[1], dir, verts, 1, 3, 0))</span>
+<span class="lineNum">     222 </span>            :     {
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :         return 3;</span>
+<span class="lineNum">     224 </span>            :     }
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :     if ((dot_product(c_space[2], norms[2]) &lt; 0.0) &amp;&amp;</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :         in_triangle(norms[2], diffs[14], diffs[2], c_space[2], dir, verts, 0, 3, 2))</span>
+<span class="lineNum">     228 </span>            :     {
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :         return 3;</span>
+<span class="lineNum">     230 </span>            :     }
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :     if ((dot_product(c_space[3], norms[3]) &lt; 0.0) &amp;&amp;</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :         in_triangle(norms[3], diffs[7], diffs[11], c_space[3], dir, verts, 2, 3, 1))</span>
+<span class="lineNum">     234 </span>            :     {
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :         return 3;</span>
+<span class="lineNum">     236 </span>            :     }
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :     if ((dot_product(c_space[0], norms[0]) &lt; 0.0) &amp;&amp;</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :         in_triangle(norms[0], diffs[4], diffs[8], c_space[0], dir, verts, 2, 1, 0))</span>
+<span class="lineNum">     240 </span>            :     {
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :         return 3;</span>
+<span class="lineNum">     242 </span>            :     }
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            :     /* Size must be 4 (ie, simplex is a tetrahedron) and the origin is inside it */
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :     verts[0] = 0;</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :     verts[1] = 1;</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :     verts[2] = 2;</span>
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :     verts[3] = 3;</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :     (*dir) = point_t(0.0, 0.0, 0.0);</span>
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :     return 4;</span>
+<span class="lineNum">     251 </span>            : }
+<a name="252"><span class="lineNum">     252 </span>            : </a>
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 : bool gjk::in_triangle(const point_t &amp;n, const point_t &amp;d0, const point_t &amp;d1, const point_t &amp;c, </span>
+<span class="lineNum">     255 </span>            :     point_t *d, int *verts, const int v0, const int v1, const int v2) const
+<span class="lineNum">     256 </span>            : {
+<span class="lineNum">     257 </span>            :     /* Get intersecting point of line and triangles plane */
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :     const fp_t a = dot_product(n, c);</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :     const fp_t b = dot_product(n, n);</span>
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :     const fp_t r = a / b;</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :     const point_t dir(n * r);</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :     const point_t w(dir - c);</span>
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            :     /* Calculate and test barycentric coordinates */
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :     const fp_t uu = dot_product(d0, d0);</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :     const fp_t uv = dot_product(d0, d1);</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :     const fp_t vv = dot_product(d1, d1);</span>
+<span class="lineNum">     269 </span>            :     
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :     const fp_t wu = dot_product(w, d0);</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :     const fp_t wv = dot_product(w, d1);</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :     const fp_t no = uv * uv - uu * vv;</span>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :     const fp_t s = ((uv * wv) - (vv * wu)) / no;</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :     if (s &lt; -raptor_physics::EPSILON || s &gt; 1.0)</span>
+<span class="lineNum">     276 </span>            :     {
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">     278 </span>            :     }
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :     const fp_t t = ((uv * wu) - (uu * wv)) / no;</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :     if (t &lt; -raptor_physics::EPSILON || (s + t) &gt; 1.0)</span>
+<span class="lineNum">     282 </span>            :     {
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">     284 </span>            :     }
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            :     /* Set output and return hit */
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :     verts[0] = v0;</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :     verts[1] = v1;</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :     verts[2] = v2;</span>
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :     (*d) = dir;</span>
+<span class="lineNum">     292 </span>            : 
+<a name="293"><span class="lineNum">     293 </span><span class="lineNoCov">          0 :     return true;</span></a>
+<span class="lineNum">     294 </span>            : }
+<span class="lineNum">     295 </span><span class="lineCov">         36 : }; /* namespace raptor_physics */</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

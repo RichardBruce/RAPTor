@@ -1,0 +1,82 @@
+-- Directory structure --
+
+* 'anim':
+
+  Contains files with arguments and waypoints for generating animations.
+  The arguments file specifies model type & path, camera orientation, lights, fps and many other
+  things that are described further in the 'usage' section below.
+  NOTE: This directory should probably be renamed to something else, e.g. 'config' or 'args'.
+
+* 'src':
+
+  Contains the 'rt_anim.py' script for generating animations. The arguments from the 'anim' folder
+  are passed to the script.
+
+
+-- Usage --
+
+* Generating an animation:
+
+  To generate an animation, simply run the 'rt_anim.py' script with arguments from the 'anim' folder.
+  For example:
+  	
+  	cd anim/sponza
+  	../../src/rt_anim.py `cat sponza_args`
+
+  The script will create an output folder containing the rendered frames as well as an avi file with
+  the video generated from the frames.
+
+* Options:
+
+  For an example of the option format, you may refer to 'animation/anim/sponza/sponza_args'.
+  (*) means you may specify more than one of these options.
+
+  --model_type   [obj|nff|lwo|mgf]
+  --model_path   [path]                        : E.g. scenes/obj_scenes/sponza/sponza.obj
+  --cam_up       [x y z]
+  --cam_fwd      [x y z]
+  --cam_right    [x y z]
+  --light (*)    [x y z ra r g b d]            : ra=radius, [r g b]=colour, d=intensity fall off
+  --fps          [number of frames per second] : Sets fps_render and fps_video to the same value.
+  --fps_render   [number of frames per second] : Sets fps to use when rendering.
+  --fps_video    [number of frames per second] : Sets fps to use when encoding video.
+  --x_res        [horizontal resolution]
+  --y_res        [vertical resolution]
+  --output_dir   [path]                        : Path to directory to store rendered images.
+  --cam_mode     [left|right|both]             : left=left eye camera only, both=both eyes (for 3d)
+  --out_vid_name [filename]                    : Path & name of avi file to generate, e.g.
+                                                 '/some/path/sponza.avi'
+  --start_at     [frame number]                : Start rendering from a given frame.
+  --end_at       [frame_number]                : End rendering at a given frame.
+  --remove_pics_after_merge                    : When using --cam_mode both, remove the left and
+                                                 right camera snapshots after merging them.
+  --waypoints    [filename]                    : Name of file containing camera waypoints, e.g.
+                                                 'sponza_waypoints'.
+  --dont_merge                                 : In cam_mode both, don't merge left and right camera,
+                                                 unless the merged file is missing. Default behaviour
+                                                 is to always merge and overwrite existing files.  
+  --silent                                     : Suppress printouts.
+  --skip_render	                               : Don't render, assume snapshot files already exist.
+  --left_cam     [path/filename pattern]       : Path and filename pattern for left camera snapshots,
+                                                 where %d is used in place of an integer frame number.
+                                                 NOTE: excluding suffix. E.g.: '/some/path/bla_%d_rgh'
+  --right_cam    [path/filename pattern]       : Path and filename pattern for right camera snapshots,
+                                                 where %d is used in place of an integer frame number.
+                                                 NOTE: excluding suffix. E.g.: '/some/path/bla_%d_rgh'
+* Waypoints:
+
+  The waypoints file contains intermediate positions for the camera while generating the animation. The
+  camera position is interpolated between waypoints. Waypoints can be edited as illustrated in the file
+  'anim/sponza/sponza_waypoints'. Each line in the waypoints file (except lines prefixed by #, which are
+  comments) describes a waypoint of the format:
+  
+  x y z sec foc eye
+
+  x y z = camera position
+  sec   = seconds between waypoints
+  foc   = focus distance, the distance to the point where left and right eyes (cameras) view vectors cross
+  eye   = eye distance, the separation distance of the two eyes
+  
+  Two consecutive lines describe the movement of the camera(s) between two waypoints, starting at the top
+  of the file. The sec,foc,eye configuration of the beginning waypoint is used during the movement towards
+  the end waypoint. (That means, the sec,foc,eye of the last line in the waypoints file will never be used).

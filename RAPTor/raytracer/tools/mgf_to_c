@@ -1,0 +1,1785 @@
+#!/usr/bin/env perl
+
+use strict;
+use Getopt::Long;
+
+my ($in_file, $out_file, $line, $eof, $light, @words, @points);
+my $line_nr = 0;
+my $verbose = 0;
+
+my $global_scale = 1.0;
+
+my @objects_in_scope;
+
+my $pi = 3.1415926535897932384626433;
+
+# Pick mid grey default material
+my @current_colour  = qw( 128.0 128.0 128.0 );
+my $current_material = "default_shading";
+my $default_shader_in_use = 0;
+
+# File instantiation
+my @file_stack;
+my @line_nr_stack;
+
+# Transformations
+my @transforms;
+my %complete_transforms = {  };
+
+# Hashes for primitive look up
+my %point_positions = { };
+my %normals         = { };
+my %colours         = { };
+my %emmitters       = { };
+my %materials       = { };
+my %objects         = { };
+
+# Number of each primitive
+my $triangle_nr = 0;
+my $ring_nr     = 0;
+my $sphere_nr   = 0;
+my $cylinder_nr = 0;
+my $cone_nr     = 0;
+
+my $help        = "";
+
+# Camera set up
+my $cam_pos = "0.0,0.0,-20.0";
+my $rx      = 0.0;
+my $ry      = 0.0;
+my $rz      = 0.0;
+my $dx      = "1.0,0.0,0.0";
+my $dy      = "0.0,1.0,0.0";
+my $dz      = "0.0,0.0,1.0";
+my $bg      = "0.0,0.0,0.0";
+
+# Lights
+my $light_spec = "";
+my $light_nr   = 0;
+
+GetOptions (
+    "mgf:s"       => \$in_file,
+    "c:s"         => \$out_file,
+    "cam:s"       => \$cam_pos,
+    "rx:s"        => \$rx,
+    "ry:s"        => \$ry,
+    "rz:s"        => \$rz,
+    "dx:s"        => \$dx,
+    "dy:s"        => \$dy,
+    "dz:s"        => \$dz,
+    "bg:s"        => \$bg,
+    "l:s"         => \$light_spec,
+    "s:i"         => \$global_scale,
+    "v"           => \$verbose,
+    "help"        => \$help
+    );
+
+# Scale camera position
+my @cam_pos = split (",", $cam_pos);
+@cam_pos[0] *= $global_scale;
+@cam_pos[1] *= $global_scale;
+@cam_pos[2] *= $global_scale;
+$cam_pos = join(',', @cam_pos);
+
+# Append to transforms to scale the scene
+if ( $global_scale != 1.0 )
+{
+    push @transforms, "-s";
+    push @transforms, $global_scale;
+}
+
+
+if ($help)
+{
+    print "Usage scn_to_c --mgf [input] -c [output] [cam|rx|ry|rz|dx|dy|dz|l|s]\n";
+    print "     input   : Input file in mgf format.\n";
+    print "     output  : Output file in c++ format.\n";
+    print "     cam     : Position of the camera.\n";
+    print "     rx      : Angle to rotate the camera about the x axis.\n";
+    print "     ry      : Angle to rotate the camera about the y axis.\n";
+    print "     rz      : Angle to rotate the camera about the z axis.\n";
+    print "     dx      : Direction of the x axis\n";
+    print "     dy      : Direction of the y axis\n";
+    print "     dz      : Direction of the z axis\n";
+    print "     bg      : Back ground colour in rgb format\n";
+    print "     l       : Positon and size of lights\n";
+    print "     s       : Value to scale the whole scene by\n";
+    print "\n";
+    print "Postions and colours should be specified as a triplet =\"x.x,y.y,z.z\"\n";
+    print "\n";
+    print "Rotations are specified in radians. \n";
+    print "You may specify a rotation using Pi =\"0.5PI\".\n";
+    print "\n";
+    print "Directions must be orthogonal and normal\n";
+    print "\n";
+    print "Lights are specified as a quadruplet =\"(x.x,y.y,z.z,s.s)\"\n";
+    print "s is the size of the light\n";
+    print "Multiple, semi-colon separated, quadruplets may be specified\n";
+    print "\n";
+    exit;
+}
+
+open(SCENE, "< $in_file")  || die "Can't open mgf file: $in_file\n";
+open(CODE,  "> $out_file") || die "Can't open output file: $out_file\n";
+
+# Pack into point_t and vector_t types
+$cam_pos    = "point_t($cam_pos)";
+$dx         = "vector_t($dx)";
+$dy         = "vector_t($dy)";
+$dz         = "vector_t($dz)";
+$bg         = "ext_colour_t($bg)";
+
+
+# Print function definition
+print CODE "#include \"scene.h\"
+
+
+/* Auto generated init function do not edit directly */
+void scene_init(list<shape *> &lights, list<shape *> &everything, list<material *> &materials, camera **c)
+{
+    /* Set up the camera */
+    *c = new camera($cam_pos, $dx, $dy, $dz, $bg, (fp_t)7.5, (fp_t)10.0, (fp_t)10.0, 640, 480);
+
+";
+
+# Add rotate about x
+if ($rx != 0.0)
+{
+    print CODE "    /* Rotate the camera about x */
+    *c->tilt($rx);
+
+";
+}
+
+# Add rotate about y
+if ($ry != 0.0)
+{
+    print CODE "    /* Rotate the camera about y */
+    *c->pan($ry);
+
+";
+}
+
+# Add rotate about z
+if ($rz != 0.0)
+{
+    print CODE "    /* Rotate the camera about z */
+    *c->roll($rz);
+
+";
+}
+
+my @lights = split (";", $light_spec);
+print "Warning: No lights specified\n" unless ( $light_spec );
+
+if ( @lights )
+{
+    print CODE "    /* Lights */\n";
+    print CODE "    point_t centre;\n";
+
+    print CODE "    light_shader *light = new light_shader(ext_colour_t(255.0,255.0,255.0));\n";
+    print CODE "    materials.push_back(light);\n";
+    foreach (@lights)
+    {
+        @_ = split (",", $_);
+        die "Error: Incorrectly specified light: @_\n" unless ($#_ == 3);
+        
+        # Scale the lights
+        @_[0] *= $global_scale;
+        @_[1] *= $global_scale;
+        @_[2] *= $global_scale;
+        @_[3] *= $global_scale;
+        
+        print CODE "    centre = point_t(@_[0],@_[1],@_[2]);
+    sphere *l$light_nr = new sphere(light,centre,@_[3],true);
+    lights.push_front(l$light_nr);
+    everything.push_front(l$light_nr);
+    
+";
+        $light_nr++;
+    }
+}
+
+
+MAIN_LOOP:
+parse_line_into_words();
+while (!$eof)
+{
+    my $variable_length = 0;
+
+    # Construct points for vertices
+    if (@words[0] =~ m/^v$/)
+    {
+        die "Error: Point incorrectly defined: " . $line_nr . " @words\n" unless ($#words < 4);
+        my $point_name = @words[1];
+        
+        # Copying a point
+        if ($#words == 3)
+        {
+            die "Error: Point incorrectly defined: " . $line_nr . "\n" unless (@words[2] =~ m/=$/);
+            die "Error: Reference of unknown point @words[3] line: $line_nr @words" unless exists $point_positions{@words[3]};
+            @words = @{$point_positions{@words[3]}};
+            unshift @words, $point_name;
+    
+            # Re-defining a point
+            if (exists $point_positions{$point_name})
+            {
+                print CODE "    $point_name = point_t(@words[1], @words[2], @words[3]);\n";
+            }
+            # Adding a new point
+            else
+            {
+                print CODE "    point_t $point_name(@words[1], @words[2], @words[3]);\n";
+            }
+
+            $point_positions{$point_name} = [ @words[1], @words[2], @words[3] ];
+            parse_line_into_words();
+        }
+        else
+        {
+            # Re-defining a point
+            if (exists $point_positions{$point_name})
+            {
+                parse_line_into_words();
+                die "Error: Point incorrectly defined: " . ($line_nr-1) . "\n" unless ((@words[0] =~ m/p$/) & ($#words == 3));
+                print CODE "    $point_name = point_t(@words[1], @words[2], @words[3]);\n";
+            }
+            # Adding a new point
+            else
+            {
+                print CODE "    point_t " . $point_name . "(";
+                parse_line_into_words();
+                die "Error: Point incorrectly defined: " . ($line_nr-1) . "\n" unless ((@words[0] =~ m/p$/) & ($#words == 3));
+                print CODE "@words[1], @words[2], @words[3]);\n";
+            }
+                    
+            $point_positions{$point_name} = [ @words[1], @words[2], @words[3] ];
+            parse_line_into_words();
+            
+            # Parse optional normal
+            if (@words[0] =~ m/n$/)
+            {
+                die "Error: Normal incorrectly defined: " . ($line_nr-1) . "\n" unless ($#words == 3);
+                $normals{$point_name} = [ @words[1], @words[2], @words[3] ];
+                parse_line_into_words();
+            }
+        }
+    }
+    # Read a transform
+    elsif (@words[0] =~ m/^xf$/)
+    {
+        # Pop the last transform
+        if ($#words == 0)
+        {
+            die "Error: Pop from empty transform list: $line_nr\n" unless ($#transforms >= 0);
+            my $last_pop = pop @transforms;
+            while ($last_pop !~ /^xf$/)
+            {
+                $last_pop = pop @transforms;
+            }
+            print "Popped transform: @transforms\n" unless (!$verbose);
+        }
+        # Push the new transform
+        else
+        {
+            push @transforms, @words;
+            print "Parsed new transform: @transforms\n" unless (!$verbose);
+        }
+        parse_line_into_words();
+    }
+    # Construct triangles for faces
+    elsif (@words[0] =~ m/^f$/)
+    {
+        die "Error: Face with too fewer points: $line_nr\n" unless ($#words >= 3);
+        print "Splitting face into triangles: $line_nr\n" unless (!$verbose);
+        
+        # Record the face in the current objects
+        foreach (@objects_in_scope)
+        {
+            push (@{$objects{$_}}, [ @words ]);
+        }
+        
+        # Drop the 'f' and uniquify the start/end point
+        shift @words;
+        if (@words[0] eq @words[$#words])
+        {
+            pop @words;
+        }
+        
+        # Convert a face to triangles
+        face_to_triangles(@words);
+
+        parse_line_into_words();
+    }
+    # Construct triangles from a prism
+    elsif (@words[0] =~ m/^prism$/)
+    {
+        # Record the prism in the current objects
+        foreach (@objects_in_scope)
+        {
+            push (@{$objects{$_}}, [ @words ]);
+        }
+
+        # Record the height of the prism        
+        my $height = pop @words;
+
+        # Drop the 'prism' and uniquify the start/end point
+        shift @words;
+        if (@words[0] eq @words[$#words])
+        {
+            pop @words;
+        }
+        
+        # Write out the near surface and get the normal
+        my @face_normal = face_to_triangles(@words);
+        
+        # Calculate the vector to the top surface
+        my @top_vector;
+        @top_vector[0] = $height * @face_normal[0];
+        @top_vector[1] = $height * @face_normal[1];
+        @top_vector[2] = $height * @face_normal[2];
+        
+        # Convert the vector so it is suitable for a variable name in c
+        my @name_append = @top_vector;
+        @name_append[0] =~ s/\./d/;
+        @name_append[1] =~ s/\./d/;
+        @name_append[2] =~ s/\./d/;
+        @name_append[0] =~ s/-/m/;
+        @name_append[1] =~ s/-/m/;
+        @name_append[2] =~ s/-/m/;
+        
+        # Create the points for the top surface
+        my @far_face;
+        foreach my $point_name (@words)
+        {
+            # Rename the point
+            my $new_point_name  = "${point_name}_prism_@{name_append[0]}_@{name_append[1]}_@{name_append[2]}";
+
+            # Move the point up
+            my @top_point = @{$point_positions{$point_name}};
+            @top_point[0] += @top_vector[0];
+            @top_point[1] += @top_vector[1];
+            @top_point[2] += @top_vector[2];
+            
+            # Adding a new point
+            print CODE "    point_t " . $new_point_name . "(@top_point[0], @top_point[1], @top_point[2]);\n";
+    
+            # Add to the list of valid points
+            $point_positions{$new_point_name} = [ @top_point[0], @top_point[1], @top_point[2] ];
+                
+            # Push onto the new face
+            push @far_face, $new_point_name;
+        }
+        
+        # Make the new face into triangles
+        face_to_triangles(@far_face);
+        
+        # Create connecting faces
+        for (my $i=0; $i<$#far_face; $i++)
+        {
+            write_out_triangle(@words[$i], @far_face[$i], @far_face[($i+1)]);
+            write_out_triangle(@far_face[($i+1)], @words[($i+1)], @words[$i]);
+        }
+        write_out_triangle(@words[$#far_face], @far_face[$#far_face], @far_face[0]);
+        write_out_triangle(@far_face[0], @words[0], @words[$#far_face]);
+        
+        # Get the next line
+        parse_line_into_words();
+    }
+    # Construct rings
+    elsif (@words[0] =~ m/^ring$/)
+    {
+        die "Error: Ring with incorrect number of parameters: $line_nr\n" unless ($#words == 3);
+        
+        # Record the ring in the current objects
+        foreach (@objects_in_scope)
+        {
+            push (@{$objects{$_}}, [ @words ]);
+        }
+        
+        # Write the code
+        write_out_ring(@words[1], @words[2], @words[3]);
+        parse_line_into_words();
+    }
+    # Construct a sphere
+    elsif (@words[0] =~ m/^sph$/)
+    {
+        die "Error: Sphere with too fewer parameters: $line_nr\n" unless ($#words == 2);
+        
+        # Record the sphere in the current objects
+        foreach (@objects_in_scope)
+        {
+            push (@{$objects{$_}}, [ @words ]);
+        }
+        
+        # Write the code
+        write_out_sphere(@words[1], @words[2]);
+        parse_line_into_words();
+    }
+    # Construct a cylinder
+    elsif (@words[0] =~ m/^cyl$/)
+    {
+        die "Error: Cylinder with too fewer parameters: $line_nr\n" unless ($#words == 3);
+        
+        # Record the sphere in the current objects
+        foreach (@objects_in_scope)
+        {
+            push (@{$objects{$_}}, [ @words ]);
+        }
+        
+        # Write the code
+        write_out_cylinder(@words[1], @words[2], @words[3]);
+        parse_line_into_words();
+    }
+    # Construct a cone
+    elsif (@words[0] =~ m/^cone$/)
+    {
+        die "Error: Cone with too fewer parameters: $line_nr\n" unless ($#words == 4);
+        
+        # Record the cone in the current objects
+        foreach (@objects_in_scope)
+        {
+            push (@{$objects{$_}}, [ @words ]);
+        }
+        
+        # Write the code
+        write_out_cone(@words[1], @words[2], @words[3], @words[4]);
+        parse_line_into_words();
+    }
+    # Gather new material properties, retrieve a material or copy a material
+    elsif ((@words[0] =~ m/^m$/) & (@words[1] =~ m/\w+/))
+    {
+        if ($#words == 3)
+        {
+            die "Error: syntax error in material: $line_nr\n" unless (@words[2] =~ m/=/);
+            
+            # Uniquify and update the hash
+            my $material = uniquify_material(@words[1], 0);
+            $materials{@words[1]} = $material;
+            $current_material = $material;
+
+            print CODE "    cook_torrance_cxy *$material = $materials{@words[3]};\n";
+            print "Copied material properties for @words[3] into = @words[1]\n" unless (!$verbose);
+
+            parse_line_into_words();
+        }
+        elsif ($#words == 2)
+        {
+            die "Error: syntax error in material: $line_nr\n" unless (@words[2] =~ m/=/);
+            define_material();
+        }
+        else
+        {
+            die "Error: syntax error in material: $line_nr\n" unless ($#words == 1);
+            $current_material = $materials{@words[1]};
+            print "Retreiving material properties for @words[1] = $materials{@words[1]}\n" unless (!$verbose);
+
+            parse_line_into_words();
+        }
+    }
+    # Gather new colour properties, retrieve a colour or copy a colour
+    elsif ((@words[0] =~ m/^c$/) & (@words[1] =~ m/\w+/))
+    {
+        if ($#words == 3)
+        {
+            die "Error: syntax error in colour: $line_nr\n" unless (@words[2] =~ m/=/);
+            @current_colour = @{$colours{@words[3]}};
+            $colours{@words[1]} = [ @current_colour ];
+            print "Copied colour properties for @words[3] into = @words[1]: $line_nr\n" unless (!$verbose);
+
+            parse_line_into_words();
+        }
+        elsif ($#words == 2)
+        {
+            die "Error: syntax error in colour: $line_nr\n" unless (@words[2] =~ m/=/);
+            define_colour();
+        }
+        else
+        {
+            die "Error: syntax error in colour: $line_nr\n" unless ($#words == 1);
+            @current_colour = @{$colours{@words[1]}};
+            print "Retreiving colour properties for @words[1] = @{$colours{@words[1]}}: $line_nr\n" unless (!$verbose);
+
+            parse_line_into_words();
+        }
+    }
+    # Start or end an object
+    elsif (@words[0] =~ m/^o$/)
+    {
+        die "Error: Object with too many parameters: $line_nr\n" unless ($#words <= 1);
+        if ($#words == 0)
+        {
+           shift ( @objects_in_scope );
+        }
+        else
+        {
+            print CODE "    /* @words[1] */\n";
+            unshift (@objects_in_scope, @words[1]);
+        }
+
+        parse_line_into_words();
+    }
+    elsif (@words[0] =~ m/^i$/)
+    {
+        # Remember where in the file we are
+        push @file_stack, $in_file;
+        push @line_nr_stack, $line_nr;
+        
+        # Create new file name relative to this file
+        $in_file =~ s/\w+\.\w+//;
+        $in_file = "${in_file}@{words[1]}";
+        print "Opening file $in_file at line: $line_nr\n";
+        
+        # Add the specified transform 
+        shift @words;
+        shift @words;
+        push @transforms, "xf";
+        push @transforms, @words;
+
+        # Open the file and go back to the start
+        close SCENE;
+        open(SCENE, "< $in_file")  || die "Can't open mgf file: $in_file\n";
+        goto MAIN_LOOP;        
+    }
+    elsif ($#words == -1)
+    {
+        print "Done at line $line_nr\n";
+        last;
+    }
+    else
+    {
+        print "Unhandled @words[0] line $line_nr $#words\n";
+        parse_line_into_words();
+    }
+}
+
+# Pop the file instantiation stack
+if (@line_nr_stack[$#line_nr_stack] > 0)
+{
+    # Open the last file
+    print "Closing $in_file";
+    $in_file = pop @file_stack;
+    close SCENE;
+    open(SCENE, "< $in_file")  || die "Can't open mgf file: $in_file\n";
+    
+    # Return to line number
+    $line_nr = @line_nr_stack[$#line_nr_stack];
+    print " and returning to line: @line_nr_stack[$#line_nr_stack]\n";
+    while (@line_nr_stack[$#line_nr_stack] > 0)
+    {
+        $_ = <SCENE>;
+        @line_nr_stack[$#line_nr_stack]--;
+    }
+
+    # Pop the transform 
+    my $last_pop = pop @transforms;
+    while ($last_pop !~ /^xf$/)
+    {
+        $last_pop = pop @transforms;
+    }
+
+    # Clear end of file
+    $eof = 0;
+    
+    goto MAIN_LOOP;
+}
+
+print "Done at line: $line_nr\n" unless (!$verbose);
+
+# Print asserts that this worked
+print CODE "
+    /* Assert there must be some lights to light the scene */
+    assert(!lights.empty());
+
+    /* Assert there is an imagine to trace */
+    assert(!everything.empty());
+    
+    return;
+}
+
+";
+
+
+close(SCENE);
+close(CODE);
+
+exit 0;
+
+# A subroutine to strip comments and return the next valid 
+# line in the array 'words'
+sub parse_line_into_words
+{
+    while ($line = <SCENE>)
+    {
+        $line_nr++;
+        
+        # Process continues lines
+        while ($line =~ m/\\$/)
+        {
+            chomp ($line);
+            $line =~ s/\\$//;
+            $line_nr++;
+            $line = $line . <SCENE>;
+        }
+
+        # Strip commas and quotes
+        $line  =~ s/\#.*$//;
+        $line  =~ s/\,/ /g;
+        $line  =~ s/\s+/ /g;
+    
+        @words = split(' ', $line);
+        # Declare centre struct
+        if ($#words < 0)
+        {
+            next;
+        }
+        else
+        {
+            for (my $i=0; $i<=$#words; $i++)
+            {
+                if ((@words[$i] !~ /^[-+]/) & (@words[$i] !~ /\de[-+]/))
+                {
+                    @words[$i]  =~ s/\+/_plus/g;
+                    @words[$i]  =~ s/\-/_minus/g;
+                }
+            }
+            return;
+        }
+    }
+    
+    $eof = 1;
+}
+
+# A subroutine to apply all transforms in scope
+sub apply_transform
+{
+    # @_ is the name of a x,y,z point
+    my $point_name = @_[0];
+    
+    my @transform_points = @{$point_positions{$point_name}};
+    
+    my (@array_point, @array_iterations, @points);
+    @array_point[0]      = 0;
+    @array_iterations[0] = 0;
+    
+    my $i     = 0;
+    my $scale = 1.0;
+    
+    print "Current transforms @transforms, there are $#transforms\n" unless ( !$verbose );
+
+TRANSFORM_LOOP:
+    for ($i; $i <=$#transforms; $i++)
+    {
+        $_ = @transforms[$i];
+
+        # Skip xf it is just a marker for popping transforms
+        if ($_ =~ m/^xf$/)
+        {
+            if (@array_iterations[$#array_iterations] > 0)
+            {
+                @array_iterations[$#array_iterations]--;
+                $i = @array_point[$#array_iterations];
+            }
+        }
+        # Array
+        elsif ($_ =~ m/^-a$/)
+        {
+            # Set the return point to the first non array syntax
+            push @array_point, ($i+2);
+            
+            # Set the number of times to loops
+            push @array_iterations, (@transforms[$i+1] - 1);
+            
+            $i++;
+        }
+        # Mirror
+        elsif ($_ =~ m/^-mx$/)
+        {
+            @transform_points[0] = -@transform_points[0];
+            $point_name = "${point_name}_mx";
+        }
+        elsif ($_ =~ m/^-my$/)
+        {
+            @transform_points[1] = -@transform_points[1];
+            $point_name = "${point_name}_my";
+        }
+        elsif ($_ =~ m/^-mz$/)
+        {
+            @transform_points[2] = -@transform_points[2];
+            $point_name = "${point_name}_mz";
+        }
+        # Rotate about
+        elsif ($_ =~ m/^-rx$/)
+        {
+            my $angle     = @transforms[$i+1];
+            my $angle_cos = cos($angle);
+            my $angle_sin = sin($angle);
+            
+            my $dist = sqrt((@transform_points[1] * @transform_points[1]) + (@transform_points[2] * @transform_points[2]));
+            
+            @transform_points[1] = $dist * $angle_sin;
+            @transform_points[2] = $dist * $angle_cos;
+
+            # Make name into a suitable c name
+            $angle =~ s/\./d/;
+            $angle =~ s/-/m/;
+            $point_name = "${point_name}_rx_${angle}";
+            
+            $i++;
+        }
+        elsif ($_ =~ m/^-ry$/)
+        {
+            my $angle     = @transforms[$i+1];
+            my $angle_cos = cos($angle);
+            my $angle_sin = sin($angle);
+            
+            my $dist = sqrt((@transform_points[0] * @transform_points[0]) + (@transform_points[2] * @transform_points[2]));
+            
+            @transform_points[0] = $dist * $angle_sin;
+            @transform_points[2] = $dist * $angle_cos;
+            
+            # Make name into a suitable c name
+            $angle =~ s/\./d/;
+            $angle =~ s/-/m/;
+            $point_name = "${point_name}_ry_${angle}";
+
+            $i++;
+        }
+        elsif ($_ =~ m/^-rz$/)
+        {
+            my $angle     = @transforms[$i+1];
+            my $angle_cos = cos($angle);
+            my $angle_sin = sin($angle);
+            
+            my $dist = sqrt((@transform_points[0] * @transform_points[0]) + (@transform_points[1] * @transform_points[1]));
+            
+            @transform_points[0] = $dist * $angle_sin;
+            @transform_points[1] = $dist * $angle_cos;
+            
+            # Make name into a suitable c name
+            $angle =~ s/\./d/;
+            $angle =~ s/-/m/;
+            $point_name = "${point_name}_rz_${angle}";
+
+            $i++;
+        }
+        # Scale
+        elsif ($_ =~ m/^-s$/)
+        {
+            $i++;
+            $scale = @transforms[$i] + 0.0;
+            @transform_points[0] *= $scale;
+            @transform_points[1] *= $scale;
+            @transform_points[2] *= $scale;
+
+            # Make name into a suitable c name
+            $scale =~ s/\./d/;
+            $point_name = "${point_name}_s_${scale}";
+            $scale =~ s/d/\./;
+        }
+        # Transform
+        elsif ($_ =~ m/^-t$/)
+        {
+            my $tx = @transforms[$i+1];
+            my $ty = @transforms[$i+2];
+            my $tz = @transforms[$i+3];
+            $i += 3;
+            
+            @transform_points[0] += ($tx * $scale);
+            @transform_points[1] += ($ty * $scale);
+            @transform_points[2] += ($tz * $scale);
+            
+            # Make name into a suitable c name
+            $tx =~ s/\./d/;
+            $ty =~ s/\./d/;
+            $tz =~ s/\./d/;
+            $tx =~ s/-/m/;
+            $ty =~ s/-/m/;
+            $tz =~ s/-/m/;
+            $point_name = "${point_name}_t_${tx}_${ty}_${tz}";
+        }
+        else
+        {
+            die "Error: Unknown transform @transforms[$i] line: $line_nr\n";
+        }
+    }
+    
+    push @points, $point_name;
+    # New points
+    if (!(exists $point_positions{$point_name}))
+    {
+        print CODE "    point_t $point_name(@transform_points[0], @transform_points[1], @transform_points[2]);\n";
+        $point_positions{$point_name} = [ @transform_points[0], @transform_points[1], @transform_points[2] ];
+    }
+    # Redeclaration
+    else
+    {
+        my @current_point = @{$point_positions{$point_name}};
+        if ((@transform_points[0] != @current_point[0]) | 
+            (@transform_points[1] != @current_point[1]) | 
+            (@transform_points[2] != @current_point[2]))
+        {
+            print CODE "    $point_name = point_t(@transform_points[0], @transform_points[1], @transform_points[2]);\n";
+            $point_positions{$point_name} = [ @transform_points[0], @transform_points[1], @transform_points[2] ];
+        }
+    }
+
+    # If there is still an array to create then load i decrement to a loop and return to the loop
+    if (@array_iterations[$#array_iterations] > 0)
+    {
+        @array_iterations[$#array_iterations]--;
+        $i = @array_point[$#array_iterations];
+        goto TRANSFORM_LOOP;
+    }
+
+    return @points;
+}
+
+# A subroutine to transform a distance (only scale applies)
+sub scale_length
+{
+    # @_ is a distance
+    my $transform_length = @_[0];
+    for (my $i=0; $i < $#transforms; $i++)
+    {
+        $_ = @transforms[$i];
+
+        if ($_ =~ m/^-s$/)
+        {
+            $i++;
+            my $scale = @transforms[$i];
+            $transform_length *= $scale;
+        }
+    }
+    
+    return $transform_length;
+}
+
+sub rotate_vector
+{
+    # @_ is the name of x,y,z vector
+    my @vector = @_;
+    
+    for (my $i=0; $i <=$#transforms; $i++)
+    {
+        $_ = @transforms[$i];
+
+        # Mirror
+        if ($_ =~ m/^-mx$/)
+        {
+            @vector[0] = -@vector[0];
+        }
+        elsif ($_ =~ m/^-my$/)
+        {
+            @vector[1] = -@vector[1];
+        }
+        elsif ($_ =~ m/^-mz$/)
+        {
+            @vector[2] = -@vector[2];
+        }
+    }
+    
+    return @vector;
+}
+
+sub uniquify_material
+{
+    my ( $material_name, $light )   = @_;
+    my $original_name   = $material_name;
+    
+    # Update the uniquifying hash and current material name
+    if (exists $materials{$material_name})
+    {
+        my @tmp = split('_', $materials{$material_name});
+        my $i = @tmp[$#tmp];
+        if ( $i !~ m/^\d+$/ )
+        {
+            # If not numbered create the number
+            $i = 0;
+        }
+        else
+        {
+            # Increment i and pop the old i
+            $i++;
+            pop @tmp;
+        }
+
+        # Join the name back together again
+        $material_name = join('_', @tmp);
+        
+        # Add '_useslightshader' if it is a new light
+        if ( $light )
+        {
+            $material_name = $material_name . "_useslightshader";
+        }
+        
+        # Add the uniquie number
+        $material_name = $material_name . "_" . $i;
+        
+        print "Redefined material. Uniquifying $original_name to $material_name\n" unless (!$verbose);
+    }
+    elsif ( $light )
+    {
+        $material_name = $material_name . "_useslightshader";
+    }
+    
+    return $material_name;
+}
+
+# A subroutine to collect new material data
+sub define_material
+{
+    my $material_name = @words[1];
+    my $original_name = @words[1];
+    
+    # Default properties
+    my $x       = 0.0;
+    my $y       = 0.0;
+    my $rd      = 0.0;
+    my $td      = 0.0;
+    my $rs      = 0.0;
+    my $ts      = 0.0;
+    my $sr      = 0.0;
+    my $tr      = 0.0;
+    my $ri_r    = 0.0;
+    my $ri_i    = 0.0;
+    my $ed      = 0;
+    my $cct     = 0;
+    
+    
+    print "New material $material_name: $line_nr\n" unless (!$verbose);
+    while (!$eof)
+    {
+        parse_line_into_words();
+        
+        if (( @words[0] =~ m/c$/ ) & ( $#words < 1 ))
+        {
+            next;
+        }
+        elsif (( @words[0] =~ m/c$/ ) & ( $#words == 1) )
+        {
+            # Retrieve a colour
+            ( $x, $y ) = @{$colours{@words[1]}};
+        }
+        elsif  (@words[0] =~ m/cxy$/)
+        {
+            die "Error: CXY specified with wrong number of parameters: $line_nr @words\n" unless ($#words == 2);
+            $x = @words[1];
+            $y = @words[2];
+        }
+        elsif (@words[0] =~ m/rs$/)
+        {
+            die "Error: rs specified with wrong number of parameters: $line_nr @words\n" unless ($#words == 2);
+            $rs = @words[1];
+            $sr = @words[2];
+        }
+        elsif (@words[0] =~ m/rd$/)
+        {
+            die "Error: rd specified with wrong number of parameters: $line_nr @words\n" unless ($#words == 1);
+            $rd = @words[1];
+        }
+        elsif (@words[0] =~ m/cspec$/)
+        {
+            print "Warning: cspec parameter ignored\n";
+        }
+        elsif (@words[0] =~ m/^ts$/)
+        {
+            die "Error: ts specified with wrong number of parameters: $line_nr @words\n" unless ($#words == 2);
+            $ts = @words[1];
+            $tr = @words[2];
+        }
+        elsif (@words[0] =~ m/td$/)
+        {
+            die "Error: td specified with wrong number of parameters: $line_nr @words\n" unless ($#words == 1);
+            $td = @words[1];
+        }
+        elsif (@words[0] =~ m/ed$/)
+        {
+            die "Error: ed specified with wrong number of parameters: $line_nr @words\n" unless ($#words == 1);
+            $ed = @words[1];
+        }
+        elsif (@words[0] =~ m/sides$/)
+        {
+            print "Warning: Sides parameter ignored line: $line_nr\n";
+        }
+        else
+        {
+            last;
+        }
+    }
+    
+    # Create the new material for light emmitters
+    my $light = 0;
+    if ( $ed ne 0 )
+    {
+        $light = 1;
+    }
+
+    # Update the uniquifying hash and current material name
+    $material_name = uniquify_material($material_name, $light);
+
+    if ( $ed != 0 )
+    {
+        # With black boy temperature
+        if ( $cct  != 0 )
+        {
+            #print CODE "    light_shader *$material_name = new light_shader($ed, $cct);\n";
+            $emmitters{$material_name}  = [ $ed, $cct ];
+        }
+        # With XY colour
+        elsif ( ($x != 0) || ($y != 0) )
+        {
+            $emmitters{$material_name}  = [ $ed, $x, $y ];
+        }
+        # And without, default white light
+        else
+        {
+            #print CODE "    light_shader *$material_name = new light_shader($ed);\n";
+            $emmitters{$material_name}  = [ $ed ];
+        }        
+    }
+    # Create the new material for non light emmitters
+    else
+    {
+        print CODE "    cook_torrance_cxy *$material_name = new cook_torrance_cxy($x, $y, $rd, $td, $rs, $ts, $sr, $tr, $ri_r, $ri_i);\n";
+        print CODE "    materials.push_back($material_name);\n";
+    }
+
+    $materials{$original_name}  = $material_name;
+    $current_material           = $material_name;
+}
+
+# A subroutine to collect new colour data
+sub define_colour
+{
+    my $colour_name = @words[1];
+    my $shininess = 0;
+    my $sides = 0;
+    my @colour;
+    die "Error: Colour specified incorrectly: $line_nr @words\n" unless ($#words == 2);
+    
+    print "New colour $colour_name\n" unless (!$verbose);
+    while (!$eof)
+    {
+        parse_line_into_words();
+        
+        if  (@words[0] =~ m/^cxy$/)
+        {
+            die "Error: CXY specified with wrong number of parameters: $line_nr @words\n" unless ($#words == 2);
+            @colour = ( @words[1], @words[2] );
+        }
+        elsif (@words[0] =~ m/^cmix$/)
+        {
+            # shift out the 'cmix'
+            shift @words;
+            @colour = ( 0.0, 0.0 );
+            
+            # Mix the first 2 colours
+            # Get colours
+            die "Error: cmix with unknown colour @words[1]: $line_nr\n" unless (exists $colours{@words[1]});
+            die "Error: cmix with unknown colour @words[3]: $line_nr\n" unless (exists $colours{@words[3]});
+            my @c1 = @{$colours{@words[1]}};
+            my @c2 = @{$colours{@words[3]}};
+            
+            # Get weightings
+            my $w1 = @words[0];
+            my $w2 = @words[2];
+            my $w_sum = $w1 + $w2;
+            die "Error: cmix with 0 weightings ( @words[0], @words[2] ): $line_nr\n" unless ($w_sum > 0.0);
+            
+            # Calculate scaling factor
+            my $scale = 1.0 / ( ($w1 / @c1[1]) + ($w2 / @c2[1]) );
+            
+		    # Mix
+    		@colour[0] = ( ((@c1[0] * $w1) / @c1[1]) + ((@c2[0] * $w2) / @c2[1]))  * $scale;
+		    @colour[1] = ( $w1 + $w2 ) * $scale;
+            
+            # Mix additional colours
+            for (my $i=4; $i<$#words; $i+=2)
+            {
+                # Get colours
+                die "Error: cmix with unknown colour @words[$i+1]: $line_nr\n" unless (exists $colours{@words[$i+1]});
+                my @c1 = @colour;
+                my @c2 = @{$colours{@words[$i+1]}};
+            
+                # Get weightings
+                my $w1 = $w_sum;
+                my $w2 = @words[$i];
+                $w_sum += $w2;
+            
+                # Calculate scaling factor
+                my $scale = 1.0 / ( $w1/@c1[1] + $w2/@c2[1] );
+            
+                # Mix
+    		    @colour[0] = (@c1[0] * $w1 / @c1[1] + @c2[0] * $w2 / @c2[1]) * $scale;
+    		    @colour[1] = ($w1 + $w2) * $scale;
+            }
+        }
+        else
+        {
+            @current_colour        = @colour;
+            $colours{$colour_name} = [ @colour ];
+            print "New colour properties for $colour_name = @{$colours{$colour_name}} line: " . ($line_nr-1) . "\n" unless (!$verbose);
+            last;
+        }
+    }
+}
+
+# A sub routine to split a face into triangles, 
+# write out the triangles and return the normal
+sub face_to_triangles
+{
+    my @face_points = @_;
+    
+    # A list to save triangles to
+    my @triangle_points;
+    
+    # Find the furthest point from the center
+    my @com = find_centre(@face_points);
+    my $max = find_furthest(@com, @face_points);
+
+    # Use the points either side of this point to find the surface normal
+    my ( $max_m1, $max_p1 );
+    if ($max == 0)
+    {
+        $max_m1 = $#face_points;
+    }
+    else
+    {
+        $max_m1 = $max - 1;
+    }
+    
+    if ($max == $#face_points)
+    {
+        $max_p1 = 0;
+    }
+    else
+    {
+        $max_p1 = $max + 1;
+    }
+    my @face_normal = cross_product(@face_points[$max_m1], @face_points[$max], @face_points[$max_p1]);
+    
+    # Write the code
+    my $no_success = 0;
+    while (($#face_points - 2) >= 0)
+    {
+        # Assume the guess will be a valid triangle
+        my $draw = 1;
+        my $next = 1;
+        
+        # Take the first 3 points of the face to try and form a triangle
+        my @triangle = shift @face_points;
+        push @triangle, (shift @face_points);
+        push @triangle, (shift @face_points);
+        
+        print "Trialing triangle: @triangle\n" unless (!$verbose);
+        
+        # If the points form a straight line the triangle is invalid
+        if (is_straight_line(@triangle))
+        {
+            print "Triangle rejected: Straight line\n" unless (!$verbose);
+            $draw = 0;
+        }
+
+        # If draw is false the cross product will fail (div by 0 error in normalising)
+        if ($draw)
+        {
+            # If the triangle has a different normal to the face it is invalid
+            my @tri_normal = cross_product(@triangle[0], @triangle[1], @triangle[2]);
+            if (vector_3_dot_product(@tri_normal, @face_normal) < 0.0)
+            {
+                print "Triangle rejected: Outside of surface\n" unless (!$verbose);
+                $draw = 0;
+                $next = 0;
+            }
+
+            # If any of the remaining points fall in the triangle it is illegal
+            if (is_in_triangle(@triangle, @face_points))
+            {
+                print "Triangle rejected: Consumes point\n" unless (!$verbose);
+                $draw = 0;
+                $next = 0;
+            }
+        }
+        
+        # Draw if the triangle is valid
+        if ($draw)
+        {
+            $no_success = 0;
+            print "Triangle accepted: @triangle\n" unless (!$verbose);
+            write_out_triangle(@triangle[0], @triangle[1], @triangle[2]);
+            push @triangle_points, @triangle[0];
+            push @triangle_points, @triangle[1];
+            push @triangle_points, @triangle[2];
+        }
+        
+        # If the triangle was valid or a straight line 
+        # remove the middle point and move to the next set of points
+        if ($next)
+        {
+            $no_success = 0;
+            push @face_points, @triangle[0];
+            unshift @face_points, @triangle[2];
+        }
+        else
+        {
+            push @face_points, @triangle[0];
+            unshift @face_points, @triangle[2];
+            unshift @face_points, @triangle[1];
+            $no_success++;
+
+        }
+        
+        die "Failure to construct face : $line_nr\n" unless ($no_success <= $#face_points);
+    }
+    # Return the surface normal
+    return @face_normal;
+}
+
+# Sub routine to check for use of default shading and to instantiate the shader if needed
+sub use_default_shader
+{
+    if (( $current_material eq 'default_shading' ) && ( $default_shader_in_use == 0))
+    {
+        print CODE "\n    /* Using the default (mid-grey) shader */\n";
+        print CODE "    cook_torrance_cxy *$current_material = new cook_torrance_cxy();\n";
+        print CODE "    materials.push_back($current_material);\n\n";
+        print "Warning: Scene uses default shading\n";
+        $default_shader_in_use = 1;
+    }
+
+    $materials{$current_material}  = $current_material;
+}
+
+# A subroutine to write out an instantiation of a triangle
+sub write_out_triangle
+{
+    my @points = @_;
+    
+    # check for use of the default shader
+    use_default_shader();
+
+    # Check points exist    
+    die "Error: Attemt to construct triangle with unknown point @points[0]: $line_nr\n" unless (exists $point_positions{@points[0]});
+    die "Error: Attemt to construct triangle with unknown point @points[1]: $line_nr\n" unless (exists $point_positions{@points[1]});
+    die "Error: Attemt to construct triangle with unknown point @points[2]: $line_nr\n" unless (exists $point_positions{@points[2]});
+    
+    # Transform the vertices to the triangle
+    my @points_0 = apply_transform(@points[0]);
+    my @points_1 = apply_transform(@points[1]);
+    my @points_2 = apply_transform(@points[2]);
+
+    # Write out the triangle for all transformed points
+    for (my $i =0; $i<=$#points_0; $i++)
+    {
+        if ($current_material =~ m/_useslightshader/)
+        {
+            my @wid = vector_3_sub(@{$point_positions{@points_0[$i]}}, @{$point_positions{@points_1[$i]}});
+            my @hei = vector_3_sub(@{$point_positions{@points_1[$i]}}, @{$point_positions{@points_2[$i]}});
+            
+            my $w = vector_3_magnitude(@wid);
+            my $h = vector_3_magnitude(@hei);
+            
+            my $area = $w * $h * 0.5;
+            my $area_name = $area;
+            $area_name =~ s/\./d/;
+            my $light_material = $current_material . "_" . $area_name;
+            
+            if ( !exists $emmitters{$light_material} )
+            {
+                my @light_parameters = @{$emmitters{$current_material}};
+                @light_parameters[0] = "(@light_parameters[0] *  $area)";
+                print CODE "    light_shader *$light_material = new light_shader(" . join(', ', @light_parameters) . ");\n";
+                $emmitters{$light_material} = 1;
+            }
+            print CODE "    triangle *tr${triangle_nr} = new triangle($light_material, @points_0[$i], @points_1[$i], @points_2[$i], true);\n";
+            print CODE "    lights.push_front(tr${triangle_nr});\n";
+        }
+        else
+        {
+            print CODE "    triangle *tr${triangle_nr} = new triangle($current_material, @points_0[$i], @points_1[$i], @points_2[$i]);\n";
+        }
+        print CODE "    everything.push_front(tr${triangle_nr});\n\n";
+        $triangle_nr++;
+    }
+}
+
+# A subroutine to write out an instantiation of a ring
+sub write_out_ring
+{
+    my @points = @_;
+
+    # check for use of the default shader
+    use_default_shader();
+
+    # Check points exist    
+    die "Error: Attemt to construct ring with unknown point @points[0]: $line_nr\n" unless (exists $point_positions{@points[0]});
+    die "Error: Attemt to construct ring with unknown normal @points[0]: $line_nr\n" unless (exists $normals{@points[0]});
+
+    # Transform the centre of the ring
+    my @points_0 = apply_transform(@points[0]);
+    @points[1] = scale_length(@points[1]);
+    @points[2] = scale_length(@points[2]);
+
+    my $normal = "vector_t(" . join (', ', @{$normals{@points[0]}}) . ")";
+
+    # Write out the ring for all transformed points
+    for (my $i =0; $i<=$#points_0; $i++)
+    {
+        if ($current_material =~ m/_useslightshader/)
+        {
+            my $area = $pi * (@points[1] *  @points[1]);
+            my $area_name = $area;
+            $area_name =~ s/\./d/;
+            my $light_material = $current_material . "_" . $area_name;
+            
+            if ( !exists $emmitters{$light_material} )
+            {
+                my @light_parameters = @{$emmitters{$current_material}};
+                @light_parameters[0] = "(@light_parameters[0] *  $area)";
+                print CODE "    light_shader *$light_material = new light_shader(" . join(', ', @light_parameters) . ");\n";
+                $emmitters{$light_material} = 1;
+            }
+            print CODE "    ring *ri${ring_nr} = new ring($light_material, @points_0[$i], $normal, @points[2], @points[1], true);\n";
+            print CODE "    lights.push_front(ri${ring_nr});\n";
+        }
+        else
+        {
+            print CODE "    ring *ri${ring_nr} = new ring($current_material, @points_0[$i], $normal, @points[2], @points[1]);\n";
+        }
+        print CODE "    everything.push_front(ri${ring_nr});\n\n";
+        $ring_nr++;
+    }
+}
+
+# A subroutine to write out an instantiation of a sphere
+sub write_out_sphere
+{
+    my @parameters = @_;
+
+    # check for use of the default shader
+    use_default_shader();
+
+    # Check points exist    
+    die "Error: Attemt to construct sphere with unknown point @parameters[0]: $line_nr\n" unless (exists $point_positions{@parameters[0]});
+
+     # Transform the centre of the sphere
+    my @points_0 = apply_transform(@parameters[0]);
+    @parameters[1] = scale_length(@parameters[1]);
+
+    # Write out the sphere for all transformed points
+    for (my $i =0; $i<=$#points_0; $i++)
+    {
+        # Write out the sphere
+        if ($current_material =~ m/_useslightshader/)
+        {
+            my $area = 4 * $pi * (@parameters[1] *  @parameters[1]);
+            my $area_name = $area;
+            $area_name =~ s/\./d/;
+            my $light_material = $current_material . "_" . $area_name;
+            
+            if ( !exists $emmitters{$light_material} )
+            {
+                my @light_parameters = @{$emmitters{$current_material}};
+                @light_parameters[0] = "(@light_parameters[0] *  $area)";
+                print CODE "    light_shader *$light_material = new light_shader(" . join(', ', @light_parameters) . ");\n";
+                $emmitters{$light_material} = 1;
+            }
+            print CODE "    sphere *sp${sphere_nr} = new sphere($light_material, @points_0[$i], @parameters[1], true);\n";
+            print CODE "    lights.push_front(sp${sphere_nr});\n";
+        }
+        else
+        {
+            print CODE "    sphere *sp${sphere_nr} = new sphere($current_material, @points_0[$i], @parameters[1]);\n";
+        }
+        print CODE "    everything.push_front(sp${sphere_nr});\n\n";
+        $sphere_nr++;
+    }
+}
+
+# A subroutine to write out an instantiation of a cylinder
+sub write_out_cylinder
+{
+    my @parameters = @_;
+    
+    # check for use of the default shader
+    use_default_shader();
+
+    # Check points exist    
+    die "Error: Attemt to construct cylinder with unknown point @parameters[0]: $line_nr\n" unless (exists $point_positions{@parameters[0]});
+    die "Error: Attemt to construct cylinder with unknown point @parameters[2]: $line_nr\n" unless (exists $point_positions{@parameters[2]});
+    
+    # Transform the bottom and radius
+    my @parameters_0 = apply_transform(@parameters[0]);
+    my @parameters_2 = apply_transform(@parameters[2]);
+    @parameters[1] = scale_length(@parameters[1]);
+
+    # Write out the cylinder for each transformed point
+    for (my $i=0; $i<=$#parameters_0; $i++)
+    {
+        # Calculate the height of the cylinder
+        my @top = @{$point_positions{@parameters[2]}};
+        my @bot = @{$point_positions{@parameters[0]}};
+        
+        # Find the height and vector through the cylinder
+        my @cur_dir = ( (@top[0] - @bot[0]), (@top[1] - @bot[1]), (@top[2] - @bot[2]));
+        my $height = sqrt((@cur_dir[0] * @cur_dir[0]) + (@cur_dir[1] * @cur_dir[1]) + (@cur_dir[2] * @cur_dir[2]));
+        @cur_dir[0] /= $height;
+        @cur_dir[1] /= $height;
+        @cur_dir[2] /= $height;
+        
+        $height = scale_length($height);
+    
+        # The original cylinder had a vector through it in 'z'
+        # Take the cross product of the vector of the original and the rotated cylinder
+        # This give the normal to the plane the cylinder was rotated in
+        # This is the axis to rotate around
+        my @rot_axis = ( (@cur_dir[1]), -(@cur_dir[0]), (0.0) );
+        # This is for the special case of the cylinder pointing in the opposite direction
+        if ((@rot_axis[0] == 0.0) & (@rot_axis[1] == 0.0))
+        {
+            @rot_axis[0] = 1.0;
+        }
+        
+        # acos of the dot product of the two centre vectors gives the angle of rotation
+        my $angel    = acos(@cur_dir[2]);
+        
+        # Write out the cylinder
+        print CODE "    cylinder *cy${cylinder_nr} = new cylinder($current_material, @parameters_0[$i], $height, @parameters[1], 0.0, vector_t(@rot_axis[0],@rot_axis[1],@rot_axis[2]), $angel";
+        if ($current_material =~ m/_useslightshader/)
+        {
+            print CODE ", true";
+        }
+        print CODE ");\n";
+        if ($current_material =~ m/_useslightshader/)
+        {
+            print CODE "    lights.push_front(cy${cylinder_nr});\n";
+        }
+        print CODE "    everything.push_front(cy${cylinder_nr});\n\n";
+        $cylinder_nr++;
+    }
+}
+
+# A subroutine to write out an instantiation of a cone
+sub write_out_cone
+{
+    my @parameters = @_;
+    
+    # check for use of the default shader
+    use_default_shader();
+
+    # Check points exist    
+    die "Error: Attemt to construct cone with unknown point @parameters[0]: $line_nr\n" unless (exists $point_positions{@parameters[0]});
+    die "Error: Attemt to construct cone with unknown point @parameters[2]: $line_nr\n" unless (exists $point_positions{@parameters[2]});
+
+    my @parameters_0 = apply_transform(@parameters[0]);
+    my @parameters_2 = apply_transform(@parameters[2]);
+    @parameters[1] = scale_length(@parameters[1]);
+    @parameters[3] = scale_length(@parameters[3]);
+
+    # Write out the cone for each transformed point
+    for (my $i=0; $i<=$#parameters_0; $i++)
+    {
+        # The largest radius must always be at the base of the cone
+        if (abs(@parameters[3]) > abs(@parameters[1]))
+        {
+            my $tmp;
+            $tmp = abs(@parameters[3]);
+            @parameters[3] = abs(@parameters[1]);
+            @parameters[1] = $tmp;
+            
+            $tmp = @parameters[2];
+            @parameters[2] = @parameters[0];
+            @parameters[0] = $tmp;
+            
+            @parameters_0[$i] = @parameters_2[$i];
+        }
+        else
+        {
+            @parameters[1] = abs(@parameters[1]);
+            @parameters[3] = abs(@parameters[3]);
+        }
+        
+        # Calculate the distance to the top surface of the cone
+        my @top = @{$point_positions{@parameters[2]}};
+        my @bot = @{$point_positions{@parameters[0]}};
+    
+        # Find the height and vector through the cylinder
+        my @cur_dir = ( (@top[0] - @bot[0]), (@top[1] - @bot[1]), (@top[2] - @bot[2]));
+        my $height = sqrt((@cur_dir[0] * @cur_dir[0]) + (@cur_dir[1] * @cur_dir[1]) + (@cur_dir[2] * @cur_dir[2]));
+        @cur_dir[0] /= $height;
+        @cur_dir[1] /= $height;
+        @cur_dir[2] /= $height;
+        
+        $height = scale_length($height);
+    
+        # The original cylinder had a vector through it in 'z'
+        # Take the cross product of the vector of the original and the rotated cylinder
+        # This give the normal to the plane the cylinder was rotated in
+        # This is the axis to rotate around
+        my @rot_axis = ( (@cur_dir[1]), -(@cur_dir[0]), (0.0) );
+        # This is for the special case of the cylinder pointing in the opposite direction
+        if ((@rot_axis[0] == 0.0) & (@rot_axis[1] == 0.0))
+        {
+            @rot_axis[0] = 1.0;
+        }
+        
+        # acos of the dot product of the two centre vectors gives the angle of rotation
+        my $angel    = acos(@cur_dir[2]);
+            
+        my @length = ( (@top[0] - @bot[0]), (@top[1] - @bot[1]), (@top[2] - @bot[2]));
+        my $top_surface = sqrt((@length[0] * @length[0]) + (@length[1] * @length[1]) + (@length[2] * @length[2]));
+        $top_surface = scale_length($top_surface);
+        
+        # Calculte the height of the point of the cone
+        my $side_grad = abs(@parameters[1] - @parameters[3]) / $top_surface;
+        $height    = @parameters[1]/$side_grad;
+        
+        # Write out the cone
+        $top_surface = ", " . $top_surface;
+        print CODE "    cone *co${cone_nr} = new cone($current_material, @parameters_0[$i], @parameters[1], $height$top_surface, vector_t(@rot_axis[0],@rot_axis[1],@rot_axis[2]), $angel";
+        if ($current_material =~ m/_useslightshader/)
+        {
+            print CODE ", true";
+        }
+        print CODE ");\n";
+        if ($current_material =~ m/_useslightshader/)
+        {
+            print CODE "    lights.push_front(co${cone_nr});\n";
+        }
+        print CODE "    everything.push_front(co${cone_nr});\n\n";
+        $cone_nr++;
+    }
+}
+
+sub find_centre
+{
+    my @total;
+    my $points = 0;
+    foreach (@_)
+    {
+        # Check and fetch the points data
+        die "Error: Find center with unknown point $_: $line_nr\n" unless (exists $point_positions{$_});
+        @total = vector_3_add(@total, @{$point_positions{$_}});
+        $points++;
+    }
+
+    return ((@total[0]/$points), (@total[1]/$points), (@total[2]/$points));
+}
+
+sub find_furthest
+{
+    my $max_point;
+    my $max_dist = 0;
+
+    my @from = shift @_;
+    push @from, (shift @_);
+    push @from, (shift @_);
+    
+    for (my $i=0; $i<=$#_; $i++)
+    {
+        my $dist = absolute_distance(@from, @_[$i]);
+        if ($dist > $max_dist)
+        {
+            $max_dist = $dist;
+            $max_point = $i;
+        }
+    }
+    
+    return $max_point;
+}
+
+sub absolute_distance
+{
+    # Check points exist    
+    die "Error: Absolute distance with unknown point @_[3]: $line_nr\n" unless (exists $point_positions{@_[3]});
+
+    my @b = @{$point_positions{@_[3]}};
+    my @a = shift @_;
+    @a = shift @_;
+    @a = shift @_;
+    
+    @a = vector_3_sub(@a, @b);
+    return sqrt((@a[0] * @a[0]) + (@a[1] * @a[1]) + (@a[2] * @a[2]));
+}
+
+sub is_straight_line
+{
+    # Check points exist    
+    die "Error: Straight line check with unknown point @_[0]: $line_nr\n" unless (exists $point_positions{@_[0]});
+    die "Error: Straight line check with unknown point @_[1]: $line_nr\n" unless (exists $point_positions{@_[1]});
+    die "Error: Straight line check with unknown point @_[2]: $line_nr\n" unless (exists $point_positions{@_[2]});
+
+    my @a = @{$point_positions{@_[0]}};
+    my @b = @{$point_positions{@_[1]}};
+    my @c = @{$point_positions{@_[2]}};
+    
+    # Check the points show movement in atleast 2 axes
+    @a = vector_3_sub(@a, @b);
+    @b = vector_3_sub(@b, @c);
+    @a = normalise(@a);
+    @b = normalise(@b);
+    
+    @c = vector_3_sub(@a, @b);
+    @a = vector_3_add(@a, @b);
+    
+    if (vector_3_is_zero(@c) | vector_3_is_zero(@a))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+
+}
+
+# A sub-routine to find if points are in a triangle
+# The first 3 parameters are the names of the points of the triangle
+# The remaining points are tested to see if they are in the triangle
+sub is_in_triangle
+{
+    # Check points exist    
+    die "Error: In triangle test with unknown point @_[0]: $line_nr\n" unless (exists $point_positions{@_[0]});
+    die "Error: In triangle test with unknown point @_[1]: $line_nr\n" unless (exists $point_positions{@_[1]});
+    die "Error: In triangle test with unknown point @_[2]: $line_nr\n" unless (exists $point_positions{@_[2]});
+
+    my @a = @{$point_positions{shift @_}};
+    my @b = @{$point_positions{shift @_}};
+    my @c = @{$point_positions{shift @_}};
+    
+    # Check each point if it is inside the triangle
+    foreach (@_)
+    {
+        # Check and fetch the points data
+        die "Error: In triangle test with unknown point $_: $line_nr\n" unless (exists $point_positions{$_});
+        my @p = @{$point_positions{$_}};
+
+        # Check the point is on the same side of
+        #       AB as C
+        #       BC as A
+        #       CA as B
+        if (same_side(@p, @a, @b, @c) & same_side(@p, @b, @a, @c) & same_side(@p, @c, @a, @b))
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+sub same_side
+{
+    my @ab  = vector_3_sub(@_[6], @_[7], @_[8], @_[9], @_[10], @_[11]);
+    
+    # Normal of the triangle form by the tested point
+    my @cp0 = vector_3_cross_product(@ab, vector_3_sub(@_[0], @_[1], @_[2], @_[6], @_[7], @_[8]));
+    
+    # Normal of the triangle
+    my @cp1 = vector_3_cross_product(@ab, vector_3_sub(@_[3], @_[4], @_[5], @_[6], @_[7], @_[8]));
+    
+    # Check the normals are in the same direction
+    if (vector_3_dot_product(@cp0, @cp1) > 0.0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+# Inverse cosine sub-routine
+sub acos
+{
+    return atan2(sqrt(1.0 - @_[0] * @_[0]), @_[0]);
+}
+
+# Cross product sub-routine
+# Takes the name of 3 points as input
+# Returns the normal of the vectors formed between the points
+sub cross_product
+{
+    # Check points exist    
+    die "Error: Cross product with unknown point @_[0]: $line_nr\n" unless (exists $point_positions{@_[0]});
+    die "Error: Cross product with unknown point @_[1]: $line_nr\n" unless (exists $point_positions{@_[1]});
+    die "Error: Cross product with unknown point @_[2]: $line_nr\n" unless (exists $point_positions{@_[2]});
+
+    # Calculate the length of the vectors
+    my @a = @{$point_positions{@_[0]}};
+    my @b = @{$point_positions{@_[1]}};
+    my @c = @{$point_positions{@_[2]}};
+    
+    @a = vector_3_sub(@a, @b);
+    @b = vector_3_sub(@b, @c);
+    @a = normalise(@a);
+    @b = normalise(@b);
+    
+    # Cross product
+    return normalise(vector_3_cross_product(@a, @b));
+}
+
+sub vector_3_dot_product
+{
+    return ((@_[0] * @_[3]) + (@_[1] * @_[4]) + (@_[2] * @_[5]));
+}
+
+sub vector_3_cross_product
+{
+    my @c;
+    @c[0] = (@_[1] * @_[5]) - (@_[2] * @_[4]);
+    @c[1] = (@_[2] * @_[3]) - (@_[0] * @_[5]);
+    @c[2] = (@_[0] * @_[4]) - (@_[1] * @_[3]);
+    return @c;
+}
+
+# Normalisation sub-routine
+# Takes the values of 3 points
+sub normalise
+{
+    my $dist = sqrt((@_[0] * @_[0]) + (@_[1] * @_[1]) + (@_[2] * @_[2]));
+    return ((@_[0]/$dist), (@_[1]/$dist), (@_[2]/$dist));
+}
+
+sub vector_3_abs
+{
+    my @abs;
+    @abs[0] = abs(@_[0]);
+    @abs[1] = abs(@_[1]);
+    @abs[2] = abs(@_[2]);
+    return @abs;
+}
+
+
+sub vector_3_magnitude
+{
+    return sqrt((@_[0] * @_[0]) + (@_[1] * @_[1]) + (@_[2] * @_[2]));
+}
+
+# Equality with zero sub-routine
+# Takes the values of 3 points
+sub vector_3_is_zero
+{
+    return ((@_[0] == 0.0) & (@_[1] == 0.0) & (@_[2] == 0.0));
+}
+
+# Equality of 2 vectors sub-routine
+# Takes the values of 3 points for each vector
+sub vector_3_is_equal
+{
+    return ((@_[0] == @_[3]) & (@_[1] == @_[4]) & (@_[2] == @_[5]));
+}
+
+# Addition of 2 vectors sub-routine
+# Takes the values of 3 points for each vector
+sub vector_3_add
+{
+    return (( @_[0] + @_[3]), ( @_[1] + @_[4]), ( @_[2] + @_[5]));
+}
+
+# Subtraction of 2 vectors sub-routine
+# Takes the values of 3 points for each vector
+sub vector_3_sub
+{
+    return (( @_[0] - @_[3]), ( @_[1] - @_[4]), ( @_[2] - @_[5]));
+}

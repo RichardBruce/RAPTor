@@ -1,0 +1,158 @@
+#!/usr/bin/env perl
+
+use strict;
+use Getopt::Long;
+
+my ( $line, $pic, $ref, $dif, $verbose, $help );
+my @error_pic   = "";
+my $save        = "compare_error.tga";
+
+GetOptions (
+    "pic:s"         => \$pic,
+    "ref:s"         => \$ref, 
+    "dif:s"         => \$dif,
+    "sav:s"         => \$save,
+    "v"             => \$verbose,
+    "help"          => \$help
+    );
+    
+if ($help)
+{
+    print "Usage compare_pictures -pic <input picture> -ref <reference picture> -dif <difference picture> -[v|help]\n";
+    print "     -pic <input picture>        : Specify <input picture> which is the picture for checking.\n";
+    print "     -ref <reference picture>    : Specify <reference picture> which is the picture to check against.\n";
+    print "     -dif <difference picture>   : Specify <difference picture> which is the picture the errors are written to.\n";
+    print "     -sav <save picture>         : Specify <save picture> where incorrect pictures will be saved\n";
+    print "     -v                          : Run verbosely.\n";
+    print "     -help                       : Print this message.\n";
+    print "\n";
+    exit;
+}
+
+# Open the files
+print "Comparing $ref and $pic\n" unless (!$verbose);
+print "Writting difference to $dif\n" unless (!$verbose);
+
+die "Error: Reference picture not specified\n" unless ($ref);
+die "Error: Input picture not specified\n" unless ($pic);
+die "Error: Difference picture not specified\n" unless ($dif);
+
+# Check if a reference picture exists
+if (-e $ref)
+{
+	open(REF, "< $ref") || die "Error: Can't open reference file: $ref\n";
+}
+else
+{
+	`mv $pic $save`;
+	die "Error: No reference picture for $pic\n";
+}
+
+# Open actual picture
+open(CMP, "< $pic") || die "Error: Can't open input file: $pic\n";
+
+# Read in the files 
+my @ref_bytes;
+my @cmp_bytes;
+while ($line = <REF>)
+{
+    push @ref_bytes, (unpack "C*", $line);
+}
+
+while ($line = <CMP>)
+{
+    push @cmp_bytes, (unpack "C*", $line);
+}
+
+
+# Compare the headers
+my $error = 0;
+for (my $i=0; $i<18; $i++)
+{
+    if (@ref_bytes[$i] != @cmp_bytes[$i])
+    {
+        $error = 1;
+    }
+}
+@error_pic = @ref_bytes;
+`mv $pic $save` unless (!$error);
+die "Error: Mismatch in picture headers\n" unless (!$error);
+
+# Get the picture size
+my $pic_width  = ((@ref_bytes[13] << 8) + @ref_bytes[12]);
+my $pic_height = ((@ref_bytes[15] << 8) + @ref_bytes[14]);
+print "Picture width  : $pic_width\n" unless (!$verbose);
+print "Picture height : $pic_height\n" unless (!$verbose);
+
+# Check the files are the same length
+die "Error: Different files lengths\n" unless ($#ref_bytes == $#cmp_bytes);
+print "File length: $#ref_bytes\n" unless (!$verbose);
+
+# Check pixel by pixel
+my $errors_found = 0;
+for (my $i=18; $i<=($#cmp_bytes-8); $i+=3)
+{
+    $error = 0;
+    if (@ref_bytes[$i] != @cmp_bytes[$i])
+    {
+        $error = 1;
+        $errors_found++;
+    }
+    
+    if (@ref_bytes[$i+1] != @cmp_bytes[$i+1])
+    {
+        $error = 1;
+        $errors_found++;
+    }
+    
+    if (@ref_bytes[$i+2] != @cmp_bytes[$i+2])
+    {
+        $error = 1;
+        $errors_found++;
+    }
+    
+    if ($error)
+    {
+        @error_pic[$i+2] = 255;
+        @error_pic[$i+1] = 0;
+        @error_pic[$i]   = 0;
+    }
+}
+
+# Report errors
+if ($errors_found)
+{
+    print "Error: Found " . ($errors_found/3.0) . " erroronous pixels\n";
+}
+
+# Compare the footers
+$error = 0;
+for (my $i=($#cmp_bytes-8); $i<=$#cmp_bytes; $i++)
+{
+    if (@ref_bytes[$i] != @cmp_bytes[$i])
+    {
+        $error = 1;
+    }
+}
+`mv $pic $save` unless (!$error);
+die "Error: Mismatch in picture footers\n" unless (!$error);
+
+# Output the differences and save the incorrect picture
+if ($errors_found)
+{
+    open(ERR, "> $dif") || die "Error: Can't open difference file: $dif\n";
+    foreach (@error_pic)
+    {
+        printf ERR "%c", $_;
+    }
+    `mv $pic $save`;
+    close ERR;
+}
+
+# Print success or failure
+die "Error: $errors_found mismatches in picture data\n" unless (!$errors_found);
+print "Success, picture is OK\n";
+
+# Close files
+close REF;
+close CMP;

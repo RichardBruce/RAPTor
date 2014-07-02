@@ -1,0 +1,12 @@
+To do list:
+2. Rotating object collision detection
+3. Friction in contacts
+4. Speed up
+5. Collections of convex objects
+6. Make game
+
+lcov suppressions:
+main.cc     void main(int arg c, char **argv)   This function is just a toy function for me to experiment with and not exported
+
+cpp check supressions:
+simplex_tests.cc    unsafeClassCanLeak          simplex_fixture, the mention member is freed by conatained class

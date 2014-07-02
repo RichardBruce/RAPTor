@@ -1,0 +1,629 @@
+#!/usr/bin/env perl
+
+use strict;
+use Getopt::Long;
+
+my ($in_file, $out_file, $line, $eof, $light, @words, @points);
+my $line_nr = 0;
+my $verbose = 0;
+
+my %point_positions = { };
+
+my $material_nr = 0;
+my $triangle_nr = 0;
+my $ring_nr     = 0;
+my $sphere_nr   = 0;
+my $cylinder_nr = 0;
+my $cone_nr     = 0;
+my $help = "";
+
+# Scale light intensity
+my $light_colour = "255.0, 255.0, 255.0";
+
+# Background colour
+my $bg           = "";
+
+# Lights
+my $light_nr   = 0;
+
+GetOptions (
+    "nff:s"       => \$in_file,
+    "c:s"         => \$out_file,
+    "l:s"         => \$light_colour,
+    "v"           => \$verbose,
+    "help"        => \$help
+    );
+    
+if ($help)
+{
+    print "Usage scn_to_c --nff [input] -c [output] [l]\n";
+    print "     input   : Input file in mgf format.\n";
+    print "     output  : Output file in c++ format.\n";
+    print "     l       : Scale the intensity of lights in format \"R, G, B\", and range 0 to 255)\n";
+    print "\n";
+    print "Note: The light colour may be overridden by values in the nff file.\n";
+    print "\n";
+    exit;
+}
+
+open(SCENE, "< $in_file")  || die "Can't open nff file: $in_file\n";
+open(CODE,  "> $out_file") || die "Can't open output file: $out_file\n";
+
+# Print include file
+print CODE "#include \"scene.h\"\n\n";
+
+
+# Parse the input file
+while ($line = <SCENE>)
+{
+    $line_nr++;
+    @words = split(' ', $line);
+    
+    if (@words[0] =~ /^b$/)
+    {
+        @words[1] *= 255.0;
+        @words[2] *= 255.0;
+        @words[3] *= 255.0;
+        $bg = "ext_colour_t(@words[1], @words[2], @words[3])"
+    }
+    elsif (@words[0] =~ /^v$/)
+    {
+        $line = <SCENE>;
+        $line_nr++;
+        @words = split(' ', $line);
+        die "Error: Incorrectly specified view point @words at line: $line_nr\n" unless ((@words[0] =~ m/^from$/) & ($#words == 3));
+        my @from = (@words[1], @words[2], @words[3]);
+        my $eye = "    /* Position the camera */\n    point_t eye(@words[1], @words[2], @words[3]);\n";
+
+        $line = <SCENE>;
+        $line_nr++;
+        @words = split(' ', $line);
+        die "Error: Incorrectly specified view point @words at line: $line_nr\n" unless ((@words[0] =~ m/^at$/) & ($#words == 3));
+        my @at_vec = ((@words[1] - @from[0]), (@words[2] - @from[1]), (@words[3] - @from[2]));
+        my $dist = sqrt((@at_vec[0] * @at_vec[0]) + (@at_vec[1] * @at_vec[1]) + (@at_vec[2] * @at_vec[2]));
+        @at_vec[0] /= $dist;
+        @at_vec[1] /= $dist;
+        @at_vec[2] /= $dist;
+        my $z_vec = "    vector_t z_vec(@at_vec[0], @at_vec[1], @at_vec[2]);\n";
+                
+        $line = <SCENE>;
+        $line_nr++;
+        @words = split(' ', $line);
+        die "Error: Incorrectly specified view point @words at line: $line_nr\n" unless ((@words[0] =~ m/^up$/) & ($#words == 3));
+        my $y_vec = "    vector_t y_vec(@words[1], @words[2], @words[3]);\n";
+        
+        $line = <SCENE>;
+        $line_nr++;
+        @words = split(' ', $line);
+        my $angle = (@words[1]/360) * (1.0 * 3.1415926535); # This is half of the angle in rad to make a right angle triangle
+        my $dist_ratio = sin($angle)/cos($angle);
+        
+        $line = <SCENE>;
+        $line_nr++;
+        @words = split(' ', $line);
+        my $hither = @words[1];
+        # Default for hither
+        if ($hither == 0.0)
+        {
+            $hither = 1.0;
+        }
+        my $height_width = $dist_ratio * $hither;
+        
+        $line = <SCENE>;
+        $line_nr++;
+        @words = split(' ', $line);
+        my $x_res = @words[1];
+        my $y_res = @words[2];
+        die "Error: Picture is expected to be square, line: $line_nr\n" unless (@words[1] == @words[2]);
+        
+print CODE "
+/* Auto generated init function do not edit directly */
+void scene_init(list<shape *> &lights, list<shape *> &everything, list<material *> &materials, camera **c)
+{
+$eye
+$y_vec
+$z_vec
+
+    vector_t x_vec(1.0, 0.0, 0.0);
+    cross_product(y_vec, z_vec, &x_vec);
+    cross_product(z_vec, x_vec, &y_vec);
+    normalise(&x_vec);
+    normalise(&y_vec);
+    normalise(&z_vec);
+    *c = new camera(eye, x_vec, y_vec, z_vec, $bg, $height_width, $height_width, $hither, $x_res, $y_res);
+
+";
+
+    }
+    elsif (@words[0] =~ /^l$/)
+    {
+        # Overload the input light colour with the colour specified in the file
+        if ($#words == 7)
+        {
+            $light_colour = "@words[4], @words[5], @words[6]";
+        }
+        
+        $material_nr++;
+        print CODE "    light_shader *m$material_nr = new light_shader(ext_colour_t($light_colour));\n";
+        print CODE "    materials.push_front(m$material_nr);\n\n";
+        print CODE "    sphere *l$light_nr = new sphere(m$material_nr, point_t(@words[1], @words[2], @words[3]), 0.01, true);\n";
+        print CODE "    lights.push_front(l$light_nr);\n";
+        print CODE "    everything.push_front(l$light_nr);\n";
+        $light_nr++;
+    }
+    elsif (@words[0] =~ /^f$/)
+    {
+        @words[1] *= 255.0;
+        @words[2] *= 255.0;
+        @words[3] *= 255.0;
+        
+        $material_nr++;
+        print CODE "    phong_shader *m$material_nr = new phong_shader(ext_colour_t(@words[1], @words[2], @words[3]), @words[4], @words[5], @words[6], @words[7], @words[8], @words[5]);\n";
+        print CODE "    materials.push_back(m$material_nr);\n";
+    }
+    elsif (@words[0] =~ /^s$/)
+    {
+        print CODE "    sphere *s$sphere_nr = new sphere(m$material_nr, point_t(@words[1], @words[2], @words[3]),@words[4]);\n";
+        print CODE "    everything.push_front(s$sphere_nr);\n\n";
+        $sphere_nr++;
+    }
+    elsif ((@words[0] =~ /^p$/) | (@words[0] =~ /^pp$/))
+    {
+        # Read in the points
+        my $points_to_read = @words[1];
+        my @points;
+        for (my $i=0; $i<$points_to_read; $i++)
+        {
+            $line = <SCENE>;
+            $line_nr++;
+            @words = split(' ', $line);
+            $point_positions{$i} = [ @words[0], @words[1], @words[2] ];
+            push @points, $i;
+        }
+        
+        # Find the furthest point from the center
+        my @com = find_centre(@points);
+        my $max = find_furthest(@com, @points);
+
+        # Use the points either side of this point to find the surface normal
+        my ( $max_m1, $max_p1 );
+        if ($max == 0)
+        {
+            $max_m1 = $#points;
+        }
+        else
+        {
+            $max_m1 = $max - 1;
+        }
+        
+        if ($max == $#points)
+        {
+            $max_p1 = 0;
+        }
+        else
+        {
+            $max_p1 = $max + 1;
+        }
+        my @face_normal = cross_product(@points[$max_m1], @points[$max], @points[$max_p1]);
+        
+        my $no_success = 0;
+        while (($#points - 2) >= 0)
+        {
+            # Assume the guess will be a valid triangle
+            my $draw = 1;
+            my $next = 1;
+            
+            # Take the first 3 points of the face to try and form a triangle
+            my @triangle = shift @points;
+            push @triangle, (shift @points);
+            push @triangle, (shift @points);
+            
+            print "Trialing triangle: @triangle\n" unless (!$verbose);
+            
+            # If the points form a straight line the triangle is invalid
+            if (is_straight_line(@triangle))
+            {
+                print "Triangle rejected: Straight line\n" unless (!$verbose);
+                $draw = 0;
+            }
+
+            # If draw is false the cross product will fail (div by 0 error in normalising)
+            if ($draw)
+            {
+                # If the triangle has a different normal to the face it is invalid
+                my @tri_normal = cross_product(@triangle[0], @triangle[1], @triangle[2]);
+                if (vector_3_dot_product(@tri_normal, @face_normal) < 0.0)
+                {
+                    print "Triangle rejected: Outside of surface\n" unless (!$verbose);
+                    $draw = 0;
+                    $next = 0;
+                }
+
+                # If any of the remaining points fall in the triangle it is illegal
+                if (is_in_triangle(@triangle, @points))
+                {
+                    print "Triangle rejected: Consumes point\n" unless (!$verbose);
+                    $draw = 0;
+                    $next = 0;
+                }
+            }
+            
+            # Draw if the triangle is valid
+            if ($draw)
+            {
+                $no_success = 0;
+                print "Triangle accepted: @triangle\n" unless (!$verbose);
+                print CODE "    triangle *t$triangle_nr = new triangle(m$material_nr,";
+                
+                my @output_point = @{$point_positions{@triangle[0]}};
+                print CODE " point_t(@output_point[0], @output_point[1], @output_point[2]),";
+                
+                @output_point = @{$point_positions{@triangle[1]}};
+                print CODE " point_t(@output_point[0], @output_point[1], @output_point[2]),";
+                
+                @output_point = @{$point_positions{@triangle[2]}};
+                print CODE " point_t(@output_point[0], @output_point[1], @output_point[2]));\n";
+                
+                print CODE "    everything.push_front(t$triangle_nr);\n\n";
+                
+                $triangle_nr++;
+            }
+            
+            # If the triangle was valid or a straight line 
+            # remove the middle point and move to the next set of points
+            if ($next)
+            {
+                $no_success = 0;
+                push @points, @triangle[0];
+                unshift @points, @triangle[2];
+            }
+            else
+            {
+                push @points, @triangle[0];
+                unshift @points, @triangle[2];
+                unshift @points, @triangle[1];
+                $no_success++;
+            }
+            
+            die "Failure to construct face : $line_nr\n" unless ($no_success <= $#words);
+        }
+    }
+    elsif (@words[0] =~ /^c$/)
+    {
+        if (@words[4] == @words[8])
+        {
+            # Calculate the height of the cylinder
+            my @bot = ( @words[1], @words[2], @words[3] );
+            my @top = ( @words[5], @words[6], @words[7] );
+    
+            # Find the height and vector through the cylinder
+            my @cur_dir = ( (@top[0] - @bot[0]), (@top[1] - @bot[1]), (@top[2] - @bot[2]));
+            my $height = sqrt((@cur_dir[0] * @cur_dir[0]) + (@cur_dir[1] * @cur_dir[1]) + (@cur_dir[2] * @cur_dir[2]));
+            @cur_dir[0] /= $height;
+            @cur_dir[1] /= $height;
+            @cur_dir[2] /= $height;
+
+            # The original cylinder had a vector through it in 'z'
+            # Take the cross product of the vector of the original and the rotated cylinder
+            # This give the normal to the plane the cylinder was rotated in
+            # This is the axis to rotate around
+            my @rot_axis = ( (@cur_dir[1]), -(@cur_dir[0]), (0.0) );
+            # This is for the special case of the cylinder pointing in the opposite direction
+            if ((@rot_axis[0] == 0.0) & (@rot_axis[1] == 0.0))
+            {
+                @rot_axis[0] = 1.0;
+            }
+    
+            # acos of the dot product of the two centre vectors gives the angle of rotation
+            my $angel    = acos(@cur_dir[2]);
+    
+            # Write out the cylinder
+            print CODE "    cylinder *cy${cylinder_nr} = new cylinder(m$material_nr";
+            print CODE ", point_t(@words[1], @words[2], @words[3]), $height, @words[4], 0.0, vector_t(@rot_axis[0],@rot_axis[1],@rot_axis[2]), $angel);\n";
+            print CODE "    everything.push_front(cy${cylinder_nr});\n\n";
+    
+            $cylinder_nr++;
+        }
+        else
+        {
+            # The largest radius must always be at the base of the cone
+            my ( @top, @bot );
+            if (abs(@words[4]) > abs(@words[8]))
+            {
+                my $tmp;
+                $tmp = abs(@words[4]);
+                @words[4] = abs(@words[8]);
+                @words[8] = $tmp;
+        
+                @top = ( @words[5], @words[6], @words[7] );
+                @bot = ( @words[1], @words[2], @words[3] );
+            }
+            else
+            {
+                @top = ( @words[1], @words[2], @words[3] );
+                @bot = ( @words[5], @words[6], @words[7] );
+                @words[8] = abs(@words[8]);
+                @words[4] = abs(@words[4]);
+            }
+    
+            # Find the height and vector through the cylinder
+            my @cur_dir = ( (@top[0] - @bot[0]), (@top[1] - @bot[1]), (@top[2] - @bot[2]));
+            my $height = sqrt((@cur_dir[0] * @cur_dir[0]) + (@cur_dir[1] * @cur_dir[1]) + (@cur_dir[2] * @cur_dir[2]));
+            @cur_dir[0] /= $height;
+            @cur_dir[1] /= $height;
+            @cur_dir[2] /= $height;
+
+            # The original cone had a vector through it in 'z'
+            # Take the cross product of the vector of the original and the rotated cone
+            # This give the normal to the plane the cone was rotated in
+            # This is the axis to rotate around
+            my @rot_axis = ( (@cur_dir[1]), -(@cur_dir[0]), (0.0) );
+            # This is for the special case of the cone pointing in the opposite direction
+            if ((@rot_axis[0] == 0.0) & (@rot_axis[1] == 0.0))
+            {
+                @rot_axis[0] = 1.0;
+            }
+    
+            # acos of the dot product of the two centre vectors gives the angle of rotation
+            my $angel    = acos(@cur_dir[2]);
+        
+            my @length = ( (@top[0] - @bot[0]), (@top[1] - @bot[1]), (@top[2] - @bot[2]));
+            my $top_surface = sqrt((@length[0] * @length[0]) + (@length[1] * @length[1]) + (@length[2] * @length[2]));
+    
+            # Calculte the height of the point of the cone
+            my $side_grad = abs(@words[8] - @words[4]) / $top_surface;
+            $height    = @words[8]/$side_grad;
+    
+            # Write out the cone
+            $top_surface = ", " . $top_surface;
+            print CODE "    cone *co${cone_nr} = new cone(m$material_nr";
+            print CODE ", point_t(@bot[0], @bot[1], @bot[2]), @words[8], $height$top_surface, vector_t(@rot_axis[0],@rot_axis[1],@rot_axis[2]), $angel);\n";
+            print CODE "    everything.push_front(co${cone_nr});\n\n";
+            $cone_nr++;
+        }
+    }
+    else
+    {
+        die "Error: Nothing known about @words\n";
+    }
+}
+
+# Print asserts that this worked
+print CODE "
+    /* Assert there must be some lights to light the scene */
+    assert(!lights.empty());
+
+    /* Assert there is an imagine to trace */
+    assert(!everything.empty());
+    
+    return;
+}
+
+";
+
+close CODE;
+close SCENE;
+
+exit 0;
+
+sub find_centre
+{
+    my @total;
+    my $points = 0;
+    foreach (@_)
+    {
+        # Check and fetch the points data
+        die "Error: Find center with unknown point $_: $line_nr\n" unless (exists $point_positions{$_});
+        @total = vector_3_add(@total, @{$point_positions{$_}});
+        $points++;
+    }
+
+    return ((@total[0]/$points), (@total[1]/$points), (@total[2]/$points));
+}
+
+sub find_furthest
+{
+    my $max_point;
+    my $max_dist = 0;
+
+    my @from = shift @_;
+    push @from, (shift @_);
+    push @from, (shift @_);
+    
+    for (my $i=0; $i<=$#_; $i++)
+    {
+        my $dist = absolute_distance(@from, @_[$i]);
+        if ($dist > $max_dist)
+        {
+            $max_dist = $dist;
+            $max_point = $i;
+        }
+    }
+    
+    return $max_point;
+}
+
+sub absolute_distance
+{
+    # Check points exist    
+    die "Error: Absolute distance with unknown point @_[3]: $line_nr\n" unless (exists $point_positions{@_[3]});
+
+    my @b = @{$point_positions{@_[3]}};
+    my @a = shift @_;
+    @a = shift @_;
+    @a = shift @_;
+    
+    @a = vector_3_sub(@a, @b);
+    return sqrt((@a[0] * @a[0]) + (@a[1] * @a[1]) + (@a[2] * @a[2]));
+}
+
+sub is_straight_line
+{
+    # Check points exist    
+    die "Error: Straight line check with unknown point @_[0]: $line_nr\n" unless (exists $point_positions{@_[0]});
+    die "Error: Straight line check with unknown point @_[1]: $line_nr\n" unless (exists $point_positions{@_[1]});
+    die "Error: Straight line check with unknown point @_[2]: $line_nr\n" unless (exists $point_positions{@_[2]});
+
+    my @a = @{$point_positions{@_[0]}};
+    my @b = @{$point_positions{@_[1]}};
+    my @c = @{$point_positions{@_[2]}};
+    
+    # Check the points show movement in atleast 2 axes
+    @a = vector_3_sub(@a, @b);
+    @b = vector_3_sub(@b, @c);
+    @a = normalise(@a);
+    @b = normalise(@b);
+    
+    @c = vector_3_sub(@a, @b);
+    @a = vector_3_add(@a, @b);
+    
+    if (vector_3_is_zero(@c) | vector_3_is_zero(@a))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+
+}
+
+# A sub-routine to find if points are in a triangle
+# The first 3 parameters are the names of the points of the triangle
+# The remaining points are tested to see if they are in the triangle
+sub is_in_triangle
+{
+    # Check points exist    
+    die "Error: In triangle test with unknown point @_[0]: $line_nr\n" unless (exists $point_positions{@_[0]});
+    die "Error: In triangle test with unknown point @_[1]: $line_nr\n" unless (exists $point_positions{@_[1]});
+    die "Error: In triangle test with unknown point @_[2]: $line_nr\n" unless (exists $point_positions{@_[2]});
+
+    my @a = @{$point_positions{shift @_}};
+    my @b = @{$point_positions{shift @_}};
+    my @c = @{$point_positions{shift @_}};
+    
+    # Check each point if it is inside the triangle
+    foreach (@_)
+    {
+        # Check and fetch the points data
+        die "Error: In triangle test with unknown point $_: $line_nr\n" unless (exists $point_positions{$_});
+        my @p = @{$point_positions{$_}};
+
+        # Check the point is on the same side of
+        #       AB as C
+        #       BC as A
+        #       CA as B
+        if (same_side(@p, @a, @b, @c) & same_side(@p, @b, @a, @c) & same_side(@p, @c, @a, @b))
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+sub same_side
+{
+    my @ab  = vector_3_sub(@_[6], @_[7], @_[8], @_[9], @_[10], @_[11]);
+    
+    # Normal of the triangle form by the tested point
+    my @cp0 = vector_3_cross_product(@ab, vector_3_sub(@_[0], @_[1], @_[2], @_[6], @_[7], @_[8]));
+    
+    # Normal of the triangle
+    my @cp1 = vector_3_cross_product(@ab, vector_3_sub(@_[3], @_[4], @_[5], @_[6], @_[7], @_[8]));
+    
+    # Check the normals are in the same direction
+    if (vector_3_dot_product(@cp0, @cp1) > 0.0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+# Cross product sub-routine
+# Takes the name of 3 points as input
+# Returns the normal of the vectors formed between the points
+sub cross_product
+{
+    # Check points exist    
+    die "Error: Cross product with unknown point @_[0]: $line_nr\n" unless (exists $point_positions{@_[0]});
+    die "Error: Cross product with unknown point @_[1]: $line_nr\n" unless (exists $point_positions{@_[1]});
+    die "Error: Cross product with unknown point @_[2]: $line_nr\n" unless (exists $point_positions{@_[2]});
+
+    # Calculate the length of the vectors
+    my @a = @{$point_positions{@_[0]}};
+    my @b = @{$point_positions{@_[1]}};
+    my @c = @{$point_positions{@_[2]}};
+    
+    @a = vector_3_sub(@a, @b);
+    @b = vector_3_sub(@b, @c);
+    @a = normalise(@a);
+    @b = normalise(@b);
+    
+    # Cross product
+    return normalise(vector_3_cross_product(@a, @b));
+}
+
+sub vector_3_cross_product
+{
+    my @c;
+    @c[0] = (@_[1] * @_[5]) - (@_[2] * @_[4]);
+    @c[1] = (@_[2] * @_[3]) - (@_[0] * @_[5]);
+    @c[2] = (@_[0] * @_[4]) - (@_[1] * @_[3]);
+    return @c;
+}
+
+sub vector_3_dot_product
+{
+    return ((@_[0] * @_[3]) + (@_[1] * @_[4]) + (@_[2] * @_[5]));
+}
+
+# Normalisation sub-routine
+# Takes the values of 3 points
+sub normalise
+{
+    my $dist = sqrt((@_[0] * @_[0]) + (@_[1] * @_[1]) + (@_[2] * @_[2]));
+    return ((@_[0]/$dist), (@_[1]/$dist), (@_[2]/$dist));
+}
+
+# Equality with zero sub-routine
+# Takes the values of 3 points
+sub vector_3_is_zero
+{
+    return ((@_[0] == 0.0) & (@_[1] == 0.0) & (@_[2] == 0.0));
+}
+
+# Equality of 2 vectors sub-routine
+# Takes the values of 3 points for each vector
+sub vector_3_is_equal
+{
+    return ((@_[0] == @_[3]) & (@_[1] == @_[4]) & (@_[2] == @_[5]));
+}
+
+# Addition of 2 vectors sub-routine
+# Takes the values of 3 points for each vector
+sub vector_3_add
+{
+    return (( @_[0] + @_[3]), ( @_[1] + @_[4]), ( @_[2] + @_[5]));
+}
+
+# Subtraction of 2 vectors sub-routine
+# Takes the values of 3 points for each vector
+sub vector_3_sub
+{
+    return (( @_[0] - @_[3]), ( @_[1] - @_[4]), ( @_[2] - @_[5]));
+}
+# Inverse cosine sub-routine
+sub acos
+{
+    return atan2(sqrt(1.0 - @_[0] * @_[0]), @_[0]);
+}
+
+sub atan
+{
+    return acos(1.0 / sqrt(1.0 + (@_[0] * @_[0])));
+}

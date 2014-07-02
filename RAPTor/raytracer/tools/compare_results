@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+
+use strict;
+use Getopt::Long;
+
+my ( $line_a, $line_b, @words_a, @words_b, $before, $after, $save, $col, $verbose, $help );
+
+GetOptions (
+    "b:s"           => \$before,
+    "a:s"           => \$after, 
+    "s:s"           => \$save,
+    "c:i"           => \$col,
+    "v"             => \$verbose,
+    "help"          => \$help
+    );
+
+if ($help)
+{
+    print "Usage compare_results -before <input picture> -after <reference picture> -save <difference picture> -[v|help]\n";
+    print "     -a <after file>             : Specify <input picture> which is the picture for checking.\n";
+    print "     -b <before file>            : Specify <reference picture> which is the picture to check against.\n";
+    print "     -s <save file>              : Specify <save picture> where incorrect pictures will be saved\n";
+    print "     -c <column>                 : Specify <difference picture> which is the picture the errors are written to.\n";
+    print "     -v                          : Run verbosely.\n";
+    print "     -help                       : Print this message.\n";
+    print "\n";
+    exit;
+}
+
+# Open the files
+die "Error: Before not specified\n" unless ($before);
+die "Error: After not specified\n" unless ($after);
+die "Error: Save not specified\n" unless ($save);
+die "Error: Column not specified\n" unless ($col);
+
+# Open inputs and outputs
+open(BEF, "< $before") || die "Error: Can't open input file: $before\n";
+open(AFT, "< $after" ) || die "Error: Can't open input file: $after\n";
+open(SAV, "> $save"  ) || die "Error: Can't open output file: $save\n";
+
+print SAV "  Test          | Before          | After            | Change (%)      |\n";
+while ($line_a = <AFT>)
+{
+    $line_b     = <BEF>;
+    @words_a    = split (/\|/, $line_a);
+    @words_b    = split (/\|/, $line_b);
+    
+    
+    # Ignore the title and find the table
+    if (($line_a !~ m/[\s|\w]+\|/) || ($line_b !~ m/[\s|\w]+\|/) || ($words_a[$col] !~ m/\d+/) || ($words_b[$col] !~ m/\d+/))
+    {
+        next;
+    }
+    else
+    {
+        printf SAV ("%15s | %15f |  %15f | %15f | \n", $words_b[0], $words_b[$col],  $words_a[$col], ($words_a[$col]/$words_b[$col]) * 100);
+    }
+}
+
+exit 0;
+

@@ -1,0 +1,1 @@
+for file in $1/*act* ; do mv $file ${file/act/exp}; done

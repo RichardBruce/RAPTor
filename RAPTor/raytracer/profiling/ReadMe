@@ -1,0 +1,20 @@
+Profiling ReadMe
+================
+
+This file contains a description of the changes made between each profile and
+what the profile is of.
+
+Profile Name                            Date        Scene       Changes
+-------------                           ----        -----       -------
+callgrind.out.nop_kdt                   04/02/09    Desklamp    Baseline for desklamp.
+callgrind.out.04_02_09                  04/02/09    Desklamp    Added naive KD-tree builder.
+callgrind.out.05_02_09                  05/02/09    Desklamp    Improvements on KD-tree builder.
+callgrind.out.10_02_09                  10/02/09    Desklamp    Optimised cos/sin with a LUT.
+callgrind.out.16_02_09_sah              16/02/09    Desklamp    First attempt SAH.
+callgrind.out.27_02_09                  27/02/09    Desklamp    Improved SAH and scene builder.
+callgrind.out.02_03_09                  02/03/09    Redchair    Baseline for redchair. Note the long KD-tree build time.
+callgrind.out.03_03_09                  03/03/09    Redchair    Bounding box access function make concrete. Loops moved inside axis switch.
+callgrind.out.04_03_09                  02/03/09    Butterfly   Baseline for butterfly. Note the number of intersection tests.
+callgrind.out.ring_with_correct_cyc_bb  15/03/09    Rings_3     Fixed the cylinder bouding box
+callgrind.out.cabin_without_qsort       15/03/09    Cabin       Reference for cabin_with_qsort
+callgrind.out.cabin_with_qsort          15/03/09    Cabin       Using quick sort instead of std::list.sort()

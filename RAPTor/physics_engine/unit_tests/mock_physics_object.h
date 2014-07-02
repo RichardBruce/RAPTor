@@ -1,0 +1,175 @@
+#ifndef __MOCK_VERTEX_GROUP_H__
+#define __MOCK_VERTEX_GROUP_H__
+
+/* Standard headers */
+#include <deque>
+
+/* Common headers */
+#include "point_t.h"
+#include "force_info.h"
+
+/* Physics headers */
+#include "inertia_tensor.h"
+#include "vertex_group.h"
+#include "physics_object.h"
+
+using raptor_physics::inertia_tensor;
+using raptor_physics::inertia_tensor_view;
+
+
+/* Class to act as a vertex group while testing */
+class mock_physics_object
+{
+    public :
+        typedef mock_physics_object inner_vg;
+
+        mock_physics_object(inertia_tensor *const i, const point_t &v = point_t(0.0, 0.0, 0.0), const point_t &w = point_t(0.0, 0.0, 0.0)) 
+            : _i(i), _v(v), _w(w), _f(point_t(0.0, 0.0, 0.0)), _tor(point_t(0.0, 0.0, 0.0)) {  };
+
+        ~mock_physics_object()
+        {
+            delete _i;
+        }
+
+        /* Setters */
+        mock_physics_object& set_force(const point_t &f)
+        {
+            _f = f;
+            return *this;
+        }
+
+        mock_physics_object& set_torque(const point_t &tor)
+        {
+            _tor = tor;
+            return *this;
+        }
+
+        mock_physics_object& set_velocity(const point_t &v)
+        {
+            _v = v;
+            return *this;
+        }
+
+        mock_physics_object& set_angular_velocity(const point_t &w)
+        {
+            _w = w;
+            return *this;
+        }
+
+        mock_physics_object& apply_force(const point_t &at, const point_t &f, const fp_t t)
+        {
+            /* No point pushing an infinite mass object */
+            if (get_mass() == numeric_limits<fp_t>::infinity())
+            {
+                return *this;
+            }
+
+            /* Add to force */
+            _f += f;
+
+            /* Add to the torque */
+            point_t tor;
+            cross_product(at, f, &tor);
+            _tor += tor;
+
+            return *this;
+        }
+
+        mock_physics_object& apply_impulse(const point_t &impulse, const point_t &poc)
+        {
+            const point_t l(cross_product(poc - get_center_of_mass(), impulse));
+
+            _v += (impulse / _i->mass());
+            _w += (l / get_orientated_tensor());
+            return *this;
+        }
+
+
+        /* Getters */
+        mock_physics_object *   get_vertex_group()                    { return this;                    }
+        point_t                 get_force()                     const { return _f;                      }
+        point_t                 get_torque()                    const { return _tor;                    }
+        point_t                 get_velocity()                  const { return _v;                      }
+        point_t                 get_angular_velocity()          const { return _w;                      }
+        point_t                 get_center_of_mass()            const { return _i->center_of_mass();    }
+        inertia_tensor&         get_inertia_tenor()             const { return *_i;                     }
+        fp_t                    get_mass()                      const { return _i->mass();              }
+
+        point_t get_velocity(const point_t &p) const
+        {
+            return _v + cross_product(_w, p - _i->center_of_mass());
+        }
+
+        point_t get_momentum() const
+        {
+            /* Infinite mass objects shouldnt be moving */
+            return (_i->mass() == numeric_limits<fp_t>::infinity()) ? 0.0 : ( _i->mass() * _v);
+        }
+
+        point_t get_angular_momentum() const
+        {
+            /* Infinite mass objects shouldnt be moving */
+            return (_i->mass() == numeric_limits<fp_t>::infinity()) ? point_t(0.0, 0.0, 0.0) : (get_orientated_tensor() * _w);
+        }
+
+        const inertia_tensor_view get_orientated_tensor() const
+        {
+            return inertia_tensor_view(*_i, quaternion_t(1.0, 0.0, 0.0, 0.0));
+        }
+        
+        /* Setters */
+        mock_physics_object& apply_impulse(const point_t &n, const point_t &angular_weight, const fp_t impulse)
+        {
+            _n.push_back(n);
+            _angular_weight.push_back(angular_weight);
+            _impulse.push_back(impulse);
+
+            return *this;
+        }
+
+        /* Result getters */
+        point_t get_collision_normal()
+        {
+            const point_t tmp = _n.front();
+            _n.pop_front();
+            return tmp;
+        }
+
+        point_t get_angular_weight()
+        {
+            const point_t tmp = _angular_weight.front();
+            _angular_weight.pop_front();
+            return tmp;
+        }
+
+        fp_t    get_impulse()
+        {
+            const fp_t tmp = _impulse.front();
+            _impulse.pop_front();
+            return tmp;
+        }
+
+
+    private :
+        inertia_tensor *const   _i;
+        std::deque<point_t>     _n;
+        std::deque<point_t>     _angular_weight;
+        std::deque<fp_t>        _impulse;
+        point_t                 _v;
+        point_t                 _w;
+        point_t                 _f;
+        point_t                 _tor;
+};
+
+/* Build a physics object that is just functional enough to build a simplex with */
+inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t> &verts)
+{
+    return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, new std::vector<int>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0);
+}
+
+inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t> &verts, const quaternion_t &o, const point_t &t)
+{
+    return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, new std::vector<int>(), nullptr), o, t, 0.0);
+}
+
+#endif /* #ifndef __MOCK_VERTEX_GROUP_H__ */

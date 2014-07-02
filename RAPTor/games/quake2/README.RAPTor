@@ -1,0 +1,177 @@
+-- Directory structure --
+
+* games/quake2/src/raptor:
+
+  Source code for the interface between Quake2 and the RAPTor raytracer library.
+
+* games/quake2/demo/baseq2:
+
+  Demo game data -- models, maps, textures, etc.
+
+* games/quake2/raptor.cfg:
+
+  Configuration file for raytraced quake2.
+
+* games/quake2/maps:
+
+  Custom maps made with Quark.
+
+* games/quake2/tools:
+
+  Tools related to Quake2 -- qbsp3 map compiler and Quark map editor.
+
+
+-- Usage --
+
+* Makefile:
+
+  At the top of games/quake2/Makefile, it is possible to choose which libraries to build.
+  For example, to build the OpenGL version as well as the raytraced version of Quake2,
+  set BUILD_SDLGL=YES and BUILD_RAPTOR=YES.
+  
+  There is also a section for setting defines to use when building the raytracer library,
+  as well as defines that affect the compilation of the raytraced version of the quake2
+  source code. To enable anti-aliasing, add RAPTOR_DEFINES+=RAPTOR_ANTI_ALIAS. To generate
+  an animation (output a sequence of frame snapshots, one snapshot for each eye left/right
+  per frame, in the directory 'video'), add RAPTOR_DEFINES+=RAPTOR_RENDER_ANIMATION.
+
+* Generate Quake2 OpenGL video:
+  
+  To generate a video from Quake2 OpenGL, add GENERATE_GL_VIDEO to the defines during
+  compilation (this has not yet been added to the Makefile, so it is necessary to edit the
+  Makefile if you want to do this). NOTE: the dumping of Quake2 OpenGL is a bit 'hacked'
+  and only supports 640x480 resolution. If you want to use any other resolution, you need
+  to edit the source code. You can find the place to change by searching for
+  GENERATE_GL_VIDEO in the file gl_rmain.c.
+  
+* Configuration file:
+
+  The file "raptor.cfg" contains options for raytraced Quake2. There are two main sections
+  of the configuration file. One section specifies reflectivity of certain textures. The
+  other section specifies attributes for certain map files. To make a texture with a certain
+  name reflective, simply add a line to the configuration file:
+  
+    reflection <path/texture_name> <reflection_coefficient>
+    
+  You can specify a default reflection coefficient to make all textures reflective:
+  
+    reflection default <reflection_coefficient>
+  
+  In the map attributes section, you can specify attributes to be associated with certain
+  Quake2 map names, that affect the rendering of those particular maps. Currently, there
+  are two attributes, both of which control lighting. You may specify light sources at
+  fixed positions, and/or specify a "player light" that is always centered at the player.
+  
+  To add a fixed light:
+
+    fixed_light <map_name> <x> <y> <z> <r> <g> <b> <intensity fall off>
+
+  To add a player light:
+
+    player_light <map_name> <r> <g> <b> <intensity fall off>
+
+  NOTE: <map_name> normally does not include any extension. For example, to set a light for
+  a map called 'my_map.bsp', just use 'my_map' as the map name, ignoring the '.bsp'. The
+  exception to this is when setting lights for pre-recorded demos. In this case, you need
+  to include the entire name, e.g. 'my_recorded_demo.dm2'.
+  
+* Choosing rendering mode:
+
+  When starting Quake2, you may choose between e.g. OpenGL or raytracing for rendering.
+  When compiling raytraced Quake2 (see Makefile section above), the raytracing related
+  changes are integrated in the softsdl library. To run OpenGL:
+  
+    quake2 +set vid_ref sdlgl
+  
+  To run raytraced (after building with BUILD_RAPTOR=TRUE):
+
+    quake2 +set vid_ref softsdl
+
+* Selecting map:
+
+  When starting Quake2, you may choose which map to start with. To specify a certain map:
+  
+    quake2 +map <map_name>
+    
+  The same rules for map names apply here as in the configuration file (see above).
+  
+  You can also choose a map while playing, by pressing the ~ key to bring up the Quake2
+  console and typing:
+  
+    map <map_name>
+
+* Recording a demo:
+
+  To start recording an interactive game session to "<filename>.dm2" for later playback (and
+  possibly rendering):
+  
+    record <filename>
+  
+  To stop recording:
+
+    stop
+
+  The file is saved in "~/.quake2/baseq2/demos" and can be played back by:
+  
+    "quake2 +map <filename>.dm2"
+
+* Dumping current Quake2 state to a .nff model file:
+
+  To dump to .nff, press the "Pause/Break" button. NOTE: this feature has not been tested
+  during the past few months and may contain bugs or undesirable behaviour in general.
+
+
+-- Source code remarks --
+
+Nearly all the functions for drawing rastered graphics have been disabled and replaced by
+passing the triangles to the raytracer. The exception is 2D overlays that are more
+convenient to keep rastered (e.g. menus). For example, R_RenderFace() has been disabled in
+ref_soft/r_bsp.c. To find all the changes related to raytracing in the Quake2 source code,
+search for "RAPTOR_RAYTRACE". Below is a short list of such changes:
+
+* linux/rw_sdl.c:
+
+  Edited to use 32 bit colour when raytracing is enabled, and to respond to the Pause/Break
+  keypress for dumping to a .nff file.
+  
+* linux/sys_linux.c:
+
+  Edited for exporting an API to pass information between libraries. It was used for passing
+  information about lights from the maps, which was replaced by instead specifying lights in
+  the raptor.cfg configuration file. The API code is left unchanged for reference. Several
+  other files have also been changed for this same purpose; client/ref.h, game/g_main.c,
+  game/g_spawn.c, linux/vid_so.c, ref_soft/r_main.c and server/sv_init.c.
+  
+All other changes are made under the ref_soft/ folder:
+
+* ref_soft/r_main.c:
+
+  The function raptor_prepare_triangles() is used for preparing a list of all the world
+  triangles to be passed to the raytracer. It also prepares a skybox and adds dynamic lights.
+  Other dynamic objects, e.g. weapons, pickups, enemies, are not processed in this function.
+  In this function, currently all transparent surfaces are skipped. To add support for
+  transparent surfaces, edit the code in this function.
+
+  The function R_RenderFrame is the top level rendering function that sets up and renders
+  each frame. This is a good place to start when trying to understand the rendering flow.
+  
+* ref_soft/r_sprite.c:
+
+  Contains changes for drawing sprites as texture mapped raytraced triangles.
+  
+* ref_soft/r_scan.c:
+
+  Contains changes for screen warping, e.g. when the player is under water.
+  
+* ref_soft/r_part.c:
+
+  Contains changes for drawing particles as raytraced triangles.
+
+* ref_soft/r_draw.c:
+
+  Contains changes for drawing 2D graphics on screen.
+
+* ref_soft/r_alias.c:
+
+  Contains changes for drawing objects such as weapons, enemy models, pulsating bonus items
+  as raytraced triangles.

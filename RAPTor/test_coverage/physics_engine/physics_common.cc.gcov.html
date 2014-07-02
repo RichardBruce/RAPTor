@@ -1,0 +1,791 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Test Coverage - physics_engine/physics_common.cc</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">physics_engine</a> - physics_common.cc<span style="font-size: 80%;"> (source / <a href="physics_common.cc.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Test Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">27</td>
+            <td class="headerCovTableEntry">338</td>
+            <td class="headerCovTableEntryLo">8.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2014-01-16</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntryLo">25.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Standard headers */</a>
+<span class="lineNum">       2 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">       3 </span>            : #include &lt;limits&gt;
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : /* Common headers */
+<span class="lineNum">       6 </span>            : #include &quot;common.h&quot;
+<span class="lineNum">       7 </span>            : #include &quot;logging.h&quot;
+<span class="lineNum">       8 </span>            : #include &quot;physics_common.h&quot;
+<span class="lineNum">       9 </span>            : #include &quot;point_t.h&quot;
+<span class="lineNum">      10 </span>            : #include &quot;matrix_3d.h&quot;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace raptor_physics
+<a name="14"><span class="lineNum">      14 </span>            : {</a>
+<span class="lineNum">      15 </span>            : /* Find the component of v that projects on to n */
+<span class="lineNum">      16 </span><span class="lineNoCov">          0 : point_t project_vector(const point_t &amp;v, const point_t &amp;n)</span>
+<span class="lineNum">      17 </span>            : {
+<span class="lineNum">      18 </span>            :     /* Check for 0 v */
+<span class="lineNum">      19 </span><span class="lineNoCov">          0 :     const fp_t vel_magn = magnitude(v);</span>
+<span class="lineNum">      20 </span><span class="lineNoCov">          0 :     if (vel_magn &lt; raptor_physics::EPSILON)</span>
+<span class="lineNum">      21 </span>            :     {
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 :         return point_t(0.0, 0.0, 0.0);</span>
+<span class="lineNum">      23 </span>            :     }
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            :     /* Project */
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :     const point_t vel_norm = v / vel_magn;</span>
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :     return n * vel_magn * dot_product(n, vel_norm);</span>
+<span class="lineNum">      28 </span>            : }
+<span class="lineNum">      29 </span>            : 
+<a name="30"><span class="lineNum">      30 </span>            : </a>
+<span class="lineNum">      31 </span>            : /* Find the most extreme vertex in direction d */
+<span class="lineNum">      32 </span><span class="lineCov">       2880 : int find_support_vertex(const matrix_3d &amp;m, const point_t &amp;d)</span>
+<span class="lineNum">      33 </span>            : {
+<span class="lineNum">      34 </span>            :     fp_t dummy;
+<span class="lineNum">      35 </span><span class="lineCov">       2880 :     return find_support_vertex(m, d, &amp;dummy);</span>
+<span class="lineNum">      36 </span>            : }
+<span class="lineNum">      37 </span>            : 
+<a name="38"><span class="lineNum">      38 </span>            : </a>
+<span class="lineNum">      39 </span>            : /* Find the most extreme vertex in direction d and its projection */
+<span class="lineNum">      40 </span><span class="lineCov">       2880 : int find_support_vertex(const matrix_3d &amp;m, const point_t &amp;d, fp_t *const val)</span>
+<span class="lineNum">      41 </span>            : {
+<span class="lineNum">      42 </span>            :     /* Search all vertices for the most extreme in the direction d */
+<span class="lineNum">      43 </span><span class="lineCov">       2880 :     int max_support_vertex = 0;</span>
+<span class="lineNum">      44 </span><span class="lineCov">       2880 :     (*val) = dot_product(m.get_row(0), d);</span>
+<span class="lineNum">      45 </span><span class="lineCov">      23040 :     for (int i = 1; i &lt; m.size(); i++)</span>
+<span class="lineNum">      46 </span>            :     {
+<span class="lineNum">      47 </span><span class="lineCov">      20160 :         const fp_t v = dot_product(m.get_row(i), d);</span>
+<span class="lineNum">      48 </span><span class="lineCov">      20160 :         if (v &gt; (*val))</span>
+<span class="lineNum">      49 </span>            :         {
+<span class="lineNum">      50 </span><span class="lineCov">       2256 :             (*val) = v;</span>
+<span class="lineNum">      51 </span><span class="lineCov">       2256 :             max_support_vertex = i;</span>
+<span class="lineNum">      52 </span>            :         }
+<span class="lineNum">      53 </span>            :     }
+<span class="lineNum">      54 </span>            :     
+<span class="lineNum">      55 </span><span class="lineCov">       2880 :     return max_support_vertex;</span>
+<span class="lineNum">      56 </span>            : }
+<a name="57"><span class="lineNum">      57 </span>            : </a>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">         48 : int find_support_vertex(const matrix_3d &amp;m, const point_t &amp;w, const point_t &amp;c, const point_t &amp;p, </span>
+<span class="lineNum">      60 </span>            :     const point_t &amp;n, fp_t *const val)
+<span class="lineNum">      61 </span>            : {
+<span class="lineNum">      62 </span>            :     /* Check there is rotation */
+<span class="lineNum">      63 </span><span class="lineCov">         48 :     const fp_t magn_w = magnitude(w);</span>
+<span class="lineNum">      64 </span><span class="lineCov">         48 :     if (fabs(magn_w) &lt; raptor_physics::EPSILON)</span>
+<span class="lineNum">      65 </span>            :     {
+<span class="lineNum">      66 </span><span class="lineCov">         24 :         (*val) = 0.0;</span>
+<span class="lineNum">      67 </span><span class="lineCov">         24 :         return 0;</span>
+<span class="lineNum">      68 </span>            :     }
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :     /* Loop constants */
+<span class="lineNum">      71 </span><span class="lineCov">         24 :     const fp_t proj_w =  magnitude((cross_product(w, n)));</span>
+<span class="lineNum">      72 </span><span class="lineCov">         24 :     const point_t norm_w(w / magn_w);</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :     /* Search all vertices for the most extreme in the direction d */
+<span class="lineNum">      75 </span>            : //    cout &lt;&lt; &quot;penalising by: &quot; &lt;&lt; p.x &lt;&lt; &quot; &quot; &lt;&lt; p.y &lt;&lt; &quot; &quot; &lt;&lt; p.z &lt;&lt; endl;
+<span class="lineNum">      76 </span><span class="lineCov">         24 :     int max_support_vertex = 0;</span>
+<span class="lineNum">      77 </span><span class="lineCov">         24 :     (*val) = (proj_w * magnitude(cross_product(m.get_row(0) - c, norm_w))) - dot_product(m.get_row(0) - p, n);</span>
+<span class="lineNum">      78 </span><span class="lineCov">        192 :     for (int i = 1; i &lt; m.size(); i++)</span>
+<span class="lineNum">      79 </span>            :     {
+<span class="lineNum">      80 </span><span class="lineCov">        168 :         const fp_t v = (proj_w * magnitude(cross_product(m.get_row(i) - c, norm_w))) - dot_product(m.get_row(i) - p, n);</span>
+<span class="lineNum">      81 </span><span class="lineCov">        168 :         if (v &gt; (*val))</span>
+<span class="lineNum">      82 </span>            :         {
+<span class="lineNum">      83 </span><span class="lineCov">         48 :             (*val) = v;</span>
+<span class="lineNum">      84 </span><span class="lineCov">         48 :             max_support_vertex = i;</span>
+<span class="lineNum">      85 </span>            :         }
+<span class="lineNum">      86 </span>            :     }
+<span class="lineNum">      87 </span>            :     
+<span class="lineNum">      88 </span><span class="lineCov">         24 :     return max_support_vertex;</span>
+<span class="lineNum">      89 </span>            : }
+<span class="lineNum">      90 </span>            : /* Find the most extreme vertex in direction d from c penalised by p and its projection */
+<span class="lineNum">      91 </span>            : // int find_support_vertex(const matrix_3d &amp;m, const point_t &amp;d, const point_t &amp;c, const point_t &amp;p, 
+<span class="lineNum">      92 </span>            : //     const point_t &amp;n, fp_t *const val)
+<span class="lineNum">      93 </span>            : // {
+<span class="lineNum">      94 </span>            : //     /* Search all vertices for the most extreme in the direction d */
+<span class="lineNum">      95 </span>            : // //    cout &lt;&lt; &quot;penalising by: &quot; &lt;&lt; p.x &lt;&lt; &quot; &quot; &lt;&lt; p.y &lt;&lt; &quot; &quot; &lt;&lt; p.z &lt;&lt; endl;
+<span class="lineNum">      96 </span>            : //     int max_support_vertex = 0;
+<span class="lineNum">      97 </span>            : //     (*val) = dot_product(m.get_row(0) - c, d) - dot_product(m.get_row(0) - p, n);
+<span class="lineNum">      98 </span>            : //     for (int i = 1; i &lt; m.size(); i++)
+<span class="lineNum">      99 </span>            : //     {
+<span class="lineNum">     100 </span>            : //         const fp_t v = dot_product(m.get_row(i) - c, d) - dot_product(m.get_row(i) - p, n);
+<span class="lineNum">     101 </span>            : //         if (v &gt; (*val))
+<span class="lineNum">     102 </span>            : //         {
+<span class="lineNum">     103 </span>            : //             (*val) = v;
+<span class="lineNum">     104 </span>            : //             max_support_vertex = i;
+<span class="lineNum">     105 </span>            : //         }
+<span class="lineNum">     106 </span>            : //     }
+<span class="lineNum">     107 </span>            :     
+<span class="lineNum">     108 </span>            : //     return max_support_vertex;
+<span class="lineNum">     109 </span>            : // }
+<span class="lineNum">     110 </span>            : 
+<a name="111"><span class="lineNum">     111 </span>            : </a>
+<span class="lineNum">     112 </span>            : /* Check if a point is &quot;inside&quot; an edge */
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 : fp_t is_inside_edge(const point_t &amp;c, const point_t &amp;t, const point_t &amp;n)</span>
+<span class="lineNum">     114 </span>            : {
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :     const point_t to_clip(c - t);</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :     return dot_product(n, to_clip);</span>
+<span class="lineNum">     117 </span>            : }
+<span class="lineNum">     118 </span>            : 
+<a name="119"><span class="lineNum">     119 </span>            : </a>
+<span class="lineNum">     120 </span>            : /* Check if 2 points are the same */
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 : bool is_coincident(const point_t &amp;a, const point_t &amp;b)</span>
+<span class="lineNum">     122 </span>            : {
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :     const point_t edge(a - b);</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :     return dot_product(edge, edge) &lt; raptor_physics::EPSILON;</span>
+<span class="lineNum">     125 </span>            : }
+<span class="lineNum">     126 </span>            : 
+<a name="127"><span class="lineNum">     127 </span>            : </a>
+<span class="lineNum">     128 </span>            : /* Find the union of two polygons */
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 : void clip_polygon(std::vector&lt;point_t&gt; *const clip, const std::vector&lt;point_t&gt; &amp;to, const point_t &amp;n)</span>
+<span class="lineNum">     130 </span>            : {
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :     METHOD_LOG;</span>
+<a name="132"><span class="lineNum">     132 </span>            : </a>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Clipping: &quot;;</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; array_to_stream(clip-&gt;begin(), clip-&gt;end(), [](std::stringstream *ss, const point_t &amp;p)</span>
+<span class="lineNum">     135 </span>            :     {
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :         (*ss) &lt;&lt; &quot;( &quot; &lt;&lt; p &lt;&lt; &quot; ) &quot;;</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :         return ss;</span>
+<a name="138"><span class="lineNum">     138 </span><span class="lineNoCov">          0 :     });</span></a>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Clipping to: &quot;;</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; array_to_stream(to.begin(), to.end(), [](std::stringstream *ss, const point_t &amp;p)</span>
+<span class="lineNum">     141 </span>            :     {
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :         (*ss) &lt;&lt; &quot;( &quot; &lt;&lt; p &lt;&lt; &quot; ) &quot;;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :         return ss;</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :     });</span>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :     typedef std::list&lt;point_t&gt;::iterator            iter;
+<span class="lineNum">     147 </span>            :     typedef std::vector&lt;point_t&gt;::const_iterator    citer;
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :     /* Resize to act as ping pong buffer */
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :     int ping_size = clip-&gt;size();</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :     const int buf_size = clip-&gt;size() + to.size();</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :     clip-&gt;resize(buf_size &lt;&lt; 1);</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :     point_t *clip_ping = &amp;(*clip)[0];</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :     point_t *clip_pong = &amp;(*clip)[buf_size];</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Set up ping pong buffer of size: &quot; &lt;&lt; buf_size;</span>
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :     /* For each edge of the the polygon being clipped to */
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :     citer prev_i = --to.cend();</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :     for (citer i = to.cbegin(); i != to.cend(); ++i)</span>
+<span class="lineNum">     160 </span>            :     {
+<span class="lineNum">     161 </span>            :         /* Build the plane normal, points inwards for a clockwise polygon */
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Testing edge: &quot; &lt;&lt; (*prev_i) &lt;&lt; &quot; to: &quot; &lt;&lt; (*i);</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :         const point_t edge((*i) - (*prev_i));</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :         const point_t norm(cross_product(edge, n));</span>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :         int pong_size = 0;</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :         point_t prev_clip(clip_ping[ping_size - 1]);</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :         bool prev_inside = (is_inside_edge(prev_clip, *i, norm) &gt; 0.0f);</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :         for (int j = 0; j &lt; ping_size; ++j)</span>
+<span class="lineNum">     170 </span>            :         {
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :             const point_t cur_clip(clip_ping[j]);</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :             BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Testing point: &quot; &lt;&lt; cur_clip;</span>
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :             const fp_t num      = is_inside_edge(cur_clip, *i, norm);</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :             const bool inside   = num &gt; 0.0f;</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :             if (prev_inside &amp; inside)</span>
+<span class="lineNum">     177 </span>            :             {
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :                 clip_pong[pong_size++] = cur_clip;</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :                 BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Remaing inside clip: &quot; &lt;&lt; clip_pong[pong_size - 1] &lt;&lt; &quot; at: &quot; &lt;&lt; (pong_size - 1);</span>
+<span class="lineNum">     180 </span>            :             }
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :             else if ((!prev_inside) &amp; inside)</span>
+<span class="lineNum">     182 </span>            :             {
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :                 const point_t clip_edge(cur_clip - prev_clip);</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :                 const point_t intersect(cur_clip - (clip_edge * (num / dot_product(norm, clip_edge))));</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :                 clip_pong[pong_size++] = intersect;</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :                 BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Outside moving in, adding: &quot; &lt;&lt; clip_pong[pong_size - 1] &lt;&lt; &quot; at: &quot; &lt;&lt; (pong_size - 1);</span>
+<span class="lineNum">     187 </span>            :              
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                 clip_pong[pong_size++] = cur_clip;</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :                 BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Outside moving in, adding: &quot; &lt;&lt; clip_pong[pong_size - 1] &lt;&lt; &quot; at: &quot; &lt;&lt; (pong_size - 1);</span>
+<span class="lineNum">     190 </span>            :             }
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :             else if (prev_inside &amp; !inside)</span>
+<span class="lineNum">     192 </span>            :             {
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :                 const point_t clip_edge(cur_clip - prev_clip);</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                 const point_t intersect(cur_clip - (clip_edge * (num / dot_product(norm, clip_edge))));</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :                 clip_pong[pong_size++] = intersect;</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :                 BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Inside moving out: &quot; &lt;&lt; clip_pong[pong_size - 1] &lt;&lt; &quot; at: &quot; &lt;&lt; (pong_size - 1);</span>
+<span class="lineNum">     197 </span>            :             }
+<span class="lineNum">     198 </span>            :         
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :             prev_clip = cur_clip;</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :             prev_inside = inside;</span>
+<span class="lineNum">     201 </span>            :         }
+<span class="lineNum">     202 </span>            : 
+<a name="203"><span class="lineNum">     203 </span>            :         /* Log the new polygon */</a>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;New clipped polygon: &quot;;</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; array_to_stream(clip_pong, clip_pong + pong_size, [](std::stringstream *ss, const point_t &amp;p)</span>
+<span class="lineNum">     206 </span>            :         {
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :             (*ss) &lt;&lt; &quot;( &quot; &lt;&lt; p &lt;&lt; &quot; ) &quot;;</span>
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :             return ss;</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :         });</span>
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :         /* Update for next loop */
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :         prev_i = i;</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :         ping_size = pong_size;</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :         pong_size = 0;</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :         std::swap(clip_ping, clip_pong);</span>
+<span class="lineNum">     216 </span>            :     }
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :     /* Put the final object back at the start of clip and resize */
+<span class="lineNum">     219 </span>            :     /* TODO -- It might be better if the co-incidence tests were done in the outer loop above or when adding point */
+<span class="lineNum">     220 </span>            :     /*         I would need a bigger data set to test that on that so leaving for now */
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :     int clip_idx = 0;</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :     for (int i = 1; i &lt; ping_size; ++i)</span>
+<span class="lineNum">     223 </span>            :     {
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Checking for co-incidence: &quot; &lt;&lt; clip_ping[i - 1] &lt;&lt; &quot; and &quot; &lt;&lt; clip_ping[i];</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :         if (!is_coincident(clip_ping[i], clip_ping[i - 1]))</span>
+<span class="lineNum">     226 </span>            :         {
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :             BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Not co-incident, adding: &quot; &lt;&lt; clip_ping[i - 1];</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :             (*clip)[clip_idx++] = clip_ping[i - 1];</span>
+<span class="lineNum">     229 </span>            :         }
+<span class="lineNum">     230 </span>            :     }
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            :     /* Check the last vs. the first point */
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Checking for co-incidence: &quot; &lt;&lt; clip_ping[0] &lt;&lt; &quot; and &quot; &lt;&lt; clip_ping[ping_size - 1];</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :     if (!is_coincident(clip_ping[0], clip_ping[ping_size - 1]))</span>
+<span class="lineNum">     235 </span>            :     {
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Not co-incident, adding: &quot; &lt;&lt; clip_ping[ping_size - 1];</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :         (*clip)[clip_idx++] = clip_ping[ping_size - 1];</span>
+<span class="lineNum">     238 </span>            :     }
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :     clip-&gt;resize(clip_idx);</span>
+<span class="lineNum">     240 </span>            : 
+<a name="241"><span class="lineNum">     241 </span>            :     /* Log the final polygon */</a>
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Clipped polygon: &quot;;</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; array_to_stream(clip-&gt;begin(), clip-&gt;end(), [](std::stringstream *ss, const point_t &amp;p)</span>
+<span class="lineNum">     244 </span>            :     {
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :         (*ss) &lt;&lt; &quot;( &quot; &lt;&lt; p &lt;&lt; &quot; ) &quot;;</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :         return ss;</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :     });</span>
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 : }</span>
+<a name="249"><span class="lineNum">     249 </span>            : </a>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 : int find_first_positive_real_root(fp_t *const roots, const fp_t a_coeff, const fp_t b_coeff, const fp_t c_coeff, const fp_t d_coeff)</span>
+<span class="lineNum">     252 </span>            : {
+<span class="lineNum">     253 </span>            :     int nr_roots;
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :     if (fabs(a_coeff) &gt; 0.0f)</span>
+<span class="lineNum">     255 </span>            :     {
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Solving as cubic&quot;;</span>
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            :         /* Normalise to a == 1 */
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :         const fp_t b = b_coeff / a_coeff;</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :         const fp_t c = c_coeff / a_coeff;</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :         const fp_t d = d_coeff / a_coeff;</span>
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            :         /* Substitute x = y - A / 3 to make a depressed cubic (x^3 + px + q = 0) */
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :         const fp_t b_sq = b * b;</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :         const fp_t p = (1.0f / 3.0f) * (c - ((1.0f / 3.0f) * b_sq));</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :         const fp_t q = (1.0f / 2.0f) * (((1.0f / 3.0f) * b * c) - ((2.0f / 27.0f) * b * b_sq) - d);</span>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            :         /* Solve using Cardano's formula */
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :         const fp_t p_cb = p * p * p;</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :         const fp_t disc = q * q + p_cb;</span>
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :         /* One real root */
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :         const fp_t disc_sqrt = sqrt(disc);</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :         const fp_t third_b = b * (1.0f / 3.0f);</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :         if (disc &gt; 0.0f)</span>
+<span class="lineNum">     276 </span>            :         {
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :             const fp_t s = q + disc_sqrt;</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :             const fp_t t = q - disc_sqrt;</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :             const fp_t s_cbrt = ((s &lt; 0.0f) ? -pow(-s, (1.0f / 3.0f)) : pow(s, (1.0f / 3.0f)));</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :             const fp_t t_cbrt = ((t &lt; 0.0f) ? -pow(-t, (1.0f / 3.0f)) : pow(t, (1.0f / 3.0f)));</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :             const fp_t root = -third_b + s_cbrt + t_cbrt;</span>
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :             nr_roots = 1;</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :             roots[0] = (root &gt;= 0.0f) ? root : numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     285 </span>            :         }        
+<span class="lineNum">     286 </span>            :         /* All real roots, at least 2 are equal */
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :         else if (disc == 0.0f)</span>
+<span class="lineNum">     288 </span>            :         {
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :             const fp_t q_cbrt = ((q &lt; 0.0f) ? -pow(-q, (1.0f / 3.0f)) : pow(q, (1.0f / 3.0f)));</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :             const fp_t root0 = -third_b + (2.0f * q_cbrt);</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :             const fp_t root1 = -q_cbrt - third_b;</span>
+<span class="lineNum">     292 </span>            :             
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :             nr_roots = 2;</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :             roots[0] = (root0 &gt;= 0.0f) ? root0 : numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :             roots[1] = (root1 &gt;= 0.0f) ? root1 : numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     296 </span>            :         }
+<span class="lineNum">     297 </span>            :         /* Three real roots */
+<span class="lineNum">     298 </span>            :         else
+<span class="lineNum">     299 </span>            :         {
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :             const fp_t neg_p = -p;</span>
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :             const fp_t neg_p_cb = -p_cb;</span>
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :             const fp_t u = acos(q / sqrt(neg_p_cb));</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :             const fp_t v = 2.0f * sqrt(neg_p);</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :             const fp_t root0 = -third_b + v * cos(u * (1.0f / 3.0f));</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :             const fp_t root1 = -third_b + v * cos((u + 2.0f * PI) * (1.0f / 3.0f));</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :             const fp_t root2 = -third_b + v * cos((u + 4.0f * PI) * (1.0f / 3.0f));</span>
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :             nr_roots = 3;</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :             roots[0] = (root0 &gt;= 0.0f) ? root0 : numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :             roots[1] = (root1 &gt;= 0.0f) ? root1 : numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :             roots[2] = (root2 &gt;= 0.0f) ? root2 : numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     312 </span>            :         }
+<span class="lineNum">     313 </span>            :     }
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :     else if (fabs(b_coeff) &gt; 0.0f)</span>
+<span class="lineNum">     315 </span>            :     {
+<span class="lineNum">     316 </span>            :         /* Check for no root */
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Solving as quadratic&quot;;</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :         const fp_t d = (c_coeff * c_coeff) - (4.0f * b_coeff * d_coeff);</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :         if (d &lt; 0.0f)</span>
+<span class="lineNum">     320 </span>            :         {
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :             BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;No roots found&quot;;</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :             roots[0] = numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :             return 0;</span>
+<span class="lineNum">     324 </span>            :         }
+<span class="lineNum">     325 </span>            : 
+<span class="lineNum">     326 </span>            :         /* Return first positive root */
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :         const fp_t sqrt_d = sqrt(d);</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :         const fp_t b_dot_2 =  2.0f * b_coeff;</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :         const fp_t root0 = (-c_coeff - sqrt_d) / b_dot_2;</span>
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :         const fp_t root1 = (-c_coeff + sqrt_d) / b_dot_2;</span>
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :         nr_roots = 2;</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :         roots[0] = (root0 &gt;= 0.0f) ? root0 : numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :         roots[1] = (root1 &gt;= 0.0f) ? root1 : numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     335 </span>            :     }
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :     else if (fabs(c_coeff) &gt; 0.0f)</span>
+<span class="lineNum">     337 </span>            :     {
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Solving as linear&quot;;</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :         const fp_t root = -d_coeff / c_coeff;</span>
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :         nr_roots = 1;</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :         roots[0] = (root &gt;= 0.0f) ? root : numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     343 </span>            :     }
+<span class="lineNum">     344 </span>            :     else
+<span class="lineNum">     345 </span>            :     {
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Returning constant&quot;;</span>
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :         nr_roots = 1;</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :         roots[0] = (fabs(d_coeff) &lt; raptor_physics::EPSILON) ? 0.0f : numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     350 </span>            :     }
+<a name="351"><span class="lineNum">     351 </span>            : </a>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :     std::sort(&amp;roots[0], &amp;roots[nr_roots]);</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; array_to_stream(&amp;roots[0], &amp;roots[nr_roots], [](std::stringstream *s, const fp_t r)</span>
+<span class="lineNum">     354 </span>            :         {
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :             (*s) &lt;&lt; r &lt;&lt; &quot;, &quot;;</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :             return s;</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :         });</span>
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :     return nr_roots;</span>
+<span class="lineNum">     360 </span>            : }
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            : 
+<span class="lineNum">     363 </span>            : /* Find the time that a translating point passes through a plane                */
+<span class="lineNum">     364 </span>            : /* pa is the point                                                              */
+<span class="lineNum">     365 </span>            : /* pb is a point on the plane                                                   */
+<span class="lineNum">     366 </span>            : /* nb is the normal of the plane                                                */
+<span class="lineNum">     367 </span>            : /* x0 is the position of the point during the frame                             */
+<a name="368"><span class="lineNum">     368 </span>            : /* q0 is the orientation of the point at the start of the frame                 */</a>
+<span class="lineNum">     369 </span>            : /* q1 is the orientation of the point at the end of the frame                   */
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 : fp_t find_exact_none_translating_collision_time(const point_t &amp;pa, const point_t &amp;pb, const point_t &amp;nb, const point_t &amp;x0, const point_t &amp;q0, </span>
+<span class="lineNum">     371 </span>            :     const point_t &amp;q1, const fp_t r0, const fp_t r1)
+<span class="lineNum">     372 </span>            : {
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :     METHOD_LOG;</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;pa: &quot; &lt;&lt; pa;</span>
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;pb: &quot; &lt;&lt; pb;</span>
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;nb: &quot; &lt;&lt; nb;</span>
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;x0: &quot; &lt;&lt; x0;</span>
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;q0: &quot; &lt;&lt; q0 &lt;&lt; &quot;, &quot; &lt;&lt; r0;</span>
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;q1: &quot; &lt;&lt; q1 &lt;&lt; &quot;, &quot; &lt;&lt; r1;</span>
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span>            :     /* Movements */
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :     const fp_t r1_m_r0 = r1 - r0;</span>
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :     const point_t q1_m_q0(q1 - q0);</span>
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            :     /* Factors of s inside dot product */
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :     const point_t q0_cross_p0(cross_product(q0, pa));</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :     const point_t q1_m_q0_cross_p0(cross_product(q1_m_q0, pa));</span>
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :     const point_t a(2.0f * (cross_product(q1_m_q0, q1_m_q0_cross_p0) + (r1_m_r0 * q1_m_q0_cross_p0)));</span>
+<span class="lineNum">     389 </span>            :     const point_t b(2.0f * (
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :                     cross_product(q0, q1_m_q0_cross_p0) + </span>
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :                     cross_product(q1_m_q0, q0_cross_p0) + </span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :                     (r0 * q1_m_q0_cross_p0) + </span>
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :                     (r1_m_r0 * q0_cross_p0)));</span>
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :     const point_t c(pa + x0 - pb + (2.0f * (cross_product(q0, q0_cross_p0) + (r0 * q0_cross_p0))));</span>
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span>            :     /* Dot product with the plane normal */
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :     const fp_t a_dot = dot_product(a, nb);</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :     const fp_t b_dot = dot_product(b, nb);</span>
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :     const fp_t c_dot = dot_product(c, nb);</span>
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Solving equation, a: &quot; &lt;&lt; a_dot &lt;&lt; &quot;, b: &quot; &lt;&lt; b_dot &lt;&lt; &quot;, c: &quot; &lt;&lt; c_dot;</span>
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span>            :     fp_t roots[3];
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :     find_first_positive_real_root(roots, 0.0f, a_dot, b_dot, c_dot);</span>
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :     return roots[0];</span>
+<span class="lineNum">     405 </span>            : }
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span>            : /* Find the time that a translating and rotating point passes through a plane   */
+<span class="lineNum">     409 </span>            : /* pa is the point                                                              */
+<span class="lineNum">     410 </span>            : /* pb is a point on the plane                                                   */
+<span class="lineNum">     411 </span>            : /* nb is the normal of the plane                                                */
+<span class="lineNum">     412 </span>            : /* x0 is the position of the point at the start of the frame                    */
+<span class="lineNum">     413 </span>            : /* x1 is the position of the point at the end of the frame                      */
+<a name="414"><span class="lineNum">     414 </span>            : /* q0 is the orientation of the point at the start of the frame                 */</a>
+<span class="lineNum">     415 </span>            : /* q1 is the orientation of the point at the end of the frame                   */
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 : fp_t find_exact_collision_time(const point_t &amp;pa, const point_t &amp;pb, const point_t &amp;nb, const point_t &amp;x0, const point_t &amp;x1,</span>
+<span class="lineNum">     417 </span>            :     const point_t &amp;q0, const point_t &amp;q1, const fp_t r0, const fp_t r1)
+<span class="lineNum">     418 </span>            : {
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :     METHOD_LOG;</span>
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;pa: &quot; &lt;&lt; pa;</span>
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;pb: &quot; &lt;&lt; pb;</span>
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;nb: &quot; &lt;&lt; nb;</span>
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;x0: &quot; &lt;&lt; x0;</span>
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;x1: &quot; &lt;&lt; x1;</span>
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;q0: &quot; &lt;&lt; q0 &lt;&lt; &quot;, &quot; &lt;&lt; r0;</span>
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;q1: &quot; &lt;&lt; q1 &lt;&lt; &quot;, &quot; &lt;&lt; r1;</span>
+<span class="lineNum">     427 </span>            : 
+<span class="lineNum">     428 </span>            :     /* Movements */
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :     const fp_t r1_m_r0 = r1 - r0;</span>
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :     const point_t q1_m_q0(q1 - q0);</span>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :     const point_t x1_m_x0(x1 - x0);</span>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span>            :     /* Factors of s inside dot product */
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :     const point_t q0_cross_p0(cross_product(q0, pa));</span>
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :     const point_t q1_m_q0_cross_p0(cross_product(q1_m_q0, pa));</span>
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 :     const point_t a(2.0f * (cross_product(q1_m_q0, q1_m_q0_cross_p0) + (r1_m_r0 * q1_m_q0_cross_p0)));</span>
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :     const point_t b(x1_m_x0 + (2.0f * (</span>
+<span class="lineNum">     438 </span><span class="lineNoCov">          0 :                     cross_product(q0, q1_m_q0_cross_p0) + </span>
+<span class="lineNum">     439 </span><span class="lineNoCov">          0 :                     cross_product(q1_m_q0, q0_cross_p0) + </span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :                     (r0 * q1_m_q0_cross_p0) + </span>
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :                     (r1_m_r0 * q0_cross_p0))));</span>
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :     const point_t c(pa + x0 - pb + (2.0f * (cross_product(q0, q0_cross_p0) + (r0 * q0_cross_p0))));</span>
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span>            :     /* Dot product with the plane normal */
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 :     const fp_t a_dot = dot_product(a, nb);</span>
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :     const fp_t b_dot = dot_product(b, nb);</span>
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :     const fp_t c_dot = dot_product(c, nb);</span>
+<span class="lineNum">     448 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Solving equation, a: &quot; &lt;&lt; a_dot &lt;&lt; &quot;, b: &quot; &lt;&lt; b_dot &lt;&lt; &quot;, c: &quot; &lt;&lt; c_dot;</span>
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            :     fp_t roots[3];
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :     find_first_positive_real_root(roots, 0.0f, a_dot, b_dot, c_dot);</span>
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :     return roots[0];</span>
+<span class="lineNum">     453 </span>            : }
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            : /* Rotate a vector as done by the intersection algorithm        */
+<span class="lineNum">     457 </span>            : /* x is the vector to rotate                                    */
+<span class="lineNum">     458 </span>            : /* q0 is the orientation of the point at the start of the frame */
+<span class="lineNum">     459 </span>            : /* q1 is the orientation of the point at the end of the frame   */
+<a name="460"><span class="lineNum">     460 </span>            : /* r0 is the orientation of the point at the start of the frame */</a>
+<span class="lineNum">     461 </span>            : /* r1 is the orientation of the point at the end of the frame   */
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 : point_t interpolated_quaternion_rotate(const point_t &amp;x, const point_t &amp;q0, const point_t &amp;q1, const fp_t r0, const fp_t r1, const fp_t s)</span>
+<span class="lineNum">     463 </span>            : {
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :     const point_t q_lerp(q0 + (s * (q1 - q0)));</span>
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :     const point_t r_lerp(r0 + (s * (r1 - r0)));</span>
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :     return x + (2.0f * cross_product(q_lerp, cross_product(q_lerp, x))) + (2.0f * r_lerp * cross_product(q_lerp, x));</span>
+<span class="lineNum">     467 </span>            : }
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span>            : /* Find the time that a translating and rotating point passes through a plane   */
+<span class="lineNum">     471 </span>            : /* pa is the point on the edge of object a                                      */
+<span class="lineNum">     472 </span>            : /* pb is the point on the edge of object b                                      */
+<span class="lineNum">     473 </span>            : /* ea an edge of object a                                                       */
+<span class="lineNum">     474 </span>            : /* eb an edge of object b                                                       */
+<span class="lineNum">     475 </span>            : /* x0 is the position of the point at the start of the frame                    */
+<span class="lineNum">     476 </span>            : /* x1 is the position of the point at the end of the frame                      */
+<a name="477"><span class="lineNum">     477 </span>            : /* q0 is the orientation of the point at the start of the frame                 */</a>
+<span class="lineNum">     478 </span>            : /* q1 is the orientation of the point at the end of the frame                   */
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 : fp_t find_exact_collision_time(const point_t &amp;pa, const point_t &amp;pb, const point_t &amp;ea, const point_t &amp;eb, const point_t &amp;x0, </span>
+<span class="lineNum">     480 </span>            :     const point_t &amp;x1, const point_t &amp;q0, const point_t &amp;q1, const fp_t r0, const fp_t r1)
+<span class="lineNum">     481 </span>            : {
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :     METHOD_LOG;</span>
+<span class="lineNum">     483 </span>            : 
+<span class="lineNum">     484 </span>            :     /* Movements */
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :     const fp_t r1_m_r0 = r1 - r0;</span>
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :     const point_t q1_m_q0(q1 - q0);</span>
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :     const point_t x1_m_x0(x1 - x0);</span>
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :     const point_t x0_m_pb(x0 - pb);</span>
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span>            :     /* Common cross products */
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 :     const point_t pa_x_ea(cross_product(pa, ea));</span>
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :     const point_t q0_x_pa_x_ea(cross_product(q0, pa_x_ea));</span>
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :     const point_t q1_m_q0_x_pa_x_ea(cross_product(q1_m_q0, pa_x_ea));</span>
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span>            :     /* Part A polynomial */
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :     const point_t a_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_pa_x_ea) + (r1_m_r0 * q1_m_q0_x_pa_x_ea)));</span>
+<span class="lineNum">     497 </span>            :     const point_t a_c(2.0f * (
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :                     cross_product(q0, q1_m_q0_x_pa_x_ea) + </span>
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :                     cross_product(q1_m_q0, q0_x_pa_x_ea) + </span>
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :                     (r0 * q1_m_q0_x_pa_x_ea) + </span>
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :                     (r1_m_r0 * q0_x_pa_x_ea)));</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :     const point_t a_d(pa_x_ea + (2.0f * (cross_product(q0, q0_x_pa_x_ea) + (r0 * q0_x_pa_x_ea))));</span>
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Part A factors of s, s^2: &quot; &lt;&lt; a_b &lt;&lt; &quot;, s:  &quot; &lt;&lt; a_c &lt;&lt; &quot;, constant: &quot; &lt;&lt; a_d;</span>
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span>            :     /* Dot product with the edge of object b */
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :     const fp_t a_b_dot = dot_product(a_b, eb);</span>
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :     const fp_t a_c_dot = dot_product(a_c, eb);</span>
+<span class="lineNum">     508 </span><span class="lineNoCov">          0 :     const fp_t a_d_dot = dot_product(a_d, eb);</span>
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Part A equation, b: &quot; &lt;&lt; a_b_dot &lt;&lt; &quot;, c: &quot; &lt;&lt; a_c_dot &lt;&lt; &quot;, d: &quot; &lt;&lt; a_d_dot;</span>
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span><span class="lineNoCov">          0 :     const point_t q0_x_ea(cross_product(q0, ea));</span>
+<span class="lineNum">     512 </span><span class="lineNoCov">          0 :     const point_t q1_m_q0_x_ea(cross_product(q1_m_q0, ea));</span>
+<span class="lineNum">     513 </span>            :     
+<span class="lineNum">     514 </span>            :     /* Part B polynomial */
+<span class="lineNum">     515 </span><span class="lineNoCov">          0 :     const point_t b_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_ea) + (r1_m_r0 * q1_m_q0_x_ea)));</span>
+<span class="lineNum">     516 </span>            :     const point_t b_c(2.0f * (
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :                     cross_product(q0, q1_m_q0_x_ea) + </span>
+<span class="lineNum">     518 </span><span class="lineNoCov">          0 :                     cross_product(q1_m_q0, q0_x_ea) + </span>
+<span class="lineNum">     519 </span><span class="lineNoCov">          0 :                     (r0 * q1_m_q0_x_ea) + </span>
+<span class="lineNum">     520 </span><span class="lineNoCov">          0 :                     (r1_m_r0 * q0_x_ea)));</span>
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :     const point_t b_d(ea + (2.0f * (cross_product(q0, q0_x_ea) + (r0 * q0_x_ea))));</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Part B factors of s pre-cross eb, s^2: &quot; &lt;&lt; b_b &lt;&lt; &quot;, s:  &quot; &lt;&lt; b_c &lt;&lt; &quot;, constant: &quot; &lt;&lt; b_d;</span>
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 :     const point_t b_b_cross(cross_product(b_b, eb));</span>
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :     const point_t b_c_cross(cross_product(b_c, eb));</span>
+<span class="lineNum">     526 </span><span class="lineNoCov">          0 :     const point_t b_d_cross(cross_product(b_d, eb));</span>
+<span class="lineNum">     527 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Part B factors of s, s^2: &quot; &lt;&lt; b_b_cross &lt;&lt; &quot;, s:  &quot; &lt;&lt; b_c_cross &lt;&lt; &quot;, constant: &quot; &lt;&lt; b_d_cross;</span>
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :     const fp_t b_a_dot = dot_product(b_b_cross, x1_m_x0);</span>
+<span class="lineNum">     530 </span><span class="lineNoCov">          0 :     const fp_t b_b_dot = dot_product(b_b_cross, x0_m_pb) + dot_product(b_c_cross, x1_m_x0);</span>
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :     const fp_t b_c_dot = dot_product(b_c_cross, x0_m_pb) + dot_product(b_d_cross, x1_m_x0);</span>
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :     const fp_t b_d_dot = dot_product(b_d_cross, x0_m_pb);</span>
+<span class="lineNum">     533 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Part B equation, a: &quot; &lt;&lt; b_a_dot &lt;&lt; &quot;, b: &quot; &lt;&lt; b_b_dot &lt;&lt; &quot;, c: &quot; &lt;&lt; b_c_dot &lt;&lt; &quot;, d: &quot; &lt;&lt; b_d_dot;</span>
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span>            :     /* Final factors */
+<span class="lineNum">     536 </span><span class="lineNoCov">          0 :     const fp_t a_dot = b_a_dot;</span>
+<span class="lineNum">     537 </span><span class="lineNoCov">          0 :     const fp_t b_dot = a_b_dot + b_b_dot;</span>
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :     const fp_t c_dot = a_c_dot + b_c_dot;</span>
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :     const fp_t d_dot = a_d_dot + b_d_dot;</span>
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Solving equation, a: &quot; &lt;&lt; a_dot &lt;&lt; &quot;, b: &quot; &lt;&lt; b_dot &lt;&lt; &quot;, c: &quot; &lt;&lt; c_dot &lt;&lt; &quot;, d: &quot; &lt;&lt; d_dot;</span>
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            :     fp_t roots[3];
+<span class="lineNum">     543 </span><span class="lineNoCov">          0 :     const int nr_roots = find_first_positive_real_root(roots, a_dot, b_dot, c_dot, d_dot);</span>
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span>            :     /* Check to see if roots are just parallel lines */
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 :     for (int i = 0; i &lt; nr_roots; ++i)</span>
+<span class="lineNum">     547 </span>            :     {
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :         const point_t cfg_ea(interpolated_quaternion_rotate(ea, q0, q1, r0, r1, roots[i]));</span>
+<span class="lineNum">     549 </span><span class="lineNoCov">          0 :         const point_t eb_cross_ea(cross_product(eb, cfg_ea));</span>
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :         if (dot_product(eb_cross_ea, eb_cross_ea) &gt; raptor_physics::EPSILON)</span>
+<span class="lineNum">     551 </span>            :         {
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :             return roots[i];</span>
+<span class="lineNum">     553 </span>            :         }
+<span class="lineNum">     554 </span><span class="lineNoCov">          0 :         else if (roots[i] == numeric_limits&lt;fp_t&gt;::infinity())</span>
+<span class="lineNum">     555 </span>            :         {
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :             return roots[i];</span>
+<span class="lineNum">     557 </span>            :         }
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Discarding parallel root: &quot; &lt;&lt; roots[i];</span>
+<span class="lineNum">     559 </span>            :     }
+<span class="lineNum">     560 </span>            : 
+<span class="lineNum">     561 </span>            :     /* All the roots are parallel */
+<span class="lineNum">     562 </span><span class="lineNoCov">          0 :     return numeric_limits&lt;fp_t&gt;::infinity();</span>
+<span class="lineNum">     563 </span>            : }
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span>            : 
+<span class="lineNum">     566 </span>            : /* Find the time that a translating and rotating point passes through a plane   */
+<span class="lineNum">     567 </span>            : /* pa is the point on the edge of object a                                      */
+<span class="lineNum">     568 </span>            : /* pb is the point on the edge of object b                                      */
+<span class="lineNum">     569 </span>            : /* ea an edge of object a                                                       */
+<span class="lineNum">     570 </span>            : /* eb an edge of object b                                                       */
+<span class="lineNum">     571 </span>            : /* x0 is the position of the point at the start of the frame                    */
+<a name="572"><span class="lineNum">     572 </span>            : /* q0 is the orientation of the point at the start of the frame                 */</a>
+<span class="lineNum">     573 </span>            : /* q1 is the orientation of the point at the end of the frame                   */
+<span class="lineNum">     574 </span><span class="lineNoCov">          0 : fp_t find_exact_none_translating_collision_time(const point_t &amp;pa, const point_t &amp;pb, const point_t &amp;ea, const point_t &amp;eb, const point_t &amp;x0, </span>
+<span class="lineNum">     575 </span>            :     const point_t &amp;q0, const point_t &amp;q1, const fp_t r0, const fp_t r1)
+<span class="lineNum">     576 </span>            : {
+<span class="lineNum">     577 </span><span class="lineNoCov">          0 :     METHOD_LOG;</span>
+<span class="lineNum">     578 </span>            : 
+<span class="lineNum">     579 </span>            :     /* Movements */
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :     const fp_t r1_m_r0 = r1 - r0;</span>
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 :     const point_t q1_m_q0(q1 - q0);</span>
+<span class="lineNum">     582 </span><span class="lineNoCov">          0 :     const point_t x0_m_pb(x0 - pb);</span>
+<span class="lineNum">     583 </span>            : 
+<span class="lineNum">     584 </span>            :     /* Common cross products */
+<span class="lineNum">     585 </span><span class="lineNoCov">          0 :     const point_t pa_x_ea(cross_product(pa, ea));</span>
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :     const point_t q0_x_pa_x_ea(cross_product(q0, pa_x_ea));</span>
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 :     const point_t q1_m_q0_x_pa_x_ea(cross_product(q1_m_q0, pa_x_ea));</span>
+<span class="lineNum">     588 </span>            : 
+<span class="lineNum">     589 </span>            :     /* Part A polynomial */
+<span class="lineNum">     590 </span><span class="lineNoCov">          0 :     const point_t a_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_pa_x_ea) + (r1_m_r0 * q1_m_q0_x_pa_x_ea)));</span>
+<span class="lineNum">     591 </span>            :     const point_t a_c(2.0f * (
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :                     cross_product(q0, q1_m_q0_x_pa_x_ea) + </span>
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 :                     cross_product(q1_m_q0, q0_x_pa_x_ea) + </span>
+<span class="lineNum">     594 </span><span class="lineNoCov">          0 :                     (r0 * q1_m_q0_x_pa_x_ea) + </span>
+<span class="lineNum">     595 </span><span class="lineNoCov">          0 :                     (r1_m_r0 * q0_x_pa_x_ea)));</span>
+<span class="lineNum">     596 </span><span class="lineNoCov">          0 :     const point_t a_d(pa_x_ea + (2.0f * (cross_product(q0, q0_x_pa_x_ea) + (r0 * q0_x_pa_x_ea))));</span>
+<span class="lineNum">     597 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Part A factors of s, s^2: &quot; &lt;&lt; a_b &lt;&lt; &quot;, s:  &quot; &lt;&lt; a_c &lt;&lt; &quot;, constant: &quot; &lt;&lt; a_d;</span>
+<span class="lineNum">     598 </span>            : 
+<span class="lineNum">     599 </span>            :     /* Dot product with the edge of object b */
+<span class="lineNum">     600 </span><span class="lineNoCov">          0 :     const fp_t a_b_dot = dot_product(a_b, eb);</span>
+<span class="lineNum">     601 </span><span class="lineNoCov">          0 :     const fp_t a_c_dot = dot_product(a_c, eb);</span>
+<span class="lineNum">     602 </span><span class="lineNoCov">          0 :     const fp_t a_d_dot = dot_product(a_d, eb);</span>
+<span class="lineNum">     603 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Part A equation, b: &quot; &lt;&lt; a_b_dot &lt;&lt; &quot;, c: &quot; &lt;&lt; a_c_dot &lt;&lt; &quot;, d: &quot; &lt;&lt; a_d_dot;</span>
+<span class="lineNum">     604 </span>            : 
+<span class="lineNum">     605 </span><span class="lineNoCov">          0 :     const point_t q0_x_ea(cross_product(q0, ea));</span>
+<span class="lineNum">     606 </span><span class="lineNoCov">          0 :     const point_t q1_m_q0_x_ea(cross_product(q1_m_q0, ea));</span>
+<span class="lineNum">     607 </span>            :     
+<span class="lineNum">     608 </span>            :     /* Part B polynomial */
+<span class="lineNum">     609 </span><span class="lineNoCov">          0 :     const point_t b_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_ea) + (r1_m_r0 * q1_m_q0_x_ea)));</span>
+<span class="lineNum">     610 </span>            :     const point_t b_c(2.0f * (
+<span class="lineNum">     611 </span><span class="lineNoCov">          0 :                     cross_product(q0, q1_m_q0_x_ea) + </span>
+<span class="lineNum">     612 </span><span class="lineNoCov">          0 :                     cross_product(q1_m_q0, q0_x_ea) + </span>
+<span class="lineNum">     613 </span><span class="lineNoCov">          0 :                     (r0 * q1_m_q0_x_ea) + </span>
+<span class="lineNum">     614 </span><span class="lineNoCov">          0 :                     (r1_m_r0 * q0_x_ea)));</span>
+<span class="lineNum">     615 </span><span class="lineNoCov">          0 :     const point_t b_d(ea + (2.0f * (cross_product(q0, q0_x_ea) + (r0 * q0_x_ea))));</span>
+<span class="lineNum">     616 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Part B factors of s pre-cross eb, s^2: &quot; &lt;&lt; b_b &lt;&lt; &quot;, s:  &quot; &lt;&lt; b_c &lt;&lt; &quot;, constant: &quot; &lt;&lt; b_d;</span>
+<span class="lineNum">     617 </span>            : 
+<span class="lineNum">     618 </span><span class="lineNoCov">          0 :     const point_t b_b_cross(cross_product(b_b, eb));</span>
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :     const point_t b_c_cross(cross_product(b_c, eb));</span>
+<span class="lineNum">     620 </span><span class="lineNoCov">          0 :     const point_t b_d_cross(cross_product(b_d, eb));</span>
+<span class="lineNum">     621 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Part B factors of s, s^2: &quot; &lt;&lt; b_b_cross &lt;&lt; &quot;, s:  &quot; &lt;&lt; b_c_cross &lt;&lt; &quot;, constant: &quot; &lt;&lt; b_d_cross;</span>
+<span class="lineNum">     622 </span>            : 
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 :     const fp_t b_b_dot = dot_product(b_b_cross, x0_m_pb);</span>
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :     const fp_t b_c_dot = dot_product(b_c_cross, x0_m_pb);</span>
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :     const fp_t b_d_dot = dot_product(b_d_cross, x0_m_pb);</span>
+<span class="lineNum">     626 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Part B equation, b: &quot; &lt;&lt; b_b_dot &lt;&lt; &quot;, c: &quot; &lt;&lt; b_c_dot &lt;&lt; &quot;, d: &quot; &lt;&lt; b_d_dot;</span>
+<span class="lineNum">     627 </span>            : 
+<span class="lineNum">     628 </span>            :     /* Final factors */
+<span class="lineNum">     629 </span><span class="lineNoCov">          0 :     const fp_t b_dot = a_b_dot + b_b_dot;</span>
+<span class="lineNum">     630 </span><span class="lineNoCov">          0 :     const fp_t c_dot = a_c_dot + b_c_dot;</span>
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :     const fp_t d_dot = a_d_dot + b_d_dot;</span>
+<span class="lineNum">     632 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Solving equation, b: &quot; &lt;&lt; b_dot &lt;&lt; &quot;, c: &quot; &lt;&lt; c_dot &lt;&lt; &quot;, d: &quot; &lt;&lt; d_dot;</span>
+<span class="lineNum">     633 </span>            : 
+<span class="lineNum">     634 </span>            :     fp_t roots[3];
+<span class="lineNum">     635 </span><span class="lineNoCov">          0 :     const int nr_roots = find_first_positive_real_root(roots, 0.0f, b_dot, c_dot, d_dot);</span>
+<span class="lineNum">     636 </span>            : 
+<span class="lineNum">     637 </span>            :     /* Check to see if roots are just parallel lines */
+<span class="lineNum">     638 </span><span class="lineNoCov">          0 :     for (int i = 0; i &lt; nr_roots; ++i)</span>
+<span class="lineNum">     639 </span>            :     {
+<span class="lineNum">     640 </span><span class="lineNoCov">          0 :         const point_t cfg_ea(interpolated_quaternion_rotate(ea, q0, q1, r0, r1, roots[i]));</span>
+<span class="lineNum">     641 </span><span class="lineNoCov">          0 :         const point_t eb_cross_ea(cross_product(eb, cfg_ea));</span>
+<span class="lineNum">     642 </span><span class="lineNoCov">          0 :         if (dot_product(eb_cross_ea, eb_cross_ea) &gt; raptor_physics::EPSILON)</span>
+<span class="lineNum">     643 </span>            :         {
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 :             return roots[i];</span>
+<span class="lineNum">     645 </span>            :         }
+<span class="lineNum">     646 </span><span class="lineNoCov">          0 :         else if (roots[i] == numeric_limits&lt;fp_t&gt;::infinity())</span>
+<span class="lineNum">     647 </span>            :         {
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :             return roots[i];</span>
+<span class="lineNum">     649 </span>            :         }
+<span class="lineNum">     650 </span><span class="lineNoCov">          0 :         BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Discarding parallel root: &quot; &lt;&lt; roots[i];</span>
+<span class="lineNum">     651 </span>            :     }
+<span class="lineNum">     652 </span>            : 
+<span class="lineNum">     653 </span>            :     /* All the roots are parallel */
+<a name="654"><span class="lineNum">     654 </span><span class="lineNoCov">          0 :     return numeric_limits&lt;fp_t&gt;::infinity();</span></a>
+<span class="lineNum">     655 </span>            : }
+<span class="lineNum">     656 </span><span class="lineCov">         36 : } /* namespace raptor_physics */</span>
+<span class="lineNum">     657 </span>            : 
+<span class="lineNum">     658 </span>            : 
+<span class="lineNum">     659 </span>            :    //  const fp_t a_dot = -2.0f*(nb.y*pa.y*pow(q0.x,2) + nb.z*pa.z*pow(q0.x,2) - 
+<span class="lineNum">     660 </span>            :    //       nb.y*pa.x*q0.x*q0.y - nb.x*pa.y*q0.x*q0.y + 
+<span class="lineNum">     661 </span>            :    //       nb.x*pa.x*pow(q0.y,2) + nb.z*pa.z*pow(q0.y,2) - 
+<span class="lineNum">     662 </span>            :    //       nb.z*pa.x*q0.x*q0.z - nb.x*pa.z*q0.x*q0.z - 
+<span class="lineNum">     663 </span>            :    //       nb.z*pa.y*q0.y*q0.z - nb.y*pa.z*q0.y*q0.z + 
+<span class="lineNum">     664 </span>            :    //       nb.x*pa.x*pow(q0.z,2) + nb.y*pa.y*pow(q0.z,2) - 
+<span class="lineNum">     665 </span>            :    //       2.0f*nb.y*pa.y*q0.x*q1.x - 2.0f*nb.z*pa.z*q0.x*q1.x + 
+<span class="lineNum">     666 </span>            :    //       nb.y*pa.x*q0.y*q1.x + nb.x*pa.y*q0.y*q1.x + 
+<span class="lineNum">     667 </span>            :    //       nb.z*pa.x*q0.z*q1.x + nb.x*pa.z*q0.z*q1.x + 
+<span class="lineNum">     668 </span>            :    //       nb.y*pa.y*pow(q1.x,2) + nb.z*pa.z*pow(q1.x,2) + 
+<span class="lineNum">     669 </span>            :    //       nb.y*pa.x*q0.x*q1.y + nb.x*pa.y*q0.x*q1.y - 
+<span class="lineNum">     670 </span>            :    //       2.0f*nb.x*pa.x*q0.y*q1.y - 2.0f*nb.z*pa.z*q0.y*q1.y + 
+<span class="lineNum">     671 </span>            :    //       nb.z*pa.y*q0.z*q1.y + nb.y*pa.z*q0.z*q1.y - 
+<span class="lineNum">     672 </span>            :    //       nb.y*pa.x*q1.x*q1.y - nb.x*pa.y*q1.x*q1.y + 
+<span class="lineNum">     673 </span>            :    //       nb.x*pa.x*pow(q1.y,2) + nb.z*pa.z*pow(q1.y,2) + 
+<span class="lineNum">     674 </span>            :    //       (nb.x*(-2.0f*pa.x*q0.z + pa.z*(q0.x - q1.x)) + 
+<span class="lineNum">     675 </span>            :    //          nb.z*(pa.x*(q0.x - q1.x) + pa.y*(q0.y - q1.y)) + 
+<span class="lineNum">     676 </span>            :    //          nb.y*(-2.0f*pa.y*q0.z + pa.z*(q0.y - q1.y)))*q1.z + 
+<span class="lineNum">     677 </span>            :    //       (nb.x*pa.x + nb.y*pa.y)*pow(q1.z,2) + 
+<span class="lineNum">     678 </span>            :    //       r0*(nb.z*(pa.y*(-q0.x + q1.x) + pa.x*(q0.y - q1.y)) + 
+<span class="lineNum">     679 </span>            :    //          nb.x*(pa.z*(-q0.y + q1.y) + pa.y*(q0.z - q1.z)) + 
+<span class="lineNum">     680 </span>            :    //          nb.y*(pa.z*(q0.x - q1.x) + pa.x*(-q0.z + q1.z))) + 
+<span class="lineNum">     681 </span>            :    //       r1*(nb.z*(pa.y*(q0.x - q1.x) + pa.x*(-q0.y + q1.y)) + 
+<span class="lineNum">     682 </span>            :    //          nb.y*(pa.z*(-q0.x + q1.x) + pa.x*(q0.z - q1.z)) + 
+<span class="lineNum">     683 </span>            :    //          nb.x*(pa.z*(q0.y - q1.y) + pa.y*(-q0.z + q1.z))));
+<span class="lineNum">     684 </span>            :    //  //const fp_t b_dot = dot_product(b, nb);
+<span class="lineNum">     685 </span>            :    //  const fp_t b_dot = 4.0f*nb.y*pa.y*pow(q0.x,2.0f) + 4.0f*nb.z*pa.z*pow(q0.x,2.0f) - 
+<span class="lineNum">     686 </span>            :    // 4.0f*nb.y*pa.x*q0.x*q0.y - 4.0f*nb.x*pa.y*q0.x*q0.y + 
+<span class="lineNum">     687 </span>            :    // 4.0f*nb.x*pa.x*pow(q0.y,2.0f) + 4.0f*nb.z*pa.z*pow(q0.y,2.0f) - 
+<span class="lineNum">     688 </span>            :    // 4.0f*nb.z*pa.x*q0.x*q0.z - 4.0f*nb.x*pa.z*q0.x*q0.z - 
+<span class="lineNum">     689 </span>            :    // 4.0f*nb.z*pa.y*q0.y*q0.z - 4.0f*nb.y*pa.z*q0.y*q0.z + 
+<span class="lineNum">     690 </span>            :    // 4.0f*nb.x*pa.x*pow(q0.z,2.0f) + 4.0f*nb.y*pa.y*pow(q0.z,2.0f) + 
+<span class="lineNum">     691 </span>            :    // 2.0f*r1*(nb.z*(pa.y*q0.x - pa.x*q0.y) + 
+<span class="lineNum">     692 </span>            :    //    nb.y*(-(pa.z*q0.x) + pa.x*q0.z) + 
+<span class="lineNum">     693 </span>            :    //    nb.x*(pa.z*q0.y - pa.y*q0.z)) - 4.0f*nb.y*pa.y*q0.x*q1.x - 
+<span class="lineNum">     694 </span>            :    // 4.0f*nb.z*pa.z*q0.x*q1.x + 2.0f*nb.y*pa.x*q0.y*q1.x + 
+<span class="lineNum">     695 </span>            :    // 2.0f*nb.x*pa.y*q0.y*q1.x + 2.0f*nb.z*pa.x*q0.z*q1.x + 
+<span class="lineNum">     696 </span>            :    // 2.0f*nb.x*pa.z*q0.z*q1.x + 2.0f*nb.y*pa.x*q0.x*q1.y + 
+<span class="lineNum">     697 </span>            :    // 2.0f*nb.x*pa.y*q0.x*q1.y - 4.0f*nb.x*pa.x*q0.y*q1.y - 
+<span class="lineNum">     698 </span>            :    // 4.0f*nb.z*pa.z*q0.y*q1.y + 2.0f*nb.z*pa.y*q0.z*q1.y + 
+<span class="lineNum">     699 </span>            :    // 2.0f*nb.y*pa.z*q0.z*q1.y + 2.0f*nb.z*pa.x*q0.x*q1.z + 
+<span class="lineNum">     700 </span>            :    // 2.0f*nb.x*pa.z*q0.x*q1.z + 2.0f*nb.z*pa.y*q0.y*q1.z + 
+<span class="lineNum">     701 </span>            :    // 2.0f*nb.y*pa.z*q0.y*q1.z - 4.0f*nb.x*pa.x*q0.z*q1.z - 
+<span class="lineNum">     702 </span>            :    // 4.0f*nb.y*pa.y*q0.z*q1.z + 
+<span class="lineNum">     703 </span>            :    // 2.0f*r0*(nb.z*(pa.y*(-2.0f*q0.x + q1.x) + pa.x*(2.0f*q0.y - q1.y)) + 
+<span class="lineNum">     704 </span>            :    //    nb.x*(pa.z*(-2.0f*q0.y + q1.y) + pa.y*(2.0f*q0.z - q1.z)) + 
+<span class="lineNum">     705 </span>            :    //    nb.y*(pa.z*(2.0f*q0.x - q1.x) + pa.x*(-2.0f*q0.z + q1.z))) - 
+<span class="lineNum">     706 </span>            :    // nb.x*x0.x - nb.y*x0.y - nb.z*x0.z + nb.x*x1.x + 
+<span class="lineNum">     707 </span>            :    // nb.y*x1.y + nb.z*x1.z;
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

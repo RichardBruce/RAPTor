@@ -1,0 +1,9 @@
+* Improve BEntity support (dynamic geometry such as doors, walls, etc)
+    - How does Quake2 exclude these surfaces when traversing the BSP tree?
+* Fix problems at borders of textures, e.g. skybox
+* Animated textures
+* Add a player character, to be able to see one's own reflection
+* Why doesnt SDL_MapRGB work on certain machines?
+* Translucency, alpha surfaces (make these surfaces refract?)
+* Filtered picture scaling
+* Transparent background colour for sprites

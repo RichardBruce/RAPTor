@@ -1,0 +1,15 @@
+--model_type obj
+--model_path scenes/obj_scenes/sponza/sponza.obj
+--cam_right  0.0  0.0 -1.0
+--cam_up     0.0  1.0  0.0
+--cam_fwd    1.0  0.0  0.0
+--light      -5.0 -5.0 -3.0 0.1 511 511 511 0.05
+--light      -6.0 10.0  0.0 0.1 511 511 511 0.05
+--waypoints  sponza_waypoints
+--fps        60
+--x_res      800
+--y_res      600
+--skip_to    0
+--cam_mode     both
+--out_vid_name sponza.avi
+--output_dir   /depot/users/erikolsson/render_output

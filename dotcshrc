@@ -1,0 +1,5 @@
+#!/usr/bin/env csh
+
+# Add the tools to the path
+set path = ( ./tools/ $path )
+setenv RAPTOR_TOOLS $PWD/tools

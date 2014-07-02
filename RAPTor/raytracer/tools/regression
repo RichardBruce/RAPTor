@@ -1,0 +1,773 @@
+#!/usr/bin/env perl
+
+use strict;
+use Getopt::Long;
+use Sys::Hostname;
+
+my ( $test, $verbose, $help, $test_cmd, $line );
+my $omit            = "nothing";
+my $use_bih         = 0;
+my $no_cfg          = 0;
+my $no_mgf          = 0;
+my $no_nff          = 0;
+my $no_lwo          = 0;
+my $no_obj          = 0;
+my $no_ply          = 0;
+my $no_clean_code   = 0;
+my $no_clean_log    = 0;
+my $no_timing       = 0;
+my $no_scalar       = 0;
+my $no_threading    = 0;
+my $summary_only    = 0;
+my $timing_runs     = 15;
+
+my @tests = qw( blkchair    bluchair    book        bookbox     butterfly   cabin       chair1      chair2      coatrack    
+                conftabl    coord       corndesk    curtain     dafvase     desk        desklamp    doorclsr    dresser     
+                exitsign    exting      medcab      mug         office      openbook    orgchair    pencil      podium      
+                redchair    soda        speaker     terminal    toilet      vanity      vent        whale2      wstbskt 
+                balls_1     balls_2     balls_3     balls_4     
+                gears_2     gears_5     gears_12    gears_25    
+                jacks_2     jacks_3     jacks_4     jacks_5     
+                lattice_1   lattice_3   lattice_8   lattice_19  
+                mount_4     mount_7     mount_9     mount_11    
+                nurbtst_1
+                rings_1     rings_2     rings_4     rings_9
+                sample_1
+                shells_1    shells_2    shells_5    shells_9
+                sombrero_2  sombrero_3  sombrero_5  sombrero_7
+                teapot_12   teapot_38   teapot_123  teapot_389
+                tetra_6     tetra_8     tetra_9     tetra_11
+                tree_4      tree_7      tree_10     tree_14
+                caterpillar_t530        trailer_container   trailer_chemical_tanker     subaru_impreza_0    
+                subaru_impreza_1        hummer                  t_62                    scud_launcher
+                isd_imperator_0         isd_imperator_1         isd_imperator_2         eg07_dragon_original 
+                eg07_dragon_smoothed    sponza
+                bun_zipper              bun_zipper_res2         bun_zipper_res3         bun_zipper_res4 
+                dragon_vrip             dragon_vrip_res2        dragon_vrip_res3        dragon_vrip_res4
+                happy_vrip              happy_vrip_res2         happy_vrip_res3         happy_vrip_res4
+                armadillo               drill_shaft_vrip        drill_shaft_zip         xyzrgb_dragon
+                xyzrgb_manuscript       xyzrgb_statuette        blade                   hand
+                lucy                    horse
+                unc_powerplant
+               );
+
+#./raytracer --cfg scenes/mgf_scenes/mgftree/mgftree.cfg --cam 1.5 -4.0 2.0 --dy 0.929776 0.368124 0 --dx -0.0915488 0.231226 0.968583 --dz -0.356559 0.900565 -0.24869 --light 5 -25 5 10 255 255 255 0.0 --bg 255 255 255 --res 1920 1080
+#./raytracer --cfg ./scenes/mgf_scenes/nrcoff/design1.cfg --cam 0.82453 5.66974 2.70777 --dx 0.505084 0.860968 0.0601528 --dy 0.314033 -0.24825 0.916379 --dz 0.803909 -0.443958 -0.39576 --light 1.0 6.0 2.7 0.001 255 255 255 0.0 --light 2.5 6.0 2.6 0.001 255 255 255 0.0 --res 1920 1080
+#./raytracer --cfg scenes/mgf_scenes/model/df_dl_ww.cfg --cam 1.99039 6.84602 2.85339 --dx 0.993631 -0.110235 0.0240561 --dy -0.0497237 -0.236433 0.970391 --dz -0.101282 -0.965395 -0.240404 --light 1 1.1 2 0.1 255 255 255 0.0 --res 1920 1080
+#./raytracer --cfg scenes/mgf_scenes/model/if_ww.cfg --cam 1.99039 6.84602 2.85339 --dx 0.993631 -0.110235 0.0240561 --dy -0.0497237 -0.236433 0.970391 --dz -0.101282 -0.965395 -0.240404 --light 1 1.1 2 0.1 255 255 255 0.0 --res 1920 1080
+#./raytracer --cfg scenes/mgf_scenes/model/dif_ww.cfg --cam 1.99039 6.84602 2.85339 --dx 0.993631 -0.110235 0.0240561 --dy -0.0497237 -0.236433 0.970391 --dz -0.101282 -0.965395 -0.240404 --light 1 1.1 2 0.1 255 255 255 0.0 --res 1920 1080
+# cfg command line options
+my %cfg_options = (
+                unc_powerplant  => ("scenes/ply_scenes/unc_powerplant/unc_powerplant.cfg --cam 500000 75000 50000 --dx 0.0314108 0 0.999507 --dy 0.0313953 0.999507 -0.000986636 --dz -0.999013 0.0314108 0.0313953 --light 500000.0 500000 100000.0 10 255 255 255 0.0 --light 100000.0 500000.0 500000.0 10 255 255 255 0.0 -res 1920 1080")
+               );
+
+#./raytracer --mgf scenes/mgf_scenes/cruiser/shipbatl.mgf --cam 11.5974 6.94461 1.23065 --dx 0.0167102 0.999227 0.0355783 --dy 0.0428478 -0.00725486 0.999056 --dz -0.994753 0.0130228 0.101481 --light 6.0 6.94461 1.23065 0.001 255 255 255 0.0 --light 12.0 6.94461 1.23065 0.001 255 255 255 0.0 --res 1920 1080
+#./raytracer --mgf scenes/mgf_scenes/cruiser/shipemer.mgf --cam 1.70543 6.82824 1.25482 --dx 0.0115531 -0.999512 0.0290114 --dy 0.0 0.0 1.0 --dz 0.99819 0.0132403 0.0586675 --light 3.0 6.82824 1.2 0.00001 255 255 255 0.0 --res 1920 1080
+#./raytracer --mgf scenes/mgf_scenes/cruiser/shipfull.mgf --cam 12.6852 7.17522 1.27253 --dx -0.443838 -0.895868 -0.0206808 --dy 0.022483 -0.06655 0.99753 --dz 0.895941 -0.444082 0.00899294 --light 14.0 7.09337 1.40625 0.0001 255 255 255 0.0 --res 1920 1080
+#./raytracer --mgf scenes/mgf_scenes/furn.mgf --cam 11.5296 6.90595 2.77921 --dx 0.675349 -0.719947 0.15993 --dy -0.456826 -0.238132 0.857087 --dz -0.578974 -0.651894 -0.489713 --light 11 10.0 15.9031 10 255 255 255 0.0 --light -11 -10.0 15.9031 10 255 255 255 0.0 --bg 255 255 255
+#./raytracer --mgf scenes/mgf_scenes/bathroom.mgf --cam 0.690096 2.25 1.72998 --dx 0.984685 -0.173215 0.0196139 --dy -0.067297 -0.273931 0.95939 --dz -0.160808 -0.946019 -0.281393 --light 0.690096 1.5 1.72998 0.0001 255 255 255 0.0 --res 1920 1080
+#./raytracer --mgf ./scenes/mgf_scenes/conf.mgf --cam 0.755185 1.96957 0.999216 --dx -0.244815 0.969566 -0.000783627 --dy -0.125365 -0.0308523 0.991629 --dz 0.961429 0.242865 0.129102 --light 5.0 2.0 1.5 0.00001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene0.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.9 0 0.001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene1.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.9 0 0.001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene2.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.9 0 0.001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene3.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 1.5 0 0.001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene4.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 1.5 0 0.001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene5.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.0 0 0.001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene6.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.0 0 0.001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene7.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.0 0 0.001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene8.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.9 0 0.001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene9.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.0 0 0.001 255 255 255 0.0
+#./raytracer --mgf scenes/mgf_scenes/ERW5/scene10.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.0 0 0.001 255 255 255 0.0
+# mgf command line options
+my %mgf_options = (
+                blkchair    => ("--cam   0.0         1.43007      1.21751  --dx  0.987689   0.110616    0.110616   --dy  0.0        -0.707107    0.707107 --dz  0.156435   -0.698401  -0.698401  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0 --bg 255.0 255.0 255.0"),
+                bluchair    => ("--cam  -0.719024    1.9063       2.08393  --dx  0.999504   0.0236753   0.0207694  --dy -0.00206248 -0.608845    0.793286 --dz  0.0314266  -0.792936  -0.608495  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                book        => ("--cam  39.7714     28.5208      -7.42805  --dx  0.516746  -0.126593    0.846728   --dy -0.276531    0.911316    0.305013 --dz -0.81025    -0.391761   0.435912  --light  200.0  150.0 -500.0 10.0 255.0 255.0 255.0 0.0"),
+                bookbox     => ("--cam  -0.537066    0.770168     0.879083 --dx  0.730342   0.658092    0.183074   --dy  0.198922   -0.4613      0.864658 --dz  0.653476   -0.595078  -0.467816  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                butterfly   => ("--cam   0.0        -2.0          1.0      --dx  1.0        0.0         0.0        --dy  0.0         0.0         1.0      --dz  0.0         1.0        0.0       --light -200.0 -150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                cabin       => ("--cam  -3.70266     7.68787      3.25664  --dx  0.453991   0.891006    2.6261e-08 --dy  0.194367   -0.099035    0.975917 --dz  0.869548   -0.443057  -0.218143  --light -200.0 -150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                chair1      => ("--cam -14.6596    -35.9896      41.0      --dx -0.876307   0.429246   -0.218712   --dy  0.0         0.45399     0.89100  --dz  0.481754    0.780795  -0.397835  --light -200.0 -150.0  500.0 10.0 255.0 255.0 255.0 0.0 --bg 255.0 255.0 255.0"),
+                chair2      => ("--cam -26.1625      5.59313     45.7324   --dx -0.0294118  0.999444    0.0157273  --dy  0.48177     0.000388113 0.876298 --dz  0.875804    0.0333504 -0.481513  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                coatrack    => ("--cam  -1.87929    -0.00197327   1.76666  --dx  0.061678   0.998027   -0.0117658  --dy  0.338435   -0.0098226   0.940939 --dz  0.938966   -0.0620175 -0.338373  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0 --bg 255.0 255.0 255.0"),
+                conftabl    => ("--cam  -2.22321     3.0          2.07992  --dx  0.484831  -0.228144    0.425779   --dy  0.0         0.904827    0.763971 --dz  0.763971   -0.535827  -0.359497  --light -200.0  150.0  200.0 10.0 255.0 255.0 255.0 0.0"),
+                coord       => ("--cam   0.0         0.0         -2.0      --dx  1.0        0.0         0.0        --dy  0.0         1.0         0.0      --dz  0.0         0.0        1.0       --light  200.0  150.0 -500.0 10.0 255.0 255.0 255.0 0.0"),
+                corndesk    => ("--cam   0.214223    2.11083      1.82584  --dx  0.786019   0.608753   -0.107678   --dy  0.453443   -0.449331    0.769734 --dz  0.420195   -0.653851  -0.629217  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                curtain     => ("--cam   0.0        10.8309      -2.70448  --dx  0.987688   0.117343   -0.103452   --dy  0.0         0.661312    0.750111 --dz  0.156434   -0.740876   0.65317   --light -200.0  150.0 -500.0 10.0 255.0 255.0 255.0 0.0 --bg 255.0 255.0 255.0"),
+                dafvase     => ("--cam  -5.25516    34.9719      21.3347   --dx  0.890567   0.453766    0.0314108  --dy -0.0279872  -0.0142602   0.999507 --dz  0.45399    -0.891007   0.0       --light  200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                desk        => ("--cam  -0.547533    1.82708      1.29237  --dx  0.710502   0.688418    0.145836   --dy  0.0936528  -0.297905    0.94999  --dz  0.697436   -0.661312  -0.276134  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                desklamp    => ("--cam  45.8079     -1.47508     48.6225   --dx  0.0       -1.0         0.0        --dy -0.425779    0.0         0.904827 --dz -0.904827    0.0       -0.425779  --light  200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                doorclsr    => ("--cam   0.204108   -0.338688     0.304267 --dx -0.101397   0.587785    0.802638   --dy  0.992115    0.0         0.125333 --dz  0.073669    0.809017  -0.58315   --light -200.0 -150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                dresser     => ("--cam  -0.0106744   1.89196      3.71793  --dx  0.755893  -0.00910099  0.0125264  --dy -0.0185809  -0.197908    0.977455 --dz  0.00574466 -0.609557  -0.789523  --light  200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                exitsign    => ("--cam   0.366792    0.469927     0.606283 --dx  0.965389  -0.214648   -0.148154   --dy -0.0214258  -0.631396    0.775165 --dz -0.259931   -0.745162  -0.614142  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                exting      => ("--cam  -0.388678    1.12059      0.821471 --dx  0.905996   0.423278   -0.00227795 --dy  0.144844   -0.304963    0.941285 --dz  0.397731   -0.853131  -0.337605  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+#                luminar     => ("--cam  -0.108051    0.0         -1.28774  --dx  0.929776   0.0        -0.368125   --dy  0.0         1.0         0.0      --dz  0.368125    0.0        0.929776  --light  -50.0    0.0 -100.0 10.0 255.0 255.0 255.0 0.0"),
+                medcab      => ("--cam  -0.861509    1.93334     -0.523312 --dx -0.0210184  0.481269    0.876321   --dy -0.769469   -0.567423    0.293169 --dz  0.638338   -0.66814    0.382248  --light -200.0  150.0  200.0 10.0 255.0 255.0 255.0 0.0"),
+                mug         => ("--cam -17.7387     13.4915      -2.61691  --dx  0.156434   0.0        -0.987688   --dy  0.305212    0.951057    0.048340 --dz  0.939347   -0.309017   0.148778  --light -200.0  150.0 -500.0 10.0 255.0 255.0 255.0 0.0"),
+                office      => ("--cam   1.0         2.91919     -0.27595  --dx  0.187381   0.0         0.982287   --dy -0.184062    0.982287    0.035111 --dz -0.964888   -0.187381   0.184062  --light   -1.0    3.5 -0.27595 0.1 255.0 255.0 255.0 0.0"),
+                openbook    => ("--cam  18.0        36.6897      28.1936   --dx  1.0        0.0         0.0        --dy  0.0        -0.790155    0.612907 --dz  0.0        -0.612907  -0.790155  --light  200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                orgchair    => ("--cam  -0.305172    1.51552      1.35142  --dx  0.892794   0.449583    0.0281915  --dy  0.215373   -0.480984    0.849864 --dz  0.395644   -0.752681  -0.526248  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                pencil      => ("--cam  15.0        15.0        -25.0      --dx  1.0        0.0         0.0        --dy  0.0         1.0         0.0      --dz  0.0         0.0        1.0       --light  200.0  150.0 -500.0 10.0 255.0 255.0 255.0 0.0"),
+                podium      => ("--cam  -0.25651    -1.22294      1.695    --dx -0.919978   0.369745   -0.130109   --dy  0.0770206   0.495989    0.864906 --dz  0.384328    0.785674  -0.484777  --light -200.0 -150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                redchair    => ("--cam   0.0         2.00789      1.12533  --dx  0.992115   0.124777    0.0117949  --dy  0.0        -0.0941083   0.995562 --dz  0.125333   -0.987712  -0.0933662 --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                soda        => ("--cam   1.0         1.0         -2.0      --dx  1.0        0.0         0.0        --dy  0.0         1.0         0.0      --dz  0.0         0.0        1.0       --light    2.0    2.0    0.0  0.1 255.0 255.0 255.0 0.0"),
+                speaker     => ("--cam   0.5         0.5         -1.0      --dx  1.0        0.0         0.0        --dy  0.0         1.0         0.0      --dz  0.0         0.0        1.0       --light  200.0  150.0 -500.0 10.0 255.0 255.0 255.0 0.0"),
+                terminal    => ("--cam   0.45        0.75012      0.5      --dx  1.0        0.0         0.0        --dy  0.0        -0.368125    0.929776 --dz  0.0        -0.929776  -0.368125  --light  200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                toilet      => ("--cam   0.0         1.84864      0.923168 --dx  0.975917   0.207467    0.06741    --dy  0.0        -0.309017    0.951057 --dz  0.21814    -0.928152  -0.301575  --light -100.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                vanity      => ("--cam   0.0         1.0747       1.58528  --dx  1.0        0.0         0.0        --dy  0.0        -0.684547    0.728969 --dz  0.0        -0.728969  -0.684547  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0"),
+                vent        => ("--cam  24.0        25.3508      -1.17269  --dx  1.0        0.0         0.0        --dy  0.0         0.425779    0.904827 --dz  0.0        -0.904827   0.425779  --light -200.0  150.0 -500.0 10.0 255.0 255.0 255.0 0.0 --bg 255.0 255.0 255.0"),
+                whale2      => ("--cam   9.35143     7.03141    -15.8402   --dx  0.0184628 -0.999507    0.0254118  --dy  0.587495    0.0314108   0.808618 --dz -0.809017    0.0        0.587785  --light  200.0  150.0 -500.0 10.0 255.0 255.0 255.0 0.0"),
+                wstbskt     => ("--cam  -0.292811    0.545782     1.47107  --dx  0.407077   0.906157   -0.114752   --dy  0.779144   -0.278929    0.561367 --dz  0.476679   -0.317928  -0.819572  --light -200.0  150.0  500.0 10.0 255.0 255.0 255.0 0.0")
+               );
+
+# nff command line options
+my %nff_options = (
+                balls_1     => (""),
+                balls_2     => (""),
+                balls_3     => (""),
+                balls_4     => (""),
+                gears_2     => (""),
+                gears_5     => (""),
+                gears_12    => (""),
+                gears_25    => (""),
+                jacks_2     => (""),
+                jacks_3     => (""),
+                jacks_4     => (""),
+                jacks_5     => (""),
+                lattice_1   => (""),
+                lattice_3   => (""),
+                lattice_8   => (""),
+                lattice_19  => (""),
+                mount_4     => (""),
+                mount_7     => (""),
+                mount_9     => (""),
+                mount_11    => (""),
+                nurbtst_1   => (""),
+                rings_1     => (""),
+                rings_2     => (""),
+                rings_4     => (""),
+                rings_9     => (""),
+                sample_1    => (""),
+                shells_1    => (""),
+                shells_2    => (""),
+                shells_5    => (""),
+                shells_9    => (""),
+                sombrero_2  => (""),
+                sombrero_3  => (""),
+                sombrero_5  => (""),
+                sombrero_7  => (""),
+                teapot_12   => (""),
+                teapot_38   => (""),
+                teapot_123  => (""),
+                teapot_389  => (""),
+                tetra_6     => (""),
+                tetra_8     => (""),
+                tetra_9     => (""),
+                tetra_11    => (""),
+                tree_4      => (""),
+                tree_7      => (""),
+                tree_10     => (""),
+                tree_14     => ("")
+               );
+
+#./raytracer --lwo ./scenes/lwo_scenes/vehicles/tanks/t62/t_62.lwo --cam 12.9077 8.18881 -19.4989 --dx 0.750648 -0.00087924 0.660703 --dy -0.22302 0.940969 0.254633 --dz -0.621925 -0.338488 0.706141 --res 1920 1080 --directionallight 15 0 0 255 255 255 0.0 0.0 0.0 0.0
+#./raytracer --lwo ./scenes/lwo_scenes/vehicles/tanks/t62/t_62.lwo --cam 12.9077 8.18881 -19.4989 --dx 0.750648 -0.00087924 0.660703 --dy -0.22302 0.940969 0.254633 --dz -0.621925 -0.338488 0.706141 --res 1920 1080 --spotlight 0 15 0 10 255 255 255 0.0 0.0 0.0 0.0 10.0 45.0
+# lwo command line options
+my %lwo_options = (
+                freightliner_aerodyne   => ("vehicles/trucks/freightliner/Freightliner_Aerodyne.lwo     --cam -11.8461   5.51688 -15.9438  --dx  0.727965    0.0198696 -0.685326 --dy  0.223434  0.938136  0.264534   --dz  0.648185 -0.345697     0.67849    --res 1920 1080 --light -100 100 -100 10 255 255 255 0.0                                        "),
+                caterpillar_t530        => ("vehicles/trucks/caterpillar/Caterpillar_T530.lwo           --cam  16.2813   7.38379 -8.46192  --dx  0.427311    0.0183088  0.903919 --dy -0.373232  0.914198  0.157922   --dz -0.82347  -0.404853     0.397481   --res 1920 1080 --light  100 100 -100 10 255 255 255 0.0                                        "),
+#                trailer_chemical_tanker => ("vehicles/trucks/trailer_tanker/trailer_chemical_tanker.lwo --cam  15.1995  5.0     -22.2613  --dx  0.728969    0.0        0.684547 --dy -0.107087  0.987688  0.114036   --dz -0.676119 -0.156434     0.719994   --res 1920 1080 --light  100 100 -100 10 255 255 255 0.0 --light 100 -100 100 10 255 255 255 0.0"),
+                trailer_container       => ("vehicles/trucks/trailer_container/Trailer_container.lwo    --cam  15.1995   5.0     -22.2613  --dx  0.728969    0.0        0.684547 --dy -0.107087  0.987688  0.114036   --dz -0.676119 -0.156434     0.719994   --res 1920 1080 --light  100 100 -100 10 255 255 255 0.0 --light 100 -100 100 10 255 255 255 0.0"),
+                subaru_impreza_0        => ("vehicles/race_cars/subaru/Subaru_Impreza.lwo               --cam   9.9388   8.90993 -13.7376  --dx  0.728969    0.0        0.684547 --dy -0.384773  0.82708   0.409741   --dz -0.566176 -0.562083     0.602916   --res 1920 1080 --light  100 100 -100 10 255 255 255 0.0 --light 100 -100 100 10 255 255 255 0.0"),
+                subaru_impreza_1        => ("vehicles/race_cars/subaru/Subaru_Impreza.lwo               --cam  -8.18096 -0.839894 14.0719  --dx -0.808254   -0.0146934 -0.588651 --dy -0.0112015 0.999891 -0.00957785 --dz  0.588727 -0.00114707  -0.808331   --res 1920 1080 --light -100 100  100 10 255 255 255 0.0 --light 100 -100 100 10 255 255 255 0.0"),
+                hummer                  => ("vehicles/cars/hummer/Hummer.lwo                            --cam  10.7323   2.44797 -13.1218  --dx  0.728969    0.0        0.684547 --dy -0.107087  0.987688  0.114036   --dz -0.676119 -0.156434     0.719994   --res 1920 1080 --light  100 100 -100 10 255 255 255 0.0 --light 100 -100 100 10 255 255 255 0.0"),
+                t_62                    => ("vehicles/tanks/t62/t_62.lwo                                --cam  12.9077   8.18881 -19.4989  --dx  0.750648   -0.00087924 0.660703 --dy -0.22302   0.940969  0.254633   --dz -0.621925 -0.338488     0.706141   --res 1920 1080 --light  100 100 -100 10 255 255 255 0.0 --light 100 -100 100 10 255 255 255 0.0"),
+                scud_launcher           => ("vehicles/tanks/scud/scud_launcher.lwo                      --cam  14.1448   9.99139 -22.98    --dx  0.750989   -0.00278201 0.66031  --dy -0.297723  0.89115   0.342362   --dz -0.589388 -0.453698     0.668415   --res 1920 1080 --light  100 100 -100 10 255 255 255 0.0 --light 100 -100 100 10 255 255 255 0.0")
+                );
+
+# obj command line options
+my %obj_options = (
+                isd_imperator_0         => ("isd_imperator/isd_imperator.obj            --cam       0.0      -85000.0  -650000.0     --dx  1.0       0.0          0.0       --dy  0.0       1.0      0.0       --dz  0.0       0.0       1.0      --res 1920 1080 --light  500000.0  200000.0  -700000.0 10.0    255 255 255 0.0                                                     "),
+                isd_imperator_1         => ("isd_imperator/isd_imperator.obj            --cam -200000.0     -200000.0   350000.0     --dx  0.880037 -0.0196184    0.4745    --dy -0.139384  0.944474 0.29756   --dz  0.45399   0.328001 -0.828437 --res 1920 1080 --light -500000.0 -500000.0   700000.0 10.0    255 255 255 0.0                                                     "),
+                isd_imperator_2         => ("isd_imperator/isd_imperator.obj            --cam  500000.0      250000.0  -650000.0     --dx -0.639625  0.000893619 -0.768686  --dy -0.36828   0.877402 0.307467  --dz -0.674721 -0.479756  0.56088  --res 1920 1080 --light       0.0  400000.0 -1000000.0 10.0    255 255 255 0.0                                                     "),
+                eg07_dragon_original    => ("phlegmatic_dragon/eg07_dragon_original.obj --cam      25.0         300.0     -725.0     --dx  1.0       0.0          0.0       --dy  0.0       0.0     -1.0       --dz  0.0      -1.0       0.0      --res 1920 1080 --light     500.0     750.0     1000.0 10.0    255 255 255 0.0 --light -500.0  500.0 -750.0 10.0    255 255 255 0.0"),
+                eg07_dragon_smoothed    => ("phlegmatic_dragon/eg07_dragon_smoothed.obj --cam       3.33962    -225.0      152.5     --dx  0.998058 -0.0153803   -0.0603799 --dy  0.0603797 0.477955 0.876307  --dz -0.0153811 0.878252 -0.477956 --res 1920 1080 --light     250.0    -350.0      500.0 10.0    255 255 255 0.0 --light -250.0 -250.0 -350.0 10.0    255 255 255 0.0"),
+                sponza                  => ("sponza/sponza.obj                          --cam     -13.7643        -6.92507   1.32953 --dx -0.105038 -0.00870562  -0.99443   --dy -0.238403  0.971023 0.0166812 --dz  0.965468  0.238826 -0.104071 --res 1920 1080 --light      -5.0      -5.0       -3.0  0.0001 255 255 255 0.0 --light   -6.0   10.0    0.0  0.0001 255 255 255 0.0")
+                );
+
+# ply command line options
+my %ply_options = (
+                bun_zipper          => ("bunny/bun_zipper.ply                    --cam   -0.12          0.29       0.28    --dx 0.960294     0.06086     0.272272  --dy  0.0945048   0.847262  -0.522701    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                bun_zipper_res2     => ("bunny/bun_zipper_res2.ply               --cam   -0.12          0.29       0.28    --dx 0.960294     0.06086     0.272272  --dy  0.0945048   0.847262  -0.522701    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                bun_zipper_res3     => ("bunny/bun_zipper_res3.ply               --cam   -0.12          0.29       0.28    --dx 0.960294     0.06086     0.272272  --dy  0.0945048   0.847262  -0.522701    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                bun_zipper_res4     => ("bunny/bun_zipper_res4.ply               --cam   -0.12          0.29       0.28    --dx 0.960294     0.06086     0.272272  --dy  0.0945048   0.847262  -0.522701    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                dragon_vrip         => ("dragon/dragon_vrip.ply                  --cam   -0.12          0.29       0.25    --dx 0.960294     0.06086     0.272272  --dy  0.0945048   0.847262  -0.522701    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                dragon_vrip_res2    => ("dragon/dragon_vrip_res2.ply             --cam   -0.12          0.29       0.25    --dx 0.960294     0.06086     0.272272  --dy  0.0945048   0.847262  -0.522701    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                dragon_vrip_res3    => ("dragon/dragon_vrip_res3.ply             --cam   -0.12          0.29       0.25    --dx 0.960294     0.06086     0.272272  --dy  0.0945048   0.847262  -0.522701    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                dragon_vrip_res4    => ("dragon/dragon_vrip_res4.ply             --cam   -0.12          0.29       0.25    --dx 0.960294     0.06086     0.272272  --dy  0.0945048   0.847262  -0.522701    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                happy_vrip          => ("happy_budha/happy_vrip.ply              --cam   -0.08          0.3        0.2     --dx 0.184456     0.849229   -0.494759  --dy -0.947139    0.0191441 -0.320253    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                happy_vrip_res2     => ("happy_budha/happy_vrip_res2.ply         --cam   -0.08          0.3        0.2     --dx 0.184456     0.849229   -0.494759  --dy -0.947139    0.0191441 -0.320253    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                happy_vrip_res3     => ("happy_budha/happy_vrip_res3.ply         --cam   -0.08          0.3        0.2     --dx 0.184456     0.849229   -0.494759  --dy -0.947139    0.0191441 -0.320253    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                happy_vrip_res4     => ("happy_budha/happy_vrip_res4.ply         --cam   -0.08          0.3        0.2     --dx 0.184456     0.849229   -0.494759  --dy -0.947139    0.0191441 -0.320253    --dz  0.262497  -0.527678  -0.807869  --res 1920 1080 --light    0.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                armadillo           => ("armadillo/Armadillo.ply                 --cam   50.0         140.0     -225.0     --dx 0.951057     0.0         0.309017  --dy -0.140291    0.891007   0.431771    --dz -0.275337  -0.453991   0.847397  --res 1920 1080 --light  500.0   0.0  -100.0 10 255 255 255 0.0 --light 0.0 100.0 -5000.0 10 255 255 255 0.0"),
+                drill_shaft_vrip    => ("drill/drill_shaft_vrip.ply              --cam   -0.06          0.18       0.08    --dx 0.754168    -0.00684085  0.656646  --dy  0.332036    0.866678  -0.37232     --dz  0.566554  -0.498822  -0.655892  --res 1920 1080 --light   10.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                drill_shaft_zip     => ("drill/drill_shaft_zip.ply               --cam   -0.06          0.18       0.08    --dx 0.754168    -0.00684085  0.656646  --dy  0.332036    0.866678  -0.37232     --dz  0.566554  -0.498822  -0.655892  --res 1920 1080 --light   10.0   1.0   100.0 10 255 255 255 0.0 --light 0.0 100.0     1.0 10 255 255 255 0.0"),
+                xyzrgb_dragon       => ("xyzrgb_dragon/xyzrgb_dragon.ply         --cam  110.0         -50.0      -175.0    --dx 0.873063    -0.0552301   0.48447   --dy  0.187223    0.955376  -0.22848     --dz -0.450232   0.290181   0.844444  --res 1920 1080 --light  100.0   0.0 -1000.0 10 255 255 255 0.0 --light 0.0 500.0   100.0 10 255 255 255 0.0"),
+                xyzrgb_manuscript   => ("xyzrgb_manuscript/xyzrgb_manuscript.ply --cam  125.0         -90.0      -275.0    --dx 0.873063    -0.0552301   0.48447   --dy  0.187223    0.955376  -0.22848     --dz -0.450232   0.290181   0.844444  --res 1920 1080 --light  100.0   0.0 -1000.0 10 255 255 255 0.0 --light 0.0 500.0   100.0 10 255 255 255 0.0"),
+                xyzrgb_statuette    => ("xyzrgb_statuette/xyzrgb_statuette.ply   --cam  -15.0          10.0      -500.0    --dx 0.000986636  0.999507    0.0313953 --dy  0.999507    0.0       -0.0314108   --dz  0.0313953 -0.0314108  0.999013  --res 1920 1080 --light  100.0   0.0 -1000.0 10 255 255 255 0.0 --light 0.0 500.0   100.0 10 255 255 255 0.0"),
+                blade               => ("blade/blade.ply                         --cam -150.0        -150.0      -500.0    --dy 0.982723    -0.031024    0.182462  --dx  0.00155596  0.987201   0.159474    --dz -0.185074  -0.156434   0.970194  --res 1920 1080 --light  100.0   0.0 -1000.0 10 255 255 255 0.0 --light 0.0 500.0   100.0 10 255 255 255 0.0"),
+                hand                => ("hand/hand.ply                           --cam    4.78399       2.74896   -10.0388 --dx 0.12625      0.991625    0.0272109 --dy -0.987618    0.12822   -0.0903884   --dz -0.0931204 -0.0154624  0.995535  --res 1920 1080 --light  100.0   0.0 -1000.0 10 255 255 255 0.0 --light 0.0 500.0   100.0 10 255 255 255 0.0"),
+#                lucy                => ("lucy/lucy.ply                           --cam  625.0        1700.0       150.0    --dx 0.0          0.0314108   0.999507  --dy  0.999507    0.0313953 -0.000986636 --dz  0.0314108 -0.999013   0.0313953 --res 1920 1080 --light  100.0   0.0 -1000.0 10 255 255 255 0.0 --light 0.0 500.0   100.0 10 255 255 255 0.0"),
+                horse               => ("horse/horse.ply                         --cam   -0.252297      0.074832    0.11   --dx 0.298892     0.953555   -0.0373727 --dy  0.364136   -0.0777636  0.928094    --dz  0.882082  -0.291008  -0.370466  --res 1920 1080 --light -100.0 100.0   200.0 10 255 255 255 0.0 --light 0.0 -50.0   100.0 10 255 255 255 0.0")
+                );
+
+
+GetOptions (
+    "no_cfg"        => \$no_cfg,
+    "no_mgf"        => \$no_mgf,
+    "no_nff"        => \$no_nff,
+    "no_lwo"        => \$no_lwo,
+    "no_obj"        => \$no_obj,
+    "no_ply"        => \$no_ply,
+    "use_bih"       => \$use_bih,
+    "no_scalar"     => \$no_scalar,
+    "no_threading"  => \$no_threading,
+    "no_clean_code" => \$no_clean_code,
+    "no_clean_log"  => \$no_clean_log,
+    "nt"            => \$no_timing,
+    "summary"       => \$summary_only,
+    "timing_runs:i" => \$timing_runs,
+    "omit:s"        => \$omit,
+    "v"             => \$verbose,
+    "help"          => \$help
+    );
+    
+if ($help)
+{
+    print "Usage regression -[nc|nt|summary|timing_runs|omit|v|help]\n";
+    print "   -no_cfg           : Dont run cfg tests\n";
+    print "   -no_mgf           : Dont run mgf tests\n";
+    print "   -no_nff           : Dont run nff tests\n";
+    print "   -no_lwo           : Dont run lwo tests\n";
+    print "   -no_obj           : Dont run obj tests\n";
+    print "   -no_ply           : Dont run ply tests\n";
+    print "   -use_bih          : Use the bih accleration structure\n";
+    print "   -no_scalar        : Dont run the scalar code\n";
+    print "   -no_threading     : Dont run the threaded code \n";
+    print "   -no_clean_code    : Dont clean code between compiles\n";
+    print "   -no_clean_log     : Dont clean the logs between regression runs\n";
+    print "   -nt               : Dont run timing\n";
+    print "   -summary          : Only summarise the logs\n";
+    print "   -timing_runs <i>  : Runs the raytracer <i> times to create timing statistics\n";
+    print "   -omit <test>      : Dont run the test called <test>\n";
+    print "   -v                : Run verbosely\n";
+    print "   -help             : Prints this messgae\n";
+    print "\n";
+    exit;
+}
+
+
+# Set the compile defines
+my $compile_defines             = "REFLECTIONS_ON REFRACTIONS_ON SPATIAL_SUBDIVISION_STATISTICS"; # SPATIAL_SUBDIVISION_BIH
+my $threaded_compile_defines    = "";
+if ( $use_bih )
+{
+    $compile_defines = "SPATIAL_SUBDIVISION_BIH " . $compile_defines;
+}
+
+
+if (!$summary_only)
+{
+    print "--------------------------------------------------------------\n";
+    print "       Regression started at: " . localtime(time) . " on host: " . hostname() . "\n";
+    print "--------------------------------------------------------------\n";
+    
+    # Re-format the compiler defines
+    $compile_defines = "DEFINES=" . $compile_defines;
+    $compile_defines =~ s/\s/ DEFINES+=/g;
+    print "Compiler defines are: $compile_defines\n\n" unless ( !$verbose );
+    
+    # Remove the performance counter and add threading
+    $threaded_compile_defines = $compile_defines . "DEFINES+=THREADED_RAY_TRACE";
+    $threaded_compile_defines =~ s/DEFINES\+=SPATIAL_SUBDIVISION_STATISTICS//;
+    print "Theaded compiler defines are: $threaded_compile_defines\n\n" unless ( !$verbose );
+    
+    if ( !$no_clean_log )
+    {
+        # Clean up from the last run
+        if ( -e "$ENV{RAYTRACER_HOME}/timing.log")
+        {
+            print "Removing old timing log\n" unless ( !$verbose );
+            `rm -rf $ENV{RAYTRACER_HOME}/timing.log`;
+        }
+        
+        if ( -e "$ENV{RAYTRACER_HOME}/compile.log")
+        {
+            print "Removing old compile log\n" unless ( !$verbose );
+            `rm -rf $ENV{RAYTRACER_HOME}/compile.log`;
+        }
+        
+        if ( -e "$ENV{RAYTRACER_HOME}/compare.log")
+        {
+            print "Removing old compare log\n" unless ( !$verbose );
+            `rm -rf $ENV{RAYTRACER_HOME}/compare.log`;
+        }
+    }
+    
+    if ( !$no_scalar )
+    {
+        # Build scalar code
+        print "Compiling scalar code\n" unless (!$verbose);
+        `echo "Building scalar code...." >> $ENV{RAYTRACER_HOME}/compile.log`;
+        `(cd $ENV{RAYTRACER_HOME} ; make clean)` unless ( $no_clean_code );
+        `(cd $ENV{RAYTRACER_HOME} ; make all $compile_defines >> $ENV{RAYTRACER_HOME}/compile.log)`;
+        `echo "Build complete" >> $ENV{RAYTRACER_HOME}/compile.log`;
+    
+        # Run scaler tests
+        foreach $test (@tests)
+        {
+                # Skip omitted tests
+            next if ($test =~ m/$omit/);
+            
+            # Run the test
+            if (( !$no_cfg ) & ( exists $cfg_options{$test} ))
+            {
+                print "Running scene from cfg for test: $test\n" unless ( !$verbose );
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --cfg $cfg_options{$test} -tga still";
+            }
+            elsif (( !$no_mgf ) & ( exists $mgf_options{$test} ))
+            {
+                print "Running scene from mgf for test: $test\n" unless ( !$verbose );
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --mgf $ENV{RAYTRACER_HOME}/scenes/mgf_scenes/${test}.mgf $mgf_options{$test} -tga still";
+            }
+            elsif (( !$no_nff ) & ( exists $nff_options{$test} ))
+            {
+                print "Running scene from nff for test: $test\n" unless ( !$verbose );
+                my $test_dir = $test;
+                $test_dir =~ s/_\d+//;
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --nff $ENV{RAYTRACER_SDP_SCENES}/${test_dir}_scenes/${test}.nff $nff_options{$test} -tga still";
+            }
+            elsif (( !$no_lwo ) & ( exists $lwo_options{$test} ))
+            {
+                print "Running scene from lwo for test: $test\n" unless ( !$verbose );
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --lwo $ENV{RAYTRACER_SCENES}/lwo_scenes/$lwo_options{$test} -tga still";
+            }
+            elsif (( !$no_obj ) & ( exists $obj_options{$test} ))
+            {
+                print "Running scene from obj for test: $test\n" unless ( !$verbose );
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --obj $ENV{RAYTRACER_SCENES}/obj_scenes/$obj_options{$test} -tga still";
+            }
+            elsif (( !$no_ply ) & ( exists $ply_options{$test} ))
+            {
+                print "Running scene from ply for test: $test\n" unless ( !$verbose );
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --ply $ENV{RAYTRACER_SCENES}/ply_scenes/$ply_options{$test} -tga still";
+            }
+            else
+            {
+                print "Skipping test: $test\n" unless (!$verbose);
+                next;
+            }
+        
+            print "------------------------------\n" unless ( !$verbose );
+            print "  Running test: $test         \n";
+            print "------------------------------\n" unless ( !$verbose );
+    
+            # Check the picture is correct
+            print "Comparing picture for test: $test\n" unless (!$verbose);
+            `echo $test >> $ENV{RAYTRACER_HOME}/compare.log`;
+            `(cd $ENV{RAYTRACER_HOME} ; $test_cmd >> $ENV{RAYTRACER_HOME}/compare.log)`;
+            `compare_pictures --ref $ENV{RAYTRACER_HOME}/reference_pictures/$test.tga --pic $ENV{RAYTRACER_HOME}/still_0.tga --dif $ENV{RAYTRACER_HOME}/${test}_dif.tga --sav $ENV{RAYTRACER_HOME}/${test}_sav.tga >> $ENV{RAYTRACER_HOME}/compare.log`;
+            
+            # Time the ray tracer
+            if ( !$no_timing )
+            {
+                print "Timing raytracer for test: $test\n" unless (!$verbose);
+                for (my $i=0; $i<$timing_runs; $i++)
+                {
+                    `(echo $test >> $ENV{RAYTRACER_HOME}/timing.log; cd $ENV{RAYTRACER_HOME} ; /usr/bin/time -o $ENV{RAYTRACER_HOME}/tmp.log $test_cmd)`;
+                    `cat $ENV{RAYTRACER_HOME}/tmp.log >> $ENV{RAYTRACER_HOME}/timing.log`;
+                }
+            }
+        }
+    }
+        
+    # Repeat for the threaded version
+    if ( !$no_threading )
+    {
+        # Build threaded code
+        print "Compiling threaded code\n" unless (!$verbose);
+        `echo "Building threaded code...." >> $ENV{RAYTRACER_HOME}/compile.log`;
+        `(cd $ENV{RAYTRACER_HOME} ; make clean)`;                                           # Must always be made clean to allow recompiler with threading
+        `(cd $ENV{RAYTRACER_HOME} ; make all $threaded_compile_defines >> $ENV{RAYTRACER_HOME}/compile.log)`;
+        `echo "Build complete" >> $ENV{RAYTRACER_HOME}/compile.log`;
+        
+        # Run threaded tests
+        foreach $test (@tests)
+        {
+            # Skip omitted tests
+            next if ($test =~ m/$omit/);
+        
+            # Run the test
+            if (( !$no_cfg ) & ( exists $cfg_options{$test} ))
+            {
+                print "Running scene from cfg for test: $test\n" unless ( !$verbose );
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --cfg $cfg_options{$test} -tga still";
+            }
+            elsif (( !$no_mgf ) & ( exists $mgf_options{$test} ))
+            {
+                print "Running scene from mgf for test: $test\n" unless ( !$verbose );
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --mgf $ENV{RAYTRACER_SCENES}/mgf_scenes/${test}.mgf $mgf_options{$test} -tga still";
+            }
+            elsif (( !$no_nff ) & ( exists $nff_options{$test} ))
+            {
+                print "Running scene from nff for test: $test\n" unless ( !$verbose );
+                my $test_dir = $test;
+                $test_dir =~ s/_\d+//;
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --nff $ENV{RAYTRACER_SDP_SCENES}/${test_dir}_scenes/${test}.nff $nff_options{$test} -tga still";
+            }
+            elsif (( !$no_lwo ) & ( exists $lwo_options{$test} ))
+            {
+                print "Running scene from lwo for test: $test\n" unless ( !$verbose );
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --lwo $ENV{RAYTRACER_SCENES}/lwo_scenes/$lwo_options{$test} -tga still";
+            }
+            elsif (( !$no_obj ) & ( exists $obj_options{$test} ))
+            {
+                print "Running scene from obj for test: $test\n" unless ( !$verbose );
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --obj $ENV{RAYTRACER_SCENES}/obj_scenes/$obj_options{$test} -tga still";
+            }
+            elsif (( !$no_ply ) & ( exists $ply_options{$test} ))
+            {
+                print "Running scene from ply for test: $test\n" unless ( !$verbose );
+                $test_cmd = "$ENV{RAYTRACER_HOME}/raytracer --ply $ENV{RAYTRACER_SCENES}/ply_scenes/$ply_options{$test} -tga still";
+            }
+            else
+            {
+                print "Skipping test: $test\n" unless (!$verbose);
+                next;
+            }
+    
+            print "------------------------------\n" unless ( !$verbose );
+            print "  Running test: $test         \n";
+            print "------------------------------\n" unless ( !$verbose );
+
+            # Check the picture is correct
+            print "Comparing picture for threaded test: $test\n" unless (!$verbose);
+            `echo threaded $test >> $ENV{RAYTRACER_HOME}/compare.log`;
+            `(cd $ENV{RAYTRACER_HOME} ; $test_cmd >> $ENV{RAYTRACER_HOME}/compare.log)`;
+            `compare_pictures --ref $ENV{RAYTRACER_HOME}/reference_pictures/$test.tga --pic $ENV{RAYTRACER_HOME}/still_0.tga --dif $ENV{RAYTRACER_HOME}/${test}_dif.tga --sav $ENV{RAYTRACER_HOME}/${test}_sav.tga >> $ENV{RAYTRACER_HOME}/compare.log`;
+        
+            # Time the ray tracer
+            if ( !$no_timing )
+            {
+                print "Timing raytracer for threaded test: $test\n" unless (!$verbose);
+                for (my $i=0; $i<$timing_runs; $i++)
+                {
+                    `(echo threaded $test >> $ENV{RAYTRACER_HOME}/timing.log; cd $ENV{RAYTRACER_HOME} ; /usr/bin/time -o $ENV{RAYTRACER_HOME}/tmp.log $test_cmd)`;
+                    `cat $ENV{RAYTRACER_HOME}/tmp.log >> $ENV{RAYTRACER_HOME}/timing.log`;
+                }
+            }
+        }
+    }
+    
+    
+    `rm $ENV{RAYTRACER_HOME}/tmp.log`;
+}
+
+# Create summary
+die "Error: Cannot open compile.log" unless open(COMPIL_LOG, "< $ENV{RAYTRACER_HOME}/compile.log");
+die "Error: Cannot open timing.rpt"  unless open(TIMING_SUM, "> timing.rpt");
+
+# Check for errors and warnings during compilation
+while ( $line = <COMPIL_LOG> )
+{
+    if ( $line =~ m/error/i )
+    {
+        print "Error: Compilation errors occurred, please consult the compile log for more details\n";
+    }
+    
+    if ( $line =~ m/warning/i )
+    {
+        print "Warning: Compilation warnings occurred, please consult the compile log for more details\n";
+    }
+}
+    
+# Header for the timing log
+if ( $no_timing )
+{
+    print TIMING_SUM "No timing data logged only acceleration structure statistics are available\n";
+}
+
+print TIMING_SUM "Tests run at: " . localtime(time) . " on host: " . hostname();
+if ( $use_bih )
+{
+    print TIMING_SUM " using BIH\n\n";    
+}
+else
+{
+    print TIMING_SUM " using KD-tree\n\n";
+}
+
+print TIMING_SUM "Test               | nsp       | ntp       | ng        | ne        | nee       | ner       | nea     | d         | nr        | ritm      | nts     | nets    | neets   |  Maximum  |  Minimum  |  Average  | CPU         | Primtives\n";
+print TIMING_SUM "                   |           |           |           |           |           |           |         |           |           |           |         |         |         |  Run Time |  Run Time |  Run Time | Utilisation | Per Second\n";
+
+foreach $test ( @tests )
+{
+    # Open compare log
+    die "Error: Cannot open compare.log" unless open(COMPAR_LOG, "< $ENV{RAYTRACER_HOME}/compare.log");
+
+    # Skip omitted tests
+    next if ($test =~ m/$omit/);
+    print "Summarising test: $test\n" unless (!$verbose);
+    
+    # Find the test
+    while ($line = <COMPAR_LOG>)
+    {
+        if ($line =~ m/$test/)
+        {
+            last;
+        }
+    }
+    
+    if ($line !~ m/$test/)
+    {
+        next;
+    }
+
+    $line = <COMPAR_LOG>;
+    $line = <COMPAR_LOG>;
+
+    # Get the KD-tree statistics and picture compare summary for scalar code
+    my @kd_tree_stats = "";
+    if ($line !~ m/.*\(nsp\)\s\:\s+(\d+)/)
+    {
+        print "Error: Could not find statistics for $test\n";
+    }
+    else
+    {
+        @kd_tree_stats[0] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(ntp\)\s\:\s+(\d+)/;
+        @kd_tree_stats[1] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(ng\s\)\s\:\s+(\d+)/;
+        @kd_tree_stats[2] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(ne\s\)\s\:\s+(\d+)/;
+        @kd_tree_stats[3] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(nee\)\s\:\s+(\d+\.*\d*)/;
+        @kd_tree_stats[4] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(ner\)\s\:\s+(\d+)/;
+        @kd_tree_stats[5] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(nea\)\s\:\s+(\d+\.\d+)/;
+        @kd_tree_stats[6] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(d\s\s\)\s\:\s+(\d+)/;
+        @kd_tree_stats[7] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line = <COMPAR_LOG>;
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(nr\s\s\s\)\s\:\s+(\d+)/;
+        @kd_tree_stats[8] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(ritm\s\)\s\:\s+(\d+\.\d+)/;
+        @kd_tree_stats[9] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(nts\s\s\)\s\:\s+(\d+\.\d+)/;
+        @kd_tree_stats[10] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(nets\s\)\s\:\s+(\d+\.\d+)/;
+        @kd_tree_stats[11] = $1;
+     
+        $line = <COMPAR_LOG>;
+        $line =~ m/.*\(neets\)\s\:\s+(\d+\.\d+)/;
+        @kd_tree_stats[12] = $1;
+     
+        # Print stats
+        printf TIMING_SUM "%-18s |",   $test;
+        printf TIMING_SUM " %9d |", @kd_tree_stats[0];
+        printf TIMING_SUM " %9d |", @kd_tree_stats[1];
+        printf TIMING_SUM " %9d |", @kd_tree_stats[2];
+        printf TIMING_SUM " %9d |", @kd_tree_stats[3];
+        printf TIMING_SUM " %9d |", @kd_tree_stats[4];
+        printf TIMING_SUM " %9d |", @kd_tree_stats[5];
+        printf TIMING_SUM " %7.2f |", @kd_tree_stats[6];
+        printf TIMING_SUM " %9d |", @kd_tree_stats[7];
+        printf TIMING_SUM " %9d |", @kd_tree_stats[8];
+        printf TIMING_SUM " %9.2f |", @kd_tree_stats[9];
+        printf TIMING_SUM " %7.2f |", @kd_tree_stats[10];
+        printf TIMING_SUM " %7.2f |", @kd_tree_stats[11];
+        printf TIMING_SUM " %7.2f |", @kd_tree_stats[12];
+
+        $line = <COMPAR_LOG>;
+        $line = <COMPAR_LOG>;
+        my $scalar_errors = 0;
+        if ($line =~ m/\d/)
+        {
+            $line =~ m/(\d+)/;
+            $scalar_errors += $1;
+        }
+        printf TIMING_SUM " %7d |", $scalar_errors;
+    }
+
+
+    # And for threaded code
+    # Get the KD-tree statistics and picture compare summary for scalar code
+    while ($line = <COMPAR_LOG>)
+    {
+        if ($line =~ m/threaded\s$test/)
+        {
+            last;
+        }
+    }
+    
+    $line = <COMPAR_LOG>;
+    $line = <COMPAR_LOG>;
+    my $thread_errors = 0;
+    if ($line =~ m/\d/)
+    {
+         $line =~ m/(\d+)/;
+        $thread_errors += $1;
+    }
+    printf TIMING_SUM " %7d |", $thread_errors;
+
+    # Get run time statistics
+    if ( !$no_timing )
+    {
+        collect_timing_statistics(@kd_tree_stats[0], $test);
+        
+        # Collect threaded stats
+        if ( !$no_threading )
+        {
+            collect_timing_statistics(@kd_tree_stats[0], "threaded " . $test);
+        }
+    }
+    # Next line for next test
+    print TIMING_SUM "\n";
+
+    # Close compare log
+    close COMPAR_LOG;
+}
+
+# close files
+close COMPIL_LOG;
+close TIMING_SUM;
+
+print "--------------------------------------------------------------\n";
+print "       Regression complete at: " . localtime(time) . "\n";
+print "--------------------------------------------------------------\n";
+    
+exit 0;
+
+# A subroutine to collect and print a summary of the timing statistics
+sub collect_timing_statistics
+{
+    my $nr_of_primitives = @_[0];
+    my $test = @_[1];
+    
+    my @times;
+    my @cpu_usages;
+    my $average_of_squares = 0;
+    
+    my $run_time;
+    my $max     = 0;
+    my $min     = 1000000;
+    my $average = 0;
+    my $cpu_use = 0;
+    my $found   = 0;
+
+    # Open timing log
+    die "Error: Cannot open timing.log" unless open(TIMING_LOG, "< $ENV{RAYTRACER_HOME}/timing.log");
+
+    # Sample original data set
+    my $i = 0;
+    while (my $line = <TIMING_LOG>)
+    {
+        if ($line =~ m/$test$/)
+        {
+            $line = <TIMING_LOG>;
+            $line =~ m/(\d+):(\d+\.\d+)elapsed\s(\d+)%CPU/;
+            my $run_time    = ($1 * 60) + $2;
+            $cpu_usages[$i] = $3;
+            $times[$i]      = $run_time;
+
+            $average            += $run_time;
+            $i++;
+
+            $found++;
+            if ($found == $timing_runs)
+            {
+                last;
+            }
+        }
+    }
+    
+    # Calculate mean and standard deviation
+    my $mean             =  $average / $timing_runs;
+    foreach $_ ( @times )
+    {
+        my $dif = $_ - $mean;
+        $average_of_squares +=  $dif * $dif;
+    }
+    $average_of_squares /= $timing_runs;
+    my $sd = sqrt($average_of_squares);
+    if ($sd == 0)
+    {
+        $sd = 0.000000000001;
+    }
+    
+    # Re-computer ignoring outliers
+    $average = 0;
+    my $divsor = 0;
+    for (my $j = 0; $j < $timing_runs; $j++)
+    {
+        my $prob = (1.0/($sd * sqrt(2.0 * 3.147))) * exp(-(($times[$j] - $mean) * ($times[$j] - $mean)) / (2.0 * $sd * $sd)) * $timing_runs;
+#        if (($prob > 0.4) || ($sd < 0.1))
+        {
+            my $run_time = $times[$j];
+            $cpu_use += $cpu_usages[$j];
+            
+            if ($min > $run_time)
+            {
+                $min = $run_time;
+            }
+            
+            if ($max < $run_time)
+            {
+                $max = $run_time;
+            }
+            
+            $average += $run_time;
+            $divsor++;
+        }
+#        else
+#        {
+#            print "Warning: On test: $test, discarded sample: $times[$j]\n";
+#        }
+    }
+    
+    # Print stats
+    $average /= $divsor;
+    $cpu_use /= $divsor;
+    printf TIMING_SUM " %9.2f |", $max;
+    printf TIMING_SUM " %9.2f |", $min;
+    printf TIMING_SUM " %9.2f |", $average;
+    printf TIMING_SUM " %8.2f% |", $cpu_use;
+    printf TIMING_SUM " %9.2f |", $nr_of_primitives/$average;
+
+    # Close timing log
+    close TIMING_LOG;
+}

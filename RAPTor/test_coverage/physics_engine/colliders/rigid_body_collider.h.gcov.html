@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Test Coverage - physics_engine/colliders/rigid_body_collider.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">physics_engine/colliders</a> - rigid_body_collider.h<span style="font-size: 80%;"> (source / <a href="rigid_body_collider.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Test Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">54</td>
+            <td class="headerCovTableEntryLo">5.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2014-01-16</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryLo">60.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #ifndef __RIGID_BODY_COLLIDER_H__</a>
+<span class="lineNum">       2 </span>            : #define __RIGID_BODY_COLLIDER_H__
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : #include &quot;collider.h&quot;
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : /* Common headers */
+<span class="lineNum">       7 </span>            : #include &quot;physics_common.h&quot;
+<span class="lineNum">       8 </span>            : #include &quot;matrix_3d.h&quot;
+<span class="lineNum">       9 </span>            : #include &quot;logging.h&quot;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : /* Physics headers */
+<span class="lineNum">      12 </span>            : #include &quot;inertia_tensor.h&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace raptor_physics
+<span class="lineNum">      16 </span>            : {
+<span class="lineNum">      17 </span>            : /* Function to process an instantaneous, frictionless collision */
+<a name="18"><span class="lineNum">      18 </span>            : /* The function is templated for testing */</a>
+<span class="lineNum">      19 </span>            : template&lt;class Object&gt;
+<span class="lineNum">      20 </span><span class="lineNoCov">          0 : void instantaneous_frictionless_collide(Object *const vg_a, Object *const vg_b, const point_t &amp;poc, const point_t &amp;noc, const fp_t cor, const fp_t mu)</span>
+<span class="lineNum">      21 </span>            : {
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 :     METHOD_LOG;</span>
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :     using raptor_physics::project_vector;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            :     /* Projected velocity */
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :     const point_t t_a_abso(vg_a-&gt;get_velocity(poc));</span>
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :     const point_t t_b_abso(vg_b-&gt;get_velocity(poc));</span>
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :     const point_t t_a_proj(project_vector(t_a_abso, -noc));</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :     const point_t t_b_proj(project_vector(t_b_abso,  noc));</span>
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Input v a: &quot; &lt;&lt; vg_a-&gt;get_velocity();</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Input v b: &quot; &lt;&lt; vg_b-&gt;get_velocity();</span>
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Input w a: &quot; &lt;&lt; vg_a-&gt;get_angular_velocity();</span>
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Input w b: &quot; &lt;&lt; vg_b-&gt;get_angular_velocity();</span>
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Input t a: &quot; &lt;&lt; t_a_abso;</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Input t b: &quot; &lt;&lt; t_b_abso;</span>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Point of collision: &quot; &lt;&lt; poc;</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Normal of collision: &quot; &lt;&lt; noc;</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Center of mass a: &quot; &lt;&lt; vg_a-&gt;get_center_of_mass();</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Center of mass b: &quot; &lt;&lt; vg_b-&gt;get_center_of_mass();</span>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Coefficient of restitution: &quot; &lt;&lt; cor;</span>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :     /* The closing speed */
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :     const point_t closing_v(t_b_proj - t_a_proj);</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;closing velocity: &quot; &lt;&lt; closing_v;</span>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :     /* Inertia matrices */
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :     const inertia_tensor_view inertia_a(vg_a-&gt;get_orientated_tensor());</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :     const inertia_tensor_view inertia_b(vg_b-&gt;get_orientated_tensor());</span>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :     const point_t ra(poc - vg_a-&gt;get_center_of_mass());</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :     const point_t rb(poc - vg_b-&gt;get_center_of_mass());</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :     const point_t ra_cross_n(cross_product(ra, noc));</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :     const point_t rb_cross_n(cross_product(rb, noc));</span>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :     const point_t a_cross_r(cross_product(ra_cross_n, ra) / inertia_a);</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :     const point_t b_cross_r(cross_product(rb_cross_n, rb) / inertia_b);</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :     const fp_t rot_comp = dot_product((a_cross_r + b_cross_r), noc);</span>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :     const fp_t total_m_inv = (1.0 / vg_a-&gt;get_mass()) + (1.0 / vg_b-&gt;get_mass());</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :     const fp_t tra_comp = dot_product(noc, noc * total_m_inv);</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;rot comp: &quot; &lt;&lt; rot_comp &lt;&lt; &quot; tra comp: &quot; &lt;&lt; tra_comp;</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :     const fp_t denom = rot_comp + tra_comp;</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :     const fp_t numer = dot_product(closing_v * (1.0 + cor), noc);</span>
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :     const fp_t impul = numer / denom;</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Impulse: &quot; &lt;&lt; impul;</span>
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :     /* Apply the impulse */
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :     const point_t a_mult_i(ra_cross_n / inertia_a);</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :     const point_t b_mult_i(rb_cross_n / inertia_b);</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;a multi i: &quot; &lt;&lt; a_mult_i;</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;b multi i: &quot; &lt;&lt; b_mult_i;</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :     vg_a-&gt;apply_impulse(noc, a_mult_i,  impul);</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :     vg_b-&gt;apply_impulse(noc, b_mult_i, -impul);</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Exit v a: &quot; &lt;&lt; vg_a-&gt;get_velocity();</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Exit v b: &quot; &lt;&lt; vg_b-&gt;get_velocity();</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Exit w a: &quot; &lt;&lt; vg_a-&gt;get_angular_velocity();</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Exit w b: &quot; &lt;&lt; vg_b-&gt;get_angular_velocity();</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      85 </span>            : 
+<a name="86"><span class="lineNum">      86 </span>            : </a>
+<span class="lineNum">      87 </span>            : /* Class to process rigid body collisions */
+<span class="lineNum">      88 </span><span class="lineCov">        128 : class rigid_body_collider : public collider</span>
+<a name="89"><span class="lineNum">      89 </span>            : {</a>
+<span class="lineNum">      90 </span>            :     public :
+<span class="lineNum">      91 </span><span class="lineCov">         64 :         rigid_body_collider(const fp_t cor, const fp_t mu)</span>
+<a name="92"><span class="lineNum">      92 </span><span class="lineCov">         64 :             : _cor(cor), _mu(mu) {  };</span></a>
+<span class="lineNum">      93 </span>            :         
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :         virtual const rigid_body_collider&amp; collide(vertex_group *const vg_a, vertex_group *const vg_b, const point_t &amp;poc, const point_t &amp;noc, const collision_t type) const</span>
+<span class="lineNum">      95 </span>            :         {
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :             METHOD_LOG;</span>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :             /* Only process these types of collision */
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :             assert((type == COLLISION) || (type == RESTING_COLLISION));</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :             /* Actual collision processing */
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :             instantaneous_frictionless_collide(vg_a, vg_b, poc, noc, _cor, _mu);</span>
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :             return *this;</span>
+<span class="lineNum">     105 </span>            :         }
+<span class="lineNum">     106 </span>            :         
+<span class="lineNum">     107 </span>            :     private :
+<span class="lineNum">     108 </span>            :         const fp_t _cor;    /* Coefficient of restitution   */
+<span class="lineNum">     109 </span>            :         const fp_t _mu;     /* Coefficient of friction      */
+<span class="lineNum">     110 </span>            : };
+<span class="lineNum">     111 </span>            : }; /* namespace raptor_physics */
+<span class="lineNum">     112 </span>            : #endif /* #ifndef __RIGID_BODY_COLLIDER_H__ */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Test Coverage - physics_engine/simplex.cc</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">physics_engine</a> - simplex.cc<span style="font-size: 80%;"> (source / <a href="simplex.cc.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Test Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">74</td>
+            <td class="headerCovTableEntry">98</td>
+            <td class="headerCovTableEntryMed">75.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2014-01-16</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryMed">88.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Standard headers */</a>
+<span class="lineNum">       2 </span>            : #include &lt;vector&gt;
+<span class="lineNum">       3 </span>            : #include &lt;memory&gt;
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : /* Common headers */
+<span class="lineNum">       6 </span>            : #include &quot;logging.h&quot;
+<span class="lineNum">       7 </span>            : #include &quot;physics_common.h&quot;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : /* Physics headers */
+<span class="lineNum">      10 </span>            : #include &quot;simplex.h&quot;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : 
+<a name="13"><span class="lineNum">      13 </span>            : namespace raptor_physics</a>
+<span class="lineNum">      14 </span>            : {
+<span class="lineNum">      15 </span><span class="lineCov">         96 : point_t simplex::normal_of_impact(const simplex &amp;s) const</span>
+<span class="lineNum">      16 </span>            : {
+<span class="lineNum">      17 </span><span class="lineCov">         96 :     METHOD_LOG;</span>
+<span class="lineNum">      18 </span><span class="lineCov">        192 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Finding normal of impact with simplex size: &quot; &lt;&lt; _size;</span>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :     /* Simplex must alway be the same size */
+<span class="lineNum">      21 </span><span class="lineCov">         96 :     assert(_size == s._size);</span>
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            :     /* Get unique points defining the simplex */
+<span class="lineNum">      24 </span><span class="lineCov">         96 :     point_t simplex_verts[6];</span>
+<span class="lineNum">      25 </span><span class="lineCov">         96 :     const int a_size = get_unique_points(&amp;simplex_verts[0]);</span>
+<span class="lineNum">      26 </span><span class="lineCov">         96 :     const int b_size = s.get_unique_points(&amp;simplex_verts[3]);</span>
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :     /* Can only deal with planes, lines of vertices not tetrahedron */
+<span class="lineNum">      29 </span>            :     /* This shouldn't fail since objects are only brought close to each other */
+<span class="lineNum">      30 </span>            :     /* and not allowed to penetrate */
+<span class="lineNum">      31 </span><span class="lineCov">         96 :     assert(a_size &lt; 4);</span>
+<span class="lineNum">      32 </span><span class="lineCov">         96 :     assert(b_size &lt; 4);</span>
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            :     /* This just shouldn't happen */
+<span class="lineNum">      35 </span><span class="lineCov">         96 :     assert(a_size &gt; 0);</span>
+<span class="lineNum">      36 </span><span class="lineCov">         96 :     assert(b_size &gt; 0);</span>
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :     /* Get the normal of the collision */
+<span class="lineNum">      39 </span>            :     point_t *l_points;
+<span class="lineNum">      40 </span>            :     point_t *s_points;
+<span class="lineNum">      41 </span><span class="lineCov">         96 :     if (a_size &gt;= b_size)</span>
+<span class="lineNum">      42 </span>            :     {
+<span class="lineNum">      43 </span><span class="lineCov">         96 :         l_points = &amp;simplex_verts[0];</span>
+<span class="lineNum">      44 </span><span class="lineCov">         96 :         s_points = &amp;simplex_verts[3];</span>
+<span class="lineNum">      45 </span>            :     }
+<span class="lineNum">      46 </span>            :     else
+<span class="lineNum">      47 </span>            :     {
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :         s_points = &amp;simplex_verts[0];</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :         l_points = &amp;simplex_verts[3];</span>
+<span class="lineNum">      50 </span>            :     }
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineCov">         96 :     point_t norm;</span>
+<span class="lineNum">      53 </span><span class="lineCov">         96 :     switch (std::max(a_size, b_size))</span>
+<span class="lineNum">      54 </span>            :     {
+<span class="lineNum">      55 </span>            :         /* Line between 2 points */
+<span class="lineNum">      56 </span>            :         case 1 :
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :             norm = normalise(l_points[0] - s_points[0]);</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :         /* Find closest point on then line to a point, then the perpendicular line */
+<span class="lineNum">      61 </span>            :         case 2 :
+<span class="lineNum">      62 </span>            :         {
+<span class="lineNum">      63 </span><span class="lineCov">         96 :             const point_t l_dir(normalise(l_points[1] - l_points[0]));</span>
+<span class="lineNum">      64 </span><span class="lineCov">         96 :             const point_t s_dir(normalise(s_points[1] - s_points[0]));</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :             /* If there is only a point or the lines are parallel */
+<span class="lineNum">      67 </span><span class="lineCov">         96 :             if ((std::min(a_size, b_size) == 1) || (fabs(dot_product(l_dir, s_dir)) &gt; (1.0 - raptor_physics::EPSILON)))</span>
+<span class="lineNum">      68 </span>            :             {
+<span class="lineNum">      69 </span>            :                 /* Find the point on l0 -&gt; l1 most opposite s0 */
+<span class="lineNum">      70 </span><span class="lineCov">         96 :                 const point_t perp((l_points[0] - (l_dir * dot_product(l_dir, l_points[0] - s_points[0]))) - s_points[0]);</span>
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :                 /* Check if the nearest point to s is s */
+<span class="lineNum">      73 </span><span class="lineCov">         96 :                 const fp_t perp_dist = magnitude(perp);</span>
+<span class="lineNum">      74 </span><span class="lineCov">         96 :                 assert((fabs(perp_dist) &gt; raptor_physics::EPSILON) || !&quot;Error: Distance between objects is 0&quot;);</span>
+<span class="lineNum">      75 </span><span class="lineCov">         96 :                 norm = perp / perp_dist;</span>
+<span class="lineNum">      76 </span>            :             }
+<span class="lineNum">      77 </span>            :             /* If there are 2 non parallel lines */
+<span class="lineNum">      78 </span>            :             else
+<span class="lineNum">      79 </span>            :             {
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :                 norm = cross_product(l_dir, s_dir);</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :                 if (dot_product(norm, l_points[0] - s_points[0]) &lt; 0.0)</span>
+<span class="lineNum">      82 </span>            :                 {
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :                     norm = -norm;</span>
+<span class="lineNum">      84 </span>            :                 }
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :                 normalise(&amp;norm);</span>
+<span class="lineNum">      86 </span>            :             }
+<span class="lineNum">      87 </span>            :         }
+<span class="lineNum">      88 </span><span class="lineCov">         96 :         break;</span>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            :         /* Cross product of 2 lines in the face */
+<span class="lineNum">      91 </span>            :         case 3 :
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :             cross_product(normalise(l_points[1] - l_points[0]), normalise(l_points[2] - l_points[0]), &amp;norm);</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :             if (dot_product(norm, l_points[0] - s_points[0]) &lt; 0.0)</span>
+<span class="lineNum">      94 </span>            :             {
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :                 norm = -norm;</span>
+<span class="lineNum">      96 </span>            :             }
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :             normalise(&amp;norm);</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">      99 </span>            :     }
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :     /* Maintain the relative direction of the normal */
+<span class="lineNum">     102 </span><span class="lineCov">         96 :     if (a_size &lt; b_size)</span>
+<span class="lineNum">     103 </span>            :     {
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :         norm = -norm;</span>
+<span class="lineNum">     105 </span>            :     }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">        192 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Normal of impact: &quot; &lt;&lt; norm;</span>
+<span class="lineNum">     108 </span><span class="lineCov">         96 :     return norm;</span>
+<span class="lineNum">     109 </span>            : }
+<a name="110"><span class="lineNum">     110 </span>            : </a>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span><span class="lineCov">        192 : std::vector&lt;point_t&gt;* simplex::get_points_in_contact_plane(const point_t &amp;noc) const</span>
+<span class="lineNum">     113 </span>            : {
+<span class="lineNum">     114 </span>            :     /* Get all verts on the colliding feature */
+<span class="lineNum">     115 </span><span class="lineCov">        192 :     std::vector&lt;point_t&gt; *verts = new std::vector&lt;point_t&gt;();</span>
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :     /* Find all verts perpendicular to noc in a */
+<span class="lineNum">     118 </span><span class="lineCov">        192 :     const point_t a(get_vertex(0));</span>
+<span class="lineNum">     119 </span><span class="lineCov">       1728 :     for (int i = 0; i &lt; _data.size(); i++)</span>
+<span class="lineNum">     120 </span>            :     {
+<span class="lineNum">     121 </span>            :         /* Check for vert is a */
+<span class="lineNum">     122 </span><span class="lineCov">       1536 :         const point_t vert  = _data.get_row(i);</span>
+<span class="lineNum">     123 </span><span class="lineCov">       1536 :         const point_t diff  = vert - a;</span>
+<span class="lineNum">     124 </span><span class="lineCov">       1536 :         if (fabs(dot_product(diff, noc)) &lt; raptor_physics::EPSILON)</span>
+<span class="lineNum">     125 </span>            :         {
+<span class="lineNum">     126 </span><span class="lineCov">        768 :             verts-&gt;push_back(vert);</span>
+<span class="lineNum">     127 </span>            :         }
+<span class="lineNum">     128 </span>            :     }
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :     /* Check that some verts were found */
+<span class="lineNum">     131 </span><span class="lineCov">        192 :     assert(!verts-&gt;empty());</span>
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineCov">        192 :     return verts;</span>
+<span class="lineNum">     134 </span>            : }
+<a name="135"><span class="lineNum">     135 </span>            : </a>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 : std::vector&lt;int&gt;* simplex::get_point_indices_in_contact_plane(const point_t &amp;noc) const</span>
+<span class="lineNum">     138 </span>            : {
+<span class="lineNum">     139 </span>            :     /* Get all verts on the colliding feature */
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :     std::vector&lt;int&gt; *verts = new std::vector&lt;int&gt;();</span>
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            :     /* Find all verts perpendicular to noc in a */
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :     const point_t a(get_vertex(0));</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :     for (int i = 0; i &lt; _data.size(); i++)</span>
+<span class="lineNum">     145 </span>            :     {
+<span class="lineNum">     146 </span>            :         /* Check for vert is a */
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :         const point_t vert  = _data.get_row(i);</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :         const point_t diff  = vert - a;</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :         if (fabs(dot_product(diff, noc)) &lt; raptor_physics::EPSILON)</span>
+<span class="lineNum">     150 </span>            :         {
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :             verts-&gt;push_back(i);</span>
+<span class="lineNum">     152 </span>            :         }
+<span class="lineNum">     153 </span>            :     }
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :     /* Check that some verts were found */
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :     assert(!verts-&gt;empty());</span>
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :     return verts;</span>
+<span class="lineNum">     159 </span>            : }
+<a name="160"><span class="lineNum">     160 </span>            : </a>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineCov">         96 : point_t simplex::center_of_impact(const simplex &amp;s, const point_t &amp;noc) const</span>
+<span class="lineNum">     163 </span>            : {
+<span class="lineNum">     164 </span><span class="lineCov">         96 :     METHOD_LOG;</span>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :     /* Simplex must alway be the same size */
+<span class="lineNum">     167 </span><span class="lineCov">         96 :     assert(_size == s._size);</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :     /* Get all verts on the colliding feature */
+<a name="170"><span class="lineNum">     170 </span><span class="lineCov">        192 :     std::unique_ptr&lt;std::vector&lt;point_t&gt;&gt; verts_a(get_points_in_contact_plane(noc));</span></a>
+<span class="lineNum">     171 </span><span class="lineCov">        192 :     std::unique_ptr&lt;std::vector&lt;point_t&gt;&gt; verts_b(s.get_points_in_contact_plane(noc));</span>
+<span class="lineNum">     172 </span><span class="lineCov">       1056 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Found &quot; &lt;&lt; verts_a-&gt;size() &lt;&lt; &quot; a verts: &quot; &lt;&lt; verts_a-&gt;front() &lt;&lt; array_to_stream(++verts_a-&gt;begin(), verts_a-&gt;end(), [this](std::stringstream *s, const point_t &amp;p)</span>
+<span class="lineNum">     173 </span>            :     {
+<span class="lineNum">     174 </span><span class="lineCov">        288 :         (*s) &lt;&lt; &quot;, &quot; &lt;&lt; p;</span>
+<a name="175"><span class="lineNum">     175 </span><span class="lineCov">        288 :         return s;</span></a>
+<span class="lineNum">     176 </span><span class="lineCov">        576 :     });</span>
+<span class="lineNum">     177 </span><span class="lineCov">       1056 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Found &quot; &lt;&lt; verts_b-&gt;size() &lt;&lt; &quot; b verts: &quot; &lt;&lt; verts_b-&gt;front() &lt;&lt; array_to_stream(++verts_b-&gt;begin(), verts_b-&gt;end(), [this](std::stringstream *s, const point_t &amp;p)</span>
+<span class="lineNum">     178 </span>            :     {
+<span class="lineNum">     179 </span><span class="lineCov">        288 :         (*s) &lt;&lt; &quot;, &quot; &lt;&lt; p;</span>
+<span class="lineNum">     180 </span><span class="lineCov">        288 :         return s;</span>
+<span class="lineNum">     181 </span><span class="lineCov">        576 :     });</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :     /* Check verts are hit */
+<span class="lineNum">     184 </span>            :     /* This is done by finding the hull of the a and b vert separately */
+<span class="lineNum">     185 </span>            :     /* then taking the minimum of this hull */
+<span class="lineNum">     186 </span><span class="lineCov">         96 :     point_t hull_a_max(verts_a-&gt;front());</span>
+<span class="lineNum">     187 </span><span class="lineCov">         96 :     point_t hull_a_min(verts_a-&gt;front());</span>
+<span class="lineNum">     188 </span><span class="lineCov">        384 :     for (unsigned int i = 1; i &lt; verts_a-&gt;size(); i++)</span>
+<span class="lineNum">     189 </span>            :     {
+<span class="lineNum">     190 </span><span class="lineCov">        288 :         hull_a_max = max(hull_a_max, verts_a-&gt;at(i));</span>
+<span class="lineNum">     191 </span><span class="lineCov">        288 :         hull_a_min = min(hull_a_min, verts_a-&gt;at(i));</span>
+<span class="lineNum">     192 </span>            :     }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span><span class="lineCov">         96 :     point_t hull_b_max(verts_b-&gt;front());</span>
+<span class="lineNum">     195 </span><span class="lineCov">         96 :     point_t hull_b_min(verts_b-&gt;front());</span>
+<span class="lineNum">     196 </span><span class="lineCov">        384 :     for (unsigned int i = 1; i &lt; verts_b-&gt;size(); i++)</span>
+<span class="lineNum">     197 </span>            :     {
+<span class="lineNum">     198 </span><span class="lineCov">        288 :         hull_b_max = max(hull_b_max, verts_b-&gt;at(i));</span>
+<span class="lineNum">     199 </span><span class="lineCov">        288 :         hull_b_min = min(hull_b_min, verts_b-&gt;at(i));</span>
+<span class="lineNum">     200 </span>            :     }
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span><span class="lineCov">         96 :     const point_t hull_max(min(hull_a_max, hull_b_max));</span>
+<span class="lineNum">     203 </span><span class="lineCov">         96 :     const point_t hull_min(max(hull_a_min, hull_b_min));</span>
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span>            :     /* Average accross verts */
+<span class="lineNum">     206 </span><span class="lineCov">        192 :     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Point off collision: &quot; &lt;&lt; ((hull_min + hull_max) * 0.5);</span>
+<span class="lineNum">     207 </span><span class="lineCov">        192 :     return ((hull_min + hull_max) * 0.5);</span>
+<span class="lineNum">     208 </span>            : }
+<a name="209"><span class="lineNum">     209 </span>            : </a>
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineCov">        192 : int simplex::get_unique_points(point_t *const points) const</span>
+<span class="lineNum">     212 </span>            : {
+<span class="lineNum">     213 </span>            :     /* The are only 4 verts (and the last should alway be a duplicate) */
+<span class="lineNum">     214 </span>            :     /* So accept O(n^2) complexity */
+<span class="lineNum">     215 </span><span class="lineCov">        192 :     int size = 0;</span>
+<span class="lineNum">     216 </span><span class="lineCov">        576 :     for (unsigned int i = _size - 1; i &lt; _size; i--)</span>
+<span class="lineNum">     217 </span>            :     {
+<span class="lineNum">     218 </span>            :         /* Check if the vert is unique */
+<span class="lineNum">     219 </span><span class="lineCov">        384 :         bool unique = true;</span>
+<span class="lineNum">     220 </span><span class="lineCov">        576 :         for (unsigned int j = i - 1; j &lt; _size; j--)</span>
+<span class="lineNum">     221 </span>            :         {
+<span class="lineNum">     222 </span><span class="lineCov">        192 :             unique &amp;= ((_verts_rd[i] &amp; 0x7fffffff) != (_verts_rd[j] &amp; 0x7fffffff));</span>
+<span class="lineNum">     223 </span>            :         }
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :         /* If so include it in the result */
+<span class="lineNum">     226 </span><span class="lineCov">        384 :         if (unique)</span>
+<span class="lineNum">     227 </span>            :         {
+<span class="lineNum">     228 </span><span class="lineCov">        384 :             points[size++] = get_vertex(i);</span>
+<span class="lineNum">     229 </span>            :         }
+<span class="lineNum">     230 </span>            :     }
+<span class="lineNum">     231 </span>            : 
+<a name="232"><span class="lineNum">     232 </span><span class="lineCov">        192 :     return size;</span></a>
+<span class="lineNum">     233 </span>            : }
+<span class="lineNum">     234 </span><span class="lineCov">         36 : }; /* namespace raptor_physics */</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

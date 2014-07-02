@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Ray tracer environment variables
+export RAYTRACER_HOME=`pwd`
+export RAYTRACER_TOOLS=$RAYTRACER_HOME/tools
+export RAYTRACER_REF_PIC=$RAYTRACER_HOME/reference_pictures
+
+export RAYTRACER_SCENES=$RAYTRACER_HOME/scenes
+export RAYTRACER_C_SCENES=$RAYTRACER_HOME/scenes/c_scenes
+export RAYTRACER_MGF_SCENES=$RAYTRACER_HOME/scenes/mgf_scenes
+export RAYTRACER_SDP_SCENES=$RAYTRACER_HOME/scenes/spd3_14
+
+# Thread Building Blocks setup
+export TBB21_INSTALL_DIR=$RAYTRACER_HOME/tbb21_20080605oss
+source tbb21_20080605oss/ia32/cc4.1.0_libc2.4_kernel2.6.16.21/bin/tbbvars.sh
+
+# Set up path
+export PATH=`pwd`/tools:$PATH

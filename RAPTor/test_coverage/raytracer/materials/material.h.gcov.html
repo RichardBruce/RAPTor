@@ -1,0 +1,428 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Test Coverage - raytracer/materials/material.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">raytracer/materials</a> - material.h<span style="font-size: 80%;"> (source / <a href="material.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Test Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2014-01-16</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">33.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #ifndef __MATERIAL_H__</a>
+<span class="lineNum">       2 </span>            : #define __MATERIAL_H__
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : #include &quot;common.h&quot;
+<span class="lineNum">       5 </span>            : #include &quot;ext_colour_t.h&quot;
+<span class="lineNum">       6 </span>            : #include &quot;point_t.h&quot;
+<span class="lineNum">       7 </span>            : class ray_trace_engine;
+<span class="lineNum">       8 </span>            : class ray;
+<span class="lineNum">       9 </span>            : class line;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : /* Change the following to suit your standard */
+<span class="lineNum">      13 </span>            : /* These are constants for colour space conversion */
+<span class="lineNum">      14 </span>            : const fp_t CIE_x_r  = 0.640;      /* nominal CRT primaries */
+<span class="lineNum">      15 </span>            : const fp_t CIE_y_r  = 0.330;
+<span class="lineNum">      16 </span>            : const fp_t CIE_x_g  = 0.290;
+<span class="lineNum">      17 </span>            : const fp_t CIE_y_g  = 0.600;
+<span class="lineNum">      18 </span>            : const fp_t CIE_x_b  = 0.150;
+<span class="lineNum">      19 </span>            : const fp_t CIE_y_b  = 0.060;
+<span class="lineNum">      20 </span>            : const fp_t CIE_x_w  = 0.3333;     /* use true white */
+<span class="lineNum">      21 </span>            : const fp_t CIE_y_w  = 0.3333;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : const fp_t CIE_C_rD = (((fp_t)1.0 / CIE_y_w) * (CIE_x_w * (CIE_y_g - CIE_y_b) - CIE_y_w * (CIE_x_g - CIE_x_b) + CIE_x_g * CIE_y_b - CIE_x_b * CIE_y_g));
+<span class="lineNum">      24 </span>            : const fp_t CIE_C_gD = (((fp_t)1.0 / CIE_y_w) * (CIE_x_w * (CIE_y_b - CIE_y_r) - CIE_y_w * (CIE_x_b - CIE_x_r) - CIE_x_r * CIE_y_b + CIE_x_b * CIE_y_r));
+<span class="lineNum">      25 </span>            : const fp_t CIE_C_bD = (((fp_t)1.0 / CIE_y_w) * (CIE_x_w * (CIE_y_r - CIE_y_g) - CIE_y_w * (CIE_x_r - CIE_x_g) + CIE_x_r * CIE_y_g - CIE_x_g * CIE_y_r));
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : /* XYZ to RGB conversion matrix */
+<span class="lineNum">      28 </span>            : const fp_t xyz2rgbmat[3][3] = {
+<span class="lineNum">      29 </span>            :     { (CIE_y_g - CIE_y_b - CIE_x_b * CIE_y_g + CIE_y_b * CIE_x_g) / CIE_C_rD,
+<span class="lineNum">      30 </span>            :       (CIE_x_b - CIE_x_g - CIE_x_b * CIE_y_g + CIE_x_g * CIE_y_b) / CIE_C_rD,
+<span class="lineNum">      31 </span>            :       (                    CIE_x_g * CIE_y_b - CIE_x_b * CIE_y_g) / CIE_C_rD },
+<span class="lineNum">      32 </span>            :      
+<span class="lineNum">      33 </span>            :     { (CIE_y_b - CIE_y_r - CIE_y_b * CIE_x_r + CIE_y_r * CIE_x_b) / CIE_C_gD,
+<span class="lineNum">      34 </span>            :       (CIE_x_r - CIE_x_b - CIE_x_r * CIE_y_b + CIE_x_b * CIE_y_r) / CIE_C_gD,
+<span class="lineNum">      35 </span>            :                           (CIE_x_b * CIE_y_r - CIE_x_r * CIE_y_b) / CIE_C_gD },
+<span class="lineNum">      36 </span>            :      
+<span class="lineNum">      37 </span>            :     { (CIE_y_r - CIE_y_g - CIE_y_r * CIE_x_g + CIE_y_g * CIE_x_r) / CIE_C_bD,
+<span class="lineNum">      38 </span>            :       (CIE_x_g - CIE_x_r - CIE_x_g * CIE_y_r + CIE_x_r * CIE_y_g) / CIE_C_bD,
+<span class="lineNum">      39 </span>            :                           (CIE_x_r * CIE_y_g - CIE_x_g * CIE_y_r) / CIE_C_bD }
+<span class="lineNum">      40 </span>            : };
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : /* Pure virtual class for material data and shading */
+<span class="lineNum">      44 </span>            : class material
+<a name="45"><span class="lineNum">      45 </span>            : {</a>
+<a name="46"><span class="lineNum">      46 </span>            :     public :</a>
+<span class="lineNum">      47 </span><span class="lineCov">         64 :         material(const bool t = false) : t(t) { };</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :         virtual ~material() { };</span>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :         /* Pure virtual function to the allow the shader a chance to generate SIMD packets */
+<span class="lineNum">      51 </span>            :         virtual void generate_rays(const ray_trace_engine &amp;r, ray &amp;i, const line &amp;n, const hit_t h, ray *const rl, ray *const rf, fp_t *const n_rl, fp_t *const n_rf) const = 0;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :         /* Pure virtual shading function. To allow the shader to shade the current object */
+<span class="lineNum">      54 </span>            :         virtual void shade(const ray_trace_engine &amp;r, ray &amp;i, const line &amp;n, const hit_t h, ext_colour_t *const c, const point_t &amp;vt) const = 0;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :         /* Pure virtual function to the allow the shader a combined SIMD packets traced secondary rays into the image */
+<span class="lineNum">      57 </span>            :         virtual void combind_secondary_rays(const ray_trace_engine &amp;r, ext_colour_t &amp;c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const fp_t *const n_rl, const fp_t *const n_rf) const = 0;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :         /* Allow read transparency */
+<span class="lineNum">      60 </span>            :         const bool      is_transparent()    const   { return t; }
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :     private :
+<span class="lineNum">      63 </span>            :         const bool      t;  /* Is the material transparent */
+<span class="lineNum">      64 </span>            : };
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : /* Function for calculating the Fresnell componant */
+<span class="lineNum">      67 </span>            : /**********************************************************
+<span class="lineNum">      68 </span>            :   direct_fresnell is a direct evaluation of the Fresnel term. This is
+<span class="lineNum">      69 </span>            :   very slow, but will give the most accurate results for conductors.
+<span class="lineNum">      70 </span>            :   Using the direct Fresnel evaluation doesnt necassarily give a benefit
+<span class="lineNum">      71 </span>            :   for non condicting materials with a 0 extinction co-efficient.
+<span class="lineNum">      72 </span>            :   
+<span class="lineNum">      73 </span>            :   The inputs to this function are :
+<span class="lineNum">      74 </span>            :     r is the index of refraction.
+<span class="lineNum">      75 </span>            :     k is the extinction co-efficient (complex part of the index of refraction).
+<span class="lineNum">      76 </span>            :     t is the angle of incidence.
+<span class="lineNum">      77 </span>            :   
+<span class="lineNum">      78 </span>            :   The return value is the Fresnel componant.
+<span class="lineNum">      79 </span>            : **********************************************************/
+<span class="lineNum">      80 </span>            : inline fp_t direct_fresnell(const fp_t r, const fp_t t, const fp_t k)
+<span class="lineNum">      81 </span>            : {
+<span class="lineNum">      82 </span>            :     /* Some repeatedly used variables */
+<span class="lineNum">      83 </span>            :     fp_t r_sq = r * r;
+<span class="lineNum">      84 </span>            :     fp_t k_sq = k * k;
+<span class="lineNum">      85 </span>            :     fp_t t_sq = t * t;
+<span class="lineNum">      86 </span>            :     
+<span class="lineNum">      87 </span>            :     /* g^2 = n^2 - 1 + t^2; where n is the complex index of refraction */
+<span class="lineNum">      88 </span>            :     fp_t  re_g_sq = r_sq - k_sq - (fp_t)1.0 + t_sq;
+<span class="lineNum">      89 </span>            :     fp_t  im_g_sq = (fp_t)2.0 * r * k;
+<span class="lineNum">      90 </span>            :     
+<span class="lineNum">      91 </span>            :     /* Take the absolute of g^2; Where g^2 = g_re^2 + i * g_im^2 */
+<span class="lineNum">      92 </span>            :     fp_t abs_re_g_sq = fabs(re_g_sq);
+<span class="lineNum">      93 </span>            :     fp_t abs_im_g_sq = fabs(im_g_sq);
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :     fp_t abs_g_sq;
+<span class="lineNum">      96 </span>            :     if ((re_g_sq == (fp_t)0.0) &amp;&amp; (im_g_sq == (fp_t)0.0))
+<span class="lineNum">      97 </span>            :     {
+<span class="lineNum">      98 </span>            :         abs_g_sq = (fp_t)0.0;
+<span class="lineNum">      99 </span>            :     }
+<span class="lineNum">     100 </span>            :     else if (abs_re_g_sq &gt;= abs_im_g_sq)
+<span class="lineNum">     101 </span>            :     {
+<span class="lineNum">     102 </span>            :         fp_t d   = abs_im_g_sq / abs_re_g_sq;
+<span class="lineNum">     103 </span>            :         abs_g_sq = abs_re_g_sq * sqrt(1.0 + (d * d));
+<span class="lineNum">     104 </span>            :     }
+<span class="lineNum">     105 </span>            :     else
+<span class="lineNum">     106 </span>            :     {
+<span class="lineNum">     107 </span>            :         fp_t d   = abs_re_g_sq / abs_im_g_sq;
+<span class="lineNum">     108 </span>            :         abs_g_sq = abs_im_g_sq * sqrt(1.0 + (d * d));
+<span class="lineNum">     109 </span>            :     }
+<span class="lineNum">     110 </span>            :     
+<span class="lineNum">     111 </span>            :     /* s = (1 - t^2) / t */
+<span class="lineNum">     112 </span>            :     fp_t s = ((fp_t)1.0 - t_sq) / t;
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :     /* a = sqrt((abs(g^2) + re(g^2)) / 2) */
+<span class="lineNum">     115 </span>            :     /* b = sqrt((abs(g^2) - re(g^2)) / 2) */
+<span class="lineNum">     116 </span>            :     fp_t a    = sqrt((abs_g_sq + re_g_sq) * (fp_t)0.5);
+<span class="lineNum">     117 </span>            :     fp_t b    = sqrt((abs_g_sq - re_g_sq) * (fp_t)0.5);
+<span class="lineNum">     118 </span>            :     fp_t b_sq = b * b;
+<span class="lineNum">     119 </span>            :     
+<span class="lineNum">     120 </span>            :     /* Some repeatedly used Fresnel terms */
+<span class="lineNum">     121 </span>            :     fp_t a_m_t = a - t;
+<span class="lineNum">     122 </span>            :     fp_t a_p_t = a + t;
+<span class="lineNum">     123 </span>            :     fp_t a_m_s = a - s;
+<span class="lineNum">     124 </span>            :     fp_t a_p_s = a + s;
+<span class="lineNum">     125 </span>            :     
+<span class="lineNum">     126 </span>            :     fp_t f0 = (fp_t)0.5 * (((a_m_t * a_m_t) + b_sq)/((a_p_t * a_p_t) + b_sq));
+<span class="lineNum">     127 </span>            :     fp_t f1 = (fp_t)1.0 + (((a_m_s * a_m_s) + b_sq)/((a_p_s * a_p_s) + b_sq));
+<span class="lineNum">     128 </span>            :     return f0 * f1;
+<span class="lineNum">     129 </span>            : }
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            : /**********************************************************
+<span class="lineNum">     133 </span>            :   schlick_fresnell uses Schlick's approximation to evaluate the Fresnel 
+<span class="lineNum">     134 </span>            :   term. This is much faster than direct evaluation, but will leave 
+<span class="lineNum">     135 </span>            :   conductors looking plastic because the extinction co-efficient is ignored.
+<span class="lineNum">     136 </span>            :   
+<span class="lineNum">     137 </span>            :   The inputs to this function are :
+<span class="lineNum">     138 </span>            :     r is the index opf refraction.
+<span class="lineNum">     139 </span>            :     t is the angle of incidence.
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :   The return value is the Fresnel componant.
+<span class="lineNum">     142 </span>            : **********************************************************/
+<span class="lineNum">     143 </span>            : inline fp_t schlick_fresnell(const fp_t r, const fp_t t, const fp_t k)
+<span class="lineNum">     144 </span>            : {
+<span class="lineNum">     145 </span>            :     return (r + ((fp_t)1.0 - r) * pow((fp_t)1.0 - t, (fp_t)5.0));
+<span class="lineNum">     146 </span>            : }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            : /**********************************************************
+<span class="lineNum">     150 </span>            :   rescaled_schlick_fresnell uses Schlick's approximation to evaluate the Fresnel 
+<span class="lineNum">     151 </span>            :   term, but the equation is rescaled to cope with a complex index of refraction.
+<span class="lineNum">     152 </span>            :   This allows better shading for conductor, but is still faster than direct
+<span class="lineNum">     153 </span>            :   evaluation. This function is slightly slower than Schlick's approximation.
+<span class="lineNum">     154 </span>            :   
+<span class="lineNum">     155 </span>            :   The inputs to this function are :
+<span class="lineNum">     156 </span>            :     r is the index of refraction.
+<span class="lineNum">     157 </span>            :     k is the extinction co-efficient (complex part of the index of refraction).
+<span class="lineNum">     158 </span>            :     t is the angle of incidence.
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            :   The return value is the Fresnel componant.
+<span class="lineNum">     161 </span>            : **********************************************************/
+<span class="lineNum">     162 </span>            : inline fp_t rescaled_schlick_fresnell(const fp_t r, const fp_t t, const fp_t k)
+<span class="lineNum">     163 </span>            : {
+<span class="lineNum">     164 </span>            :     fp_t r_m1 = r - (fp_t)1.0;
+<span class="lineNum">     165 </span>            :     fp_t r_p1 = r + (fp_t)1.0;
+<span class="lineNum">     166 </span>            :     fp_t k_sq = k * k;
+<span class="lineNum">     167 </span>            :     
+<span class="lineNum">     168 </span>            :     return ((r_m1 * r_m1) + ((fp_t)4.0 * r * pow(((fp_t)1.0 - t), (fp_t)5.0)) + k_sq) / ((r_p1 * r_p1) + k_sq);
+<span class="lineNum">     169 </span>            : }
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            : /* Function for calculating the Geometric attenuation factor */
+<span class="lineNum">     173 </span>            : /**********************************************************
+<span class="lineNum">     174 </span>            :   geometric_attenuation_factor calculates the geometric attenuation
+<span class="lineNum">     175 </span>            :   factor needed by some shaders.
+<span class="lineNum">     176 </span>            :   
+<span class="lineNum">     177 </span>            :   The inputs to this function are :
+<span class="lineNum">     178 </span>            :     nh is the angle between the normal and half vector.
+<span class="lineNum">     179 </span>            :     nv is the angle between the normal and view vector.
+<span class="lineNum">     180 </span>            :     nl is the angle between the normal and light vector.
+<span class="lineNum">     181 </span>            :     vh is angle between the view and half vector
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :   The return value is the geometric attenuation factor.
+<span class="lineNum">     184 </span>            : **********************************************************/
+<span class="lineNum">     185 </span>            : inline fp_t geometric_attenuation_factor(const fp_t nh, const fp_t nv, const fp_t nl, const fp_t vh)
+<span class="lineNum">     186 </span>            : {
+<span class="lineNum">     187 </span>            :     fp_t g0 = ((fp_t)2.0 * nh * nv ) / vh;
+<span class="lineNum">     188 </span>            :     fp_t g1 = ((fp_t)2.0 * nh * nl ) / vh;
+<span class="lineNum">     189 </span>            :     return min((fp_t)1.0, max((fp_t)0.0, min(g0, g1)));
+<span class="lineNum">     190 </span>            : }
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            : /* Function for calculating the Facet slope distributon function */
+<span class="lineNum">     194 </span>            : /**********************************************************
+<span class="lineNum">     195 </span>            :   gaussian_facet_distribution uses a guassian distribution of facets to
+<span class="lineNum">     196 </span>            :   approximate the amount of occulsion caused by micro-facets. This curve
+<span class="lineNum">     197 </span>            :   can be fixed to a real curve using 'c'. This function will run faster
+<span class="lineNum">     198 </span>            :   than the Beckmann distribution, but requires fitting of the curve.
+<span class="lineNum">     199 </span>            :   
+<span class="lineNum">     200 </span>            :   The inputs to this function are :
+<span class="lineNum">     201 </span>            :     a is the viewing angle.
+<span class="lineNum">     202 </span>            :     m is the rms facet distribution.
+<span class="lineNum">     203 </span>            :     c is an arbitary constant.
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span>            :   The return value is the facet distribution.
+<span class="lineNum">     206 </span>            : **********************************************************/
+<span class="lineNum">     207 </span>            : inline fp_t gaussian_facet_distribution(const fp_t a, const fp_t m, const fp_t c)
+<span class="lineNum">     208 </span>            : {
+<span class="lineNum">     209 </span>            :     /* ce^-((alpha/m)^2) */
+<span class="lineNum">     210 </span>            :     fp_t a_div_m = a / m;
+<span class="lineNum">     211 </span>            :     return c * exp(-(a_div_m * a_div_m));
+<span class="lineNum">     212 </span>            : }
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            : /**********************************************************
+<span class="lineNum">     216 </span>            :   beckmann_facet_distribution uses a distribution model proposed by 
+<span class="lineNum">     217 </span>            :   Beckmann to model the amount of occulsion caused by micro-facets.
+<span class="lineNum">     218 </span>            :   This function will run slower than the Guassian distribution function,
+<span class="lineNum">     219 </span>            :   but doesnt require fitting.
+<span class="lineNum">     220 </span>            :   
+<span class="lineNum">     221 </span>            :   The inputs to this function are :
+<span class="lineNum">     222 </span>            :     a is the viewing angle.
+<span class="lineNum">     223 </span>            :     m is the rms facet distribution.
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :   The return value is the facet distribution.
+<span class="lineNum">     226 </span>            : **********************************************************/
+<span class="lineNum">     227 </span>            : inline fp_t beckmann_facet_distribution(const fp_t a, const fp_t m, const fp_t c)
+<span class="lineNum">     228 </span>            : {
+<span class="lineNum">     229 </span>            :     fp_t cos_4_a  = pow(cos(a), (fp_t)4.0);
+<span class="lineNum">     230 </span>            :     fp_t tan_a    = tan(a);
+<span class="lineNum">     231 </span>            :     fp_t tan_a_sq = tan_a * tan_a;
+<span class="lineNum">     232 </span>            :     
+<span class="lineNum">     233 </span>            :     fp_t m_sq = m * m;
+<span class="lineNum">     234 </span>            :     
+<span class="lineNum">     235 </span>            :     /* 1/(m^2 * cos^4(alpha)) * e^-(tan^2(alpha)/m^2) */
+<span class="lineNum">     236 </span>            :     return (((fp_t)1.0 / (m_sq * cos_4_a)) * exp(-(tan_a_sq / m_sq)));
+<span class="lineNum">     237 </span>            : }
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            : /* Function for calculating colour shift */
+<span class="lineNum">     241 </span>            : /**********************************************************
+<span class="lineNum">     242 </span>            :   linear_colour_shift uses a linear interpolation model to calculate
+<span class="lineNum">     243 </span>            :   the attenuation of a wavelength at the current viewing angle. As the
+<span class="lineNum">     244 </span>            :   viewing angle approaches 90 degrees to the normal the viewed colour 
+<span class="lineNum">     245 </span>            :   approaches that of the light source. As the viewing angle approaches 
+<span class="lineNum">     246 </span>            :   0 degrees to the normal the viewed colour approaches that of the material.
+<span class="lineNum">     247 </span>            :   
+<span class="lineNum">     248 </span>            :   The inputs to this function are :
+<span class="lineNum">     249 </span>            :     c0  is the colour at 0 degrees viewing angle.
+<span class="lineNum">     250 </span>            :     c90 is the colour at 90 degrees viewing angle.
+<span class="lineNum">     251 </span>            :     fa  is the Fresnel term at the current viewing angle.
+<span class="lineNum">     252 </span>            :     f0  is the Fresnel term at 0 degrees viewing angle.
+<span class="lineNum">     253 </span>            :     f90 is the Fresnel term at 90 degrees viewing angle.
+<span class="lineNum">     254 </span>            :     
+<span class="lineNum">     255 </span>            :   The return value is the attenuated colour.
+<span class="lineNum">     256 </span>            : **********************************************************/
+<span class="lineNum">     257 </span>            : inline fp_t linear_colour_shift(const fp_t c0, const fp_t c90, const fp_t fa, const fp_t f0, const fp_t f90)
+<span class="lineNum">     258 </span>            : {
+<span class="lineNum">     259 </span>            :     /* calpha = c0 + ((c90 - c0) * (max(0,Falpha - F0)/F90- F0)) */
+<span class="lineNum">     260 </span>            :     return c0 + ((c90 - c0) * (max((fp_t)0.0, (fa - f0)) / (f90- f0)));
+<span class="lineNum">     261 </span>            : }
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            : /* Function for black body colour conversion */
+<span class="lineNum">     265 </span>            : /**********************************************************
+<span class="lineNum">     266 </span>            :   black_body_temperature_to_cxy evaluates the equations below
+<span class="lineNum">     267 </span>            :   to give a fast approximation of the colour of an incandescant
+<span class="lineNum">     268 </span>            :   light emitter.
+<span class="lineNum">     269 </span>            :   x_c= -0.2661239 {10^9}/{T^3} - 0.2343580 {10^6}/{T^2} + 0.8776956 {10^3}/{T} + 0.179910 for 1667 &lt;= T &lt;=  4000
+<span class="lineNum">     270 </span>            :        -3.0258469 {10^9}/{T^3} + 2.1070379 {10^6}/{T^2} + 0.2226347 {10^3}/{T} + 0.24039  for 4000 &lt;= T &lt;= 25000
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :   y_c= -1.1063814 x_c^3 - 1.34811020 x_c^2 + 2.18555832 x_c - 0.20219683 for 1667 &lt;= T &lt;=  2222
+<span class="lineNum">     273 </span>            :        -0.9549476 x_c^3 - 1.37418593 x_c^2 + 2.09137015 x_c - 0.16748867 for 2222 &lt;= T &lt;=  4000
+<span class="lineNum">     274 </span>            :        +3.0817580 x_c^3 - 5.87338670 x_c^2 + 3.75112997 x_c - 0.37001483 for 4000 &lt;= T &lt;= 25000
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            :   The inputs to this function are :
+<span class="lineNum">     277 </span>            :     t is the black body temperature in Kelvin
+<span class="lineNum">     278 </span>            :     
+<span class="lineNum">     279 </span>            :   The return value is the colour of the light emitter.
+<span class="lineNum">     280 </span>            : **********************************************************/
+<span class="lineNum">     281 </span>            : inline void black_body_temperature_to_cxy(const fp_t t, fp_t *const x, fp_t *const y)
+<span class="lineNum">     282 </span>            : {
+<span class="lineNum">     283 </span>            :     /* Convert temperature to CXY X value */
+<span class="lineNum">     284 </span>            :     fp_t c_x;
+<span class="lineNum">     285 </span>            :     fp_t t_sq = t    * t;
+<span class="lineNum">     286 </span>            :     fp_t t_3  = t_sq * t;
+<span class="lineNum">     287 </span>            :     if (((fp_t)1667.0 &lt;= t) &amp;&amp; (t &lt;= (fp_t)4000.0))
+<span class="lineNum">     288 </span>            :     {
+<span class="lineNum">     289 </span>            :         c_x = (fp_t)-0.2661239 * ((fp_t)10e9 / t_3) - (fp_t)0.2343580 * ((fp_t)10e6 / t_sq) + (fp_t)0.8776956 * ((fp_t)10e3 / t) + (fp_t)0.179910;
+<span class="lineNum">     290 </span>            :     }
+<span class="lineNum">     291 </span>            :     else if (((fp_t)4000.0 &lt;= t) &amp;&amp; (t &lt;= (fp_t)25000.0))
+<span class="lineNum">     292 </span>            :     {
+<span class="lineNum">     293 </span>            :         c_x = (fp_t)-3.0258469 * ((fp_t)10e9 / t_3) + (fp_t)2.1070379 * ((fp_t)10e6 / t_sq) + (fp_t)0.2226347 * ((fp_t)10e3 / t) + (fp_t)0.24039;
+<span class="lineNum">     294 </span>            :     }
+<span class="lineNum">     295 </span>            :     else
+<span class="lineNum">     296 </span>            :     {
+<span class="lineNum">     297 </span>            :         assert(false);
+<span class="lineNum">     298 </span>            :     }
+<span class="lineNum">     299 </span>            :     *x = c_x;
+<span class="lineNum">     300 </span>            :     
+<span class="lineNum">     301 </span>            :     /* Convert temperature and CXY X value to CXY Y value */
+<span class="lineNum">     302 </span>            :     fp_t c_x_sq = c_x    * c_x;
+<span class="lineNum">     303 </span>            :     fp_t c_x_3  = c_x_sq * c_x;
+<span class="lineNum">     304 </span>            :     if (((fp_t)1667.0 &lt;= t) &amp;&amp; (t &lt;= (fp_t)2222.0))
+<span class="lineNum">     305 </span>            :     {
+<span class="lineNum">     306 </span>            :         *y = -(fp_t)1.1063814 * c_x_3 - (fp_t)1.34811020 * c_x_sq + (fp_t)2.18555832 * c_x - (fp_t)0.20219683;
+<span class="lineNum">     307 </span>            :     }
+<span class="lineNum">     308 </span>            :     else if (((fp_t)2222.0 &lt;= t) &amp;&amp; (t &lt;= (fp_t)4000.0))
+<span class="lineNum">     309 </span>            :     {
+<span class="lineNum">     310 </span>            :         *y = (fp_t)-0.9549476 * c_x_3 - (fp_t)1.37418593 * c_x_sq + (fp_t)2.09137015 * c_x - (fp_t)0.16748867;
+<span class="lineNum">     311 </span>            :     }
+<span class="lineNum">     312 </span>            :     else if (((fp_t)4000.0 &lt;= t) &amp;&amp; (t &lt;= (fp_t)25000.0))
+<span class="lineNum">     313 </span>            :     {
+<span class="lineNum">     314 </span>            :         *y =  (fp_t)3.0817580 * c_x_3 - (fp_t)5.87338670 * c_x_sq + (fp_t)3.75112997 * c_x - (fp_t)0.37001483;
+<span class="lineNum">     315 </span>            :     }
+<span class="lineNum">     316 </span>            :     else
+<span class="lineNum">     317 </span>            :     {
+<span class="lineNum">     318 </span>            :         assert(false);
+<span class="lineNum">     319 </span>            :     }
+<span class="lineNum">     320 </span>            : }
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            : /* Function for colour space conversion */
+<span class="lineNum">     323 </span>            : inline ext_colour_t&amp; cxy_to_rgb(const fp_t c_x, const fp_t c_y, const fp_t y, ext_colour_t *const rgb)
+<span class="lineNum">     324 </span>            : {
+<span class="lineNum">     325 </span>            :     fp_t cie[3], cout[3];
+<span class="lineNum">     326 </span>            :     
+<span class="lineNum">     327 </span>            :     cie[0] = y * c_x/c_y;
+<span class="lineNum">     328 </span>            :     cie[1] = y;
+<span class="lineNum">     329 </span>            :     cie[2] = y * ((fp_t)1.0/c_y - (fp_t)1.0) - cie[0];
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span>            :     /* convert to RGB */
+<span class="lineNum">     332 </span>            :     cout[0] = (xyz2rgbmat[0][0] * cie[0]) + (xyz2rgbmat[0][1] * cie[1]) + (xyz2rgbmat[0][2] * cie[2]);
+<span class="lineNum">     333 </span>            :     cout[1] = (xyz2rgbmat[1][0] * cie[0]) + (xyz2rgbmat[1][1] * cie[1]) + (xyz2rgbmat[1][2] * cie[2]);
+<span class="lineNum">     334 </span>            :     cout[2] = (xyz2rgbmat[2][0] * cie[0]) + (xyz2rgbmat[2][1] * cie[1]) + (xyz2rgbmat[2][2] * cie[2]);
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            :     /* Bound the rgb value */
+<span class="lineNum">     337 </span>            :     rgb-&gt;r = max((fp_t)0.0, min((fp_t)1.0, cout[0])) * (fp_t)255.0;
+<span class="lineNum">     338 </span>            :     rgb-&gt;g = max((fp_t)0.0, min((fp_t)1.0, cout[1])) * (fp_t)255.0;
+<span class="lineNum">     339 </span>            :     rgb-&gt;b = max((fp_t)0.0, min((fp_t)1.0, cout[2])) * (fp_t)255.0;
+<span class="lineNum">     340 </span>            :     return *rgb;
+<span class="lineNum">     341 </span>            : }
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            : #endif /* #ifndef __MATERIAL_H__ */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
