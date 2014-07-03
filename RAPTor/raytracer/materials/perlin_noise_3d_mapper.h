@@ -12,6 +12,8 @@
 #include "perlin_noise_3d.h"
 
 
+namespace raptor_raytracer
+{
 /* Pure virtual class for material data and shading */
 class perlin_noise_3d_mapper : public texture_mapper
 {
@@ -44,11 +46,12 @@ class perlin_noise_3d_mapper : public texture_mapper
         const fp_t              op;     /* Opaqueness of the texture        */
         const int               o;      /* Number of octaves to include     */
 };
+}; /* namespace raptor_raytracer */
 
 namespace boost { 
 namespace serialization {
 template<class Archive>
-inline void save_construct_data(Archive & ar, const perlin_noise_3d_mapper *t, const unsigned int file_version)
+inline void save_construct_data(Archive & ar, const raptor_raytracer::perlin_noise_3d_mapper *t, const unsigned int file_version)
 {
     ar << t->rgb;
     ar << t->p;
@@ -60,10 +63,10 @@ inline void save_construct_data(Archive & ar, const perlin_noise_3d_mapper *t, c
 
 
 template<class Archive>
-inline void load_construct_data(Archive & ar, perlin_noise_3d_mapper *t, const unsigned int file_version)
+inline void load_construct_data(Archive & ar, raptor_raytracer::perlin_noise_3d_mapper *t, const unsigned int file_version)
 {
     /* Retreive the fields */
-    ext_colour_t rgb;
+    raptor_raytracer::ext_colour_t rgb;
     fp_t p, z, op;
     int o, s;
     ar >> rgb;
@@ -74,9 +77,9 @@ inline void load_construct_data(Archive & ar, perlin_noise_3d_mapper *t, const u
     ar >> s;
     
     /* Use plaement new to create the class */
-    ::new(t)perlin_noise_3d_mapper(rgb, p, z, o, s, op);
+    ::new(t)raptor_raytracer::perlin_noise_3d_mapper(rgb, p, z, o, s, op);
 }
-} /* namespace serialization */
-} /* namespace boost */
+}; /* namespace serialization */
+}; /* namespace boost */
 
 #endif /* #ifndef __PERLIN_NOISE_3D_MAPPER_H__ */

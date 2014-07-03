@@ -13,6 +13,8 @@
 #include "ray.h"
 
 
+namespace raptor_raytracer
+{
 /* Pure virtual class for material data and shading */
 class perlin_noise_2d_mapper : public material
 {
@@ -42,5 +44,6 @@ class perlin_noise_2d_mapper : public material
         unsigned int            h;
         int                     o;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __PERLIN_NOISE_2D_MAPPER_H__ */

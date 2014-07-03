@@ -5,6 +5,8 @@
 #include "triangle.h"
 
 
+namespace raptor_raytracer
+{
 class bih_bucket
 {
     public :
@@ -62,5 +64,6 @@ class bih_bucket
         int         begin;  /*  */
         int         end;    /*  */
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __BIH_BUCKET_H__ */

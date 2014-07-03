@@ -23,7 +23,10 @@
 
 
 /* Forward declaration */
+namespace raptor_raytracer
+{
 class material;
+}; /* namespace raptor_raytracer */
 
 namespace raptor_physics
 {
@@ -31,7 +34,7 @@ class vertex_group : private boost::noncopyable
 {
     public :
         /* CTORs and DTORs */
-        vertex_group(const std::vector<point_t> &verts, std::vector<int> *const tris, material *const mat)
+        vertex_group(const std::vector<point_t> &verts, std::vector<int> *const tris, raptor_raytracer::material *const mat)
             : _verts(new matrix_3d(verts)),
               _tris(tris),
               _edges(build_edges_from_tris()),
@@ -120,7 +123,7 @@ class vertex_group : private boost::noncopyable
         }
 
         /* Build triangles for rendering */
-        const vertex_group& triangles(primitive_list *p, const quaternion_t &r, const point_t &t) const
+        const vertex_group& triangles(raptor_raytracer::primitive_list *p, const quaternion_t &r, const point_t &t) const
         {
             /* Position vertices */
             std::vector<point_t> pos_verts;
@@ -134,7 +137,7 @@ class vertex_group : private boost::noncopyable
             /* For each triple of edges build a triangle */
             for (unsigned int i = 0; i < _tris->size(); i += 3)
             {
-                p->push_back(new triangle(_mat, 
+                p->push_back(new raptor_raytracer::triangle(_mat, 
                     pos_verts[_tris->at(i    )], 
                     pos_verts[_tris->at(i + 1)], 
                     pos_verts[_tris->at(i + 2)]));
@@ -164,15 +167,15 @@ class vertex_group : private boost::noncopyable
             return edges;
         }        
 
-        matrix_3d           *const  _verts; /* Vertices making up the group     */
-        std::vector<int>    *const  _tris;  /* Triples of triangle edges        */
-        std::vector<int>    *const  _edges; /* Per vertex connectivity          */
-        material            *const  _mat;   /* Shader for the triangles         */
+        matrix_3d                   *const  _verts; /* Vertices making up the group     */
+        std::vector<int>            *const  _tris;  /* Triples of triangle edges        */
+        std::vector<int>            *const  _edges; /* Per vertex connectivity          */
+        raptor_raytracer::material  *const  _mat;   /* Shader for the triangles         */
 };
 
 
 /* Routine to make plane out of triangles */
-inline vertex_group* make_plane(material *m, const point_t &bl, const point_t &br, const point_t &tl, const point_t &tr)
+inline vertex_group* make_plane(raptor_raytracer::material *m, const point_t &bl, const point_t &br, const point_t &tl, const point_t &tr)
 {
     /* Vertices of the plane */
     std::vector<point_t> verts(
@@ -195,7 +198,7 @@ inline vertex_group* make_plane(material *m, const point_t &bl, const point_t &b
 
 
 /* Routine to make cubes out of triangles */
-inline vertex_group* make_cube(material *m, const point_t &bl, const point_t &tr)
+inline vertex_group* make_cube(raptor_raytracer::material *m, const point_t &bl, const point_t &tr)
 {
     /* Vertices of the cube */
     std::vector<point_t> verts(

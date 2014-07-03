@@ -6,6 +6,8 @@
 #include "nff_parser.h"
 
 
+namespace raptor_raytracer
+{
 void nff_parser(
     ifstream            &nff_file,
     light_list          &l, 
@@ -260,3 +262,4 @@ void nff_parser(
     /* Tidy up */
     delete [] buffer;
 }
+}; /* namespace raptor_raytracer */

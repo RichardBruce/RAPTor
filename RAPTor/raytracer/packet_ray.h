@@ -6,6 +6,9 @@
 
 #ifdef SIMD_PACKET_TRACING
 
+
+namespace raptor_raytracer
+{
 /* Forward declarations */
 class triangle;
 
@@ -201,7 +204,7 @@ class packet_ray_to_pixel
     public :
         packet_ray_to_pixel()
         {
-            const unsigned int pkt_width = (unsigned int)sqrt((fp_t)(MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH));
+            const unsigned int pkt_width = (unsigned int)std::sqrt((fp_t)(MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH));
 
             /* Foreach ray in the biggest packet */
             for (unsigned int i = 0; i < (unsigned int)(MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH); i++)
@@ -252,7 +255,7 @@ class packet_ray_to_co_ordinate
     public :
         packet_ray_to_co_ordinate()
         {
-            const unsigned int pkt_width = (unsigned int)sqrt((fp_t)MAXIMUM_PACKET_SIZE) >> 1;
+            const unsigned int pkt_width = (unsigned int)std::sqrt((fp_t)MAXIMUM_PACKET_SIZE) >> 1;
 
             /* Foreach the biggest packet size */
             for (unsigned int i = 0; i < MAXIMUM_PACKET_SIZE; i++)
@@ -290,4 +293,6 @@ class packet_ray_to_co_ordinate
 extern const packet_ray_to_co_ordinate packet_ray_to_co_ordinate_lut;
 
 #endif /* #ifdef SIMD_PACKET_TRACING */
+}; /* namespace raptor_raytracer */
+
 #endif /* #ifndef __PACKET_RAY_H__ */

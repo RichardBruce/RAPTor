@@ -9,14 +9,6 @@ all:: raytracer libraytracer.a libraytracer.so
 raytracer : $(CPP_OBJECTS) $(C_OBJECTS) $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib/libSDL2-2.0.so.0.2.1 $(LIBARYS_PATH)/tbb$(TBB_VER)/build/build_release/libtbb.so.2 $(LIBARYS_PATH)/tbb$(TBB_VER)/build/build_release/libtbbmalloc.so.2
 	$(CPP) $(LD_OPT) -o $@ $(CPP_OBJECTS) $(C_OBJECTS) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBRARY))
 
-libraytracer.so : $(CPP_OBJECTS) $(C_OBJECTS)
-	$(CPP) -fvisibility=default -shared -Wl,-soname,$@.1.0.1 -o $@.1.0.1 $(CPP_OBJECTS) $(C_OBJECTS) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(SO_LIBS))
-	ln -s $@.1.0.1 $@
-	ln -s $@.1.0.1 $@.1
-
-libraytracer.a : $(CPP_OBJECTS) $(C_OBJECTS)
-	ar rcs $@ $(CPP_OBJECTS) $(C_OBJECTS)
-
 
 # SPD for test scenes
 $(LIBARYS_PATH)/spd$(SPD_VER) : 

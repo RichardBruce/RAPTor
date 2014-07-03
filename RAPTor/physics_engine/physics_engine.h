@@ -93,9 +93,9 @@ class physics_engine : private boost::noncopyable
 
         physics_engine& advance_time(const fp_t t);
         
-        primitive_list* scene_to_triangles() const
+        raptor_raytracer::primitive_list* scene_to_triangles() const
         {
-            primitive_list *ret = new primitive_list();
+            raptor_raytracer::primitive_list *ret = new raptor_raytracer::primitive_list();
             for (auto& p : (*_objects))
             {
                 p.second->triangles(ret);

@@ -17,10 +17,10 @@ INCLUDE = $(LOCAL_INCLUDES) \
 	$(LIBARYS_PATH)/tbb$(TBB_VER)/include/tbb/ \
 	$(LIBARYS_PATH)/fftw-$(FFTW_VER)/include \
 	${BOOST_INCLUDE_PATH}
-LOCAL_INCLUDES = . materials/ textures/ spatial_sub_division/ parsers/ parsers/mgflib ../sdl_wrappers \
-	$(RAPTOR_HOME)/common/
-vpath %.c $(INCLUDE)
-vpath %.cc $(INCLUDE)
+LOCAL_INCLUDES = . $(RAPTOR_HOME)/raytracer/materials/ $(RAPTOR_HOME)/raytracer/textures/ $(RAPTOR_HOME)/raytracer/spatial_sub_division/ \
+	$(RAPTOR_HOME)/raytracer/parsers/ $(RAPTOR_HOME)/raytracer/parsers/mgflib $(RAPTOR_HOME)/sdl_wrappers $(RAPTOR_HOME)/common/
+vpath %.c $(LOCAL_INCLUDES)
+vpath %.cc $(LOCAL_INCLUDES)
 
 # Libraries
 LIBPATH = $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib \

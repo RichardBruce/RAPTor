@@ -4,6 +4,8 @@
 #include "triangle.h"
 
 
+namespace raptor_raytracer
+{
 /* Enumerate the major axis and direction of the lights direction */
 enum light_direction_t { x_pos = 0, y_pos = 1, z_pos = 2, x_neg = 3, y_neg = 4, z_neg = 5 };
 
@@ -247,5 +249,6 @@ class light
         const fp_t                      s_b;    /* Angle where spotlight finishes fading    */
         const light_direction_t         n_dir;  /* Major axis and direction of the light    */
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __LIGHT_H__ */

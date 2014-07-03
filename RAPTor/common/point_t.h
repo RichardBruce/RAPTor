@@ -484,4 +484,3 @@ inline point_t normalise(point_t a)
 }
 
 #endif /* #ifndef __POINT_T_H__ */
-

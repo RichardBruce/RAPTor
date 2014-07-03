@@ -4,6 +4,8 @@
 #include "light.h"
 
 
+namespace raptor_raytracer
+{
 void cook_torrance_cxy::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, fp_t *const n_rl, fp_t *const n_rf) const
 {
     /* For each light request rays */
@@ -141,3 +143,4 @@ void cook_torrance_cxy::combind_secondary_rays(const ray_trace_engine &r, ext_co
 //  
 //  return float4( Final, 1.0f );
 //}
+}; /* namespace raptor_raytracer */

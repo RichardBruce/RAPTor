@@ -9,6 +9,8 @@
 #include "point_t.h"
 #include "texture_mapper.h"
 
+namespace raptor_raytracer
+{
 /* Forward delcarations */
 class ext_colour_t;
 
@@ -118,11 +120,12 @@ class planar_mapper : public texture_mapper
         unsigned                        u_max;  /* Max u value for early wrapping       */
         unsigned                        v_max;  /* Max v value for early wrapping       */
 };
+}; /* namespace raptor_raytracer */
 
 namespace boost { 
 namespace serialization {
 template<class Archive>
-inline void save_construct_data(Archive & ar, const planar_mapper *t, const unsigned int file_version)
+inline void save_construct_data(Archive & ar, const raptor_raytracer::planar_mapper *t, const unsigned int file_version)
 {
     ar << t->c;
     ar << t->n;
@@ -142,11 +145,11 @@ inline void save_construct_data(Archive & ar, const planar_mapper *t, const unsi
 }
 
 template<class Archive>
-inline void load_construct_data(Archive & ar, planar_mapper *t, const unsigned int file_version)
+inline void load_construct_data(Archive & ar, raptor_raytracer::planar_mapper *t, const unsigned int file_version)
 {
     /* Retreive the fields */
     point_t c, n, u, s, v;
-    texture_wrapping_mode_t uw, vw;
+    raptor_raytracer::texture_wrapping_mode_t uw, vw;
     fp_t *img;
     unsigned h, w, cpp, u_max, v_max;
     int u_off, v_off;
@@ -167,9 +170,9 @@ inline void load_construct_data(Archive & ar, planar_mapper *t, const unsigned i
     ar >> v_max;
     
     /* Use plaement new to create the class */
-    ::new(t)planar_mapper(img, u, v, c, n, s, cpp, w, h, uw, vw, u_off, v_off, u_max, v_max);
+    ::new(t)raptor_raytracer::planar_mapper(img, u, v, c, n, s, cpp, w, h, uw, vw, u_off, v_off, u_max, v_max);
 }
-} /* namespace serialization */
-} /* namespace boost */
+}; /* namespace serialization */
+}; /* namespace boost */
 
 #endif /* #ifndef __PLANAR_MAPPER_H__ */

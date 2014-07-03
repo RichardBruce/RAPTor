@@ -7,6 +7,8 @@
 #include "raytracer.h"
 
 
+namespace raptor_raytracer
+{
 class kdt_node
 {
     public :
@@ -147,5 +149,6 @@ class kdt_node
         fp_t                split_pos;
         axis                normal;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __KDT_NODE_H__ */

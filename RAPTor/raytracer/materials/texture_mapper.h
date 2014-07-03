@@ -12,9 +12,12 @@ extern "C"
 }
 
 /* Forward declarations */
-class ext_colour_t;
 class point_t;
 
+namespace raptor_raytracer
+{
+/* Forward declarations */
+class ext_colour_t;
 
 enum texture_wrapping_mode_t { blank = 0, clamp = 1, tile = 2, mirror = 3 };
 
@@ -147,5 +150,6 @@ inline bool apply_wrapping_mode(int *const c, const int s, const texture_wrappin
     
     return true;
 }
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __TEXTURE_MAPPER_H__ */

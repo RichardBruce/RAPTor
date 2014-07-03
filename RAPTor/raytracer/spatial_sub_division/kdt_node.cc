@@ -1,6 +1,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 /**********************************************************
   test_leaf_node_nearest tests all primitives of the 
   KD-tree leaf node to find the nearest.
@@ -77,3 +79,4 @@ bool kdt_node::test_leaf_node_nearer(const ray *const r, const fp_t max) const
     
     return false;
 }
+}; /* namespace raptor_raytracer */

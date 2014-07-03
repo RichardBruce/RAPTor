@@ -8,6 +8,8 @@ using namespace tbb;
 #endif /* #ifdef THREADED_RAY_TRACE */
 
 
+namespace raptor_raytracer
+{
 /* Tree depth */
 static unsigned depth = 0;
 
@@ -74,3 +76,4 @@ void build_kd_tree(const primitive_list *const objects, kdt_node *const kdt_subd
 
     return;
 }
+}; /* namespace raptor_raytracer */

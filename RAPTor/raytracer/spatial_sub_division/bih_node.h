@@ -9,6 +9,8 @@
 #include "frustrum.h"
 
 
+namespace raptor_raytracer
+{
 class bih_node
 {
     public :
@@ -236,5 +238,6 @@ class bih_node
         static vector<triangle *>   *   o;      /* Vector of primitives                 */
         static bih_node             *   bih;    /* BIH nodes                            */
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __BIH_NODE_H__ */

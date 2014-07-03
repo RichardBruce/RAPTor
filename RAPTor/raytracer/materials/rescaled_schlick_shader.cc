@@ -2,6 +2,8 @@
 #include "rescaled_schlick_shader.h"
 
 
+namespace raptor_raytracer
+{
 void rescaled_schlick_shader::shade(const ray &i, const list<ray> &l, const line &n, ext_colour_t *const c, ray *const rl, ray *const rr) const
 {
     /* For each light */
@@ -12,3 +14,4 @@ void rescaled_schlick_shader::shade(const ray &i, const list<ray> &l, const line
         c->b += 0.0;
     }
 }
+}; /* namespace raptor_raytracer */

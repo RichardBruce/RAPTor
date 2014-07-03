@@ -7,6 +7,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 class cone : public shape
 {
     public :
@@ -34,5 +36,6 @@ class cone : public shape
         fp_t     r, h, top, theta;
         vector_t rot_axis;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __CONE_H__ */

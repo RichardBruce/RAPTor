@@ -13,6 +13,8 @@
 
 class kdt_node;
 
+namespace raptor_raytracer
+{
 class voxel
 {
     public :
@@ -67,5 +69,6 @@ class voxel
         point_t          b;
         axis             n;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __VOXEL_H__ */

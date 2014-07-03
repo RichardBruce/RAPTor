@@ -10,6 +10,7 @@
 #include "common.h"
 
 class vfp_t;
+
 extern const vfp_t  vfp_zero;
 extern const vfp_t  vfp_one;
 extern const vfp_t  vfp_true;

@@ -16,6 +16,8 @@
 #include "bih_node.h"
 #include "bih_builder.h"
 
+namespace raptor_raytracer
+{
 vector<triangle *>   * bih_node::o      = nullptr;
 bih_node             * bih_node::bih    = nullptr;
 
@@ -4038,3 +4040,4 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 //    }
 //}
 //
+}; /* namespace raptor_raytracer */

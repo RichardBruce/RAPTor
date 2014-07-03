@@ -9,6 +9,8 @@
 class ray;
 
 
+namespace raptor_raytracer
+{
 /* Abstract base class all shapes must implement */
 class shape
 {
@@ -118,6 +120,6 @@ class sort_shape_by_highest_z
     public :
         bool operator() (const shape *const a, const shape *const b) { return (a->highest_z() < b->highest_z()); }
 };
-
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __SHAPE_H__ */

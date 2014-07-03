@@ -6,6 +6,8 @@
 #include "lwo_parser.h"
 
 
+namespace raptor_raytracer
+{
 enum mapper_type_t { non = 0, f_noise = 1, planar = 2, cubic = 3, spherical = 4, cylindrical = 5 };
 enum mapper_of_t   { map_btex = 0, map_ctex = 1, map_dtex = 2, map_ltex = 3, map_stex = 4, map_rtex = 5, map_ttex = 6 };
 
@@ -614,3 +616,4 @@ void lwo_parser(
     delete [] surf_materials;
 //    cout << "Parsing LWO file complete" << endl;
 }
+}; /* namespace raptor_raytracer */

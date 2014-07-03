@@ -32,7 +32,7 @@ const point_t cam_p( 0.0, -5.0, -25);                               /* Position 
 const point_t x_vec( 1.0,  0.0, 0.0);                               /* Horizontal vector        */
 const point_t y_vec( 0.0,  1.0, 0.0);                               /* Virtical vector          */
 const point_t z_vec( 0.0,  0.0, 1.0);                               /* Forward vector           */
-const ext_colour_t bg(0.0, 0.0, 0.0);                               /* Background colour        */
+const raptor_raytracer::ext_colour_t bg(0.0, 0.0, 0.0);             /* Background colour        */
 const unsigned xr = 640;                                            /* X resolution             */
 const unsigned yr = 480;                                            /* Y resolution             */
 const unsigned xa = 1;                                              /* X anti-aliasing factor   */
@@ -105,7 +105,7 @@ class simulation_environment
         bool                    screen_initialised()        const   { return _texture != nullptr;   }
         bool                    font_initialised()          const   { return _font != nullptr;      }
 
-        simulation_environment& add_light(const ext_colour_t &rgb, const point_t &at)
+        simulation_environment& add_light(const raptor_raytracer::ext_colour_t &rgb, const point_t &at)
         {
             new_light(&_lights, rgb, at, 0.0, 0.0);
             return *this;
@@ -132,8 +132,8 @@ class simulation_environment
         SDL_Texture *                           _texture;
         SDL_Texture *                           _load_screen;
         TTF_Font *                              _font;
-        camera                                  _cam;
-        light_list                              _lights;
+        raptor_raytracer::camera                _cam;
+        raptor_raytracer::light_list            _lights;
         std::unique_ptr<sdl_event_handler_base> _cam_event_handler;
         clock_t                                 _sim_time;
         fp_t                                    _time_run;

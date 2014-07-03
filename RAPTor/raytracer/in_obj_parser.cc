@@ -16,6 +16,8 @@
 // using namespace sheep;
 // using namespace std;
 
+//namespace raptor_raytracer
+//{
 // OBJLoader::OBJLoader() {
 //     m_keyword_table.Insert("d", D);
 //     m_keyword_table.Insert("f", F);
@@ -793,3 +795,4 @@
 //     m_material_id[material_name] = m_matbuilder->BeginMaterial(material_name);
 //     m_inside_material_def = true;
 // }
+//}; /* namespace raptor_raytracer */

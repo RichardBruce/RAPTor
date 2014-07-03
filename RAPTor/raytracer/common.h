@@ -16,6 +16,14 @@
 #include <map>
 #include <sstream>
 
+/* Size of a floating point number */
+#define SINGLE_PRECISION
+#ifdef SINGLE_PRECISION
+typedef float fp_t;
+#else
+typedef double fp_t;
+#endif /* #ifdef SINGLE_PRECISION */
+
 /* Threading headers */
 #ifdef THREADED_RAY_TRACE
 #include "scalable_allocator.h"
@@ -26,6 +34,30 @@ using namespace tbb;
 
 using namespace std;
 
+/* Template for casting bits from one type to another */
+template<class T, class S>
+inline S bit_cast(const T t_in)
+{
+    assert(sizeof(T) == sizeof(S));
+
+    /* Create union of the types */
+    union
+    {
+        T t;
+        S s;
+    } cast_union;
+    
+    /* Input one type */
+    cast_union.t = t_in;
+    
+    /* And return the other */
+    return cast_union.s;
+}
+
+extern const fp_t PI;
+
+namespace raptor_raytracer
+{
 /* Alignment */
 #define ALIGN(x) __attribute__ ((aligned (x)))
 
@@ -176,14 +208,6 @@ using namespace std;
 #endif
 #endif  /* #ifdef SIMD_PACKET_TRACING */
 
-/* Size of a floating point number */
-#define SINGLE_PRECISION
-#ifdef SINGLE_PRECISION
-typedef float fp_t;
-#else
-typedef double fp_t;
-#endif /* #ifdef SINGLE_PRECISION */
-
 /* Primitive list to hold primitives */
 class triangle;
 class light;
@@ -204,31 +228,10 @@ extern const fp_t       FP_DELTA;
 extern const fp_t       FP_DELTA_SMALL;
 extern const fp_t       MAX_DIST;
 extern const fp_t       EPSILON;
-extern const fp_t       PI;
 extern const fp_t       EXP;
 
 /* Modulus 3 look up table for values less than 6 */
 extern const unsigned   mod_3_lut[6];
-
-/* Template for casting bits from one type to another */
-template<class T, class S>
-inline S bit_cast(const T t_in)
-{
-    assert(sizeof(T) == sizeof(S));
-
-    /* Create union of the types */
-    union
-    {
-        T t;
-        S s;
-    } cast_union;
-    
-    /* Input one type */
-    cast_union.t = t_in;
-    
-    /* And return the other */
-    return cast_union.s;
-}
 
 /* Class to hold a look up table of cos */
 template <const unsigned int size> class static_cos
@@ -309,5 +312,6 @@ enum image_format_t { tga = 0, jpg = 1, png = 2 };
 
 /* Function to generate a random number between -1 and 1 */
 fp_t gen_random_mersenne_twister();
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __COMMON_H__ */

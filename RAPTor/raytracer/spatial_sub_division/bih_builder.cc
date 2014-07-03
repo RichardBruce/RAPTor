@@ -2,6 +2,9 @@
 
 
 #ifdef SPATIAL_SUBDIVISION_BIH
+
+namespace raptor_raytracer
+{
 /* Tree depth */
 static unsigned depth = 0;
 
@@ -685,4 +688,4 @@ const vector<triangle *> * build_bih(const primitive_list *const o, bih_node *bi
     return object_copy;
 }
 #endif /* #ifdef SPATIAL_SUBDIVISION_BIH */
-
+}; /* namespace raptor_raytracer */

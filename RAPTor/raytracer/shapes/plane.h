@@ -7,6 +7,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 class plane : public shape
 {
     public :
@@ -75,5 +77,6 @@ class plane : public shape
     private : 
         fp_t x_n, y_n, z_n;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __PLANE_H__ */

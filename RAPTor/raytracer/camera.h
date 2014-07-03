@@ -16,6 +16,24 @@
 #include "packet_ray.h"
 #endif
 
+
+namespace raptor_raytracer
+{
+class camera;
+}; /* namespace raptor_raytracer */
+
+namespace boost {
+namespace serialization {
+template<class Archive>
+inline void save_construct_data(Archive & ar, const raptor_raytracer::camera *cam, const unsigned int file_version);
+
+template<class Archive>
+inline void load_construct_data(Archive & ar, raptor_raytracer::camera *cam, const unsigned int file_version);
+} /* namespace serialization */
+} /* namespace boost */
+
+namespace raptor_raytracer
+{
 /* Enumerate the 3 light levels */
 enum light_level_t { scotopic = 0, mesopic = 1, photopic = 2 };
 
@@ -26,17 +44,6 @@ enum tone_mapping_mode_t { global_contrast = 1, local_histogram      = 2, local_
 
 /* File output functions */
 void write_png_file(const string &file_name, unsigned char *png_data, const unsigned int x, const unsigned int y);
-
-class camera;
-namespace boost {
-namespace serialization {
-template<class Archive>
-inline void save_construct_data(Archive & ar, const camera *cam, const unsigned int file_version);
-
-template<class Archive>
-inline void load_construct_data(Archive & ar, camera *cam, const unsigned int file_version);
-}
-}
 
 /* Class representing a camera, shouldn't be copied */
 class camera : private boost::noncopyable
@@ -611,11 +618,12 @@ class camera : private boost::noncopyable
         fp_t                                        time_step;                  /* Time step between last and current frame in seconds              */
         fp_t                                        adatption_level;            /* Current light level that has been adapted to                     */
 };
+}; /* namespace raptor_raytracer */
 
 namespace boost { 
 namespace serialization {
 template<class Archive>
-inline void save_construct_data(Archive & ar, const camera *cam, const unsigned int file_version)
+inline void save_construct_data(Archive & ar, const raptor_raytracer::camera *cam, const unsigned int file_version)
 {
     ar << cam->tm;
     ar << cam->u;
@@ -636,12 +644,12 @@ inline void save_construct_data(Archive & ar, const camera *cam, const unsigned 
 }
 
 template<class Archive>
-inline void load_construct_data(Archive & ar, camera *cam, const unsigned int file_version)
+inline void load_construct_data(Archive & ar, raptor_raytracer::camera *cam, const unsigned int file_version)
 {
     /* Retreive the fields */
-    vector<texture_mapper *>  *tm;
+    vector<raptor_raytracer::texture_mapper *>  *tm;
     point_t u, l, r_vec, r_pivot;
-    ext_colour_t b;
+    raptor_raytracer::ext_colour_t b;
     fp_t x_m, y_m, x_inc, y_inc, t, r_angle;
     unsigned int x_res, y_res, out_x_res, out_y_res;
 
@@ -663,7 +671,7 @@ inline void load_construct_data(Archive & ar, camera *cam, const unsigned int fi
     ar >> r_pivot;
 
     /* Use plaement new to create the class */
-    ::new(cam)camera(tm, u, l, b, x_m, y_m, x_inc, y_inc, t, x_res, y_res, out_x_res, out_y_res, r_vec, r_angle, r_pivot);
+    ::new(cam)raptor_raytracer::camera(tm, u, l, b, x_m, y_m, x_inc, y_inc, t, x_res, y_res, out_x_res, out_y_res, r_vec, r_angle, r_pivot);
 }
 } /* namespace serialization */
 } /* namespace boost */

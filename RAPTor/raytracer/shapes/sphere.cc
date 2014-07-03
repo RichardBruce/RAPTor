@@ -5,6 +5,8 @@
 #include "sphere.h"
 
 
+namespace raptor_raytracer
+{
 /***********************************************************
  is_intersecting returns the distance along the line l that 
  the sphere and the line intersect. If the shere and the line 
@@ -106,3 +108,4 @@ point_t sphere::get_random_point(const int i) const
     
     return point_t(x,y,z);
 }
+}; /* namespace raptor_raytracer */

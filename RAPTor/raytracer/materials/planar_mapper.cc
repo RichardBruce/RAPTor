@@ -3,6 +3,8 @@
 #include "ext_colour_t.h"
 
 
+namespace raptor_raytracer
+{
 /***********************************************************
   Overloaded virtual texture mapping function. Takes the 
   destination of the ray (query point) and returns the colour
@@ -113,3 +115,4 @@ fp_t planar_mapper::texture_map(const point_t &dst, const point_t &dir, ext_colo
     (*c) = (c0 * w0) + (c1 * w1) + (c2 * w2) + (c3 * w3);
     return (fp_t)1.0;
 }
+}; /* namespace raptor_raytracer */

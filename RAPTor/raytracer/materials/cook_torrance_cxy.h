@@ -8,6 +8,8 @@
 #include "ray.h"
 
 
+namespace raptor_raytracer
+{
 /* Pure virtual class for material data and shading */
 class cook_torrance_cxy : public material
 {
@@ -52,5 +54,6 @@ class cook_torrance_cxy : public material
         const fp_t  ri_r;   /* Real refractive index                    */
         const fp_t  ri_i;   /* Imaginery refractive index               */
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __COOK_TORRANCE_CXY_H__ */

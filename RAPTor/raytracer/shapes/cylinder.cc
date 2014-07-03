@@ -5,6 +5,8 @@
 #include "cylinder.h"
 
 
+namespace raptor_raytracer
+{
 cylinder::cylinder(material *const m, const point_t &c, const fp_t h, const fp_t r, const fp_t i, const vector_t &n, const fp_t theta, const bool l) : 
                    shape(m,c,l), rot_axis(n), r(r), h(h), i_sq(i*i), theta(theta)
 {
@@ -395,3 +397,4 @@ point_t cylinder::get_random_point(const int i) const
     
     return point_t(x,y,z);
 }
+}; /* namespace raptor_raytracer */

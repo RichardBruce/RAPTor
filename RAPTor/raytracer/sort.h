@@ -3,6 +3,8 @@
 
 #include "common.h"
 
+namespace raptor_raytracer
+{
 struct bb_point_t
 {
     fp_t p;
@@ -18,5 +20,6 @@ void insertion_sort(fp_t       *a, int length);
 void insertion_sort(bb_point_t *a, int length);
 
 void radixsort(float *source, long n);
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __SORT_H__ */

@@ -1,6 +1,9 @@
 #include "camera.h"
 #include "fftw3.h"
 
+
+namespace raptor_raytracer
+{
 /* C style headers */
 extern "C"
 {
@@ -2240,7 +2243,7 @@ camera & camera::write_png_file(const string &file_name)
     unsigned char * png_data = new unsigned char [this->out_x_res * this->out_y_res * 3];
     this->clip_image_to_rgb(png_data);
         
-    ::write_png_file(file_name, &png_data[0], this->out_x_res, this->out_y_res);
+    raptor_raytracer::write_png_file(file_name, &png_data[0], this->out_x_res, this->out_y_res);
 
     delete [] png_data;
     return *this;
@@ -2311,3 +2314,4 @@ camera & camera::write_jpeg_file(const string &file_name, const int q, unsigned 
     
     return *this;
 }
+}; /* namespace raptor_raytracer */

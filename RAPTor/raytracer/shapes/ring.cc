@@ -5,6 +5,8 @@
 #include "ring.h"
 
 
+namespace raptor_raytracer
+{
 ring::ring(material *const m, const point_t &c, const vector_t &n, const fp_t r, const fp_t i, const bool l) : 
                    shape(m,c,l), r_sq(r*r), i_sq(i*i), n(n)
 {
@@ -117,3 +119,4 @@ point_t ring::get_random_point(const int i) const
     
     return point_t(x,y,z);
 }
+}; /* namespace raptor_raytracer */

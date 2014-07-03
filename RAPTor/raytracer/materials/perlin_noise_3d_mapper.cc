@@ -1,6 +1,8 @@
 #include "perlin_noise_3d_mapper.h"
 
 
+namespace raptor_raytracer
+{
 /***********************************************************
   Overloaded virtual texture mapping function. Takes the 
   destination of the ray (query point) and returns the colour
@@ -37,3 +39,4 @@ fp_t perlin_noise_3d_mapper::texture_map(const point_t &dst, const point_t &dir,
         return (fp_t)this->op;
     }
 }
+}; /* namespace raptor_raytracer */

@@ -6,6 +6,8 @@
 #include "vrml_parser.h"
 
 
+namespace raptor_raytracer
+{
 bool group_done(const char *a)
 {
     /* Eat the string until the ']' or new line is found */
@@ -289,3 +291,4 @@ void vrml_parser(
     /* Clean up */
     delete [] buffer;
 }
+}; /* namespace raptor_raytracer */

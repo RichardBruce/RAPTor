@@ -7,6 +7,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 class aab : public shape
 {
     public :
@@ -37,5 +39,6 @@ class aab : public shape
 
     private : 
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __AAB_H__ */

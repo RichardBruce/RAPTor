@@ -52,8 +52,8 @@ int simulation_environment::run()
         /* render */
         if (_po->render())
         {
-            primitive_list *tris = _pe->scene_to_triangles();
-            ray_tracer(_lights, *tris, _cam);
+            raptor_raytracer::primitive_list *tris = _pe->scene_to_triangles();
+            raptor_raytracer::ray_tracer(_lights, *tris, _cam);
 
             /* Clean up triangles */        
             for (auto t : (*tris))

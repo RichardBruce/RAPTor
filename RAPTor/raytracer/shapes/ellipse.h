@@ -7,6 +7,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 class ellipse : public shape
 {
     public :
@@ -32,5 +34,6 @@ class ellipse : public shape
         fp_t     r, h, a, c, i_sq, a_sq, theta;
         bool     rotate;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __ELLIPSE_H__ */

@@ -9,6 +9,9 @@
 #include "point_t.h"
 #include "texture_mapper.h"
 
+
+namespace raptor_raytracer
+{
 /* Pure virtual class for material data and shading */
 class cylindrical_mapper : public texture_mapper
 {
@@ -59,11 +62,12 @@ class cylindrical_mapper : public texture_mapper
         unsigned            w;      /* Image width                          */
         unsigned            cpp;    /* Componants per pixel                 */
 };
+}; /* namespace raptor_raytracer */
 
 namespace boost { 
 namespace serialization {
 template<class Archive>
-inline void save_construct_data(Archive & ar, const cylindrical_mapper *t, const unsigned int file_version)
+inline void save_construct_data(Archive & ar, const raptor_raytracer::cylindrical_mapper *t, const unsigned int file_version)
 {
     ar << t->c;
     ar << t->u;
@@ -77,7 +81,7 @@ inline void save_construct_data(Archive & ar, const cylindrical_mapper *t, const
 }
 
 template<class Archive>
-inline void load_construct_data(Archive & ar, cylindrical_mapper *t, const unsigned int file_version)
+inline void load_construct_data(Archive & ar, raptor_raytracer::cylindrical_mapper *t, const unsigned int file_version)
 {
     /* Retreive the fields */
     point_t c, u, v, s;
@@ -95,9 +99,9 @@ inline void load_construct_data(Archive & ar, cylindrical_mapper *t, const unsig
     ar >> cpp;
     
     /* Use plaement new to create the class */
-    ::new(t)cylindrical_mapper(c, u, v, s, r, img, h, w, cpp);
+    ::new(t)raptor_raytracer::cylindrical_mapper(c, u, v, s, r, img, h, w, cpp);
 }
-} /* namespace serialization */
-} /* namespace boost */
+}; /* namespace serialization */
+}; /* namespace boost */
 
 #endif /* #ifndef __CYLINDRICAL_MAPPER_H__ */

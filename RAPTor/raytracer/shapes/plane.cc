@@ -5,6 +5,8 @@
 #include "plane.h"
 
 
+namespace raptor_raytracer
+{
 /**********************************************************
  is_intersecting returns the distance along the line l that 
  the plane and the line intersect. If the plane and the line 
@@ -70,3 +72,4 @@ line plane::normal_at_point(ray *const r, const hit_t h) const
     
     return line(r->get_dst(), x_dir, y_dir, z_dir);
 }
+}; /* namespace raptor_raytracer */

@@ -5,6 +5,8 @@
 #include "triangle.h"
 
 
+namespace raptor_raytracer
+{
 /***********************************************************
  Constructor for the triangle.
  
@@ -276,3 +278,4 @@ point_t triangle::get_random_point(const int i) const
     
     return point_t(x,y,z);
 }
+}; /* namespace raptor_raytracer */

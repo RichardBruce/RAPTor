@@ -148,7 +148,7 @@ class physics_object : private boost::noncopyable
         
         physics_object& commit_movement(const fp_t t);
 
-        const physics_object& triangles(primitive_list *p) const
+        const physics_object& triangles(raptor_raytracer::primitive_list *p) const
         {
             _vg->triangles(p, _o, _i->center_of_mass());
             return *this;

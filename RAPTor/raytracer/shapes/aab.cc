@@ -1,6 +1,8 @@
 #include "aab.h"
 
 
+namespace raptor_raytracer
+{
 /***********************************************************
   For a aab (x0,y0,z0) defines the botttom left corner and 
   the normal at this point defines which way the top of the 
@@ -134,3 +136,4 @@ point_t aab::get_random_point(const int i) const
     
     return point_t(x,y,z);
 }
+}; /* namespace raptor_raytracer */
