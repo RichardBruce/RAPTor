@@ -71,7 +71,7 @@ boost_$(BOOST_VER) : boost_$(BOOST_VER).tar.bz2
 	@(cd boost_$(BOOST_VER)/tools/build/v2 ; ./bootstrap.sh ; ./b2 install --prefix=./ -d0)
 	@(cd boost_$(BOOST_VER) ; ./bootstrap.sh variant=release --with-libraries=log,serialization,system,test --prefix=./ ; ./b2 -d0 -j8 install)
         
-all :	SDL2-$(SDL_VER) SDL2_ttf-$(SDLTTF_VER) tbb$(TBB_VER) fftw-$(FFTW_VER) ffmpeg spd$(SPD_VER) boost_$(BOOST_VER)
+all :	SDL2-$(SDL_VER) SDL2_ttf-$(SDLTTF_VER) SDL2_image-$(SDLIMAGE_VER) freefont-$(FREEFONT_VER) freetype-$(FREETYPE_VER) tbb$(TBB_VER) fftw-$(FFTW_VER) ffmpeg spd$(SPD_VER) boost_$(BOOST_VER)
 
 # Clean targets
 clean ::
