@@ -46,7 +46,10 @@ OBJECTS = $(SOURCE:%.cc=build/%.o)
 all:: physics_engine libphysics_engine.a libphysics_engine.so
 
 # Compile source code to object files
-build/%.o : %.cc
+build :
+	@mkdir build
+
+build/%.o : %.cc build
 	$(CPP) $(CC_OPT) $(patsubst %,-D%,$(DEFINES)) $(patsubst %,-I%,$(INCLUDE)) -c $< -o $@
 
 # Link the object files to build the raytracer
@@ -67,7 +70,7 @@ cppcheck.xml ::
 
 # Clean targets
 clean ::
-	$(RM) build/*
+	$(RM) -r build
 	$(RM) physics_engine
 	$(RM) libphysics_engine.a
 	$(RM) libphysics_engine.so
@@ -75,7 +78,7 @@ clean ::
 	$(RM) libphysics_engine.so.1.0.1
 
 spotless ::
-	$(RM) build/*
+	$(RM) -r build
 	$(RM) physics_engine
 	$(RM) libphysics_engine.a
 	$(RM) libphysics_engine.so
