@@ -19,7 +19,7 @@ libterrain_generator.a : $(OBJECTS)
 
 # Clean targets
 clean ::
-	$(RM) build/*
+	$(RM) -r build
 	$(RM) terrain_generator
 	$(RM) libterrain_generator.a
 	$(RM) libterrain_generator.so
@@ -27,7 +27,7 @@ clean ::
 	$(RM) libterrain_generator.so.1.0.1
 
 spotless ::
-	$(RM) build/*
+	$(RM) -r build
 	$(RM) terrain_generator
 	$(RM) libterrain_generator.a
 	$(RM) libterrain_generator.so
