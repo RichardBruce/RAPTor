@@ -77,6 +77,7 @@ const float result_tolerance = 0.0005;
 BOOST_AUTO_TEST_CASE( ctor_test )
 {
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -89,6 +90,7 @@ BOOST_AUTO_TEST_CASE( add_object_test )
 {
     uut.add_object(po0.release());
     BOOST_CHECK(uut.number_of_objects() == 1);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 1);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == nullptr);
@@ -97,6 +99,28 @@ BOOST_AUTO_TEST_CASE( add_object_test )
 
     uut.add_object(po1.release());
     BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.next_object_id() == 2);
+    BOOST_CHECK(uut.get_object(1) == po1_check);
+    BOOST_CHECK(uut.get_object(2) == nullptr);
+    BOOST_CHECK(uut.number_of_collisions() == 0);
+    BOOST_CHECK(uut.default_collider() == collider);
+}
+
+BOOST_AUTO_TEST_CASE( add_moving_object_test )
+{
+    uut.add_moving_object(po0.release());
+    BOOST_CHECK(uut.number_of_objects() == 1);
+    BOOST_CHECK(uut.number_of_moving_objects() == 1);
+    BOOST_CHECK(uut.next_object_id() == 1);
+    BOOST_CHECK(uut.get_object(0) == po0_check);
+    BOOST_CHECK(uut.get_object(1) == nullptr);
+    BOOST_CHECK(uut.number_of_collisions() == 0);
+    BOOST_CHECK(uut.default_collider() == collider);
+
+    uut.add_moving_object(po1.release());
+    BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 2);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(1) == po1_check);
     BOOST_CHECK(uut.get_object(2) == nullptr);
@@ -109,14 +133,24 @@ BOOST_AUTO_TEST_CASE( add_no_cleaning_test )
     rigid_body_collider *const pe_collider = new rigid_body_collider(0.9, 0.75);
     physics_engine pe(pe_collider, false);
     BOOST_CHECK(pe.number_of_objects() == 0);
-    BOOST_CHECK(uut.next_object_id() == 0);
+    BOOST_CHECK(pe.number_of_moving_objects() == 0);
+    BOOST_CHECK(pe.next_object_id() == 0);
     BOOST_CHECK(pe.get_object(0) == nullptr);
     BOOST_CHECK(pe.number_of_collisions() == 0);
     BOOST_CHECK(pe.default_collider() == pe_collider);
 
     pe.add_object(po0.get());
     BOOST_CHECK(pe.number_of_objects() == 1);
+    BOOST_CHECK(pe.number_of_moving_objects() == 0);
     BOOST_CHECK(pe.next_object_id() == 1);
+    BOOST_CHECK(pe.get_object(0) == po0_check);
+    BOOST_CHECK(pe.number_of_collisions() == 0);
+    BOOST_CHECK(pe.default_collider() == pe_collider);
+
+    pe.add_moving_object(po1.get());
+    BOOST_CHECK(pe.number_of_objects() == 2);
+    BOOST_CHECK(pe.number_of_moving_objects() == 1);
+    BOOST_CHECK(pe.next_object_id() == 2);
     BOOST_CHECK(pe.get_object(0) == po0_check);
     BOOST_CHECK(pe.number_of_collisions() == 0);
     BOOST_CHECK(pe.default_collider() == pe_collider);
@@ -129,6 +163,7 @@ BOOST_AUTO_TEST_CASE( remove_object_test )
     uut.add_object(po0.release());
     uut.add_object(po1.release());
     BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(1) == po1_check);
     BOOST_CHECK(uut.get_object(2) == nullptr);
@@ -137,6 +172,7 @@ BOOST_AUTO_TEST_CASE( remove_object_test )
 
     uut.remove_object(0);
     BOOST_CHECK(uut.number_of_objects() == 1);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.get_object(1) == po1_check);
@@ -146,6 +182,73 @@ BOOST_AUTO_TEST_CASE( remove_object_test )
 
     uut.remove_object(1);
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.next_object_id() == 2);
+    BOOST_CHECK(uut.get_object(0) == nullptr);
+    BOOST_CHECK(uut.get_object(1) == nullptr);
+    BOOST_CHECK(uut.get_object(2) == nullptr);
+    BOOST_CHECK(uut.number_of_collisions() == 0);
+    BOOST_CHECK(uut.default_collider() == collider);
+}
+
+BOOST_AUTO_TEST_CASE( remove_moving_object_test )
+{
+    uut.add_moving_object(po0.release());
+    uut.add_moving_object(po1.release());
+    BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 2);
+    BOOST_CHECK(uut.next_object_id() == 2);
+    BOOST_CHECK(uut.get_object(1) == po1_check);
+    BOOST_CHECK(uut.get_object(2) == nullptr);
+    BOOST_CHECK(uut.number_of_collisions() == 0);
+    BOOST_CHECK(uut.default_collider() == collider);
+
+    uut.remove_object(0);
+    BOOST_CHECK(uut.number_of_objects() == 1);
+    BOOST_CHECK(uut.number_of_moving_objects() == 1);
+    BOOST_CHECK(uut.next_object_id() == 2);
+    BOOST_CHECK(uut.get_object(0) == nullptr);
+    BOOST_CHECK(uut.get_object(1) == po1_check);
+    BOOST_CHECK(uut.get_object(2) == nullptr);
+    BOOST_CHECK(uut.number_of_collisions() == 0);
+    BOOST_CHECK(uut.default_collider() == collider);
+
+    uut.remove_object(1);
+    BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.next_object_id() == 2);
+    BOOST_CHECK(uut.get_object(0) == nullptr);
+    BOOST_CHECK(uut.get_object(1) == nullptr);
+    BOOST_CHECK(uut.get_object(2) == nullptr);
+    BOOST_CHECK(uut.number_of_collisions() == 0);
+    BOOST_CHECK(uut.default_collider() == collider);
+}
+
+BOOST_AUTO_TEST_CASE( remove_mixed_object_test )
+{
+    uut.add_object(po0.release());
+    uut.add_moving_object(po1.release());
+    BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 1);
+    BOOST_CHECK(uut.next_object_id() == 2);
+    BOOST_CHECK(uut.get_object(1) == po1_check);
+    BOOST_CHECK(uut.get_object(2) == nullptr);
+    BOOST_CHECK(uut.number_of_collisions() == 0);
+    BOOST_CHECK(uut.default_collider() == collider);
+
+    uut.remove_object(0);
+    BOOST_CHECK(uut.number_of_objects() == 1);
+    BOOST_CHECK(uut.number_of_moving_objects() == 1);
+    BOOST_CHECK(uut.next_object_id() == 2);
+    BOOST_CHECK(uut.get_object(0) == nullptr);
+    BOOST_CHECK(uut.get_object(1) == po1_check);
+    BOOST_CHECK(uut.get_object(2) == nullptr);
+    BOOST_CHECK(uut.number_of_collisions() == 0);
+    BOOST_CHECK(uut.default_collider() == collider);
+
+    uut.remove_object(1);
+    BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.get_object(1) == nullptr);
@@ -159,8 +262,9 @@ BOOST_AUTO_TEST_CASE( remove_object_test )
 BOOST_AUTO_TEST_CASE( scene_to_triangles_test )
 {
     uut.add_object(po0.release());
-    uut.add_object(po1.release());
+    uut.add_moving_object(po1.release());
     BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 1);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == po1_check);
@@ -256,9 +360,10 @@ BOOST_AUTO_TEST_CASE( scene_to_triangles_test )
 /* Apply force tests */
 BOOST_AUTO_TEST_CASE( apply_force_test )
 {
-    uut.add_object(po0.release());
-    uut.add_object(po1.release());
+    uut.add_moving_object(po0.release());
+    uut.add_moving_object(po1.release());
     BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 2);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == po1_check);
@@ -280,13 +385,41 @@ BOOST_AUTO_TEST_CASE( apply_force_test )
     BOOST_CHECK(uut.get_object(1)->get_torque() == point_t( 0.0,  -0.2,  9.0 ));
 }
 
-
-/* Apply force tests */
-BOOST_AUTO_TEST_CASE( apply_acceleration_test )
+BOOST_AUTO_TEST_CASE( apply_force_not_moving_test )
 {
     uut.add_object(po0.release());
     uut.add_object(po1.release());
     BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.next_object_id() == 2);
+    BOOST_CHECK(uut.get_object(0) == po0_check);
+    BOOST_CHECK(uut.get_object(1) == po1_check);
+    BOOST_CHECK(uut.get_object(2) == nullptr);
+    BOOST_CHECK(uut.number_of_collisions() == 0);
+    BOOST_CHECK(uut.default_collider() == collider);
+
+    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t(0.0, 0.0, 0.0));
+    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t(0.0, 0.0, 0.0));
+    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t(0.0, 0.0, 0.0));
+    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t(0.0, 0.0, 0.0));
+
+    uut.apply_force(new mock_force(point_t( 0.65, -2.25, 1.05), point_t(0.0,  0.0, 0.0), 1.0), 0);
+    uut.apply_force(new mock_force(point_t(-3.3,   4.5,  0.1 ), point_t(0.0, -0.2, 9.0), 1.0), 1);
+
+    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t(0.0, 0.0, 0.0));
+    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t(0.0, 0.0, 0.0));
+    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t(0.0, 0.0, 0.0));
+    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t(0.0, 0.0, 0.0));
+}
+
+
+/* Apply force tests */
+BOOST_AUTO_TEST_CASE( apply_acceleration_test )
+{
+    uut.add_moving_object(po0.release());
+    uut.add_moving_object(po1.release());
+    BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 2);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == po1_check);
@@ -315,11 +448,12 @@ BOOST_AUTO_TEST_CASE( apply_acceleration_test )
 /* Collision detect versus tests */
 BOOST_AUTO_TEST_CASE( get_collision_test )
 {
-    uut.add_object(po0.release());
-    uut.add_object(po1.release());
-    uut.add_object(po2.release());
-    uut.add_object(po3.release());
+    uut.add_moving_object(po0.release());
+    uut.add_moving_object(po1.release());
+    uut.add_moving_object(po2.release());
+    uut.add_moving_object(po3.release());
     BOOST_CHECK(uut.number_of_objects() == 4);
+    BOOST_CHECK(uut.number_of_moving_objects() == 4);
     BOOST_CHECK(uut.next_object_id() == 4);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == po1_check);
@@ -367,11 +501,12 @@ BOOST_AUTO_TEST_CASE( get_collision_test )
 /* Collision detect versus tests */
 BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
 {
-    uut.add_object(po0.release());
-    uut.add_object(po1.release());
-    uut.add_object(po2.release());
-    uut.add_object(po3.release());
+    uut.add_moving_object(po0.release());
+    uut.add_moving_object(po1.release());
+    uut.add_moving_object(po2.release());
+    uut.add_moving_object(po3.release());
     BOOST_CHECK(uut.number_of_objects() == 4);
+    BOOST_CHECK(uut.number_of_moving_objects() == 4);
     BOOST_CHECK(uut.next_object_id() == 4);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == po1_check);
@@ -473,6 +608,7 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
 BOOST_AUTO_TEST_CASE( default_collider_test )
 {
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -481,6 +617,7 @@ BOOST_AUTO_TEST_CASE( default_collider_test )
     auto collider1 = new rigid_body_collider(0.5, 0.5);
     uut.default_collider(collider1);
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -491,6 +628,7 @@ BOOST_AUTO_TEST_CASE( default_collider_test )
 BOOST_AUTO_TEST_CASE( add_pairwise_collider_test )
 {
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -499,6 +637,7 @@ BOOST_AUTO_TEST_CASE( add_pairwise_collider_test )
     auto collider00 = new rigid_body_collider(0.5, 0.5);
     uut.pair_collider(collider00, 0, 0);
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -508,6 +647,7 @@ BOOST_AUTO_TEST_CASE( add_pairwise_collider_test )
     auto collider01 = new rigid_body_collider(0.5, 0.5);
     uut.pair_collider(collider01, 0, 1);
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -518,6 +658,7 @@ BOOST_AUTO_TEST_CASE( add_pairwise_collider_test )
     auto collider10 = new rigid_body_collider(0.5, 0.5);
     uut.pair_collider(collider10, 1, 0);
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -528,6 +669,7 @@ BOOST_AUTO_TEST_CASE( add_pairwise_collider_test )
     auto collider11 = new rigid_body_collider(0.5, 0.5);
     uut.pair_collider(collider11, 1, 1);
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -539,6 +681,7 @@ BOOST_AUTO_TEST_CASE( add_pairwise_collider_test )
 BOOST_AUTO_TEST_CASE( update_pairwise_collider_test )
 {
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -547,6 +690,7 @@ BOOST_AUTO_TEST_CASE( update_pairwise_collider_test )
     auto collider00 = new rigid_body_collider(0.5, 0.5);
     uut.pair_collider(collider00, 0, 0);
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -556,6 +700,7 @@ BOOST_AUTO_TEST_CASE( update_pairwise_collider_test )
     auto collider01 = new rigid_body_collider(0.5, 0.5);
     uut.pair_collider(collider01, 0, 0);
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -567,6 +712,7 @@ BOOST_AUTO_TEST_CASE( update_pairwise_collider_test )
 BOOST_AUTO_TEST_CASE( get_pairwise_collider_test )
 {
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -580,6 +726,7 @@ BOOST_AUTO_TEST_CASE( get_pairwise_collider_test )
     auto collider00 = new rigid_body_collider(0.5, 0.5);
     uut.pair_collider(collider00, 0, 0);
     BOOST_CHECK(uut.number_of_objects() == 0);
+    BOOST_CHECK(uut.number_of_moving_objects() == 0);
     BOOST_CHECK(uut.next_object_id() == 0);
     BOOST_CHECK(uut.get_object(0) == nullptr);
     BOOST_CHECK(uut.number_of_collisions() == 0);
@@ -596,13 +743,14 @@ BOOST_AUTO_TEST_CASE( advance_time_collide_test )
 {
     po0->set_velocity(point_t(0.0, -9.0, 0.0));
     po1->set_velocity(point_t(0.0,  9.0, 0.0));
-    uut.add_object(po0.release());
-    uut.add_object(po1.release());
+    uut.add_moving_object(po0.release());
+    uut.add_moving_object(po1.release());
 
     rigid_body_collider *const c = new rigid_body_collider(0.5, 0.0);
     uut.default_collider(c);
 
     BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 2);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == po1_check);
@@ -629,9 +777,9 @@ BOOST_AUTO_TEST_CASE( advance_time_three_way_collide_test )
     po0->set_velocity(point_t(0.0, -9.0, 0.0));
     po1->set_velocity(point_t(0.0,  9.0, 0.0));
     po4->set_velocity(point_t(0.0, -9.0, 0.0));
-    uut.add_object(po0.release());
-    uut.add_object(po1.release());
-    uut.add_object(po4.release());
+    uut.add_moving_object(po0.release());
+    uut.add_moving_object(po1.release());
+    uut.add_moving_object(po4.release());
 
     rigid_body_collider *const dc = new rigid_body_collider(0.5, 0.0);
     uut.default_collider(dc);
@@ -640,6 +788,7 @@ BOOST_AUTO_TEST_CASE( advance_time_three_way_collide_test )
     uut.pair_collider(pc, 0, 1);
 
     BOOST_CHECK(uut.number_of_objects() == 3);
+    BOOST_CHECK(uut.number_of_moving_objects() == 3);
     BOOST_CHECK(uut.next_object_id() == 3);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == po1_check);
@@ -673,10 +822,11 @@ BOOST_AUTO_TEST_CASE( advance_time_rotating_past_test )
     po4->set_velocity(point_t(-1.0, 0.0, 0.0));
     po0->set_angular_velocity(point_t(1.0, 0.0, 10.0));
     po4->set_angular_velocity(point_t(1.0, 0.0, 10.0));
-    uut.add_object(po0.release());
-    uut.add_object(po4.release());
+    uut.add_moving_object(po0.release());
+    uut.add_moving_object(po4.release());
 
     BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 2);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == po4_check);
@@ -704,13 +854,14 @@ BOOST_AUTO_TEST_CASE( advance_time_rotating_in_plane_collide_test )
     po1->set_velocity(point_t(0.0,  9.0, 0.0));
     po0->set_angular_velocity(point_t(0.0, -9.0, 0.0));
     po1->set_angular_velocity(point_t(0.0,  9.0, 0.0));
-    uut.add_object(po0.release());
-    uut.add_object(po1.release());
+    uut.add_moving_object(po0.release());
+    uut.add_moving_object(po1.release());
 
     rigid_body_collider *const c = new rigid_body_collider(0.5, 0.0);
     uut.default_collider(c);
 
     BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 2);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == po1_check);
@@ -738,13 +889,14 @@ BOOST_AUTO_TEST_CASE( advance_time_rotating_in_plane_collide_and_slide_test )
     po1->set_velocity(point_t(0.0,  9.0, 0.0));
     po0->set_angular_velocity(point_t(0.0, -9.0, 0.0));
     po1->set_angular_velocity(point_t(0.0,  9.0, 0.0));
-    uut.add_object(po0.release());
-    uut.add_object(po1.release());
+    uut.add_moving_object(po0.release());
+    uut.add_moving_object(po1.release());
 
     rigid_body_collider *const c = new rigid_body_collider(0.0, 0.0);
     uut.default_collider(c);
 
     BOOST_CHECK(uut.number_of_objects() == 2);
+    BOOST_CHECK(uut.number_of_moving_objects() == 2);
     BOOST_CHECK(uut.next_object_id() == 2);
     BOOST_CHECK(uut.get_object(0) == po0_check);
     BOOST_CHECK(uut.get_object(1) == po1_check);
