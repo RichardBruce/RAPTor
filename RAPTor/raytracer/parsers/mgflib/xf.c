@@ -1,9 +1,5 @@
 /* Copyright (c) 1995 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)xf.c 1.13 12/15/97 LBL";
-#endif
-
 /*
  * Routines for 4x4 homogeneous, rigid-body transformations
  */

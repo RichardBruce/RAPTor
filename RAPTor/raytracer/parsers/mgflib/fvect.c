@@ -1,9 +1,5 @@
 /* Copyright (c) 1994 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)fvect.c 1.3 3/18/97 LBL";
-#endif
-
 /*
  * Routines for 3-d vectors
  */

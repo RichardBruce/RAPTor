@@ -1,9 +1,5 @@
 /* Copyright (c) 1995 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)mgfilt.c 1.5 11/22/95 LBL";
-#endif
-
 /*
  * Filter MGF stream, removing entities that won't be understood
  */

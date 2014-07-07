@@ -1,9 +1,5 @@
 /* Copyright (c) 1994 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)words.c 1.2 5/10/95 LBL";
-#endif
-
 /*
  * Routines for recognizing and moving about words in strings.
  */

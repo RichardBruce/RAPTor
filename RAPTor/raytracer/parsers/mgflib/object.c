@@ -1,9 +1,5 @@
 /* Copyright (c) 1994 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)object.c 1.5 11/29/95 LBL";
-#endif
-
 /*
  * Header file for tracking hierarchical object names
  */

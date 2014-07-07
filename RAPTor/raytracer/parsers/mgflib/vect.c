@@ -1,7 +1,3 @@
-#ifndef lint
-static char SCCSid[] = "@(#)vect.c 1.2 1/16/98 LBL";
-#endif
-
 #include <math.h>
 #include <string.h>
 #include "vect.h"

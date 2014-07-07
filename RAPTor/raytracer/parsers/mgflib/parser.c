@@ -1,9 +1,5 @@
 /* Copyright (c) 1996 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)parser.c 1.26 12/15/97 LBL";
-#endif
-
 /*
  * Parse an MGF file, converting or discarding unsupported entities
  */
