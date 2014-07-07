@@ -8,7 +8,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.01 0.26 0.48
+                    diffuseColor 0.67 0.34 0.36
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -81,7 +81,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.27 0.5 0.54
+                    diffuseColor 0.09 0.46 0.3
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -145,7 +145,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.39 0.96 0.09
+                    diffuseColor 0.09 0.69 0.25
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -221,7 +221,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.45 0.11 0.26
+                    diffuseColor 0.51 0.57 0.73
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -312,7 +312,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.8 0.02 0.12
+                    diffuseColor 0.7 0.58 0.85
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -379,7 +379,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.32 0.52 0.57
+                    diffuseColor 0.64 0.83 0.39
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -458,7 +458,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.03 0.46 0.61
+                    diffuseColor 0.64 0.86 0.52
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -501,7 +501,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.6 0.5 0.27
+                    diffuseColor 0.03 0.68 0.76
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -565,7 +565,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.52 0.53 0.71
+                    diffuseColor 0.32 0.27 0.3
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -638,7 +638,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.4 0.57 0.84
+                    diffuseColor 0.67 0.66 0.37
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -684,7 +684,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.48 0.1 0.11
+                    diffuseColor 0.04 0.33 0.71
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -751,7 +751,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.48 0.37 0.13
+                    diffuseColor 0.92 0.94 0.17
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -791,7 +791,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.54 0.77 0.61
+                    diffuseColor 0.75 0.55 0.38
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -849,7 +849,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.63 0.74 0.24
+                    diffuseColor 0 0.07 0.47
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -922,7 +922,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.42 0.54 0.26
+                    diffuseColor 0.73 0.77 0.57
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1004,7 +1004,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.54 0.39 0.78
+                    diffuseColor 0.59 0.93 0.92
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1074,7 +1074,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.64 0.42 0.25
+                    diffuseColor 0.5 0.57 0.78
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1120,7 +1120,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.77 0.02 0.27
+                    diffuseColor 0.02 0.6 0.47
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1226,7 +1226,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.04 0.54 0.8
+                    diffuseColor 0.31 0.44 0.26
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1299,7 +1299,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.75 0.46 0.9
+                    diffuseColor 0.61 0.11 0.92
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1381,7 +1381,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.6 0.94 0
+                    diffuseColor 0.98 0.68 0.77
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1448,7 +1448,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.23 0.42 0.9
+                    diffuseColor 0.21 0.6 0.71
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1551,7 +1551,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.88 0.96 0.19
+                    diffuseColor 0.9 0.87 0.79
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1642,7 +1642,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.49 0.12 0.93
+                    diffuseColor 0.8 0.87 0.86
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1700,7 +1700,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.25 0.54 0.48
+                    diffuseColor 0.79 0.13 0.63
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1788,7 +1788,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.51 0.6 0.87
+                    diffuseColor 0.36 0.24 0.09
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1864,7 +1864,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.82 0.24 0.29
+                    diffuseColor 0.28 0.74 0.66
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -1928,7 +1928,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.59 0.02 0.83
+                    diffuseColor 0.59 0.29 0.27
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2001,7 +2001,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.86 0.06 0.37
+                    diffuseColor 0.58 0.6 0.71
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2080,7 +2080,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.67 0.34 0.36
+                    diffuseColor 0.84 0.73 0.35
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2135,7 +2135,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.09 0.46 0.3
+                    diffuseColor 0.29 0.24 0.03
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2214,7 +2214,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.09 0.69 0.25
+                    diffuseColor 0.58 0.45 0.15
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2290,7 +2290,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.51 0.57 0.73
+                    diffuseColor 0.82 0.88 0.03
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2333,7 +2333,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.7 0.58 0.85
+                    diffuseColor 0.61 0.68 0.42
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2409,7 +2409,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.64 0.83 0.39
+                    diffuseColor 0.47 0 0.55
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2449,7 +2449,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.64 0.86 0.52
+                    diffuseColor 0.62 0.36 0.31
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2489,7 +2489,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.03 0.68 0.76
+                    diffuseColor 0.71 0.17 0.58
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2538,7 +2538,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.32 0.27 0.3
+                    diffuseColor 0.38 0.76 0.87
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2614,7 +2614,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.67 0.66 0.37
+                    diffuseColor 0.17 0.34 0.99
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2651,7 +2651,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.04 0.33 0.71
+                    diffuseColor 0.4 0.7 0.72
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2709,7 +2709,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.92 0.94 0.17
+                    diffuseColor 0.27 0.51 0.96
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2794,7 +2794,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.75 0.55 0.38
+                    diffuseColor 0.82 0.1 0.94
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2864,7 +2864,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0 0.07 0.47
+                    diffuseColor 0.98 0.92 0.82
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -2940,7 +2940,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.73 0.77 0.57
+                    diffuseColor 0.47 0.52 0.54
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3013,7 +3013,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.59 0.93 0.92
+                    diffuseColor 0.55 0.14 0.91
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3098,7 +3098,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.5 0.57 0.78
+                    diffuseColor 0.86 0.38 0.6
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3168,7 +3168,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.02 0.6 0.47
+                    diffuseColor 0.44 0.28 0.88
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3232,7 +3232,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.31 0.44 0.26
+                    diffuseColor 0.83 0.45 0.22
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3314,7 +3314,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.61 0.11 0.92
+                    diffuseColor 0.34 0.37 0.44
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3381,7 +3381,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.98 0.68 0.77
+                    diffuseColor 0.07 0.65 0.96
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3430,7 +3430,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.21 0.6 0.71
+                    diffuseColor 0.55 0.47 0.06
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3509,7 +3509,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.9 0.87 0.79
+                    diffuseColor 0.49 0.97 0.5
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3591,7 +3591,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.8 0.87 0.86
+                    diffuseColor 0.83 0.02 0.03
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3634,7 +3634,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.79 0.13 0.63
+                    diffuseColor 0.38 0.5 0.55
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3731,7 +3731,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.36 0.24 0.09
+                    diffuseColor 0.92 0.05 0.21
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3795,7 +3795,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.28 0.74 0.66
+                    diffuseColor 0.35 0.91 0.11
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3844,7 +3844,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.59 0.29 0.27
+                    diffuseColor 0.95 0.88 0.39
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3902,7 +3902,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.58 0.6 0.71
+                    diffuseColor 0.83 0.23 0.36
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -3975,7 +3975,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.84 0.73 0.35
+                    diffuseColor 0.57 0.58 0.26
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4054,7 +4054,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.29 0.24 0.03
+                    diffuseColor 0.02 0.65 0.91
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4142,7 +4142,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.58 0.45 0.15
+                    diffuseColor 0.5 0.2 0.9
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4224,7 +4224,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.82 0.88 0.03
+                    diffuseColor 0.08 0.22 0.88
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4306,7 +4306,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.61 0.68 0.42
+                    diffuseColor 0.58 0.57 0.9
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4361,7 +4361,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.47 0 0.55
+                    diffuseColor 0.61 0.95 0.4
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4398,7 +4398,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.62 0.36 0.31
+                    diffuseColor 0.68 0.4 0.97
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4468,7 +4468,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.71 0.17 0.58
+                    diffuseColor 0.53 0.23 0.29
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4511,7 +4511,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.38 0.76 0.87
+                    diffuseColor 0.44 0.58 0.52
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4563,7 +4563,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.17 0.34 0.99
+                    diffuseColor 0.33 0.16 0.1
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4654,7 +4654,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.4 0.7 0.72
+                    diffuseColor 0.59 0.7 0.27
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4739,7 +4739,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.27 0.51 0.96
+                    diffuseColor 0.5 0.72 0
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4830,7 +4830,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.82 0.1 0.94
+                    diffuseColor 0.4 0.8 0.74
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4894,7 +4894,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.98 0.92 0.82
+                    diffuseColor 0.8 0.38 0.31
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4943,7 +4943,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.47 0.52 0.54
+                    diffuseColor 0.71 0.99 0.79
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -4983,7 +4983,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.55 0.14 0.91
+                    diffuseColor 0.61 0.12 0.46
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -5080,7 +5080,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.86 0.38 0.6
+                    diffuseColor 0.54 0.17 0.69
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -5153,7 +5153,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.44 0.28 0.88
+                    diffuseColor 0.83 0.62 0.28
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
@@ -5241,7 +5241,7 @@ Group {
         Shape {
             appearance Appearance {
                 material Material {
-                    diffuseColor 0.83 0.45 0.22
+                    diffuseColor 0.87 0.95 0.96
                     ambientIntensity 0.4
                     specularColor 0.5 0.5 0.5
                     emissiveColor 0 0 0
