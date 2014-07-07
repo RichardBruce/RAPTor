@@ -52,6 +52,8 @@ clean ::
 	$(RM) libraytracer.so
 	$(RM) libraytracer.so.1
 	$(RM) libraytracer.so.1.0.1
+	$(MAKE) -C unit_tests clean
+	$(MAKE) -C regression_tests clean
 
 spotless ::
 	$(RM) -r build
@@ -62,3 +64,5 @@ spotless ::
 	$(RM) libraytracer.so.1.0.1
 	$(RM) *.tga
 	$(RM) -rf scenes/spd$(SPD_VER)/
+	$(MAKE) -C unit_tests spotless
+	$(MAKE) -C regression_tests spotless

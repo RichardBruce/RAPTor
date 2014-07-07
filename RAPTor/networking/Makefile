@@ -13,3 +13,13 @@ video_receiver : $(CPP_OBJECTS) $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib/libSDL2-2.0.
 clean ::
 	$(RM) -r build
 	$(RM) video_receiver
+	$(MAKE) -C unit_tests clean
+	$(MAKE) -C regression_tests clean
+
+spotless ::
+	$(RM) -r build
+	$(RM) video_receiver
+	$(RM) cppcheck.xml
+	$(RM) lines_of_code
+	$(MAKE) -C unit_tests spotless
+	$(MAKE) -C regression_tests spotless
