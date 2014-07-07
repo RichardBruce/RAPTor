@@ -83,14 +83,24 @@ class simulation_environment
 
         simulation_environment& load_screen(const char *const file)
         {
-            /* Load and draw image */
+            /* Clean old image */
             if (_load_screen != nullptr)
             {
                 SDL_DestroyTexture(_load_screen);
             }
 
-            _load_screen = IMG_LoadTexture(_renderer, file);
-            draw_screen(_renderer, _load_screen);
+            if (_po->render())
+            {
+                /* Load image */
+                _load_screen = IMG_LoadTexture(_renderer, file);
+                if (_load_screen == nullptr)
+                {
+                    BOOST_LOG_TRIVIAL(trace) << "Failed to load image: " << IMG_GetError();
+                }
+
+                /* Render */
+                draw_screen(_renderer, _load_screen);
+            }
 
             return *this;
         }
@@ -99,11 +109,12 @@ class simulation_environment
         int run();
 
         /* Access functions */
-        physics_engine *const   engine()                            { return _pe;                   }
-        fp_t                    time_run()                          { return _time_run;             }
-        int                     number_of_lights()          const   { return _lights.size();        }
-        bool                    screen_initialised()        const   { return _texture != nullptr;   }
-        bool                    font_initialised()          const   { return _font != nullptr;      }
+        physics_engine *const   engine()                            { return _pe;                       }
+        fp_t                    time_run()                          { return _time_run;                 }
+        int                     number_of_lights()          const   { return _lights.size();            }
+        bool                    screen_initialised()        const   { return _texture != nullptr;       }
+        bool                    font_initialised()          const   { return _font != nullptr;          }
+        bool                    load_screen_initialised()   const   { return _load_screen != nullptr;   }
 
         simulation_environment& add_light(const raptor_raytracer::ext_colour_t &rgb, const point_t &at)
         {

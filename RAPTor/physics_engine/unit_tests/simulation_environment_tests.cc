@@ -56,10 +56,12 @@ BOOST_AUTO_TEST_CASE( ctor_test )
     simulation_environment uut(&pe, &po);
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 }
 
 
@@ -69,26 +71,32 @@ BOOST_AUTO_TEST_CASE( add_light_test )
     simulation_environment uut(&pe, &po);
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 
     uut.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 0.0, 1.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
     BOOST_CHECK(uut.number_of_lights() == 1);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 
     uut.add_light(ext_colour_t(125.0, 0.0, 64.0), point_t(-10.0, 0.0, 5.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
     BOOST_CHECK(uut.number_of_lights() == 2);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 }
 
 
@@ -98,26 +106,32 @@ BOOST_AUTO_TEST_CASE( add_object_test )
     simulation_environment uut(&pe, &po);
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 
     uut.add_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, 9.5, 0.0), 10.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 1);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 
     uut.add_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, -9.5, 0.0), 10.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 2);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 }
 
 
@@ -127,26 +141,32 @@ BOOST_AUTO_TEST_CASE( add_moving_object_test )
     simulation_environment uut(&pe, &po);
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 
     uut.add_moving_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, 9.5, 0.0), 10.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 1);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 1);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 1);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 
     uut.add_moving_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, -9.5, 0.0), 10.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 2);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 2);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 2);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 }
 
 
@@ -158,10 +178,12 @@ BOOST_AUTO_TEST_CASE( run_one_frame_no_fps_limit_test )
     uut.add_moving_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, -9.5, 0.0), 10.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 2);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 2);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 2);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 
     po.frames_to_run(1);
     BOOST_CHECK(uut.run() == 0);
@@ -182,10 +204,12 @@ BOOST_AUTO_TEST_CASE( run_one_frame_fps_limit_test )
     simulation_environment uut(&pe, &po);
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 
     po.max_timestep(0.5);
     po.min_timestep(0.5);
@@ -208,10 +232,12 @@ BOOST_AUTO_TEST_CASE( run_multiple_frames_fps_limit_test )
     simulation_environment uut(&pe, &po);
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
-    BOOST_CHECK(uut.number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
     BOOST_CHECK(uut.number_of_lights() == 0);
     BOOST_CHECK(uut.screen_initialised() == false);
     BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
 
     po.max_timestep(0.25);
     po.min_timestep(0.25);
@@ -226,6 +252,25 @@ BOOST_AUTO_TEST_CASE( run_multiple_frames_fps_limit_test )
     po.frames_to_run(2);
     BOOST_CHECK(uut.run() == 0);
     BOOST_CHECK(uut.time_run() == 0.5);
+}
+
+
+/* Test load screen */
+BOOST_AUTO_TEST_CASE (load_screen_test )
+{
+    simulation_environment uut(&pe, &po);
+    BOOST_CHECK(uut.engine() == &pe);
+    BOOST_CHECK(uut.time_run() == 0.0);
+    BOOST_CHECK(uut.engine()->number_of_objects() == 0);
+    BOOST_CHECK(uut.engine()->number_of_moving_objects() == 0);
+    BOOST_CHECK(uut.number_of_lights() == 0);
+    BOOST_CHECK(uut.screen_initialised() == false);
+    BOOST_CHECK(uut.font_initialised() == false);
+    BOOST_CHECK(uut.load_screen_initialised() == false);
+
+    /* Set load screen */
+    uut.load_screen("./load_screen.png");
+    BOOST_CHECK(uut.load_screen_initialised() == false);    /* No renderer so cant load image */
 }
 
 BOOST_AUTO_TEST_SUITE_END()

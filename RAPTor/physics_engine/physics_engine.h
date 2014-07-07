@@ -87,7 +87,16 @@ class physics_engine : private boost::noncopyable
         physics_engine& apply_force(force *const f, const int i)
         {
             /* Only moving objects can have forces applied to them */
-            _moving_objects->at(i)->register_force(f);
+            auto mov_obj_iter = _moving_objects->find(i);
+            if (mov_obj_iter != _moving_objects->end())
+            {
+                mov_obj_iter->second->register_force(f);
+            }
+            else
+            {
+                delete f;
+            }
+
             return *this;
         }
 
@@ -240,7 +249,6 @@ class physics_engine : private boost::noncopyable
             auto mov_obj_iter = _moving_objects->find(i);
             if (mov_obj_iter != _moving_objects->end())
             {
-                delete mov_obj_iter->second;
                 _moving_objects->erase(mov_obj_iter);
             }
 

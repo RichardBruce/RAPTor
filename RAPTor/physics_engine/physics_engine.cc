@@ -280,6 +280,11 @@ bool physics_engine::retest_and_cache(physics_object *const vg_a, physics_object
         }
 
     }
+    else
+    {
+        delete simplex_a;
+        delete simplex_b;
+    }
 
     /* Possible that wasnt anything */
     (*_collision_cache)[vg_a]->void_collision(vg_b);
