@@ -2119,7 +2119,7 @@ camera & camera::write_depth_map(const string &file_name)
 #endif
 
 
-camera & camera::write_tga_file(const string &file_name, unsigned char *o)
+const camera & camera::write_tga_file(const string &file_name, unsigned char *o) const
 {
     /* Open output file */
     ofstream tga_output(file_name.c_str(), ios::out);
@@ -2174,18 +2174,14 @@ camera & camera::write_tga_file(const string &file_name, unsigned char *o)
 }
 
 
-void write_png_file(const string &file_name, unsigned char *png_data, const unsigned int x, const unsigned int y)
+void write_png_file(const std::string &file_name, unsigned char *png_data, const unsigned int x, const unsigned int y)
 {
     /* Open output file */
-    ofstream png_output(file_name.c_str(), ios::out);
     cout << "Writing snapshot taken to " << file_name << endl;
 
     /* Initialise png objects */
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
-    if (png_ptr == nullptr)
-    {
-        assert(!"Error creating png write struct");
-    }
+    assert((png_ptr != nullptr) || !"Error creating png write struct");
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (info_ptr == nullptr)
@@ -2217,11 +2213,11 @@ void write_png_file(const string &file_name, unsigned char *png_data, const unsi
     png_write_info(png_ptr, info_ptr);
 
     png_bytep row_pointers[y];
-    const int row_stride = x * 3;
-    int read_location = x * (y - 1) * 3;
-    for (int k = 0; k < (int)y; k++)
+    const unsigned int row_stride = x * 3;
+    unsigned int read_location = x * (y - 1) * 3;
+    for (unsigned int i = 0; i < y; ++i)
     {
-        row_pointers[k] = &png_data[read_location];
+        row_pointers[i] = &png_data[read_location];
         read_location -= row_stride;
     }
     png_write_image(png_ptr, row_pointers);
@@ -2231,13 +2227,11 @@ void write_png_file(const string &file_name, unsigned char *png_data, const unsi
     png_destroy_write_struct(&png_ptr, &info_ptr);
     fclose(fp);
    
-    png_output.close();
-    
     return;
 }
 
 
-camera & camera::write_png_file(const string &file_name)
+const camera & camera::write_png_file(const string &file_name) const
 {
     /* Convert data to rgb */
     unsigned char * png_data = new unsigned char [this->out_x_res * this->out_y_res * 3];
@@ -2249,8 +2243,86 @@ camera & camera::write_png_file(const string &file_name)
     return *this;
 }
 
+
+void read_png_file(const std::string &file_name, unsigned char *png_data, unsigned int *const x, unsigned int *const y)
+{
+    /* Open output file */
+    cout << "Reading png from " << file_name << endl;
+
+    /* Open file and check it is a png file */
+    FILE *fp;
+    if ((fp = fopen(file_name.c_str(), "rb")) == nullptr)
+    {
+        cout << "Error opening png file " << file_name << " for input" << endl;
+        assert(!"Cannot open file");
+    }
+
+    png_byte header[8];
+    assert((fread(header, 1, 8, fp) == 8) || !"Not enough bytes read for png header");
+    assert(!png_sig_cmp(header, 0, 8) || !"File is not a png file");
+
+    /* Initialise png objects */
+    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    assert((png_ptr != nullptr) || !"Error creating png read struct");
+
+    png_infop info_ptr = png_create_info_struct(png_ptr);
+    if (info_ptr == nullptr)
+    {
+        png_destroy_read_struct(&png_ptr, (png_infopp)nullptr, (png_infopp)nullptr);
+        assert(!"Error creating png info struct");
+    }
+
+    if (setjmp(png_jmpbuf(png_ptr)))
+    {
+        /* If we get here, we had a problem reading the file */
+        png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)nullptr);
+        assert(!"Error setting png error handler");
+    }
+
+    /* Set compression parameters */
+    png_init_io(png_ptr, fp);
+    png_set_sig_bytes(png_ptr, 8);
+
+    /* Decompress */
+    png_read_info(png_ptr, info_ptr);
+
+    /* Read image info */
+    (*x) = png_get_image_width(png_ptr, info_ptr);
+    (*y) = png_get_image_height(png_ptr, info_ptr);
+
+    assert((png_get_color_type(png_ptr, info_ptr) == PNG_COLOR_TYPE_RGB) || !"Unexpected colour type");
+    assert((png_get_bit_depth(png_ptr, info_ptr) == 8) || !"Unexpected bit depth");
+    assert((png_set_interlace_handling(png_ptr) == PNG_INTERLACE_NONE) || !"Unexpected interlace handling");
+    png_read_update_info(png_ptr, info_ptr);
+
+    /* Read data */
+    if (setjmp(png_jmpbuf(png_ptr)))
+    {
+        /* If we get here, we had a problem reading the file */
+        png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)nullptr);
+        assert(!"Error setting png error handler");
+    }
+
+    png_bytep row_pointers[(*y)];
+    const unsigned int row_stride = (*x) * 3;
+    unsigned int write_location = (*x) * ((*y) - 1) * 3;
+    for (unsigned int i = 0; i < (*y); ++i)
+    {
+        row_pointers[i] = &png_data[write_location];
+        write_location -= row_stride;
+    }
+
+    png_read_image(png_ptr, row_pointers);
+
+    /* Clean up */
+    fclose(fp);
+    png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)nullptr);
+
+    return;
+}
+
         
-camera & camera::write_jpeg_file(const string &file_name, const int q, unsigned char *o)
+const camera & camera::write_jpeg_file(const string &file_name, const int q, unsigned char *o) const
 {
     /* q must be in the range 0-100 */
     assert(q >=   0);

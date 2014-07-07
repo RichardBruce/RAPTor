@@ -44,6 +44,7 @@ enum tone_mapping_mode_t { global_contrast = 1, local_histogram      = 2, local_
 
 /* File output functions */
 void write_png_file(const string &file_name, unsigned char *png_data, const unsigned int x, const unsigned int y);
+void read_png_file(const std::string &file_name, unsigned char *png_data, unsigned int *const x, unsigned int *const y);
 
 /* Class representing a camera, shouldn't be copied */
 class camera : private boost::noncopyable
@@ -407,13 +408,13 @@ class camera : private boost::noncopyable
 #endif
 
         /* Write to tga file */
-        camera & write_tga_file(const string &file_name, unsigned char *o = nullptr);
+        const camera & write_tga_file(const string &file_name, unsigned char *o = nullptr) const;
 
         /* Write to png file */
-        camera & write_png_file(const string &file_name);
+        const camera & write_png_file(const string &file_name) const;
 
         /* Write to jpeg file */
-        camera & write_jpeg_file(const string &file_name, const int q, unsigned char *o = nullptr);
+        const camera & write_jpeg_file(const string &file_name, const int q, unsigned char *o = nullptr) const;
 
 
         /* Image colour correction */
