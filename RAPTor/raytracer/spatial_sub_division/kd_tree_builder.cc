@@ -20,7 +20,7 @@ static unsigned depth = 0;
 void divide_kdt_node(voxel *const base, kdt_node *const kdt_subdiv)
 {
     /* Check the tree is not too deep */
-    depth++;
+    ++depth;
     assert(depth < MAX_KDT_STACK_HEIGHT);
     
     /* Divide the node */
@@ -30,7 +30,7 @@ void divide_kdt_node(voxel *const base, kdt_node *const kdt_subdiv)
     if (kdt_subdiv->get_normal() != not_set)
     {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-        ng++;
+        ++ng;
 #endif
         /* If no leaf node was created recurse */
         divide_kdt_node(base,          kdt_subdiv->get_left());
@@ -40,7 +40,7 @@ void divide_kdt_node(voxel *const base, kdt_node *const kdt_subdiv)
     else
     {
         /* Collect stats on the leaf node */
-        ne++;
+        ++ne;
         max_depth    = max(max_depth, depth);
         nee         += kdt_subdiv->is_empty();
         ner          = max(ner, (unsigned)kdt_subdiv->get_size());       
@@ -49,7 +49,7 @@ void divide_kdt_node(voxel *const base, kdt_node *const kdt_subdiv)
 #endif
     
     /* Decrease the depth */
-    depth--;
+    --depth;
     return;
 }
 

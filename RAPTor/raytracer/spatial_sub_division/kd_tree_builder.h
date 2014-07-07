@@ -30,7 +30,7 @@ class kd_tree_build_task : public task
             if (this->k->get_normal() != not_set)
             {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-                ng++;
+                ++ng;
 #endif
                 /* If no leaf node was created recurse */
                 /* Allocate 2 new children */
@@ -48,7 +48,7 @@ class kd_tree_build_task : public task
             else
             {
                 /* Collect stats on the leaf node */
-                ne++;
+                ++ne;
                 max_depth    = max(max_depth, d);
                 nee         += this->k->is_empty();
                 ner          = max(ner, (unsigned)this->k->get_size());       
