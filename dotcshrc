@@ -3,3 +3,4 @@
 # Add the tools to the path
 set path = ( ./tools/ $path )
 setenv RAPTOR_TOOLS $PWD/tools
+setenv RAPTOR_DATA $PWD/data
