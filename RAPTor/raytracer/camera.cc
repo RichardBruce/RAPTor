@@ -2292,7 +2292,7 @@ void read_png_file(const std::string &file_name, unsigned char *png_data, unsign
 
     assert((png_get_color_type(png_ptr, info_ptr) == PNG_COLOR_TYPE_RGB) || !"Unexpected colour type");
     assert((png_get_bit_depth(png_ptr, info_ptr) == 8) || !"Unexpected bit depth");
-    assert((png_set_interlace_handling(png_ptr) == PNG_INTERLACE_NONE) || !"Unexpected interlace handling");
+    assert((png_set_interlace_handling(png_ptr) == 1) || !"Unexpected interlace handling");
     png_read_update_info(png_ptr, info_ptr);
 
     /* Read data */
