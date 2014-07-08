@@ -2,7 +2,7 @@
 include ../Project.mk
 
 # Source
-SOURCE  += convex_decomposition.cc \
+TEST_SOURCE = convex_decomposition.cc \
     teamcity_boost.cc teamcity_messages.cc
 
 include $(RAPTOR_TOOLS)/UnitTest.mk

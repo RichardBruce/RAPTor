@@ -2,7 +2,7 @@
 include ../Project.mk
 
 # Source
-SOURCE  += grid_cell_tests.cc \
+TEST_SOURCE = grid_cell_tests.cc \
 	teamcity_boost.cc teamcity_messages.cc
 
 include $(RAPTOR_TOOLS)/UnitTest.mk

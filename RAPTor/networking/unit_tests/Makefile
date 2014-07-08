@@ -1,7 +1,7 @@
 # Include project info makefile
 include ../Project.mk
 
-SOURCE  += vector_stream_tests.cc msg_header_tests.cc msg_data_tests.cc stack_controller_tests.cc \
+TEST_SOURCE = vector_stream_tests.cc msg_header_tests.cc msg_data_tests.cc stack_controller_tests.cc \
 	fragmenter_tests.cc batcher_tests.cc drop_late_sequencer_tests.cc reorder_sequencer_tests.cc \
 	ack_retransmission_tests.cc nack_retransmission_tests.cc rate_limiter_tests.cc message_delivery_tests.cc \
 	udp_connection_tests.cc tcp_connection_tests.cc group_tests.cc \
