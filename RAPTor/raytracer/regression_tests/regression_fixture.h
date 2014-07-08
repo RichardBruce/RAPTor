@@ -2,11 +2,13 @@
 #define __REGRESSION_FIXTURE_H__
 
 /* Standard headers */
+#include <cstdlib>
 #include <list>
 #include <string>
 #include <vector>
 
 /* Common headers */
+#include "logging.h"
 #include "point_t.h"
 
 /* Boost headers */
@@ -42,13 +44,17 @@ struct regression_fixture : private boost::noncopyable
             const fp_t screen_width     = 10.0;
             const fp_t screen_height    = screen_width * ((fp_t)yr / (fp_t)xr);
 
+            const std::string data_dir(getenv("RAPTOR_DATA"));
+            const std::string input_path(data_dir + input_file);
+            BOOST_LOG_TRIVIAL(trace) << "Opening input file: " << input_path;
+
             int last_slash;
             std::string path;
             std::ifstream input_stream;
             switch (input_format)
             {
                 case cfg :
-                    input_stream.open(input_file.c_str());
+                    input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
                     cfg_parser(input_stream, _lights, _everything, _materials, &_cam);
 
@@ -57,23 +63,23 @@ struct regression_fixture : private boost::noncopyable
                     break;
 
                 case mgf :
-                    mgf_parser(input_file.c_str(), _lights, _everything, _materials);
+                    mgf_parser(input_path.c_str(), _lights, _everything, _materials);
                     
                     /* Camera is not set in the scene so do it here */
                     _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya);
                     break;
 
                 case nff :
-                    input_stream.open(input_file.c_str());
+                    input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
                     nff_parser(input_stream, _lights, _everything, _materials, &_cam);
                     break;
 
                 case lwo :
-                    input_stream.open(input_file.c_str());
+                    input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
-                    last_slash  = input_file.find_last_of('/');
-                    path        = input_file.substr(0, last_slash + 1);
+                    last_slash  = input_path.find_last_of('/');
+                    path        = input_path.substr(0, last_slash + 1);
                     lwo_parser(input_stream, path, _lights, _everything, _materials, &_cam);
 
                     /* Camera is not set in the scene so do it here */
@@ -81,10 +87,10 @@ struct regression_fixture : private boost::noncopyable
                     break;
                     
                 case obj :
-                    input_stream.open(input_file.c_str());
+                    input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
-                    last_slash  = input_file.find_last_of('/');
-                    path        = input_file.substr(0, last_slash + 1);
+                    last_slash  = input_path.find_last_of('/');
+                    path        = input_path.substr(0, last_slash + 1);
                     obj_parser(input_stream, path, _lights, _everything, _materials, &_cam);
                     
                     /* Camera is not set in the scene so do it here */
@@ -92,7 +98,7 @@ struct regression_fixture : private boost::noncopyable
                     break;
 
                 case ply :
-                    input_stream.open(input_file.c_str());
+                    input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
                     ply_parser(input_stream, _lights, _everything, _materials, &_cam);
                     
@@ -106,7 +112,7 @@ struct regression_fixture : private boost::noncopyable
                                              point_t((fp_t)0.0, (fp_t)1.0, (fp_t) 0.0), 
                                              point_t((fp_t)0.0, (fp_t)0.0, (fp_t)-1.0), bg, screen_width, screen_height, 20, xr, yr, xa, ya);
 
-                    input_stream.open(input_file.c_str());
+                    input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
                     vrml_parser(input_stream, _lights, _everything, _materials, _cam, view_point);
                     break;
@@ -115,15 +121,6 @@ struct regression_fixture : private boost::noncopyable
                     assert(false);
                     break;
             }
-
-            /* Assert there must be some lights to light the scene */
-            assert(!_lights.empty());
-
-            /* Assert there must be some materials for the objects */
-            assert(!_materials.empty());
-
-            /* Assert there is an imagine to trace */
-            assert(!_everything.empty());
             
             /* Pan tilt and roll the camera */
             _cam->tilt(rx);
@@ -156,6 +153,16 @@ struct regression_fixture : private boost::noncopyable
 
         regression_fixture& render()
         {
+            /* Assert there must be some lights to light the scene */
+            assert(!_lights.empty());
+
+            /* Assert there must be some materials for the objects */
+            assert(!_materials.empty());
+
+            /* Assert there is an imagine to trace */
+            assert(!_everything.empty());
+
+            /* Render */
             ray_tracer(_lights, _everything, *_cam);
 
             return *this;
