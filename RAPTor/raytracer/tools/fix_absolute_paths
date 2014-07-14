@@ -87,7 +87,10 @@ if ($format =~ m/lwo/)
             $word_of_interest =~ s/.*\\//;
             $word_of_interest =~ s/\s/_/g;
             $word_of_interest =~ s/é/e/g;
-            $word_of_interest = "./" . $word_of_interest;
+            if ($word_of_interest ne "(none)")
+            {
+                $word_of_interest = "./" . $word_of_interest;
+            }
             
             # Null terminate the path and make it an even number of bytes long
             $word_of_interest = $word_of_interest . chr(0);
@@ -109,6 +112,7 @@ if ($format =~ m/lwo/)
             $bytes_out[$surf_size_ptr + 3] = chr( $surf_size        & 0xff);
     
             # Append the new file name
+            print "New TIMG: $word_of_interest\n";
             push @bytes_out, split(//, $word_of_interest);
             $out_index += $length_of_path + 1;
         }
