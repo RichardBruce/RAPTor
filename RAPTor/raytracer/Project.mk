@@ -6,8 +6,8 @@ MAIN    = main.cc raytracer.cc common.cc ray.cc triangle.cc scene.cc sort.cc lin
 SSD	 = kdt_node.cc kd_tree_builder.cc voxel.cc bih_builder.cc
 TEXTURE = phong_shader.cc cook_torrance_cxy.cc mandelbrot_shader.cc \
 	mapper_shader.cc perlin_noise_2d_mapper.cc perlin_noise_3d_mapper.cc planar_mapper.cc \
-	cylindrical_mapper.cc coloured_mapper_shader.cc perlin_noise_3d.cc perlin_noise_2d.cc
-PARSER  = cfg_parser.cc nff_parser.cc mgf_parser.cc lwo_parser.cc obj_parser.cc ply_parser.cc vrml_parser.cc
+	cylindrical_mapper.cc cubic_mapper.cc coloured_mapper_shader.cc perlin_noise_3d.cc perlin_noise_2d.cc
+PARSER  = cfg_parser.cc nff_parser.cc mgf_parser.cc lwo_parser.cc lwo1_parser.cc lwo2_parser.cc obj_parser.cc ply_parser.cc vrml_parser.cc
 MGF	 = parser.c badarg.c lookup.c context.c vect.c words.c fvect.c object.c xf.c
 
 # Includes
