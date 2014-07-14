@@ -5,6 +5,24 @@ namespace raptor_raytracer
 {
 class camera;
 
+/***********************************************************
+  check_for_chunk checks that the pointer a points at the 
+  same chunk name as the pointer e with length l.
+  
+  If the comparison is correct a is updated past the chunk
+  name otherwise the program is aborted through assert()
+************************************************************/
+inline void check_for_chunk(const char **const a, const char *const e, const int l)
+{
+    if (strncmp(*a, e, l) != 0)
+    {
+        BOOST_LOG_TRIVIAL(error) << (*a) << " found where " << e << " chunk expected";
+        assert(false);
+    }
+    (*a) += l;
+}
+
+
 void lwo_parser(
     ifstream            &lwo_file,
     string              &p,
