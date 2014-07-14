@@ -299,11 +299,37 @@ class camera : private boost::noncopyable
             {
                 /* Find the intersection point with the sky box and which plane was hit */
                 point_t p;
-                unsigned int tm_nr = this->sky_box_intersection(r, &p);
+                const unsigned int tm_nr = this->sky_box_intersection(r, &p);
+
+                point_t n;
+                switch(tm_nr)
+                {
+                    case 0 :
+                        n = point_t(1.0, 0.0, 0.0);
+                        break;
+                    case 1 :
+                        n = point_t(0.0, 1.0, 0.0);
+                        break;
+                    case 2 :
+                        n = point_t(0.0, 0.0, 1.0);
+                        break;
+                    case 3 :
+                        n = point_t(-1.0, 0.0, 0.0);
+                        break;
+                    case 4 :
+                        n = point_t(0.0, -1.0, 0.0);
+                        break;
+                    case 5 :
+                        n = point_t(0.0, 0.0, -1.0);
+                        break;
+                    default :
+                        assert(!"Sky box texture mapper out of range");
+                        break;
+                }
                 
                 /* Look up the texture and texture map the pixel */
                 ext_colour_t c;
-                (*this->tm)[tm_nr]->texture_map(p, r.get_dir(), &c, point_t(MAX_DIST, MAX_DIST, MAX_DIST));
+                (*this->tm)[tm_nr]->texture_map(&c, p, n, point_t(MAX_DIST, MAX_DIST, MAX_DIST));
                 return c;
             }
         }
