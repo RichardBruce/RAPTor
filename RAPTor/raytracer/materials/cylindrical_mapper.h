@@ -6,7 +6,10 @@
 
 /* Common headers */
 #include "common.h"
+#include "logging.h"
 #include "point_t.h"
+
+/* Ray tracer headers */
 #include "texture_mapper.h"
 
 
@@ -19,17 +22,19 @@ class cylindrical_mapper : public texture_mapper
         cylindrical_mapper(const char *const filename, const point_t &c, const point_t &n, const point_t &s, const fp_t r) 
             : texture_mapper(), c(c), u(point_t(n.y, n.z, n.x)), v(n), s(s), r(r)
             {
+                METHOD_LOG;
+                
                 /* Decompress the jpeg */
                 this->cpp = read_jpeg(&this->img, filename, &this->h, &this->w);   
                 assert((this->cpp == 1) || (this->cpp == 3));
 
                 /* Find the V vector */
-//                cross_product(n, this->u, &this->v);
-                cout << "u vec : " << this->u.x << ", " << this->u.y << ", " << this->u.z << endl;
-                cout << "v vec : " << this->v.x << ", " << this->v.y << ", " << this->v.z << endl;
-                cout << "size  : " << this->s.x << ", " << this->s.y << ", " << this->s.z << endl;
-                cout << "height: " << this->h << endl;
-                cout << "width : " << this->w << endl;
+                BOOST_LOG_TRIVIAL(trace) << "Loaded cyclindric texture map with parameters: ";
+                BOOST_LOG_TRIVIAL(trace) << "U vec : " << this->u;
+                BOOST_LOG_TRIVIAL(trace) << "V vec : " << this->v;
+                BOOST_LOG_TRIVIAL(trace) << "Size  : " << this->s;
+                BOOST_LOG_TRIVIAL(trace) << "Height: " << this->h;
+                BOOST_LOG_TRIVIAL(trace) << "Width : " << this->w;
             };
 
         cylindrical_mapper(const point_t &c, const point_t &u, const point_t &v, const point_t &s,
@@ -43,7 +48,7 @@ class cylindrical_mapper : public texture_mapper
 
         /* Texture mapping function. Takes the destination and direction 
            of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        fp_t texture_map(const point_t &dst, const point_t &dir, ext_colour_t *const c, const point_t &vt) const;
+        fp_t texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
 
     private :
         friend class boost::serialization::access;

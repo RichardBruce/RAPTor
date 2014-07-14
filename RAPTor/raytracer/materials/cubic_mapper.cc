@@ -1,4 +1,4 @@
-#include "planar_mapper.h"
+#include "cubic_mapper.h"
 
 #include "ext_colour_t.h"
 
@@ -10,7 +10,7 @@ namespace raptor_raytracer
   destination of the ray (query point) and returns the colour
   at the location and an alpha value
 ************************************************************/
-fp_t planar_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const
+fp_t cubic_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const
 {
     fp_t u_co, v_co;
     
@@ -23,44 +23,20 @@ fp_t planar_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const
     /* Calculate the texture address */
     else
     {
-        /* Check the ray came from outside the texture */
-        /* If it didnt the texture is flipped horizontally */
-        point_t flip_u;
-    //    if (dot_product(dst, this->n) > 0.0)
-    //    {
-    ////        cout << "flipping" << endl;
-    //        flip_u = -this->u;
-    //    }
-    //    else
-    //    {
-            flip_u =  this->u;
-    //    }
-        
         /* Find the u,v co-ordinates of the hit */
         /* Offset */
-        point_t dist = dst - this->c;
-    //    cout << "dists: " << dist.x << ", " << dist.y << ", " << dist.z << endl;
-        dist += ((this->s * flip_u) + (this->s * this->v)) * 0.5;
+        const point_t dist((dst - this->c) + (((this->s * this->u) + (this->s * this->v)) * 0.5));
+
+        /* Work out manhattan distances */
+        const fp_t dist_u = dot_product(dist, this->u) + dot_product(dist, this->n);
+        const fp_t dist_v = dot_product(dist, this->v);
         
         /* Scale */
-        u_co = (dot_product(dist, flip_u)) * ((fp_t)this->w / fabs(dot_product(this->s, flip_u)));
-        v_co = (dot_product(dist, this->v)) * ((fp_t)this->h / fabs(dot_product(this->s, this->v)));
+        u_co = dist_u * ((fp_t)this->w / fabs(dot_product(this->s, this->u)));
+        v_co = dist_v * ((fp_t)this->h / fabs(dot_product(this->s, this->v)));
     }
 
-//    if (!(v_co >= 0.0) || !(u_co >= 0.0))
-//    {
-//        cout << "wrap : " << this->uw  << ", " << this->vw << endl;
-//        cout << "u vec: " << flip_u.x << ", " << flip_u.y << ", " << flip_u.z << endl;
-//        cout << "v vec: " << this->v.x << ", " << this->v.y << ", " << this->v.z << endl;
-//        cout << "s vec: " << this->s.x << ", " << this->s.y << ", " << this->s.z << endl;
-//        cout << "dists: " << dist.x << ", " << dist.y << ", " << dist.z << endl;
-//        cout << "co-ords: " << u_co << ", " << v_co << endl;
-//    }
-    
-//    cout << u_co << endl;
-//    assert(u_co >= 0.0);
-//    assert(v_co >= 0.0);
-    
+   
     /* Addresses and weights */
     int u0 = (int)u_co + this->u_off;
     int v0 = (int)v_co + this->v_off;
@@ -70,13 +46,13 @@ fp_t planar_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const
     assert(this->v_max == this->h);
     if(!apply_wrapping_mode(&u0, (int)this->u_max, this->uw))
     {
-        (*c) = ext_colour_t(0.0,0.0,0.0);
+        (*c) = ext_colour_t(0.0, 0.0, 0.0);
         return 1.0;
     }
     
     if(!apply_wrapping_mode(&v0, (int)this->v_max, this->vw))
     {
-        (*c) = ext_colour_t(0.0,0.0,0.0);
+        (*c) = ext_colour_t(0.0, 0.0, 0.0);
         return 1.0;
     }
 

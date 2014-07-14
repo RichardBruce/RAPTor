@@ -30,7 +30,7 @@ class perlin_noise_3d_mapper : public texture_mapper
 
         /* Texture mapping function. Takes the destination and direction 
            of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        fp_t texture_map(const point_t &dst, const point_t &dir, ext_colour_t *const c, const point_t &vt) const;
+        fp_t texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
 
     private :
         friend class boost::serialization::access;
