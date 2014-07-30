@@ -14,7 +14,9 @@
 
 /* Physics headers */
 #include "vertex_group.h"
+#include "object_bound.h"
 #include "force.h"
+#include "integrators.h"
 
 
 namespace raptor_physics
@@ -61,10 +63,23 @@ class physics_object : private boost::noncopyable
               _w(w),
               _v(v),
               _o(o),
-              _cur_t(0),
+              _cur_t(0.0),
+              _t_step(0.0),
               _type(t)
               {
                     _i->move_center_of_mass(com - _i->center_of_mass());
+
+                    /* Build bounds */
+                    point_t hi;
+                    point_t lo;
+                    get_bounds(&hi, &lo);
+
+                    _lower_bound[0] = new object_bound(this, lo.x, true);
+                    _upper_bound[0] = new object_bound(this, hi.x, false);
+                    _lower_bound[1] = new object_bound(this, lo.y, true);
+                    _upper_bound[1] = new object_bound(this, hi.y, false);
+                    _lower_bound[2] = new object_bound(this, lo.z, true);
+                    _upper_bound[2] = new object_bound(this, hi.z, false);
               };
 
         ~physics_object()
@@ -76,7 +91,17 @@ class physics_object : private boost::noncopyable
             }
             delete _forces;
 
+            /* Clean up inertia tensor */
             delete _i;
+
+            /* Clean up bounds */
+            delete _upper_bound[0];
+            delete _upper_bound[1];
+            delete _upper_bound[2];
+
+            delete _lower_bound[0];
+            delete _lower_bound[1];
+            delete _lower_bound[2];
         }
         
         /* Register a force the will be applied for multiple time steps */
@@ -87,9 +112,15 @@ class physics_object : private boost::noncopyable
         }
         
         /* Start a new time step, reset time and apply the forces */
-        physics_object& begin_time_step()
+        physics_object& begin_time_step(const fp_t t_step)
         {
+            /* Set the step times */
             _cur_t  = 0.0;
+            _t_step = t_step;
+
+            /* Update the bounds for the full time step */
+            update_bounds(_t_step);
+
             return *this;
         }
 
@@ -146,7 +177,45 @@ class physics_object : private boost::noncopyable
             }
         }
         
-        physics_object& commit_movement(const fp_t t);
+        physics_object& commit_movement(const fp_t t)
+        {
+            /* Update time */
+            if (t < _cur_t)
+            {
+                return *this;
+            }
+            const fp_t dt = t - _cur_t;
+            _cur_t = t;
+
+            /* Rotate */
+            point_t vel;
+            rk4_integrator integ;
+            _o += integ.project_rotation(_agg_force, *_i, &vel, _o, _w, dt);
+            _w = vel;
+            normalise(&_o);
+
+            /* Translate */
+            _i->move_center_of_mass(integ.project_translation(_agg_force, *_i, &vel, _v, dt));
+            _v = vel;
+
+            /* Update bounds for the remainder of the time step */
+            update_bounds(_t_step - _cur_t);
+
+            /* Derement forces */
+            for (auto& f : (*_forces))
+            {
+                if (f->commit(dt))
+                {
+                    delete f;
+                    f = nullptr;
+                }
+            }
+            
+            /* Remove spent forces */
+            _forces->erase(std::remove(_forces->begin(), _forces->end(), nullptr), _forces->end());
+            
+            return *this;
+        }
 
         const physics_object& triangles(primitive_list *p) const
         {
@@ -235,8 +304,68 @@ class physics_object : private boost::noncopyable
             _w = w;
             return *this;
         }
-        
+
+        /* Bounds access */
+        object_bound *upper_bound(const axis_t axis) const
+        {
+            return _upper_bound[axis];
+        }
+
+        object_bound *lower_bound(const axis_t axis) const
+        {
+            return _lower_bound[axis];
+        }
+
     private :
+        /* Bounding box */
+        const physics_object& get_bounds(point_t *const hi, point_t *const lo) const
+        {
+            /* Get the bounds of the vertex group */
+            point_t local_hi;
+            point_t local_lo;
+            _vg->get_bounds(&local_hi, &local_lo);
+
+            /* Move bounds into global co-ordinates, an OOB */
+            const point_t p0(_o.rotate(local_lo) + _i->center_of_mass());
+            const point_t p1(_o.rotate(point_t(local_lo.x, local_lo.y, local_hi.x)) + _i->center_of_mass());
+            const point_t p2(_o.rotate(point_t(local_lo.x, local_hi.y, local_lo.x)) + _i->center_of_mass());
+            const point_t p3(_o.rotate(point_t(local_lo.x, local_hi.y, local_hi.x)) + _i->center_of_mass());
+            const point_t p4(_o.rotate(point_t(local_hi.x, local_lo.y, local_lo.x)) + _i->center_of_mass());
+            const point_t p5(_o.rotate(point_t(local_hi.x, local_lo.y, local_hi.x)) + _i->center_of_mass());
+            const point_t p6(_o.rotate(point_t(local_hi.x, local_hi.y, local_lo.x)) + _i->center_of_mass());
+            const point_t p7(_o.rotate(local_hi) + _i->center_of_mass());
+
+            /* Find the axis aligned bounds of the OOB */
+            (*hi) = max(max(max(p0, p1), max(p2, p3)), max(max(p4, p5), max(p6, p7))) + WELD_DISTANCE;
+            (*lo) = min(min(min(p0, p1), min(p2, p3)), min(min(p4, p5), min(p6, p7))) - WELD_DISTANCE;
+
+            return *this;
+        }
+
+        /* Update of bounding box */
+        physics_object& update_bounds(const fp_t dt)
+        {
+            /* Get the bounds of the stationary object */
+            point_t hi;
+            point_t lo;
+            get_bounds(&hi, &lo);
+
+            /* Get the translation of the object */
+            point_t vel;
+            rk4_integrator integ;
+            const point_t trans(integ.project_translation(_agg_force, *_i, &vel, _v, dt));
+
+            /* Set bounds to current position plus any translation */
+            _lower_bound[0]->bound(lo.x + std::min(trans.x, 0.0f));
+            _upper_bound[0]->bound(hi.x + std::max(trans.x, 0.0f));
+            _lower_bound[1]->bound(lo.y + std::min(trans.y, 0.0f));
+            _upper_bound[1]->bound(hi.y + std::max(trans.y, 0.0f));
+            _lower_bound[2]->bound(lo.z + std::min(trans.z, 0.0f));
+            _upper_bound[2]->bound(hi.z + std::max(trans.z, 0.0f));
+
+            return *this;
+        }
+        
         /* Find the projection of the largest rotational movement in the direction n */
         fp_t project_maximum_rotation_onto(const point_t &n, const point_t &p, const fp_t t) const;
 
@@ -258,12 +387,15 @@ class physics_object : private boost::noncopyable
         std::shared_ptr<vertex_group>   _vg;
         std::vector<force *>   *        _forces;
         aggregate_force                 _agg_force;
-        inertia_tensor      *const      _i;     /* The moment of inertia                                        */
-        point_t                         _w;     /* Angular velocity                                             */
-        point_t                         _v;     /* Velocity                                                     */
-        quaternion_t                    _o;     /* Orientation                                                  */
-        fp_t                            _cur_t; /* The committed time                                           */
-        const unsigned int              _type;  /* The type of the material to associate it with a collider     */
+        inertia_tensor      *const      _i;                 /* The moment of inertia                                        */
+        object_bound *                  _upper_bound[3];    /* The upper bound of the object in this time step              */
+        object_bound *                  _lower_bound[3];    /* The lower bound of the object in this time step              */
+        point_t                         _w;                 /* Angular velocity                                             */
+        point_t                         _v;                 /* Velocity                                                     */
+        quaternion_t                    _o;                 /* Orientation                                                  */
+        fp_t                            _cur_t;             /* The committed time                                           */
+        fp_t                            _t_step;            /* The time we are simulating to                                */
+        const unsigned int              _type;              /* The type of the material to associate it with a collider     */
 };
 }; /* namespace raptor_physics */
 

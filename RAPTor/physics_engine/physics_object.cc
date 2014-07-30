@@ -7,7 +7,6 @@
 /* Physics headers */
 #include "physics_common.h"
 #include "physics_object.h"
-#include "integrators.h"
 #include "gjk.h"
 
 /* Shared headers */
@@ -414,44 +413,6 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
         BOOST_LOG_TRIVIAL(trace) << "No collision";
         return NO_COLLISION;
     }
-}
-
-
-physics_object& physics_object::commit_movement(const fp_t t)
-{
-    /* Update time */
-    if (t < _cur_t)
-    {
-        return *this;
-    }
-    const fp_t dt = t - _cur_t;
-    _cur_t = t;
-
-    /* Rotate */
-    point_t vel;
-    rk4_integrator integ;
-    _o += integ.project_rotation(_agg_force, *_i, &vel, _o, _w, dt);
-    _w = vel;
-    normalise(&_o);
-
-    /* Translate */
-    _i->move_center_of_mass(integ.project_translation(_agg_force, *_i, &vel, _v, dt));
-    _v = vel;
-
-    /* Derement forces */
-    for (auto& f : (*_forces))
-    {
-        if (f->commit(dt))
-        {
-            delete f;
-            f = nullptr;
-        }
-    }
-    
-    /* Remove spent forces */
-    _forces->erase(std::remove(_forces->begin(), _forces->end(), nullptr), _forces->end());
-    
-    return *this;
 }
 
 
