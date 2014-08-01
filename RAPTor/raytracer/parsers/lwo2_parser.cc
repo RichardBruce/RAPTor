@@ -16,6 +16,21 @@ namespace raptor_raytracer
 enum mapper_type_t { non = 0, f_noise = 1, planar = 2, cubic = 3, spherical = 4, cylindrical = 5 };
 enum mapper_of_t   { map_btex = 0, map_ctex = 1, map_dtex = 2, map_ltex = 3, map_stex = 4, map_rtex = 5, map_ttex = 6 };
 
+
+std::uint32_t parse_vx(const char **at)
+{
+    std::uint32_t idx = from_byte_stream<std::uint16_t>(at);
+    if ((idx & 0xff00) == 0xff00)
+    {
+        idx &= 0x00ff;
+        idx <<= 16;
+        idx += from_byte_stream<std::uint16_t>(at);
+    }
+
+    return idx;
+}
+
+
 struct texture_info_t
 {
     void reset(const mapper_of_t m, const mapper_type_t s)
@@ -25,7 +40,7 @@ struct texture_info_t
         shader          = s;
         map_of          = m;
         twrp_mode_x     = (texture_wrapping_mode_t)2;
-        twrp_mode_y     = (texture_wrapping_mode_t)2;    
+        twrp_mode_y     = (texture_wrapping_mode_t)2;
     }
     
     void add_shader_to(list<texture_mapper *>  *const t)
@@ -113,70 +128,314 @@ struct texture_info_t
     texture_wrapping_mode_t twrp_mode_y;
 };
 
-
-/***********************************************************
-  find_surf_chunk will move s to point to the first byte of 
-  the SURF chunk (the MSB of the size of the SURF chunk).
-  The number of surfaces will also be returned.
-  
-  l is the number of bytes in the SRFS chunk. s is a pointer
-  to move the the start of the SURF chunk and p is a pointer
-  to the input file.
-************************************************************/
-inline std::uint32_t find_surf_chunk(const char *p, const char **s, std::uint32_t l)
+struct image_info_t
 {
-    /* Parse through the SRFS chunk counting the number of SRFS */
-    std::uint32_t num_of_surfs = 0;
-    for (std::uint32_t i = 0; i < l; i++)
+};
+
+
+inline static mapper_type_t pick_shader(const std::uint16_t m)
+{
+    switch (m)
     {
-        if ((*p == 0x00) && ((i & 0x1) == 1))
-        {
-            num_of_surfs++;
-        }
-        p++;
+        case 0 : 
+            return planar;
+        case 1 : 
+            return cylindrical;
+        // case 2 : - Spherical
+        case 3 : 
+            return cubic;
+        // case 4 :- Front Projection
+        // case 5 : - UV
+        default :
+            BOOST_LOG_TRIVIAL(error) << "Unknown texture: " << m;
+            assert(false);
     }
-    
-    /* Check p points where it should */
-    check_for_chunk(&p, "POLS", 4);
-    
-    /* Skip the POLS chunk */
-    std::uint32_t tmp = from_byte_stream<std::uint32_t>(&p);
-    (*s) = p + tmp;
-    
-    /* Check the SURF chunk has been found */
-    check_for_chunk(s, "SURF", 4);
-    
-    return num_of_surfs;
 }
 
 
-inline mapper_type_t pick_shader(const char *const c)
+inline static mapper_type_t pick_procedural_shader(const char *const c)
 {
     if (strcmp(c, "Fractal Noise") == 0)
     {
         return f_noise;
     }
-    else if (strcmp(c, "Planar Image Map") == 0)
-    {
-        return planar;
-    }
-    else if (strcmp(c, "Cubic Image Map") == 0)
-    {
-        return cubic;
-    }
-    else if (strcmp(c, "Cylindrical Image Map") == 0)
-    {
-        return cylindrical;
-    }
     else
     {
-        BOOST_LOG_TRIVIAL(error) << "Unknown texture: " << c;
+        BOOST_LOG_TRIVIAL(error) << "Unknown procedural shader: " << c;
         assert(false);
     }
 }
 
 
-inline void parse_surf(material **m, const string &p, const char **ptr, const std::uint32_t surf_len)
+inline static mapper_of_t pick_channel(const char *const c)
+{
+    if (strncmp(c, "COLR", 4) == 0)
+    {
+        return map_ctex;
+    }
+    else if (strncmp(c, "DIFF", 4) == 0)
+    {
+        return map_dtex;
+    }
+    else if (strncmp(c, "LUMI", 4) == 0)
+    {
+        return map_ltex;
+    }
+    else if (strncmp(c, "SPEC", 4) == 0)
+    {
+        return map_stex;
+    }
+    else if (strncmp(c, "REFL", 4) == 0)
+    {
+        return map_rtex;
+    }
+    else if (strncmp(c, "TRAN", 4) == 0)
+    {
+        return map_ttex;
+    }
+    else if (strncmp(c, "BUMP", 4) == 0)
+    {
+        return map_btex;
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(error) << "Unknown channel: " << c;
+        assert(false);
+    }
+}
+
+
+inline static texture_wrapping_mode_t get_wrapping_mode(const std::uint16_t m)
+{
+    switch (m)
+    {
+        case 0 : 
+            return blank;
+        case 1 : 
+            return tile;
+        case 2 :
+            return mirror;
+        case 3 : 
+            return clamp;
+        default :
+            BOOST_LOG_TRIVIAL(error) << "Unknown wrapping mode: " << m;
+            assert(false);
+    }
+}
+
+
+inline void parse_tmap(texture_info_t *current_info, const char **ptr, const std::uint32_t tmap_len)
+{
+    std::uint32_t i = 0;
+    while (i < tmap_len)
+    {
+        const char *tmp_ptr = (*ptr) + 4;
+        const std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
+        BOOST_LOG_TRIVIAL(trace) << "Parsing: " << *ptr << " with length " << sec_len;
+
+        /* Texture center */
+        if (strncmp((*ptr), "CNTR", 4) == 0)
+        {
+            current_info->tctr.x = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info->tctr.y = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info->tctr.z = from_byte_stream<fp_t>(&tmp_ptr);
+            
+            BOOST_LOG_TRIVIAL(trace) << "CNTR:" << current_info->tctr;
+        }
+        /* Texture size */
+        else if (strncmp((*ptr), "SIZE", 4) == 0)
+        {
+            current_info->tsiz.x = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info->tsiz.y = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info->tsiz.z = from_byte_stream<fp_t>(&tmp_ptr);
+            
+            BOOST_LOG_TRIVIAL(trace) << "SIZE: "<< current_info->tsiz;
+        }
+        else if (strncmp((*ptr), "ROTA", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "ROTA (not handled)";
+        }
+        else if (strncmp((*ptr), "FALL", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "FALL (not handled)";
+        }
+        else if (strncmp((*ptr), "OREF", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "OREF (not handled)";
+        }
+        else if (strncmp((*ptr), "CSYS", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "CSYS (not handled)";
+        }
+        /* Catch unknown entities */
+        else
+        {
+            BOOST_LOG_TRIVIAL(error) << "Unknown entity: "<< *ptr << " found in TMAP sub-chunk";
+            assert(false);
+        }
+
+        (*ptr) += sec_len + 6;
+        i += sec_len + 6;
+    }
+}
+
+
+inline void parse_header(texture_info_t *current_info, const char **ptr, const std::uint32_t header_len)
+{
+    std::uint32_t ord_len = strlen(*ptr) + 1;
+    ord_len += (ord_len & 0x1);
+
+    (*ptr) += ord_len;
+    std::uint32_t i = 0;
+    while (i < header_len)
+    {
+        const char *tmp_ptr = (*ptr) + 4;
+        const std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
+        BOOST_LOG_TRIVIAL(trace) << "Parsing: " << *ptr << " with length " << sec_len;
+
+        /* The mapped channel */
+        if (strncmp((*ptr), "CHAN", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "CHAN: " << tmp_ptr;
+            current_info->map_of = pick_channel(tmp_ptr);
+        }
+        else if (strncmp((*ptr), "OPAC", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "OPAC (not handled)";
+        }
+        else if (strncmp((*ptr), "ENAB", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "ENAB (not handled)";
+        }
+        else if (strncmp((*ptr), "NEGA", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "NEGA (not handled)";
+        }
+        // else if (strncmp((*ptr), "AXIS", 4) == 0)
+        // {
+        //     BOOST_LOG_TRIVIAL(trace) << "AXIS";
+        // }
+        /* Catch unknown entities */
+        else
+        {
+            BOOST_LOG_TRIVIAL(error) << "Unknown entity: "<< *ptr << " found in IMAP sub-chunk";
+            assert(false);
+        }
+
+        (*ptr) += sec_len + 6;
+        i += sec_len + 6;
+    }
+}
+
+
+inline void parse_blok(texture_info_t *current_info, const std::map<std::uint32_t, std::string> &clips, const char **ptr, const std::uint32_t blok_len)
+{
+    std::uint32_t i = 0;
+    current_info->shader = non;
+    while (i < blok_len)
+    {
+        const char *tmp_ptr = (*ptr) + 4;
+        const std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
+        BOOST_LOG_TRIVIAL(trace) << "Parsing: " << *ptr << " with length " << sec_len;
+
+        /* Image map */
+        if (strncmp((*ptr), "IMAP", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "IMAP";
+            parse_header(current_info, &tmp_ptr, sec_len - 2);
+        }
+        /* Procedural image mapping info */
+        else if (strncmp((*ptr), "PROC", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "PROC";
+            parse_header(current_info, &tmp_ptr, sec_len - 2);
+        }
+        /* Texture mapping info */
+        else if (strncmp((*ptr), "TMAP", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "TMAP";
+            parse_tmap(current_info, &tmp_ptr, sec_len - 2);
+        }
+        else if (strncmp((*ptr), "PROJ", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "PROJ";
+            current_info->shader = pick_shader(from_byte_stream<std::uint16_t>(&tmp_ptr));
+        }
+        /* Texture axis */
+        else if (strncmp((*ptr), "AXIS", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "AXIS";
+            
+            /* Get the normal */
+            const std::uint16_t tflg = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            current_info->tnorm.x = (fp_t)((tflg     ) & 0x1);
+            current_info->tnorm.y = (fp_t)((tflg >> 1) & 0x1);
+            current_info->tnorm.z = (fp_t)((tflg >> 2) & 0x1);
+        }
+        /* Texture wrapping options */
+        else if (strncmp((*ptr), "WRAP", 4) == 0)
+        {
+            current_info->twrp_mode_x = get_wrapping_mode(from_byte_stream<std::uint16_t>(&tmp_ptr));
+            current_info->twrp_mode_y = get_wrapping_mode(from_byte_stream<std::uint16_t>(&tmp_ptr));
+            BOOST_LOG_TRIVIAL(trace) << "WRAP: " << current_info->twrp_mode_x << ", " << current_info->twrp_mode_y;
+        }
+        /* Image index */
+        else if (strncmp((*ptr), "IMAG", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "IMAG";
+            std::uint32_t idx = parse_vx(&tmp_ptr);
+            current_info->filename = clips.at(idx);
+        }
+        /* Procedural shader function */
+        else if (strncmp((*ptr), "FUNC", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "FUNC: " << tmp_ptr;
+            current_info->shader = pick_procedural_shader(tmp_ptr);
+        }
+        else if (strncmp((*ptr), "WRPW", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "WRPW (not handled)";
+        }
+        else if (strncmp((*ptr), "WRPH", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "WRPH (not handled)";
+        }
+        else if (strncmp((*ptr), "AAST", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "AAST (not handled)";
+        }
+        else if (strncmp((*ptr), "PIXB", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "PIXB (not handled)";
+        }
+        else if (strncmp((*ptr), "VALU", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "VALU (not handled)";
+        }
+        // else if (strncmp((*ptr), "STCK", 4) == 0)
+        // {
+        //     BOOST_LOG_TRIVIAL(trace) << "STCK";
+        // }
+        else if (strncmp((*ptr), "TAMP", 4) == 0)
+        {
+            BOOST_LOG_TRIVIAL(trace) << "TAMP (not handled)";
+        }
+        /* Catch unknown entities */
+        else
+        {
+            BOOST_LOG_TRIVIAL(error) << "Unknown entity: "<< *ptr << " found in BLOK sub-chunk";
+            assert(false);
+        }
+
+        (*ptr) += sec_len + 6;
+        i += sec_len + 6;
+    }
+
+    current_info->add_shader();
+}
+
+
+inline static void parse_surf(material **m, const std::map<std::uint32_t, std::string> &clips, const char **ptr, const std::uint32_t surf_len)
 {
     /* Variable to hold all the parameters */
     texture_info_t  current_info;
@@ -187,112 +446,50 @@ inline void parse_surf(material **m, const string &p, const char **ptr, const st
     fp_t            vt  = 0.0;
     fp_t            ri  = 0.0;
     fp_t            vr  = 0.0;
-    const char      *tmp_ptr;
     std::uint32_t   i   = 0;
-    std::uint16_t   short_tmp;
     
-    current_info.shader = non;
-
     while (i < surf_len)
     {
-        tmp_ptr = (*ptr) + 4;
-        std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
+        const char *tmp_ptr = (*ptr) + 4;
+        const std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
         BOOST_LOG_TRIVIAL(trace) << "Parsing: " << *ptr << " with length " << sec_len;
-        
-        if ((current_info.shader != non) && (strncmp((*ptr + 1), "TEX", 3) == 0))
-        {
-            current_info.add_shader();
-        }
         
         /* Base image colour */
         if (strncmp((*ptr), "COLR", 4) == 0)
         {
-            rgb.r = static_cast<fp_t>(static_cast<std::uint8_t>(tmp_ptr[0]));
-            rgb.g = static_cast<fp_t>(static_cast<std::uint8_t>(tmp_ptr[1]));
-            rgb.b = static_cast<fp_t>(static_cast<std::uint8_t>(tmp_ptr[2]));
-            tmp_ptr += 4;
+            rgb.r = from_byte_stream<fp_t>(&tmp_ptr) * 255.0;
+            rgb.g = from_byte_stream<fp_t>(&tmp_ptr) * 255.0;
+            rgb.b = from_byte_stream<fp_t>(&tmp_ptr) * 255.0;
             BOOST_LOG_TRIVIAL(trace) << "COLR: "<< rgb.r << ", " << rgb.g << ", " << rgb.b;
         }
-        /* Integer percentage diffuse co-efficient */
+        /* Floating point percentage diffuse co-efficient */
         else if (strncmp((*ptr), "DIFF", 4) == 0)
         {
-            if (vkd == 0.0)
-            {
-                vkd = (fp_t)from_byte_stream<std::uint16_t>(&tmp_ptr) / 255.0;
-            }
+            vkd = from_byte_stream<fp_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "DIFF: " << vkd;
         }
-        /* Floating point percentage diffuse co-efficient */
-        /* Takes precidence over the interge version */
-        else if (strncmp((*ptr), "VDIF", 4) == 0)
-        {
-            vkd = from_byte_stream<fp_t>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(trace) << "VDIF: " << vkd;
-        }
-        /* Integer percentage specular co-efficient */
+        /* Floating point percentage specular co-efficient */
         else if (strncmp((*ptr), "SPEC", 4) == 0)
         {
-            if (vks == 0.0)
-            {
-                vks = from_byte_stream<fp_t>(&tmp_ptr) / 255.0;
-            }
-            else
-            {
-                tmp_ptr += 4;
-            }
+            vks = from_byte_stream<fp_t>(&tmp_ptr) / 255.0;
             BOOST_LOG_TRIVIAL(trace) << "SPEC: " << vks;
-        }
-        /* Floating point percentage specular co-efficient. */
-        /* Takes precidence over the interge version */
-        else if (strncmp((*ptr), "VSPC", 4) == 0)
-        {
-            vks = from_byte_stream<fp_t>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(trace) << "VSPC: " << vks;
         }
         else if (strncmp((*ptr), "GLOS", 4) == 0)
         {
-            s = (fp_t)from_byte_stream<std::uint16_t>(&tmp_ptr);
+            s = from_byte_stream<fp_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "GLOS: " << s;
         }
-        /* Integer percentage transmittance co-efficient */
+        /* Floating point percentage transmittance co-efficient. */
         else if (strncmp((*ptr), "TRAN", 4) == 0)
         {
-            if (vt == 0.0)
-            {
-                vt = (fp_t)from_byte_stream<std::uint16_t>(&tmp_ptr) / 255.0;
-            }
-            else
-            {
-                tmp_ptr += 4;
-            }
+            vt = from_byte_stream<fp_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TRAN: " << vt;
         }
-        /* Floating point percentage transmittance co-efficient. */
-        /* Takes precidence over the interge version */
-        else if (strncmp((*ptr), "VTRN", 4) == 0)
-        {
-            vt = from_byte_stream<fp_t>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(trace) << "VTRN: " << vt;
-        }
-        /* Integer percentage reflectance co-efficient */
+        /* Floating point percentage reflectance co-efficient. */
         else if (strncmp((*ptr), "REFL", 4) == 0)
         {
-            if (vr == 0.0)
-            {
-                vr = (fp_t)from_byte_stream<std::uint16_t>(&tmp_ptr)/255.0;
-            }
-            else
-            {
-                tmp_ptr += 4;
-            }
-            BOOST_LOG_TRIVIAL(trace) << "REFL: " << vr;
-        }
-        /* Floating point percentage reflectance co-efficient. */
-        /* Takes precidence over the interge version */
-        else if (strncmp((*ptr), "VRFL", 4) == 0)
-        {
             vr = from_byte_stream<fp_t>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(trace) << "VRFL: " << vr;
+            BOOST_LOG_TRIVIAL(trace) << "REFL: " << vr;
         }
         /* Refractive index */
         else if (strncmp((*ptr), "RIND", 4) == 0)
@@ -300,85 +497,41 @@ inline void parse_surf(material **m, const string &p, const char **ptr, const st
             ri = from_byte_stream<fp_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "RIND: " << ri;
         }
-        /* Integer percentage luminance co-efficient */
+        /* Floating point percentage luminance co-efficient */
         else if (strncmp((*ptr), "LUMI", 4) == 0)
         {
             tmp_ptr += 4;
             BOOST_LOG_TRIVIAL(trace) << "LUMI (not handled)";
         }
-        else if (strncmp((*ptr), "TFLG", 4) == 0)
+        /* Texture mapper or shader block */
+        else if (strncmp((*ptr), "BLOK", 4) == 0)
         {
-            /* Texture flags */
-            short_tmp = from_byte_stream<std::uint16_t>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(trace) << "TFLG (not handled fully): " << short_tmp;
-            
-            /* Get the normal */
-            current_info.tnorm.x = (fp_t)((short_tmp     ) & 0x1);
-            current_info.tnorm.y = (fp_t)((short_tmp >> 1) & 0x1);
-            current_info.tnorm.z = (fp_t)((short_tmp >> 2) & 0x1);
+            BOOST_LOG_TRIVIAL(trace) << "BLOK";
+            parse_blok(&current_info, clips, &tmp_ptr, sec_len);
         }
-        else if (strncmp((*ptr), "TSIZ", 4) == 0)
+        else if (strncmp((*ptr), "CLRH", 4) == 0)
         {
-            /* Texture size */
-            current_info.tsiz.x = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info.tsiz.y = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info.tsiz.z = from_byte_stream<fp_t>(&tmp_ptr);
-            
-            BOOST_LOG_TRIVIAL(trace) << "TSIZ: "<< current_info.tsiz;
+            /* The blending of specular highlight colour between the object and lights colour */
+            tmp_ptr += 4;
+            BOOST_LOG_TRIVIAL(trace) << "LUMI (not handled)";
         }
-        /* Texture colour */
-        else if (strncmp((*ptr), "TCLR", 4) == 0)
+        else if (strncmp((*ptr), "TRNL", 4) == 0)
         {
-            current_info.trgb.r = (fp_t)(*ptr)[6];
-            current_info.trgb.g = (fp_t)(*ptr)[7];
-            current_info.trgb.b = (fp_t)(*ptr)[8];
-            BOOST_LOG_TRIVIAL(trace) << "TCLR: "<< current_info.trgb.r << ", " << current_info.trgb.g << ", " << current_info.trgb.b;
+            /* Translucency */
+            tmp_ptr += 4;
+            BOOST_LOG_TRIVIAL(trace) << "TRNL (not handled)";
         }
-        /* Integer texture parameter 0 */
-        else if (strncmp((*ptr), "TIP0", 4) == 0)
-        {
-            current_info.tip = from_byte_stream<std::uint16_t>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(trace) << "TIP0: " << current_info.tip;
-        }
-        /* Floating point texture parameter 0 */
-        else if (strncmp((*ptr), "TFP0", 4) == 0)
-        {
-            current_info.tfp[0] = from_byte_stream<fp_t>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(trace) << "TFP0: " << current_info.tfp[0];
-        }
-        /* Floating point texture parameter 1 */
-        else if (strncmp((*ptr), "TFP1", 4) == 0)
-        {
-            current_info.tfp[1] = from_byte_stream<fp_t>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(trace) << "TFP1: " << current_info.tfp[1];
-        }
-        /* Texture image name */
         else if (strncmp((*ptr), "TIMG", 4) == 0)
         {
-            BOOST_LOG_TRIVIAL(trace) << "TIMG: " << tmp_ptr;
-            if (strncmp(tmp_ptr, "(none)", 6) != 0)
-            {
-                current_info.filename = p + tmp_ptr;
-            }
-            std::uint32_t timg_len = strlen(tmp_ptr) + 1;
-            timg_len += timg_len & 0x1;
-            tmp_ptr += timg_len;
+            /* Transparency image name */
+            BOOST_LOG_TRIVIAL(trace) << "TIMG: (not handled)";
+            std::uint32_t idx = parse_vx(&tmp_ptr);
         }
-        else if (strncmp((*ptr), "TWRP", 4) == 0)
+        else if (strncmp((*ptr), "RIMG", 4) == 0)
         {
-            /* Texture wrapping options */
-            current_info.twrp_mode_x = (texture_wrapping_mode_t)from_byte_stream<std::uint16_t>(&tmp_ptr);
-            current_info.twrp_mode_y = (texture_wrapping_mode_t)from_byte_stream<std::uint16_t>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(trace) << "TWRP: " << current_info.twrp_mode_x << ", " << current_info.twrp_mode_y;
-        }
-        /* Texture center */
-        else if (strncmp((*ptr), "TCTR", 4) == 0)
-        {
-            current_info.tctr.x = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info.tctr.y = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info.tctr.z = from_byte_stream<fp_t>(&tmp_ptr);
-            
-            BOOST_LOG_TRIVIAL(trace) << "TCTR: "<< current_info.tctr;
+            /* Reflection image name */
+            BOOST_LOG_TRIVIAL(trace) << "RIMG: (not handled)";
+            std::uint32_t idx = parse_vx(&tmp_ptr);
         }
         else if (strncmp((*ptr), "TAMP", 4) == 0)
         {
@@ -392,6 +545,30 @@ inline void parse_surf(material **m, const string &p, const char **ptr, const st
             tmp_ptr += 4;
             BOOST_LOG_TRIVIAL(trace) << "SMAN (not handled)";
         }
+        else if (strncmp((*ptr), "BUMP", 4) == 0)
+        {
+            /* Bump height scaling */
+            tmp_ptr += 4;
+            BOOST_LOG_TRIVIAL(trace) << "BUMP (not handled)";
+        }
+        else if (strncmp((*ptr), "SIDE", 4) == 0)
+        {
+            /* Sidedness */
+            tmp_ptr += 2;
+            BOOST_LOG_TRIVIAL(trace) << "SIDE (not handled)";
+        }
+        else if (strncmp((*ptr), "RFOP", 4) == 0)
+        {
+            /* Reflection options, ignored because we always just raytrace */
+            tmp_ptr += 2;
+            BOOST_LOG_TRIVIAL(trace) << "RFOP (ignored)";
+        }
+        else if (strncmp((*ptr), "TROP", 4) == 0)
+        {
+            /* Transparency options, ignored because we always just raytrace */
+            tmp_ptr += 2;
+            BOOST_LOG_TRIVIAL(trace) << "TROP (ignored)";
+        }
         /* Catch unknown entities */
         else
         {
@@ -400,17 +577,17 @@ inline void parse_surf(material **m, const string &p, const char **ptr, const st
         }
 
         /* Envelop */
-        const std::uint16_t envelop_id = from_byte_stream<std::uint16_t>(&tmp_ptr);
-        assert(envelop_id == 0);   /* The envelop must be null */
+        if ((strncmp((*ptr), "SMAN", 4) != 0) && (strncmp((*ptr), "RFOP", 4) != 0) && (strncmp((*ptr), "TROP", 4) != 0) && (strncmp((*ptr), "SIDE", 4) != 0) &&
+            (strncmp((*ptr), "BLOK", 4) != 0) && (strncmp((*ptr), "RIMG", 4) != 0) && (strncmp((*ptr), "TIMG", 4) != 0))
+        {
+            const std::uint16_t envelop_id = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            BOOST_LOG_TRIVIAL(trace) << "Envelop: " << envelop_id;
+            assert(envelop_id == 0);   /* The envelop must be null */
+        }
 
         (*ptr) += sec_len + 6;
         i += sec_len + 6;
         
-    }
-
-    if (current_info.shader != non)
-    {
-        current_info.add_shader();
     }
 
     /* Create the new material and return */
@@ -434,13 +611,19 @@ void parse_surf(list<material *> &m, const std::string &p, const std::map<std::s
     const std::uint32_t ptag_len = from_byte_stream<std::uint32_t>(&at);
     at += ptag_len;
 
-    /* Check for CLIP chunks */
+    /* Parse CLIP chunks */
+    std::map<std::uint32_t, std::string> clips;
     while (strncmp(at, "CLIP", 4) == 0)
     {
-        at += 4;
-        const std::uint32_t clip_len = from_byte_stream<std::uint32_t>(&at);
-        BOOST_LOG_TRIVIAL(trace) << "CLIP (not handled): " << clip_len;
-        at += clip_len;
+        BOOST_LOG_TRIVIAL(trace) << "CLIP";
+        at += 8;
+        const std::uint32_t clip_idx = from_byte_stream<std::uint32_t>(&at);
+
+        check_for_chunk(&at, "STIL", 4);
+        const std::uint16_t stil_len = from_byte_stream<std::uint16_t>(&at);
+        clips.emplace(clip_idx, p + at);
+
+        at += stil_len;
     }
     
     /* Check the SURF chunk has been found */
@@ -466,8 +649,10 @@ void parse_surf(list<material *> &m, const std::string &p, const std::map<std::s
         at          += source_len;
         BOOST_LOG_TRIVIAL(trace) << "Name length: " << srf_len << " Source length: " << source_len;
         
-        parse_surf(&surf_materials[i], p, &at, surf_len - srf_len - source_len);
+        parse_surf(&surf_materials[i], clips, &at, surf_len - srf_len - source_len);
         m.push_back(surf_materials[i]);
+
+        at += 4;
     }
 }
 
@@ -490,7 +675,7 @@ void parse_pols(light_list &l, primitive_list &e, const std::map<std::string, st
     check_for_chunk(&ptags_at, "SURF", 4);
 
     /* Gather all the polygons */
-    std::uint16_t pol = 0;
+    std::uint32_t pol = 0;
     vector<point_t> pol_vert;
     std::uint16_t vert_this_pol = 0;
     std::uint32_t num_of_surfs = tag_map.size();
@@ -506,9 +691,8 @@ void parse_pols(light_list &l, primitive_list &e, const std::map<std::string, st
         }
         
         /* Parse the material to use */
-        const std::uint16_t ptag_pol = from_byte_stream<std::uint16_t>(&ptags_at);
+        const std::uint32_t ptag_pol = parse_vx(&ptags_at);
         const std::uint16_t mat_num = from_byte_stream<std::uint16_t>(&ptags_at);
-        BOOST_LOG_TRIVIAL(trace) << "Poly: " << ptag_pol << " (" << pol << ") assign surf: " << mat_num;
         assert((ptag_pol == pol) || !"Error: ptag is not for this polygon");
 
         /* Range check the material */
@@ -519,7 +703,10 @@ void parse_pols(light_list &l, primitive_list &e, const std::map<std::string, st
         }
 
         /* Create the polygon */
-        face_to_triangles(&e, &l, pol_vert, surf_materials[mat_num], false);
+        if (vert_this_pol > 2)
+        {
+            face_to_triangles(&e, &l, pol_vert, surf_materials[mat_num], false);
+        }
         
         /* Clean up */
         pol_vert.clear();
@@ -584,9 +771,18 @@ const char * lwo2_parser(
     if (strncmp(at, "BBOX", 4) == 0)
     {
         at += 4;
-        std::uint32_t bbox_len = from_byte_stream<std::uint32_t>(&at);
+        const std::uint32_t bbox_len = from_byte_stream<std::uint32_t>(&at);
         BOOST_LOG_TRIVIAL(trace) << "BBOX (not handled): " << bbox_len;
         at += bbox_len;
+    }
+
+    /* Check for optional VMAP chunk */
+    while (strncmp(at, "VMAP", 4) == 0)
+    {
+        at += 4;
+        const std::uint32_t vmap_len = from_byte_stream<std::uint32_t>(&at);
+        BOOST_LOG_TRIVIAL(trace) << "VMAP (not handled): " << vmap_len;
+        at += vmap_len;
     }
     
     /* Look for the SURF chunks */
@@ -601,17 +797,17 @@ const char * lwo2_parser(
     while (strncmp(at, "CLIP", 4) == 0)
     {
         at += 4;
+        BOOST_LOG_TRIVIAL(trace) << "CLIP";
         const std::uint32_t clip_len = from_byte_stream<std::uint32_t>(&at);
-        BOOST_LOG_TRIVIAL(trace) << "CLIP (not handled): " << clip_len;
         at += clip_len;
     }
 
     /* Check for and skip SURF chunk */
-    check_for_chunk(&at, "SURF", 4);
     for (std::uint32_t i = 0; i < tag_map.size(); ++i)
     {
+        check_for_chunk(&at, "SURF", 4);
         const std::uint32_t surf_len = from_byte_stream<std::uint32_t>(&at);
-        at += surf_len + 4;
+        at += surf_len;
     }
     
     /* Clean up */

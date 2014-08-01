@@ -475,7 +475,7 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_mechanical_detachable_gooseneck_jeep_te
     CREATE_REGRESSION_CHECKER(checker);
 
     /* Enviroment set up */
-    regression_fixture fixture("/lwo_scenes/vehicles/trucks/trailers_trailking/3_axle_Mechanical_Detachable_Gooseneck_Jeep.lwo", lwo, point_t(15.1995, 5.0, -22.2613), point_t(0.728969, 0.0, 0.684547), point_t(-0.107087, 0.987688, 0.114036), point_t(-0.676119, -0.156434, 0.719994), ext_colour_t(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, 1920, 1080);
+    regression_fixture fixture("/lwo_scenes/vehicles/trucks/trailers_trailking/3_axle_mechanical_detachable_gooseneck_jeep.lwo", lwo, point_t(15.1995, 5.0, -22.2613), point_t(0.728969, 0.0, 0.684547), point_t(-0.107087, 0.987688, 0.114036), point_t(-0.676119, -0.156434, 0.719994), ext_colour_t(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0,  100.0, -100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 

@@ -176,7 +176,7 @@ inline mapper_type_t pick_shader(const char *const c)
 }
 
 
-inline void parse_surf(material **m, const string &p, const char **ptr, const std::uint32_t surf_len)
+inline static void parse_surf(material **m, const string &p, const char **ptr, const std::uint32_t surf_len)
 {
     /* Variable to hold all the parameters */
     texture_info_t  current_info;
