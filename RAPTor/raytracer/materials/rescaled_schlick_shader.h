@@ -7,6 +7,8 @@
 #include "ray.h"
 
 
+namespace raptor_raytracer
+{
 /* Pure virtual class for material data and shading */
 class rescaled_schlick_shader : public material
 {
@@ -20,5 +22,6 @@ class rescaled_schlick_shader : public material
 
     private :
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __RESCALED_SCHLICK_SHADER_H__ */

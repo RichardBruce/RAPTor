@@ -6,6 +6,8 @@
 #include "obj_parser.h"
 
 
+namespace raptor_raytracer
+{
 const char * find_next_statement(const char *at)
 {
     while (true)
@@ -527,3 +529,4 @@ void obj_parser(
     delete [] buffer;
 //    cout << "Parsing complete" << endl;
 }
+}; /* namespace raptor_raytracer */

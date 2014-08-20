@@ -14,10 +14,13 @@
 #include "mapper_shader.h"
 #include "coloured_mapper_shader.h"
 #include "perlin_noise_3d_mapper.h"
-#include "planar_mapper.h"
+#include "cubic_mapper.h"
 #include "cylindrical_mapper.h"
+#include "planar_mapper.h"
 
 
+namespace raptor_raytracer
+{
 /* Parsing functions */
 /* Byte to... conversion */
 template <class T>
@@ -708,20 +711,6 @@ inline void face_to_triangles(primitive_list *e, light_list *l, vector<point_t> 
         new_light(l, ext_colour_t(255.0, 255.0,255.0), com, 0.0, t);
     }
 }
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __PARSER_COMMON_H__ */
-// bruce@bruce-XPS-L701X:~/work/RAPTor/raytracer$ /usr/bin/time ./raytracer --cfg ./scenes/ply_scenes/unc_powerplant/unc_powerplant.cfg 
-// 2.29user 0.69system 0:03.00elapsed 99%CPU (0avgtext+0avgdata 2096032maxresident)k
-// 0inputs+0outputs (0major+473595minor)pagefaults 0swaps
-// bruce@bruce-XPS-L701X:~/work/RAPTor/raytracer$ /usr/bin/time ./raytracer --cfg ./scenes/ply_scenes/unc_powerplant/unc_powerplant.cfg 
-// 2.29user 0.69system 0:02.99elapsed 99%CPU (0avgtext+0avgdata 2095796maxresident)k
-// 0inputs+0outputs (0major+472514minor)pagefaults 0swaps
-// bruce@bruce-XPS-L701X:~/work/RAPTor/raytracer$ /usr/bin/time ./raytracer --cfg ./scenes/ply_scenes/unc_powerplant/unc_powerplant.cfg 
-// 2.28user 0.69system 0:02.99elapsed 99%CPU (0avgtext+0avgdata 2094584maxresident)k
-// 0inputs+0outputs (0major+473743minor)pagefaults 0swaps
-// bruce@bruce-XPS-L701X:~/work/RAPTor/raytracer$ /usr/bin/time ./raytracer --cfg ./scenes/ply_scenes/unc_powerplant/unc_powerplant.cfg 
-// 2.27user 0.69system 0:02.98elapsed 99%CPU (0avgtext+0avgdata 2094928maxresident)k
-// 0inputs+0outputs (0major+473318minor)pagefaults 0swaps
-// bruce@bruce-XPS-L701X:~/work/RAPTor/raytracer$ /usr/bin/time ./raytracer --cfg ./scenes/ply_scenes/unc_powerplant/unc_powerplant.cfg 
-// 2.27user 0.69system 0:02.98elapsed 99%CPU (0avgtext+0avgdata 2094328maxresident)k
-// 0inputs+0outputs (0major+473729minor)pagefaults 0swaps

@@ -5,6 +5,8 @@
 #include "point_t.h"
 
 
+namespace raptor_raytracer
+{
 class line
 {
     public :
@@ -33,5 +35,6 @@ class line
     private :
         point_t ogn, dir;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __LINE_H__ */

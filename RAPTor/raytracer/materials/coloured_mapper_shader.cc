@@ -4,6 +4,8 @@
 #include "light.h"
 
 
+namespace raptor_raytracer
+{
 void coloured_mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, fp_t *const n_rl, fp_t *const n_rf) const
 {
     /* For each light request rays */
@@ -29,14 +31,14 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line
     ext_colour_t cur_ka;
     if(this->t_ns != NULL)
     {
-        cur_ns = this->t_ns->texture_map(i.get_dst(), i.get_dir(), &cur_ka, vt);
+        cur_ns = this->t_ns->texture_map(&cur_ka, i.get_dst(), n.get_dir(), vt);
     }
 
     /* Get the materials ka */
     cur_ka = this->ka;
     if(this->t_ka != NULL)
     {
-        this->t_ka->texture_map(i.get_dst(), i.get_dir(), &cur_ka, vt);
+        this->t_ka->texture_map(&cur_ka, i.get_dst(), n.get_dir(), vt);
         cur_ka *= (this->ka * ((fp_t)1.0/(fp_t)255.0));
     }
 
@@ -44,7 +46,7 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line
     ext_colour_t cur_kd = this->kd;
     if(this->t_kd != NULL)
     {
-        this->t_kd->texture_map(i.get_dst(), i.get_dir(), &cur_kd, vt);
+        this->t_kd->texture_map(&cur_kd, i.get_dst(), n.get_dir(), vt);
         cur_kd *= (this->kd* ((fp_t)1.0/(fp_t)255.0));
     }
     
@@ -52,7 +54,7 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line
     ext_colour_t cur_ks = this->ks;
     if(this->t_ks != NULL)
     {
-        this->t_ks->texture_map(i.get_dst(), i.get_dir(), &cur_ks, vt);
+        this->t_ks->texture_map(&cur_ks, i.get_dst(), n.get_dir(), vt);
         cur_ks *= (this->ks * ((fp_t)1.0/(fp_t)255.0));
     }
 
@@ -128,3 +130,4 @@ void coloured_mapper_shader::combind_secondary_rays(const ray_trace_engine &r, e
 
     return;
 }
+}; /* namespace raptor_raytracer */

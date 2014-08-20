@@ -7,7 +7,8 @@
 /* Common headers */
 #include "common.h"
 
-
+namespace raptor_raytracer
+{
 /* Class to hold a rgb colour as floating point numbers, to be rounded and saturated later */
 class ext_colour_t
 {
@@ -91,5 +92,6 @@ inline fp_t magnitude(const ext_colour_t &a)
 {
     return sqrt((a.r * a.r) + (a.g * a.g) + (a.b * a.b));
 }
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __EXT_COLOUR_T_H__ */

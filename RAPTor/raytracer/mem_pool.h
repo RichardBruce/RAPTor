@@ -5,6 +5,8 @@
 #include "shape.h"
 
 
+namespace raptor_raytracer
+{
 template <typename T, unsigned log_s = 16>
 class mem_pool
 {
@@ -114,5 +116,6 @@ class mem_pool
         vector<T *>     pools;
         unsigned        cur;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __MEM_POOL_H__ */

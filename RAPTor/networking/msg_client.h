@@ -177,7 +177,7 @@ class msg_client
         class multi_cast_receiver : public data_receiver
         {
             public :
-                multi_cast_receiver(SDL_Window *const window, SDL_Renderer *const renderer, SDL_Texture *const texture, TTF_Font *const font, camera *const cam)
+                multi_cast_receiver(SDL_Window *const window, SDL_Renderer *const renderer, SDL_Texture *const texture, TTF_Font *const font, raptor_raytracer::camera *const cam)
                     : _window(window), 
                       _renderer(renderer),
                       _texture(texture),
@@ -238,15 +238,15 @@ class msg_client
                 }
 
             private :
-                SDL_Window *const       _window;
-                SDL_Renderer *const     _renderer;
-                SDL_Texture *const      _texture;
-                TTF_Font *const         _font;
-                camera *const           _cam;
-                std::ostringstream      _fps;
-                clock_t                 _sim_time;
-                fp_t                    _damped_fps;
-                unsigned char *const    _screen_data;
+                SDL_Window *const               _window;
+                SDL_Renderer *const             _renderer;
+                SDL_Texture *const              _texture;
+                TTF_Font *const                 _font;
+                raptor_raytracer::camera *const _cam;
+                std::ostringstream              _fps;
+                clock_t                         _sim_time;
+                fp_t                            _damped_fps;
+                unsigned char *const            _screen_data;
 
                 static constexpr fp_t   _clocks_per_sec_inv  = (1.0 / CLOCKS_PER_SEC);
         };
@@ -278,13 +278,13 @@ class msg_client
             return -1;
         }
 
-        boost::asio::io_service _io_service;
-        protocol_stack          _uni_cast_conn;
-        protocol_stack       *  _multi_cast_conn;
-        group  *                _group;
-        camera *                _cam;
-        std::uint32_t           _id;
-        bool                    _subscribed;
+        boost::asio::io_service     _io_service;
+        protocol_stack              _uni_cast_conn;
+        protocol_stack       *      _multi_cast_conn;
+        group  *                    _group;
+        raptor_raytracer::camera *  _cam;
+        std::uint32_t               _id;
+        bool                        _subscribed;
 };
 }; /* namespace raptor_networking */
 

@@ -14,6 +14,8 @@
 #endif
 #include "material.h"
 
+namespace raptor_raytracer
+{
 class triangle : private boost::noncopyable
 {
     public :
@@ -883,6 +885,6 @@ class sort_triangle_by_highest_z
     public :
         bool operator() (const triangle *const a, const triangle *const b) { return (a->highest_z() < b->highest_z()); }
 };
-
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __TRIANGLE_H__ */

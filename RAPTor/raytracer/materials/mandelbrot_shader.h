@@ -7,6 +7,8 @@
 #include "ray.h"
 
 
+namespace raptor_raytracer
+{
 /* Pure virtual class for material data and shading */
 class mandelbrot_shader : public material
 {
@@ -33,5 +35,6 @@ class mandelbrot_shader : public material
         fp_t    y;      /* Y width */
         int     i;      /* Iteration limit */
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __MANDELBROT_SHADER_H__ */

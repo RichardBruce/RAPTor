@@ -8,6 +8,8 @@
 #include "ray.h"
 
 
+namespace raptor_raytracer
+{
 /* Pure virtual class for material data and shading */
 class phong_shader : public material
 {
@@ -71,5 +73,6 @@ class phong_shader : public material
         const fp_t          td;     /* Transmitted diffuseness      */
         const fp_t          rfd;    /* Reflected diffuseness        */
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __PHONG_SHADER_H__ */

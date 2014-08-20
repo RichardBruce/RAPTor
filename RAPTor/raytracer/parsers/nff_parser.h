@@ -1,6 +1,8 @@
 #ifndef __NFF_PARSER_H__
 #define __NFF_PARSER_H__
 
+namespace raptor_raytracer
+{
 class camera;
 
 void nff_parser(
@@ -9,5 +11,6 @@ void nff_parser(
     primitive_list      &e,
     list<material *>    &m,
     camera              **c);
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __NFF_PARSER_H__ */

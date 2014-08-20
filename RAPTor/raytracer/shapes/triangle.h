@@ -7,6 +7,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 class triangle : public shape
 {
     public :
@@ -24,5 +26,6 @@ class triangle : public shape
         point_t  a;
         vector_t n;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __TRIANGLE_H__ */

@@ -1,9 +1,5 @@
 /* Copyright (c) 1995 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)mgf2inv.c 1.7 5/22/97 LBL";
-#endif
-
 /*
  * Convert MGF to Inventor file.
  *

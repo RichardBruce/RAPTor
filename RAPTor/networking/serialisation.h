@@ -31,9 +31,9 @@
 namespace raptor_networking
 {
 /* Serialisation */
-/* Template method to deserialise and append */
+/* Template method to serialise and append */
 template<class T>
-std::vector<char> *const serialise(std::vector<char> *const serial_msg, const T &msg)
+inline std::vector<char> *const serialise(std::vector<char> *const serial_msg, const T &msg)
 {
     /* Build  back inserter */
     boost::iostreams::back_insert_device<std::vector<char>> inserter(*serial_msg);
@@ -48,23 +48,25 @@ std::vector<char> *const serialise(std::vector<char> *const serial_msg, const T 
 }
 
 /* Specialisation for datatypes not requiring serialisation */
-template<> std::vector<char> *const serialise<std::string>(std::vector<char> *const serial_msg, const std::string &msg)
+template<> 
+inline std::vector<char> *const serialise<std::string>(std::vector<char> *const serial_msg, const std::string &msg)
 {
     std::cout << "sending string" << std::endl;
     serial_msg->insert(serial_msg->end(), msg.begin(), msg.end());
     return serial_msg;
 }
 
-template<> std::vector<char> *const serialise<std::vector<char>>(std::vector<char> *const serial_msg, const std::vector<char> &msg)
+template<> 
+inline std::vector<char> *const serialise<std::vector<char>>(std::vector<char> *const serial_msg, const std::vector<char> &msg)
 {
     std::cout << "sending vector" << std::endl;
     serial_msg->insert(serial_msg->end(), msg.begin(), msg.end());
     return serial_msg;
 }
 
-/* Template method to deserialise */
+/* Template method to serialise */
 template<class T>
-std::vector<char> serialise(const T &msg)
+inline std::vector<char> serialise(const T &msg)
 {
     std::vector<char> serial_msg;
     serialise(&serial_msg, msg);
@@ -72,12 +74,14 @@ std::vector<char> serialise(const T &msg)
 }
 
 /* Specialisation for datatypes not requiring serialisation */
-template<> std::vector<char> serialise<std::string>(const std::string &msg)
+template<> 
+inline std::vector<char> serialise<std::string>(const std::string &msg)
 {
     return std::vector<char>(msg.begin(), msg.end());
 }
 
-template<> std::vector<char> serialise<std::vector<char>>(const std::vector<char> &msg)
+template<> 
+inline std::vector<char> serialise<std::vector<char>>(const std::vector<char> &msg)
 {
     std::cout << "sending vector" << std::endl;
     return msg;
@@ -87,20 +91,22 @@ template<> std::vector<char> serialise<std::vector<char>>(const std::vector<char
 /* Deserialisation */
 /* Template method to deserialise */
 template<class T>
-void deserialise(T *const recv, std::istream &recv_buf)
+inline void deserialise(T *const recv, std::istream &recv_buf)
 {
     boost::archive::binary_iarchive archive(recv_buf);
     archive >> *recv;
 }
 
 /* Specialisation for datatypes not requiring deserialisation */
-template<> void deserialise<std::string>(std::string *const recv, std::istream &recv_buf)
+template<> 
+inline void deserialise<std::string>(std::string *const recv, std::istream &recv_buf)
 {
     std::cout << "receiving string" << std::endl;
     *recv = std::string(std::istream_iterator<char>(recv_buf), std::istream_iterator<char>());
 }
 
-template<> void deserialise<std::vector<char>>(std::vector<char> *const recv, std::istream &recv_buf)
+template<> 
+inline void deserialise<std::vector<char>>(std::vector<char> *const recv, std::istream &recv_buf)
 {
     std::cout << "receiving vector" << std::endl;
     *recv = std::vector<char>(std::istream_iterator<char>(recv_buf), std::istream_iterator<char>());

@@ -1,9 +1,5 @@
 /* Copyright (c) 1995 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)cvrgb.c 1.1 12/1/95 LBL";
-#endif
-
 /*
  * Convert MGF color to RGB representation defined below.
  */

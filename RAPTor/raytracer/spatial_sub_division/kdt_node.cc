@@ -1,6 +1,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 /**********************************************************
   test_leaf_node_nearest tests all primitives of the 
   KD-tree leaf node to find the nearest.
@@ -21,7 +23,7 @@ triangle* kdt_node::test_leaf_node_nearest(const ray *const r, hit_description *
         hit_description hit_type;
         (*i)->is_intersecting(r, &hit_type);
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-        nit++;
+        ++nit;
 #endif
         if ((hit_type.d < ((h->d) + (1.0 * EPSILON))) && (hit_type.d > (min - (1.0 * EPSILON))))
         {
@@ -33,7 +35,7 @@ triangle* kdt_node::test_leaf_node_nearest(const ray *const r, hit_description *
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
     if (h->h != miss)
     {
-        ritm++;
+        ++ritm;
     }
 #endif
     
@@ -64,12 +66,12 @@ bool kdt_node::test_leaf_node_nearer(const ray *const r, const fp_t max) const
 		hit_description hit_type;
         (*i)->is_intersecting(r, &hit_type);
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-        nit++;
+        ++nit;
 #endif
         if ((hit_type.d < max) && (hit_type.d > (1.0 * EPSILON)))
         {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-            ritm++;
+            ++ritm;
 #endif
             return true;
         }
@@ -77,3 +79,4 @@ bool kdt_node::test_leaf_node_nearer(const ray *const r, const fp_t max) const
     
     return false;
 }
+}; /* namespace raptor_raytracer */

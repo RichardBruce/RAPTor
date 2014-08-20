@@ -1,5 +1,10 @@
 #include "common.h"
 
+
+const fp_t PI = 3.1415926535897932384626433;
+
+namespace raptor_raytracer
+{
 /* Common numbers */
 #ifdef SINGLE_PRECISION
 const fp_t EPSILON      = 1.0e-3;
@@ -10,7 +15,6 @@ const fp_t EPSILON      = 1.0e-9;
 const fp_t      FP_DELTA        = 32.0;
 const fp_t      FP_DELTA_SMALL  = 1.0e-4;
 const fp_t      MAX_DIST        = 1.7e308;
-const fp_t      PI              = 3.1415926535897932384626433;
 const fp_t      EXP             = 2.7182818284590452353602875;
 
 /* Modulus 3 look up table for values less than 6 */
@@ -99,4 +103,4 @@ fp_t gen_random_mersenne_twister()
     y ^=  (y>>18);
     return (fp_t)y * (1.0/4294967296.0);
 }
-
+}; /* namespace raptor_raytracer */

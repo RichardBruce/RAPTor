@@ -7,6 +7,8 @@
 //#include "ray.h"
 //
 //
+//namespace raptor_raytracer
+//{
 ///* Pure virtual class for material data and shading */
 //class light_shader : public material
 //{
@@ -75,3 +77,4 @@
 //
 //#endif /* #ifndef __LIGHT_SHADER_H__ */
 //
+//}; /* namespace raptor_raytracer */

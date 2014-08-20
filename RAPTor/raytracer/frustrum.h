@@ -8,6 +8,8 @@
 #ifdef SIMD_PACKET_TRACING
 
 
+namespace raptor_raytracer
+{
 //enum frustrum_dir_t { forward = 0, backward = 1 };
 
 /* Frustrum class to represent an array of rays by proxy */
@@ -395,4 +397,5 @@ class frustrum
 };
 
 #endif /* #ifdef SIMD_PACKET_TRACING */
+}; /* namespace raptor_raytracer */
 #endif /* #ifndef __FRUSTRUM_H__ */

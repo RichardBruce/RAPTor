@@ -15,6 +15,9 @@
 #include "sdl_event_handler.h"
 #include "sdl_event_handler_factory.h"
 
+using namespace raptor_raytracer;
+
+
 /*****************************************************
  Function to write an helpful message to the screen.
 *****************************************************/

@@ -4,6 +4,8 @@
 #include "light.h"
 
 
+namespace raptor_raytracer
+{
 void mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, fp_t *const n_rl, fp_t *const n_rf) const
 {
     /* For each light request rays */
@@ -23,7 +25,7 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const line &n, cons
     fp_t alpha  = 1.0;
     for (list<texture_mapper *>::const_iterator j = this->ctex.begin(); j != this->ctex.end() ; ++j)
     {
-        alpha *= (*j)->texture_map(i.get_dst(), i.get_dir(), &rgb, vt);
+        alpha *= (*j)->texture_map(&rgb, i.get_dst(), n.get_dir(), vt);
         
         if (alpha == 0.0)
         {
@@ -37,7 +39,7 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const line &n, cons
     ext_colour_t param;
     for (list<texture_mapper *>::const_iterator j = this->dtex.begin(); j != this->dtex.end() ; ++j)
     {
-        alpha *= (*j)->texture_map(i.get_dst(), i.get_dir(), &param, vt);
+        alpha *= (*j)->texture_map(&param, i.get_dst(), n.get_dir(), vt);
         cur_kd = magnitude(param) / 255.0;
         
         if (alpha == 0.0)
@@ -91,8 +93,8 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const line &n, cons
     alpha       = 1.0;
     for (list<texture_mapper *>::const_iterator j = this->rtex.begin(); j != this->rtex.end() ; ++j)
     {
-        alpha *= (*j)->texture_map(i.get_dst(), i.get_dir(), &rgb, vt);
-        refl = magnitude(rgb);
+        alpha *= (*j)->texture_map(&rgb, i.get_dst(), n.get_dir(), vt);
+        refl = rgb.r / 255.0;
         
         if (alpha == 0.0)
         {
@@ -128,8 +130,8 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const line &n, cons
     alpha       = 1.0;
     for (list<texture_mapper *>::const_iterator j = this->ttex.begin(); j != this->ttex.end() ; ++j)
     {
-        alpha *= (*j)->texture_map(i.get_dst(), i.get_dir(), &rgb, vt);
-        trans = rgb.r;
+        alpha *= (*j)->texture_map(&rgb, i.get_dst(), n.get_dir(), vt);
+        trans = rgb.r / 255.0;
         
         if (alpha == 0.0)
         {
@@ -170,3 +172,4 @@ void mapper_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour
 {
     return;
 }
+}; /* namespace raptor_raytracer */

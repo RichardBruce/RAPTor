@@ -4,10 +4,14 @@
 #include "common.h"
 #include "ext_colour_t.h"
 #include "point_t.h"
+
+
+namespace raptor_raytracer
+{
+/* Forward declarations */
 class ray_trace_engine;
 class ray;
 class line;
-
 
 /* Change the following to suit your standard */
 /* These are constants for colour space conversion */
@@ -339,6 +343,6 @@ inline ext_colour_t& cxy_to_rgb(const fp_t c_x, const fp_t c_y, const fp_t y, ex
     rgb->b = max((fp_t)0.0, min((fp_t)1.0, cout[2])) * (fp_t)255.0;
     return *rgb;
 }
-
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __MATERIAL_H__ */

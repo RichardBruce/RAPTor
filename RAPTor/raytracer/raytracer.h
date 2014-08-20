@@ -16,7 +16,8 @@
 using namespace tbb;
 #endif /* #ifdef THREADED_RAY_TRACE */
 
-
+namespace raptor_raytracer
+{
 /* Global performance counters for the spatial sub division */
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
 extern unsigned nit;            /* Number of intersection tests */
@@ -218,5 +219,6 @@ class ray_trace_engine
 
 /* Ray tracer main function */
 void ray_tracer(const light_list &lights, const primitive_list &everything, camera &c);
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __RAYTRACER_H__ */

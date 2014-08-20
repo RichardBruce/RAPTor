@@ -13,10 +13,6 @@
 
 --------------------------------------------------------------------------*/
 
-#ifndef lint
-static char SCCSid[] = "%Z%%M% %I% %G% LBL";
-#endif
-
 #ifdef __TURBOC__
 #include <alloc.h>
 #endif

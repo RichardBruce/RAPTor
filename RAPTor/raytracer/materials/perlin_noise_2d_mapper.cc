@@ -1,6 +1,8 @@
 #include "perlin_noise_2d_mapper.h"
 
 
+namespace raptor_raytracer
+{
 void perlin_noise_2d_mapper::shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c) const
 {
     fp_t x = i.get_x1();
@@ -89,4 +91,4 @@ void perlin_noise_2d_mapper::shade(const ray_trace_engine &r, ray &i, const line
 //
 //    delete [] pDataFloat;
 //}
-
+}; /* namespace raptor_raytracer */

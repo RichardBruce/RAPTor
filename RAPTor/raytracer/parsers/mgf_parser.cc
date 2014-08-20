@@ -8,6 +8,8 @@ extern "C"
 }
 
 
+namespace raptor_raytracer
+{
 bool                cur_light = false;
 light_list          *global_l=NULL;
 primitive_list      *global_e=NULL;
@@ -347,4 +349,4 @@ MG_E_IES
 
     return;
 }
-
+}; /* namespace raptor_raytracer */

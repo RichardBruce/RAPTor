@@ -1,9 +1,5 @@
 /* Copyright (c) 1997 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)context.c 1.26 12/15/97 LBL";
-#endif
-
 /*
  * Context handlers
  */

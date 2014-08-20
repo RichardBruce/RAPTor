@@ -45,9 +45,9 @@ if ($format =~ m/lwo/)
         # Bytewise copy
         $bytes_out[$out_index++] = $bytes_in[$i];
 
-        # Check for SURF
+        # Check for SURF or CLIP
         # If found record length and position of SURF chunk
-        if (($bytes_in[$i] . $bytes_in[$i + 1] . $bytes_in[$i + 2] . $bytes_in[$i + 3]) =~ m/SURF/)
+        if ((($bytes_in[$i] . $bytes_in[$i + 1] . $bytes_in[$i + 2] . $bytes_in[$i + 3]) =~ m/SURF/) || (($bytes_in[$i] . $bytes_in[$i + 1] . $bytes_in[$i + 2] . $bytes_in[$i + 3]) =~ m/CLIP/))
         {
             $surf_size_ptr = $out_index + 3;
             $surf_size  = 0;
@@ -57,8 +57,8 @@ if ($format =~ m/lwo/)
             $surf_size +=  ord($bytes_in[$i + 7]);
         }
         
-        # Check for TIMG
-        if (($bytes_in[$i] . $bytes_in[$i + 1] . $bytes_in[$i + 2] . $bytes_in[$i + 3]) =~ m/TIMG/)
+        # Check for TIMG or STIL
+        if ((($bytes_in[$i] . $bytes_in[$i + 1] . $bytes_in[$i + 2] . $bytes_in[$i + 3]) =~ m/TIMG/) || (($bytes_in[$i] . $bytes_in[$i + 1] . $bytes_in[$i + 2] . $bytes_in[$i + 3]) =~ m/STIL/))
         {
             # Output the start code
             my $end_cnt = $i + 4;
@@ -83,11 +83,15 @@ if ($format =~ m/lwo/)
             }
             
             # Adjust the string to a relative path
+            print "TIMG: $word_of_interest\n";
             $surf_size -= length($word_of_interest);
-            $word_of_interest =~ s/.*\\//;
+            $word_of_interest =~ s/.*[\/]//;
             $word_of_interest =~ s/\s/_/g;
             $word_of_interest =~ s/é/e/g;
-            $word_of_interest = "./" . $word_of_interest;
+            if ($word_of_interest ne "(none)")
+            {
+                $word_of_interest = "./" . $word_of_interest;
+            }
             
             # Null terminate the path and make it an even number of bytes long
             $word_of_interest = $word_of_interest . chr(0);
@@ -109,6 +113,7 @@ if ($format =~ m/lwo/)
             $bytes_out[$surf_size_ptr + 3] = chr( $surf_size        & 0xff);
     
             # Append the new file name
+            print "New TIMG: $word_of_interest\n";
             push @bytes_out, split(//, $word_of_interest);
             $out_index += $length_of_path + 1;
         }

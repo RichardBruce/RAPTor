@@ -9,6 +9,8 @@
 #include "frustrum.h"
 
 
+namespace raptor_raytracer
+{
 class bih_node
 {
     public :
@@ -86,7 +88,7 @@ class bih_node
             for (int i = this->b; i <= end; i++)
             {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-                nit++;
+                ++nit;
 #endif
                 hit_description hit_type(h->d);
                 (*bih_node::o)[i]->is_intersecting(r, &hit_type);
@@ -100,7 +102,7 @@ class bih_node
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
             if (h->d < MAX_DIST)
             {
-                ritm++;
+                ++ritm;
             }
 #endif
     
@@ -113,7 +115,7 @@ class bih_node
             for (int i = this->b; i <= end; i++)
             {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-                nit++;
+                ++nit;
 #endif
                 if ((*bih_node::o)[i]->get_light() || (*bih_node::o)[i]->is_transparent())
                 {
@@ -125,7 +127,7 @@ class bih_node
                 if (hit_type.d < max)
                 {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    ritm++;
+                    ++ritm;
 #endif
                     return true;
                 }
@@ -133,7 +135,6 @@ class bih_node
             return false;
         }
 
-#ifdef SIMD_PACKET_TRACING
         void test_leaf_node_nearest(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned int size) const
         {
             int end = this->e;
@@ -215,8 +216,7 @@ class bih_node
 
             return;
         }
-#endif /* #ifdef SIMD_PACKET_TRACING */
-        
+
         
     private : 
         /* Unions of mutually exclusive data */
@@ -236,5 +236,6 @@ class bih_node
         static vector<triangle *>   *   o;      /* Vector of primitives                 */
         static bih_node             *   bih;    /* BIH nodes                            */
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __BIH_NODE_H__ */

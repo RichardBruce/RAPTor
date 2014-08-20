@@ -1,6 +1,8 @@
 #ifndef __PLY_PARSER_H__
 #define __PLY_PARSER_H__
 
+namespace raptor_raytracer
+{
 class camera;
 
 void ply_parser(
@@ -9,5 +11,6 @@ void ply_parser(
     primitive_list      &e,
     list<material *>    &m,
     camera              **c);
+}; /* namespace raptor_raytracer */
 
 #endif	/* #ifndef __PLY_PARSER_H__ */

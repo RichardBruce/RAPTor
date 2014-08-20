@@ -1,6 +1,8 @@
 #include "sort.h"
 
 
+namespace raptor_raytracer
+{
 /**********************************************************
   insertion_sort is an implementation of insertion sort.
   
@@ -187,3 +189,4 @@ void quick_sort(bb_point_t* a, int bottom, int top)
         }
     }
 }
+}; /* namespace raptor_raytracer */

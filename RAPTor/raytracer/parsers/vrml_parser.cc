@@ -6,6 +6,8 @@
 #include "vrml_parser.h"
 
 
+namespace raptor_raytracer
+{
 bool group_done(const char *a)
 {
     /* Eat the string until the ']' or new line is found */
@@ -210,7 +212,7 @@ void parse_triangles(primitive_list &prim, list<material *> &m, const vector<poi
             m.push_back(cur_mat);
 
             /* Create the triangle */
-            vector<triangle *> *t;
+            vector<triangle *> *t = nullptr;
             new_triangle(&prim, t, cur_mat, p[va], p[vb], p[vc], false);
         
 //            cout << va << ", " << vb << ", " << vc << endl;
@@ -289,3 +291,4 @@ void vrml_parser(
     /* Clean up */
     delete [] buffer;
 }
+}; /* namespace raptor_raytracer */

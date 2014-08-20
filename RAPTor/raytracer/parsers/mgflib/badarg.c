@@ -1,9 +1,5 @@
 /* Copyright (c) 1994 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)badarg.c 1.1 6/21/94 LBL";
-#endif
-
 /*
  * Check argument list against format string.
  */

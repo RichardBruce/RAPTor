@@ -3,6 +3,9 @@
 
 #include "line.h"
 
+
+namespace raptor_raytracer
+{
 /* Forward declarations */
 class triangle;
 
@@ -163,5 +166,6 @@ class ray
         fp_t    length, magn;
         int     componant;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __RAY_H__ */

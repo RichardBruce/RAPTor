@@ -1,12 +1,14 @@
 #include "perlin_noise_3d_mapper.h"
 
 
+namespace raptor_raytracer
+{
 /***********************************************************
   Overloaded virtual texture mapping function. Takes the 
   destination of the ray (query point) and returns the colour
   at the location and an alpha value
 ************************************************************/
-fp_t perlin_noise_3d_mapper::texture_map(const point_t &dst, const point_t &dir, ext_colour_t *const c, const point_t &vt) const
+fp_t perlin_noise_3d_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const
 {
     fp_t x_co       = dst.x;
     fp_t y_co       = dst.y;
@@ -37,3 +39,4 @@ fp_t perlin_noise_3d_mapper::texture_map(const point_t &dst, const point_t &dir,
         return (fp_t)this->op;
     }
 }
+}; /* namespace raptor_raytracer */

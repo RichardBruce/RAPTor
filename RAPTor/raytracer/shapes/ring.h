@@ -7,6 +7,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 class ring : public shape
 {
     public :
@@ -27,5 +29,6 @@ class ring : public shape
         fp_t     r_sq, i_sq;
         vector_t n;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __RING_H__ */

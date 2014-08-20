@@ -3,3 +3,4 @@
 # Add the tools to the path
 export PATH=$PWD/tools/:$PATH
 export RAPTOR_TOOLS=$PWD/tools
+export RAPTOR_DATA=$PWD/data

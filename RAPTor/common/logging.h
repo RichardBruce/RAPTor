@@ -46,7 +46,7 @@ class method_logger
 };
 
 #ifdef __GNUC__ 
-#define METHOD_LOG method_logger __method_logger(__PRETTY_FUNCTION__);
+#define METHOD_LOG raptor_physics::method_logger __method_logger(__PRETTY_FUNCTION__);
 #else
     #error Method log statement not defined for this compiler
 #endif /* #ifdef __GNUC__ */

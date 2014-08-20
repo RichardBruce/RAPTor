@@ -11,6 +11,8 @@
 // #include <string>
 // #include <vector>
 
+// namespace raptor_raytracer
+// {
 // class OBJLoader : public IMeshLoader {
 // public:
 //     struct ExtendedLoadingException : public LoadingException {
@@ -311,5 +313,6 @@
 // //
 // //}
 // //
+// // }; /* namespace raptor_raytracer */
 // //#endif    // !SHEEP_MESHIO_OBJLOADER_H
 // //

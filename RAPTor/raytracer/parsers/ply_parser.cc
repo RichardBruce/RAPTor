@@ -6,6 +6,8 @@
 #include "ply_parser.h"
 
 
+namespace raptor_raytracer
+{
 /**********************************************************
  next_statement finds the next statement that can be 
  parsed. comment and obj_info statements are ignores.
@@ -574,3 +576,4 @@ void ply_parser(
     delete [] buffer;
 //    cout << "Parsing complete" << endl;
 }
+}; /* namespace raptor_raytracer */

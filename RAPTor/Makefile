@@ -7,16 +7,16 @@ raptor_$(RAPTOR_VER).tar.gz :
 
 # Clean targets
 clean ::
-	@( cd networking                         ; make clean     )
-	@( cd networking/unit_tests              ; make clean     )
-	@( cd networking/regression_tests        ; make clean     )
-	@( cd terrain_generator                  ; make clean     )
-	@( cd terrain_generator/unit_tests       ; make clean     )
-	@( cd terrain_generator/regression_tests ; make clean     )
-	@( cd physics_engine                     ; make clean     )
-	@( cd physics_engine/unit_tests          ; make clean     )
-	@( cd physics_engine/regression_tests    ; make clean     )
-	@( cd raytracer                          ; make spotless  )
-	@( cd raytracer/unit_tests               ; make spotless  )
-	@( cd raytracer/regression_tests         ; make spotless  )
-	@( cd games/quake2                       ; make distclean )
+	$(MAKE) -C networking clean
+	$(MAKE) -C terrain_generator clean
+	$(MAKE) -C physics_engine clean
+	$(MAKE) -C raytracer clean
+	@( cd games/quake2 ; make distclean )
+
+spotless ::
+	$(MAKE) -C networking spotless
+	$(MAKE) -C terrain_generator spotless
+	$(MAKE) -C physics_engine spotless
+	$(MAKE) -C raytracer spotless
+	@( cd games/quake2 ; make distclean )
+

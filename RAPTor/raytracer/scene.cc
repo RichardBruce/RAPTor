@@ -2,6 +2,8 @@
 #include "parser_common.h"
 
 
+namespace raptor_raytracer
+{
 /* Auto generated init function do not edit directly */
 void scene_init(light_list &lights, primitive_list &everything, list<material *> &materials, camera **c)
 {
@@ -27,4 +29,4 @@ void scene_init(light_list &lights, primitive_list &everything, list<material *>
     
     return;
 }
-
+}; /* namespace raptor_raytracer */

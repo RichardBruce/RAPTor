@@ -1,6 +1,8 @@
 #include "voxel.h"
 
 
+namespace raptor_raytracer
+{
 /**********************************************************
  
 **********************************************************/
@@ -3458,3 +3460,4 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    this->x.erase(this->x.begin() + this_index, this->x.end());
 //    this->y.erase(this->y.begin() + this_index, this->y.end());
 //    this->z.erase(this->z.begin() + this_index, this->z.end());
+}; /* namespace raptor_raytracer */

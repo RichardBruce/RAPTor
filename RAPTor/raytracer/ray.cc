@@ -3,6 +3,8 @@
 #include "light.h"
 
 
+namespace raptor_raytracer
+{
 /**********************************************************
  calculate_destination returns the 3-D co-ordinate of the 
  ray after it has travelled a distance d.
@@ -391,3 +393,4 @@ fp_t ray::refract(ray rays[], const line &n, const fp_t t, fp_t ri, const hit_t 
 //    r.set_absorb(a);
 //    return r;
 //}
+}; /* namespace raptor_raytracer */

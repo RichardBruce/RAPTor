@@ -1,9 +1,5 @@
 /* Copyright (c) 1994 Regents of the University of California */
 
-#ifndef lint
-static char SCCSid[] = "@(#)lookup.c 1.7 9/4/98 LBL";
-#endif
-
 /*
  * Table lookup routines
  */

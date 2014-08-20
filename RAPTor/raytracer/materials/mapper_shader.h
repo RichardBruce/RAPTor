@@ -9,6 +9,8 @@
 #include "ray.h"
 
 
+namespace raptor_raytracer
+{
 /* Child of material used to attach multiple texture mapper */
 /* This class with calculate illumination and pass this value to the texture mapper for shading */
 class mapper_shader : public material
@@ -82,5 +84,6 @@ class mapper_shader : public material
         const fp_t                      td;     /* Transmitted diffuseness                  */
         const fp_t                      rfd;    /* Reflected diffuseness                    */
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __MAPPER_SHADER_H__ */

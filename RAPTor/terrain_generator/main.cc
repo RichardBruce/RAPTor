@@ -119,35 +119,35 @@ int main()
     raptor_physics::simulation_environment se(&pe, &po);
     se.load_screen("./load_screen.png");
 
-    std::unique_ptr<material> m[16];
-    m[ 0].reset(new phong_shader(ext_colour_t(255.0, 255.0, 255.0), 1.0));
-    m[ 1].reset(new phong_shader(ext_colour_t(128.0,   0.0,   0.0), 1.0));
-    m[ 2].reset(new phong_shader(ext_colour_t(255.0,   0.0,   0.0), 1.0));
-    m[ 3].reset(new phong_shader(ext_colour_t(  0.0, 128.0,   0.0), 1.0));
-    m[ 4].reset(new phong_shader(ext_colour_t(  0.0, 255.0,   0.0), 1.0));
-    m[ 5].reset(new phong_shader(ext_colour_t(  0.0,   0.0, 128.0), 1.0));
-    m[ 6].reset(new phong_shader(ext_colour_t(  0.0,   0.0, 255.0), 1.0));
-    m[ 7].reset(new phong_shader(ext_colour_t(128.0, 128.0,   0.0), 1.0));
-    m[ 8].reset(new phong_shader(ext_colour_t(255.0, 255.0,   0.0), 1.0));
-    m[ 9].reset(new phong_shader(ext_colour_t(128.0,   0.0, 128.0), 1.0));
-    m[10].reset(new phong_shader(ext_colour_t(255.0,   0.0, 255.0), 1.0));
-    m[11].reset(new phong_shader(ext_colour_t(  0.0, 128.0, 128.0), 1.0));
-    m[12].reset(new phong_shader(ext_colour_t(  0.0, 255.0, 255.0), 1.0));
-    m[13].reset(new phong_shader(ext_colour_t(128.0, 255.0, 255.0), 1.0));
-    m[14].reset(new phong_shader(ext_colour_t(255.0, 128.0, 255.0), 1.0));
-    m[15].reset(new phong_shader(ext_colour_t(255.0, 255.0, 128.0), 1.0));
+    std::unique_ptr<raptor_raytracer::material> m[16];
+    m[ 0].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), 1.0));
+    m[ 1].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0,   0.0,   0.0), 1.0));
+    m[ 2].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0,   0.0,   0.0), 1.0));
+    m[ 3].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0, 128.0,   0.0), 1.0));
+    m[ 4].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0, 255.0,   0.0), 1.0));
+    m[ 5].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0,   0.0, 128.0), 1.0));
+    m[ 6].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0,   0.0, 255.0), 1.0));
+    m[ 7].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0, 128.0,   0.0), 1.0));
+    m[ 8].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0,   0.0), 1.0));
+    m[ 9].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0,   0.0, 128.0), 1.0));
+    m[10].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0,   0.0, 255.0), 1.0));
+    m[11].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0, 128.0, 128.0), 1.0));
+    m[12].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0, 255.0, 255.0), 1.0));
+    m[13].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0, 255.0, 255.0), 1.0));
+    m[14].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 128.0, 255.0), 1.0));
+    m[15].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 128.0), 1.0));
 
     fp_t *img;
     unsigned int img_width;
     unsigned int img_height;
-    const ext_colour_t black(0.0, 0.0, 0.0);
-    unsigned int cpp = read_jpeg(&img, "./grass-texture-2.jpg", &img_height, &img_width);
-    planar_mapper *tm = new planar_mapper(img, point_t(0.0, 0.0, 0.0), point_t(0.0, 1.0, 0.0), point_t(10.0, 0.0, 10.0), cpp, img_width, img_height, tile, tile);
-    std::unique_ptr<material> grass(new coloured_mapper_shader(black, ext_colour_t(255.0, 255.0, 255.0), black, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, nullptr, tm, nullptr, nullptr));
+    const raptor_raytracer::ext_colour_t black(0.0, 0.0, 0.0);
+    unsigned int cpp = raptor_raytracer::read_jpeg(&img, "./grass-texture-2.jpg", &img_height, &img_width);
+    raptor_raytracer::planar_mapper *tm = new raptor_raytracer::planar_mapper(img, point_t(0.0, 0.0, 0.0), point_t(0.0, 1.0, 0.0), point_t(10.0, 0.0, 10.0), cpp, img_width, img_height, raptor_raytracer::tile, raptor_raytracer::tile);
+    std::unique_ptr<raptor_raytracer::material> grass(new raptor_raytracer::coloured_mapper_shader(black, raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), black, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, nullptr, tm, nullptr, nullptr));
 
     /* Lights */
-    se.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t( 200.0,  1500.0,  200.0));
-    // se.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t( 200.0, -1500.0,  200.0));
+    se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t( 200.0,  1500.0,  200.0));
+    // se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t( 200.0, -1500.0,  200.0));
 
 
     /* Generate height map */
@@ -410,7 +410,7 @@ int main()
 
         /* Bash into triangles */
         std::vector<int> *const tris = new std::vector<int>();
-        face_to_triangle_edges(tris, facet_verts);
+        raptor_raytracer::face_to_triangle_edges(tris, facet_verts);
         assert((tris->size() == ((facet_verts.size() - 2) * 3)) || !"Error: There is a triangle missing");
 
         /* Add static objects */

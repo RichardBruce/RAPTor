@@ -7,6 +7,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 class torus : public shape
 {
     public :
@@ -33,5 +35,6 @@ class torus : public shape
         fp_t     r, a, sr, theta;
         bool     rotate;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __TORUS_H__ */

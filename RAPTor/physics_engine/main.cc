@@ -30,11 +30,11 @@ int main(int argc, char **argv)
     raptor_physics::simulation_environment se(&pe, &po);
 
     /* Lights */
-    se.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-    se.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+    se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
+    se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
 
     /* Add moving objects */
-    std::unique_ptr<material> m(new phong_shader(ext_colour_t(255.0, 255.0, 255.0), 1.0));
+    std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), 1.0));
     se.add_moving_object(new raptor_physics::physics_object(raptor_physics::make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, 9.5, 0.0), 10.0));
 
     /* Add static objects */

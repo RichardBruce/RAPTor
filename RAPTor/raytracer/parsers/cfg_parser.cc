@@ -12,6 +12,8 @@
 #include "scene.h"
 
 
+namespace raptor_raytracer
+{
 /**********************************************************
  next_statement finds the next statement that can be 
  parsed. # means comment and is ignored.
@@ -138,3 +140,4 @@ void cfg_parser(
     delete [] buffer;
 //    cout << "Parsing complete" << endl;
 }
+}; /* namespace raptor_raytracer */

@@ -17,7 +17,8 @@
 #include "planar_mapper.h"
 #include "mandelbrot_shader.h"
 
-
+namespace raptor_raytracer
+{
 /* C coded scene set up */
 void scene_init(light_list &lights, primitive_list &everything, list<material *> &materials, camera **c);
 
@@ -42,5 +43,6 @@ inline void scene_clean(primitive_list *e, list<material *> *m, camera *c)
     
     return;
 }
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __SCENE_INIT_H__ */

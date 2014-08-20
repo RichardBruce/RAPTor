@@ -7,6 +7,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 class cylinder : public shape
 {
     public :
@@ -34,5 +36,6 @@ class cylinder : public shape
         fp_t     r, h, i_sq, theta;
         bool     rotate;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __CYLINDER_H__ */

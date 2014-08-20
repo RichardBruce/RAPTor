@@ -10,10 +10,6 @@
       Compiled with MSDOS GNU C++ 2.4.1 or generic ANSI-C compiler
 */
 
-#ifndef lint
-static char SCCSid[] = "@(#)3ds2mgf.c 1.5 1/16/98 LBL";
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

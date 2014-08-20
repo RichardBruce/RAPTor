@@ -1,7 +1,8 @@
 #include "bih_builder.h"
 
 
-#ifdef SPATIAL_SUBDIVISION_BIH
+namespace raptor_raytracer
+{
 /* Tree depth */
 static unsigned depth = 0;
 
@@ -174,7 +175,7 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
     /* Construct the BIH nodes */
     bih_node::get_node_array(cur).create_generic_node(*child, max_left, min_right, split_axis);
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-    ng++;
+    ++ng;
 #endif
 
     /* Reduce the bouding boxes to just fit the new split */
@@ -244,7 +245,7 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
     {
         bih_node::get_node_array(left_child).create_leaf_node(b, max(0, bottom - 1));
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-        ne++;
+        ++ne;
         nee       += (node_size < 2);
         ave_ob    +=  node_size;
         max_depth  = max(max_depth, depth + 1);
@@ -263,7 +264,7 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
     {
         bih_node::get_node_array(right_child).create_leaf_node(bottom, e);
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-        ne++;
+        ++ne;
         nee       += (node_size < 1);
         ave_ob    +=  node_size + 1;
         max_depth  = max(max_depth, depth + 1);
@@ -428,7 +429,7 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
     /* Construct the BIH nodes */
     bih_node::get_node_array(cur).create_generic_node(*child, max_left, min_right, split_axis);
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
-    ng++;
+    ++ng;
 #endif
 
     /* Reduce the bouding boxes to just fit the new split */
@@ -684,5 +685,4 @@ const vector<triangle *> * build_bih(const primitive_list *const o, bih_node *bi
     
     return object_copy;
 }
-#endif /* #ifdef SPATIAL_SUBDIVISION_BIH */
-
+}; /* namespace raptor_raytracer */

@@ -7,6 +7,8 @@
 #include "kdt_node.h"
 
 
+namespace raptor_raytracer
+{
 class sphere : public shape
 {
     public :
@@ -29,5 +31,6 @@ class sphere : public shape
     private : 
         fp_t r;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __SPHERE_H__ */

@@ -12,6 +12,8 @@
 /* Local headers */
 #include "camera.h"
 
+using raptor_raytracer::camera;
+
 
 /* Function to create an handler for the camera mappings of SDL_Keycode */
 /*  cam is the camera that will be updated. ownership is not taken of the camera */

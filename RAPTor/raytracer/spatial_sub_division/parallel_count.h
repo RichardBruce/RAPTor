@@ -4,6 +4,9 @@
 #include "common.h"
 #include "triangle.h"
 
+
+namespace raptor_raytracer
+{
 class primitive_count 
 {
     public:
@@ -75,5 +78,6 @@ class primitive_count
         const primitive_list   &a;
         fp_t                    s[8];
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __PRIMITIVE_COUNT_H__ */

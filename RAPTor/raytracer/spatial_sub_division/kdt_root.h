@@ -5,6 +5,8 @@
 #include "ray.h"
 #include "kdt_node.h"
 
+namespace raptor_raytracer
+{
 class kdt_root
 {
     public :
@@ -21,5 +23,6 @@ class kdt_root
         const kdt_node *const  k;
         const point_t  t, b;
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __KDT_ROOT_H__ */

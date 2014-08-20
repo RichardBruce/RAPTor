@@ -5,6 +5,8 @@
 #include "cone.h"
 
 
+namespace raptor_raytracer
+{
 cone::cone(material *const m, const point_t &c, const fp_t r, const fp_t h, const fp_t top, 
              const vector_t &n, const fp_t theta, const bool l) : 
            shape(m,c,l), r(r), h(h), top(top ? top : h), theta(theta), rot_axis(n)
@@ -396,3 +398,4 @@ point_t cone::get_random_point(const int i) const
     
     return point_t(x,y,z);
 }
+}; /* namespace raptor_raytracer */

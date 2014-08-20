@@ -4,7 +4,8 @@
 
 #include "torus.h"
 
-
+namespace raptor_raytracer
+{
 torus::torus(material *const m, point_t c, fp_t r, fp_t a, vector_t n, fp_t theta, bool l) : 
     shape(m,c,l), rot_axis(n), rot_point(c), r(r), a(a), sr(r + a), theta(theta)
 {
@@ -427,3 +428,4 @@ point_t torus::get_random_point(const int i) const
     
     return point_t(x,y,z);
 }
+}; /* namespace raptor_raytracer */

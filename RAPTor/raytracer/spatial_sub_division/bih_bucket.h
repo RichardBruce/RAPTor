@@ -5,6 +5,8 @@
 #include "triangle.h"
 
 
+namespace raptor_raytracer
+{
 class bih_bucket
 {
     public :
@@ -36,9 +38,6 @@ class bih_bucket
             this->t.x = max(this->t.x, top.x);
             this->t.y = max(this->t.y, top.y);
             this->t.z = max(this->t.z, top.z);
-
-//            cout << "max: " << this->t.x << ", " << this->t.y << ", " << this->t.z << endl;
-//            cout << "min: " << this->b.x << ", " << this->b.y << ", " << this->b.z << endl;
             return *this;
         }
         
@@ -62,5 +61,6 @@ class bih_bucket
         int         begin;  /*  */
         int         end;    /*  */
 };
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __BIH_BUCKET_H__ */

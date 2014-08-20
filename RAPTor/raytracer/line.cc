@@ -4,6 +4,8 @@
 
 #include "line.h"
 
+namespace raptor_raytracer
+{
 void line::rotate(const vector_t &r, const point_t &c, const fp_t theta)
 {
     /* Rotate the origin into the new coordinate system */
@@ -62,4 +64,4 @@ void line::rotate(const vector_t &r, const point_t &c, const fp_t theta)
     this->ogn = q;
     this->dir = q2;
 }
-
+}; /* namespace raptor_raytracer */
