@@ -471,13 +471,51 @@ BOOST_AUTO_TEST_CASE( update_object_move_away_y_test )
     BOOST_CHECK(uut.number_of_possible_collisions() == 0);
 }
 
-BOOST_AUTO_TEST_CASE( update_object_performance_test )
+// BOOST_AUTO_TEST_CASE( update_object_performance_test )
+// {
+//     const int number_of_objects = 10000;
+
+//     std::default_random_engine generator;
+//     std::normal_distribution<float> normal_dist(1.0, 0.1);
+//     std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0 / 3.0) * 5.0);
+//     std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
+
+//     /* Create some random objects on a grid moving in random directions */
+//     std::unordered_map<int, physics_object*> objects;
+//     for (int i = 0; i < number_of_objects; ++i)
+//     {
+//         const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+//         const point_t vel(normalise(-pos) * point_t(normal_dist(generator), normal_dist(generator), normal_dist(generator)));
+//         auto po = new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), pos, vel, point_t(0.0, 0.0, 0.0), 1.0);
+//         objects.emplace(i, po);
+//     }
+
+//     /* Do some updates */
+//     spatial_sub_division uut(objects);
+//     for (int i = 0; i < 100000; ++i)
+//     {
+//         const int obj = int_uniform_dist(generator);
+//         const fp_t t_step = normal_dist(generator);
+//         objects[obj]->begin_time_step(t_step);
+//         uut.update_object(*objects[obj]);
+
+//         objects[obj]->commit_movement(t_step);
+//         uut.update_object(*objects[obj]);
+//     }
+
+//     /* Clean up */
+//     for (auto &p : objects)
+//     {
+//         delete p.second;
+//     }
+// }
+
+BOOST_AUTO_TEST_CASE( remove_object_performance_test )
 {
     const int number_of_objects = 10000;
 
     std::default_random_engine generator;
-    std::normal_distribution<float> normal_dist(1.0, 0.1);
-    std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0 / 3.0));
+    std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0 / 3.0) * 5.0);
     std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
 
     /* Create some random objects on a grid moving in random directions */
@@ -485,24 +523,22 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
     for (int i = 0; i < number_of_objects; ++i)
     {
         const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
-        const point_t vel(normalise(-pos) * point_t(normal_dist(generator), normal_dist(generator), normal_dist(generator)));
-        auto po = new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), pos, vel, point_t(0.0, 0.0, 0.0), 1.0);
+        auto po = new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), pos, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0);
         objects.emplace(i, po);
     }
 
-    /* Do some updates */
+    /* Remove 10%-ish of the objects */
     spatial_sub_division uut(objects);
-    for (int i = 0; i < 10000; ++i)
+    for (int i = 0; i < number_of_objects * 0.1; ++i)
     {
         const int obj = int_uniform_dist(generator);
-        BOOST_CHECK(obj < number_of_objects);
-        BOOST_CHECK(obj >= 0);
-        const fp_t t_step = normal_dist(generator);
-        objects[obj]->begin_time_step(t_step);
-        uut.update_object(*objects[obj]);
-
-        objects[obj]->commit_movement(t_step);
-        uut.update_object(*objects[obj]);
+        auto obj_iter = objects.find(obj);
+        if (obj_iter != objects.end())
+        {
+            uut.remove_object(obj_iter->second);
+            delete obj_iter->second;
+            objects.erase(obj_iter);
+        }
     }
 
     /* Clean up */
@@ -511,5 +547,39 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
         delete p.second;
     }
 }
+
+// BOOST_AUTO_TEST_CASE( add_object_performance_test )
+// {
+//     const int number_of_objects = 10000;
+
+//     std::default_random_engine generator;
+//     std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0 / 3.0) * 5.0);
+//     std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
+
+//     /* Create 90% of some random objects on a grid moving in random directions */
+//     std::unordered_map<int, physics_object*> objects;
+//     for (int i = 0; i < number_of_objects * 0.9; ++i)
+//     {
+//         const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+//         auto po = new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), pos, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0);
+//         objects.emplace(i, po);
+//     }
+
+//     /* Add the final 10% of the objects */
+//     spatial_sub_division uut(objects);
+//     for (int i = 0; i < number_of_objects * 0.1; ++i)
+//     {
+//         const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+//         auto po = new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), pos, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0);
+//         objects.emplace(i, po);
+//         uut.add_object(*po);
+//     }
+
+//     /* Clean up */
+//     for (auto &p : objects)
+//     {
+//         delete p.second;
+//     }
+// }
 
 BOOST_AUTO_TEST_SUITE_END()

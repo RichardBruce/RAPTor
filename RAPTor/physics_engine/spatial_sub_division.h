@@ -18,6 +18,7 @@
 
 /* Physics headers */
 #include "object_bound.h"
+#include "pair_manager.h"
 #include "physics_object.h"
 
 
@@ -27,47 +28,73 @@ namespace raptor_physics
 class spatial_sub_division : private boost::noncopyable
 {
     public :
-        typedef std::unordered_set<std::pair<const physics_object *, const physics_object *>, boost::hash<std::pair<const physics_object *, const physics_object *>>> collision_set;
+        // typedef std::unordered_set<std::pair<const physics_object *, const physics_object *>, boost::hash<std::pair<const physics_object *, const physics_object *>>> collision_set;
+        typedef pair_manager collision_set;
 
         spatial_sub_division(const std::unordered_map<int, physics_object*> &objects)
-        : _axis(pick_bounds_axis(objects))
         {
             /* Sweep the objects picking points in the selected axis */
-            _bounds.reserve(objects.size() << 1);
+            _bounds[X_AXIS].reserve(objects.size() << 1);
+            _bounds[Y_AXIS].reserve(objects.size() << 1);
+            _bounds[Z_AXIS].reserve(objects.size() << 1);
             for (auto o : objects)
             {
-                _bounds.push_back(o.second->lower_bound(_axis));
-                _bounds.push_back(o.second->upper_bound(_axis));
+                _bounds[X_AXIS].push_back(o.second->lower_bound(X_AXIS));
+                _bounds[Y_AXIS].push_back(o.second->lower_bound(Y_AXIS));
+                _bounds[Z_AXIS].push_back(o.second->lower_bound(Z_AXIS));
+                _bounds[X_AXIS].push_back(o.second->upper_bound(X_AXIS));
+                _bounds[Y_AXIS].push_back(o.second->upper_bound(Y_AXIS));
+                _bounds[Z_AXIS].push_back(o.second->upper_bound(Z_AXIS));
             }
 
             /* Sort objects */
-            std::sort(_bounds.begin(), _bounds.end(), [](const object_bound *const l, const object_bound *const &r)
-                {
-                    return (*l) < (*r);
-                });
+            for (int i = 0; i < 3; ++i)
+            {
+                std::sort(_bounds[i].begin(), _bounds[i].end(), [](const object_bound *const l, const object_bound *const &r)
+                    {
+                        return (*l) < (*r);
+                    });
+            }
 
             /* Set indices */
             set_indices();
 
             /* Perform full collision detection */
+            _axis_possibles[0].reserve(_bounds[0].size());
+            _axis_possibles[1].reserve(_bounds[0].size());
+            _axis_possibles[2].reserve(_bounds[0].size());
+            _possibles.reserve(_bounds[0].size());
+
+            _axis_possibles[0].load_factor(0.7);
+            _axis_possibles[1].load_factor(0.7);
+            _axis_possibles[2].load_factor(0.7);
+            _possibles.load_factor(0.7);
             collision_detect();
+
+            _axis_possibles[0].load_factor(1.0);
+            _axis_possibles[1].load_factor(1.0);
+            _axis_possibles[2].load_factor(1.0);
+            _possibles.load_factor(1.0);
         }
 
-        // /* Allow default DTOR */
+        /* Allow default DTOR */
 
         spatial_sub_division& add_object(const physics_object &po)
         {
-            object_bound *const lower_bound = po.lower_bound(_axis);
-            _bounds.insert(std::upper_bound(_bounds.begin(), _bounds.end(), lower_bound, [](const object_bound *const l, const object_bound *const r)
-                {
-                    return (*l) < (*r);
-                }), lower_bound);
+            for (int i = 0; i < 3; ++i)
+            {
+                object_bound *const lower_bound = po.lower_bound(static_cast<axis_t>(i));
+                _bounds[i].insert(std::upper_bound(_bounds[i].begin(), _bounds[i].end(), lower_bound, [](const object_bound *const l, const object_bound *const r)
+                    {
+                        return (*l) < (*r);
+                    }), lower_bound);
 
-            object_bound *const upper_bound = po.upper_bound(_axis);
-            _bounds.insert(std::upper_bound(_bounds.begin(), _bounds.end(), upper_bound, [](const object_bound *const l, const object_bound *const r)
-                {
-                    return (*l) < (*r);
-                }), upper_bound);
+                object_bound *const upper_bound = po.upper_bound(static_cast<axis_t>(i));
+                _bounds[i].insert(std::upper_bound(_bounds[i].begin(), _bounds[i].end(), upper_bound, [](const object_bound *const l, const object_bound *const r)
+                    {
+                        return (*l) < (*r);
+                    }), upper_bound);
+            }
 
             /* Set indices */
             set_indices();
@@ -81,80 +108,57 @@ class spatial_sub_division : private boost::noncopyable
 
         spatial_sub_division& remove_object(const physics_object *const po)
         {
-            /* Move both of these object references to the end */
-            _bounds.erase(std::remove_if(_bounds.begin(), _bounds.end(), [po](const object_bound *const p)
-                {
-                    return p->object() == po;
-                }), _bounds.end());
-
-            /* Set indices */
-            set_indices();
-
-            /* Clean from possibles */
-            for(auto it = _axis_possibles.begin(); it != _axis_possibles.end(); )
+            for (int i = 0; i < 3; ++i)
             {
-                if ((it->first == po) | (it->second == po))
+                /* Move both of these object references to the end */
+                unsigned int at = po->lower_bound(static_cast<axis_t>(i))->index();
+                for (unsigned int j = at + 1; j < _bounds[2].size(); ++j)
                 {
-                    it = _axis_possibles.erase(it);
+                    if (_bounds[i][j]->object() != po)
+                    {
+                        _bounds[i][at] = _bounds[i][j];
+                        _bounds[i][at]->index(at);
+                        ++at;
+                    }
                 }
-                else
+                _bounds[i].resize(at);
+
+                /* Clean from axis possibles */
+                /* This is the major cost of remove_object */
+                for (auto iter = _axis_possibles[i].begin(); iter != _axis_possibles[i].end(); )
                 {
-                    ++it;
+                    if ((iter->first == po) | (iter->second == po))
+                    {
+                        iter = _axis_possibles[i].erase(iter);
+                    }
+                    else
+                    {
+                        ++iter;
+                    }
                 }
             }
 
-            for(auto it = _possibles.begin(); it != _possibles.end(); )
+            /* Clean from possibles */
+            for (auto iter = _possibles.begin(); iter != _possibles.end(); )
             {
-                if ((it->first == po) | (it->second == po))
+                if ((iter->first == po) | (iter->second == po))
                 {
-                    it = _possibles.erase(it);
+                    iter = _possibles.erase(iter);
                 }
                 else
                 {
-                    ++it;
+                    ++iter;
                 }
             };
 
-            return *this;            
+            return *this;
         }
 
         spatial_sub_division& update_object(const physics_object &po)
         {
-            /* Get object bounds */
-            const object_bound *const lower_bound = po.lower_bound(_axis);
-            const object_bound *const upper_bound = po.upper_bound(_axis);
-
-            /* Adjust bounds tracking changes in collision set */
-            // if (*this < o)
-            /* Moving lower bound down */
-            while ((lower_bound->index() > 0) && (_bounds[lower_bound->index()]->compare_and_swap(_bounds[lower_bound->index() - 1])))
-            {
-                std::swap(_bounds[lower_bound->index()], _bounds[lower_bound->index() + 1]);
-                update_possibles(_bounds[lower_bound->index()], _bounds[lower_bound->index() + 1]);
-            }
-
-            /* Moving upper bound down */
-            while ((upper_bound->index() > 0) && (_bounds[upper_bound->index()]->compare_and_swap(_bounds[upper_bound->index() - 1])))
-            {
-                std::swap(_bounds[upper_bound->index()], _bounds[upper_bound->index() + 1]);
-                update_possibles(_bounds[upper_bound->index()], _bounds[upper_bound->index() + 1]);
-            }
-
-            /* Moving upper bound up */
-            while ((upper_bound->index() < static_cast<int>(_bounds.size() - 1)) && (_bounds[upper_bound->index() + 1]->compare_and_swap(_bounds[upper_bound->index()])))
-            {
-                std::swap(_bounds[upper_bound->index() - 1], _bounds[upper_bound->index()]);
-                update_possibles(_bounds[upper_bound->index() - 1], _bounds[upper_bound->index()]);
-            }
-
-            /* Moving lower bound up */
-            while ((lower_bound->index() < static_cast<int>(_bounds.size() - 1)) && (_bounds[lower_bound->index() + 1]->compare_and_swap(_bounds[lower_bound->index()])))
-            {
-                std::swap(_bounds[lower_bound->index() - 1], _bounds[lower_bound->index()]);
-                update_possibles(_bounds[lower_bound->index() - 1], _bounds[lower_bound->index()]);
-            }
-
-            remove_from_possible(&po);
+            update_axis(po, X_AXIS);
+            update_axis(po, Y_AXIS);
+            update_axis(po, Z_AXIS);
 
             return *this;            
         }
@@ -171,55 +175,18 @@ class spatial_sub_division : private boost::noncopyable
 
 
     private :
-        spatial_sub_division& remove_from_possible(const physics_object *const po);
-
         /* Set indices on the bounds */
         void set_indices()
         {
+            assert(_bounds[X_AXIS].size() == _bounds[Y_AXIS].size());
+            assert(_bounds[X_AXIS].size() == _bounds[Z_AXIS].size());
+
             /* Set indices */
-            for (int i = 0; i < static_cast<int>(_bounds.size()); ++i)
+            for (int i = 0; i < static_cast<int>(_bounds[X_AXIS].size()); ++i)
             {
-                _bounds[i]->index(i);
-            }
-        }
-
-        /* Find the axis that maximises the range of the scene */
-        axis_t pick_bounds_axis(const std::unordered_map<int, physics_object*> &objects) const
-        {
-            /* Sweep the object to find the scene bounding box */
-            point_t min_pt(std::numeric_limits<fp_t>::max(), std::numeric_limits<fp_t>::max(), std::numeric_limits<fp_t>::max());
-            point_t max_pt(std::numeric_limits<fp_t>::min(), std::numeric_limits<fp_t>::min(), std::numeric_limits<fp_t>::min());
-            for (auto o : objects)
-            {
-                const point_t hi(o.second->upper_bound(X_AXIS)->bound(), o.second->upper_bound(Y_AXIS)->bound(), o.second->upper_bound(Z_AXIS)->bound());
-                const point_t lo(o.second->lower_bound(X_AXIS)->bound(), o.second->lower_bound(Y_AXIS)->bound(), o.second->lower_bound(Z_AXIS)->bound());
-                max_pt = max(max_pt, hi);
-                min_pt = min(min_pt, lo);
-            }
-
-            /* Pick axis to maximise range (and therefore likelyness of separating objects */
-            const point_t diff(max_pt - min_pt);
-            if (diff.x > diff.y)
-            {
-                if (diff.x > diff.z)
-                {
-                    return X_AXIS;
-                }
-                else
-                {
-                    return Z_AXIS;
-                }
-            }
-            else
-            {
-                if (diff.y > diff.z)
-                {
-                    return Y_AXIS;
-                }
-                else
-                {
-                    return Z_AXIS;
-                }
+                _bounds[X_AXIS][i]->index(i);
+                _bounds[Y_AXIS][i]->index(i);
+                _bounds[Z_AXIS][i]->index(i);
             }
         }
 
@@ -227,99 +194,118 @@ class spatial_sub_division : private boost::noncopyable
         {
             /* Clean old state */
             _possibles.clear();
-            _axis_possibles.clear();
+            _axis_possibles[X_AXIS].clear();
+            _axis_possibles[Y_AXIS].clear();
+            _axis_possibles[Z_AXIS].clear();
 
             /* For all bounds */
-            for (unsigned int i = 0; i < _bounds.size(); ++i)
-            {
-                /* That are minimums */
-                if (_bounds[i]->min())
-                {
-                    /* There may be collisions between this object and any found before the maximum */
-                    int j = i + 1;
-                    while ((_bounds[i]->object() != _bounds[j]->object()) && (j < static_cast<int>(_bounds.size())))
-                    {
-                        _axis_possibles.emplace(std::min(_bounds[i]->object(), _bounds[j]->object()), std::max(_bounds[i]->object(), _bounds[j]->object()));
-                        ++j;
-                    }
-                }
-            }
+            collision_detect_axis(X_AXIS);
+            collision_detect_axis(Y_AXIS);
+            collision_detect_axis(Z_AXIS);
 
             /* Update possibles */
-            std::copy_if(_axis_possibles.begin(), _axis_possibles.end(), std::inserter(_possibles, _possibles.begin()), [this](const std::pair<const physics_object *, const physics_object *> &p)
+            const int smallest_set = (_axis_possibles[X_AXIS].size() < _axis_possibles[Y_AXIS].size()) ?
+                ((_axis_possibles[X_AXIS].size() < _axis_possibles[Z_AXIS].size()) ? X_AXIS : Z_AXIS) :
+                ((_axis_possibles[Y_AXIS].size() < _axis_possibles[Z_AXIS].size()) ? Y_AXIS : Z_AXIS);
+
+            switch (smallest_set)
             {
-                return is_possible(p);
-            });
+                case X_AXIS :
+                    for (auto p : _axis_possibles[X_AXIS])
+                    {
+                        if ((_axis_possibles[Y_AXIS].find(p) != _axis_possibles[Y_AXIS].end()) && 
+                            (_axis_possibles[Z_AXIS].find(p) != _axis_possibles[Z_AXIS].end()))
+                        {
+                            _possibles.insert(p);
+                        }
+                    }
+                    break;
+                case Y_AXIS :
+                    for (auto p : _axis_possibles[X_AXIS])
+                    {
+                        if ((_axis_possibles[X_AXIS].find(p) != _axis_possibles[X_AXIS].end()) && 
+                            (_axis_possibles[Z_AXIS].find(p) != _axis_possibles[Z_AXIS].end()))
+                        {
+                            _possibles.insert(p);
+                        }
+                    }
+                    break;
+                case Z_AXIS :
+                    for (auto p : _axis_possibles[X_AXIS])
+                    {
+                        if ((_axis_possibles[X_AXIS].find(p) != _axis_possibles[X_AXIS].end()) && 
+                            (_axis_possibles[Y_AXIS].find(p) != _axis_possibles[Y_AXIS].end()))
+                        {
+                            _possibles.insert(p);
+                        }
+                    }
+                    break;
+            }
 
             return *this;
         }
 
-        void update_possibles(const object_bound *const moving_lo, const object_bound *const moving_hi)
+        void collision_detect_axis(const axis_t axis)
         {
-            if (moving_lo->min() && !moving_hi->min())
+            /* For all bounds */
+            for (unsigned int i = 0; i < _bounds[axis].size(); ++i)
             {
-                const auto pair(std::make_pair(std::min(moving_lo->object(), moving_hi->object()), std::max(moving_lo->object(), moving_hi->object())));
-                _axis_possibles.insert(pair);
-
-                if (is_possible(pair))
+                /* That are minimums */
+                if (_bounds[axis][i]->min())
                 {
-                    _possibles.insert(pair);
+                    /* There may be collisions between this object and any found before the maximum */
+                    int j = i + 1;
+                    while ((_bounds[axis][i]->object() != _bounds[axis][j]->object()) && (j < static_cast<int>(_bounds[axis].size())))
+                    {
+                        _axis_possibles[axis].insert(_bounds[axis][i]->object(), _bounds[axis][j]->object());
+                        ++j;
+                    }
                 }
-            }
-
-            if (!moving_lo->min() && moving_hi->min())
-            {
-                const auto pair(std::make_pair(std::min(moving_lo->object(), moving_hi->object()), std::max(moving_lo->object(), moving_hi->object())));
-                _axis_possibles.erase(pair);
-                _possibles.erase(pair);
             }
         }
 
-        bool is_possible(const std::pair<const physics_object *, const physics_object *> &p) const
+        void update_axis(const physics_object &po, const axis_t axis)
         {
-            if (this->_axis != X_AXIS)
+            /* Get object bounds */
+            const object_bound *const lower_bound = po.lower_bound(axis);
+            const object_bound *const upper_bound = po.upper_bound(axis);
+
+            /* Adjust bounds tracking changes in collision set */
+            /* Moving lower bound down */
+            while ((lower_bound->index() > 0) && (_bounds[axis][lower_bound->index()]->compare_and_swap(_bounds[axis][lower_bound->index() - 1])))
             {
-                const fp_t first_lo = p.first->lower_bound(X_AXIS)->bound();
-                const fp_t first_hi = p.first->upper_bound(X_AXIS)->bound();
-                const fp_t second_lo = p.second->lower_bound(X_AXIS)->bound();
-                const fp_t second_hi = p.second->upper_bound(X_AXIS)->bound();
-                if ((first_lo > second_hi) | (first_hi < second_lo))
-                {
-                    return false;
-                }
+                std::swap(_bounds[axis][lower_bound->index()], _bounds[axis][lower_bound->index() + 1]);
+                update_possibles(_bounds[axis][lower_bound->index()], _bounds[axis][lower_bound->index() + 1], axis);
             }
 
-            if (this->_axis != Y_AXIS)
+            /* Moving upper bound down */
+            while ((upper_bound->index() > 0) && (_bounds[axis][upper_bound->index()]->compare_and_swap(_bounds[axis][upper_bound->index() - 1])))
             {
-                const fp_t first_lo = p.first->lower_bound(Y_AXIS)->bound();
-                const fp_t first_hi = p.first->upper_bound(Y_AXIS)->bound();
-                const fp_t second_lo = p.second->lower_bound(Y_AXIS)->bound();
-                const fp_t second_hi = p.second->upper_bound(Y_AXIS)->bound();
-                if ((first_lo > second_hi) | (first_hi < second_lo))
-                {
-                    return false;
-                }
+                std::swap(_bounds[axis][upper_bound->index()], _bounds[axis][upper_bound->index() + 1]);
+                update_possibles(_bounds[axis][upper_bound->index()], _bounds[axis][upper_bound->index() + 1], axis);
             }
 
-            if (this->_axis != Z_AXIS)
+            /* Moving upper bound up */
+            const int axis_size = _bounds[axis].size() - 1;
+            while ((upper_bound->index() < axis_size) && (_bounds[axis][upper_bound->index() + 1]->compare_and_swap(_bounds[axis][upper_bound->index()])))
             {
-                const fp_t first_lo = p.first->lower_bound(Z_AXIS)->bound();
-                const fp_t first_hi = p.first->upper_bound(Z_AXIS)->bound();
-                const fp_t second_lo = p.second->lower_bound(Z_AXIS)->bound();
-                const fp_t second_hi = p.second->upper_bound(Z_AXIS)->bound();
-                if ((first_lo > second_hi) | (first_hi < second_lo))
-                {
-                    return false;
-                }
+                std::swap(_bounds[axis][upper_bound->index() - 1], _bounds[axis][upper_bound->index()]);
+                update_possibles(_bounds[axis][upper_bound->index() - 1], _bounds[axis][upper_bound->index()], axis);
             }
 
-            return true;
+            /* Moving lower bound up */
+            while ((lower_bound->index() < axis_size) && (_bounds[axis][lower_bound->index() + 1]->compare_and_swap(_bounds[axis][lower_bound->index()])))
+            {
+                std::swap(_bounds[axis][lower_bound->index() - 1], _bounds[axis][lower_bound->index()]);
+                update_possibles(_bounds[axis][lower_bound->index() - 1], _bounds[axis][lower_bound->index()], axis);
+            }
         }
 
-        std::vector<object_bound *> _bounds;
-        collision_set               _axis_possibles;
+        void update_possibles(const object_bound *const moving_lo, const object_bound *const moving_hi, const axis_t axis);
+
+        std::vector<object_bound *> _bounds[3];
+        collision_set               _axis_possibles[3];
         collision_set               _possibles;
-        const axis_t                _axis;
 };
 }; /* namespace raptor_physics */
 

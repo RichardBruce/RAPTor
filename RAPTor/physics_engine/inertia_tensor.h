@@ -45,11 +45,6 @@ inline void invert_inertia_tensor(fp_t *const out, const fp_t *const in)
     out[3] = cof_12 * det_inv;
     out[4] = cof_23 * det_inv;
     out[5] = cof_13 * det_inv;
-    
-    BOOST_LOG_TRIVIAL(trace) << "Inverse Inertia Tensor: ";
-    BOOST_LOG_TRIVIAL(trace) << "    " << out[0] << " " << out[3] << " " << out[5];
-    BOOST_LOG_TRIVIAL(trace) << "    " << out[3] << " " << out[1] << " " << out[4];
-    BOOST_LOG_TRIVIAL(trace) << "    " << out[5] << " " << out[4] << " " << out[2];
 }
 
 /* Class representing the interia tensor of an arbitary polyhedron */
@@ -283,9 +278,6 @@ class inertia_tensor_view
     public :
         inertia_tensor_view(const inertia_tensor &it, const quaternion_t &q)
         {
-            METHOD_LOG;
-            BOOST_LOG_TRIVIAL(trace) << "Orientating to: " << q;
-
             /* Infinite mass, nothing really to do */
             if (it.mass() == numeric_limits<fp_t>::infinity())
             {
