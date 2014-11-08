@@ -1139,7 +1139,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         this->image[i] /= (fp_t)255.0;
 
         /* Find average rgb value for average tone mapper */
-        if (tone_map == global_exposure)
+        if (tone_map == tone_mapping_mode_t::global_exposure)
         {
             rgbAvg += (this->image[i].r + this->image[i].g + this->image[i].b) * (fp_t)(1.0 / 3.0);
         }
@@ -1274,7 +1274,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
 
 
     /* Contrast based tone mapping (Ward) */
-    if (tone_map == global_contrast)
+    if (tone_map == tone_mapping_mode_t::global_contrast)
     {
         const fp_t Yw  = (fp_t)300.0;  /* Maximum display illumination */
         const fp_t num = (fp_t)1.219 + pow(Yw * (fp_t)0.5, (fp_t)0.4);
@@ -1287,17 +1287,17 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         }
     }
     /* Hostogram based local tone mapping function */
-    else if (tone_map == local_histogram)
+    else if (tone_map == tone_mapping_mode_t::local_histogram)
     {
         this->histogram_tone_map(false);
     }
     /* Hostogram based local tone mapping function with human based contrast limits */
-    else if (tone_map == local_human_histogram)
+    else if (tone_map == tone_mapping_mode_t::local_human_histogram)
     {
         this->histogram_tone_map(true);
     }
     /* Non-linear tone mapping */
-    else if (tone_map == global_non_linear)
+    else if (tone_map == tone_mapping_mode_t::global_non_linear)
     {
         const fp_t sf = key / Yi;
         maxY *= sf;
@@ -1313,7 +1313,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         }
     }
     /* Exposure based tone mapping */
-    else if (tone_map == global_exposure)
+    else if (tone_map == tone_mapping_mode_t::global_exposure)
     {
         const fp_t sf = key / Yi;
         maxY *= sf;
@@ -1328,7 +1328,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         }
     }
     /* Average luminance based tone mapping */
-    else if (tone_map == global_avg_luminance)
+    else if (tone_map == tone_mapping_mode_t::global_avg_luminance)
     {
         /* Map average luminance to 0.5 */
         fp_t sf = (fp_t)1.0;
@@ -1343,7 +1343,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         }
     }
     /* Maximum luminance based tone mapping */
-    else if (tone_map == global_max_luminance)
+    else if (tone_map == tone_mapping_mode_t::global_max_luminance)
     {
         const fp_t sf = key / maxY;
         for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
@@ -1351,12 +1351,12 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
             this->image[i].g *= sf;
         }
     }
-    else if (tone_map == global_bilateral_filter)
+    else if (tone_map == tone_mapping_mode_t::global_bilateral_filter)
     {
         const fp_t s_s = (fp_t)0.02 * min(this->x_res, this->y_res);
         this->bilateral_filter_tone_map((fp_t)0.4, s_s, (fp_t)0.4, s_s);
     }
-    else if (tone_map == global_ferwerda)
+    else if (tone_map == tone_mapping_mode_t::global_ferwerda)
     {
         const fp_t lda      = (fp_t)800.0;
         const fp_t log_lda  = log(lda * (fp_t)0.5);
@@ -2097,26 +2097,6 @@ void camera::convert_Yxy_to_rgb()
 
     return;
 }
-
-
-#ifdef LOG_DEPTH
-camera & camera::write_depth_map(const string &file_name)
-{
-    /* Open output file */
-    ofstream depth_output(file_name.c_str(), ios::out);
-    
-    /* Write pixel depths */
-    for (unsigned int i = 0; i < (this->out_x_res * this->out_y_res); i++)
-    {
-        depth_output << this->depth_map[i] << ", ";
-    }
-
-    /* Clean up */
-    depth_output.close();
-    
-    return *this;
-}
-#endif
 
 
 const camera & camera::write_tga_file(const string &file_name, unsigned char *o) const

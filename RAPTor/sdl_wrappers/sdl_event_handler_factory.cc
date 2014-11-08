@@ -1,5 +1,6 @@
 /* Standard headers */
 #include <map>
+#include <string>
 
 /* Common headers */
 #include "common.h"
@@ -11,14 +12,16 @@
 
 /* Local headers */
 #include "camera.h"
+#include "common.h"
 
 using raptor_raytracer::camera;
-
+using raptor_raytracer::image_format_t;
+using raptor_raytracer::tone_mapping_mode_t;
 
 /* Function to create an handler for the camera mappings of SDL_Keycode */
 /*  cam is the camera that will be updated. ownership is not taken of the camera */
 /*  a pointer to an sdl_event_handler<camera> is returned */
-sdl_event_handler<camera>* get_camera_event_handler(camera *const cam)
+sdl_event_handler<camera>* get_camera_event_handler(camera *const cam, const std::string &output_file, const int jpg_quality, const image_format_t image_format)
 {
     typedef std::function<int (const SDL_Keycode, camera*)> handler_function;
 
@@ -31,6 +34,11 @@ sdl_event_handler<camera>* get_camera_event_handler(camera *const cam)
         { SDLK_KP_MINUS, [](const SDL_Keycode key, camera* c) -> int
             {
                 c->slow_down(); return -1;
+            }
+        },
+        { SDLK_ESCAPE, [](const SDL_Keycode key, camera* c) -> int
+            {
+                return 1;
             }
         },
         { SDLK_q, [](const SDL_Keycode key, camera* c) -> int
@@ -104,6 +112,37 @@ sdl_event_handler<camera>* get_camera_event_handler(camera *const cam)
         { SDLK_p, [](const SDL_Keycode key, camera* c) -> int
             {
                 c->print_position_data(); return 0;
+            }
+        },
+        { SDLK_f, [&output_file, jpg_quality, image_format](const SDL_Keycode key, camera* c) -> int
+            {
+                static unsigned int snapshot_nr = 0;
+                ostringstream file_name(ostringstream::out);
+
+                /* Tone map */
+                c->tone_map(tone_mapping_mode_t::local_human_histogram);
+                
+                /* Output image */
+                switch (image_format)
+                {
+                    case image_format_t::tga :
+                        file_name << output_file << "_" << snapshot_nr++ << ".tga";
+                        c->write_tga_file(file_name.str());
+                        break;
+                    case image_format_t::jpg :
+                        file_name << output_file << "_" << snapshot_nr++ << ".jpg";
+                        c->write_jpeg_file(file_name.str(), jpg_quality);
+                        break;
+                    case image_format_t::png :
+                        file_name << output_file << "_" << snapshot_nr++ << ".png";
+                        c->write_png_file(file_name.str());
+                        break;
+                    default :
+                        assert(!"Error unknown image format");
+                        break;
+                }
+
+                return 0;
             }
         }
     });

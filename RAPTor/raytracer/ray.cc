@@ -230,9 +230,6 @@ fp_t ray::reflect(ray rays[], const line &n, const fp_t r, const fp_t dr) const
     rays[0].set_up(start_point, ref.x, ref.y, ref.z, refl_power);
     return 1.0;
 #endif /* #ifdef DIFFUSE_REFLECTIONS */
-#else
-
-    return 0.0;
 }
 
 
@@ -335,9 +332,6 @@ fp_t ray::refract(ray rays[], const line &n, const fp_t t, fp_t ri, const hit_t 
     rays[0].set_up(start_point, ref.x, ref.y, ref.z, refr_power);
     return 1.0;
 #endif /* #ifdef DIFFUSE_REFLECTIONS */
-#else
-
-    return 0.0;
 }
 
 

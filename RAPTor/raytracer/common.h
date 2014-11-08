@@ -308,7 +308,7 @@ struct hit_description
 enum model_format_t { cfg = 0, code = 1, mgf = 2, nff = 3, lwo = 4, obj = 5, ply = 6, vrml = 7 };
 
 /* Enumerate the output file formats */
-enum image_format_t { tga = 0, jpg = 1, png = 2 };
+enum class image_format_t : char { tga = 0, jpg = 1, png = 2 };
 
 /* Function to generate a random number between -1 and 1 */
 fp_t gen_random_mersenne_twister();

@@ -87,123 +87,6 @@ void help()
 
 
 /*****************************************************
- Function to write to process user key presses. 
- 
- The presses key is used to move the view point and 
- to rotate the angle of view. A snapshot may be taken,
- this is processed using a camera output function.
- 
- true is returned if the program should exit. false is
- returned otherwise.
-*****************************************************/
-inline int key_press(camera *const c, const string &output_file, const SDL_Keycode key_pressed, const image_format_t image_format, const int jpg_quality)
-{
-    /* Static to unique output file naming */
-    static unsigned int snapshot_nr = 0;
-    ostringstream file_name(ostringstream::out);
-    
-#ifdef LOG_DEPTH                
-    ostringstream depth_map_name(ostringstream::out);
-#endif 
-
-
-    /* Find which key was pressed */
-    switch (key_pressed) 
-    {
-        /* quit */
-        case SDLK_ESCAPE :
-        case SDLK_KP_PLUS :
-                c->speed_up();
-                return -1;
-        case SDLK_KP_MINUS :
-                c->slow_down();
-                return -1;
-        case SDLK_q      :
-                return 1;
-        /* Rotation */
-        case SDLK_UP :
-                c->tilt( 0.01 * PI);
-                break;
-        case SDLK_DOWN :
-                c->tilt(-0.01 * PI);
-                break;
-        case SDLK_RIGHT :
-                c->pan( 0.01 * PI);
-                break;
-        case SDLK_LEFT :
-                c->pan(-0.01 * PI);
-                break;
-        case SDLK_PAGEDOWN :
-                c->roll( 0.01 * PI);
-                break;
-        case SDLK_PAGEUP :
-                c->roll(-0.01 * PI);
-                break;
-        /* Movement */
-        case SDLK_SPACE :
-                c->move_up();
-                break;
-        case SDLK_LCTRL :
-                c->move_up(-1.0);
-                break;
-        case SDLK_a :
-                c->move_right(-1.0);
-                break;
-        case SDLK_d :
-                c->move_right();
-                break;
-        case SDLK_s :
-                c->move_forward(-1.0);
-                break;
-        case SDLK_w :
-                c->move_forward();
-                break;
-        /* Take a snapshot */
-        case SDLK_f :
-                /* Tone map */
-                c->tone_map(local_human_histogram);
-                
-                /* Output image */
-                switch (image_format)
-                {
-                    case tga :
-                        file_name << output_file << "_" << snapshot_nr++ << ".tga";
-                        c->write_tga_file(file_name.str());
-                        break;
-                    case jpg :
-                        file_name << output_file << "_" << snapshot_nr++ << ".jpg";
-                        c->write_jpeg_file(file_name.str(), jpg_quality);
-                        break;
-                    case png :
-                        file_name << output_file << "_" << snapshot_nr++ << ".png";
-                        c->write_png_file(file_name.str());
-                        break;
-                    default :
-                        assert(!"Error unknown image format");
-                        break;
-                }
-                
-        
-#ifdef LOG_DEPTH                
-                depth_map_name << output_file << ".dm";
-                c->write_depth_map(depth_map_name.str());
-#endif 
-
-                return -1;
-        /* Print the angle and position of the camera */
-        case SDLK_p :
-                c->print_position_data();
-                return -1;
-        default :
-                cout << "Invalid input" << endl;
-                break;
-    }
-    
-    return 0;
-}
-
-
-/*****************************************************
  The main function.
 *****************************************************/
 int main (int argc, char **argv)
@@ -211,7 +94,7 @@ int main (int argc, char **argv)
     /* Default parameters */
     bool            interactive     = false;
     model_format_t  input_format    = code;
-    image_format_t  image_format    = tga;
+    image_format_t  image_format    = image_format_t::tga;
     int             jpg_quality     = 50;
     ext_colour_t    bg;
     string          input_file;
@@ -264,7 +147,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                image_format    = tga;
+                image_format    = image_format_t::tga;
                 output_file     = argv[++i];
                 caption        += "-tga ";
                 caption        += argv[i];
@@ -280,7 +163,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
 
-                image_format    = png;
+                image_format    = image_format_t::png;
                 output_file     = argv[++i];
                 caption        += "-png ";
                 caption        += argv[i];
@@ -296,7 +179,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                image_format    = jpg;
+                image_format    = image_format_t::jpg;
                 output_file     = argv[++i];
                 caption        += "-jpg ";
                 caption        += argv[i];
@@ -804,7 +687,7 @@ int main (int argc, char **argv)
 
         /* Run until exitted */
         int do_next = 0;
-        std::unique_ptr<sdl_event_handler_base> cam_event_handler(get_camera_event_handler(cam));
+        std::unique_ptr<sdl_event_handler_base> cam_event_handler(get_camera_event_handler(cam, output_file, jpg_quality, image_format));
         std::unique_ptr<unsigned char[]> screen_data(new unsigned char [cam->x_resolution() * cam->y_resolution() * 3]);
         while(do_next != 1) 
         {
@@ -844,15 +727,15 @@ int main (int argc, char **argv)
         ostringstream file_name(ostringstream::out);
         switch (image_format)
         {
-            case tga :
+            case image_format_t::tga :
                 file_name << output_file << "_0.tga";
                 cam->write_tga_file(file_name.str());
                 break;
-            case jpg :
+            case image_format_t::jpg :
                 file_name << output_file << "_0.jpg";
                 cam->write_jpeg_file(file_name.str(), jpg_quality);
                 break;
-            case png :
+            case image_format_t::png :
                 file_name << output_file << "_0.png";
                 cam->write_png_file(file_name.str());
                 break;
@@ -860,12 +743,6 @@ int main (int argc, char **argv)
                 assert(!"Error unknown image format");
                 break;
         }
-        
-#ifdef LOG_DEPTH                
-        ostringstream depth_map_name(ostringstream::out);
-        depth_map_name << output_file << ".dm";
-        cam->write_depth_map(depth_map_name.str());
-#endif        
     }
 
     /* Clean up dynamic memory usage */

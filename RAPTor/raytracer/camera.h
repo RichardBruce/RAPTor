@@ -38,9 +38,9 @@ namespace raptor_raytracer
 enum light_level_t { scotopic = 0, mesopic = 1, photopic = 2 };
 
 /* Enumerate the tone mappers */
-enum tone_mapping_mode_t { global_contrast = 1, local_histogram      = 2, local_human_histogram = 3, global_non_linear       = 4, 
-                           global_exposure = 5, global_avg_luminance = 6, global_max_luminance  = 7, global_bilateral_filter = 8, 
-                           global_ferwerda = 9, none = 0 };
+enum class tone_mapping_mode_t : char { global_contrast = 1, local_histogram      = 2, local_human_histogram = 3, global_non_linear       = 4, 
+                                       global_exposure = 5, global_avg_luminance = 6, global_max_luminance  = 7, global_bilateral_filter = 8, 
+                                       global_ferwerda = 9, none = 0 };
 
 /* File output functions */
 void write_png_file(const string &file_name, unsigned char *png_data, const unsigned int x, const unsigned int y);
@@ -56,11 +56,7 @@ class camera : private boost::noncopyable
                 u(point_t((fp_t)0.0, (fp_t)0.0, (fp_t)0.0)), l(point_t((fp_t)0.0, (fp_t)0.0, (fp_t)0.0)), c(c), x(x), y(y), z(z), b(b), x_m(-w), y_m(-h), x_inc((w * (fp_t)2.0)/(fp_t)(x_res * x_a_res)), y_inc((h * (fp_t)2.0)/(fp_t)(y_res * y_a_res)), 
                 t(t), x_res(x_res * x_a_res), y_res(y_res * y_a_res), out_x_res(x_res), out_y_res(y_res), r_vec(point_t(0.0, 0.0, 0.0)), r_angle(0.0),
                 r_pivot(point_t(0.0, 0.0, 0.0)), speed(1.0), time_step(0.0), adatption_level(0.0)
-        {
-#ifdef LOG_DEPTH                
-            this->depth_map = new fp_t[ this->x_res * this->y_res ];
-#endif
-        };
+        { };
 
         camera(const vector<texture_mapper *>  * const tm, const point_t &u, const point_t &l, const point_t &c, 
                const vector_t &x, const vector_t    &y, const vector_t    &z, const ext_colour_t     &b, const     fp_t w, 
@@ -71,22 +67,13 @@ class camera : private boost::noncopyable
             u(u), l(l), c(c), x(x), y(y), z(z), b(b), x_m(-w), y_m(-h), x_inc((w * (fp_t)2.0)/(fp_t)(x_res * x_a_res)), y_inc((h * (fp_t)2.0)/(fp_t)(y_res * y_a_res)), 
             t(t), x_res(x_res * x_a_res), y_res(y_res * y_a_res), out_x_res(x_res), out_y_res(y_res), r_vec(r_vec), r_angle(r_angle),
             r_pivot(r_pivot), speed(speed), time_step(time_step), adatption_level(0.0)
-        {
-#ifdef LOG_DEPTH                
-            this->depth_map = new fp_t[ this->x_res * this->y_res ];
-#endif
-        };
+        {  };
 
         ~camera()
         {
             /* Delete the image data */
             delete [] this->image;
             
-#ifdef LOG_DEPTH
-            /* Delete the depth map */
-            delete [] this->depth_map;
-#endif
-
             /* Delete any glare filter images */            
             if (this->scotopic_glare_filter != nullptr)
             {
@@ -351,16 +338,6 @@ class camera : private boost::noncopyable
             return *this;
         }
 
-        /* Setting depth */
-        camera & set_pixel(const fp_t p, const int x, const int y)
-        {
-#ifdef LOG_DEPTH
-            this->depth_map[x + (y * this->x_res)] = p;
-#endif
-            return *this;
-        }
-        
-        
         /* Image output function */
         /* Downsample and set output clipped to rgb */
         void clip_image_to_rgb(unsigned char * c) const
@@ -428,11 +405,6 @@ class camera : private boost::noncopyable
             return;
         }
         
-#ifdef LOG_DEPTH
-        /* Depth map */
-        camera & write_depth_map(const string &file_name);
-#endif
-
         /* Write to tga file */
         const camera & write_tga_file(const string &file_name, unsigned char *o = nullptr) const;
 
@@ -478,9 +450,6 @@ class camera : private boost::noncopyable
             {
                 ar & image[i];
             }
-#ifdef LOG_DEPTH                
-            ar & depth_map;
-#endif
             ar & c;
             ar & x;
             ar & y;
@@ -495,9 +464,6 @@ class camera : private boost::noncopyable
             const unsigned x_res, const unsigned y_res, const unsigned out_x_res, const unsigned out_y_res, 
             const point_t &r_vec, const fp_t r_angle, const point_t &r_pivot)
             : tm(tm), image(new ext_colour_t[x_res * y_res]), 
-#ifdef LOG_DEPTH                
-            depth_map(nullptr),
-#endif
             scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), 
             temporal_glare_filter(nullptr), u(u), l(l), b(b), x_m(x_m), y_m(y_m), x_inc(x_inc), y_inc(y_inc), 
             t(t), x_res(x_res), y_res(y_res), out_x_res(out_x_res), out_y_res(out_y_res), r_vec(r_vec), 
@@ -619,9 +585,6 @@ class camera : private boost::noncopyable
         ext_colour_t                    *           mesopic_glare_filter;       /* Array of colours for glare filter images in mesopic lighting     */
         ext_colour_t                    *           photopic_glare_filter;      /* Array of colours for glare filter images in photopic lighting    */
         ext_colour_t                    *           temporal_glare_filter;      /* Array of colours for temporal glare filter images                */
-#ifdef LOG_DEPTH                
-        fp_t                            *           depth_map;                  /* Per pixel ray depths for 3D reconstruction                       */
-#endif
         const point_t                               u;                          /* Upper bounds of the sky box                                      */
         const point_t                               l;                          /* Lower bounds of the sky box                                      */
         point_t                                     c;                          /* Camera position                                                  */
