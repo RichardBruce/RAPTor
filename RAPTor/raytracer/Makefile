@@ -62,6 +62,9 @@ spotless ::
 	$(RM) libraytracer.so
 	$(RM) libraytracer.so.1
 	$(RM) libraytracer.so.1.0.1
+	$(RM) todo
+	$(RM) cppcheck.xml
+	$(RM) lines_of_code
 	$(RM) *.tga
 	$(RM) -r $(RAPTOR_DATA)/spd$(SPD_VER)/
 	$(MAKE) -C unit_tests spotless
