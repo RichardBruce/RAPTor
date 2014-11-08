@@ -525,13 +525,13 @@ inline static void parse_surf(material **m, const std::map<std::uint32_t, std::s
         {
             /* Transparency image name */
             BOOST_LOG_TRIVIAL(trace) << "TIMG: (not handled)";
-            std::uint32_t idx = parse_vx(&tmp_ptr);
+            /*std::uint32_t idx = */ parse_vx(&tmp_ptr);
         }
         else if (strncmp((*ptr), "RIMG", 4) == 0)
         {
             /* Reflection image name */
             BOOST_LOG_TRIVIAL(trace) << "RIMG: (not handled)";
-            std::uint32_t idx = parse_vx(&tmp_ptr);
+            /*std::uint32_t idx = */ parse_vx(&tmp_ptr);
         }
         else if (strncmp((*ptr), "TAMP", 4) == 0)
         {
