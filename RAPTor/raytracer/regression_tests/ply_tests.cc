@@ -12,7 +12,7 @@ const raptor_physics::init_logger init_logger;
 #include "regression_fixture.h"
 
 
-BOOST_AUTO_TEST_SUITE( ply_tests )
+BOOST_AUTO_TEST_SUITE( ply_tests );
 
 BOOST_AUTO_TEST_CASE( ply_bun_zipper_test )
 {
