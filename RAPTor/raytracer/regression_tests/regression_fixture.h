@@ -53,7 +53,7 @@ struct regression_fixture : private boost::noncopyable
             std::ifstream input_stream;
             switch (input_format)
             {
-                case cfg :
+                case model_format_t::cfg :
                     input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
                     cfg_parser(input_stream, _lights, _everything, _materials, &_cam);
@@ -62,20 +62,20 @@ struct regression_fixture : private boost::noncopyable
                     _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
                     break;
 
-                case mgf :
+                case model_format_t::mgf :
                     mgf_parser(input_path.c_str(), _lights, _everything, _materials);
                     
                     /* Camera is not set in the scene so do it here */
                     _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya);
                     break;
 
-                case nff :
+                case model_format_t::nff :
                     input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
                     nff_parser(input_stream, _lights, _everything, _materials, &_cam);
                     break;
 
-                case lwo :
+                case model_format_t::lwo :
                     input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
                     last_slash  = input_path.find_last_of('/');
@@ -86,7 +86,7 @@ struct regression_fixture : private boost::noncopyable
                     _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
                     break;
                     
-                case obj :
+                case model_format_t::obj :
                     input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
                     last_slash  = input_path.find_last_of('/');
@@ -97,7 +97,7 @@ struct regression_fixture : private boost::noncopyable
                     _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
                     break;
 
-                case ply :
+                case model_format_t::ply :
                     input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
                     ply_parser(input_stream, _lights, _everything, _materials, &_cam);
@@ -106,7 +106,7 @@ struct regression_fixture : private boost::noncopyable
                     _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
                     break;
 
-                case vrml :
+                case model_format_t::vrml :
                     /* Deafult camera set up for vrml -- NOTE negative z axis */
                     _cam = new camera(cam_p, point_t((fp_t)1.0, (fp_t)0.0, (fp_t) 0.0), 
                                              point_t((fp_t)0.0, (fp_t)1.0, (fp_t) 0.0), 
