@@ -292,7 +292,6 @@ class packet_ray_to_co_ordinate
 
 extern const packet_ray_to_co_ordinate packet_ray_to_co_ordinate_lut;
 
-#endif /* #ifdef SIMD_PACKET_TRACING */
 }; /* namespace raptor_raytracer */
-
+#endif /* #ifdef SIMD_PACKET_TRACING */
 #endif /* #ifndef __PACKET_RAY_H__ */
