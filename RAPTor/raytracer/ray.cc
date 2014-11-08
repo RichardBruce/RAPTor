@@ -162,7 +162,6 @@ fp_t ray::find_rays(ray rays[], const light &l, const line &n, const hit_t h) co
 **********************************************************/
 fp_t ray::reflect(ray rays[], const line &n, const fp_t r, const fp_t dr) const
 {
-#ifdef REFLECTIONS_ON
     /* Check the ray will be strong enough to continue */
     
     assert(this->magn <  1.1);
@@ -234,7 +233,6 @@ fp_t ray::reflect(ray rays[], const line &n, const fp_t r, const fp_t dr) const
 #else
 
     return 0.0;
-#endif /* #ifdef REFLECTIONS_ON */
 }
 
 
@@ -252,7 +250,6 @@ fp_t ray::reflect(ray rays[], const line &n, const fp_t r, const fp_t dr) const
 **********************************************************/
 fp_t ray::refract(ray rays[], const line &n, const fp_t t, fp_t ri, const hit_t h, const fp_t dr) const 
 {
-#ifdef REFRACTIONS_ON
     /* Check the ray will be strong enough to continue */
     fp_t refr_power = this->magn * t;
     if (refr_power <= MIN_REFLECTIVE_POWER)
@@ -341,7 +338,6 @@ fp_t ray::refract(ray rays[], const line &n, const fp_t t, fp_t ri, const hit_t 
 #else
 
     return 0.0;
-#endif /* #ifdef REFRACTIONS_ON */
 }
 
 

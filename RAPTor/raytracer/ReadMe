@@ -110,8 +110,6 @@ targets:
     `make spotless`                     - as make clean, but also removes the SDL, SPD and TBB directories.
 
 The ray tracer can be configured using the following defines in the Makefile:    
-    -DREFLECTIONS_ON                        - Enables reflections.
-    -DREFRACTIONS_ON                        - Enables refractions.
     -DSPATIAL_SUBDIVISION_ON                - Enables spatial sub division.
     -DDIFFUSE_REFLECTIONS=<reflection rays> - Enables diffuse reflections with a number of rays.
     -DSOFT_SHADOW=<shadow rays>             - Enables soft shadow with a number of rays.

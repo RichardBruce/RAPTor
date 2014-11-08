@@ -267,7 +267,7 @@ if ($help)
 
 
 # Set the compile defines
-my $compile_defines             = "REFLECTIONS_ON REFRACTIONS_ON SPATIAL_SUBDIVISION_STATISTICS"; # SPATIAL_SUBDIVISION_BIH
+my $compile_defines             = "SPATIAL_SUBDIVISION_STATISTICS"; # SPATIAL_SUBDIVISION_BIH
 my $threaded_compile_defines    = "";
 if ( $use_bih )
 {
