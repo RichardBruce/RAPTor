@@ -43,4 +43,4 @@ build/%.o : %.c | build
 
 # Lint code
 cppcheck.xml : $(SOURCE)
-	cppcheck  $(patsubst %,-I%,$(LOCAL_INCLUDES)) --enable=all --error-exitcode=1 --force --inline-suppr --suppress=missingIncludeSystem --xml-version=2 ./ 2> cppcheck.xml
+	cppcheck  $(patsubst %,-I%,$(LOCAL_INCLUDES)) $(patsubst %,-D%,$(LINTER_DEFINES)) --enable=all --error-exitcode=1 --force --inline-suppr --suppress=missingIncludeSystem --xml-version=2 ./ 2> cppcheck.xml
