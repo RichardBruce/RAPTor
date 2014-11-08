@@ -661,11 +661,11 @@ inline line triangle::normal_at_point(ray *const r, hit_description *const h) co
     if (denom > 0.0)
     {
         l.opposite_dir();
-        h->h = in_out;
+        h->h = hit_t::in_out;
     }
     else
     {
-        h->h = out_in;
+        h->h = hit_t::out_in;
     }
     
     return l;

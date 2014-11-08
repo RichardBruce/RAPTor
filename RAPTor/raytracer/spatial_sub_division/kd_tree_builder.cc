@@ -27,7 +27,7 @@ void divide_kdt_node(voxel *const base, kdt_node *const kdt_subdiv)
     voxel right_divide = base->divide(kdt_subdiv);
     
     /* Check if a leaf node was create */
-    if (kdt_subdiv->get_normal() != not_set)
+    if (kdt_subdiv->get_normal() != axis_t::not_set)
     {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
         ++ng;
@@ -57,7 +57,7 @@ void divide_kdt_node(voxel *const base, kdt_node *const kdt_subdiv)
 /**********************************************************
  
 **********************************************************/
-void build_kd_tree(const primitive_list *const objects, kdt_node *const kdt_subdiv, axis normal)
+void build_kd_tree(const primitive_list *const objects, kdt_node *const kdt_subdiv, axis_t normal)
 {
     /* Create a voxel to hold everything */
     primitive_list *object_copy = new primitive_list;

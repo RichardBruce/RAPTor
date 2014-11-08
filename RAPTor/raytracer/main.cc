@@ -93,7 +93,7 @@ int main (int argc, char **argv)
 {
     /* Default parameters */
     bool            interactive     = false;
-    model_format_t  input_format    = code;
+    model_format_t  input_format    = model_format_t::code;
     image_format_t  image_format    = image_format_t::tga;
     int             jpg_quality     = 50;
     ext_colour_t    bg;
@@ -198,7 +198,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                input_format    = cfg;
+                input_format    = model_format_t::cfg;
                 input_file      = argv[++i];
             }
             /* MGF input */
@@ -211,7 +211,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                input_format    = mgf;
+                input_format    = model_format_t::mgf;
                 input_file      = argv[++i];
             }
             /* NFF input */
@@ -224,7 +224,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                input_format    = nff;
+                input_format    = model_format_t::nff;
                 input_file      = argv[++i];
             }
             /* LWO input */
@@ -237,7 +237,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                input_format    = lwo;
+                input_format    = model_format_t::lwo;
                 input_file      = argv[++i];
             }
             /* OBJ input */
@@ -250,7 +250,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                input_format    = obj;
+                input_format    = model_format_t::obj;
                 input_file      = argv[++i];
             }
             /* PLY input */
@@ -263,7 +263,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                input_format    = ply;
+                input_format    = model_format_t::ply;
                 input_file      = argv[++i];
             }
             /* VRML input */
@@ -276,7 +276,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                input_format    = vrml;
+                input_format    = model_format_t::vrml;
                 input_file      = argv[++i];
                 view_point      = argv[++i];
             }
@@ -586,7 +586,7 @@ int main (int argc, char **argv)
     const fp_t screen_height    = screen_width * ((fp_t)yr / (fp_t)xr);
     switch (input_format)
     {
-        case cfg :
+        case model_format_t::cfg :
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());
             cfg_parser(input_stream, lights, everything, materials, &cam);
@@ -595,24 +595,24 @@ int main (int argc, char **argv)
             cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
             break;
 
-        case code :
+        case model_format_t::code :
             scene_init(lights, everything, materials, &cam);
             break;
 
-        case mgf :
+        case model_format_t::mgf :
             mgf_parser(input_file.c_str(), lights, everything, materials);
             
             /* Camera is not set in the scene so do it here */
             cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya);
             break;
 
-        case nff :
+        case model_format_t::nff :
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());
             nff_parser(input_stream, lights, everything, materials, &cam);
             break;
 
-        case lwo :
+        case model_format_t::lwo :
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());
             last_slash  = input_file.find_last_of('/');
@@ -623,7 +623,7 @@ int main (int argc, char **argv)
             cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
             break;
             
-        case obj :
+        case model_format_t::obj :
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());
             last_slash  = input_file.find_last_of('/');
@@ -634,7 +634,7 @@ int main (int argc, char **argv)
             cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
             break;
 
-        case ply :
+        case model_format_t::ply :
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());
             ply_parser(input_stream, lights, everything, materials, &cam);
@@ -643,7 +643,7 @@ int main (int argc, char **argv)
             cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
             break;
 
-        case vrml :
+        case model_format_t::vrml :
             /* Deafult camera set up for vrml -- NOTE negative z axis */
             cam = new camera(cam_p, point_t((fp_t)1.0, (fp_t)0.0, (fp_t) 0.0), 
                                     point_t((fp_t)0.0, (fp_t)1.0, (fp_t) 0.0), 

@@ -378,17 +378,17 @@ void camera::generate_glare_filter(ext_colour_t **gf, const light_level_t ll)
     photopic_bloom_t    pb;
     switch (ll)
     {
-        case scotopic   : 
+        case light_level_t::scotopic   : 
             this->apply_point_spreading_function(sc, &(*gf)[0]                            );
             this->apply_point_spreading_function(sh, &(*gf)[this->x_res * this->y_res    ]);
             this->apply_point_spreading_function(sb, &(*gf)[this->x_res * this->y_res * 2]);
             break;
-        case mesopic    : 
+        case light_level_t::mesopic    : 
             this->apply_point_spreading_function(mc, &(*gf)[0]                            );
             this->apply_point_spreading_function(mh, &(*gf)[this->x_res * this->y_res    ]);
             this->apply_point_spreading_function(mb, &(*gf)[this->x_res * this->y_res * 2]);
             break;
-        case photopic   : 
+        case light_level_t::photopic   : 
             this->apply_point_spreading_function(pc, &(*gf)[0]                            );
             this->apply_point_spreading_function(ph, &(*gf)[this->x_res * this->y_res    ]);
             this->apply_point_spreading_function(pb, &(*gf)[this->x_res * this->y_res * 2]);
@@ -1205,7 +1205,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
     }
 
     rgbAvg /= (this->x_res * this->y_res);
-    Yi = pow((fp_t)10.0, Yi);
+    Yi = std::pow((fp_t)10.0, Yi);
 
 
     /* Correct Yi to the adaption level */
@@ -1252,8 +1252,8 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         else
         {
             const fp_t r    = (Yi / this->adatption_level);
-            const fp_t c1   = this->adatption_level * (pow(r, (fp_t)0.9) - (fp_t)1.0);
-            const fp_t c2   = Yi * ((fp_t)1.0 - pow(r, (fp_t)-0.1));
+            const fp_t c1   = this->adatption_level * (std::pow(r, (fp_t)0.9) - (fp_t)1.0);
+            const fp_t c2   = Yi * ((fp_t)1.0 - std::pow(r, (fp_t)-0.1));
 
             /* Cone adaption level */
             const fp_t a_cone = Yi - (c1 * exp(-(this->time_step / (fp_t)16.0e-3))) - (c2 * exp(-(this->time_step / (fp_t)200.0e-3)));
@@ -1277,9 +1277,9 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
     if (tone_map == tone_mapping_mode_t::global_contrast)
     {
         const fp_t Yw  = (fp_t)300.0;  /* Maximum display illumination */
-        const fp_t num = (fp_t)1.219 + pow(Yw * (fp_t)0.5, (fp_t)0.4);
-        const fp_t den = (fp_t)1.219 + pow(Yi, (fp_t)0.4);
-        const fp_t sf  = ((fp_t)1.0 / Yw) * pow((num / den), (fp_t)2.5);
+        const fp_t num = (fp_t)1.219 + std::pow(Yw * (fp_t)0.5, (fp_t)0.4);
+        const fp_t den = (fp_t)1.219 + std::pow(Yi, (fp_t)0.4);
+        const fp_t sf  = ((fp_t)1.0 / Yw) * std::pow((num / den), (fp_t)2.5);
 
         for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
         {
@@ -1370,7 +1370,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         }
         else if (log_la <= (fp_t)1.9)
         {
-            tp = pow((((fp_t)0.249 * log_la) + (fp_t)0.65), (fp_t)2.7) - (fp_t)0.72;
+            tp = std::pow((((fp_t)0.249 * log_la) + (fp_t)0.65), (fp_t)2.7) - (fp_t)0.72;
         }
         else
         {
@@ -1386,7 +1386,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         }
         else if (log_la < (fp_t)-1.44)
         {
-            ts = pow((((fp_t)0.405 * log_la) + (fp_t)1.6), (fp_t)2.18) - (fp_t)2.86;
+            ts = std::pow((((fp_t)0.405 * log_la) + (fp_t)1.6), (fp_t)2.18) - (fp_t)2.86;
         }
         else
         {
@@ -1455,7 +1455,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
     /* Add glare filter */
     if (gf)
     { 
-        this->perform_glare_filter(Yi, 1.0);
+        this->perform_glare_filter(Yi, 1.0f);
     }
 
     return *this;
@@ -1480,16 +1480,16 @@ camera & camera::gamma_correct(const fp_t gamma)
         if (fabs(gamma - (fp_t)2.2) > 0.001)
         {
             /* regular gamma correction */
-            r = pow(r, (fp_t)1.0/gamma);
-            g = pow(g, (fp_t)1.0/gamma);
-            b = pow(b, (fp_t)1.0/gamma);
+            r = std::pow(r, (fp_t)1.0/gamma);
+            g = std::pow(g, (fp_t)1.0/gamma);
+            b = std::pow(b, (fp_t)1.0/gamma);
         }
         else if (fabs(gamma - (fp_t)1.0) > 0.001)
         {
             /* sRGB standard gamma correction (similar to regular w/2.2) */
-            r = (r <= (fp_t)0.0031308) ? ((fp_t)12.92 * r) : ((fp_t)1.055 * pow(r, (fp_t)(1.0 / 2.4)) - (fp_t)0.055);
-            g = (g <= (fp_t)0.0031308) ? ((fp_t)12.92 * g) : ((fp_t)1.055 * pow(g, (fp_t)(1.0 / 2.4)) - (fp_t)0.055);
-            b = (b <= (fp_t)0.0031308) ? ((fp_t)12.92 * b) : ((fp_t)1.055 * pow(b, (fp_t)(1.0 / 2.4)) - (fp_t)0.055);
+            r = (r <= (fp_t)0.0031308) ? ((fp_t)12.92 * r) : ((fp_t)1.055 * std::pow(r, (fp_t)(1.0 / 2.4)) - (fp_t)0.055);
+            g = (g <= (fp_t)0.0031308) ? ((fp_t)12.92 * g) : ((fp_t)1.055 * std::pow(g, (fp_t)(1.0 / 2.4)) - (fp_t)0.055);
+            b = (b <= (fp_t)0.0031308) ? ((fp_t)12.92 * b) : ((fp_t)1.055 * std::pow(b, (fp_t)(1.0 / 2.4)) - (fp_t)0.055);
         }
 
         this->image[i].r = r * (fp_t)255.0;
@@ -1511,19 +1511,19 @@ void camera::perform_glare_filter(const fp_t Yi, const fp_t Yw)
     if (log10_yi < (fp_t)-2.0)
     {
         cout << "lighting is scotopic" << endl;
-        current_light_level = scotopic;
+        current_light_level = light_level_t::scotopic;
         glare_filter_ptr    = &this->scotopic_glare_filter;
     }
     else if (log10_yi < (fp_t)0.6)
     {
         cout << "lighting is mesopic" << endl;
-        current_light_level = mesopic;
+        current_light_level = light_level_t::mesopic;
         glare_filter_ptr    = &this->mesopic_glare_filter;
     }
     else
     {
         cout << "lighting is photopic" << endl;
-        current_light_level = photopic;
+        current_light_level = light_level_t::photopic;
         glare_filter_ptr    = &this->photopic_glare_filter;
     }
 
@@ -1789,7 +1789,7 @@ void camera::bilateral_filter_tone_map(const fp_t r_s, const fp_t s_s, const fp_
     const fp_t gamma = log10(contrast) /  (max_value - min_value);
     for(int i = 0; i < (int)(this->x_res * this->y_res); i++)
     {
-        const fp_t scaled_value = pow((fp_t)10.0, (result[i] * gamma + (log_intensity[i] - result[i])));
+        const fp_t scaled_value = std::pow((fp_t)10.0, (result[i] * gamma + (log_intensity[i] - result[i])));
         this->image[i].g = scaled_value * (fp_t)(1.0/255.0);
     }
     
@@ -1821,7 +1821,7 @@ fp_t camera::just_noticable_difference(const fp_t La) const
     }
     else if (lLa < (fp_t)-1.44)
     {
-        lLt = pow((fp_t)0.405 * lLa + (fp_t)1.6, (fp_t)2.18) - (fp_t)2.86;
+        lLt = std::pow((fp_t)0.405 * lLa + (fp_t)1.6, (fp_t)2.18) - (fp_t)2.86;
     }
     else if (lLa < (fp_t)-0.0184)
     {
@@ -1829,14 +1829,14 @@ fp_t camera::just_noticable_difference(const fp_t La) const
     }
     else if (lLa < (fp_t)1.9)
     {
-        lLt = pow((fp_t)0.249 * lLa + (fp_t)0.65, (fp_t)2.7) - (fp_t)0.72;
+        lLt = std::pow((fp_t)0.249 * lLa + (fp_t)0.65, (fp_t)2.7) - (fp_t)0.72;
     }
     else
     {
         lLt = lLa - (fp_t)1.255;
     }
     
-    return pow((fp_t)10.0, lLt);
+    return std::pow((fp_t)10.0, lLt);
 }
 
 
@@ -1980,10 +1980,10 @@ void camera::histogram_tone_map(const bool h)
         if (pix_gt0 < tolerance)
         {
             cout << "using contrast based scale factor" << endl;
-            const fp_t num = (fp_t)1.219 + pow(ld_max * (fp_t)0.5, (fp_t)0.4);
-            const fp_t den = (fp_t)1.219 + pow(lw_avg , (fp_t)0.4);
+            const fp_t num = (fp_t)1.219 + std::pow(ld_max * (fp_t)0.5, (fp_t)0.4);
+            const fp_t den = (fp_t)1.219 + std::pow(lw_avg , (fp_t)0.4);
 
-            const fp_t sf  = ((fp_t)1.0 / ld_max) * pow((num / den), (fp_t)2.5);
+            const fp_t sf  = ((fp_t)1.0 / ld_max) * std::pow((num / den), (fp_t)2.5);
 
             for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
             {

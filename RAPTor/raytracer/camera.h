@@ -35,7 +35,7 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::camera *cam, con
 namespace raptor_raytracer
 {
 /* Enumerate the 3 light levels */
-enum light_level_t { scotopic = 0, mesopic = 1, photopic = 2 };
+enum class light_level_t : char { scotopic = 0, mesopic = 1, photopic = 2 };
 
 /* Enumerate the tone mappers */
 enum class tone_mapping_mode_t : char { global_contrast = 1, local_histogram      = 2, local_human_histogram = 3, global_non_linear       = 4, 

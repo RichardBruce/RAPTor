@@ -55,13 +55,13 @@ void cfg_parser(
     
     /* Statement hash */
     map<string, model_format_t> format;
-    format["cfg"]   = cfg;
-    format["code"]  = code;
-    format["mgf"]   = mgf;
-    format["nff"]   = nff;
-    format["lwo"]   = lwo;
-    format["obj"]   = obj;
-    format["ply"]   = ply;
+    format["cfg"]   = model_format_t::cfg;
+    format["code"]  = model_format_t::code;
+    format["mgf"]   = model_format_t::mgf;
+    format["nff"]   = model_format_t::nff;
+    format["lwo"]   = model_format_t::lwo;
+    format["obj"]   = model_format_t::obj;
+    format["ply"]   = model_format_t::ply;
     
     while (true)
     {
@@ -88,27 +88,27 @@ void cfg_parser(
 //        cout << "path: " << input_file << endl;
         switch ((*i).second)
         {
-            case cfg :
+            case model_format_t::cfg :
                 input_stream.open(input_file.c_str());
                 assert(input_stream.is_open());
                 cfg_parser(input_stream, l, e, m, c);
                 break;
 
-            case code :
+            case model_format_t::code :
                 scene_init(l, e, m, c);
                 break;
 
-            case mgf :
+            case model_format_t::mgf :
                 mgf_parser(input_file.c_str(), l, e, m);
                 break;
 
-            case nff :
+            case model_format_t::nff :
                 input_stream.open(input_file.c_str());
                 assert(input_stream.is_open());
                 nff_parser(input_stream, l, e, m, c);
                 break;
 
-            case lwo :
+            case model_format_t::lwo :
                 input_stream.open(input_file.c_str());
                 assert(input_stream.is_open());
                 last_slash  = input_file.find_last_of('/');
@@ -116,7 +116,7 @@ void cfg_parser(
                 lwo_parser(input_stream, path, l, e, m, c);
                 break;
             
-            case obj :
+            case model_format_t::obj :
                 input_stream.open(input_file.c_str());
                 assert(input_stream.is_open());
                 last_slash  = input_file.find_last_of('/');
@@ -124,7 +124,7 @@ void cfg_parser(
                 obj_parser(input_stream, path, l, e, m, c);
                 break;
 
-            case ply :
+            case model_format_t::ply :
                 input_stream.open(input_file.c_str());
                 assert(input_stream.is_open());
                 ply_parser(input_stream, l, e, m, c);

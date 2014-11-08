@@ -18,7 +18,7 @@ voxel voxel::divide(kdt_node *const k)
     fp_t cost_before = lowest_cost;
 
 #if 1   /* Approximate builder */
-    axis normal;
+    axis_t normal;
     fp_t best_split;
     
 #ifdef SIMD_PACKET_TRACING
@@ -50,14 +50,14 @@ voxel voxel::divide(kdt_node *const k)
         {
             switch (normal)
             {
-                case x_axis:
-                    normal  = y_axis;
+                case axis_t::x_axis:
+                    normal  = axis_t::y_axis;
                     break;
-                case y_axis:
-                    normal  = z_axis;
+                case axis_t::y_axis:
+                    normal  = axis_t::z_axis;
                     break;
-                case z_axis:
-                    normal  = x_axis;
+                case axis_t::z_axis:
+                    normal  = axis_t::x_axis;
                     break;
                 default:
                     assert(false);
@@ -69,14 +69,14 @@ voxel voxel::divide(kdt_node *const k)
             {
                 switch (normal)
                 {
-                    case x_axis:
-                        normal  = y_axis;
+                    case axis_t::x_axis:
+                        normal  = axis_t::y_axis;
                         break;
-                    case y_axis:
-                        normal  = z_axis;
+                    case axis_t::y_axis:
+                        normal  = axis_t::z_axis;
                         break;
-                    case z_axis:
-                        normal  = x_axis;
+                    case axis_t::z_axis:
+                        normal  = axis_t::x_axis;
                         break;
                     default:
                         assert(false);
@@ -91,7 +91,7 @@ voxel voxel::divide(kdt_node *const k)
 #if 0   /* Signal axis aplit */
     fp_t best_split = this->split_this_axis(&lowest_cost);
 #else   /* All axis aplit */
-    axis normal;
+    axis_t normal;
     fp_t best_split = this->split_all_axis(&lowest_cost, &normal);
 #endif
 #endif
@@ -107,30 +107,30 @@ voxel voxel::divide(kdt_node *const k)
     /* Adjust the size of the voxel */
     point_t upper_limit = this->t;
     point_t lower_limit = this->b;
-    axis    nxt_n;
+    axis_t  nxt_n;
     switch (normal)
     {
-        case x_axis:
+        case axis_t::x_axis:
             /* Assert the the voxel is really split */
             assert(best_split > this->b.x);
             assert(best_split < this->t.x);
             lower_limit.x   = best_split;
             this->t.x       = best_split;
-            nxt_n           = y_axis;
+            nxt_n           = axis_t::y_axis;
             break;
-        case y_axis:
+        case axis_t::y_axis:
             assert(best_split > this->b.y);
             assert(best_split < this->t.y);
             lower_limit.y   = best_split;
             this->t.y       = best_split;
-            nxt_n           = z_axis;
+            nxt_n           = axis_t::z_axis;
             break;
-        case z_axis:
+        case axis_t::z_axis:
             assert(best_split > this->b.z);
             assert(best_split < this->t.z);
             lower_limit.z   = best_split;
             this->t.z       = best_split;
-            nxt_n           = x_axis;
+            nxt_n           = axis_t::x_axis;
             break;
         default:
             assert(false);
@@ -147,7 +147,7 @@ voxel voxel::divide(kdt_node *const k)
     primitive_list::iterator p_dst = this->p->begin();
     switch (normal)
     {
-        case x_axis:
+        case axis_t::x_axis:
             for (primitive_list::iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
 #if 0   /* Set to enable clip of split plane to nearest primitive */
@@ -179,7 +179,7 @@ voxel voxel::divide(kdt_node *const k)
                 }
             }
             break;
-        case y_axis:
+        case axis_t::y_axis:
             for (primitive_list::iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
 #if 0  /* Set to enable clip of split plane to nearest primitive */
@@ -211,7 +211,7 @@ voxel voxel::divide(kdt_node *const k)
                 }
             }
             break;
-        case z_axis:
+        case axis_t::z_axis:
             for (primitive_list::iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
 #if 0  /* Set to enable clip of split plane to nearest primitive */
@@ -263,12 +263,12 @@ voxel voxel::divide(kdt_node *const k)
 /**********************************************************
  
 **********************************************************/
-// fp_t voxel::split_all_axis(fp_t *s, axis *normal)
+// fp_t voxel::split_all_axis(fp_t *s, axis_t *normal)
 // {
 //     /* Find the best split position of the primitives */
-//     axis best_axis   = not_set;
-//     fp_t best_split  = not_set;
-//     fp_t lowest_cost = *s;
+//     axis_t   best_axis   = axis_t::not_set;
+//     fp_t     best_split  = axis_t::not_set;
+//     fp_t     lowest_cost = *s;
     
 //      /* Initial primitive split */
 //     unsigned size_of_prim = this->p->size();
@@ -352,12 +352,12 @@ voxel voxel::divide(kdt_node *const k)
 //         /* Evaluate unique points */
 //         if (last_guess != guess)
 //         {
-//             fp_t this_cost = calculate_sah_cost(left, right, guess, x_axis);
+//             fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::x_axis);
 //             if (this_cost < lowest_cost)
 //             {
 //                 lowest_cost = this_cost;
 //                 best_split  = guess;
-//                 best_axis   = x_axis;
+//                 best_axis   = axis_t::x_axis;
 //             }
 //             last_guess = guess;
 //         }
@@ -442,12 +442,12 @@ voxel voxel::divide(kdt_node *const k)
 //         /* Evaluate unique points */
 //         if (last_guess != guess)
 //         {
-//             fp_t this_cost = calculate_sah_cost(left, right, guess, y_axis);
+//             fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::y_axis);
 //             if (this_cost < lowest_cost)
 //             {
 //                 lowest_cost = this_cost;
 //                 best_split  = guess;
-//                 best_axis   = y_axis;
+//                 best_axis   = axis_t::y_axis;
 //             }
 //             last_guess = guess;
 //         }
@@ -532,12 +532,12 @@ voxel voxel::divide(kdt_node *const k)
 //         /* Evaluate unique points */
 //         if (last_guess != guess)
 //         {
-//             fp_t this_cost = calculate_sah_cost(left, right, guess, z_axis);
+//             fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::z_axis);
 //             if (this_cost < lowest_cost)
 //             {
 //                 lowest_cost = this_cost;
 //                 best_split  = guess;
-//                 best_axis   = z_axis;
+//                 best_axis   = axis_t::z_axis;
 //             }
 //             last_guess = guess;
 //         }
@@ -560,37 +560,37 @@ voxel voxel::divide(kdt_node *const k)
 // }
 
 
-// fp_t voxel::approximate_split_all_axis(fp_t *s, axis * normal) const
+// fp_t voxel::approximate_split_all_axis(fp_t *s, axis_t * normal) const
 // {
-//     axis best_axis      = not_set;
-//     fp_t best_split     = MAX_DIST;
-//     fp_t cost           = *s;
-//     fp_t lowest_cost    = *s;
+//     axis_t   best_axis      = axis_t::not_set;
+//     fp_t     best_split     = MAX_DIST;
+//     fp_t     cost           = *s;
+//     fp_t     lowest_cost    = *s;
 
 //     /* Split in x and compare the result */
-//     fp_t split =  approximate_split_one_axis(&cost, x_axis);
+//     fp_t split =  approximate_split_one_axis(&cost, axis_t::x_axis);
 //     if (cost < lowest_cost)
 //     {
 //         lowest_cost = cost;
-//         best_axis   = x_axis;
+//         best_axis   = axis_t::x_axis;
 //         best_split  = split;
 //     }
 
 //     /* Split in y and compare the result */
-//     split =  approximate_split_one_axis(&cost, y_axis);
+//     split =  approximate_split_one_axis(&cost, axis_t::y_axis);
 //     if (cost < lowest_cost)
 //     {
 //         lowest_cost = cost;
-//         best_axis   = y_axis;
+//         best_axis   = axis_t::y_axis;
 //         best_split  = split;
 //     }
 
 //     /* Split in z and compare the result */
-//     split =  approximate_split_one_axis(&cost, z_axis);
+//     split =  approximate_split_one_axis(&cost, axis_t::z_axis);
 //     if (cost < lowest_cost)
 //     {
 //         lowest_cost = cost;
-//         best_axis   = z_axis;
+//         best_axis   = axis_t::z_axis;
 //         best_split  = split;
 //     }
     
@@ -601,7 +601,7 @@ voxel voxel::divide(kdt_node *const k)
 // }
 
 
-fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
+fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
 {
     /* Find the best split position of the primitives */
     fp_t best_split     = MAX_DIST;
@@ -651,7 +651,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
 
     switch (normal)
     {
-        case x_axis :   
+        case axis_t::x_axis :   
             /* Pick fixed points to evaluate */
             dw          = xw * (1.0 / 9.0);
             evaluate    = this->t.x;
@@ -665,7 +665,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
             {
                 sample[i] = this->b.x + (dw * (fp_t)(i+1));
             }
-            this->count_primitives(cl, cr, sample, 8, x_axis);
+            this->count_primitives(cl, cr, sample, 8, axis_t::x_axis);
             
             /* Fix adaptive sample width per bin */
             for (int i = 7; i >= 0; i--)
@@ -688,7 +688,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
                 }
                 adaptive_offset += (int)bins_per_sample[i];
             }
-            this->count_primitives(cla, cra, sample, 8, x_axis);
+            this->count_primitives(cla, cra, sample, 8, axis_t::x_axis);
             
             /* Evaluate SAH minima for each sample as -b/2a */
             adaptive_offset = 0;
@@ -772,7 +772,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
             }
             break;
             
-        case y_axis :
+        case axis_t::y_axis :
             /* Pick fixed points to evaluate */
             dw          = yw * (1.0 / 9.0);
             evaluate    = this->t.y;
@@ -786,7 +786,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
             {
                 sample[i] = this->b.y + (dw * (fp_t)(i+1));
             }
-            this->count_primitives(cl, cr, sample, 8, y_axis);
+            this->count_primitives(cl, cr, sample, 8, axis_t::y_axis);
         
             /* Fix adaptive sample width per bin */
             for (int i = 7; i >= 0; i--)
@@ -809,7 +809,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
                 }
                 adaptive_offset += (int)bins_per_sample[i];
             }
-            this->count_primitives(cla, cra, sample, 8, y_axis);
+            this->count_primitives(cla, cra, sample, 8, axis_t::y_axis);
             
             /* Evaluate SAH minima for each sample as -b/2a */
             adaptive_offset = 0;
@@ -893,7 +893,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
             }
             break;
 
-        case z_axis :
+        case axis_t::z_axis :
             /* Pick fixed points to evaluate */
             dw          = zw * (1.0 / 9.0);
             evaluate    = this->t.z;
@@ -907,7 +907,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
             {
                 sample[i] = this->b.z + (dw * (fp_t)(i+1));
             }
-            this->count_primitives(cl, cr, sample, 8, z_axis);
+            this->count_primitives(cl, cr, sample, 8, axis_t::z_axis);
         
             /* Fix adaptive sample width per bin */
             for (int i = 7; i >= 0; i--)
@@ -930,7 +930,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
                 }
                 adaptive_offset += (int)bins_per_sample[i];
             }
-            this->count_primitives(cla, cra, sample, 8, z_axis);
+            this->count_primitives(cla, cra, sample, 8, axis_t::z_axis);
             
             /* Evaluate SAH minima for each sample as -b/2a */
             adaptive_offset = 0;
@@ -1028,28 +1028,28 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis normal) const
 /**********************************************************
  
 **********************************************************/
-inline fp_t voxel::count_primitives(fp_t *const r, const fp_t s, const axis normal) const
+inline fp_t voxel::count_primitives(fp_t *const r, const fp_t s, const axis_t normal) const
 {
     /* Sub divide the objects */
     fp_t left_objects  = (fp_t)0.0;
     fp_t right_objects = (fp_t)0.0;
     switch (normal)
     {
-        case x_axis:
+        case axis_t::x_axis:
             for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
             {
                 left_objects  += (int)((*i)->lowest_x()  < s);
                 right_objects += (int)((*i)->highest_x() > s);
             }
             break;
-        case y_axis:
+        case axis_t::y_axis:
             for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
             {
                 left_objects  += (int)((*i)->lowest_y()  < s);
                 right_objects += (int)((*i)->highest_y() > s);
             }
             break;
-        case z_axis:
+        case axis_t::z_axis:
             for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
             {
                 left_objects  += (int)((*i)->lowest_z()  < s);
@@ -1070,7 +1070,7 @@ inline fp_t voxel::count_primitives(fp_t *const r, const fp_t s, const axis norm
 /**********************************************************
  
 **********************************************************/
-inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis n) const
+inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis_t n) const
 {
 //    if (this->p->size() > 1000000)
 //    {
@@ -1095,7 +1095,7 @@ inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *co
     /* Count in the given axis */
     switch (n)
     {
-        case x_axis:
+        case axis_t::x_axis:
             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
                 for (int j = 0; j < len; j++)
@@ -1106,7 +1106,7 @@ inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *co
             }
             break;
 
-        case y_axis:
+        case axis_t::y_axis:
             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
                 for (int j = 0; j < len; j++)
@@ -1117,7 +1117,7 @@ inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *co
             }
             break;
 
-    case z_axis:
+    case axis_t::z_axis:
             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
                 for (int j = 0; j < len; j++)
@@ -1139,7 +1139,7 @@ inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *co
 /**********************************************************
  
 **********************************************************/
-inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis n) const
+inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis_t n) const
 {
     assert(len == 8);
     vfp_t l_vec[2] = { vfp_zero, vfp_zero };
@@ -1150,7 +1150,7 @@ inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *co
     /* Count in the given axis */
     switch (n)
     {
-        case x_axis:
+        case axis_t::x_axis:
             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
                 const vfp_t hi((*i)->highest_x());
@@ -1163,7 +1163,7 @@ inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *co
             }
             break;
 
-        case y_axis:
+        case axis_t::y_axis:
             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
                 const vfp_t hi((*i)->highest_y());
@@ -1176,7 +1176,7 @@ inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *co
             }
             break;
 
-        case z_axis:
+        case axis_t::z_axis:
             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
                 const vfp_t hi((*i)->highest_z());
@@ -1224,7 +1224,7 @@ inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *co
 /**********************************************************
  
 **********************************************************/
-fp_t voxel::brute_force_split_all_axis(fp_t *s, axis * normal) const
+fp_t voxel::brute_force_split_all_axis(fp_t *s, axis_t * normal) const
 {
     /* Find the best split position of the primitives */
     fp_t sample[9] ALIGN(16);
@@ -1232,7 +1232,7 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis * normal) const
 
     vfp_t l_vec[2], r_vec[2], s_vec[2];
     vfp_t lc_vec(*s);
-    vfp_t ba_vec((fp_t)not_set);
+    vfp_t ba_vec((fp_t)axis_t::not_set);
     vfp_t bs_vec(MAX_DIST);
 
     /* Evaluate the X axis */
@@ -1255,15 +1255,15 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis * normal) const
         {
             s_vec[0] = &sample[0];
             s_vec[1] = &sample[SIMD_WIDTH];
-            this->count_primitives(l_vec, r_vec, s_vec, x_axis);
+            this->count_primitives(l_vec, r_vec, s_vec, axis_t::x_axis);
             for (int j = 0; j < 2; j++)
             {
-                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], x_axis);
+                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::x_axis);
                 vfp_t mask = (cost < lc_vec);
 
                 lc_vec = min(lc_vec, cost);
                 bs_vec = mov_p(mask, s_vec[j], bs_vec);
-                ba_vec = mov_p(mask, vfp_t((fp_t)x_axis), ba_vec);
+                ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::x_axis), ba_vec);
             }
             
             /* Move down any overflow */
@@ -1285,15 +1285,15 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis * normal) const
     valid_mask[0] = (bucketted & SIMD_WIDTH) ? vfp_true : index_to_mask_lut[bucketted];
     valid_mask[1] = (bucketted & SIMD_WIDTH) ? index_to_mask_lut[bucketted - SIMD_WIDTH] : vfp_zero;
     
-    this->count_primitives(l_vec, r_vec, s_vec, x_axis);
+    this->count_primitives(l_vec, r_vec, s_vec, axis_t::x_axis);
     for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + (int)(bucketted > 0)); j++)
     {
-        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], x_axis);
+        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::x_axis);
         vfp_t mask = (cost < lc_vec) & valid_mask[j];
 
         lc_vec = mov_p(mask, cost,                lc_vec);
         bs_vec = mov_p(mask, s_vec[j],            bs_vec);
-        ba_vec = mov_p(mask, vfp_t((fp_t)x_axis), ba_vec);
+        ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::x_axis), ba_vec);
     }
 
     /* Evaluate the Y axis */
@@ -1316,15 +1316,15 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis * normal) const
         {
             s_vec[0] = &sample[0];
             s_vec[1] = &sample[SIMD_WIDTH];
-            this->count_primitives(l_vec, r_vec, s_vec, y_axis);
+            this->count_primitives(l_vec, r_vec, s_vec, axis_t::y_axis);
             for (int j = 0; j < 2; j++)
             {
-                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], y_axis);
+                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::y_axis);
                 vfp_t mask = (cost < lc_vec);
 
                 lc_vec = min(lc_vec, cost);
                 bs_vec = mov_p(mask, s_vec[j], bs_vec);
-                ba_vec = mov_p(mask, vfp_t((fp_t)y_axis), ba_vec);
+                ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::y_axis), ba_vec);
             }
             
             /* Move down any overflow */
@@ -1346,15 +1346,15 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis * normal) const
     valid_mask[0] = (bucketted & SIMD_WIDTH) ? vfp_true : index_to_mask_lut[bucketted];
     valid_mask[1] = (bucketted & SIMD_WIDTH) ? index_to_mask_lut[bucketted - SIMD_WIDTH] : vfp_zero;
     
-    this->count_primitives(l_vec, r_vec, s_vec, y_axis);
+    this->count_primitives(l_vec, r_vec, s_vec, axis_t::y_axis);
     for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + (int)(bucketted > 0)); j++)
     {
-        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], y_axis);
+        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::y_axis);
         vfp_t mask = (cost < lc_vec) & valid_mask[j];
 
         lc_vec = mov_p(mask, cost,                lc_vec);
         bs_vec = mov_p(mask, s_vec[j],            bs_vec);
-        ba_vec = mov_p(mask, vfp_t((fp_t)y_axis), ba_vec);
+        ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::y_axis), ba_vec);
     }
 
     /* Evaluate the Z axis */
@@ -1377,15 +1377,15 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis * normal) const
         {
             s_vec[0] = &sample[0];
             s_vec[1] = &sample[SIMD_WIDTH];
-            this->count_primitives(l_vec, r_vec, s_vec, z_axis);
+            this->count_primitives(l_vec, r_vec, s_vec, axis_t::z_axis);
             for (int j = 0; j < 2; j++)
             {
-                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], z_axis);
+                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::z_axis);
                 vfp_t mask = (cost < lc_vec);
 
                 lc_vec = min(lc_vec, cost);
                 bs_vec = mov_p(mask, s_vec[j], bs_vec);
-                ba_vec = mov_p(mask, vfp_t((fp_t)z_axis), ba_vec);
+                ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::z_axis), ba_vec);
             }
             
             /* Move down any overflow */
@@ -1407,22 +1407,22 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis * normal) const
     valid_mask[0] = (bucketted & SIMD_WIDTH) ? vfp_true : index_to_mask_lut[bucketted];
     valid_mask[1] = (bucketted & SIMD_WIDTH) ? index_to_mask_lut[bucketted - SIMD_WIDTH] : vfp_zero;
     
-    this->count_primitives(l_vec, r_vec, s_vec, z_axis);
+    this->count_primitives(l_vec, r_vec, s_vec, axis_t::z_axis);
     for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + (int)(bucketted > 0)); ++j)
     {
-        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], z_axis);
+        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::z_axis);
         vfp_t mask = (cost < lc_vec) & valid_mask[j];
 
         lc_vec = mov_p(mask, cost,                lc_vec);
         bs_vec = mov_p(mask, s_vec[j],            bs_vec);
-        ba_vec = mov_p(mask, vfp_t((fp_t)z_axis), ba_vec);
+        ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::z_axis), ba_vec);
     }
     
     /* Collect results */
     (*s) = min(min(lc_vec[0], lc_vec[1]), min(lc_vec[2], lc_vec[3]));
 
     const int index = mask_to_index_lut[move_mask(vfp_t(*s) == lc_vec)];
-    (*normal) = (axis)ba_vec[index];
+    (*normal) = static_cast<axis_t>(ba_vec[index]);
     return bs_vec[index];
 }
 
@@ -1430,7 +1430,7 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis * normal) const
 /**********************************************************
  
 **********************************************************/
-inline void voxel::count_primitives(vfp_t *const l, vfp_t *const r, const vfp_t *const s, const axis n) const
+inline void voxel::count_primitives(vfp_t *const l, vfp_t *const r, const vfp_t *const s, const axis_t n) const
 {
     l[0] = vfp_zero;
     l[1] = vfp_zero;
@@ -1440,7 +1440,7 @@ inline void voxel::count_primitives(vfp_t *const l, vfp_t *const r, const vfp_t 
     /* Count in the given axis */
     switch (n)
     {
-        case x_axis:
+        case axis_t::x_axis:
             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
                 const vfp_t hi((*i)->highest_x());
@@ -1453,7 +1453,7 @@ inline void voxel::count_primitives(vfp_t *const l, vfp_t *const r, const vfp_t 
             }
             break;
 
-        case y_axis:
+        case axis_t::y_axis:
             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
                 const vfp_t hi((*i)->highest_y());
@@ -1466,7 +1466,7 @@ inline void voxel::count_primitives(vfp_t *const l, vfp_t *const r, const vfp_t 
             }
             break;
 
-        case z_axis:
+        case axis_t::z_axis:
             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
             {
                 const vfp_t hi((*i)->highest_z());
@@ -1488,7 +1488,7 @@ inline void voxel::count_primitives(vfp_t *const l, vfp_t *const r, const vfp_t 
 /**********************************************************
  
 **********************************************************/
-inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp_t &s, const axis normal) const
+inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp_t &s, const axis_t normal) const
 {
     /* Surface area of sub-divides */
     vfp_t left_area, right_area;
@@ -1496,7 +1496,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    const fp_t sa   = 1.0 / ((x_dist * y_dist) + (x_dist * z_dist) + (y_dist * z_dist));
     switch (normal)
     {
-        case x_axis:
+        case axis_t::x_axis:
 //            assert(move_mask(s < vfp_t(this->b.x)) == 0x0);
 //            assert(move_mask(s > vfp_t(this->t.x)) == 0x0);
 
@@ -1508,7 +1508,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
             x_dist = vfp_t(this->t.x) - s;
             right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
             break;
-        case y_axis:
+        case axis_t::y_axis:
 //            assert(move_mask(s < vfp_t(this->b.y)) == 0x0);
 //            assert(move_mask(s > vfp_t(this->t.y)) == 0x0);
 
@@ -1520,7 +1520,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
             y_dist = vfp_t(this->t.y) - s;
             right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
             break;
-        case z_axis:
+        case axis_t::z_axis:
 //            assert(move_mask(s < vfp_t(this->b.z)) == 0x0);
 //            assert(move_mask(s > vfp_t(this->t.z)) == 0x0);
 
@@ -1547,7 +1547,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 /**********************************************************
  
 **********************************************************/
-// inline fp_t voxel::calculate_sah_cost(const fp_t l, const fp_t r, const fp_t s, const axis normal) const
+// inline fp_t voxel::calculate_sah_cost(const fp_t l, const fp_t r, const fp_t s, const axis_t normal) const
 // {
 //     /* Surface area of sub-divides */
 //     fp_t left_area, right_area;
@@ -1557,7 +1557,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 // //    const fp_t sa   = 1.0 / ((x_dist * y_dist) + (x_dist * z_dist) + (y_dist * z_dist));
 //     switch (normal)
 //     {
-//         case x_axis:
+//         case axis_t::x_axis:
 //             assert(s > this->b.x);
 //             assert(s < this->t.x);
 //             x_dist = s - this->b.x;
@@ -1565,7 +1565,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //             x_dist = this->t.x - s;
 //             right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //             break;
-//         case y_axis:
+//         case axis_t::y_axis:
 //             assert(s > this->b.y);
 //             assert(s < this->t.y);
 //             y_dist = s - this->b.y;
@@ -1573,7 +1573,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //             y_dist = this->t.y - s;
 //             right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //             break;
-//         case z_axis:
+//         case axis_t::z_axis:
 //             assert(s > this->b.z);
 //             assert(s < this->t.z);
 //             z_dist = s - this->b.z;
@@ -1597,7 +1597,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 ///**********************************************************
 // 
 //**********************************************************/
-//fp_t voxel::calculate_sah_cost(const fp_t s, const axis normal) const
+//fp_t voxel::calculate_sah_cost(const fp_t s, const axis_t normal) const
 //{
 //    /* Surface area of sub-divides */
 //    fp_t left_area, right_area;
@@ -1606,7 +1606,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    fp_t z_dist = this->t.z - this->b.z;
 //    switch (normal)
 //    {
-//        case x_axis:
+//        case axis_t::x_axis:
 //            assert(s > this->b.x);
 //            assert(s < this->t.x);
 //            x_dist = s - this->b.x;
@@ -1614,7 +1614,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            x_dist = this->t.x - s;
 //            right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            break;
-//        case y_axis:
+//        case axis_t::y_axis:
 //            assert(s > this->b.y);
 //            assert(s < this->t.y);
 //            y_dist = s - this->b.y;
@@ -1622,7 +1622,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            y_dist = this->t.y - s;
 //            right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            break;
-//        case z_axis:
+//        case axis_t::z_axis:
 //            assert(s > this->b.z);
 //            assert(s < this->t.z);
 //            z_dist = s - this->b.z;
@@ -1640,7 +1640,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    fp_t right_objects = 0.0;
 //    switch (normal)
 //    {
-//        case x_axis:
+//        case axis_t::x_axis:
 //            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); i++)
 //            {
 //                triangle *current_p = *i;
@@ -1659,7 +1659,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //            }
 //            break;
-//        case y_axis:
+//        case axis_t::y_axis:
 //            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); i++)
 //            {
 //                triangle *current_p = *i;
@@ -1678,7 +1678,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //            }
 //            break;
-//        case z_axis:
+//        case axis_t::z_axis:
 //            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); i++)
 //            {
 //                triangle *current_p = *i;
@@ -1712,34 +1712,34 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 
 /* Sequential */
 
-//fp_t voxel::approximate_split_all_axis(fp_t *s, axis * normal) const
+//fp_t voxel::approximate_split_all_axis(fp_t *s, axis_t * normal) const
 //{
 //    /* Find the best split position of the primitives */
-//    fp_t best_split = MAX_DIST;
-//    fp_t lowest_cost = *s;
-//    axis best_axis = not_set;
+//    fp_t      best_split = MAX_DIST;
+//    fp_t      lowest_cost = *s;
+//    axis_t    best_axis = axis_t::not_set;
 //
 //    for (primitive_list::const_iterator i=p.begin(); i!=p.end(); i++)
 //    {
 //        const triangle *current_p = *i;
 //        if ((current_p->lowest_x() > this->b.x) && (current_p->lowest_x() < this->t.x))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->lowest_x(), x_axis);
+//            fp_t this_cost = this->calculate_sah_cost(current_p->lowest_x(), axis_t::x_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = current_p->lowest_x();
-//                best_axis   = x_axis;
+//                best_axis   = axis_t::x_axis;
 //            }
 //        }
 //        if ((current_p->highest_x() > this->b.x) && (current_p->highest_x() < this->t.x))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->highest_x(), x_axis);
+//            fp_t this_cost = this->calculate_sah_cost(current_p->highest_x(), axis_t::x_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = current_p->highest_x();
-//                best_axis   = x_axis;
+//                best_axis   = axis_t::x_axis;
 //            }
 //        }
 //    }
@@ -1749,22 +1749,22 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        const triangle *current_p = *i;
 //        if ((current_p->lowest_y() > this->b.y) && (current_p->lowest_y() < this->t.y))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->lowest_y(), y_axis);
+//            fp_t this_cost = this->calculate_sah_cost(current_p->lowest_y(), axis_t::y_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = current_p->lowest_y();
-//                best_axis   = y_axis;
+//                best_axis   = axis_t::y_axis;
 //            }
 //        }
 //        if ((current_p->highest_y() > this->b.y) && (current_p->highest_y() < this->t.y))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->highest_y(), y_axis);
+//            fp_t this_cost = this->calculate_sah_cost(current_p->highest_y(), axis_t::y_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = current_p->highest_y();
-//                best_axis   = y_axis;
+//                best_axis   = axis_t::y_axis;
 //            }
 //        }
 //    }
@@ -1774,22 +1774,22 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        const triangle *current_p = *i;
 //        if ((current_p->lowest_z() > this->b.z) && (current_p->lowest_z() < this->t.z))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->lowest_z(), z_axis);
+//            fp_t this_cost = this->calculate_sah_cost(current_p->lowest_z(), axis_t::z_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = current_p->lowest_z();
-//                best_axis   = z_axis;
+//                best_axis   = axis_t::z_axis;
 //            }
 //        }
 //        if ((current_p->highest_z() > this->b.z) && (current_p->highest_z() < this->t.z))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->highest_z(), z_axis);
+//            fp_t this_cost = this->calculate_sah_cost(current_p->highest_z(), axis_t::z_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = current_p->highest_z();
-//                best_axis   = z_axis;
+//                best_axis   = axis_t::z_axis;
 //            }
 //        }
 //    }
@@ -1810,7 +1810,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    fp_t lowest_cost = *s;
 //    switch (this->n)
 //    {
-//        case x_axis:
+//        case axis_t::x_axis:
 //            for (primitive_list::const_iterator i=p.begin(); i!=p.end(); i++)
 //            {
 //                const triangle *current_p = *i;
@@ -1834,7 +1834,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //            }
 //            break;
-//        case y_axis:
+//        case axis_t::y_axis:
 //            for (primitive_list::const_iterator i=p.begin(); i!=p.end(); i++)
 //            {
 //                const triangle *current_p = *i;
@@ -1858,7 +1858,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //            }
 //            break;
-//        case z_axis:
+//        case axis_t::z_axis:
 //            for (primitive_list::const_iterator i=p.begin(); i!=p.end(); i++)
 //            {
 //                const triangle *current_p = *i;
@@ -1905,7 +1905,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    fp_t z_dist = this->t.z - this->b.z;
 //    switch (this->n)
 //    {
-//        case x_axis:
+//        case axis_t::x_axis:
 //            assert(s > this->b.x);
 //            assert(s < this->t.x);
 //            x_dist = s - this->b.x;
@@ -1913,7 +1913,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            x_dist = this->t.x - s;
 //            right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            break;
-//        case y_axis:
+//        case axis_t::y_axis:
 //            assert(s > this->b.y);
 //            assert(s < this->t.y);
 //            y_dist = s - this->b.y;
@@ -1921,7 +1921,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            y_dist = this->t.y - s;
 //            right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            break;
-//        case z_axis:
+//        case axis_t::z_axis:
 //            assert(s > this->b.z);
 //            assert(s < this->t.z);
 //            z_dist = s - this->b.z;
@@ -1939,7 +1939,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    fp_t right_objects = 0.0;
 //    switch (this->n)
 //    {
-//        case x_axis:
+//        case axis_t::x_axis:
 //            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); i++)
 //            {
 //                triangle *current_p = *i;
@@ -1958,7 +1958,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //            }
 //            break;
-//        case y_axis:
+//        case axis_t::y_axis:
 //            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); i++)
 //            {
 //                triangle *current_p = *i;
@@ -1977,7 +1977,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //            }
 //            break;
-//        case z_axis:
+//        case axis_t::z_axis:
 //            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); i++)
 //            {
 //                triangle *current_p = *i;
@@ -2021,7 +2021,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    fp_t z_dist = this->t.z - this->b.z;
 //    switch (this->n)
 //    {
-//        case x_axis:
+//        case axis_t::x_axis:
 //            assert(s > this->b.x);
 //            assert(s < this->t.x);
 //            x_dist = s - this->b.x;
@@ -2029,7 +2029,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            x_dist = this->t.x - s;
 //            right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            break;
-//        case y_axis:
+//        case axis_t::y_axis:
 //            assert(s > this->b.y);
 //            assert(s < this->t.y);
 //            y_dist = s - this->b.y;
@@ -2037,7 +2037,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            y_dist = this->t.y - s;
 //            right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            break;
-//        case z_axis:
+//        case axis_t::z_axis:
 //            assert(s > this->b.z);
 //            assert(s < this->t.z);
 //            z_dist = s - this->b.z;
@@ -2063,12 +2063,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 ///**********************************************************
 // 
 //**********************************************************/
-//fp_t voxel::split_all_axis(fp_t *s, axis *normal)
+//fp_t voxel::split_all_axis(fp_t *s, axis_t *normal)
 //{
 //    /* Find the best split position of the primitives */
-//    axis best_axis   = not_set;
-//    fp_t best_split  = not_set;
-//    fp_t lowest_cost = *s;
+//    axis_t    best_axis   = axis_t::not_set;
+//    fp_t  best_split  = axis_t::not_set;
+//    fp_t  lowest_cost = *s;
 //    
 //     /* Initial primitive split */
 //    unsigned size_of_prim = this->p->size();
@@ -2148,7 +2148,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = guess;
-//                best_axis   = x_axis;
+//                best_axis   = axis_t::x_axis;
 //            }
 //            last_guess = guess;
 //        }
@@ -2227,7 +2227,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = guess;
-//                best_axis   = y_axis;
+//                best_axis   = axis_t::y_axis;
 //            }
 //            last_guess = guess;
 //        }
@@ -2307,7 +2307,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = guess;
-//                best_axis   = z_axis;
+//                best_axis   = axis_t::z_axis;
 //            }
 //            last_guess = guess;
 //        }
@@ -2332,12 +2332,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 /**********************************************************
  
 **********************************************************/
-//fp_t voxel::split_all_axis(fp_t *s, axis *normal)
+//fp_t voxel::split_all_axis(fp_t *s, axis_t *normal)
 //{
 //    /* Find the best split position of the primitives */
-//    axis best_axis   = not_set;
-//    fp_t best_split  = not_set;
-//    fp_t lowest_cost = *s;
+//    axis_t    best_axis   = axis_t::not_set;
+//    fp_t      best_split  = axis_t::not_set;
+//    fp_t      lowest_cost = *s;
 //    
 //     /* Initial primitive split */
 //    unsigned size_of_prim = this->p->size();
@@ -2434,7 +2434,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = guess;
-//                best_axis   = x_axis;
+//                best_axis   = axis_t::x_axis;
 //            }
 //            last_guess = guess;
 //        }
@@ -2532,7 +2532,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = guess;
-//                best_axis   = y_axis;
+//                best_axis   = axis_t::y_axis;
 //            }
 //            last_guess = guess;
 //        }
@@ -2630,7 +2630,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = guess;
-//                best_axis   = z_axis;
+//                best_axis   = axis_t::z_axis;
 //            }
 //            last_guess = guess;
 //        }
@@ -2655,12 +2655,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //}
 
 
-//fp_t voxel::approximate_split_all_axis(fp_t *s, axis * normal) const
+//fp_t voxel::approximate_split_all_axis(fp_t *s, axis_t * normal) const
 //{
 //    /* Find the best split position of the primitives */
-//    fp_t best_split     = MAX_DIST;
-//    fp_t lowest_cost    = *s;
-//    axis best_axis      = not_set;
+//    fp_t      best_split     = MAX_DIST;
+//    fp_t      lowest_cost    = *s;
+//    axis_t    best_axis      = axis_t::not_set;
 //    
 //    /* Adaptive sampling bin sizes */
 //    const fp_t adapt_bin_size   = this->p->size() * (2.0/9.0);
@@ -2706,12 +2706,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    {
 //        sample[i] = this->b.x + (divide_width * (fp_t)(i+1));
 //    }
-//    this->count_primitives(cl_x, cr_x, sample, 8, x_axis);
+//    this->count_primitives(cl_x, cr_x, sample, 8, axis_t::x_axis);
 //    
 //    for (int i = 7; i >= 0; i--)
 //    {
 ////        evaluate -= divide_width;
-////        cl_x[i] = count_primitives(&cr_x[i], evaluate, x_axis);
+////        cl_x[i] = count_primitives(&cr_x[i], evaluate, axis_t::x_axis);
 ////        cout << "At: " << evaluate << " found " << cl_x[i] << ", " << cr_x[i] << endl;
 //        bins_per_sample[i] = int((cl_x[i] - cr_x[i]) / adapt_bin_size) + 4;
 //
@@ -2732,12 +2732,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
 //        {
 //            evaluate   += adaptive_width[i];
-////            cl_ax[j]    = count_primitives(&cr_ax[j], evaluate, x_axis);
+////            cl_ax[j]    = count_primitives(&cr_ax[j], evaluate, axis_t::x_axis);
 //            sample[j] = evaluate;
 //        }
 //        adaptive_offset += bins_per_sample[i];
 //    }
-//    this->count_primitives(cl_ax, cr_ax, sample, 8, x_axis);
+//    this->count_primitives(cl_ax, cr_ax, sample, 8, axis_t::x_axis);
 //    
 //    /* Evaluate SAH minima for each sample as -b/2a */
 //    adaptive_offset = 0;
@@ -2775,7 +2775,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            if (cost < lowest_cost)
 //            {
 //                lowest_cost = cost;
-//                best_axis   = x_axis;
+//                best_axis   = axis_t::x_axis;
 //                best_split  = xm;
 //            }
 //            
@@ -2811,7 +2811,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        if (cost < lowest_cost)
 //        {
 //            lowest_cost = cost;
-//            best_axis   = x_axis;
+//            best_axis   = axis_t::x_axis;
 //            best_split  = xm;
 //        }
 //      
@@ -2835,12 +2835,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    {
 //        sample[i] = this->b.y + (divide_width * (fp_t)(i+1));
 //    }
-//    this->count_primitives(cl_y, cr_y, sample, 8, y_axis);
+//    this->count_primitives(cl_y, cr_y, sample, 8, axis_t::y_axis);
 //
 //    for (int i = 7; i >= 0; i--)
 //    {
 ////        evaluate -= divide_width;
-////        cl_y[i] = count_primitives(&cr_y[i], evaluate, y_axis);
+////        cl_y[i] = count_primitives(&cr_y[i], evaluate, axis_t::y_axis);
 //        bins_per_sample[i] = int((cl_y[i] - cr_y[i]) / adapt_bin_size) + 4;
 //
 //
@@ -2861,12 +2861,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
 //        {
 //            evaluate   += adaptive_width[i];
-////            cl_ay[j]    = count_primitives(&cr_ay[j], evaluate, y_axis);
+////            cl_ay[j]    = count_primitives(&cr_ay[j], evaluate, axis_t::y_axis);
 //            sample[j] = evaluate;
 //        }
 //        adaptive_offset += bins_per_sample[i];
 //    }
-//    this->count_primitives(cl_ay, cr_ay, sample, 8, y_axis);
+//    this->count_primitives(cl_ay, cr_ay, sample, 8, axis_t::y_axis);
 //    
 //    /* Evaluate SAH minima for each sample as -b/2a */
 //    adaptive_offset = 0;
@@ -2904,7 +2904,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            if (cost < lowest_cost)
 //            {
 //                lowest_cost = cost;
-//                best_axis   = y_axis;
+//                best_axis   = axis_t::y_axis;
 //                best_split  = ym;
 //            }
 //            
@@ -2940,7 +2940,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        if (cost < lowest_cost)
 //        {
 //            lowest_cost = cost;
-//            best_axis   = y_axis;
+//            best_axis   = axis_t::y_axis;
 //            best_split  = ym;
 //        }
 //      
@@ -2964,12 +2964,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    {
 //        sample[i] = this->b.z + (divide_width * (fp_t)(i+1));
 //    }
-//    this->count_primitives(cl_z, cr_z, sample, 8, z_axis);
+//    this->count_primitives(cl_z, cr_z, sample, 8, axis_t::z_axis);
 //
 //    for (int i = 7; i >= 0; i--)
 //    {
 ////        evaluate -= divide_width;
-////        cl_z[i] = count_primitives(&cr_z[i], evaluate, z_axis);
+////        cl_z[i] = count_primitives(&cr_z[i], evaluate, axis_t::z_axis);
 //        bins_per_sample[i] = int((cl_z[i] - cr_z[i]) / adapt_bin_size) + 4;
 //
 //
@@ -2990,12 +2990,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
 //        {
 //            evaluate   += adaptive_width[i];
-//            //cl_az[j]    = count_primitives(&cr_az[j], evaluate, z_axis);
+//            //cl_az[j]    = count_primitives(&cr_az[j], evaluate, axis_t::z_axis);
 //            sample[j] = evaluate;
 //        }
 //        adaptive_offset += bins_per_sample[i];
 //    }
-//    this->count_primitives(cl_az, cr_az, sample, 8, z_axis);
+//    this->count_primitives(cl_az, cr_az, sample, 8, axis_t::z_axis);
 //
 //    
 //    /* Evaluate SAH minima for each sample as -b/2a */
@@ -3034,7 +3034,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            if (cost < lowest_cost)
 //            {
 //                lowest_cost = cost;
-//                best_axis   = z_axis;
+//                best_axis   = axis_t::z_axis;
 //                best_split  = zm;
 //            }
 //            
@@ -3070,7 +3070,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        if (cost < lowest_cost)
 //        {
 //            lowest_cost = cost;
-//            best_axis   = z_axis;
+//            best_axis   = axis_t::z_axis;
 //            best_split  = zm;
 //        }
 //      
@@ -3088,9 +3088,9 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 
 
 
-//fp_t voxel::stl_split_all_axis(fp_t *s, axis *normal)
+//fp_t voxel::stl_split_all_axis(fp_t *s, axis_t *normal)
 //{
-//    axis best_axis;
+//    axis_t best_axis;
 //    /* Find the best split position of the primitives */
 //    fp_t best_split;
 //    fp_t lowest_cost = *s;
@@ -3180,12 +3180,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        /* Evaluate unique points */
 //        if (last_guess != guess)
 //        {
-//            fp_t this_cost = calculate_sah_cost(left, right, guess, x_axis);
+//            fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::x_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = guess;
-//                best_axis   = x_axis;
+//                best_axis   = axis_t::x_axis;
 //            }
 //            last_guess = guess;
 //        }
@@ -3272,12 +3272,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        /* Evaluate unique points */
 //        if (last_guess != guess)
 //        {
-//            fp_t this_cost = calculate_sah_cost(left, right, guess, y_axis);
+//            fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::y_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = guess;
-//                best_axis   = y_axis;
+//                best_axis   = axis_t::y_axis;
 //            }
 //            last_guess = guess;
 //        }
@@ -3364,12 +3364,12 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        /* Evaluate unique points */
 //        if (last_guess != guess)
 //        {
-//            fp_t this_cost = calculate_sah_cost(left, right, guess, z_axis);
+//            fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::z_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
 //                best_split  = guess;
-//                best_axis   = z_axis;
+//                best_axis   = axis_t::z_axis;
 //            }
 //            last_guess = guess;
 //        }
@@ -3399,7 +3399,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    unsigned this_index  = 0;
 //    switch (normal)
 //    {
-//        case x_axis:
+//        case axis_t::x_axis:
 //            for (unsigned i = 0; i < this->x.size(); i++)
 //            {
 //                if (this->x[i] > nearest_clip)
@@ -3417,7 +3417,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //            }
 //            break;
-//        case y_axis:
+//        case axis_t::y_axis:
 //            for (unsigned i = 0; i < this->y.size(); i++)
 //            {
 //                if (this->y[i] > nearest_clip)
@@ -3435,7 +3435,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //            }
 //            break;
-//        case z_axis:
+//        case axis_t::z_axis:
 //            for (unsigned i = 0; i < this->z.size(); i++)
 //            {
 //                if (this->z[i] > nearest_clip)

@@ -67,8 +67,8 @@ class kd_tree_build_task : public task
 
 
 /* Function to build a kd tree containg the object given in objects and with the first split
-   in the axis given by normal */
-void build_kd_tree(const primitive_list *const objects, kdt_node *const kdt_subdiv, axis normal);
+   in the axis_t given by normal */
+void build_kd_tree(const primitive_list *const objects, kdt_node *const kdt_subdiv, axis_t normal);
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __KD_TREE_BUILDER__ */

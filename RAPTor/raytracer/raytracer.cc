@@ -76,7 +76,7 @@ inline int ray_trace_engine::find_bih_leaf_node(const frustrum &r, bih_stack_ele
         switch (current_node->get_split_axis())
         {
             /* This node is not split in any plane, ie/ it is a leaf */
-            case not_set : 
+            case axis_t::not_set : 
             {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
                 /* Count elementary nodes accessed */
@@ -90,7 +90,7 @@ inline int ray_trace_engine::find_bih_leaf_node(const frustrum &r, bih_stack_ele
                 return 1;
             }
     
-            case x_axis :
+            case axis_t::x_axis :
             {
                 /* Note -- All rays in the frustrum must have the same direction */
                 fp_t min_near_plane;
@@ -176,7 +176,7 @@ inline int ray_trace_engine::find_bih_leaf_node(const frustrum &r, bih_stack_ele
                 continue;
             }
     
-            case y_axis :
+            case axis_t::y_axis :
             {
                 /* Note -- All rays in the frustrum must have the same direction */
                 fp_t min_near_plane;
@@ -262,7 +262,7 @@ inline int ray_trace_engine::find_bih_leaf_node(const frustrum &r, bih_stack_ele
                 continue;
             }
 
-            case z_axis :
+            case axis_t::z_axis :
             {
                 /* Note -- All rays in the frustrum must have the same direction */
                 fp_t min_near_plane;
@@ -854,7 +854,7 @@ inline bool ray_trace_engine::find_bih_leaf_node(const packet_ray &r, bih_stack_
         switch (current_node->get_split_axis())
         {
             /* This node is not split in any plane, ie/ it is a leaf */
-            case not_set : 
+            case axis_t::not_set : 
             {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
                 /* Count elementary nodes accessed */
@@ -866,7 +866,7 @@ inline bool ray_trace_engine::find_bih_leaf_node(const packet_ray &r, bih_stack_
                 return true;
             }
     
-            case x_axis :
+            case axis_t::x_axis :
             {
                 vfp_t near_plane = (near_split - r.get_x0()) * i_rd[0];
                 vfp_t far_plane  = (far_split  - r.get_x0()) * i_rd[0];
@@ -924,7 +924,7 @@ inline bool ray_trace_engine::find_bih_leaf_node(const packet_ray &r, bih_stack_
                 continue;
             }
     
-            case y_axis :
+            case axis_t::y_axis :
             {
                 vfp_t near_plane = (near_split - r.get_y0()) * i_rd[1];
                 vfp_t far_plane  = (far_split  - r.get_y0()) * i_rd[1];
@@ -982,7 +982,7 @@ inline bool ray_trace_engine::find_bih_leaf_node(const packet_ray &r, bih_stack_
                 continue;
             }
 
-            case z_axis :
+            case axis_t::z_axis :
             {
                 vfp_t near_plane = (near_split - r.get_z0()) * i_rd[2];
                 vfp_t far_plane  = (far_split  - r.get_z0()) * i_rd[2];
@@ -1281,7 +1281,7 @@ inline bool ray_trace_engine::find_bih_leaf_node(const ray &r, bih_stack_element
         switch (current_node->get_split_axis())
         {
             /* This node is not split in any plane, ie/ it is a leaf */
-            case not_set : 
+            case axis_t::not_set : 
             {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
                 /* Count elementary nodes accessed */
@@ -1293,7 +1293,7 @@ inline bool ray_trace_engine::find_bih_leaf_node(const ray &r, bih_stack_element
                 return true;
             }
     
-            case x_axis :
+            case axis_t::x_axis :
             {
                 fp_t near_plane = (near_split - r.get_x0()) * i_rd.x;
                 fp_t far_plane  = (far_split  - r.get_x0()) * i_rd.x;
@@ -1346,7 +1346,7 @@ inline bool ray_trace_engine::find_bih_leaf_node(const ray &r, bih_stack_element
                 continue;
             }
     
-            case y_axis :
+            case axis_t::y_axis :
             {
                 fp_t near_plane = (near_split - r.get_y0()) * i_rd.y;
                 fp_t far_plane  = (far_split  - r.get_y0()) * i_rd.y;
@@ -1399,7 +1399,7 @@ inline bool ray_trace_engine::find_bih_leaf_node(const ray &r, bih_stack_element
                 continue;
             }
 
-            case z_axis :
+            case axis_t::z_axis :
             {
                 fp_t near_plane = (near_split - r.get_z0()) * i_rd.z;
                 fp_t far_plane  = (far_split  - r.get_z0()) * i_rd.z;
@@ -1715,7 +1715,7 @@ inline void ray_trace_engine::find_kdt_leaf_node(const packet_ray *const r, kdt_
     vfp_t t_min                     = entry_point->vt_min;
     vfp_t dist;
     
-    while (current_node->get_normal() != not_set)
+    while (current_node->get_normal() != axis_t::not_set)
     {
         int axis = (int)current_node->get_normal() - 1;
         vfp_t split_pos(current_node->get_split_position());
@@ -2063,7 +2063,7 @@ inline bool ray_trace_engine::find_kdt_leaf_node(const frustrum &r, kdt_stack_el
         switch (current_node->get_normal())
         {
             /* This node is not split in any plane, ie/ it is a leaf */
-            case not_set : 
+            case axis_t::not_set : 
             {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
                 /* Count elementary nodes accessed */
@@ -2077,7 +2077,7 @@ inline bool ray_trace_engine::find_kdt_leaf_node(const frustrum &r, kdt_stack_el
                 return true;
             }
     
-            case x_axis :
+            case axis_t::x_axis :
             {
                 if (!near_offset[0])
                 {
@@ -2126,7 +2126,7 @@ inline bool ray_trace_engine::find_kdt_leaf_node(const frustrum &r, kdt_stack_el
                 continue;
             }
     
-            case y_axis :
+            case axis_t::y_axis :
             {
                 if (!near_offset[1])
                 {
@@ -2175,7 +2175,7 @@ inline bool ray_trace_engine::find_kdt_leaf_node(const frustrum &r, kdt_stack_el
                 continue;
             }
 
-            case z_axis :
+            case axis_t::z_axis :
             {
                 if (!near_offset[2])
                 {
@@ -2653,7 +2653,7 @@ inline void ray_trace_engine::find_kdt_leaf_node(const ray *const r, const kdt_n
         switch (current_node->get_normal())
         {
             /* This node is not split in any plane, ie/ it is a leaf */
-            case not_set: 
+            case axis_t::not_set: 
             {
                 *n   = current_node;
                 *out = exit_point;
@@ -2664,7 +2664,7 @@ inline void ray_trace_engine::find_kdt_leaf_node(const ray *const r, const kdt_n
                 return;
             }
 
-            case x_axis:
+            case axis_t::x_axis:
             {
 #ifdef SHOW_KD_TREE
                 ++x_split_node_crossed;
@@ -2709,7 +2709,7 @@ inline void ray_trace_engine::find_kdt_leaf_node(const ray *const r, const kdt_n
                 continue;
             }
       
-            case y_axis:
+            case axis_t::y_axis:
             {
 #ifdef SHOW_KD_TREE
                 ++y_split_node_crossed;
@@ -2753,7 +2753,7 @@ inline void ray_trace_engine::find_kdt_leaf_node(const ray *const r, const kdt_n
                 continue;
             }
       
-            case z_axis:
+            case axis_t::z_axis:
             {
 #ifdef SHOW_KD_TREE
                 ++z_split_node_crossed;
@@ -3504,9 +3504,6 @@ void ray_trace_engine::ray_trace_one_packet(const int x, const int y) const
         {
             /* Save output */
             this->c.set_pixel(pixel_colour[j + (i * (unsigned)sqrt(MAXIMUM_PACKET_SIZE * SIMD_WIDTH))], (x + j), (y + i));
-#ifdef LOG_DEPTH                
-//            this->c.set_pixel(r[j + (i * (unsigned)sqrt(MAXIMUM_PACKET_SIZE * SIMD_WIDTH))].get_length(), (x + j), (y + i));
-#endif
         }
     }
 }
@@ -3528,9 +3525,6 @@ inline void ray_trace_engine::ray_trace_one_pixel(const int x, const int y) cons
     /* Work on the pixel as a fp_t and then saturate back to an unsigned char */
     ext_colour_t pixel_colour;
     this->ray_trace(ray_0, &pixel_colour);
-#ifdef LOG_DEPTH                
-    this->c.set_pixel(ray_0.get_length(), x, y);
-#endif
 
     /* Saturate colours and save output */
      this->c.set_pixel(pixel_colour, x, y);
@@ -3589,7 +3583,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
     /* Build a KD-tree to speed up ray tracing */    
     /* The base of the tree will hold everything for now, but adding it will 
       just be a waste of time for now */
-    build_kd_tree(&everything, &kdt_base, x_axis);
+    build_kd_tree(&everything, &kdt_base, axis_t::x_axis);
 #else
     
     /* Grab an array to hold the BIH */
@@ -3692,7 +3686,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 //           the ray start search for leaves */
 //        switch (current_node->get_normal())
 //        {
-//            case x_axis :
+//            case axis_t::x_axis :
 //            {
 //                if (split_pos >= entry_point->p.x)
 //                {
@@ -3723,7 +3717,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 //                continue;
 //            }
 //            
-//            case y_axis :
+//            case axis_t::y_axis :
 //            {
 //                if (split_pos >= entry_point->p.y)
 //                {
@@ -3754,7 +3748,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 //                continue;
 //            }
 //            
-//            case z_axis :
+//            case axis_t::z_axis :
 //            {
 //                if (split_pos >= entry_point->p.z)
 //                {
@@ -3785,7 +3779,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 //                continue;
 //            }
 //            /* This node is not split in any plane, ie/ it is a leaf */
-//            case not_set : 
+//            case axis_t::not_set : 
 //            {
 //                *n   = current_node;
 //                *out = exit_point;
@@ -3814,7 +3808,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 //
 //        switch (current_node->get_split_axis())
 //        {
-//            case x_axis :
+//            case axis_t::x_axis :
 //            {
 //                const fp_t left_dist  = (left_split  - r.get_x0()) / r.get_x_grad();
 //                const fp_t right_dist = (right_split - r.get_x0()) / r.get_x_grad();
@@ -3879,7 +3873,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 //                continue;
 //            }
 //            
-//            case y_axis :
+//            case axis_t::y_axis :
 //            {
 //                const fp_t left_dist  = (left_split  - r.get_y0()) / r.get_y_grad();
 //                const fp_t right_dist = (right_split - r.get_y0()) / r.get_y_grad();
@@ -3945,7 +3939,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 //                continue;
 //            }
 //            
-//            case z_axis :
+//            case axis_t::z_axis :
 //            {
 //                const fp_t left_dist  = (left_split  - r.get_z0()) / r.get_z_grad();
 //                const fp_t right_dist = (right_split - r.get_z0()) / r.get_z_grad();
@@ -4012,7 +4006,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 //            }
 //
 //            /* This node is not split in any plane, ie/ it is a leaf */
-//            case not_set : 
+//            case axis_t::not_set : 
 //            {
 //                *n   = current_node;
 //                *out = exit_point;

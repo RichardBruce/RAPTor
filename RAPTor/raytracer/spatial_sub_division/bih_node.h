@@ -20,18 +20,18 @@ class bih_node
         /* Tree construction */
         void create_leaf_node(const int b, const int e)
         {
-            assert((axis)(this->c & 0x3) == not_set);
+            assert((axis_t)(this->c & 0x3) == axis_t::not_set);
             this->b = b;
             this->e = e;
         }
 
-        void create_generic_node(const unsigned c, const fp_t l, const fp_t r, const axis a)
+        void create_generic_node(const unsigned c, const fp_t l, const fp_t r, const axis_t a)
         {
-            assert((a & 0xfffffffc) == 0);
+            assert((static_cast<int>(a) & 0xfffffffc) == 0);
             assert((c & 0xc0000000) == 0);
             this->l = l;
             this->r = r;
-            this->c = c | (a << 30);
+            this->c = c | (static_cast<int>(a) << 30);
         }
         
         /* Set statics */
@@ -43,9 +43,9 @@ class bih_node
 
 
         /* Tree traversal */        
-        const axis get_split_axis() const
+        const axis_t get_split_axis() const
         {
-            return (axis)((this->c >> 30) & 0x3);
+            return (axis_t)((this->c >> 30) & 0x3);
         }
 
         const fp_t get_left_split() const

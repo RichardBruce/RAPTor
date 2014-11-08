@@ -12,11 +12,11 @@ namespace raptor_raytracer
 class kdt_node
 {
     public :
-        kdt_node(fp_t s = (fp_t)0.0, axis n = not_set) : c(NULL), split_pos(s), normal(n) { };
+        kdt_node(fp_t s = (fp_t)0.0, axis_t n = axis_t::not_set) : c(NULL), split_pos(s), normal(n) { };
         ~kdt_node() 
         {
             /* Clean up dynamic memory usage */
-            if (this->normal != not_set)
+            if (this->normal != axis_t::not_set)
             {
                 delete [] this->c;
             }
@@ -31,12 +31,12 @@ class kdt_node
         kdt_node *      get_left()                const     { return &this->c[0];       }
         kdt_node *      get_right()               const     { return &this->c[1];       }
         fp_t            get_split_position()      const     { return this->split_pos;   }
-        axis            get_normal()              const     { return this->normal;      }
+        axis_t          get_normal()              const     { return this->normal;      }
         int             get_size()                const     { return this->p->size();   }
         bool            is_empty()                const     { return this->p->empty();  }
         
         void            set_primitives(primitive_list *p)   { this->p = p;              }
-        kdt_node &      split_node(const fp_t s, const axis n) 
+        kdt_node &      split_node(const fp_t s, const axis_t n) 
         {
             this->normal    = n;
             this->split_pos = s;
@@ -145,8 +145,8 @@ class kdt_node
             primitive_list  *p;
         };
 
-        fp_t                split_pos;
-        axis                normal;
+        fp_t    split_pos;
+        axis_t  normal;
 };
 }; /* namespace raptor_raytracer */
 

@@ -259,7 +259,7 @@ fp_t ray::refract(ray rays[], const line &n, const fp_t t, fp_t ri, const hit_t 
                             
     /* sin^2(x) = 1 - cos^2(x) */
     /* cos(refratced angle) */
-	if (h == out_in)
+	if (h == hit_t::out_in)
 	{
         ri = (fp_t)1.0/ri;
     }

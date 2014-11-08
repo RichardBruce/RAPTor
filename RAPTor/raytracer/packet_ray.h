@@ -170,7 +170,7 @@ struct packet_hit_description
 {
     packet_hit_description(const vfp_t &d = MAX_DIST) : u((fp_t)0.0), v((fp_t)0.0), d(d) {  };
     
-    hit_description operator[](int i)   const   { return hit_description(d[i], miss, u[i], v[i]);   };
+    hit_description operator[](int i)   const   { return hit_description(d[i], hit_t::miss, u[i], v[i]);   };
 
     const packet_hit_description & extract(hit_description *const h) const
     {
@@ -179,10 +179,10 @@ struct packet_hit_description
         const fp_t *fp_v = this->v;
         const fp_t *fp_d = this->d;
 
-        h[0] = hit_description(fp_d[0], miss, fp_u[0], fp_v[0]);
-        h[1] = hit_description(fp_d[1], miss, fp_u[1], fp_v[1]);
-        h[2] = hit_description(fp_d[2], miss, fp_u[2], fp_v[2]);
-        h[3] = hit_description(fp_d[3], miss, fp_u[3], fp_v[3]);
+        h[0] = hit_description(fp_d[0], hit_t::miss, fp_u[0], fp_v[0]);
+        h[1] = hit_description(fp_d[1], hit_t::miss, fp_u[1], fp_v[1]);
+        h[2] = hit_description(fp_d[2], hit_t::miss, fp_u[2], fp_v[2]);
+        h[3] = hit_description(fp_d[3], hit_t::miss, fp_u[3], fp_v[3]);
         return *this;
     }
 

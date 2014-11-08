@@ -282,7 +282,7 @@ extern const int BPP;
 extern const int DEPTH;
 
 /* Enumerate the axes */
-enum axis { x_axis = 1, y_axis = 2, z_axis = 3, not_set = 0};
+enum class axis_t : char { x_axis = 1, y_axis = 2, z_axis = 3, not_set = 0};
 
 /* Enumerate the ways a ray may intersect a primitive */
 /*
@@ -290,12 +290,12 @@ enum axis { x_axis = 1, y_axis = 2, z_axis = 3, not_set = 0};
     out_in - ray is entering the primitive from the outside world
     in_out - ray is leaving the primitive to the outside world
 */
-enum hit_t { miss = 0, out_in = 1, in_out = -1 };
+enum class hit_t : char { miss = 0, out_in = 1, in_out = -1 };
 
 /* A struct to hold the hit information */
 struct hit_description
 {
-    hit_description(const fp_t d = MAX_DIST, const hit_t h = miss, const fp_t u = 0.0, const fp_t v = 0.0) :
+    hit_description(const fp_t d = MAX_DIST, const hit_t h = hit_t::miss, const fp_t u = 0.0, const fp_t v = 0.0) :
                     u(u), v(v), d(d), h(h) {  };
 
     fp_t    u;      /* Barycentric u co-ordinate    */
@@ -305,7 +305,7 @@ struct hit_description
 };
 
 /* Enumerate the input file formats */
-enum model_format_t { cfg = 0, code = 1, mgf = 2, nff = 3, lwo = 4, obj = 5, ply = 6, vrml = 7 };
+enum class model_format_t : char { cfg = 0, code = 1, mgf = 2, nff = 3, lwo = 4, obj = 5, ply = 6, vrml = 7 };
 
 /* Enumerate the output file formats */
 enum class image_format_t : char { tga = 0, jpg = 1, png = 2 };
