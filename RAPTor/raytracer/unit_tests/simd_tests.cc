@@ -1,13 +1,21 @@
+#ifdef STAND_ALONE
+#define BOOST_TEST_MODULE simd test
+
+/* Common headers */
+#include "logging.h"
+
+/* Initialise logger */
+const raptor_physics::init_logger init_logger;
+#endif /* #ifdef STAND_ALONE */
 
 // Standard headers
 
 #include "simd.h"
 
-#define BOOST_TEST_MODULE simd test
 #include "boost/test/unit_test.hpp"
 
 
-using namespace auto_trader;
+using namespace raptor_raytracer;
 
 const float result_tolerance = 0.00001;
 
