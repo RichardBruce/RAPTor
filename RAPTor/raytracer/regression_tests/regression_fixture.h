@@ -34,6 +34,7 @@
 struct regression_fixture : private boost::noncopyable
 {
     public :
+        /* CTOR */
         regression_fixture(const std::string &input_file, const model_format_t input_format, 
             const point_t &cam_p = point_t(0.0, 0.0, -10), const point_t &x_vec = point_t(1.0, 0.0, 0.0), const point_t &y_vec = point_t(0.0, 1.0, 0.0), const point_t &z_vec = point_t(0.0, 0.0, 1.0),
             const ext_colour_t &bg = ext_colour_t(0.0, 0.0, 0.0),
@@ -122,10 +123,19 @@ struct regression_fixture : private boost::noncopyable
                     break;
             }
             
+            /* Log scene size */
+            BOOST_LOG_TRIVIAL(trace) << input_path << " loaded: " << _everything.size() << " primitives, of which lights: " << _lights.size();
+
             /* Pan tilt and roll the camera */
             _cam->tilt(rx);
             _cam->pan(ry);
             _cam->roll(rz);
+        }
+
+        /* DTOR */
+        ~regression_fixture()
+        {
+            scene_clean(&_everything, &_materials, _cam);
         }
 
         regression_fixture& add_light(const ext_colour_t &rgb, const point_t &c, const fp_t d, const fp_t r)
@@ -172,13 +182,6 @@ struct regression_fixture : private boost::noncopyable
         {
             return *_cam;
         }
-
-        /* Clean up dynamic memory usage */
-        ~regression_fixture()
-        {
-            scene_clean(&_everything, &_materials, _cam);
-        }
-
 
     private :
         camera              *   _cam;
