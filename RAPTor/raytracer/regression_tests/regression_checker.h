@@ -56,12 +56,13 @@ class regression_checker : private boost::noncopyable
             /* Load expected image */
             unsigned int exp_x_res;
             unsigned int exp_y_res;
+            BOOST_REQUIRE(boost::filesystem::exists(_expected));
             std::unique_ptr<unsigned char []> expected(new unsigned char [image_size]);
             read_png_file(_expected, expected.get(), &exp_x_res, &exp_y_res);
 
             /* Check image dimensions, if this fails theres no point even trying */
-            BOOST_ASSERT(x_res == exp_x_res);
-            BOOST_ASSERT(y_res == exp_y_res);
+            BOOST_REQUIRE(x_res == exp_x_res);
+            BOOST_REQUIRE(y_res == exp_y_res);
 
             /* Compare */
             int failures = 0;

@@ -8,6 +8,8 @@ UUT_OBJECTS = $(filter-out %main.o, $(C_OBJECTS:build/%.o=%.o) $(CPP_OBJECTS:bui
 TEST_SOURCE = cfg_tests.cc lwo_tests.cc mgf_tests.cc nff_tests.cc obj_tests.cc ply_tests.cc \
     teamcity_boost.cc teamcity_messages.cc
 
+LIBRARY += boost_filesystem
+
 include $(RAPTOR_TOOLS)/UnitTest.mk
 
 # All
