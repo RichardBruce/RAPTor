@@ -3,6 +3,7 @@
 
 /* Standard headers */
 #include <cstdlib>
+#include <chrono>
 #include <list>
 #include <string>
 #include <vector>
@@ -173,7 +174,12 @@ struct regression_fixture : private boost::noncopyable
             assert(!_everything.empty());
 
             /* Render */
+            const auto t0(std::chrono::system_clock::now());
             ray_tracer(_lights, _everything, *_cam);
+            const auto t1(std::chrono::system_clock::now());
+
+            /* Log test duration */
+            BOOST_LOG_TRIVIAL(fatal) << "Test took: " << std::duration::cast<milliseconds>(t1 - t0).count();
 
             return *this;
         }
