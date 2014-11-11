@@ -179,7 +179,7 @@ struct regression_fixture : private boost::noncopyable
             const auto t1(std::chrono::system_clock::now());
 
             /* Log test duration */
-            BOOST_LOG_TRIVIAL(fatal) << "Test took: " << std::duration::cast<milliseconds>(t1 - t0).count();
+            BOOST_LOG_TRIVIAL(fatal) << "Test took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
 
             return *this;
         }
