@@ -48,11 +48,12 @@ struct regression_fixture : private boost::noncopyable
 
             const std::string data_dir(getenv("RAPTOR_DATA"));
             const std::string input_path(data_dir + input_file);
-            BOOST_LOG_TRIVIAL(trace) << "Opening input file: " << input_path;
+            BOOST_LOG_TRIVIAL(fatal) << "Opening input file: " << input_path;
 
             int last_slash;
             std::string path;
             std::ifstream input_stream;
+            const auto t0(std::chrono::system_clock::now());
             switch (input_format)
             {
                 case model_format_t::cfg :
@@ -124,9 +125,9 @@ struct regression_fixture : private boost::noncopyable
                     break;
             }
             
-            /* Log scene size */
-            BOOST_LOG_TRIVIAL(trace) << input_path << " loaded: " << _everything.size() << " primitives, of which lights: " << _lights.size();
-
+            const auto t1(std::chrono::system_clock::now());
+            BOOST_LOG_TRIVIAL(fatal) << "Parser took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
+            
             /* Pan tilt and roll the camera */
             _cam->tilt(rx);
             _cam->pan(ry);
@@ -172,6 +173,9 @@ struct regression_fixture : private boost::noncopyable
 
             /* Assert there is an imagine to trace */
             assert(!_everything.empty());
+
+            /* Log scene size */
+            BOOST_LOG_TRIVIAL(fatal) << "Rendering: " << _everything.size() << " primitives, of which lights: " << _lights.size();
 
             /* Render */
             const auto t0(std::chrono::system_clock::now());
