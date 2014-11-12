@@ -14,6 +14,7 @@ const raptor_physics::init_logger init_logger;
 
 BOOST_AUTO_TEST_SUITE( nff_tests );
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( nff_balls_1_test )
 {
     /* Checker */
@@ -29,7 +30,6 @@ BOOST_AUTO_TEST_CASE( nff_balls_1_test )
     checker.check(fixture.get_camera());
 }
 
-#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( nff_balls_2_test )
 {
     /* Checker */
@@ -74,7 +74,6 @@ BOOST_AUTO_TEST_CASE( nff_balls_4_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
-#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( nff_gears_2_test )
 {
@@ -91,7 +90,6 @@ BOOST_AUTO_TEST_CASE( nff_gears_2_test )
     checker.check(fixture.get_camera());
 }
 
-#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( nff_gears_5_test )
 {
     /* Checker */
@@ -260,7 +258,6 @@ BOOST_AUTO_TEST_CASE( nff_lattice_19_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
-#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( nff_mount_4_test )
 {
@@ -277,7 +274,6 @@ BOOST_AUTO_TEST_CASE( nff_mount_4_test )
     checker.check(fixture.get_camera());
 }
 
-#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( nff_mount_7_test )
 {
     /* Checker */
@@ -339,6 +335,7 @@ BOOST_AUTO_TEST_CASE( nff_nurbtst_1_test )
     checker.check(fixture.get_camera());
 }
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( nff_rings_1_test )
 {
     /* Checker */
@@ -354,7 +351,6 @@ BOOST_AUTO_TEST_CASE( nff_rings_1_test )
     checker.check(fixture.get_camera());
 }
 
-#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( nff_rings_2_test )
 {
     /* Checker */
@@ -399,7 +395,6 @@ BOOST_AUTO_TEST_CASE( nff_rings_9_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
-#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( nff_sample_1_test )
 {
@@ -431,7 +426,6 @@ BOOST_AUTO_TEST_CASE( nff_shells_1_test )
     checker.check(fixture.get_camera());
 }
 
-#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( nff_shells_2_test )
 {
     /* Checker */
@@ -538,7 +532,6 @@ BOOST_AUTO_TEST_CASE( nff_sombrero_7_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
-#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( nff_teapot_12_test )
 {
@@ -555,7 +548,6 @@ BOOST_AUTO_TEST_CASE( nff_teapot_12_test )
     checker.check(fixture.get_camera());
 }
 
-#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( nff_teapot_38_test )
 {
     /* Checker */
@@ -662,7 +654,6 @@ BOOST_AUTO_TEST_CASE( nff_tetra_11_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
-#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( nff_tree_4_test )
 {
@@ -679,7 +670,6 @@ BOOST_AUTO_TEST_CASE( nff_tree_4_test )
     checker.check(fixture.get_camera());
 }
 
-#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( nff_tree_7_test )
 {
     /* Checker */
