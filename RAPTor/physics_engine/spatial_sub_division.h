@@ -29,7 +29,7 @@ class spatial_sub_division : private boost::noncopyable
 {
     public :
         // typedef std::unordered_set<std::pair<const physics_object *, const physics_object *>, boost::hash<std::pair<const physics_object *, const physics_object *>>> collision_set;
-        typedef pair_manager collision_set;
+        typedef pair_manager<> collision_set;
 
         spatial_sub_division(const std::unordered_map<int, physics_object*> &objects)
         {
@@ -65,16 +65,16 @@ class spatial_sub_division : private boost::noncopyable
             _axis_possibles[2].reserve(_bounds[0].size());
             _possibles.reserve(_bounds[0].size());
 
-            _axis_possibles[0].load_factor(0.7);
-            _axis_possibles[1].load_factor(0.7);
-            _axis_possibles[2].load_factor(0.7);
-            _possibles.load_factor(0.7);
+            // _axis_possibles[0].load_factor(0.7);
+            // _axis_possibles[1].load_factor(0.7);
+            // _axis_possibles[2].load_factor(0.7);
+            // _possibles.load_factor(0.7);
             collision_detect();
 
-            _axis_possibles[0].load_factor(1.0);
-            _axis_possibles[1].load_factor(1.0);
-            _axis_possibles[2].load_factor(1.0);
-            _possibles.load_factor(1.0);
+            // _axis_possibles[0].load_factor(1.0);
+            // _axis_possibles[1].load_factor(1.0);
+            // _axis_possibles[2].load_factor(1.0);
+            // _possibles.load_factor(1.0);
         }
 
         /* Allow default DTOR */

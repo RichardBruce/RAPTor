@@ -6,6 +6,7 @@
 
 /* Boost headers */
 #include "boost/functional/hash.hpp"
+#include "boost/iterator/iterator_facade.hpp"
 
 /* Physics headers */
 #include "physics_object.h"
@@ -39,26 +40,71 @@ inline unsigned int next_power_of_two(unsigned int x)
 }
 
 
+template<class HashFn = boost::hash<contents>>
 class pair_manager
 {
     public :
+        /* Iterators */
+        class pair_manager_iterator : public boost::iterator_facade<pair_manager_iterator, contents, boost::forward_traversal_tag>
+        {
+            public :
+                pair_manager_iterator(const pair_manager *const container, const unsigned int bin, const unsigned int idx)
+                : _container(container), _bin(bin), _idx(idx) {  };
+
+                constexpr pair_manager_iterator(const pair_manager_iterator &rhs)
+                : _container(rhs._container), _bin(rhs._bin), _idx(rhs._idx) {  }
+
+                pair_manager_iterator& operator=(pair_manager_iterator&& rhs)
+                {
+                    _container = rhs._container;
+                    _bin = rhs._bin;
+                    _idx = rhs._idx;
+
+                    return *this;
+                }
+
+                operator contents*() { return &_container->_pairs[(_bin * _container->_load_factor) + _idx]; }
+
+            private :
+                friend class boost::iterator_core_access;
+
+                void increment()
+                {
+                    ++_idx;
+                    if (_idx == _container->_pairs_in_bin[_bin])
+                    {
+                        ++_bin;
+                        while ((_bin < _container->_size) && (_container->_pairs_in_bin[_bin] == 0))
+                        {
+                            ++_bin;
+                        }
+
+                        assert(_container->_pairs_in_bin[_bin] < _container->_load_factor);
+                        _idx = 0;
+                    }
+                }
+
+                bool equal(pair_manager_iterator const& iter) const
+                {
+                    return (_container == iter._container) && (_bin == iter._bin) && (_idx == iter._idx);
+                }
+
+                contents& dereference() const
+                {
+                    return _container->_pairs[(_bin * _container->_load_factor) + _idx];
+                }
+
+                const pair_manager *    _container;
+                unsigned int            _bin;
+                unsigned int            _idx;
+        };
+
+        /* CTOR */
         pair_manager()
-        : _hash_func(), _pairs(nullptr), _hash_table(nullptr), _next(nullptr), _load_factor(1.0), _size(0), _mask(0), _number_of_pairs(0) { }
+        : _hash_func(), _pairs(nullptr), _pairs_in_bin(nullptr), _load_factor(8), _size(128), _mask(0x7f), _number_of_pairs(0) { }
 
-        ~pair_manager()
-        {
-            delete [] _next;
-            delete [] _pairs;
-            delete [] _hash_table;
-        }
-
-        pair_manager& clear()
-        {
-            _number_of_pairs  = 0;
-            std::fill_n(_hash_table, _size, INVALID_ID);
-
-            return *this;
-        }
+        unsigned int capacity()     const { return _size * _load_factor;    }
+        unsigned int load_factor()  const { return _load_factor;            }
 
         pair_manager& reserve(const unsigned int size)
         {
@@ -66,12 +112,23 @@ class pair_manager
             return *this;
         }
 
-        pair_manager& load_factor(const float load_factor)
+        pair_manager& load_factor(const unsigned int load_factor)
         {
-            assert(load_factor <= 1.0);
-            assert(load_factor >  0.0);
+            assert(load_factor > 1);
+            _load_factor = next_power_of_two(load_factor);
+            rehash(_size - 1);
 
-            _load_factor = load_factor;
+            return *this;
+        }
+
+        pair_manager& clear()
+        {
+            if (_pairs != nullptr)
+            {
+                _number_of_pairs = 0;
+                std::fill_n(_pairs_in_bin.get(), _size, 0);
+            }
+
             return *this;
         }
 
@@ -85,30 +142,11 @@ class pair_manager
 
         const contents* find(const contents &p) const
         {
-            /* Check something has been added */
-            if (_hash_table == nullptr)
-            {
-                return end();
-            }
-
             /* Compute hash value for this pair */
             const std::size_t hash = _hash_func(p) & _mask;
 
-            /* Look for it in the table */
-            unsigned int offset = _hash_table[hash];
-            while ((offset != INVALID_ID) && is_different_pair(_pairs[offset], p.first, p.second))
-            {
-                assert(_pairs[offset].first != INVALID_USER_ID);
-                offset = _next[offset];
-            }
-
-            if (offset == INVALID_ID)
-            {
-                return end();
-            }
-
-            assert(offset < _number_of_pairs);
-            return &_pairs[offset];
+            /* Find */
+            return find(p.first, p.second, hash);
         }
 
         const contents* insert(const physics_object *id0, const physics_object *id1)
@@ -121,35 +159,50 @@ class pair_manager
 
         const contents* insert(const contents &p)
         {
+            /* Check the table exists */
+            if (_pairs == nullptr)
+            {
+                _pairs_in_bin.reset(new unsigned int [_size] ());
+                _pairs.reset(new contents [_size * _load_factor]);
+            }
+
             /* Check for existing pair */
             std::size_t hash = _hash_func(p) & _mask;
+            assert(_pairs_in_bin[hash] < _load_factor);
+
             contents* pair = find(p.first, p.second, hash);
             if (pair != nullptr)
             {
                 return pair;
             }
-
+            
             /* Possibly rehash */
-            if (_number_of_pairs >= (_size * _load_factor))
+            while (_pairs_in_bin[hash] == (_load_factor - 1))
             {
-                rehash(_number_of_pairs + 1);
+                rehash(_size + 1);
 
                 /* Rehash the new entry */
                 hash = _hash_func(p) & _mask;
             }
 
             /* Update */
-            contents* new_p = &_pairs[_number_of_pairs];
-            new_p->first    = p.first;
-            new_p->second   = p.second;
+            contents* new_p = &_pairs[(hash * _load_factor) + _pairs_in_bin[hash]];
+            (*new_p) = p;
 
-            _next[_number_of_pairs] = _hash_table[hash];
-            _hash_table[hash] = _number_of_pairs++;
+            ++_pairs_in_bin[hash];
+            ++_number_of_pairs;
+
+            assert(_pairs_in_bin[hash] < _load_factor);
             return new_p;
         }
 
+        void check_bin_size(const std::size_t hash)
+        {
+            assert(_pairs_in_bin[hash] < _load_factor);
+        }
 
-        contents* erase(const physics_object *id0, const physics_object *id1)
+
+        pair_manager_iterator erase(const physics_object *id0, const physics_object *id1)
         {
             /* Order the ids */
             sort(id0, id1);
@@ -157,7 +210,7 @@ class pair_manager
             return erase(std::make_pair(id0, id1));
         }
 
-        contents* erase(const contents &p)
+        pair_manager_iterator erase(const contents &p)
         {
             /* Find the pair or give up */
             const std::size_t hash = _hash_func(p) & _mask;
@@ -173,168 +226,163 @@ class pair_manager
             return erase(pair, hash);
         }
 
-        contents* erase(contents *const pair)
+        pair_manager_iterator erase(const pair_manager_iterator &p)
         {
-            const std::size_t hash = _hash_func(*pair) & _mask;
-            return erase(pair, hash);
+            contents &pair = *p;
+            const std::size_t hash = _hash_func(pair) & _mask;
+            return erase(&pair, hash);
         }
 
-        contents* erase(contents *const pair, const std::size_t hash)
+        pair_manager_iterator erase(contents *const pair, const std::size_t hash)
         {
-            /* Fix next */
-            const unsigned int pair_index = get_index(pair);
-            unsigned int offset = _hash_table[hash];
-            assert(offset != INVALID_ID);
+            /* Convert to indices */
+            const unsigned int idx = static_cast<unsigned int>((((std::size_t)pair - (std::size_t)_pairs.get())) / sizeof(contents));
+            const unsigned int bin = idx / _load_factor;
+            assert(_pairs_in_bin[bin] < _load_factor);
 
-            unsigned int previous = INVALID_ID;
-            while (offset != pair_index)
-            {
-                previous = offset;
-                offset = _next[offset];
-            }
+            /* Decrement size of bin */
+            --_pairs_in_bin[bin];
+            --_number_of_pairs;
+            assert(_pairs_in_bin[hash] < _load_factor);
 
-            /* Repoint next */
-            if (previous != INVALID_ID)
+            /* Move the element now out the end of the bin into the erased element */
+            const unsigned int bin_offset = bin * _load_factor;
+            const unsigned int last_pair = bin_offset + _pairs_in_bin[bin];
+            if (idx != last_pair)
             {
-                assert(_next[previous] == pair_index);
-                _next[previous] = _next[pair_index];
+                _pairs[idx] = _pairs[last_pair];
+                return pair_manager_iterator(this, bin, idx - bin_offset);
             }
-            /* The first in the chain, repoint hash */
+            /* Search for the next pair in other bins */
             else
             {
-                _hash_table[hash] = _next[pair_index];
-            }
-            // we're now free to reuse next[pair_index] without breaking the list
+                for (unsigned int i = bin + 1; i < _size; ++i)
+                {
+                    if (_pairs_in_bin[i] > 0)
+                    {
+                        return pair_manager_iterator(this, i, 0);
+                    }
+                }
 
-            /* Remove the last pair */
-            const unsigned int last_pair_idx = _number_of_pairs - 1;
-            if (last_pair_idx == pair_index)
-            {
-                --_number_of_pairs;
+                for (unsigned int i = 0; i < bin; ++i)
+                {
+                    if (_pairs_in_bin[i] > 0)
+                    {
+                        return pair_manager_iterator(this, i, 0);
+                    }
+                }
+
                 return end();
             }
-
-            const contents* last = &_pairs[last_pair_idx];
-            const unsigned int last_hash = _hash_func(*last) & _mask;
-
-            // Walk the hash table to fix _next
-            offset = _hash_table[last_hash];
-            assert(offset != INVALID_ID);
-
-            previous = INVALID_ID;
-            while (offset != last_pair_idx)
-            {
-                previous = offset;
-                offset = _next[offset];
-            }
-
-            // Let us go/jump us
-            if (previous != INVALID_ID)
-            {
-                assert(_next[previous] == last_pair_idx);
-                _next[previous] = _next[last_pair_idx];
-            }
-            // else we were the first
-            else
-            { 
-                _hash_table[last_hash] = _next[last_pair_idx];
-            }
-            // we're now free to reuse _next[last_pair_idx] without breaking the list
-
-            // Don't invalidate entry since we're going to shrink the array
-
-            // 2) Re-insert in free slot
-            _pairs[pair_index]      = _pairs[last_pair_idx];
-            _next[pair_index]       = _hash_table[last_hash];
-            _hash_table[last_hash]  = pair_index;
-
-            --_number_of_pairs;
-
-            return pair;
         }
 
-        // Access functions
+        /* Access functions */
         unsigned int size() const { return _number_of_pairs; }
 
-        contents* begin()   const { return &_pairs[0];                  }
-        contents* end()     const { return &_pairs[_number_of_pairs];   }
+        pair_manager_iterator begin() const
+        {
+            /* Check we have data */
+            if (_pairs == nullptr)
+            {
+                return pair_manager_iterator(this, 0, 0);
+            }
+
+            /* Find first populated bin */
+            unsigned int bin = 0;
+            while ((bin < _size) && (_pairs_in_bin[bin] == 0))
+            {
+                ++bin;
+            }
+            assert(_pairs_in_bin[bin] < _load_factor);
+
+            return pair_manager_iterator(this, bin, 0);
+        }
+
+        pair_manager_iterator end() const
+        {
+            /* Check we have data */
+            if (_pairs == nullptr)
+            {
+                return pair_manager_iterator(this, 0, 0);
+            }
+
+            return pair_manager_iterator(this, _size, 0);
+        }
 
     private :
         void rehash(const unsigned int size)
         {
-            /* Make more space for the hash table */
-            _size = next_power_of_two(size / _load_factor);
-            _mask = _size - 1;
+            /* Check the hash exists */
+            if (_pairs == nullptr)
+            {
+                _size = next_power_of_two(size);
+                _mask = size - 1;
+                return;
+            }
 
-            delete [] _hash_table;
-            _hash_table = new unsigned int[_size];
-            std::fill_n(_hash_table, _size, INVALID_ID);
+            /* Make more space for the hash table */
+            const unsigned int new_size = next_power_of_two(size);
+            _mask = new_size - 1;
 
             /* Get some more space for data */
-            contents* new_pairs     = new contents [_size];
-            unsigned int* new_next  = new unsigned int [_size];
-
-            /* Copy the old data */
-            if(_number_of_pairs)
-            {
-                memcpy(new_pairs, _pairs, _number_of_pairs*sizeof(contents));
-            }
+            std::unique_ptr<contents []> new_pairs(new contents [new_size * _load_factor]);
+            std::unique_ptr<unsigned int []> new_pairs_in_bin(new unsigned int [new_size] ());
 
             /* Rehash everything */
-            for (unsigned int i = 0; i < _number_of_pairs; ++i)
+            unsigned int bin_offset = 0;
+            for (unsigned int i = 0; i < _size; ++i)
             {
-                const std::size_t hash = _hash_func(_pairs[i]) & _mask;
-                new_next[i] = _hash_table[hash];
-                _hash_table[hash] = i;
+                for (unsigned int j = 0; j < _pairs_in_bin[i]; ++j)
+                {
+                    /* TODO - Could save the call to hash_func by keeping unmasked hash */
+                    /*        This would speed up rehash, but slow down everything else, lets just keep rehashing rare and everything else fast */
+                    const std::size_t hash = _hash_func(_pairs[bin_offset + j]) & _mask;
+                    new_pairs[(hash * _load_factor) + new_pairs_in_bin[hash]] = _pairs[bin_offset + j];
+                    ++new_pairs_in_bin[hash];
+                    assert(new_pairs_in_bin[hash] < _load_factor);
+                }
+
+                bin_offset += _load_factor;
             }
 
-            /* Clean up */
-            delete [] _next;
-            delete [] _pairs;
-
-            _pairs = new_pairs;
-            _next = new_next;
-        }
-
-        unsigned int get_index(const contents* pair)  const
-        {
-            return ((unsigned int)((std::size_t(pair) - std::size_t(_pairs))) / sizeof(contents));
+            /* Swap in the new table  */
+            _size = new_size;
+            _pairs.swap(new_pairs);
+            _pairs_in_bin.swap(new_pairs_in_bin);
         }
 
         contents* find(const physics_object *id0, const physics_object *id1, const std::size_t hash) const
         {
-            if (_hash_table == nullptr)
+            assert(_pairs_in_bin[hash] < _load_factor);
+
+            /* Check we have data */
+            if (_pairs == nullptr)
             {
                 return nullptr;
             }
 
             /* Look for it in the table */
-            unsigned int offset = _hash_table[hash];
-            while ((offset != INVALID_ID) && is_different_pair(_pairs[offset], id0, id1))
+            const unsigned int bin_offset = hash * _load_factor;
+            for (unsigned int i = bin_offset; i < (bin_offset + _pairs_in_bin[hash]); ++i)
             {
-                assert(_pairs[offset].first != INVALID_USER_ID);
-                offset = _next[offset];
+                assert(_pairs_in_bin[hash] < _load_factor);
+                if (!is_different_pair(_pairs[i], id0, id1))
+                {
+                    return &_pairs[i];
+                }
             }
 
-            if (offset == INVALID_ID)
-            {
-                return nullptr;
-            }
-
-            assert(offset < _number_of_pairs);
-            return &_pairs[offset];
+            /* Not found */
+            return nullptr;
         }
 
-        boost::hash<contents>   _hash_func;
-        contents*               _pairs;
-        unsigned int*           _hash_table;
-        unsigned int*           _next;
-        float                   _load_factor;
-        unsigned int            _size;
-        unsigned int            _mask;
-        unsigned int            _number_of_pairs;
-        static constexpr physics_object* INVALID_USER_ID = nullptr;
-        static constexpr unsigned int INVALID_ID = 0xffffffff;
+        HashFn                              _hash_func;
+        std::unique_ptr<contents []>        _pairs;
+        std::unique_ptr<unsigned int []>    _pairs_in_bin;
+        unsigned int                        _load_factor;
+        unsigned int                        _size;
+        unsigned int                        _mask;
+        unsigned int                        _number_of_pairs;
 };
 }; /* namespace raptor_physics */
 

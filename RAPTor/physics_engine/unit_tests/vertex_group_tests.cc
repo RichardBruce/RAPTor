@@ -30,7 +30,7 @@ using namespace raptor_physics;
 struct vertex_group_fixture : private boost::noncopyable
 {
     vertex_group_fixture()
-    : mat(new phong_shader(ext_colour_t(255, 255, 255), 1.0)),
+    : mat(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0)),
       plane_vg(make_plane(mat, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0))),
       cube_vg0(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5, 0.5))),
       cube_vg1(make_cube(mat, point_t(-0.5,  9.0, -0.5), point_t(0.5, 10.0, 0.5)))
@@ -44,10 +44,10 @@ struct vertex_group_fixture : private boost::noncopyable
         delete cube_vg1;
     }
 
-    material *      mat;
-    vertex_group *  plane_vg;
-    vertex_group *  cube_vg0;
-    vertex_group *  cube_vg1;
+    raptor_raytracer::material *    mat;
+    vertex_group *                  plane_vg;
+    vertex_group *                  cube_vg0;
+    vertex_group *                  cube_vg1;
 };
 
 BOOST_FIXTURE_TEST_SUITE( vertex_group_tests, vertex_group_fixture )
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE( find_intersection_time_test )
 BOOST_AUTO_TEST_CASE( static_build_triangles_test )
 {
     /* Test plane */
-    primitive_list p0;
+    raptor_raytracer::primitive_list p0;
     plane_vg->triangles(&p0, quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(p0.size() == 2);
 
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE( static_build_triangles_test )
     }
 
     /* Test cube */
-    primitive_list p1;
+    raptor_raytracer::primitive_list p1;
     cube_vg0->triangles(&p1, quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(p1.size() == 12);
 
@@ -239,7 +239,7 @@ BOOST_AUTO_TEST_CASE( static_build_triangles_test )
 BOOST_AUTO_TEST_CASE( translated_build_triangles_test )
 {
     /* Test plane */
-    primitive_list p0;
+    raptor_raytracer::primitive_list p0;
     plane_vg->triangles(&p0, quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(-3.0, 1.0, -2.0));
     BOOST_CHECK(p0.size() == 2);
 
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE( translated_build_triangles_test )
     }
 
     /* Test cube */
-    primitive_list p1;
+    raptor_raytracer::primitive_list p1;
     cube_vg0->triangles(&p1, quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(-2.3, -1.2, 1.5));
     BOOST_CHECK(p1.size() == 12);
 
@@ -319,7 +319,7 @@ BOOST_AUTO_TEST_CASE( translated_build_triangles_test )
 BOOST_AUTO_TEST_CASE( translated_rotated_build_triangles_test )
 {
     /* Test plane */
-    primitive_list p0;
+    raptor_raytracer::primitive_list p0;
     plane_vg->triangles(&p0, quaternion_t(0.931655, 0.0186331, -0.316763, -0.177014), point_t(2.04, -9.1, -1.44));
     BOOST_CHECK(p0.size() == 2);
 
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE( translated_rotated_build_triangles_test )
     }
 
     /* Test cube */
-    primitive_list p1;
+    raptor_raytracer::primitive_list p1;
     cube_vg0->triangles(&p1, quaternion_t(0.0647662, 0.450449, -0.867219, 0.20207), point_t(-1.71, -6.51, 1.43));
     BOOST_CHECK(p1.size() == 12);
 

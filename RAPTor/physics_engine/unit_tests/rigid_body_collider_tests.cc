@@ -741,7 +741,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_test )
 {
     const point_t poc(0.5, 1.0, 0.5);
     const point_t noc(0.0, 1.0, 0.0);
-    std::unique_ptr<material> m(new phong_shader(ext_colour_t(255, 255, 255), 1.0));
+    std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0));
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 0.5, 0.5), 1.0));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 1.5, 0.5), 1.0));
 
@@ -779,7 +779,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_reverse_test )
 {
     const point_t poc(0.5, 1.0, 0.5);
     const point_t noc(0.0, 1.0, 0.0);
-    std::unique_ptr<material> m(new phong_shader(ext_colour_t(255, 255, 255), 1.0));
+    std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0));
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 0.5, 0.5), 1.0));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 1.5, 0.5), 1.0));
 
@@ -817,7 +817,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_more_friction_test )
 {
     const point_t poc(0.5, 1.0, 0.5);
     const point_t noc(0.0, 1.0, 0.0);
-    std::unique_ptr<material> m(new phong_shader(ext_colour_t(255, 255, 255), 1.0));
+    std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0));
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 0.5, 0.5), 1.0));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 1.5, 0.5), 1.0));
     
@@ -855,7 +855,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_max_friction_test )
 {
     const point_t poc(0.5, 1.0, 0.5);
     const point_t noc(0.0, 1.0, 0.0);
-    std::unique_ptr<material> m(new phong_shader(ext_colour_t(255, 255, 255), 1.0));
+    std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0));
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 0.5, 0.5), 1.0));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 1.5, 0.5), 1.0));
 
@@ -892,7 +892,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_capped_max_friction_test )
 {
     const point_t poc(0.5, 1.0, 0.5);
     const point_t noc(0.0, 1.0, 0.0);
-    std::unique_ptr<material> m(new phong_shader(ext_colour_t(255, 255, 255), 1.0));
+    std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0));
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 0.5, 0.5), 1.0));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 1.5, 0.5), 1.0));
 
@@ -930,7 +930,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_zero_tanjent_velocity_test )
 {
     const point_t poc(0.5, 1.0, 0.5);
     const point_t noc(0.0, 1.0, 0.0);
-    std::unique_ptr<material> m(new phong_shader(ext_colour_t(255, 255, 255), 1.0));
+    std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0));
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 0.5, 0.5), 1.0));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 1.5, 0.5), 1.0));
 
@@ -968,7 +968,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_zero_mu_test )
 {
     const point_t poc(0.5, 1.0, 0.5);
     const point_t noc(0.0, 1.0, 0.0);
-    std::unique_ptr<material> m(new phong_shader(ext_colour_t(255, 255, 255), 1.0));
+    std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0));
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 0.5, 0.5), 1.0));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.5, 1.5, 0.5), 1.0));
 
