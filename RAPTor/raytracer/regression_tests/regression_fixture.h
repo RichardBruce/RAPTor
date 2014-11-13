@@ -60,8 +60,8 @@ struct regression_fixture : private boost::noncopyable
                 {
                     input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
-                    const unsigned int path_end = input_file.find_last_of("/\\") + 1;
-                    cfg_parser(input_file.substr(0, path_end), input_stream, _lights, _everything, _materials, &_cam);
+                    const unsigned int path_end = input_path.find_last_of("/\\") + 1;
+                    cfg_parser(input_path.substr(0, path_end), input_stream, _lights, _everything, _materials, &_cam);
 
                     /* Camera is not set in the scene so do it here */
                     _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
