@@ -33,7 +33,7 @@ struct physics_engine_fixture : private boost::noncopyable
     physics_engine_fixture()
     :  collider(new rigid_body_collider(0.9, 0.75)),
        uut(collider),
-       m(new phong_shader(ext_colour_t(255.0, 255.0, 255.0), 1.0)),
+       m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), 1.0)),
        po0_check(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0,  9.5, 0.0), 10.0)),
        po1_check(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, -9.5, 0.0), 10.0)),
        po2_check(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, -8.4999975, 0.0), 10.0)),
@@ -53,7 +53,7 @@ struct physics_engine_fixture : private boost::noncopyable
 
     rigid_body_collider *collider;
     physics_engine uut;
-    material *m;
+    raptor_raytracer::material *m;
 
     physics_object *po0_check;
     physics_object *po1_check;
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE( scene_to_triangles_test )
     BOOST_CHECK(uut.number_of_collisions() == 0);
     BOOST_CHECK(uut.default_collider() == collider);
 
-    std::unique_ptr<primitive_list> tris(uut.scene_to_triangles());
+    std::unique_ptr<raptor_raytracer::primitive_list> tris(uut.scene_to_triangles());
     BOOST_CHECK(tris->size() == 24);
 
     BOOST_CHECK(tris->at( 0)->get_vertex_a() == point_t(-0.5, -10.0, -0.5));

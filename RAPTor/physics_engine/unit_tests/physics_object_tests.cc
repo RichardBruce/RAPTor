@@ -33,7 +33,7 @@ struct physics_object_fixture : private boost::noncopyable
 {
     physics_object_fixture()
     : point_outside(100.0, 110.0, 90.0),
-      mat(new phong_shader(ext_colour_t(255, 255, 255), 1.0)),
+      mat(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0)),
       vg0(make_plane(mat, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0))),
       vg1(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5))),
       vg2(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5))),
@@ -75,29 +75,29 @@ struct physics_object_fixture : private boost::noncopyable
         delete moving_po_type;
     }
 
-    const point_t       point_outside;
-    material        *   mat;
-    vertex_group    *   vg0;
-    vertex_group    *   vg1;
-    vertex_group    *   vg2;
-    vertex_group    *   vg3;
-    vertex_group    *   vg4;
-    vertex_group    *   vg5;
-    vertex_group    *   vg6;
-    vertex_group    *   vg7;
-    physics_object  *   plane_po;
-    physics_object  *   cube_po0;
-    physics_object  *   cube_po1;
-    physics_object  *   centered_cube;
-    physics_object  *   far_po;
-    physics_object  *   near_po;
-    physics_object  *   nearer_po;
-    physics_object  *   touching_po;
-    physics_object  *   hit_except_x_po;
-    physics_object  *   orientated_po;
-    physics_object  *   orientated_po_type;
-    physics_object  *   moving_po;
-    physics_object  *   moving_po_type;
+    const point_t                   point_outside;
+    raptor_raytracer::material  *   mat;
+    vertex_group                *   vg0;
+    vertex_group                *   vg1;
+    vertex_group                *   vg2;
+    vertex_group                *   vg3;
+    vertex_group                *   vg4;
+    vertex_group                *   vg5;
+    vertex_group                *   vg6;
+    vertex_group                *   vg7;
+    physics_object              *   plane_po;
+    physics_object              *   cube_po0;
+    physics_object              *   cube_po1;
+    physics_object              *   centered_cube;
+    physics_object              *   far_po;
+    physics_object              *   near_po;
+    physics_object              *   nearer_po;
+    physics_object              *   touching_po;
+    physics_object              *   hit_except_x_po;
+    physics_object              *   orientated_po;
+    physics_object              *   orientated_po_type;
+    physics_object              *   moving_po;
+    physics_object              *   moving_po_type;
 };
 
 
@@ -654,7 +654,7 @@ BOOST_FIXTURE_TEST_CASE( apply_impulse_with_pre_computes_test, physics_object_fi
 BOOST_FIXTURE_TEST_CASE( build_triangles_test, physics_object_fixture )
 {
     /* Test plane */
-    primitive_list p0;
+    raptor_raytracer::primitive_list p0;
     plane_po->triangles(&p0);
     BOOST_CHECK(p0.size() == 2);
 
@@ -672,7 +672,7 @@ BOOST_FIXTURE_TEST_CASE( build_triangles_test, physics_object_fixture )
     }
 
     /* Test cube */
-    primitive_list p1;
+    raptor_raytracer::primitive_list p1;
     cube_po0->triangles(&p1);
     BOOST_CHECK(p1.size() == 12);
 

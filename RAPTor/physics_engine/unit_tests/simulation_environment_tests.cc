@@ -31,7 +31,7 @@ struct simulation_environment_fixture : private boost::noncopyable
     simulation_environment_fixture()
     :  pe(new rigid_body_collider(0.9, 0.75)),
        po(-1.0, 0.0, 1, false, false), /* Cant check the rendered output so make sure that code isnt even run */
-       m(new phong_shader(ext_colour_t(255.0, 255.0, 255.0), 1.0))
+       m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), 1.0))
     {  };
 
     ~simulation_environment_fixture()
@@ -41,7 +41,7 @@ struct simulation_environment_fixture : private boost::noncopyable
 
     physics_engine pe;
     physics_options po;
-    material *m;
+    raptor_raytracer::material *m;
 };
 
 
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE( add_light_test )
     BOOST_CHECK(uut.font_initialised() == false);
     BOOST_CHECK(uut.load_screen_initialised() == false);
 
-    uut.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 0.0, 1.0));
+    uut.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 0.0, 1.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 0);
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE( add_light_test )
     BOOST_CHECK(uut.font_initialised() == false);
     BOOST_CHECK(uut.load_screen_initialised() == false);
 
-    uut.add_light(ext_colour_t(125.0, 0.0, 64.0), point_t(-10.0, 0.0, 5.0));
+    uut.add_light(raptor_raytracer::ext_colour_t(125.0, 0.0, 64.0), point_t(-10.0, 0.0, 5.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 0);

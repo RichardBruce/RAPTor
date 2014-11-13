@@ -54,7 +54,7 @@ class simulation_environment
         simulation_environment(physics_engine *const pe, physics_options *const po)
         : _po(po), _pe(pe), _window(nullptr), _renderer(nullptr), _texture(nullptr), _load_screen(nullptr), _font(nullptr), 
           _cam(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya), 
-          _lights(), _cam_event_handler(get_camera_event_handler(&_cam)), _sim_time(clock()), _time_run(0.0), _damped_fps(0.0)
+          _lights(), _cam_event_handler(get_camera_event_handler(&_cam, "physics_snapshot")), _sim_time(clock()), _time_run(0.0), _damped_fps(0.0)
         {    
             /* Initialise and lock the screen */
             if (_po->render())
