@@ -10,11 +10,11 @@ extern "C"
 
 namespace raptor_raytracer
 {
-bool                cur_light = false;
-light_list          *global_l=NULL;
-primitive_list      *global_e=NULL;
-list<material *>    *global_m=NULL;
-material            *cur_mat=NULL;
+bool                cur_light   = false;
+light_list          *global_l   = nullptr;
+primitive_list      *global_e   = nullptr;
+list<material *>    *global_m   = nullptr;
+material            *cur_mat    = nullptr;
 
 
 void appply_material()
@@ -32,7 +32,7 @@ void appply_material()
 //        else
 //        {
 //            cur_light   = true;
-//            cur_mat     = new light_shader(min((fp_t)(C_CMAXV * 10), ((fp_t)c_cmaterial->ed)));
+//            cur_mat     = new light_shader(min(static_cast<float>(C_CMAXV * 10), (static_cast<float>(c_cmaterial->ed))));
 //        }
         
         global_m->push_back(cur_mat);
@@ -63,8 +63,8 @@ void appply_material()
 //    
 //    xf_xfmpoint(vert0, vp0->p);		                /* apply transform */
 //    xf_xfmpoint(vert1, vp1->p);
-//    fp_t r0 = xf_scale(atof(av[2]));
-//    fp_t r1 = xf_scale(atof(av[4]));
+//    float r0 = xf_scale(atof(av[2]));
+//    float r1 = xf_scale(atof(av[4]));
 //    
 //    appply_material();                              /* apply material */
 //    
@@ -103,7 +103,7 @@ void appply_material()
 //    
 //    xf_xfmpoint(vert0, vp0->p);		                /* apply transform */
 //    xf_xfmpoint(vert1, vp1->p);
-//    fp_t r = xf_scale(atof(av[2]));
+//    float r = xf_scale(atof(av[2]));
 //    
 //    appply_material();                              /* apply material */
 //    
@@ -148,8 +148,8 @@ void appply_material()
 //    	return(MG_EUNDEF);
 //    }
 //    xf_xfmpoint(vert, vp->p);		                /* apply transform */
-//    fp_t i = xf_scale(atof(av[2]));
-//    fp_t r = xf_scale(atof(av[3]));
+//    float i = xf_scale(atof(av[2]));
+//    float r = xf_scale(atof(av[3]));
 //    
 //    appply_material();                              /* apply material */
 //    
@@ -180,7 +180,7 @@ void appply_material()
 //    }
 //
 //    xf_xfmpoint(vert, vp->p);                       /* apply transform */
-//    fp_t r = xf_scale(atof(av[2]));
+//    float r = xf_scale(atof(av[2]));
 //    
 //    appply_material();                              /* apply material */
 //    
@@ -308,6 +308,18 @@ void mgf_parser(
     global_l = &l;
     global_e = &e;
     global_m = &m;
+
+    c_cmaterial->clock      = 1;
+    c_cmaterial->rd_c.cx    = 0.33f;
+    c_cmaterial->rd_c.cy    = 0.33f;
+    c_cmaterial->rd         = 0.5f;
+    c_cmaterial->td         = 0.0f;
+    c_cmaterial->rs         = 0.0f;
+    c_cmaterial->ts         = 0.0f;
+    c_cmaterial->rs_a       = 0.0f;
+    c_cmaterial->ts_a       = 0.0f;
+    c_cmaterial->nr         = 0.0f;
+    c_cmaterial->ni         = 0.0f;
     
     /* Initialize dispatch table */
 //    mg_ehand[MG_E_CONE]     = mgf_cone_handler;
