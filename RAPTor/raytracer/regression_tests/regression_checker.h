@@ -79,6 +79,7 @@ class regression_checker : private boost::noncopyable
                 }
                 else if (failures == failure_limit)
                 {
+                    ++failures;
                     BOOST_LOG_TRIVIAL(warning) << failure_limit << " errors detected, I'm not checking anymore. Go fix your code";
                 }
 
