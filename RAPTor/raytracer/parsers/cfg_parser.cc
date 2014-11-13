@@ -35,6 +35,7 @@ const char * cfg_next_statement(const char *c)
 
 
 void cfg_parser(
+    const std::string   &base_path,
     ifstream            &cfg_file,
     light_list          &l, 
     primitive_list      &e,
@@ -84,14 +85,14 @@ void cfg_parser(
         ifstream    input_stream;
         string      path;
         size_t      last_slash;
-        string input_file = get_this_string(&at);
+        string input_file(base_path + get_this_string(&at));
 //        cout << "path: " << input_file << endl;
         switch ((*i).second)
         {
             case model_format_t::cfg :
                 input_stream.open(input_file.c_str());
                 assert(input_stream.is_open());
-                cfg_parser(input_stream, l, e, m, c);
+                cfg_parser(base_path, input_stream, l, e, m, c);
                 break;
 
             case model_format_t::code :
@@ -103,6 +104,7 @@ void cfg_parser(
                 break;
 
             case model_format_t::nff :
+                std::cout << "opening: " << input_file << std::endl;
                 input_stream.open(input_file.c_str());
                 assert(input_stream.is_open());
                 nff_parser(input_stream, l, e, m, c);
@@ -136,7 +138,7 @@ void cfg_parser(
         }
     }
 
-     /* Tidy up */
+    /* Tidy up */
     delete [] buffer;
 //    cout << "Parsing complete" << endl;
 }
