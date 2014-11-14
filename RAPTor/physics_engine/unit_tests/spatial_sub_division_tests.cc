@@ -583,7 +583,7 @@ BOOST_AUTO_TEST_CASE( remove_object_performance_test )
 
 BOOST_AUTO_TEST_CASE( add_object_performance_test )
 {
-    const int number_of_objects = 5000;
+    const int number_of_objects = 10000;
     std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0f / 3.0f) * 5.0f);
     std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
 

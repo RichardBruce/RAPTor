@@ -90,27 +90,24 @@ class spatial_sub_division : private boost::noncopyable
 
         spatial_sub_division& add_object(const physics_object &po)
         {
-            for (int i = 0; i < 3; ++i)
-            {
-                object_bound *const lower_bound = po.lower_bound(static_cast<axis_t>(i));
-                _bounds[i].insert(std::upper_bound(_bounds[i].begin(), _bounds[i].end(), lower_bound, [](const object_bound *const l, const object_bound *const r)
-                    {
-                        return (*l) < (*r);
-                    }), lower_bound);
+            /* Add bounds to the end and swap the sentinel to the end */
+            _bounds[X_AXIS].push_back(po.upper_bound(static_cast<axis_t>(X_AXIS)));
+            _bounds[X_AXIS].push_back(po.lower_bound(static_cast<axis_t>(X_AXIS)));
+            std::swap(_bounds[X_AXIS][_bounds[X_AXIS].size() - 3], _bounds[X_AXIS][_bounds[X_AXIS].size() - 1]);
 
-                object_bound *const upper_bound = po.upper_bound(static_cast<axis_t>(i));
-                _bounds[i].insert(std::upper_bound(_bounds[i].begin(), _bounds[i].end(), upper_bound, [](const object_bound *const l, const object_bound *const r)
-                    {
-                        return (*l) < (*r);
-                    }), upper_bound);
-            }
+            _bounds[Y_AXIS].push_back(po.upper_bound(static_cast<axis_t>(Y_AXIS)));
+            _bounds[Y_AXIS].push_back(po.lower_bound(static_cast<axis_t>(Y_AXIS)));
+            std::swap(_bounds[Y_AXIS][_bounds[Y_AXIS].size() - 3], _bounds[Y_AXIS][_bounds[Y_AXIS].size() - 1]);
+
+            _bounds[Z_AXIS].push_back(po.upper_bound(static_cast<axis_t>(Z_AXIS)));
+            _bounds[Z_AXIS].push_back(po.lower_bound(static_cast<axis_t>(Z_AXIS)));
+            std::swap(_bounds[Z_AXIS][_bounds[Z_AXIS].size() - 3], _bounds[Z_AXIS][_bounds[Z_AXIS].size() - 1]);
 
             /* Set indices */
             set_indices();
 
-            /* Perform full collision detection */
-            /* TODO -- Perhaps this could be an incremental collision detect */
-            collision_detect();
+            /* Update the new object into place */
+            update_object(po);
 
             return *this;
         }
