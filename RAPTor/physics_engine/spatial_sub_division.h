@@ -28,15 +28,20 @@ namespace raptor_physics
 class spatial_sub_division : private boost::noncopyable
 {
     public :
-        // typedef std::unordered_set<std::pair<const physics_object *, const physics_object *>, boost::hash<std::pair<const physics_object *, const physics_object *>>> collision_set;
-        typedef pair_manager collision_set;
+        typedef pair_manager<> collision_set;
 
         spatial_sub_division(const std::unordered_map<int, physics_object*> &objects)
+        :   _min_sentinel(new object_bound(nullptr, -std::numeric_limits<float>::max(), true)),
+            _max_sentinel(new object_bound(nullptr,  std::numeric_limits<float>::max(), false))
         {
             /* Sweep the objects picking points in the selected axis */
-            _bounds[X_AXIS].reserve(objects.size() << 1);
-            _bounds[Y_AXIS].reserve(objects.size() << 1);
-            _bounds[Z_AXIS].reserve(objects.size() << 1);
+            _bounds[X_AXIS].reserve((objects.size() << 1) + 2);
+            _bounds[Y_AXIS].reserve((objects.size() << 1) + 2);
+            _bounds[Z_AXIS].reserve((objects.size() << 1) + 2);
+
+            _bounds[X_AXIS].push_back(_min_sentinel);
+            _bounds[Y_AXIS].push_back(_min_sentinel);
+            _bounds[Z_AXIS].push_back(_min_sentinel);
             for (auto o : objects)
             {
                 _bounds[X_AXIS].push_back(o.second->lower_bound(X_AXIS));
@@ -46,6 +51,9 @@ class spatial_sub_division : private boost::noncopyable
                 _bounds[Y_AXIS].push_back(o.second->upper_bound(Y_AXIS));
                 _bounds[Z_AXIS].push_back(o.second->upper_bound(Z_AXIS));
             }
+            _bounds[X_AXIS].push_back(_max_sentinel);
+            _bounds[Y_AXIS].push_back(_max_sentinel);
+            _bounds[Z_AXIS].push_back(_max_sentinel);
 
             /* Sort objects */
             for (int i = 0; i < 3; ++i)
@@ -55,6 +63,12 @@ class spatial_sub_division : private boost::noncopyable
                         return (*l) < (*r);
                     });
             }
+            assert(_bounds[X_AXIS].front()->object()    == nullptr);
+            assert(_bounds[Y_AXIS].front()->object()    == nullptr);
+            assert(_bounds[Z_AXIS].front()->object()    == nullptr);
+            assert(_bounds[X_AXIS].back()->object()     == nullptr);
+            assert(_bounds[Y_AXIS].back()->object()     == nullptr);
+            assert(_bounds[Z_AXIS].back()->object()     == nullptr);
 
             /* Set indices */
             set_indices();
@@ -65,16 +79,11 @@ class spatial_sub_division : private boost::noncopyable
             _axis_possibles[2].reserve(_bounds[0].size());
             _possibles.reserve(_bounds[0].size());
 
-            _axis_possibles[0].load_factor(0.7);
-            _axis_possibles[1].load_factor(0.7);
-            _axis_possibles[2].load_factor(0.7);
-            _possibles.load_factor(0.7);
+            _axis_possibles[0].load_factor(0.7f);
+            _axis_possibles[1].load_factor(0.7f);
+            _axis_possibles[2].load_factor(0.7f);
+            _possibles.load_factor(0.7f);
             collision_detect();
-
-            _axis_possibles[0].load_factor(1.0);
-            _axis_possibles[1].load_factor(1.0);
-            _axis_possibles[2].load_factor(1.0);
-            _possibles.load_factor(1.0);
         }
 
         /* Allow default DTOR */
@@ -129,7 +138,7 @@ class spatial_sub_division : private boost::noncopyable
                 {
                     if ((iter->first == po) | (iter->second == po))
                     {
-                        iter = _axis_possibles[i].erase(iter);
+                        _axis_possibles[i].erase(iter);
                     }
                     else
                     {
@@ -143,7 +152,7 @@ class spatial_sub_division : private boost::noncopyable
             {
                 if ((iter->first == po) | (iter->second == po))
                 {
-                    iter = _possibles.erase(iter);
+                    _possibles.erase(iter);
                 }
                 else
                 {
@@ -248,8 +257,10 @@ class spatial_sub_division : private boost::noncopyable
         void collision_detect_axis(const axis_t axis)
         {
             /* For all bounds */
-            for (unsigned int i = 0; i < _bounds[axis].size(); ++i)
+            for (unsigned int i = 1; i < (_bounds[axis].size() - 1); ++i)
             {
+                assert(_bounds[axis][i]->object() != nullptr);
+
                 /* That are minimums */
                 if (_bounds[axis][i]->min())
                 {
@@ -301,11 +312,48 @@ class spatial_sub_division : private boost::noncopyable
             }
         }
 
-        void update_possibles(const object_bound *const moving_lo, const object_bound *const moving_hi, const axis_t axis);
+        void update_possibles(const object_bound *const moving_lo, const object_bound *const moving_hi, const axis_t axis)
+        {
+            if (moving_lo->min() & !moving_hi->min())
+            {
+                const std::pair<const physics_object*, const physics_object*> *pair = _axis_possibles[axis].insert(moving_lo->object(), moving_hi->object());
 
+                switch (axis)
+                {
+                    case X_AXIS :
+                        if ((_axis_possibles[Y_AXIS].find(*pair) != _axis_possibles[Y_AXIS].end()) && 
+                            (_axis_possibles[Z_AXIS].find(*pair) != _axis_possibles[Z_AXIS].end()))
+                        {
+                            _possibles.insert(*pair);
+                        }
+                        break;
+                    case Y_AXIS :
+                        if ((_axis_possibles[X_AXIS].find(*pair) != _axis_possibles[X_AXIS].end()) && 
+                            (_axis_possibles[Z_AXIS].find(*pair) != _axis_possibles[Z_AXIS].end()))
+                        {
+                            _possibles.insert(*pair);
+                        }
+                        break;
+                    case Z_AXIS :
+                        if ((_axis_possibles[X_AXIS].find(*pair) != _axis_possibles[X_AXIS].end()) && 
+                            (_axis_possibles[Y_AXIS].find(*pair) != _axis_possibles[Y_AXIS].end()))
+                        {
+                            _possibles.insert(*pair);
+                        }
+                        break;
+                }
+            }
+            else if (!moving_lo->min() & moving_hi->min())
+            {
+                _axis_possibles[axis].erase(moving_lo->object(), moving_hi->object());
+                _possibles.erase(moving_lo->object(), moving_hi->object());
+            }
+        }
         std::vector<object_bound *> _bounds[3];
         collision_set               _axis_possibles[3];
         collision_set               _possibles;
+        object_bound *              _min_sentinel;
+        object_bound *              _max_sentinel;
 };
 }; /* namespace raptor_physics */
 

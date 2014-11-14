@@ -10,6 +10,7 @@ const raptor_physics::init_logger init_logger;
 
 
 /* Standard headers */
+#include <chrono>
 #include <cmath>
 #include <random>
 #include <unordered_map>
@@ -32,21 +33,21 @@ struct spatial_sub_division_fixture : private boost::noncopyable
 {
     spatial_sub_division_fixture()
     : mat( new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0)),
-      po0( new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t( 1.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po1( new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 2.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po2( new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 4.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po3( new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 6.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po4( new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 8.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po5( new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(10.0, 0.0, 0.0), point_t(-1.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po6( new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 1.0, 0.0), point_t( 0.0, 1.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po7( new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 1.0, 1.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po8( new physics_object(make_cube(mat, point_t(-1.5, -0.5, -0.5), point_t(1.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 2.0, 1.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po9( new physics_object(make_cube(mat, point_t(-4.5, -0.5, -0.5), point_t(4.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 5.0, 1.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po10(new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 1.5, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po11(new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 0.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po12(new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 1.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po13(new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 1.0, 1.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po14(new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 1.0, 0.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po0( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t( 1.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po1( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 2.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po2( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 4.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po3( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 6.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po4( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 8.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po5( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(10.0, 0.0, 0.0), point_t(-1.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po6( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 1.0, 0.0), point_t( 0.0, 1.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po7( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 1.0, 1.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po8( new physics_object(make_cube(mat, point_t(-1.5, -0.5f, -0.5f), point_t(1.5,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 2.0, 1.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po9( new physics_object(make_cube(mat, point_t(-4.5, -0.5f, -0.5f), point_t(4.5,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 5.0, 1.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po10(new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 1.5, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po11(new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 0.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po12(new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 1.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po13(new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 1.0, 1.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po14(new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 1.0, 0.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
       objects0(
         {
             { 0, po0.get() }, { 1, po1.get() }, { 2, po2.get() }, { 3, po3.get() }, { 4, po4.get() }, { 5, po5.get() }
@@ -78,7 +79,9 @@ struct spatial_sub_division_fixture : private boost::noncopyable
       objects7(
         {
             { 0, po0.get() }, { 1, po1.get() }, { 2, po2.get() }, { 3, po3.get() }, { 4, po4.get() }, { 5, po11.get() }, { 6, po12.get() }, { 7, po13.get() }, { 8, po14.get() }
-        })
+        }),
+      generator(),
+      normal_dist(1.0f, 0.1f)
       {  };
 
     raptor_raytracer::material *const           mat;
@@ -105,6 +108,8 @@ struct spatial_sub_division_fixture : private boost::noncopyable
     std::unordered_map<int, physics_object*>    objects5;
     std::unordered_map<int, physics_object*>    objects6;
     std::unordered_map<int, physics_object*>    objects7;
+    std::default_random_engine                  generator;
+    std::normal_distribution<float>             normal_dist;
 };
 
 BOOST_FIXTURE_TEST_SUITE( spatial_sub_division_tests, spatial_sub_division_fixture );
@@ -471,13 +476,37 @@ BOOST_AUTO_TEST_CASE( update_object_move_away_y_test )
     BOOST_CHECK(uut.number_of_possible_collisions() == 0);
 }
 
+BOOST_AUTO_TEST_CASE( contruct_performance_test )
+{
+    const int number_of_objects = 10000;
+    std::uniform_real_distribution<float> real_uniform_dist(0.0f, std::pow(number_of_objects, 1.0f / 3.0f) * 5.0f);
+
+    /* Create some random objects on a grid moving in random directions */
+    std::unordered_map<int, physics_object*> objects;
+    for (int i = 0; i < number_of_objects; ++i)
+    {
+        const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+        auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f);
+        objects.emplace(i, po);
+    }
+
+    /* Construct */
+    const auto t0(std::chrono::system_clock::now());
+    spatial_sub_division uut(objects);
+    const auto t1(std::chrono::system_clock::now());
+    BOOST_LOG_TRIVIAL(fatal) << "Performance test: Sort and Sweep Construct took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
+
+    /* Clean up */
+    for (auto &p : objects)
+    {
+        delete p.second;
+    }
+}
+
 BOOST_AUTO_TEST_CASE( update_object_performance_test )
 {
     const int number_of_objects = 10000;
-
-    std::default_random_engine generator;
-    std::normal_distribution<float> normal_dist(1.0, 0.1);
-    std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0 / 3.0) * 5.0);
+    std::uniform_real_distribution<float> real_uniform_dist(0.0f, std::pow(number_of_objects, 1.0f / 3.0f) * 5.0f);
     std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
 
     /* Create some random objects on a grid moving in random directions */
@@ -486,12 +515,13 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
     {
         const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
         const point_t vel(normalise(-pos) * point_t(normal_dist(generator), normal_dist(generator), normal_dist(generator)));
-        auto po = new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), pos, vel, point_t(0.0, 0.0, 0.0), 1.0);
+        auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, vel, point_t(0.0f, 0.0f, 0.0f), 1.0f);
         objects.emplace(i, po);
     }
 
     /* Do some updates */
     spatial_sub_division uut(objects);
+    const auto t0(std::chrono::system_clock::now());
     for (int i = 0; i < 100000; ++i)
     {
         const int obj = int_uniform_dist(generator);
@@ -502,6 +532,8 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
         objects[obj]->commit_movement(t_step);
         uut.update_object(*objects[obj]);
     }
+    const auto t1(std::chrono::system_clock::now());
+    BOOST_LOG_TRIVIAL(fatal) << "Performance test: Sort and Sweep Update Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
 
     /* Clean up */
     for (auto &p : objects)
@@ -509,81 +541,79 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
         delete p.second;
     }
 }
-// 7.42user 0.07system 0:07.50elapsed 99%CPU (0avgtext+0avgdata 186896maxresident)k
-// 0inputs+0outputs (0major+14580minor)pagefaults 0swaps
 
-// BOOST_AUTO_TEST_CASE( remove_object_performance_test )
-// {
-//     const int number_of_objects = 10000;
+BOOST_AUTO_TEST_CASE( remove_object_performance_test )
+{
+    const int number_of_objects = 10000;
+    std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0f / 3.0f) * 5.0f);
+    std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
 
-//     std::default_random_engine generator;
-//     std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0 / 3.0) * 5.0);
-//     std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
+    /* Create some random objects on a grid moving in random directions */
+    std::unordered_map<int, physics_object*> objects;
+    for (int i = 0; i < number_of_objects; ++i)
+    {
+        const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+        auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f);
+        objects.emplace(i, po);
+    }
 
-//     /* Create some random objects on a grid moving in random directions */
-//     std::unordered_map<int, physics_object*> objects;
-//     for (int i = 0; i < number_of_objects; ++i)
-//     {
-//         const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
-//         auto po = new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), pos, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0);
-//         objects.emplace(i, po);
-//     }
+    /* Remove 10%-ish of the objects */
+    spatial_sub_division uut(objects);
+    const auto t0(std::chrono::system_clock::now());
+    for (int i = 0; i < number_of_objects * 0.1f; ++i)
+    {
+        const int obj = int_uniform_dist(generator);
+        auto obj_iter = objects.find(obj);
+        if (obj_iter != objects.end())
+        {
+            uut.remove_object(obj_iter->second);
+            delete obj_iter->second;
+            objects.erase(obj_iter);
+        }
+    }
+    const auto t1(std::chrono::system_clock::now());
+    BOOST_LOG_TRIVIAL(fatal) << "Performance test: Sort and Sweep Remove Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
 
-//     /* Remove 10%-ish of the objects */
-//     spatial_sub_division uut(objects);
-//     for (int i = 0; i < number_of_objects * 0.1; ++i)
-//     {
-//         const int obj = int_uniform_dist(generator);
-//         auto obj_iter = objects.find(obj);
-//         if (obj_iter != objects.end())
-//         {
-//             uut.remove_object(obj_iter->second);
-//             delete obj_iter->second;
-//             objects.erase(obj_iter);
-//         }
-//     }
+    /* Clean up */
+    for (auto &p : objects)
+    {
+        delete p.second;
+    }
+}
 
-//     /* Clean up */
-//     for (auto &p : objects)
-//     {
-//         delete p.second;
-//     }
-// }
-// 4.90user 0.05system 0:04.96elapsed 99%CPU (0avgtext+0avgdata 190096maxresident)k
-// 0inputs+0outputs (0major+10270minor)pagefaults 0swaps
+BOOST_AUTO_TEST_CASE( add_object_performance_test )
+{
+    const int number_of_objects = 5000;
+    std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0f / 3.0f) * 5.0f);
+    std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
 
-// BOOST_AUTO_TEST_CASE( add_object_performance_test )
-// {
-//     const int number_of_objects = 10000;
+    /* Create 90% of some random objects on a grid moving in random directions */
+    std::unordered_map<int, physics_object*> objects;
+    for (int i = 0; i < number_of_objects * 0.9f; ++i)
+    {
+        const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+        auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f);
+        objects.emplace(i, po);
+    }
 
-//     std::default_random_engine generator;
-//     std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0 / 3.0) * 5.0);
-//     std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
+    /* Add the final 10% of the objects */
+    spatial_sub_division uut(objects);
+    const auto t0(std::chrono::system_clock::now());
+    for (int i = 0; i < number_of_objects * 0.1f; ++i)
+    {
+        const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+        auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f);
+        objects.emplace(i, po);
+        uut.add_object(*po);
+    }
+    const auto t1(std::chrono::system_clock::now());
+    BOOST_LOG_TRIVIAL(fatal) << "Performance test: Sort and Sweep Add Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
 
-//     /* Create 90% of some random objects on a grid moving in random directions */
-//     std::unordered_map<int, physics_object*> objects;
-//     for (int i = 0; i < number_of_objects * 0.9; ++i)
-//     {
-//         const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
-//         auto po = new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), pos, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0);
-//         objects.emplace(i, po);
-//     }
-
-//     /* Add the final 10% of the objects */
-//     spatial_sub_division uut(objects);
-//     for (int i = 0; i < number_of_objects * 0.1; ++i)
-//     {
-//         const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
-//         auto po = new physics_object(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5)), quaternion_t(1.0, 0.0, 0.0, 0.0), pos, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0);
-//         objects.emplace(i, po);
-//         uut.add_object(*po);
-//     }
-
-//     /* Clean up */
-//     for (auto &p : objects)
-//     {
-//         delete p.second;
-//     }
-// }
+    /* Clean up */
+    for (auto &p : objects)
+    {
+        delete p.second;
+    }
+}
 
 BOOST_AUTO_TEST_SUITE_END()

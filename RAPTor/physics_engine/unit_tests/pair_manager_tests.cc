@@ -52,8 +52,8 @@ BOOST_FIXTURE_TEST_SUITE( pair_manager_tests, pair_manager_fixture );
 BOOST_AUTO_TEST_CASE( ctor_test )
 {
     BOOST_CHECK(uut.size() == 0);
-    BOOST_CHECK(uut.load_factor() == 8);
-    BOOST_CHECK(uut.capacity() == 1024);
+    BOOST_CHECK(uut.load_factor() == 1.0f);
+    BOOST_CHECK(uut.capacity() == 0);
     BOOST_CHECK(uut.begin() == uut.end());
 }
 
@@ -61,13 +61,19 @@ BOOST_AUTO_TEST_CASE( ctor_test )
 BOOST_AUTO_TEST_CASE( capacity_test )
 {
     BOOST_CHECK(uut.size() == 0);
-    BOOST_CHECK(uut.load_factor() == 8);
-    BOOST_CHECK(uut.capacity() == 1024);
+    BOOST_CHECK(uut.load_factor() == 1.0f);
+    BOOST_CHECK(uut.capacity() == 0);
 
+    /* We lazily rehash when setting load factor so see a capacity of 32 here and 64 below */
     uut.reserve(27);
-    uut.load_factor(3);
-    BOOST_CHECK(uut.load_factor() == 4);
-    BOOST_CHECK(uut.capacity() == 128);
+    uut.load_factor(0.7f);
+    BOOST_CHECK(uut.load_factor() == 0.7f);
+    BOOST_CHECK(uut.capacity() == 32);
+
+    uut.load_factor(0.7f);
+    uut.reserve(27);
+    BOOST_CHECK(uut.load_factor() == 0.7f);
+    BOOST_CHECK(uut.capacity() == 64);
 }
 
 /* Insert test */
@@ -173,7 +179,7 @@ BOOST_AUTO_TEST_CASE( find_test )
 
     /* Look for something that isnt there */
     const auto *const ret5 = uut.find(reinterpret_cast<physics_object *>(0x10), reinterpret_cast<physics_object *>(0x02));
-    BOOST_CHECK(ret5 == nullptr);
+    BOOST_CHECK(ret5 == uut.end());
     BOOST_CHECK(uut.size() == 4);
 
     /* Find after collision */
@@ -245,38 +251,38 @@ BOOST_AUTO_TEST_CASE( erase_test )
 
     /* Erase */
     const auto ret0 = uut.erase(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x02));
-    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x02)) == nullptr);
+    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x02)) == uut.end());
     BOOST_CHECK(ret0 != uut.end());
     BOOST_CHECK(uut.size() == 2);
 
     /* Erase again */
     const auto ret1 = uut.erase(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x02));
-    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x02)) == nullptr);
+    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x02)) == uut.end());
     BOOST_CHECK(ret1 == uut.end());
     BOOST_CHECK(uut.size() == 2);
 
     /* Erase the same pair again, but in reversed order */
     uut.insert(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x02));
     const auto ret2 = uut.erase(reinterpret_cast<physics_object *>(0x02), reinterpret_cast<physics_object *>(0x01));
-    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x02), reinterpret_cast<physics_object *>(0x01)) == nullptr);
-    BOOST_CHECK(ret2 != uut.end());
-    BOOST_CHECK(ret2 == ret0);
+    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x02), reinterpret_cast<physics_object *>(0x01)) == uut.end());
+    BOOST_CHECK(ret2 == uut.end());
     BOOST_CHECK(uut.size() == 2);
 
     /* Erase some new pairs */
-    const auto ret3 = uut.erase(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x03));
-    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x03)) == nullptr);
+    /* Note: When 1,2 was erased the first time 4,2 was moved into its spot so no longer at the end */
+    const auto ret3 = uut.erase(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x02));
+    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x02)) == uut.end());
     BOOST_CHECK(ret3 != uut.end());
     BOOST_CHECK(uut.size() == 1);
 
-    const auto ret4 = uut.erase(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x02));
-    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x02)) == nullptr);
+    const auto ret4 = uut.erase(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x03));
+    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x03)) == uut.end());
     BOOST_CHECK(ret4 == uut.end());
     BOOST_CHECK(uut.size() == 0);
 
     /* Erase something that is no longer there */
     const auto ret5 = uut.erase(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x02));
-    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x02)) == nullptr);
+    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x02)) == uut.end());
     BOOST_CHECK(ret5 == uut.end());
     BOOST_CHECK(uut.size() == 0);
 }
@@ -335,20 +341,21 @@ BOOST_AUTO_TEST_CASE( erase_after_rehash_test )
     BOOST_CHECK(ret3 != uut.end());
     BOOST_CHECK(uut.size() == 5);
 
+    /* From here on down the order was reversed as above were erase */
     const auto ret4 = uut.erase(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x90));
-    BOOST_CHECK(ret4 != uut.end());
+    BOOST_CHECK(ret4 == uut.end());
     BOOST_CHECK(uut.size() == 4);
 
     const auto ret5 = uut.erase(reinterpret_cast<physics_object *>(0x02), reinterpret_cast<physics_object *>(0x90));
-    BOOST_CHECK(ret5 != uut.end());
+    BOOST_CHECK(ret5 == uut.end());
     BOOST_CHECK(uut.size() == 3);
 
     const auto ret6 = uut.erase(reinterpret_cast<physics_object *>(0x03), reinterpret_cast<physics_object *>(0x90));
-    BOOST_CHECK(ret6 == uut.end()); /* When 0x2 was erased, 0x3 took its position, which is now at the end */
+    BOOST_CHECK(ret6 == uut.end());
     BOOST_CHECK(uut.size() == 2);
 
     const auto ret7 = uut.erase(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x90));
-    BOOST_CHECK(ret7 == uut.end()); /* When 0x1 was erased, 0x4 took its position, which is now at the end */
+    BOOST_CHECK(ret7 == uut.end());
     BOOST_CHECK(uut.size() == 1);
 
     const auto ret8 = uut.erase(reinterpret_cast<physics_object *>(0x05), reinterpret_cast<physics_object *>(0x90));
@@ -364,20 +371,20 @@ BOOST_AUTO_TEST_CASE( erase_sequence_test )
     uut.insert(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x02));
     BOOST_CHECK(uut.size() == 3);
 
-    const auto ret0 = uut.erase(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x03));
-    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x03)) == nullptr);
+    const auto ret0 = uut.erase(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x02));
+    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x02)) == uut.end());
     BOOST_CHECK(ret0->first == reinterpret_cast<physics_object *>(0x02));
     BOOST_CHECK(ret0->second == reinterpret_cast<physics_object *>(0x04));
     BOOST_CHECK(uut.size() == 2);
     
     const auto ret1 = uut.erase(ret0);
-    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x02)) == nullptr);
+    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x04), reinterpret_cast<physics_object *>(0x02)) == uut.end());
     BOOST_CHECK(ret1->first == reinterpret_cast<physics_object *>(0x01));
-    BOOST_CHECK(ret1->second == reinterpret_cast<physics_object *>(0x02));
+    BOOST_CHECK(ret1->second == reinterpret_cast<physics_object *>(0x03));
     BOOST_CHECK(uut.size() == 1);
     
     const auto ret2 = uut.erase(ret1);
-    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x02)) == nullptr);
+    BOOST_CHECK(uut.find(reinterpret_cast<physics_object *>(0x01), reinterpret_cast<physics_object *>(0x03)) == uut.end());
     BOOST_CHECK(ret2 == uut.end());
     BOOST_CHECK(uut.size() == 0);
 }
