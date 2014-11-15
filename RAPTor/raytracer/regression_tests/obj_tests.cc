@@ -14,6 +14,7 @@ const raptor_physics::init_logger init_logger;
 
 BOOST_AUTO_TEST_SUITE( obj_tests );
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( obj_isd_imperator_0_test )
 {
     /* Checker */
@@ -112,5 +113,6 @@ BOOST_AUTO_TEST_CASE( obj_sponza_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
+#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -14,6 +14,7 @@ const raptor_physics::init_logger init_logger;
 
 BOOST_AUTO_TEST_SUITE( ply_tests );
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( ply_bun_zipper_test )
 {
     /* Checker */
@@ -378,6 +379,24 @@ BOOST_AUTO_TEST_CASE( ply_horse_test )
     regression_fixture fixture("/ply_scenes/horse/horse.ply", model_format_t::ply, point_t(-0.252297, 0.074832, 0.11), point_t(0.298892, 0.953555, -0.0373727), point_t(0.364136, -0.0777636, 0.928094), point_t(0.882082, -0.291008, -0.370466), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-100.0, 100.0, 200.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(   0.0, -50.0, 100.0), 0.0, 10.0);
+
+    /* Ray trace the scene */
+    fixture.render();
+
+    /* Check image */
+    checker.check(fixture.get_camera());
+}
+#endif /* #ifndef VALGRIND_TESTS */
+
+BOOST_AUTO_TEST_CASE( ply_happy_vrip_res4_low_res_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/ply_scenes/happy_budha/happy_vrip_res4.ply", model_format_t::ply, point_t(-0.08, 0.3, 0.2), point_t(0.184456, 0.849229, -0.494759), point_t(0.947139, 0.0191441, -0.320253), point_t(0.262497, -0.527678, -0.807869), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 640, 480);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
 
     /* Ray trace the scene */
     fixture.render();
