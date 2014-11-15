@@ -69,27 +69,27 @@ class regression_checker : private boost::noncopyable
             std::unique_ptr<unsigned char []> difference(new unsigned char [image_size]);
             for (unsigned int i = 0; i < image_pixels; ++i)
             {
-                /* Check */
-                const unsigned int idx = i * 3;
-                if (failures < failure_limit)
-                {
-                    BOOST_CHECK(actual[idx    ] == expected[idx    ]);
-                    BOOST_CHECK(actual[idx + 1] == expected[idx + 1]);
-                    BOOST_CHECK(actual[idx + 2] == expected[idx + 2]);
-                }
-                else if (failures == failure_limit)
-                {
-                    ++failures;
-                    BOOST_LOG_TRIVIAL(warning) << failure_limit << " errors detected, I'm not checking anymore. Go fix your code";
-                }
-
                 /* Colour mismatch pixels red */
+                const unsigned int idx = i * 3;
                 if ((actual[idx] != expected[idx]) || (actual[idx + 1] != expected[idx + 1]) || (actual[idx + 2] != expected[idx + 2]))
                 {
                     ++failures;
                     difference[idx    ] = 255;
                     difference[idx + 1] = 0;
                     difference[idx + 2] = 0;
+
+                    /* Check only the failing pixels or we get loads of team city logs */
+                    if (failures < failure_limit)
+                    {
+                        BOOST_CHECK(actual[idx    ] == expected[idx    ]);
+                        BOOST_CHECK(actual[idx + 1] == expected[idx + 1]);
+                        BOOST_CHECK(actual[idx + 2] == expected[idx + 2]);
+                    }
+                    else if (failures == failure_limit)
+                    {
+                        ++failures;
+                        BOOST_LOG_TRIVIAL(warning) << failure_limit << " errors detected, I'm not checking anymore. Go fix your code";
+                    }
                 }
                 else
                 {
