@@ -677,6 +677,7 @@ const vector<triangle *> * build_bih(const primitive_list *const o, bih_node *bi
     bih_node::set_node_array(bih);
     unsigned grand_child = 1;
 
+    depth = 0;
     divide_bih_node(object_copy, 0, &grand_child, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, object_copy->size() - 1);
 
 //    approximate_sort(o, object_copy);
