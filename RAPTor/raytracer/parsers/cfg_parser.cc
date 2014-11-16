@@ -22,13 +22,13 @@ namespace raptor_raytracer
  statement and a pointer to the next statement is 
  returned.
 **********************************************************/
-const char * cfg_next_statement(const char *c)
+const char * cfg_next_statement(const char *c, const char *const end)
 {
     c--;
     do
     {
         find_next_line(&c);
-    } while ((c[0] == '#') || (c[0] == '\n'));
+    } while ((c < end) && ((c[0] == '#') || (c[0] == '\n')));
     
     return c;
 }
@@ -66,13 +66,13 @@ void cfg_parser(
     
     while (true)
     {
-        at = cfg_next_statement(at);
-        if (at >= &buffer[len])
+        at = cfg_next_statement(at, &buffer[len - 1]);
+        if (at >= &buffer[len - 1])
         {
             break;
         }
 
-        string statement = get_this_string(&at);
+        const string statement(get_this_string(&at));
         
         map<string, model_format_t>::const_iterator i = format.find(statement);
 //        cout << "parsing : " << statement << endl;
@@ -85,7 +85,7 @@ void cfg_parser(
         ifstream    input_stream;
         string      path;
         size_t      last_slash;
-        string input_file(base_path + get_this_string(&at));
+        const string input_file(base_path + get_this_string(&at));
 //        cout << "path: " << input_file << endl;
         switch ((*i).second)
         {
