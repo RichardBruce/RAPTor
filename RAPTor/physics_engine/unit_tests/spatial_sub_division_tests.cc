@@ -524,8 +524,8 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
     const auto t0(std::chrono::system_clock::now());
     for (int i = 0; i < 100000; ++i)
     {
-        const int obj = int_uniform_dist(generator);
-        const fp_t t_step = normal_dist(generator);
+        const int obj       = int_uniform_dist(generator);
+        const float t_step  = normal_dist(generator);
         objects[obj]->begin_time_step(t_step);
         uut.update_object(*objects[obj]);
 
