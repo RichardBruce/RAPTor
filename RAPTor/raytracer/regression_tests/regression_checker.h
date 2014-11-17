@@ -19,7 +19,8 @@
 
 using namespace raptor_raytracer;
 
-const float result_tolerance = 0.0005;
+const float result_tolerance = 0.0005f;
+const int pixel_error = 3;
 const int failure_limit = 1000;
 const std::string test_data_location = "test_data/";
 
@@ -71,7 +72,9 @@ class regression_checker : private boost::noncopyable
             {
                 /* Colour mismatch pixels red */
                 const unsigned int idx = i * 3;
-                if ((actual[idx] != expected[idx]) || (actual[idx + 1] != expected[idx + 1]) || (actual[idx + 2] != expected[idx + 2]))
+                if ((abs(actual[idx    ] - expected[idx    ]) > pixel_error) ||
+                    (abs(actual[idx + 1] - expected[idx + 1]) > pixel_error) ||
+                    (abs(actual[idx + 2] - expected[idx + 2]) > pixel_error))
                 {
                     ++failures;
                     difference[idx    ] = 255;
