@@ -128,9 +128,13 @@ class simulation_environment
             return *this;
         }
 
-        simulation_environment& add_moving_object(physics_object *const o)
+        simulation_environment& add_moving_object(physics_object *const o, const bool gravity = true)
         {
-            o->register_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -raptor_physics::ACCELERATION_UNDER_GRAVITY * o->get_mass(), 0.0), numeric_limits<fp_t>::infinity()));
+            if (gravity)
+            {
+                o->register_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -raptor_physics::ACCELERATION_UNDER_GRAVITY * o->get_mass(), 0.0), numeric_limits<fp_t>::infinity()));
+            }
+            
             _pe->add_moving_object(o);
             return *this;
         }

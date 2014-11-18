@@ -1,5 +1,5 @@
 # Source
-SOURCE  = main.cc simulation_environment.cc physics_common.cc physics_object.cc physics_engine.cc \
+SOURCE  = main.cc lcp_solver.cc simulation_environment.cc physics_common.cc physics_object.cc physics_engine.cc \
     vertex_group.cc gjk.cc simplex.cc \
     sdl_wrapper.cc sdl_event_handler_factory.cc
 
@@ -17,8 +17,8 @@ LOCAL_INCLUDES  = . $(RAPTOR_HOME)/physics_engine/colliders $(RAPTOR_HOME)/physi
 vpath %.cc $(LOCAL_INCLUDES)
 
 # Libraries
-LIBPATH = $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib $(LIBARYS_PATH)/SDL2_ttf-$(SDLTTF_VER)/lib $(LIBARYS_PATH)/tbb$(TBB_VER)/build/build_release $(LIBARYS_PATH)/fftw-$(FFTW_VER)/lib $(RAYTRACER_HOME) ${BOOST_LIB_PATH}
-SO_LIBS = raytracer SDL2 SDL2_ttf tbb pthread boost_thread boost_filesystem boost_system boost_log boost_serialization
+LIBPATH = $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib $(LIBARYS_PATH)/SDL2_ttf-$(SDLTTF_VER)/lib $(LIBARYS_PATH)/SDL2_image-$(SDLIMAGE_VER)/lib $(LIBARYS_PATH)/tbb$(TBB_VER)/build/build_release $(LIBARYS_PATH)/fftw-$(FFTW_VER)/lib $(RAYTRACER_HOME) ${BOOST_LIB_PATH}
+SO_LIBS = raytracer SDL2 SDL2_ttf SDL2_image tbb pthread boost_thread boost_filesystem boost_system boost_log boost_serialization
 LIBRARY = $(SO_LIBS) fftw3f
 
 # Defines

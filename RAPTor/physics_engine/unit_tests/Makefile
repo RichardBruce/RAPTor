@@ -5,7 +5,7 @@ include ../Project.mk
 TEST_SOURCE = physics_options_tests.cc lcp_solver_tests.cc inertia_tensor_tests.cc gjk_tests.cc clipping_tests.cc \
 	exact_collision_time_tests.cc vertex_group_tests.cc rigid_body_collider_tests.cc simplex_tests.cc physics_engine_tests.cc \
 	collision_info_tests.cc tracking_info_tests.cc physics_object_tests.cc contact_graph_tests.cc simulation_environment_tests.cc \
-	integrator_tests.cc force_tests.cc object_bound_tests.cc pair_manager_tests.cc spatial_sub_division_tests.cc \
+	integrator_tests.cc force_tests.cc object_bound_tests.cc spatial_sub_division_tests.cc \
 	teamcity_boost.cc teamcity_messages.cc
 
 include $(RAPTOR_TOOLS)/UnitTest.mk
