@@ -103,7 +103,7 @@ int main (int argc, char **argv)
     string          caption         = "raytracer ";
 
     /* Camera parameters */
-    camera   *cam;
+    camera   *cam = nullptr;
     point_t  cam_p( 0.0, 0.0, -10);     /* Position                         */
     vector_t x_vec( 1.0, 0.0, 0.0);     /* Horizontal vector                */
     vector_t y_vec( 0.0, 1.0, 0.0);     /* Virtical vector                  */
@@ -587,14 +587,19 @@ int main (int argc, char **argv)
     switch (input_format)
     {
         case model_format_t::cfg :
+        {
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());
-            cfg_parser(input_stream, lights, everything, materials, &cam);
+            const unsigned int path_end = input_file.find_last_of("/\\") + 1;
+            cfg_parser(input_file.substr(0, path_end), input_stream, lights, everything, materials, &cam);
 
-            /* Camera is not set in the scene so do it here */
-            cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            /* If camera is not set in the scene so do it here (an nff file would have set the camera) */
+            if (cam == nullptr)
+            {
+                cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            }
             break;
-
+        }
         case model_format_t::code :
             scene_init(lights, everything, materials, &cam);
             break;

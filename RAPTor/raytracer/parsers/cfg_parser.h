@@ -6,6 +6,7 @@ namespace raptor_raytracer
 class camera;
 
 void cfg_parser(
+    const std::string   &base_path,
     ifstream            &cfg_file,
     light_list          &l, 
     primitive_list      &e,
