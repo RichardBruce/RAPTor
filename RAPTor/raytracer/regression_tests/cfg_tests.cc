@@ -14,13 +14,14 @@ const raptor_physics::init_logger init_logger;
 
 BOOST_AUTO_TEST_SUITE( cfg_tests );
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( cfg_mgftree_test )
 {
     /* Checker */
     CREATE_REGRESSION_CHECKER(checker);
 
     /* Enviroment set up */
-    regression_fixture fixture("/mgf_scenes/mgftree/mgftree.cfg", model_format_t::cfg, point_t(1.5, -4.0, 2.0), point_t(0.929776, 0.368124, 0.0), point_t(-0.0915488, 0.231226, 0.968583), point_t(-0.356559, 0.900565, -0.24869), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+    regression_fixture fixture("/mgf_scenes/mgftree/mgftree.cfg", model_format_t::cfg, point_t(1.5, -4.0, 2.37), point_t(0.929776, 0.368124, 0.0), point_t(-0.0915488, 0.231226, 0.968583), point_t(-0.356559, 0.900565, -0.24869), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(5.0, -25.0, 5.0), 0.0, 10.0);
 
     /* Ray trace the scene */
@@ -111,5 +112,23 @@ BOOST_AUTO_TEST_CASE( cfg_unc_powerplant_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
+#endif /* #ifndef VALGRIND_TESTS */
+
+BOOST_AUTO_TEST_CASE( cfg_dif_ww_low_res_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/model/dif_ww.cfg", model_format_t::cfg, point_t(1.99039, 6.84602, 2.85339), point_t(0.993631, -0.110235, 0.0240561), point_t(-0.0497237, -0.236433, 0.970391), point_t(-0.101282, -0.965395, -0.240404), ext_colour_t(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, 640, 480);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(1.0, 1.1, 2.0), 0.0, 0.1);
+
+    /* Ray trace the scene */
+    fixture.render();
+
+    /* Check image */
+    checker.check(fixture.get_camera());
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
