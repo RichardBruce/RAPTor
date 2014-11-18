@@ -10,7 +10,7 @@ static unsigned depth = 0;
 /**********************************************************
   swap swaps the elements a and b of the vector o. 
 **********************************************************/
-inline void swap(vector<triangle *> *const o, const int a, const int b)
+inline void swap(std::vector<triangle *> *const o, const int a, const int b)
 {
     triangle *s = (*o)[a];
     (*o)[a]     = (*o)[b];
@@ -29,7 +29,7 @@ inline void swap(bih_bucket *const o, const int a, const int b)
 /**********************************************************
  
 **********************************************************/
-void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child, point_t bl, point_t tr, int b, int e)
+void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *child, point_t bl, point_t tr, int b, int e)
 {
     /* Depth check */
     ++depth;
@@ -40,24 +40,24 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
     /* Pick longest side to divide in */
     point_t bm;
     point_t tm;
-    fp_t split_pnt;
+    float split_pnt;
     axis_t split_axis   = axis_t::not_set;
-    const fp_t dx       = tr.x - bl.x;
-    const fp_t dy       = tr.y - bl.y;
-    const fp_t dz       = tr.z - bl.z;
+    const float dx      = tr.x - bl.x;
+    const float dy      = tr.y - bl.y;
+    const float dz      = tr.z - bl.z;
     if (dx > dy)
     {
         if (dx > dz)
         {
             split_axis = axis_t::x_axis;
-            split_pnt  = bl.x + (dx * (fp_t)0.5);
+            split_pnt  = bl.x + (dx * 0.5f);
             bm         = point_t(split_pnt, bl.y, bl.z);
             tm         = point_t(split_pnt, tr.y, tr.z);
         }
         else
         {
             split_axis = axis_t::z_axis;
-            split_pnt  = bl.z + (dz * (fp_t)0.5);
+            split_pnt  = bl.z + (dz * 0.5f);
             bm         = point_t(bl.x, bl.y, split_pnt);
             tm         = point_t(tr.x, tr.y, split_pnt);
         }
@@ -67,22 +67,22 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
         if (dy > dz)
         {
             split_axis = axis_t::y_axis;
-            split_pnt  = bl.y + (dy * (fp_t)0.5);
+            split_pnt  = bl.y + (dy * 0.5f);
             bm         = point_t(bl.x, split_pnt, bl.z);
             tm         = point_t(tr.x, split_pnt, tr.z);
         }
         else
         {
             split_axis = axis_t::z_axis;
-            split_pnt  = bl.z + (dz * (fp_t)0.5);
+            split_pnt  = bl.z + (dz * 0.5f);
             bm         = point_t(bl.x, bl.y, split_pnt);
             tm         = point_t(tr.x, tr.y, split_pnt);
         }
     }
     
     /* Partition primitives */
-    fp_t max_left   = -MAX_DIST;
-    fp_t min_right  =  MAX_DIST;
+    float max_left  = -MAX_DIST;
+    float min_right =  MAX_DIST;
     int top         = e;
     int bottom      = b;
     switch (split_axis)
@@ -90,13 +90,13 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
         case axis_t::x_axis :
             while(bottom < top)
             {
-                while (split_pnt < (((*o)[top]->highest_x() + (*o)[top]->lowest_x()) * (fp_t)0.5) && top > bottom)
+                while (split_pnt < (((*o)[top]->highest_x() + (*o)[top]->lowest_x()) * 0.5f) && top > bottom)
                 {
                     min_right = min(min_right, (*o)[top--]->lowest_x());
                 }
                 swap(o, bottom, top);
                 
-                while(split_pnt >= (((*o)[bottom]->highest_x() + (*o)[bottom]->lowest_x()) * (fp_t)0.5) && bottom < top)
+                while(split_pnt >= (((*o)[bottom]->highest_x() + (*o)[bottom]->lowest_x()) * 0.5f) && bottom < top)
                 {
                     max_left = max(max_left, (*o)[bottom++]->highest_x());
                 }
@@ -104,7 +104,7 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
             }             
 
             /* Parition the last primitive */
-            if (split_pnt >= (((*o)[bottom]->highest_x() + (*o)[bottom]->lowest_x()) * (fp_t)0.5))
+            if (split_pnt >= (((*o)[bottom]->highest_x() + (*o)[bottom]->lowest_x()) * 0.5f))
             {
                 max_left = max(max_left, (*o)[bottom++]->highest_x());
             }
@@ -117,13 +117,13 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
         case axis_t::y_axis :
             while(bottom < top)
             {
-                while(split_pnt < (((*o)[top]->highest_y() + (*o)[top]->lowest_y()) * (fp_t)0.5) && top > bottom)
+                while(split_pnt < (((*o)[top]->highest_y() + (*o)[top]->lowest_y()) * 0.5f) && top > bottom)
                 {
                     min_right = min(min_right, (*o)[top--]->lowest_y());
                 }
                 swap(o, bottom, top);
          
-                while(split_pnt >= (((*o)[bottom]->highest_y() + (*o)[bottom]->lowest_y()) * (fp_t)0.5) && bottom < top)
+                while(split_pnt >= (((*o)[bottom]->highest_y() + (*o)[bottom]->lowest_y()) * 0.5f) && bottom < top)
                 {
                     max_left = max(max_left, (*o)[bottom++]->highest_y());
                 }
@@ -131,7 +131,7 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
             }
 
             /* Parition the last primitive */
-            if (split_pnt >= (((*o)[bottom]->highest_y() + (*o)[bottom]->lowest_y()) * (fp_t)0.5))
+            if (split_pnt >= (((*o)[bottom]->highest_y() + (*o)[bottom]->lowest_y()) * 0.5f))
             {
                 max_left = max(max_left, (*o)[bottom++]->highest_y());
             }
@@ -144,13 +144,13 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
          case axis_t::z_axis :
             while(bottom < top)
             {
-                while(split_pnt < (((*o)[top]->highest_z() + (*o)[top]->lowest_z()) * (fp_t)0.5) && top > bottom)
+                while(split_pnt < (((*o)[top]->highest_z() + (*o)[top]->lowest_z()) * 0.5f) && top > bottom)
                 {
                     min_right = min(min_right, (*o)[top--]->lowest_z());
                 }
                 swap(o, bottom, top);
          
-                while(split_pnt >= (((*o)[bottom]->highest_z() + (*o)[bottom]->lowest_z()) * (fp_t)0.5) && bottom < top)
+                while(split_pnt >= (((*o)[bottom]->highest_z() + (*o)[bottom]->lowest_z()) * 0.5f) && bottom < top)
                 {
                     max_left = max(max_left, (*o)[bottom++]->highest_z());
                 }
@@ -158,7 +158,7 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
             }
 
             /* Parition the last primitive */
-            if (split_pnt >= (((*o)[bottom]->highest_z() + (*o)[bottom]->lowest_z()) * (fp_t)0.5))
+            if (split_pnt >= (((*o)[bottom]->highest_z() + (*o)[bottom]->lowest_z()) * 0.5f))
             {
                 max_left = max(max_left, (*o)[bottom++]->highest_z());
             }
@@ -179,54 +179,54 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
 #endif
 
     /* Reduce the bouding boxes to just fit the new split */
-    fp_t pos;
+    float pos;
     switch (split_axis)
     {
         case axis_t::x_axis :
-            pos = (tm.x - bl.x) * (fp_t)0.5;
+            pos = (tm.x - bl.x) * 0.5f;
             while (((bl.x + pos) > max_left) && (max_left > -MAX_DIST))
             {
                 tm.x = bl.x + pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
 
-            pos = (tr.x - bm.x) * (fp_t)0.5;
+            pos = (tr.x - bm.x) * 0.5f;
             while (((tr.x - pos) < min_right) && (min_right < MAX_DIST))
             {
                 bm.x = tr.x - pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
             break;
 
         case axis_t::y_axis :
-            pos = (tm.y - bl.y) * (fp_t)0.5;
+            pos = (tm.y - bl.y) * 0.5f;
             while (((bl.y + pos) > max_left) && (max_left > -MAX_DIST))
             {
                 tm.y = bl.y + pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
 
-            pos = (tr.y - bm.y) * (fp_t)0.5;
+            pos = (tr.y - bm.y) * 0.5f;
             while (((tr.y - pos) < min_right) && (min_right < MAX_DIST))
             {
                 bm.y = tr.y - pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
             break;
 
         case axis_t::z_axis :
-            pos = (tm.z - bl.z) * (fp_t)0.5;
+            pos = (tm.z - bl.z) * 0.5f;
             while (((bl.z + pos) > max_left) && (max_left > -MAX_DIST))
             {
                 tm.z = bl.z + pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
 
-            pos = (tr.z - bm.z) * (fp_t)0.5;
+            pos = (tr.z - bm.z) * 0.5f;
             while (((tr.z - pos) < min_right) && (min_right < MAX_DIST))
             {
                 bm.z = tr.z - pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
             break;
 
@@ -285,7 +285,7 @@ void divide_bih_node(vector<triangle *> *const o, unsigned cur, unsigned *child,
 /**********************************************************
  
 **********************************************************/
-void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned cur, unsigned *child, point_t bl, point_t tr, int b, int e)
+void divide_bih_node(bih_bucket *const o, std::vector<triangle *> *const p, unsigned cur, unsigned *child, point_t bl, point_t tr, int b, int e)
 {
     /* Depth check */
     ++depth;
@@ -294,24 +294,24 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
     /* Pick longest side to divide in */
     point_t bm;
     point_t tm;
-    fp_t split_pnt;
+    float split_pnt;
     axis_t split_axis   = axis_t::not_set;
-    const fp_t dx       = tr.x - bl.x;
-    const fp_t dy       = tr.y - bl.y;
-    const fp_t dz       = tr.z - bl.z;
+    const float dx      = tr.x - bl.x;
+    const float dy      = tr.y - bl.y;
+    const float dz      = tr.z - bl.z;
     if (dx > dy)
     {
         if (dx > dz)
         {
             split_axis = axis_t::x_axis;
-            split_pnt  = bl.x + (dx * (fp_t)0.5);
+            split_pnt  = bl.x + (dx * 0.5f);
             bm         = point_t(split_pnt, bl.y, bl.z);
             tm         = point_t(split_pnt, tr.y, tr.z);
         }
         else
         {
             split_axis = axis_t::z_axis;
-            split_pnt  = bl.z + (dz * (fp_t)0.5);
+            split_pnt  = bl.z + (dz * 0.5f);
             bm         = point_t(bl.x, bl.y, split_pnt);
             tm         = point_t(tr.x, tr.y, split_pnt);
         }
@@ -321,22 +321,22 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
         if (dy > dz)
         {
             split_axis = axis_t::y_axis;
-            split_pnt  = bl.y + (dy * (fp_t)0.5);
+            split_pnt  = bl.y + (dy * 0.5f);
             bm         = point_t(bl.x, split_pnt, bl.z);
             tm         = point_t(tr.x, split_pnt, tr.z);
         }
         else
         {
             split_axis = axis_t::z_axis;
-            split_pnt  = bl.z + (dz * (fp_t)0.5);
+            split_pnt  = bl.z + (dz * 0.5f);
             bm         = point_t(bl.x, bl.y, split_pnt);
             tm         = point_t(tr.x, tr.y, split_pnt);
         }
     }
     
     /* Partition primitives */
-    fp_t max_left   = -MAX_DIST;
-    fp_t min_right  =  MAX_DIST;
+    float max_left  = -MAX_DIST;
+    float min_right =  MAX_DIST;
     int top         = e;
     int bottom      = b;
     switch (split_axis)
@@ -344,13 +344,13 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
         case axis_t::x_axis :
             while(bottom < top)
             {
-                while (split_pnt < ((o[top].highest_x() + o[top].lowest_x()) * (fp_t)0.5) && top > bottom)
+                while (split_pnt < ((o[top].highest_x() + o[top].lowest_x()) * 0.5f) && top > bottom)
                 {
                     min_right = min(min_right, o[top--].lowest_x());
                 }
                 swap(o, bottom, top);
                 
-                while(split_pnt >= ((o[bottom].highest_x() + o[bottom].lowest_x()) * (fp_t)0.5) && bottom < top)
+                while(split_pnt >= ((o[bottom].highest_x() + o[bottom].lowest_x()) * 0.5f) && bottom < top)
                 {
                     max_left = max(max_left, o[bottom++].highest_x());
                 }
@@ -358,7 +358,7 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
             }             
 
             /* Parition the last primitive */
-            if (split_pnt >= ((o[bottom].highest_x() + o[bottom].lowest_x()) * (fp_t)0.5))
+            if (split_pnt >= ((o[bottom].highest_x() + o[bottom].lowest_x()) * 0.5f))
             {
                 max_left = max(max_left, o[bottom++].highest_x());
             }
@@ -371,13 +371,13 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
         case axis_t::y_axis :
             while(bottom < top)
             {
-                while(split_pnt < ((o[top].highest_y() + o[top].lowest_y()) * (fp_t)0.5) && top > bottom)
+                while(split_pnt < ((o[top].highest_y() + o[top].lowest_y()) * 0.5f) && top > bottom)
                 {
                     min_right = min(min_right, o[top--].lowest_y());
                 }
                 swap(o, bottom, top);
          
-                while(split_pnt >= ((o[bottom].highest_y() + o[bottom].lowest_y()) * (fp_t)0.5) && bottom < top)
+                while(split_pnt >= ((o[bottom].highest_y() + o[bottom].lowest_y()) * 0.5f) && bottom < top)
                 {
                     max_left = max(max_left, o[bottom++].highest_y());
                 }
@@ -385,7 +385,7 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
             }
 
             /* Parition the last primitive */
-            if (split_pnt >= ((o[bottom].highest_y() + o[bottom].lowest_y()) * (fp_t)0.5))
+            if (split_pnt >= ((o[bottom].highest_y() + o[bottom].lowest_y()) * 0.5f))
             {
                 max_left = max(max_left, o[bottom++].highest_y());
             }
@@ -398,13 +398,13 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
          case axis_t::z_axis :
             while(bottom < top)
             {
-                while(split_pnt < ((o[top].highest_z() + o[top].lowest_z()) * (fp_t)0.5) && top > bottom)
+                while(split_pnt < ((o[top].highest_z() + o[top].lowest_z()) * 0.5f) && top > bottom)
                 {
                     min_right = min(min_right, o[top--].lowest_z());
                 }
                 swap(o, bottom, top);
          
-                while(split_pnt >= ((o[bottom].highest_z() + o[bottom].lowest_z()) * (fp_t)0.5) && bottom < top)
+                while(split_pnt >= ((o[bottom].highest_z() + o[bottom].lowest_z()) * 0.5f) && bottom < top)
                 {
                     max_left = max(max_left, o[bottom++].highest_z());
                 }
@@ -412,7 +412,7 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
             }
 
             /* Parition the last primitive */
-            if (split_pnt >= ((o[bottom].highest_z() + o[bottom].lowest_z()) * (fp_t)0.5))
+            if (split_pnt >= ((o[bottom].highest_z() + o[bottom].lowest_z()) * 0.5f))
             {
                 max_left = max(max_left, o[bottom++].highest_z());
             }
@@ -433,54 +433,54 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
 #endif
 
     /* Reduce the bouding boxes to just fit the new split */
-    fp_t pos;
+    float pos;
     switch (split_axis)
     {
         case axis_t::x_axis :
-            pos = (tm.x - bl.x) * (fp_t)0.5;
+            pos = (tm.x - bl.x) * 0.5f;
             while (((bl.x + pos) > max_left) && (max_left > -MAX_DIST))
             {
                 tm.x = bl.x + pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
 
-            pos = (tr.x - bm.x) * (fp_t)0.5;
+            pos = (tr.x - bm.x) * 0.5f;
             while (((tr.x - pos) < min_right) && (min_right < MAX_DIST))
             {
                 bm.x = tr.x - pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
             break;
 
         case axis_t::y_axis :
-            pos = (tm.y - bl.y) * (fp_t)0.5;
+            pos = (tm.y - bl.y) * 0.5f;
             while (((bl.y + pos) > max_left) && (max_left > -MAX_DIST))
             {
                 tm.y = bl.y + pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
 
-            pos = (tr.y - bm.y) * (fp_t)0.5;
+            pos = (tr.y - bm.y) * 0.5f;
             while (((tr.y - pos) < min_right) && (min_right < MAX_DIST))
             {
                 bm.y = tr.y - pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
             break;
 
         case axis_t::z_axis :
-            pos = (tm.z - bl.z) * (fp_t)0.5;
+            pos = (tm.z - bl.z) * 0.5f;
             while (((bl.z + pos) > max_left) && (max_left > -MAX_DIST))
             {
                 tm.z = bl.z + pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
 
-            pos = (tr.z - bm.z) * (fp_t)0.5;
+            pos = (tr.z - bm.z) * 0.5f;
             while (((tr.z - pos) < min_right) && (min_right < MAX_DIST))
             {
                 bm.z = tr.z - pos;
-                pos *= (fp_t)0.5;
+                pos *= 0.5f;
             }
             break;
 
@@ -567,7 +567,7 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
         divide_bih_node(o, p, right_child, child, bm, tr, bottom, e);
     }
     
-    depth--;
+    --depth;
     return;
 }
 
@@ -575,11 +575,11 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
 /**********************************************************
  
 **********************************************************/
-// void approximate_sort(const primitive_list *const o, vector<triangle *> *const copy)
+// void approximate_sort(const primitive_list *const o, std::vector<triangle *> *const copy)
 // {
 //     /* Calculate the total average size primitive */
 //     point_t average(0.0, 0.0, 0.0);
-//     point_t scale(((fp_t)o->size() * (fp_t)0.16), ((fp_t)o->size() * (fp_t)0.16), ((fp_t)o->size() * (fp_t)0.16));
+//     point_t scale((o->sizef() * 0.16f), (o->sizef() * 0.16f), (o->sizef() * 0.16f));
 //     for (unsigned int i = 0; i < o->size(); i++)
 //     {
 //         average += ((*o)[i]->highest_point() - (*o)[i]->lowest_point()) / scale;
@@ -664,12 +664,12 @@ void divide_bih_node(bih_bucket *const o, vector<triangle *> *const p, unsigned 
 /**********************************************************
  
 **********************************************************/
-const vector<triangle *> * build_bih(const primitive_list *const o, bih_node *bih)
+const std::vector<triangle *> * build_bih(const primitive_list *const o, std::vector<bih_node> *const bih)
 {
 //    cout << "BIH construction has begun" << endl;
 
     /* Bound all primitives in the scene and copy them */
-    vector<triangle *> *object_copy = new vector<triangle *>;
+    std::vector<triangle *> *object_copy = new std::vector<triangle *>;
     *object_copy = *o;
 
     /* Divide the nodes */
@@ -677,6 +677,7 @@ const vector<triangle *> * build_bih(const primitive_list *const o, bih_node *bi
     bih_node::set_node_array(bih);
     unsigned grand_child = 1;
 
+    depth = 0;
     divide_bih_node(object_copy, 0, &grand_child, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, object_copy->size() - 1);
 
 //    approximate_sort(o, object_copy);
