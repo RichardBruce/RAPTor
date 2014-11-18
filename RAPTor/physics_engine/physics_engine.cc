@@ -109,7 +109,7 @@ physics_engine& physics_engine::advance_time(const fp_t t)
 
         /* Full collision detection */
         BOOST_LOG_TRIVIAL(info) << "Beginning full collision detection";
-        for (auto p0 = _moving_objects->begin(); p0 != _moving_objects->end(); ++p0)
+        for (auto p0 = _objects->begin(); p0 != _objects->end(); ++p0)
         {
             collision_detect_versus(p0, t_step, false);
         }
