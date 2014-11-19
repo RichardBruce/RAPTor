@@ -68,6 +68,10 @@ class udp_connection : public connection<UpNode>
             delete [] _head_buf;
         }
 
+        /* Access functions */
+        short recv_port() const { return _recv_socket. local_endpoint().port();   }
+        short send_port() const { return _send_port;                              }
+
         /* Start waiting for data on the socket */
         virtual void start_receiving() override
         {
