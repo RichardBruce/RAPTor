@@ -81,7 +81,7 @@ class ray_trace_engine
         typedef light_list::iterator       light_iterator;
         typedef light_list::const_iterator const_light_iterator;
 
-        ray_trace_engine(const light_list &l, camera &c, const kdt_node *const k, const bih_node *const b) :    
+        ray_trace_engine(const light_list &l, camera &c, const kdt_node *const k, const std::vector<bih_node> &b) :    
             kdt_base(k), bih_base(b), c(c), lights(l) 
             {
                 this->pending_shadows      = static_cast<ray *>(scalable_malloc(  this->lights.size() * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(ray))));
@@ -207,14 +207,14 @@ class ray_trace_engine
         mutable bih_stack_element   bih_stack[MAX_BIH_STACK_HEIGHT];
 #endif /* #ifndef SPATIAL_SUBDIVISION_BIH */
 
-        const kdt_node          *const kdt_base;
-        const bih_node          *const bih_base;
-        camera                  &c;    
-        const light_list        &lights;
+        const kdt_node          *const  kdt_base;
+        const std::vector<bih_node>     &bih_base;
+        camera                          &c;    
+        const light_list                &lights;
         
-        mutable ray             *pending_shadows;
-        mutable fp_t            *nr_pending_shadows;
-        mutable int             shader_nr;
+        mutable ray                     *pending_shadows;
+        mutable fp_t                    *nr_pending_shadows;
+        mutable int                     shader_nr;
 };
 
 /* Ray tracer main function */
