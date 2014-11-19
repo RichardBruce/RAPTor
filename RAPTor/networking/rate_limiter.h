@@ -17,8 +17,8 @@ template<class UpNode, class DnNode>
 class rate_limiter : public stack_component_impl<UpNode, DnNode>
 {
     public :
-        rate_limiter(DnNode *const dn_node, boost::asio::io_service &io_service, const fp_t bytes_per_milli)
-            : stack_component_impl<UpNode, DnNode>(dn_node), _timeout(io_service), _bytes_per_milli_inv(1.0 / bytes_per_milli)
+        rate_limiter(DnNode *const dn_node, boost::asio::io_service &io_service, const float bytes_per_milli)
+            : stack_component_impl<UpNode, DnNode>(dn_node), _timeout(io_service), _bytes_per_milli_inv(1.0f / bytes_per_milli)
               { };
 
         ~rate_limiter()
@@ -43,8 +43,8 @@ class rate_limiter : public stack_component_impl<UpNode, DnNode>
             }
 
             /* Increase the timer by the time required for this message */
-            const fp_t bytes    = header->fragment_length();
-            const fp_t millis   = bytes * _bytes_per_milli_inv;
+            const float bytes   = header->fragment_length();
+            const float millis  = bytes * _bytes_per_milli_inv;
             _timeout.expires_at(std::chrono::system_clock::now() + std::chrono::milliseconds(static_cast<int>(millis)));
 
             /* Pass the data down the stack */
@@ -56,7 +56,7 @@ class rate_limiter : public stack_component_impl<UpNode, DnNode>
         {
             /* Clone this and down nodes */
             auto dn_pair = this->_dn_node->clean_clone();
-            auto *cloned = new rate_limiter<UpNode, DnNode>(dn_pair.last(), _timeout.get_io_service(), 1.0 / _bytes_per_milli_inv);
+            auto *cloned = new rate_limiter<UpNode, DnNode>(dn_pair.last(), _timeout.get_io_service(), 1.0f / _bytes_per_milli_inv);
 
             /* Update return pair */
             dn_pair.update(cloned);
@@ -64,11 +64,11 @@ class rate_limiter : public stack_component_impl<UpNode, DnNode>
         }
 
         /* Access fucntions */
-        fp_t rate() const { return 1.0 / _bytes_per_milli_inv; }
+        float rate() const { return 1.0f / _bytes_per_milli_inv; }
 
     private :
         boost::asio::system_timer   _timeout;
-        const fp_t                  _bytes_per_milli_inv;
+        const float                 _bytes_per_milli_inv;
 };
 }; /* namespace raptor_networking */
 
