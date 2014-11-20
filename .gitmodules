@@ -1,3 +1,6 @@
 [submodule "lib"]
 	path = lib
 	url = git@github.com:RichardBruce/lib.git
+[submodule "dat"]
+	path = data
+	url = bruce@192.168.1.10:/home/bruce/work/git/data.git

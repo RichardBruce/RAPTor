@@ -38,7 +38,9 @@ inline unsigned int next_power_of_two(unsigned int x)
     return x + 1;
 }
 
+const unsigned int INVALID_ID = 0xffffffff;
 
+template<class HashFn = boost::hash<contents>>
 class pair_manager
 {
     public :
@@ -60,11 +62,15 @@ class pair_manager
             return *this;
         }
 
+        unsigned int capacity() const { return _size; }
+
         pair_manager& reserve(const unsigned int size)
         {
             rehash(size);
             return *this;
         }
+
+        float load_factor() const { return _load_factor; }
 
         pair_manager& load_factor(const float load_factor)
         {
@@ -98,7 +104,7 @@ class pair_manager
             unsigned int offset = _hash_table[hash];
             while ((offset != INVALID_ID) && is_different_pair(_pairs[offset], p.first, p.second))
             {
-                assert(_pairs[offset].first != INVALID_USER_ID);
+                assert(_pairs[offset].first != nullptr);
                 offset = _next[offset];
             }
 
@@ -181,7 +187,7 @@ class pair_manager
 
         contents* erase(contents *const pair, const std::size_t hash)
         {
-            /* Fix next */
+            /* Search through next to find the previous entry */
             const unsigned int pair_index = get_index(pair);
             unsigned int offset = _hash_table[hash];
             assert(offset != INVALID_ID);
@@ -193,20 +199,20 @@ class pair_manager
                 offset = _next[offset];
             }
 
-            /* Repoint next */
+            /* Repoint next to skip the erase entry */
             if (previous != INVALID_ID)
             {
                 assert(_next[previous] == pair_index);
                 _next[previous] = _next[pair_index];
             }
-            /* The first in the chain, repoint hash */
+            /* We erased the first in the chain so repoint hash to the next */
             else
             {
                 _hash_table[hash] = _next[pair_index];
             }
-            // we're now free to reuse next[pair_index] without breaking the list
+            /* Now we can reuse next[pair_index] */
 
-            /* Remove the last pair */
+            /* We removed the last pair, so just drop it */
             const unsigned int last_pair_idx = _number_of_pairs - 1;
             if (last_pair_idx == pair_index)
             {
@@ -217,7 +223,7 @@ class pair_manager
             const contents* last = &_pairs[last_pair_idx];
             const unsigned int last_hash = _hash_func(*last) & _mask;
 
-            // Walk the hash table to fix _next
+            /* Find the last pair in its next chain */
             offset = _hash_table[last_hash];
             assert(offset != INVALID_ID);
 
@@ -228,26 +234,23 @@ class pair_manager
                 offset = _next[offset];
             }
 
-            // Let us go/jump us
+            /* Relink the last pair in its chain*/
             if (previous != INVALID_ID)
             {
                 assert(_next[previous] == last_pair_idx);
                 _next[previous] = _next[last_pair_idx];
             }
-            // else we were the first
+            /* The last pair was first in its chain, just update the hash */
             else
             { 
                 _hash_table[last_hash] = _next[last_pair_idx];
             }
-            // we're now free to reuse _next[last_pair_idx] without breaking the list
+            /* Now we can reuse _next[last_pair_idx] */
 
-            // Don't invalidate entry since we're going to shrink the array
-
-            // 2) Re-insert in free slot
+            /* Move last pair to the empty slot */
             _pairs[pair_index]      = _pairs[last_pair_idx];
             _next[pair_index]       = _hash_table[last_hash];
             _hash_table[last_hash]  = pair_index;
-
             --_number_of_pairs;
 
             return pair;
@@ -312,7 +315,7 @@ class pair_manager
             unsigned int offset = _hash_table[hash];
             while ((offset != INVALID_ID) && is_different_pair(_pairs[offset], id0, id1))
             {
-                assert(_pairs[offset].first != INVALID_USER_ID);
+                assert(_pairs[offset].first != nullptr);
                 offset = _next[offset];
             }
 
@@ -325,16 +328,14 @@ class pair_manager
             return &_pairs[offset];
         }
 
-        boost::hash<contents>   _hash_func;
-        contents*               _pairs;
-        unsigned int*           _hash_table;
-        unsigned int*           _next;
-        float                   _load_factor;
-        unsigned int            _size;
-        unsigned int            _mask;
-        unsigned int            _number_of_pairs;
-        static constexpr physics_object* INVALID_USER_ID = nullptr;
-        static constexpr unsigned int INVALID_ID = 0xffffffff;
+        HashFn          _hash_func;
+        contents*       _pairs;
+        unsigned int*   _hash_table;
+        unsigned int*   _next;
+        float           _load_factor;
+        unsigned int    _size;
+        unsigned int    _mask;
+        unsigned int    _number_of_pairs;
 };
 }; /* namespace raptor_physics */
 

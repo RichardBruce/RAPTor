@@ -14,6 +14,7 @@ const raptor_physics::init_logger init_logger;
 
 BOOST_AUTO_TEST_SUITE( mgf_tests );
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( mgf_blkchair_test )
 {
     /* Checker */
@@ -93,6 +94,7 @@ BOOST_AUTO_TEST_CASE( mgf_butterfly_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
+#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( mgf_cabin_test )
 {
@@ -110,6 +112,7 @@ BOOST_AUTO_TEST_CASE( mgf_cabin_test )
     checker.check(fixture.get_camera());
 }
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( mgf_chair1_test )
 {
     /* Checker */
@@ -189,6 +192,7 @@ BOOST_AUTO_TEST_CASE( mgf_coord_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
+#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( mgf_corndesk_test )
 {
@@ -206,6 +210,7 @@ BOOST_AUTO_TEST_CASE( mgf_corndesk_test )
     checker.check(fixture.get_camera());
 }
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( mgf_curtain_test )
 {
     /* Checker */
@@ -365,6 +370,7 @@ BOOST_AUTO_TEST_CASE( mgf_mug_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
+#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( mgf_office_test )
 {
@@ -382,6 +388,7 @@ BOOST_AUTO_TEST_CASE( mgf_office_test )
     checker.check(fixture.get_camera());
 }
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( mgf_openbook_test )
 {
     /* Checker */
@@ -397,7 +404,6 @@ BOOST_AUTO_TEST_CASE( mgf_openbook_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
-
               
 BOOST_AUTO_TEST_CASE( mgf_orgchair_test )
 {
@@ -590,6 +596,7 @@ BOOST_AUTO_TEST_CASE( mgf_wstbskt_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
+#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_SUITE_END()
 

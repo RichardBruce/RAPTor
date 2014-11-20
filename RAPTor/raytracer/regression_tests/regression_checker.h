@@ -19,7 +19,8 @@
 
 using namespace raptor_raytracer;
 
-const float result_tolerance = 0.0005;
+const float result_tolerance = 0.0005f;
+const int pixel_error = 3;
 const int failure_limit = 1000;
 const std::string test_data_location = "test_data/";
 
@@ -56,38 +57,42 @@ class regression_checker : private boost::noncopyable
             /* Load expected image */
             unsigned int exp_x_res;
             unsigned int exp_y_res;
+            BOOST_REQUIRE(boost::filesystem::exists(_expected));
             std::unique_ptr<unsigned char []> expected(new unsigned char [image_size]);
             read_png_file(_expected, expected.get(), &exp_x_res, &exp_y_res);
 
             /* Check image dimensions, if this fails theres no point even trying */
-            BOOST_ASSERT(x_res == exp_x_res);
-            BOOST_ASSERT(y_res == exp_y_res);
+            BOOST_REQUIRE(x_res == exp_x_res);
+            BOOST_REQUIRE(y_res == exp_y_res);
 
             /* Compare */
             int failures = 0;
             std::unique_ptr<unsigned char []> difference(new unsigned char [image_size]);
             for (unsigned int i = 0; i < image_pixels; ++i)
             {
-                /* Check */
-                const unsigned int idx = i * 3;
-                if (failures < failure_limit)
-                {
-                    BOOST_CHECK(actual[idx    ] == expected[idx    ]);
-                    BOOST_CHECK(actual[idx + 1] == expected[idx + 1]);
-                    BOOST_CHECK(actual[idx + 2] == expected[idx + 2]);
-                }
-                else if (failures == failure_limit)
-                {
-                    BOOST_LOG_TRIVIAL(warning) << failure_limit << " errors detected, I'm not checking anymore. Go fix your code";
-                }
-
                 /* Colour mismatch pixels red */
-                if ((actual[idx] != expected[idx]) || (actual[idx + 1] != expected[idx + 1]) || (actual[idx + 2] != expected[idx + 2]))
+                const unsigned int idx = i * 3;
+                if ((abs(actual[idx    ] - expected[idx    ]) > pixel_error) ||
+                    (abs(actual[idx + 1] - expected[idx + 1]) > pixel_error) ||
+                    (abs(actual[idx + 2] - expected[idx + 2]) > pixel_error))
                 {
                     ++failures;
                     difference[idx    ] = 255;
                     difference[idx + 1] = 0;
                     difference[idx + 2] = 0;
+
+                    /* Check only the failing pixels or we get loads of team city logs */
+                    if (failures < failure_limit)
+                    {
+                        BOOST_CHECK(actual[idx    ] == expected[idx    ]);
+                        BOOST_CHECK(actual[idx + 1] == expected[idx + 1]);
+                        BOOST_CHECK(actual[idx + 2] == expected[idx + 2]);
+                    }
+                    else if (failures == failure_limit)
+                    {
+                        ++failures;
+                        BOOST_LOG_TRIVIAL(warning) << failure_limit << " errors detected, I'm not checking anymore. Go fix your code";
+                    }
                 }
                 else
                 {

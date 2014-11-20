@@ -18,7 +18,7 @@ namespace raptor_physics
 const int collision_resolution_max = 50;
 
 bool physics_object::has_collided(physics_object *const po, simplex **const manifold_a, 
-    simplex **const manifold_b, point_t *const d, const fp_t t0, const fp_t t1)
+    simplex **const manifold_b, point_t *const d, const float t0, const float t1)
 {
     METHOD_LOG;
 
@@ -49,7 +49,7 @@ bool physics_object::has_collided(physics_object *const po, simplex **const mani
 
 /* TODO -- There has to be a faster way to handle objects in resting contact */
 /* TODO -- Re-write using POSSIBLY_ to avoid some full collision detection */
-collision_t physics_object::exactly_resolve_collisions(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, fp_t *const t)
+collision_t physics_object::exactly_resolve_collisions(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const t)
 {
     METHOD_LOG;
 
@@ -61,8 +61,8 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
         return NO_COLLISION;
     }
 
-    const fp_t min_t = std::max(_cur_t, po->_cur_t);
-    const fp_t max_t = *t;
+    const float min_t = std::max(_cur_t, po->_cur_t);
+    const float max_t = *t;
     BOOST_LOG_TRIVIAL(trace) << "Solving within time range: " << min_t << " to " << max_t;
 
     /* Test at start position */
@@ -70,13 +70,13 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
     simplex *sim_a;
     simplex *sim_b;
     has_collided(po, &sim_a, &sim_b, &dir1, min_t, min_t);
-    const fp_t d_t0 = magnitude(dir1);
+    const float d_t0 = magnitude(dir1);
     assert((d_t0 > raptor_physics::EPSILON) || !"Error: Object must start separated");
 
     /* Test during time period, note d_t1 <= dt_0 */
     point_t dir;
     has_collided(po, manifold_a, manifold_b, &dir, min_t, max_t);
-    fp_t d_t1 = magnitude(dir);
+    float d_t1 = magnitude(dir);
 
     /* The objects never get within weld ditance, all is well */
     if (d_t1 > raptor_physics::WELD_DISTANCE)
@@ -120,9 +120,9 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
             delete sim_b;
 
             /* Multiple collision may happen in the time step, but the times and distances are so small we just want to find one */
-            fp_t t_lo   = min_t;
-            fp_t t_mid  = (min_t + max_t) * 0.5;
-            fp_t t_hi   = max_t;
+            float t_lo  = min_t;
+            float t_mid = (min_t + max_t) * 0.5;
+            float t_hi  = max_t;
             int res_col_cnt = 0;
             do
             {
@@ -131,7 +131,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
 
                 BOOST_LOG_TRIVIAL(trace) << "Objects " << d_t0 << " (" << t_lo << ") apart and moving to " << t_hi << "(" << d_t1 << ")";
                 has_collided(po, manifold_a, manifold_b, &dir, t_mid, t_mid);
-                const fp_t d_mid = magnitude(dir);
+                const float d_mid = magnitude(dir);
 
                 if ((d_mid > d_t0) && (dot_product(dir1, dir) > 0.0))
                 {
@@ -166,9 +166,9 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
     /* There was a collision bring the objects in contact without penetrating each other */
     BOOST_LOG_TRIVIAL(trace) << "Objects started apart at " << min_t << " (" << d_t0 << ") and collided by " << max_t << "(" << d_t1 << ")";
     int res_col_cnt = 0;
-    std::pair<fp_t, fp_t> p_t0(min_t, d_t0);
-    std::pair<fp_t, fp_t> p_t1(max_t, d_t1);
-    fp_t adjusted_t = (p_t0.first + p_t1.first) * 0.5;
+    std::pair<float, float> p_t0(min_t, d_t0);
+    std::pair<float, float> p_t1(max_t, d_t1);
+    float adjusted_t = (p_t0.first + p_t1.first) * 0.5;
     while (true)
     {
         /* Clean the last (no longer needed) manifolds */
@@ -207,9 +207,9 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
                 p_t1.second = d_t1;
             }
 
-            const fp_t disp = p_t0.second - p_t1.second;
-            const fp_t move = d_t1 - (0.5 * raptor_physics::WELD_DISTANCE);
-            const fp_t last_adj = ((p_t1.first - p_t0.first) / disp) * move;
+            const float disp = p_t0.second - p_t1.second;
+            const float move = d_t1 - (0.5 * raptor_physics::WELD_DISTANCE);
+            const float last_adj = ((p_t1.first - p_t0.first) / disp) * move;
             adjusted_t = std::min(adjusted_t + last_adj, max_t);
         }
         assert(adjusted_t > (min_t + raptor_physics::EPSILON));
@@ -221,7 +221,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
 }
 
 
-collision_t physics_object::conservatively_resolve_collisions(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, fp_t *const t)
+collision_t physics_object::conservatively_resolve_collisions(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const t)
 {
     METHOD_LOG;
 
@@ -233,8 +233,8 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
         return NO_COLLISION;
     }
 
-    const fp_t min_t = std::max(_cur_t, po->_cur_t);
-    const fp_t max_t = *t;
+    const float min_t = std::max(_cur_t, po->_cur_t);
+    const float max_t = *t;
     BOOST_LOG_TRIVIAL(trace) << "Solving between " << min_t << " and " << max_t;
 //    BOOST_LOG_TRIVIAL(trace) << "w: " << _w.x << " " << _w.y << " " << _w.z;
 
@@ -243,7 +243,7 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
     has_collided(po, manifold_a, manifold_b, &dir, min_t, min_t);
 
     /* Retreive the distance between the objects and the closest points */
-    const fp_t d_t0 = magnitude(dir);
+    const float d_t0 = magnitude(dir);
     BOOST_LOG_TRIVIAL(trace) << "Initial separation: " << d_t0;
     assert((d_t0 > raptor_physics::EPSILON) || !"Error: Object must start separated");
     
@@ -256,8 +256,8 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
 
     /* Check the worst case distance at max_t */
     const point_t noc(dir / d_t0);
-    const fp_t max_d = project_maximum_movement_onto((*po), p_a, p_b, noc, max_t);
-    fp_t d_t1 = d_t0 - max_d;
+    const float max_d = project_maximum_movement_onto((*po), p_a, p_b, noc, max_t);
+    float d_t1 = d_t0 - max_d;
 
     /* Objects start in contact */
     if (d_t0 < raptor_physics::WELD_DISTANCE)
@@ -292,9 +292,9 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
 
     /* Iterate until no contact possible */
     int res_col_cnt = 0;
-    fp_t adjusted_t = max_t;
-    std::pair<fp_t, fp_t> p_t1;
-    std::pair<fp_t, fp_t> p_t0(min_t, d_t0);
+    float adjusted_t = max_t;
+    std::pair<float, float> p_t1;
+    std::pair<float, float> p_t0(min_t, d_t0);
     BOOST_LOG_TRIVIAL(trace) << "Objects started apart at " << min_t << " (" << d_t0 << ") and collided by " << max_t << "(" << d_t1 << ")";
     do
     {
@@ -313,12 +313,12 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
         }
 
         /* Refine guess */
-        const fp_t vel = (p_t0.second - p_t1.second) / (p_t1.first - p_t0.first);
-        const fp_t adj = d_t1 - (0.5 * raptor_physics::WELD_DISTANCE);
+        const float vel = (p_t0.second - p_t1.second) / (p_t1.first - p_t0.first);
+        const float adj = d_t1 - (0.5 * raptor_physics::WELD_DISTANCE);
         adjusted_t += adj / vel;
 
         /* Get worst case movement at adjusted t */
-        const fp_t max_d = project_maximum_movement_onto((*po), p_a, p_b, noc, adjusted_t);
+        const float max_d = project_maximum_movement_onto((*po), p_a, p_b, noc, adjusted_t);
 
         /* Update worst case distance at adjusted t */
         d_t1 = d_t0 - max_d;
@@ -333,13 +333,13 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
 
 /* This function is to be called by a conservative collision detection scheme when two object are very close */
 /* Conservative schemes do badly in this situation because the two objects will conservatively collide instantly */
-collision_t physics_object::close_contact_collision_detection(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, fp_t *const t, const point_t &noc) const
+collision_t physics_object::close_contact_collision_detection(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const t, const point_t &noc) const
 {
     METHOD_LOG;
     BOOST_LOG_TRIVIAL(trace) << "Determining exact collision time up to: " << *t;
 
     /* Check for objects moving together, if so they collide instantly */
-    // const fp_t va_dot_vb = dot_product(_v, po->_v);
+    // const float va_dot_vb = dot_product(_v, po->_v);
     // if (va_dot_vb < 0.0)
     // {
     //     BOOST_LOG_TRIVIAL(trace) << "Objects translating towards each other, instant impact";
@@ -368,7 +368,7 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
     //     }
     // }
 
-    fp_t full_t = *t;
+    float full_t = *t;
     rk4_integrator integ;
     quaternion_t full_rot(normalise(integ.project_rotation(_agg_force, *_i, _o, _w, full_t - _cur_t)));
     while (fabs(full_rot.w) < 0.99)
@@ -382,7 +382,7 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
     /* Initial relative state, less the safety margin */
     const point_t x0(_i->center_of_mass() - po->_i->center_of_mass() - (n * (0.25 * raptor_physics::WELD_DISTANCE)));
 
-    const fp_t r0 = 1.0;
+    const float r0 = 1.0;
     const point_t q0(0.0, 0.0, 0.0);
 
     /* Final relative state */
@@ -390,10 +390,10 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
 
     const quaternion_t rot(integ.project_rotation(_agg_force, *_i, _o, _w, full_t - _cur_t));
     const point_t q1(rot.x, rot.y, rot.z);
-    const fp_t r1 = rot.w;
+    const float r1 = rot.w;
 
     /* Compute exact time of intersection */
-    const fp_t frac_t = _vg->find_intersection_time(*(po->_vg), n, x0, x1, q0, q1, r0, r1, full_t);
+    const float frac_t = _vg->find_intersection_time(*(po->_vg), n, x0, x1, q0, q1, r0, r1, full_t);
     
     BOOST_LOG_TRIVIAL(trace) << "Exact collision time at: " << (full_t * frac_t);
     if (frac_t <= 1.0) 
@@ -416,13 +416,13 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
 }
 
 
-fp_t physics_object::project_maximum_rotation_onto(const point_t &n, const point_t &po, const fp_t t) const
+float physics_object::project_maximum_rotation_onto(const point_t &n, const point_t &po, const float t) const
 {
     rk4_integrator integ;
     const point_t apo_ang_vel(integ.project_translation(_agg_force, *_i, _v, t - _cur_t));
 
     /* Find the vertex moving the most along n */
-    fp_t max_rot;
+    float max_rot;
     const point_t w_cross_n(cross_product(apo_ang_vel, n));
 //    BOOST_LOG_TRIVIAL(trace) << "n: " << n.x << " " << n.y << " " << n.z;
 //    BOOST_LOG_TRIVIAL(trace) << "w cross n: " << w_cross_n.x << " " << w_cross_n.y << " " << w_cross_n.z;
@@ -434,15 +434,15 @@ fp_t physics_object::project_maximum_rotation_onto(const point_t &n, const point
 }
 
 
-fp_t physics_object::project_maximum_movement_onto(const physics_object &p, const point_t &p_a, const point_t &p_b, const point_t &n, const fp_t t) const
+float physics_object::project_maximum_movement_onto(const physics_object &p, const point_t &p_a, const point_t &p_b, const point_t &n, const float t) const
 {
     /* Translation */
     rk4_integrator integ;
     const point_t tra_rel(integ.project_translation(p._agg_force, *p._i, p._v, t - p._cur_t) - integ.project_translation(_agg_force, *_i, _v, t - _cur_t));
-    const fp_t tra = dot_product(tra_rel, n);
+    const float tra = dot_product(tra_rel, n);
 
     /* Rotation */
-    const fp_t rot = p.project_maximum_rotation_onto(-n, p_b, t) + project_maximum_rotation_onto(n, p_a, t);
+    const float rot = p.project_maximum_rotation_onto(-n, p_b, t) + project_maximum_rotation_onto(n, p_a, t);
     BOOST_LOG_TRIVIAL(trace) << "tra: " << tra << " rot: " << rot;
 
     /* Total */

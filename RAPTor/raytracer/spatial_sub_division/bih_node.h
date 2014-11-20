@@ -20,12 +20,12 @@ class bih_node
         /* Tree construction */
         void create_leaf_node(const int b, const int e)
         {
-            assert((axis_t)(this->c & 0x3) == axis_t::not_set);
+            assert(static_cast<axis_t>(this->c & 0x3) == axis_t::not_set);
             this->b = b;
             this->e = e;
         }
 
-        void create_generic_node(const unsigned c, const fp_t l, const fp_t r, const axis_t a)
+        void create_generic_node(const unsigned c, const float l, const float r, const axis_t a)
         {
             assert((static_cast<int>(a) & 0xfffffffc) == 0);
             assert((c & 0xc0000000) == 0);
@@ -35,37 +35,45 @@ class bih_node
         }
         
         /* Set statics */
-        static void set_primitives(vector<triangle *> *const p) { bih_node::o   = p;    }
-        static void set_node_array(bih_node           *const b) { bih_node::bih = b;    }
+        static void set_primitives(std::vector<triangle *> *const p)    { bih_node::o   = p;    }
+        static void set_node_array(std::vector<bih_node> *const b)      { bih_node::bih = b;    }
 
         /* Get elements of statics */
-        static bih_node & get_node_array(unsigned i) { return bih_node::bih[i]; }
+        static bih_node & get_node_array(const unsigned int i)
+        {
+            if (i >= bih_node::bih->size())
+            {
+                bih_node::bih->resize(i + 1);
+            }
+
+            return (*bih_node::bih)[i];
+        }
 
 
         /* Tree traversal */        
         const axis_t get_split_axis() const
         {
-            return (axis_t)((this->c >> 30) & 0x3);
+            return static_cast<axis_t>((this->c >> 30) & 0x3);
         }
 
-        const fp_t get_left_split() const
+        const float get_left_split() const
         {
             return this->l;
         }
 
-        const fp_t get_right_split() const
+        const float get_right_split() const
         {
             return this->r;
         }
 
         const bih_node * get_left_child() const
         {
-            return &bih_node::bih[(this->c & 0x3fffffff)];
+            return &(*bih_node::bih)[(this->c & 0x3fffffff)];
         }
 
         const bih_node * get_right_child() const
         {
-            return &bih_node::bih[(this->c & 0x3fffffff) + 1];
+            return &(*bih_node::bih)[(this->c & 0x3fffffff) + 1];
         }
 
 
@@ -109,7 +117,7 @@ class bih_node
             return intersecting_object;
         }
 
-        bool test_leaf_node_nearer(const ray *const r, const fp_t max) const
+        bool test_leaf_node_nearer(const ray *const r, const float max) const
         {
             int end = this->e;
             for (int i = this->b; i <= end; i++)
@@ -222,19 +230,19 @@ class bih_node
         /* Unions of mutually exclusive data */
         union
         {
-            int                         b;      /* Index of primitives                  */
-            fp_t                        l;      /* Position of the left split plane     */
+            int     b;  /* Index of primitives                  */
+            float   l;  /* Position of the left split plane     */
         };
         
         union
         {
-            int                         e;      /* Index of last primitive              */
-            fp_t                        r;      /* Position of the right split plane    */
+            int     e;  /* Index of last primitive              */
+            float   r;  /* Position of the right split plane    */
         };
 
-        unsigned                        c;      /* Index to the left child              */
-        static vector<triangle *>   *   o;      /* Vector of primitives                 */
-        static bih_node             *   bih;    /* BIH nodes                            */
+        unsigned                            c;      /* Index to the left child              */
+        static std::vector<triangle *> *    o;      /* Vector of primitives                 */
+        static std::vector<bih_node> *      bih;    /* BIH nodes                            */
 };
 }; /* namespace raptor_raytracer */
 

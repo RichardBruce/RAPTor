@@ -33,7 +33,7 @@ struct physics_object_fixture : private boost::noncopyable
 {
     physics_object_fixture()
     : point_outside(100.0, 110.0, 90.0),
-      mat(new phong_shader(ext_colour_t(255, 255, 255), 1.0)),
+      mat(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0)),
       vg0(make_plane(mat, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0))),
       vg1(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5))),
       vg2(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5))),
@@ -42,7 +42,7 @@ struct physics_object_fixture : private boost::noncopyable
       vg5(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5))),
       vg6(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5))),
       vg7(make_cube(mat, point_t( 5.5, -1.5, -3.5), point_t(6.5, -0.5, -2.5))),
-      plane_po(new physics_object(vg0, point_t(0.0, -10.0, 0.0), numeric_limits<fp_t>::infinity(), 7)),
+      plane_po(new physics_object(vg0, point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity(), 7)),
       cube_po0(new physics_object(vg1, point_t(0.5,  -9.5, 0.0), 1.0)),
       cube_po1(new physics_object(vg2, point_t(0.0,   9.5, 0.0), 1.0)),
       centered_cube(new physics_object(vg7, point_t(-5.0, 10.5, 3.0), 1.0)),
@@ -75,29 +75,29 @@ struct physics_object_fixture : private boost::noncopyable
         delete moving_po_type;
     }
 
-    const point_t       point_outside;
-    material        *   mat;
-    vertex_group    *   vg0;
-    vertex_group    *   vg1;
-    vertex_group    *   vg2;
-    vertex_group    *   vg3;
-    vertex_group    *   vg4;
-    vertex_group    *   vg5;
-    vertex_group    *   vg6;
-    vertex_group    *   vg7;
-    physics_object  *   plane_po;
-    physics_object  *   cube_po0;
-    physics_object  *   cube_po1;
-    physics_object  *   centered_cube;
-    physics_object  *   far_po;
-    physics_object  *   near_po;
-    physics_object  *   nearer_po;
-    physics_object  *   touching_po;
-    physics_object  *   hit_except_x_po;
-    physics_object  *   orientated_po;
-    physics_object  *   orientated_po_type;
-    physics_object  *   moving_po;
-    physics_object  *   moving_po_type;
+    const point_t                   point_outside;
+    raptor_raytracer::material  *   mat;
+    vertex_group                *   vg0;
+    vertex_group                *   vg1;
+    vertex_group                *   vg2;
+    vertex_group                *   vg3;
+    vertex_group                *   vg4;
+    vertex_group                *   vg5;
+    vertex_group                *   vg6;
+    vertex_group                *   vg7;
+    physics_object              *   plane_po;
+    physics_object              *   cube_po0;
+    physics_object              *   cube_po1;
+    physics_object              *   centered_cube;
+    physics_object              *   far_po;
+    physics_object              *   near_po;
+    physics_object              *   nearer_po;
+    physics_object              *   touching_po;
+    physics_object              *   hit_except_x_po;
+    physics_object              *   orientated_po;
+    physics_object              *   orientated_po_type;
+    physics_object              *   moving_po;
+    physics_object              *   moving_po_type;
 };
 
 
@@ -398,7 +398,7 @@ BOOST_AUTO_TEST_CASE( infinite_mass_begin_time_step_test )
     BOOST_CHECK(plane_po->get_registered_force(0) == cf);
 
     /* Time step and check */
-    plane_po->begin_time_step();
+    plane_po->begin_time_step(1.0);
     BOOST_CHECK(plane_po->get_force() == point_t(0.5, -7.2, 5.5));
     BOOST_CHECK(plane_po->get_torque() == point_t(5.5, 0.0, -0.5));
 
@@ -420,7 +420,7 @@ BOOST_AUTO_TEST_CASE( half_step_begin_time_step_test )
     BOOST_CHECK(cube_po0->get_registered_force(0) == lf);
 
     /* Time step and check */
-    cube_po0->begin_time_step();
+    cube_po0->begin_time_step(0.5);
     BOOST_CHECK(cube_po0->get_force() == point_t(5.5, 0.0, -0.5));
     BOOST_CHECK(cube_po0->get_torque() == point_t(-0.5, 0.0, -5.5));
     
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE( expended_forces_begin_time_step_test )
     BOOST_CHECK(cube_po0->get_registered_force(0) == lf);
 
     /* Time step and check */
-    cube_po0->begin_time_step();
+    cube_po0->begin_time_step(0.5);
     BOOST_CHECK(cube_po0->get_force() == point_t(5.5, 0.0, -0.5));
     BOOST_CHECK(cube_po0->get_torque() == point_t(-0.5, 0.0, -5.5));
     
@@ -456,7 +456,7 @@ BOOST_AUTO_TEST_CASE( expended_forces_begin_time_step_test )
     BOOST_CHECK(cube_po0->get_registered_force(0) == lf);
 
     /* Time step and check */
-    cube_po0->begin_time_step();
+    cube_po0->begin_time_step(0.5);
     BOOST_CHECK(cube_po0->get_force() == point_t(5.75, -3.6, 2.25));
     BOOST_CHECK(cube_po0->get_torque() == point_t(2.25, 0.0, -5.75));
     
@@ -465,7 +465,7 @@ BOOST_AUTO_TEST_CASE( expended_forces_begin_time_step_test )
     BOOST_CHECK(cube_po0->number_of_registered_forces() == 0);
 
     /* Time step and check */
-    cube_po0->begin_time_step();
+    cube_po0->begin_time_step(1.0);
     BOOST_CHECK(cube_po0->get_force() == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(cube_po0->get_torque() == point_t(0.0, 0.0, 0.0));
     
@@ -496,7 +496,7 @@ BOOST_AUTO_TEST_CASE( staggered_forces_begin_time_step_test )
     BOOST_CHECK(cube_po0->get_registered_force(3) == cf3);
 
     /* Time step and check */
-    cube_po0->begin_time_step();
+    cube_po0->begin_time_step(1.0);
     BOOST_CHECK(cube_po0->get_force() == point_t(4.5, -32.8, 26.0));
     BOOST_CHECK(cube_po0->get_torque() == point_t(0.0, 0.0, 0.0));
     
@@ -505,7 +505,7 @@ BOOST_AUTO_TEST_CASE( staggered_forces_begin_time_step_test )
     BOOST_CHECK(cube_po0->number_of_registered_forces() == 3);
 
     /* Time step and check */
-    cube_po0->begin_time_step();
+    cube_po0->begin_time_step(1.0);
     BOOST_CHECK(fabs(magnitude(cube_po0->get_force() - point_t(4.0, -25.6, 20.5))) < result_tolerance);
     BOOST_CHECK(cube_po0->get_torque() == point_t(0.0, 0.0, 0.0));
     
@@ -514,7 +514,7 @@ BOOST_AUTO_TEST_CASE( staggered_forces_begin_time_step_test )
     BOOST_CHECK(cube_po0->number_of_registered_forces() == 1);
 
     /* Time step and check */
-    cube_po0->begin_time_step();
+    cube_po0->begin_time_step(1.0);
     BOOST_CHECK(cube_po0->get_force() == point_t(2.5, -9.2, 7.5));
     BOOST_CHECK(cube_po0->get_torque() == point_t(0.0, 0.0, 0.0));
     
@@ -544,7 +544,7 @@ BOOST_FIXTURE_TEST_CASE( setter_test, physics_object_fixture )
 /* Test apply force */
 BOOST_FIXTURE_TEST_CASE( apply_force_whole_frame_at_com_test, physics_object_fixture )
 {
-    const fp_t t0 = 1.2;
+    const float t0 = 1.2;
     const point_t f0(1.0, 2.5, 3.9);
     const point_t at0(0.0, 0.0, 0.0);
     plane_po->apply_force(at0, f0, t0);
@@ -552,7 +552,7 @@ BOOST_FIXTURE_TEST_CASE( apply_force_whole_frame_at_com_test, physics_object_fix
     BOOST_CHECK(plane_po->get_force() == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(plane_po->get_torque() == point_t(0.0, 0.0, 0.0));
 
-    const fp_t t1 = 1.2;
+    const float t1 = 1.2;
     const point_t f1(0.0, 1.5, 2.9);
     const point_t at1(0.0, 0.0, 0.0);
     cube_po0->apply_force(at1, f1, t1);
@@ -564,7 +564,7 @@ BOOST_FIXTURE_TEST_CASE( apply_force_whole_frame_at_com_test, physics_object_fix
 
 BOOST_FIXTURE_TEST_CASE( apply_force_whole_frame_off_com_test, physics_object_fixture )
 {
-    const fp_t t0 = 1.2;
+    const float t0 = 1.2;
     const point_t f0(1.0, 12.5, -3.9);
     const point_t at0(0.0, 0.1, 10.0);
     plane_po->apply_force(at0, f0, t0);
@@ -572,7 +572,7 @@ BOOST_FIXTURE_TEST_CASE( apply_force_whole_frame_off_com_test, physics_object_fi
     BOOST_CHECK(fabs(magnitude(plane_po->get_force() - point_t(0.0, 0.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(plane_po->get_torque() - point_t(0.0, 0.0, 0.0))) < result_tolerance);
 
-    const fp_t t1 = 1.2;
+    const float t1 = 1.2;
     const point_t f1(0.1, 0.0, -0.1);
     const point_t at1(0.5, -1.3, 0.9);
     cube_po0->apply_force(at1, f1, t1);
@@ -619,7 +619,7 @@ BOOST_FIXTURE_TEST_CASE( apply_impulse_with_pre_computes_test, physics_object_fi
 {
     const point_t n0(0.0, 1.0, 0.0);
     const point_t aw0(0.3905667329, -0.1301889110, 0.9113223769);
-    const fp_t i0 = 1.0;
+    const float i0 = 1.0;
     plane_po->apply_impulse(n0, aw0, i0);
     BOOST_CHECK(plane_po->get_velocity() == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(fabs(magnitude(plane_po->get_angular_velocity() - point_t(0.3905667329, -0.1301889110, 0.9113223769))) < result_tolerance);
@@ -628,7 +628,7 @@ BOOST_FIXTURE_TEST_CASE( apply_impulse_with_pre_computes_test, physics_object_fi
 
     const point_t n1(0.7071067812, 0.0, 0.7071067812);
     const point_t aw1(0.0, -0.7071067812, -0.7071067812);
-    const fp_t i1 = 12.7;
+    const float i1 = 12.7;
     cube_po0->set_velocity(point_t(1.9, 0.0, 0.0));
     cube_po0->set_angular_velocity(point_t(0.0, 0.0, -2.0));
     cube_po0->apply_impulse(n1, aw1, i1);
@@ -639,7 +639,7 @@ BOOST_FIXTURE_TEST_CASE( apply_impulse_with_pre_computes_test, physics_object_fi
       
     const point_t n2(0.1301889110, 0.3905667329, 0.9113223769);
     const point_t aw2(0.0, 0.0, 1.0);
-    const fp_t i2 = 4.9;
+    const float i2 = 4.9;
     cube_po1->set_velocity(point_t(1.9, 0.0, -10.1));
     cube_po1->set_angular_velocity(point_t(-4.3, 17.9, 11.0));
     cube_po1->apply_impulse(n2, aw2, i2);
@@ -654,7 +654,7 @@ BOOST_FIXTURE_TEST_CASE( apply_impulse_with_pre_computes_test, physics_object_fi
 BOOST_FIXTURE_TEST_CASE( build_triangles_test, physics_object_fixture )
 {
     /* Test plane */
-    primitive_list p0;
+    raptor_raytracer::primitive_list p0;
     plane_po->triangles(&p0);
     BOOST_CHECK(p0.size() == 2);
 
@@ -672,7 +672,7 @@ BOOST_FIXTURE_TEST_CASE( build_triangles_test, physics_object_fixture )
     }
 
     /* Test cube */
-    primitive_list p1;
+    raptor_raytracer::primitive_list p1;
     cube_po0->triangles(&p1);
     BOOST_CHECK(p1.size() == 12);
 
@@ -735,11 +735,12 @@ BOOST_FIXTURE_TEST_CASE( build_triangles_test, physics_object_fixture )
 BOOST_FIXTURE_TEST_CASE( commit_movement_no_applied_force_test, physics_object_fixture )
 {
     /* Test plane */
-    const fp_t t0 = 0.2;
+    const float t0 = 0.2;
     const point_t v0(10.2, 4.5, -7.2);
     const point_t w0(0.2, -3.4, -1.9);
     plane_po->set_velocity(v0);
     plane_po->set_angular_velocity(w0);
+    plane_po->begin_time_step(t0);
     plane_po->commit_movement(t0);
     
     /* Check kinematics */
@@ -751,11 +752,12 @@ BOOST_FIXTURE_TEST_CASE( commit_movement_no_applied_force_test, physics_object_f
     BOOST_CHECK(fabs(magnitude(plane_po->get_orientation()      - quaternion_t(0.924936, 0.0194935, -0.331389, -0.185188))) < result_tolerance);
 
     /* Test cube */
-    const fp_t t1 = 1.3;
+    const float t1 = 1.3;
     const point_t v1(-1.7, 2.3, 1.1);
     const point_t w1(10.7, -20.6, 4.8);
     cube_po0->set_velocity(v1);
     cube_po0->set_angular_velocity(w1);
+    cube_po0->begin_time_step(t1);
     cube_po0->commit_movement(t1);
     
     /* Check kinematics */
@@ -771,13 +773,14 @@ BOOST_FIXTURE_TEST_CASE( commit_movement_no_applied_force_test, physics_object_f
 BOOST_FIXTURE_TEST_CASE( commit_movement_test, physics_object_fixture )
 {
     /* Test plane */
-    const fp_t t0 = 0.2;
+    const float t0 = 0.2;
     const point_t v0(10.2, 4.5, -7.2);
     const point_t w0(0.2, -3.4, -1.9);
     mock_force *const mf0 = new mock_force(point_t(-1.8, 8.7, 3.5), point_t(-7.5, 1.4, 4.6), t0);
     plane_po->register_force(mf0);
     plane_po->set_velocity(v0);
     plane_po->set_angular_velocity(w0);
+    plane_po->begin_time_step(t0);
     plane_po->commit_movement(t0);
     
     /* Check kinematics */
@@ -789,13 +792,14 @@ BOOST_FIXTURE_TEST_CASE( commit_movement_test, physics_object_fixture )
     BOOST_CHECK(fabs(magnitude(plane_po->get_orientation()      - quaternion_t(0.924936, 0.0194935, -0.331389, -0.185188))) < result_tolerance);
 
     /* Test cube */
-    const fp_t t1 = 1.3;
+    const float t1 = 1.3;
     const point_t v1(-1.7, 2.3, 1.1);
     const point_t w1(10.7, -20.6, 4.8);
     mock_force *const mf1 = new mock_force(point_t(-1.8, 8.7, 3.5), point_t(-7.5, 1.4, 4.6), t1);
     cube_po0->register_force(mf1);
     cube_po0->set_velocity(v1);
     cube_po0->set_angular_velocity(w1);
+    cube_po0->begin_time_step(t1);
     cube_po0->commit_movement(t1);
     
     /* Check kinematics */
@@ -812,13 +816,15 @@ BOOST_FIXTURE_TEST_CASE( commit_movement_test, physics_object_fixture )
 
 BOOST_FIXTURE_TEST_CASE( commit_movement_two_steps_test, physics_object_fixture )
 {
-    const fp_t t0 = 0.5;
+    const float t0 = 0.5;
+    const float t1 = 1.3;
     const point_t v(-1.7, 2.3, 1.1);
     const point_t w(10.7, -20.6, 4.8);
     mock_force *const mf = new mock_force(point_t(-1.8, 8.7, 3.5), point_t(-7.5, 1.4, 4.6), 1.8);
     cube_po0->register_force(mf);
     cube_po0->set_velocity(v);
     cube_po0->set_angular_velocity(w);
+    cube_po0->begin_time_step(t1);
     cube_po0->commit_movement(t0);
     
     /* Check kinematics */
@@ -832,7 +838,6 @@ BOOST_FIXTURE_TEST_CASE( commit_movement_two_steps_test, physics_object_fixture 
     BOOST_CHECK(fabs(magnitude(cube_po0->get_orientation()      - quaternion_t(0.502279, -0.39563, 0.748378, -0.176415))) < result_tolerance);
 
     /* Step again */
-    const fp_t t1 = 1.3;
     cube_po0->commit_movement(t1);
     
     /* Check kinematics */
@@ -849,13 +854,14 @@ BOOST_FIXTURE_TEST_CASE( commit_movement_two_steps_test, physics_object_fixture 
 
 BOOST_FIXTURE_TEST_CASE( commit_movement_two_steps_not_backwards_test, physics_object_fixture )
 {
-    const fp_t t0 = 1.3;
+    const float t0 = 1.3;
     const point_t v(-1.7, 2.3, 1.1);
     const point_t w(10.7, -20.6, 4.8);
     mock_force *const mf = new mock_force(point_t(-1.8, 8.7, 3.5), point_t(-7.5, 1.4, 4.6), 1.8);
     cube_po0->register_force(mf);
     cube_po0->set_velocity(v);
     cube_po0->set_angular_velocity(w);
+    cube_po0->begin_time_step(t0);
     cube_po0->commit_movement(t0);
     
     /* Check kinematics */
@@ -869,7 +875,7 @@ BOOST_FIXTURE_TEST_CASE( commit_movement_two_steps_not_backwards_test, physics_o
     BOOST_CHECK(fabs(magnitude(cube_po0->get_orientation()      - quaternion_t(0.967707, -0.11614, 0.218197, -0.0494436))) < result_tolerance);
 
     /* Step again */
-    const fp_t t1 = 0.5;
+    const float t1 = 0.5;
     cube_po0->commit_movement(t1);
     
     /* Check kinematics */
@@ -886,7 +892,7 @@ BOOST_FIXTURE_TEST_CASE( commit_movement_two_steps_not_backwards_test, physics_o
 
 BOOST_FIXTURE_TEST_CASE( commit_movement_two_steps_with_reset_test, physics_object_fixture )
 {
-    const fp_t t0 = 0.5;
+    const float t0 = 0.5;
     const point_t f(-1.8, 8.7, 3.5);
     const point_t a(-7.5, 1.4, 4.6);
     const point_t v(-1.7, 2.3, 1.1);
@@ -895,6 +901,7 @@ BOOST_FIXTURE_TEST_CASE( commit_movement_two_steps_with_reset_test, physics_obje
     cube_po0->register_force(mf);
     cube_po0->set_velocity(v);
     cube_po0->set_angular_velocity(w);
+    cube_po0->begin_time_step(t0);
     cube_po0->commit_movement(t0);
     
     /* Check kinematics */
@@ -908,10 +915,10 @@ BOOST_FIXTURE_TEST_CASE( commit_movement_two_steps_with_reset_test, physics_obje
     BOOST_CHECK(fabs(magnitude(cube_po0->get_orientation()      - quaternion_t(0.502279, -0.39563, 0.748378, -0.176415))) < result_tolerance);
 
     /* Reset, reapply forces and step again */
-    const fp_t t1 = 0.8;
-    cube_po0->begin_time_step();
+    const float t1 = 0.8;
     mf->set_force(f);
     mf->set_torque(a);
+    cube_po0->begin_time_step(t1);
     cube_po0->commit_movement(t1);
     
     /* Check kinematics */
@@ -932,8 +939,8 @@ BOOST_FIXTURE_TEST_CASE( self_collision_has_collided_test, physics_object_fixtur
     point_t d;
     simplex *manifold_a;
     simplex *manifold_b;
-    const fp_t t0 = 0.0;
-    const fp_t t1 = 1.0;
+    const float t0 = 0.0;
+    const float t1 = 1.0;
 
     /* Check not colliding */
     BOOST_CHECK(!cube_po0->has_collided(cube_po0, &manifold_a, &manifold_b, &d, t0, t1));
@@ -948,8 +955,8 @@ BOOST_FIXTURE_TEST_CASE( no_movement_has_collided_test, physics_object_fixture )
     point_t d;
     simplex *manifold_a;
     simplex *manifold_b;
-    const fp_t t0 = 0.0;
-    const fp_t t1 = 1.0;
+    const float t0 = 0.0;
+    const float t1 = 1.0;
 
     /* Check not colliding */
     BOOST_CHECK(!cube_po0->has_collided(far_po, &manifold_a, &manifold_b, &d, t0, t1));
@@ -970,8 +977,8 @@ BOOST_FIXTURE_TEST_CASE( one_translating_has_collided_test, physics_object_fixtu
     point_t d;
     simplex *manifold_a;
     simplex *manifold_b;
-    const fp_t t0 = 0.0;
-    const fp_t t1 = 1.0;
+    const float t0 = 0.0;
+    const float t1 = 1.0;
 
     /* Starting apart and heading away */
     mock_force *const mf = new mock_force(point_t(5.0, 1.0, -2.0), point_t(0.0, 0.0, 0.0), 1.0);
@@ -1013,8 +1020,8 @@ BOOST_FIXTURE_TEST_CASE( two_translating_has_collided_test, physics_object_fixtu
     point_t d;
     simplex *manifold_a;
     simplex *manifold_b;
-    const fp_t t0 = 0.5;
-    const fp_t t1 = 1.5;
+    const float t0 = 0.5;
+    const float t1 = 1.5;
 
     /* Starting apart and heading away */
     mock_force *const mf0 = new mock_force(point_t( 5.0,  1.0, -2.0), point_t(0.0, 0.0, 0.0), 1.0);
@@ -1064,7 +1071,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_has_collided_test, physics_object_fixtu
 /* Test resolve collision */
 BOOST_FIXTURE_TEST_CASE( self_collision_exact_resolve_collisions_test, physics_object_fixture )
 {
-    fp_t t = 10.0;
+    float t = 10.0;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1078,7 +1085,7 @@ BOOST_FIXTURE_TEST_CASE( self_collision_exact_resolve_collisions_test, physics_o
 
 BOOST_FIXTURE_TEST_CASE( self_collision_conservative_resolve_collisions_test, physics_object_fixture )
 {
-    fp_t t = 10.0;
+    float t = 10.0;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1101,7 +1108,7 @@ BOOST_FIXTURE_TEST_CASE( self_collision_conservative_resolve_collisions_test, ph
 
 BOOST_FIXTURE_TEST_CASE( no_movement_resolve_collisions_no_collision_test, physics_object_fixture )
 {
-    fp_t t = 10.0;
+    float t = 10.0;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1115,7 +1122,7 @@ BOOST_FIXTURE_TEST_CASE( no_movement_resolve_collisions_no_collision_test, physi
 
 BOOST_FIXTURE_TEST_CASE( no_movement_resolve_collisions_sliding_collision_test, physics_object_fixture )
 {
-    fp_t t = 10.0;
+    float t = 10.0;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1129,7 +1136,7 @@ BOOST_FIXTURE_TEST_CASE( no_movement_resolve_collisions_sliding_collision_test, 
 
 BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_no_collision_test, physics_object_fixture )
 {
-    fp_t t = 0.02;
+    float t = 0.02;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1163,7 +1170,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_no_collision_test, p
 
 BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_sliding_collision_test, physics_object_fixture )
 {
-    fp_t t = 0.02;
+    float t = 0.02;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1215,7 +1222,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_sliding_collision_te
 
 BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_collision_test, physics_object_fixture )
 {
-    fp_t t = 1.0;
+    float t = 1.0;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1230,7 +1237,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_collision_test, phys
 
 BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_no_collision_test, physics_object_fixture )
 {
-    fp_t t = 0.02;
+    float t = 0.02;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1273,7 +1280,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_no_collision_test, p
 
 BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_sliding_collision_test, physics_object_fixture )
 {
-    fp_t t = 0.02;
+    float t = 0.02;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1337,7 +1344,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_sliding_collision_te
 
 BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_collision_test, physics_object_fixture )
 {
-    fp_t t = 1.0;
+    float t = 1.0;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1357,7 +1364,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_collision_test, phys
 
 BOOST_FIXTURE_TEST_CASE( translating_solver_resolve_collisions_test, physics_object_fixture )
 {
-    fp_t t = 5.0;
+    float t = 5.0;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1401,7 +1408,7 @@ BOOST_FIXTURE_TEST_CASE( translating_solver_resolve_collisions_test, physics_obj
 
 BOOST_FIXTURE_TEST_CASE( one_rotating_resolve_collisions_test, physics_object_fixture )
 {
-    fp_t t = 0.02;
+    float t = 0.02;
     simplex *manifold_a;
     simplex *manifold_b;
 
@@ -1457,7 +1464,7 @@ BOOST_FIXTURE_TEST_CASE( one_rotating_resolve_collisions_test, physics_object_fi
 
 
 // /* Check for collisions and separate objects as needed */
-// collision_t resolve_collisions(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, fp_t *const t)
+// collision_t resolve_collisions(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, float *const t)
 // {
 //     /* If no rotation use exact */
 //     if ((fabs(magnitude(    _w)) < raptor_physics::EPSILON) && (fabs(magnitude(    _tor)) < raptor_physics::EPSILON) &&

@@ -18,8 +18,8 @@
 
 namespace raptor_raytracer
 {
-vector<triangle *>   * bih_node::o      = nullptr;
-bih_node             * bih_node::bih    = nullptr;
+std::vector<triangle *>   * bih_node::o     = nullptr;
+std::vector<bih_node>   *   bih_node::bih   = nullptr;
 
 
 /* Globals for drawing the KD-tree */
@@ -469,7 +469,7 @@ void ray_trace_engine::bih_frustrum_find_nearest_object(const packet_ray *const 
     exit_point->t_min   = 0.0;
 
     bih_stack_element  entry_point;
-    entry_point.n      = this->bih_base;
+    entry_point.n      = &this->bih_base[0];
     entry_point.t_max  = MAX_DIST;
     entry_point.t_min  = 0.0;
     
@@ -671,7 +671,7 @@ void ray_trace_engine::bih_frustrum_found_nearer_object(const packet_ray *const 
     exit_point->t_min   = 0.0;
 
     bih_stack_element  entry_point;
-    entry_point.n      = this->bih_base;
+    entry_point.n      = &this->bih_base[0];
     entry_point.t_max  = max_d;
     entry_point.t_min  = 0.0;
     
@@ -1057,7 +1057,7 @@ void ray_trace_engine::bih_find_nearest_object(const packet_ray *const r, const 
     bih_stack_element *exit_point = &(this->bih_stack[0]);
 
     bih_stack_element   entry_point;
-    entry_point.n       = this->bih_base;
+    entry_point.n       = &this->bih_base[0];
     entry_point.vt_max  = vfp_t(MAX_DIST);
     entry_point.vt_min  = vfp_t(0.0);
     
@@ -1209,7 +1209,7 @@ vfp_t ray_trace_engine::bih_found_nearer_object(const packet_ray *const r, const
     bih_stack_element *exit_point = &(this->bih_stack[0]);
 
     bih_stack_element   entry_point;
-    entry_point.n       = this->bih_base;
+    entry_point.n       = &this->bih_base[0];
     entry_point.vt_max  = t;
     entry_point.vt_min  = vfp_zero;
     
@@ -1473,7 +1473,7 @@ triangle* ray_trace_engine::bih_find_nearest_object(const ray *const r, hit_desc
     exit_point->t_min   = 0.0;
 
     bih_stack_element   entry_point;
-    entry_point.n       = this->bih_base;
+    entry_point.n       = &this->bih_base[0];
     entry_point.t_max   = MAX_DIST;
     entry_point.t_min   = 0.0;
 
@@ -1600,7 +1600,7 @@ bool ray_trace_engine::bih_found_nearer_object(const ray *const r, const fp_t t)
     exit_point->t_min   = 0.0;
 
     bih_stack_element   entry_point;
-    entry_point.n       = this->bih_base;
+    entry_point.n       = &this->bih_base[0];
     entry_point.t_max   = t;
     entry_point.t_min   = 0.0;
 
@@ -3578,7 +3578,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 #endif
 
     kdt_node kdt_base;
-    bih_node *bih_base = nullptr;
+    std::vector<bih_node> bih_base;
 #ifndef SPATIAL_SUBDIVISION_BIH
     /* Build a KD-tree to speed up ray tracing */    
     /* The base of the tree will hold everything for now, but adding it will 
@@ -3588,8 +3588,8 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
     
     /* Grab an array to hold the BIH */
     /* Maximum theoretical size is everything.size() * 6, but this is very unlikely */
-    bih_base = new bih_node [everything.size() * 3];
-    const vector<triangle *> *bih_prim = build_bih(&everything, bih_base);
+    bih_base.resize(everything.size() * 3);
+    const vector<triangle *> *bih_prim = build_bih(&everything, &bih_base);
 #endif /* #ifndef SPATIAL_SUBDIVISION_BIH */
 
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
@@ -3659,7 +3659,6 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
 
 #ifdef SPATIAL_SUBDIVISION_BIH
     /* Clean up */
-    delete [] bih_base;
     delete    bih_prim;
 #endif /* #ifdef SPATIAL_SUBDIVISION_BIH */
 }

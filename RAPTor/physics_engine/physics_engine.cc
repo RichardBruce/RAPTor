@@ -11,7 +11,7 @@
 
 namespace raptor_physics
 {
-physics_engine& physics_engine::advance_time(const fp_t t)
+physics_engine& physics_engine::advance_time(const float t)
 {
     METHOD_LOG;
 
@@ -19,17 +19,17 @@ physics_engine& physics_engine::advance_time(const fp_t t)
     assert(t >= 0.0);
     
     /* Simulate multiple smaller time steps */
-    fp_t t_now = 0.0;
+    float t_now = 0.0;
     int frm_seg_cnt = 0;
     while (t_now < t)
     {
         /* Calculate the time step that means the max displacement cant be exceeded */
-        fp_t max_v = 0.0;
+        float max_v = 0.0;
         for (auto &p : (*_moving_objects))
         {
             max_v = std::max(max_v, p.second->get_speed());
         }    
-        fp_t t_step = std::min(_max_d / max_v, t - t_now);
+        float t_step = std::min(_max_d / max_v, t - t_now);
         BOOST_LOG_TRIVIAL(info) << "New frame segment, step size: " << t_step;
     
 
@@ -109,7 +109,7 @@ physics_engine& physics_engine::advance_time(const fp_t t)
 
         /* Full collision detection */
         BOOST_LOG_TRIVIAL(info) << "Beginning full collision detection";
-        for (auto p0 = _moving_objects->begin(); p0 != _moving_objects->end(); ++p0)
+        for (auto p0 = _objects->begin(); p0 != _objects->end(); ++p0)
         {
             collision_detect_versus(p0, t_step, false);
         }
@@ -139,7 +139,7 @@ physics_engine& physics_engine::advance_time(const fp_t t)
             }
 
             /* Check for iteration complete */
-            const fp_t c_time = fc->second->get_first_collision_time();
+            const float c_time = fc->second->get_first_collision_time();
             BOOST_LOG_TRIVIAL(info) << "Iteration time moved to: " << c_time;
             assert((c_time <= t_step) || !"Error: Stepped out the end of the times slot");
             if (fc->second->get_first_collision_type() == SLIDING_COLLISION)
@@ -231,11 +231,11 @@ physics_engine& physics_engine::advance_time(const fp_t t)
 }
 
 
-bool physics_engine::collide_and_cache(physics_object *const vg_a, physics_object *const vg_b, const fp_t t)
+bool physics_engine::collide_and_cache(physics_object *const vg_a, physics_object *const vg_b, const float t)
 {
     simplex *simplex_a;
     simplex *simplex_b;
-    fp_t toc = t;
+    float toc = t;
     collision_t collision_type = vg_a->resolve_collisions(vg_b, &simplex_a, &simplex_b, &toc);
     if (collision_type != NO_COLLISION)
     {
@@ -254,11 +254,11 @@ bool physics_engine::collide_and_cache(physics_object *const vg_a, physics_objec
 }
 
 
-bool physics_engine::retest_and_cache(physics_object *const vg_a, physics_object *const vg_b, const fp_t t)
+bool physics_engine::retest_and_cache(physics_object *const vg_a, physics_object *const vg_b, const float t)
 {
     simplex *simplex_a;
     simplex *simplex_b;
-    fp_t toc = t;
+    float toc = t;
     collision_t collision_type = vg_a->resolve_collisions(vg_b, &simplex_a, &simplex_b, &toc);
     if (collision_type != NO_COLLISION)
     {
@@ -294,7 +294,7 @@ bool physics_engine::retest_and_cache(physics_object *const vg_a, physics_object
 }
 
 
-physics_engine& physics_engine::collision_detect_versus(const const_obj_iter &v, const fp_t t, const bool all)
+physics_engine& physics_engine::collision_detect_versus(const const_obj_iter &v, const float t, const bool all)
 {
     for (auto p = all ? _objects->begin() : v; p != _objects->end(); ++p)
     {

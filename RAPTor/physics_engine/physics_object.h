@@ -49,13 +49,13 @@ class physics_object : private boost::noncopyable
         typedef vertex_group inner_vg;
 
         /* Ownership isnt taken of vg */
-        physics_object(vertex_group *const vg, const point_t &com, const fp_t density, const unsigned int t = 0)
+        physics_object(vertex_group *const vg, const point_t &com, const float density, const unsigned int t = 0)
             : physics_object(vg, quaternion_t(1.0, 0.0, 0.0, 0.0), com, density, t) {  };
               
-        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t &com, const fp_t density, const unsigned int t = 0)
+        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t &com, const float density, const unsigned int t = 0)
             : physics_object(vg, o, com, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), density, t) {  };
 
-        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t &com, const point_t &v, const point_t &w, const fp_t density, const unsigned int t = 0)
+        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t &com, const point_t &v, const point_t &w, const float density, const unsigned int t = 0)
             : _vg(vg),
               _forces(new std::vector<force *>()),
               _agg_force(*_forces),
@@ -112,7 +112,7 @@ class physics_object : private boost::noncopyable
         }
         
         /* Start a new time step, reset time and apply the forces */
-        physics_object& begin_time_step(const fp_t t_step)
+        physics_object& begin_time_step(const float t_step)
         {
             /* Set the step times */
             _cur_t  = 0.0;
@@ -128,10 +128,10 @@ class physics_object : private boost::noncopyable
         /* Note -- Technically the force should stop after f.t */
         /*         This is appoximated by weighting the force in proportion to the period it is applied */
         /* TODO - Is it worth checking that the force is applied on the object not in free space? */
-        physics_object& apply_force(const point_t &at, const point_t &f, const fp_t t)
+        physics_object& apply_force(const point_t &at, const point_t &f, const float t)
         {
             /* No point pushing an infinite mass object */
-            if (get_mass() == numeric_limits<fp_t>::infinity())
+            if (get_mass() == numeric_limits<float>::infinity())
             {
                 return *this;
             }
@@ -151,7 +151,7 @@ class physics_object : private boost::noncopyable
             return *this;
         }
 
-        physics_object& apply_impulse(const point_t &n, const point_t &angular_weight, const fp_t impulse)
+        physics_object& apply_impulse(const point_t &n, const point_t &angular_weight, const float impulse)
         {
             _v += (n * (impulse / _i->mass()));
             _w += (angular_weight * impulse);
@@ -159,10 +159,10 @@ class physics_object : private boost::noncopyable
         }
         
         /* Collision detection */
-        bool has_collided(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, point_t *const d, const fp_t t0, const fp_t t1);
+        bool has_collided(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, point_t *const d, const float t0, const float t1);
         
         /* Check for collisions and separate objects as needed */
-        collision_t resolve_collisions(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, fp_t *const t)
+        collision_t resolve_collisions(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const t)
         {
             /* If no rotation use exact */
             if ((fabs(magnitude(    _w)) < raptor_physics::EPSILON) && (fabs(magnitude(    get_torque())) < raptor_physics::EPSILON) &&
@@ -177,14 +177,14 @@ class physics_object : private boost::noncopyable
             }
         }
         
-        physics_object& commit_movement(const fp_t t)
+        physics_object& commit_movement(const float t)
         {
             /* Update time */
             if (t < _cur_t)
             {
                 return *this;
             }
-            const fp_t dt = t - _cur_t;
+            const float dt = t - _cur_t;
             _cur_t = t;
 
             /* Rotate */
@@ -228,8 +228,8 @@ class physics_object : private boost::noncopyable
         unsigned int                get_physical_type()     const { return _type;                                                       }
         const point_t               get_force()             const { return _agg_force.get_force(*_i, get_center_of_mass(), _v, 0.0);    }
         const point_t               get_torque()            const { return _agg_force.get_torque(*_i, get_center_of_mass(), _w, 0.0);   }
-        const fp_t                  get_speed()             const { return magnitude(_v);                                               }
-        const fp_t                  get_mass()              const { return _i->mass();                                                  }
+        const float                 get_speed()             const { return magnitude(_v);                                               }
+        const float                 get_mass()              const { return _i->mass();                                                  }
         const point_t&              get_center_of_mass()    const { return _i->center_of_mass();                                        }
         const quaternion_t&         get_orientation()       const { return _o;                                                          }
         const inertia_tensor&       get_inertia_tenor()     const { return *_i;                                                         }
@@ -249,13 +249,13 @@ class physics_object : private boost::noncopyable
         const point_t get_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
-            return (_i->mass() == numeric_limits<fp_t>::infinity()) ? 0.0 : ( _i->mass() * _v);
+            return (_i->mass() == numeric_limits<float>::infinity()) ? 0.0 : ( _i->mass() * _v);
         }
 
         const point_t get_angular_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
-            return (_i->mass() == numeric_limits<fp_t>::infinity()) ? point_t(0.0, 0.0, 0.0) : (get_orientated_tensor() * _w);
+            return (_i->mass() == numeric_limits<float>::infinity()) ? point_t(0.0, 0.0, 0.0) : (get_orientated_tensor() * _w);
         }
 
         /* Vertex getters */
@@ -343,7 +343,7 @@ class physics_object : private boost::noncopyable
         }
 
         /* Update of bounding box */
-        physics_object& update_bounds(const fp_t dt)
+        physics_object& update_bounds(const float dt)
         {
             /* Get the bounds of the stationary object */
             point_t hi;
@@ -367,21 +367,21 @@ class physics_object : private boost::noncopyable
         }
         
         /* Find the projection of the largest rotational movement in the direction n */
-        fp_t project_maximum_rotation_onto(const point_t &n, const point_t &p, const fp_t t) const;
+        float project_maximum_rotation_onto(const point_t &n, const point_t &p, const float t) const;
 
         /* Calculate the longest possible movement, assuming worst case rotation */
         /* of the vertices in the direction n and of v's vertices in the direction of -n */
-        fp_t project_maximum_movement_onto(const physics_object &v, const point_t &p_a, const point_t &p_b, const point_t &n, const fp_t t) const;
+        float project_maximum_movement_onto(const physics_object &v, const point_t &p_a, const point_t &p_b, const point_t &n, const float t) const;
 
         /* Check for collisions when the exact object movement can be calculated */
-        collision_t exactly_resolve_collisions(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, fp_t *const t);
+        collision_t exactly_resolve_collisions(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, float *const t);
 
         /* Check for collisions and conservatively separate objects as needed */
         /* Objects should be moved and retested before accepting a collision */
-        collision_t conservatively_resolve_collisions(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, fp_t *const t);
+        collision_t conservatively_resolve_collisions(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, float *const t);
 
         /* Specialise algorithm for calculating toc when two objects are very close */
-        collision_t close_contact_collision_detection(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, fp_t *const t, const point_t &noc) const;
+        collision_t close_contact_collision_detection(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, float *const t, const point_t &noc) const;
         
 
         std::shared_ptr<vertex_group>   _vg;
@@ -393,8 +393,8 @@ class physics_object : private boost::noncopyable
         point_t                         _w;                 /* Angular velocity                                             */
         point_t                         _v;                 /* Velocity                                                     */
         quaternion_t                    _o;                 /* Orientation                                                  */
-        fp_t                            _cur_t;             /* The committed time                                           */
-        fp_t                            _t_step;            /* The time we are simulating to                                */
+        float                           _cur_t;             /* The committed time                                           */
+        float                           _t_step;            /* The time we are simulating to                                */
         const unsigned int              _type;              /* The type of the material to associate it with a collider     */
 };
 }; /* namespace raptor_physics */
