@@ -1,2 +1,2 @@
-rm test_data/*/*_act.png
-rm test_data/*/*_diff.png
+rm test_data/*/*act*
+rm test_data/*/*diff*
