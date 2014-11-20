@@ -21,6 +21,7 @@ else
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
 my $date =  ($year + 1900) . "-" . ($mon + 1) . "-" . $mday;
 my $output_dir = $ARGV[1] . $project_name . "/" .  $date;
+print $output_dir;
 `mkdir -p $output_dir`;
 
 
@@ -94,7 +95,7 @@ open (LOGFILE, "<", $ARGV[0]) or die "Error: Can't find input file";
 while (<LOGFILE>)
 {
     chomp;
-    if (m/Opening\s+input\s+file:\s+.*\/(\w+\/\w+\/\w+\.\w+)/)
+    if (m/PERF - Scene:\s+.*\/(\w+\/\w+\/\w+\.\w+)/)
     {
         # Output last scene
         if ($scene ne "No Scenes Found")
@@ -111,18 +112,22 @@ while (<LOGFILE>)
         $parser_time    = "--";
         $render_time    = "--";
     }
-    elsif (m/Rendering:\s+(\d+)\s+primitives,\s+of\s+which\s+lights:\s+(\d+)/)
+    elsif (m/PERF - # Primitives:\s+(\d+)/)
     {
         # Get primitive counts
         $primitives = $1;
-        $lights     = $2;
     }
-    elsif (m/Parser\s+took:\s+(\d)+ms/)
+    elsif (m/PERF - # Lights:\s+(\d+)/)
+    {
+        # Get light counts
+        $lights     = $1;
+    }
+    elsif (m/PERF - Parser Time ms:\s+(\d+)/)
     {
         # Get parser run time
         $parser_time = $1;
     }
-    elsif (m/Test\s+took:\s+(\d+)ms/)
+    elsif (m/PERF - Render Time ms:\s+(\d+)/)
     {
         # Get rendering run time
         $render_time = $1;
