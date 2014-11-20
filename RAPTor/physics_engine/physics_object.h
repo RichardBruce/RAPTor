@@ -180,7 +180,7 @@ class physics_object : private boost::noncopyable
         physics_object& commit_movement(const float t)
         {
             /* Update time */
-            if (t < _cur_t)
+            if ((t < _cur_t) | (_i->mass() == std::numeric_limits<float>::infinity()))
             {
                 return *this;
             }
