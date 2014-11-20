@@ -37,7 +37,7 @@ struct regression_fixture : private boost::noncopyable
           : po(0.04, 0.04, -1, false, false),
             pe(new raptor_physics::rigid_body_collider(0.5, 0.75), false),
             se(&pe, &po),
-            m(new phong_shader(ext_colour_t(255.0, 255.0, 255.0), 1.0)),
+            m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), 1.0)),
             _objects(),
             _objects_idx(0)
         {  };
@@ -55,7 +55,7 @@ struct regression_fixture : private boost::noncopyable
         }
 
         /* Add objects for testing */
-        physics_object* make_plane(material *m, const point_t &bl, const point_t &br, const point_t &tl, const point_t &tr, const point_t &com, const fp_t density)
+        physics_object* make_plane(raptor_raytracer::material *m, const point_t &bl, const point_t &br, const point_t &tl, const point_t &tr, const point_t &com, const float density)
         {
             /* Check there is space */
             assert(_objects_idx < max_test_objects);
@@ -67,17 +67,17 @@ struct regression_fixture : private boost::noncopyable
 
 
         /* Routine to make cubes out of triangles */
-        physics_object* make_cube(material *m, const point_t &bl, const point_t &tr, const point_t &com, const fp_t density, const int t = 0)
+        physics_object* make_cube(raptor_raytracer::material *m, const point_t &bl, const point_t &tr, const point_t &com, const float density, const int t = 0)
         {
             return make_cube(m, bl, tr, com, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), density, t);
         }
 
-        physics_object* make_cube(material *m, const point_t &bl, const point_t &tr, const point_t &com, const point_t &v, const point_t &w, const fp_t density, const int t = 0)
+        physics_object* make_cube(raptor_raytracer::material *m, const point_t &bl, const point_t &tr, const point_t &com, const point_t &v, const point_t &w, const float density, const int t = 0)
         {
             return make_cube(m, quaternion_t(1.0, 0.0, 0.0, 0.0), bl, tr, com, v, w, density, t);
         }
 
-        physics_object* make_cube(material *m, const quaternion_t &o, const point_t &bl, const point_t &tr, const point_t &com, const point_t &v, const point_t &w, const fp_t density, const int t = 0)
+        physics_object* make_cube(raptor_raytracer::material *m, const quaternion_t &o, const point_t &bl, const point_t &tr, const point_t &com, const point_t &v, const point_t &w, const float density, const int t = 0)
         {
             /* Check there is space */
             assert(_objects_idx < max_test_objects);
@@ -90,7 +90,7 @@ struct regression_fixture : private boost::noncopyable
         raptor_physics::physics_options po;
         raptor_physics::physics_engine pe;
         raptor_physics::simulation_environment se;
-        material *m;
+        raptor_raytracer::material *m;
 
     private :
         char    _objects[alignof(physics_object) + (max_test_objects * sizeof(physics_object))];
