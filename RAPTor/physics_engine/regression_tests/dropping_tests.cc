@@ -40,16 +40,7 @@ BOOST_AUTO_TEST_CASE( no_force_drop_10_fps_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 150; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 150);
 }
 
 
@@ -78,16 +69,7 @@ BOOST_AUTO_TEST_CASE( no_force_drop_25_fps_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 300; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 300);
 }
 
 
@@ -116,16 +98,7 @@ BOOST_AUTO_TEST_CASE( no_force_drop_60_fps_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 600; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 600);
 }
 
 
@@ -159,16 +132,7 @@ BOOST_AUTO_TEST_CASE( up_force_drop_10_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 200.0, 0.0), 0.5), 2);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 250; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 250);
 }
 
 
@@ -202,16 +166,7 @@ BOOST_AUTO_TEST_CASE( up_force_drop_25_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 200.0, 0.0), 0.5), 2);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 600; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 600);
 }
 
 
@@ -245,16 +200,7 @@ BOOST_AUTO_TEST_CASE( up_force_drop_60_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 200.0, 0.0), 0.5), 2);
     
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 1200; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 1200);
 }
 
 
@@ -288,16 +234,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_10_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -200.0, 0.0), 0.5), 2);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 150; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 150);
 }
 
 
@@ -331,16 +268,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_25_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -200.0, 0.0), 0.5), 2);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 300; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 300);
 }
 
 
@@ -374,16 +302,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -200.0, 0.0), 0.5), 2);
     
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 600; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 600);
 }
 
 // BOOST_AUTO_TEST_CASE( friction_drop_25_fps_cor_0_5_test )
@@ -407,16 +326,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
-//     /* Check starting state */
-//     checker.check(pe, 0);
-
-//     /* Run some frames and check */
-//     for (int i = 1; i <= 200; ++i)
-//     {
-//         po.frames_to_run(1);
-//         BOOST_CHECK(se.run() == 0);
-//         checker.check(pe, i);
-//     }
+    // run(&checker, 200);
 // }
 
 
@@ -441,16 +351,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
-// //     /* Check starting state */
-// //     checker.check(pe, 0);
-
-// //     /* Run some frames and check */
-// //     for (int i = 1; i <= 50; ++i)
-// //     {
-// //         po.frames_to_run(1);
-// //         BOOST_CHECK(se.run() == 0);
-// //         checker.check(pe, i);
-// //     }
+    // run(&checker, 50);
 // // }
 
 
@@ -479,12 +380,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     checker.check(pe, 0);
 
 // //     /* Run some frames and check */
-// //     for (int i = 1; i <= 50; ++i)
-// //     {
-// //         po.frames_to_run(1);
-// //         BOOST_CHECK(se.run() == 0);
-// //         checker.check(pe, i);
-// //     }
+    // run(&checker, 50);
 // // }
 
 
@@ -513,12 +409,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     checker.check(pe, 0);
 
 // //     /* Run some frames and check */
-// //     for (int i = 1; i <= 50; ++i)
-// //     {
-// //         po.frames_to_run(1);
-// //         BOOST_CHECK(se.run() == 0);
-// //         checker.check(pe, i);
-// //     }
+    // run(&checker, 50);
 // // }
 
 
@@ -543,16 +434,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
-// //     /* Check starting state */
-// //     checker.check(pe, 0);
-
-// //     /* Run some frames and check */
-// //     for (int i = 1; i <= 100; ++i)
-// //     {
-// //         po.frames_to_run(1);
-// //         BOOST_CHECK(se.run() == 0);
-// //         checker.check(pe, i);
-// //     }
+    // run(&checker, 100);
 // // }
 
 
@@ -577,16 +459,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
-// //     /* Check starting state */
-// //     checker.check(pe, 0);
-
-// //     /* Run some frames and check */
-// //     for (int i = 1; i <= 100; ++i)
-// //     {
-// //         po.frames_to_run(1);
-// //         BOOST_CHECK(se.run() == 0);
-// //         checker.check(pe, i);
-// //     }
+    // run(&checker, 100);
 // // }
 
 
@@ -611,16 +484,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
-// //     /* Check starting state */
-// //     checker.check(pe, 0);
-
-// //     /* Run some frames and check */
-// //     for (int i = 1; i <= 100; ++i)
-// //     {
-// //         po.frames_to_run(1);
-// //         BOOST_CHECK(se.run() == 0);
-// //         checker.check(pe, i);
-// //     }
+    // run(&checker, 100);
 // // }
 
 
@@ -645,16 +509,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
-// //     /* Check starting state */
-// //     checker.check(pe, 0);
-
-// //     /* Run some frames and check */
-// //     for (int i = 1; i <= 200; ++i)
-// //     {
-// //         po.frames_to_run(1);
-// //         BOOST_CHECK(se.run() == 0);
-// //         checker.check(pe, i);
-// //     }
+    // run(&checker, 200);
 // // }
 
 
@@ -679,16 +534,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
-// //     /* Check starting state */
-// //     checker.check(pe, 0);
-
-// //     /* Run some frames and check */
-// //     for (int i = 1; i <= 200; ++i)
-// //     {
-// //         po.frames_to_run(1);
-// //         BOOST_CHECK(se.run() == 0);
-// //         checker.check(pe, i);
-// //     }
+    // run(&checker, 200);
 // // }
 
 
@@ -713,16 +559,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
-// //     /* Check starting state */
-// //     checker.check(pe, 0);
-
-// //     /* Run some frames and check */
-// //     for (int i = 1; i <= 200; ++i)
-// //     {
-// //         po.frames_to_run(1);
-// //         BOOST_CHECK(se.run() == 0);
-// //         checker.check(pe, i);
-// //     }
+    // run(&checker, 200);
 // // }
 
 
@@ -747,16 +584,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
-// //     /* Check starting state */
-// //     checker.check(pe, 0);
-
-// //     /* Run some frames and check */
-// //     for (int i = 1; i <= 200; ++i)
-// //     {
-// //         po.frames_to_run(1);
-// //         BOOST_CHECK(se.run() == 0);
-// //         checker.check(pe, i);
-// //     }
+    // run(&checker, 200);
 // // }
 
 BOOST_AUTO_TEST_SUITE_END()

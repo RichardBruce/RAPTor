@@ -35,7 +35,8 @@ const std::string test_data_location = "test_data/";
 
 #define CREATE_REGRESSION_CHECKER(NAME)  regression_checker NAME( \
     boost::unit_test::framework::get<boost::unit_test::test_suite>(boost::unit_test::framework::current_test_case().p_parent_id).p_name, \
-    boost::unit_test::framework::current_test_case().p_name);
+    boost::unit_test::framework::current_test_case().p_name); \
+    BOOST_LOG_TRIVIAL(fatal) << "PERF - Scene: " << boost::unit_test::framework::current_test_case().p_name;
 
 
 /* Class to hold all data erquired to check the state of an object at the end of a frame */

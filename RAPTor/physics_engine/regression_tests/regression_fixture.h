@@ -2,6 +2,7 @@
 #define __REGRESSION_FIXTURE_H__
 
 /* Standard headers */
+#include <chrono>
 #include <vector>
 
 /* Common headers */
@@ -39,6 +40,7 @@ struct regression_fixture : private boost::noncopyable
             se(&pe, &po),
             m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), 1.0)),
             _objects(),
+            _runtime(0.0),
             _objects_idx(0)
         {  };
 
@@ -52,6 +54,9 @@ struct regression_fixture : private boost::noncopyable
             }
 
             delete m;
+
+            /* Log run time */
+            BOOST_LOG_TRIVIAL(fatal) << "PERF - Physics Time us: " << _runtime;
         }
 
         /* Add objects for testing */
@@ -87,13 +92,47 @@ struct regression_fixture : private boost::noncopyable
             return reinterpret_cast<physics_object *>(&_objects[alignof(physics_object) + (_objects_idx++ * sizeof(physics_object))]);
         }
 
-        raptor_physics::physics_options po;
-        raptor_physics::physics_engine pe;
-        raptor_physics::simulation_environment se;
-        raptor_raytracer::material *m;
+        void run(regression_checker *const checker, const int total_frames, const int frames, const bool initial = true)
+        {
+            /* Check starting state */
+            if (initial)
+            {
+                checker->check(pe, 0);
+                _frames_inv = 1.0 / static_cast<float>(total_frames);
+            }
+
+            /* Run some frames and check */
+            for (int i = 1; i <= frames; ++i)
+            {
+                po.frames_to_run(1);
+
+                /* Time frame */
+                const auto t0(std::chrono::system_clock::now());
+                BOOST_CHECK(se.run() == 0);
+                const auto t1(std::chrono::system_clock::now());
+
+                /* Check */
+                checker->check(pe, i);
+
+                /* Keep running average frame time */
+                _runtime += (std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() * _frames_inv);
+            }
+        }
+
+        void run(regression_checker *const checker, const int frames, const bool initial = true)
+        {
+            run(checker, frames, frames, initial);
+        }
+
+        raptor_physics::physics_options         po;
+        raptor_physics::physics_engine          pe;
+        raptor_physics::simulation_environment  se;
+        raptor_raytracer::material *            m;
 
     private :
         char    _objects[alignof(physics_object) + (max_test_objects * sizeof(physics_object))];
+        float   _runtime;
+        float   _frames_inv;
         int     _objects_idx;
 };
 

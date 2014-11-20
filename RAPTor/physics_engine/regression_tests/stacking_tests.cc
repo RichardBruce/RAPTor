@@ -38,16 +38,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_1_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 150; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 150);
 }
 
 
@@ -75,16 +66,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_5_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 150; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 150);
 }
 
 
@@ -112,16 +94,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_5_test )
 //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
-//     /* Check starting state */
-//     checker.check(pe, 0);
-
-//     /* Run some frames and check */
-//     for (int i = 1; i <= 150; ++i)
-//     {
-//         po.frames_to_run(1);
-//         BOOST_CHECK(se.run() == 0);
-//         checker.check(pe, i);
-//     }
+    // run(&checker, 150);
 // }
 
 
@@ -149,16 +122,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_25_fps_cor_0_1_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 200; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 200);
 }
 
 
@@ -186,16 +150,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_25_fps_cor_0_5_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 200; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 200);
 }
 
 
@@ -223,16 +178,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_25_fps_cor_0_9_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 250; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 250);
 }
 
 
@@ -260,16 +206,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_60_fps_cor_0_1_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 450; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 450);
 }
 
 
@@ -297,16 +234,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_60_fps_cor_0_5_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 450; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 450);
 }
 
 
@@ -334,16 +262,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_60_fps_cor_0_9_test )
     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 800; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 800);
 }
 
 
@@ -372,16 +291,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_60_fps_cor_0_9_test )
 //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
-//     /* Check starting state */
-//     checker.check(pe, 0);
-
-//     /* Run some frames and check */
-//     for (int i = 1; i <= 400; ++i)
-//     {
-//         po.frames_to_run(1);
-//         BOOST_CHECK(se.run() == 0);
-//         checker.check(pe, i);
-//     }
+    // run(&checker, 400);
 // }
 
 
@@ -412,16 +322,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_60_fps_cor_0_9_test )
 //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
-//     /* Check starting state */
-//     checker.check(pe, 0);
-
-//     /* Run some frames and check */
-//     for (int i = 1; i <= 400; ++i)
-//     {
-//         po.frames_to_run(1);
-//         BOOST_CHECK(se.run() == 0);
-//         checker.check(pe, i);
-//     }
+    // run(&checker, 400);
 // }
 
 
@@ -449,16 +350,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_60_fps_cor_0_9_test )
 //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
-//     /* Check starting state */
-//     checker.check(pe, 0);
-
-//     /* Run some frames and check */
-//     for (int i = 1; i <= 400; ++i)
-//     {
-//         po.frames_to_run(1);
-//         BOOST_CHECK(se.run() == 0);
-//         checker.check(pe, i);
-//     }
+    // run(&checker, 400);
 // }
 
 
@@ -490,16 +382,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_60_fps_cor_0_9_test )
 //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
-//     /* Check starting state */
-//     checker.check(pe, 0);
-
-//     /* Run some frames and check */
-//     for (int i = 1; i <= 400; ++i)
-//     {
-//         po.frames_to_run(1);
-//         BOOST_CHECK(se.run() == 0);
-//         checker.check(pe, i);
-//     }
+    // run(&checker, 400);
 // }
 
 BOOST_AUTO_TEST_SUITE_END()

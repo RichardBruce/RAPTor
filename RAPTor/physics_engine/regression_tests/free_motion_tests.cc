@@ -33,16 +33,7 @@ BOOST_AUTO_TEST_CASE( sin_500_n_10_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.25), point_t(5.0, 0.0, 0.0), 20.0), 0);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 250; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 250);
 }
 
 BOOST_AUTO_TEST_CASE( sin_500_n_25_fps_test )
@@ -64,16 +55,7 @@ BOOST_AUTO_TEST_CASE( sin_500_n_25_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.25), point_t(5.0, 0.0, 0.0), 20.0), 0);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 500; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 500);
 }
 
 
@@ -96,16 +78,7 @@ BOOST_AUTO_TEST_CASE( sin_500_n_60_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.25), point_t(5.0, 0.0, 0.0), 20.0), 0);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 1000; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 1000);
 }
 
 
@@ -128,16 +101,7 @@ BOOST_AUTO_TEST_CASE( sin_10000_n_10_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.25), point_t(5.0, 0.0, 0.0), 20.0), 0);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 250; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 250);
 }
 
 
@@ -160,16 +124,7 @@ BOOST_AUTO_TEST_CASE( sin_10000_n_25_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.25), point_t(5.0, 0.0, 0.0), 20.0), 0);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 500; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 500);
 }
 
 
@@ -192,16 +147,7 @@ BOOST_AUTO_TEST_CASE( sin_10000_n_60_fps_test )
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.25), point_t(5.0, 0.0, 0.0), 20.0), 0);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 1000; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 1000);
 }
 
 
@@ -223,16 +169,7 @@ BOOST_AUTO_TEST_CASE( viscous_10_fps_test )
     pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 50.0, numeric_limits<float>::infinity()), 0);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 150; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 150);
 }
 
 
@@ -254,16 +191,7 @@ BOOST_AUTO_TEST_CASE( viscous_25_fps_test )
     pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 50.0, numeric_limits<float>::infinity()), 0);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 250; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 250);
 }
 
 
@@ -285,16 +213,7 @@ BOOST_AUTO_TEST_CASE( viscous_60_fps_test )
     pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 50.0, numeric_limits<float>::infinity()), 0);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 400; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 400);
 }
 
 
@@ -329,16 +248,7 @@ BOOST_AUTO_TEST_CASE( attract_10_fps_test )
     pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 4);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 500; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 500);
 }
 
 
@@ -373,16 +283,7 @@ BOOST_AUTO_TEST_CASE( attract_25_fps_test )
     pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 4);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 1000; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 1000);
 }
 
 
@@ -418,16 +319,7 @@ BOOST_AUTO_TEST_CASE( attract_60_fps_test )
 
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 1500; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 1500);
 }
 
 
@@ -462,16 +354,7 @@ BOOST_AUTO_TEST_CASE( repulsive_10_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t( 5.0,   0.0,  0.0), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0),  250.0), false);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 10; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 110, 10);
 
     /* Apply forces */
     for (int i = 2; i < 14; ++i)
@@ -482,12 +365,7 @@ BOOST_AUTO_TEST_CASE( repulsive_10_fps_test )
     }
 
     /* Run some frames and check */
-    for (int i = 1; i <= 100; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 100, false);
 }
 
 
@@ -522,16 +400,7 @@ BOOST_AUTO_TEST_CASE( repulsive_25_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t( 5.0,   0.0,  0.0), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0),  250.0), false);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 25; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 275, 25);
 
     /* Apply forces */
     for (int i = 2; i < 14; ++i)
@@ -542,12 +411,7 @@ BOOST_AUTO_TEST_CASE( repulsive_25_fps_test )
     }
 
     /* Run some frames and check */
-    for (int i = 1; i <= 250; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 250, false);
 }
 
 
@@ -582,16 +446,7 @@ BOOST_AUTO_TEST_CASE( repulsive_60_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t( 5.0,   0.0,  0.0), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0),  250.0), false);
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 50; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 550, 50);
 
     /* Apply forces */
     for (int i = 2; i < 14; ++i)
@@ -602,12 +457,7 @@ BOOST_AUTO_TEST_CASE( repulsive_60_fps_test )
     }
 
     /* Run some frames and check */
-    for (int i = 1; i <= 500; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 500, false);
 }
 
 
@@ -642,16 +492,7 @@ BOOST_AUTO_TEST_CASE( repulsive_drop_10_fps_test )
     }
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 100; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 100);
 }
 
 
@@ -686,16 +527,7 @@ BOOST_AUTO_TEST_CASE( repulsive_drop_25_fps_test )
     }
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 250; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 250);
 }
 
 
@@ -730,16 +562,7 @@ BOOST_AUTO_TEST_CASE( repulsive_drop_60_fps_test )
     }
 
     /* Run physics simulation */
-    /* Check starting state */
-    checker.check(pe, 0);
-
-    /* Run some frames and check */
-    for (int i = 1; i <= 500; ++i)
-    {
-        po.frames_to_run(1);
-        BOOST_CHECK(se.run() == 0);
-        checker.check(pe, i);
-    }
+    run(&checker, 500);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
