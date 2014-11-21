@@ -94,6 +94,7 @@ class regression_checker : private boost::noncopyable
                         /* Check only the failing pixels or we get loads of team city logs */
                         if (failures < failure_limit)
                         {
+                            ++failures;
                             BOOST_CHECK(actual[idx    ] == expected[idx    ]);
                             BOOST_CHECK(actual[idx + 1] == expected[idx + 1]);
                             BOOST_CHECK(actual[idx + 2] == expected[idx + 2]);
