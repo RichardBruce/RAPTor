@@ -76,7 +76,7 @@ struct bih_stack_element
 
 /* Class for threaded ray tracing */
 class ray_trace_engine 
-{							
+{
     public :
         typedef light_list::iterator       light_iterator;
         typedef light_list::const_iterator const_light_iterator;
