@@ -91,7 +91,10 @@ class planar_mapper : public texture_mapper
                 }
             };
 
-        virtual ~planar_mapper() { };
+        virtual ~planar_mapper()
+        {
+            delete [] img;
+        };
 
         /* Texture mapping function. Takes the destination and direction 
            of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
