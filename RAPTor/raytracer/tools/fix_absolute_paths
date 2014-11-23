@@ -40,7 +40,7 @@ if ($format =~ m/lwo/)
         push @bytes_in, split(//, $line);
     }
 
-    for (my $i = 0; $i < $#bytes_in; $i++)
+    for (my $i = 0; $i <= $#bytes_in; $i++)
     {
         # Bytewise copy
         $bytes_out[$out_index++] = $bytes_in[$i];
