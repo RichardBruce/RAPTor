@@ -7,11 +7,11 @@
  The same value will be returned for the same point everytime.
  The return value will be in the range -1 to 1
 ************************************************************/
-fp_t perlin_noise_3d::noise(const int x, const int y, const int z) const
+float perlin_noise_3d::noise(const int x, const int y, const int z) const
 {
     int n = x + y * 57 + z * 13 + this->_s;
     n = (n << 13) ^ n;
-    return (fp_t) (1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
+    return static_cast<float>(1.0f - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);
 }
 
 
@@ -24,12 +24,12 @@ fp_t perlin_noise_3d::noise(const int x, const int y, const int z) const
   the center and the center of the faces of a 2 unit cube.
   These values are weighted and added.
 ************************************************************/
-fp_t perlin_noise_3d::smooth_noise(const int x, const int y, const int z) const
+float perlin_noise_3d::smooth_noise(const int x, const int y, const int z) const
 {
-    const fp_t sides  = (noise(x-1, y,   z  ) + noise(x+1, y,   z  ) + noise(x,   y-1,  z ) + noise(x,   y+1, z  ) + 
-                         noise(x,   y,   z-1) + noise(x,   y,   z+1)) * (fp_t)(1.0/16.0);
+    const float sides  = (noise(x - 1, y,   z    ) + noise(x + 1, y,   z    ) + noise(x,   y - 1,  z ) + noise(x,   y + 1, z  ) + 
+                          noise(x,     y,   z - 1) + noise(x,     y,   z + 1)) * (1.0f / 16.0f);
 
-    const fp_t center =  noise(x, y, z) * (fp_t)(1.0/4.0);
+    const float center =  noise(x, y, z) * (1.0f / 4.0f);
     return sides + center;
 }
 
@@ -40,12 +40,12 @@ fp_t perlin_noise_3d::smooth_noise(const int x, const int y, const int z) const
   
   Cos interpolation is used for the interpolation function.
 ************************************************************/
-fp_t perlin_noise_3d::interpolate(const fp_t a, const fp_t b, const fp_t x) const
+float perlin_noise_3d::interpolate(const float a, const float b, const float x) const
 {
-    const fp_t ft = x * PI;
-    const fp_t f = ((fp_t)1.0 - cos(ft)) * (fp_t)0.5;
+    const float ft = x * PI;
+    const float f = (1.0f - cos(ft)) * 0.5f;
 
-    return  a * ((fp_t)1.0 - f) + b * f;
+    return  a * (1.0f - f) + b * f;
 }
 
 
@@ -56,35 +56,35 @@ fp_t perlin_noise_3d::interpolate(const fp_t a, const fp_t b, const fp_t x) cons
   Smoothed noise values are generated at the 8 vertices of a
   two unit cube and then interploted.
 ************************************************************/
-fp_t perlin_noise_3d::interpolated_noise(const fp_t x, const fp_t y, const fp_t z) const
+float perlin_noise_3d::interpolated_noise(const float x, const float y, const float z) const
 {
     /* Get integer and fractional componants of x, y and z */
-    const int wx  = (int)((fp_t)((int)x) + 0.5);
-    const fp_t px = x - wx;
+    const int wx    = (int)(static_cast<float>((int)x) + 0.5f);
+    const float px  = x - wx;
 
-    const int wy  = (int)((fp_t)((int)y) + 0.5);
-    const fp_t py = y - wy;
+    const int wy    = (int)(static_cast<float>((int)y) + 0.5f);
+    const float py  = y - wy;
 
-    const int wz  = (int)((fp_t)((int)z) + 0.5);
-    const fp_t pz = z - wz;
+    const int wz    = (int)(static_cast<float>((int)z) + 0.5f);
+    const float pz  = z - wz;
 
     /* Generate smooted noise on a 2 unit cube */
-    const fp_t v1 = smooth_noise(wx,     wy,     wz    );
-    const fp_t v2 = smooth_noise(wx + 1, wy,     wz    );
-    const fp_t v3 = smooth_noise(wx,     wy + 1, wz    );
-    const fp_t v4 = smooth_noise(wx + 1, wy + 1, wz    );
-    const fp_t v5 = smooth_noise(wx,     wy,     wz + 1);
-    const fp_t v6 = smooth_noise(wx + 1, wy,     wz + 1);
-    const fp_t v7 = smooth_noise(wx,     wy + 1, wz + 1);
-    const fp_t v8 = smooth_noise(wx + 1, wy + 1, wz + 1);
+    const float v1 = smooth_noise(wx,     wy,     wz    );
+    const float v2 = smooth_noise(wx + 1, wy,     wz    );
+    const float v3 = smooth_noise(wx,     wy + 1, wz    );
+    const float v4 = smooth_noise(wx + 1, wy + 1, wz    );
+    const float v5 = smooth_noise(wx,     wy,     wz + 1);
+    const float v6 = smooth_noise(wx + 1, wy,     wz + 1);
+    const float v7 = smooth_noise(wx,     wy + 1, wz + 1);
+    const float v8 = smooth_noise(wx + 1, wy + 1, wz + 1);
 
     /* Interpolate within the cube */
-    const fp_t ix0 = interpolate(v1, v2, px);
-    const fp_t ix1 = interpolate(v3, v4, px);
-    const fp_t ix2 = interpolate(v5, v6, px);
-    const fp_t ix3 = interpolate(v7, v8, px);
+    const float ix0 = interpolate(v1, v2, px);
+    const float ix1 = interpolate(v3, v4, px);
+    const float ix2 = interpolate(v5, v6, px);
+    const float ix3 = interpolate(v7, v8, px);
 
-    const fp_t iy0 = interpolate(ix0, ix1, py);
-    const fp_t iy1 = interpolate(ix2, ix3, py);
+    const float iy0 = interpolate(ix0, ix1, py);
+    const float iy1 = interpolate(ix2, ix3, py);
     return interpolate(iy0, iy1, pz);
 }
