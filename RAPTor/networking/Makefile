@@ -19,6 +19,7 @@ clean ::
 spotless ::
 	$(RM) -r build
 	$(RM) video_receiver
+	$(RM) todo
 	$(RM) cppcheck.xml
 	$(RM) lines_of_code
 	$(MAKE) -C unit_tests spotless
