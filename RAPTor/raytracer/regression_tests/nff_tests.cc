@@ -166,36 +166,6 @@ BOOST_AUTO_TEST_CASE( nff_jacks_3_test )
     /* Check image */
     checker.check(fixture.get_camera());
 }
-
-BOOST_AUTO_TEST_CASE( nff_jacks_4_test )
-{
-    /* Checker */
-    CREATE_REGRESSION_CHECKER(checker);
-
-    /* Enviroment set up */
-    regression_fixture fixture("/spd3_14/jacks_scenes/jacks_4.nff", model_format_t::nff);
-
-    /* Ray trace the scene */
-    fixture.render();
-
-    /* Check image */
-    checker.check(fixture.get_camera());
-}
-
-BOOST_AUTO_TEST_CASE( nff_jacks_5_test )
-{
-    /* Checker */
-    CREATE_REGRESSION_CHECKER(checker);
-
-    /* Enviroment set up */
-    regression_fixture fixture("/spd3_14/jacks_scenes/jacks_5.nff", model_format_t::nff);
-
-    /* Ray trace the scene */
-    fixture.render();
-
-    /* Check image */
-    checker.check(fixture.get_camera());
-}
 #endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( nff_lattice_1_test )
