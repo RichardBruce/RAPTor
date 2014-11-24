@@ -18,7 +18,7 @@ class ext_colour_t;
 class planar_mapper : public texture_mapper
 {
     public :
-        planar_mapper(const fp_t *const im, const point_t &c, const point_t &n, const point_t &s, 
+        planar_mapper(const float *const im, const point_t &c, const point_t &n, const point_t &s, 
                       const unsigned cpp, const unsigned w, const unsigned h, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
                       const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1) : 
             texture_mapper(), c(c), n(n), u(point_t(n.y, n.z, -n.x)), s(s), uw(uw), vw(vw), img(im), h(h), w(w), cpp(cpp),
@@ -64,7 +64,7 @@ class planar_mapper : public texture_mapper
 //                cout << "v vec: " << this->v.x << ", " << this->v.y << ", " << this->v.z << endl;
             };
 
-        planar_mapper(const fp_t *const im, const point_t &u, const point_t &v, const point_t &c, const point_t &n, const point_t &s, 
+        planar_mapper(const float *const im, const point_t &u, const point_t &v, const point_t &c, const point_t &n, const point_t &s, 
             const unsigned cpp, const unsigned w, const unsigned h, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
             const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1)
             : texture_mapper(), c(c), n(n), u(u), s((u * s.x) + (v * s.y) + (n * s.z)), uw(uw), vw(vw), v(v), img(im), h(h), w(w), cpp(cpp),
@@ -97,8 +97,8 @@ class planar_mapper : public texture_mapper
         };
 
         /* Texture mapping function. Takes the destination and direction 
-           of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        fp_t texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
+           of the incident ray and returns either a float (alpha, kd, ks, t, r....), a colour (rgb) or both */
+        float texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
 
     private :
         friend class boost::serialization::access;
@@ -114,7 +114,7 @@ class planar_mapper : public texture_mapper
         const texture_wrapping_mode_t   uw;     /* U wrapping mode                      */
         const texture_wrapping_mode_t   vw;     /* V wrapping mode                      */
         point_t                         v;      /* V vector in the plane of the texture */
-        const fp_t               *const img;    /* Image data                           */
+        const float               *const img;    /* Image data                           */
         unsigned                        h;      /* Image height                         */
         unsigned                        w;      /* Image width                          */
         unsigned                        cpp;    /* Componants per pixel                 */
@@ -153,7 +153,7 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::planar_mapper *t
     /* Retreive the fields */
     point_t c, n, u, s, v;
     raptor_raytracer::texture_wrapping_mode_t uw, vw;
-    fp_t *img;
+    float *img;
     unsigned h, w, cpp, u_max, v_max;
     int u_off, v_off;
     ar >> c;
