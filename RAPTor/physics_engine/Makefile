@@ -27,6 +27,7 @@ spotless ::
 	$(RM) libphysics_engine.so
 	$(RM) libphysics_engine.so.1
 	$(RM) libphysics_engine.so.1.0.1
+	$(RM) todo
 	$(RM) cppcheck.xml
 	$(RM) lines_of_code
 	$(MAKE) -C unit_tests spotless
