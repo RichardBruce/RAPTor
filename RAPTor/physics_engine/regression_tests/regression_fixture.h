@@ -35,12 +35,13 @@ struct regression_fixture : private boost::noncopyable
 {
     public :
         regression_fixture()
-          : po(0.04, 0.04, -1, false, false),
-            pe(new raptor_physics::rigid_body_collider(0.5, 0.75), false),
+          : po(0.04f, 0.04f, -1, false, false),
+            pe(new raptor_physics::rigid_body_collider(0.5f, 0.75f), false),
             se(&pe, &po),
-            m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), 1.0)),
+            m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), 1.0f)),
             _objects(),
-            _runtime(0.0),
+            _runtime(0.0f),
+            _frames_inv(0.0f),
             _objects_idx(0)
         {  };
 
@@ -74,12 +75,12 @@ struct regression_fixture : private boost::noncopyable
         /* Routine to make cubes out of triangles */
         physics_object* make_cube(raptor_raytracer::material *m, const point_t &bl, const point_t &tr, const point_t &com, const float density, const int t = 0)
         {
-            return make_cube(m, bl, tr, com, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), density, t);
+            return make_cube(m, bl, tr, com, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), density, t);
         }
 
         physics_object* make_cube(raptor_raytracer::material *m, const point_t &bl, const point_t &tr, const point_t &com, const point_t &v, const point_t &w, const float density, const int t = 0)
         {
-            return make_cube(m, quaternion_t(1.0, 0.0, 0.0, 0.0), bl, tr, com, v, w, density, t);
+            return make_cube(m, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), bl, tr, com, v, w, density, t);
         }
 
         physics_object* make_cube(raptor_raytracer::material *m, const quaternion_t &o, const point_t &bl, const point_t &tr, const point_t &com, const point_t &v, const point_t &w, const float density, const int t = 0)
@@ -98,7 +99,7 @@ struct regression_fixture : private boost::noncopyable
             if (initial)
             {
                 checker->check(pe, 0);
-                _frames_inv = 1.0 / static_cast<float>(total_frames);
+                _frames_inv = 1.0f / static_cast<float>(total_frames);
             }
 
             /* Run some frames and check */

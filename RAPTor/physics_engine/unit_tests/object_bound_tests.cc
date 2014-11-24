@@ -18,7 +18,7 @@ const raptor_physics::init_logger init_logger;
 
 using namespace raptor_physics;
 
-BOOST_AUTO_TEST_SUITE( object_bound_tests )
+BOOST_AUTO_TEST_SUITE( object_bound_tests );
 
 
 /* Test Construction */
