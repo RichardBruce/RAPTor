@@ -11,6 +11,7 @@ INCLUDE = $(LOCAL_INCLUDES) \
     $(RAPTOR_HOME)/physics_engine \
     $(RAPTOR_HOME)/physics_engine/forces/ \
     $(RAPTOR_HOME)/physics_engine/colliders/ \
+    $(RAPTOR_HOME)/physics_engine/integrators/ \
     $(RAPTOR_HOME)/sdl_wrappers/ \
     ${BOOST_INCLUDE_PATH} \
     $(LIBARYS_PATH)/SDL2-$(SDL_VER)/include/ \
