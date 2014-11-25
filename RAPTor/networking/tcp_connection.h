@@ -34,7 +34,7 @@ class tcp_connection : public connection<UpNode>
               _acceptor(ctrl->io_service(), _recv_endpoint), 
               _send_socket(ctrl->io_service()),
               _recv_socket(ctrl->io_service()),
-              _head_buf(new char [HEADER_SIZE]),
+              _head_buf(new char [msg_header::size()]),
               _send_port(send_port)
         {  };
 
@@ -42,6 +42,10 @@ class tcp_connection : public connection<UpNode>
         {
             delete [] _head_buf;
         }
+
+        /* Access functions */
+        short recv_port() const { return _recv_endpoint.port(); }
+        short send_port() const { return _send_port;            }
 
         
         /* Virtual functions for sending and receiving messages */
@@ -62,7 +66,6 @@ class tcp_connection : public connection<UpNode>
             const boost::asio::ip::address *to_addr = header->physical_address();
             if (to_addr == nullptr)
             {
-                std::cout << "using unspec addr" << std::endl;
                 header->from_address(this->_grp->my_address());
                 to_addr = this->_grp->physical_address(header->to_address());
             }
@@ -73,11 +76,12 @@ class tcp_connection : public connection<UpNode>
             _send_socket.connect(send_endpoint, ec);
             if (ec)
             {
+                std::cout << "Connect failed: " << ec.message() << std::endl;
                 return;
             }
 
             /* Build the message */
-            std::array<char, HEADER_SIZE> serial_header;
+            std::array<char, msg_header::size()> serial_header;
             header->serialise(serial_header.data());
             std::array<boost::asio::const_buffer, 2> send_buf =
             {{
@@ -87,6 +91,10 @@ class tcp_connection : public connection<UpNode>
 
             /* Send the message */
             boost::asio::write(_send_socket, send_buf, ec);
+            if (ec)
+            {
+                std::cout << "Write failed: " << ec.message() << std::endl;
+            }
             _send_socket.close();
         }
 
@@ -94,10 +102,16 @@ class tcp_connection : public connection<UpNode>
         virtual void start_receiving() override
         {
             /* Start async connect */
-            _acceptor.async_accept(_recv_socket, _recv_endpoint, 
-                [this](const boost::system::error_code &)
+            _acceptor.async_accept(_recv_socket, _recv_endpoint, [this](const boost::system::error_code &ec)
                 {
-                    receive_header();
+                    if (!ec)
+                    {
+                        receive_header();
+                    }
+                    else
+                    {
+                        std::cout << "Start receiving failed: " << ec.message() << std::endl;
+                    }
                 });
         }
 
@@ -106,10 +120,17 @@ class tcp_connection : public connection<UpNode>
         void receive_header()
         {
             /* Wait for data */
-            boost::asio::async_read(_recv_socket, boost::asio::buffer(_head_buf, HEADER_SIZE),
-                [this](const boost::system::error_code &, size_t)
+            boost::asio::async_read(_recv_socket, boost::asio::buffer(_head_buf, msg_header::size()),
+                [this](const boost::system::error_code &ec, size_t)
                 {
-                    receive_data(_recv_endpoint.address(), std::shared_ptr<msg_header>(new msg_header(_head_buf, _recv_endpoint.address())));
+                    if (!ec)
+                    {
+                        receive_data(_recv_endpoint.address(), std::shared_ptr<msg_header>(new msg_header(_head_buf, _recv_endpoint.address())));
+                    }
+                    else
+                    {
+                        std::cout << "Receive header failed: " << ec.message() << std::endl;
+                    }
                 });
         }
 
