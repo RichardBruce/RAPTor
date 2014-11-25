@@ -95,11 +95,6 @@ neighbour_t track_anti_clockwise_edge(grid_cell **const grid_cells, const grid_c
 }
 
 
-void CallBack(const char * msg, double progress, double concavity, size_t nVertices)
-{
-    std::cout << msg;
-}
-
 int main()
 {
     const int x = 128;
