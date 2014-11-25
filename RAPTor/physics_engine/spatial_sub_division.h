@@ -86,7 +86,12 @@ class spatial_sub_division : private boost::noncopyable
             collision_detect();
         }
 
-        /* Allow default DTOR */
+        /* DTOR */
+        ~spatial_sub_division()
+        {
+            delete _min_sentinel;
+            delete _max_sentinel;
+        }
 
         spatial_sub_division& add_object(const physics_object &po)
         {

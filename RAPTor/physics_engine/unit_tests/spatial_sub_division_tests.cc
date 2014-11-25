@@ -84,6 +84,11 @@ struct spatial_sub_division_fixture : private boost::noncopyable
       normal_dist(1.0f, 0.1f)
       {  };
 
+    ~spatial_sub_division_fixture()
+    {
+        delete mat;
+    }
+
     raptor_raytracer::material *const           mat;
     std::unique_ptr<physics_object>             po0;
     std::unique_ptr<physics_object>             po1;
@@ -592,7 +597,8 @@ BOOST_AUTO_TEST_CASE( add_object_performance_test )
 
     /* Create 90% of some random objects on a grid moving in random directions */
     std::unordered_map<int, physics_object*> objects;
-    for (int i = 0; i < number_of_objects * 0.9f; ++i)
+    int i = 0;
+    for ( ; i < static_cast<int>(number_of_objects * 0.9f); ++i)
     {
         const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
         auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f);
@@ -602,7 +608,7 @@ BOOST_AUTO_TEST_CASE( add_object_performance_test )
     /* Add the final 10% of the objects */
     spatial_sub_division uut(objects);
     const auto t0(std::chrono::system_clock::now());
-    for (int i = 0; i < number_of_objects * 0.1f; ++i)
+    for ( ; i < number_of_objects; ++i)
     {
         const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
         auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f);
