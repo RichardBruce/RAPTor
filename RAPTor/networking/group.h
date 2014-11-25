@@ -164,6 +164,12 @@ class group : public stack_component_impl<stack_component, stack_component>
             return group_iter->second.port_offset();
         }
 
+        group& add_to_group(const uuid &id, const address &addr, const std::uint16_t port_offset)
+        {
+            _pimpl->_group.insert({ id, group_member(addr, port_offset, false) });
+            return *this;
+        }
+
         /* Virtual functions for sending and receiving messages */
         virtual void received(const stack_accessor &acc, const std::shared_ptr<msg_data> &data, const std::shared_ptr<msg_header> &header) override
         {
@@ -268,31 +274,6 @@ class group : public stack_component_impl<stack_component, stack_component>
             {
                 _ran_gen.seed(time(NULL));
             };
-
-        // int wait_for_reponse(const std::future<std::istream *const> &fut, const unsigned int timeout_ms = 1000) const
-        // {
-        //     /* Wait for the response */
-        //     if (fut.wait_for(std::chrono::duration<int, std::milli>(timeout_ms)) == std::future_status::ready)
-        //     {
-        //         /* Return that a response was received */
-        //         return 1;
-        //     }
-
-        //     /* If not ask weather to try again */
-        //     std::cout << "Attempt to connect to server failed" << std::endl;
-        //     std::cout << "Try again, y for yes, else no" << std::endl;
-
-        //     /* Get response and return give up if not y or Y */
-        //     char resp;
-        //     std::cin >> resp;
-        //     if ((resp != 'y') && (resp != 'Y'))
-        //     {
-        //         return 0;
-        //     }
-
-        //     /* Return continue trying */
-        //     return -1;
-        // }
 
         struct group_impl
         {

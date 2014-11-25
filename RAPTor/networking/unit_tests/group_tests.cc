@@ -112,6 +112,18 @@ BOOST_AUTO_TEST_CASE( port_offset_test )
 }
 
 
+BOOST_AUTO_TEST_CASE( add_to_group_test )
+{
+    const auto id(subscribe_mg.from_address());
+    const auto addr(address::from_string("192.168.0.255"));
+    mid_node->add_to_group(id, addr, 7);
+
+    // Checks
+    BOOST_CHECK( mid_node->port_offset(id)      == 7);
+    BOOST_CHECK(*mid_node->physical_address(id) == addr);
+}
+
+
 /* Test send */
 BOOST_AUTO_TEST_CASE( send_test )
 {
