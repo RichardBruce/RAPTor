@@ -46,18 +46,18 @@ class msg_header
 
         /* Copy CTOR */
         explicit msg_header(const msg_header &header)
-            : _phy_addr(header._phy_addr),
-              _to_addr(header._to_addr),
-              _group_addr(header._group_addr),
-              _from_addr(header._from_addr),
-              _seq_id(header._seq_id),
-              _length(header._length),
-              _frag_id(header._frag_id),
-              _frag_len(header._frag_len),
-              _resend_id(header._resend_id),
-              _resp_to(header._resp_to),
-              _is_resp(header._is_resp),
-              _has_phy(header._has_phy) {  };
+            :   _phy_addr(header._phy_addr),
+                _to_addr(header._to_addr),
+                _group_addr(header._group_addr),
+                _from_addr(header._from_addr),
+                _seq_id(header._seq_id),
+                _length(header._length),
+                _frag_id(header._frag_id),
+                _frag_len(header._frag_len),
+                _resend_id(header._resend_id),
+                _resp_to(header._resp_to),
+                _is_resp(header._is_resp),
+                _has_phy(header._has_phy) {  };
 
         /* Getters */
         const address * physical_address()      const { return _has_phy ? &_phy_addr : nullptr; }
@@ -179,6 +179,10 @@ class msg_header
             std::cout << "Resend to: " << _resp_to << std::endl;
             std::cout << "Is Response: " << _is_resp << std::endl;
             std::cout << "Has Physical Address: " << _has_phy << std::endl;
+            if (_has_phy)
+            {
+                std::cout << "Physical Address: " <<  _phy_addr.to_string() << std::endl;
+            }
         }
 
     private :
