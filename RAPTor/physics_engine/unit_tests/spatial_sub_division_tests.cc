@@ -110,6 +110,13 @@ struct spatial_sub_division_fixture : private boost::noncopyable
     std::unordered_map<int, physics_object*>    objects7;
     std::default_random_engine                  generator;
     std::normal_distribution<float>             normal_dist;
+#ifndef VALGRIND_TESTS
+    const int number_of_objects                 = 10000;
+    const int number_of_updates                 = 100000;
+#else
+    const int number_of_objects                 = 1000;
+    const int number_of_updates                 = 10000;
+#endif
 };
 
 BOOST_FIXTURE_TEST_SUITE( spatial_sub_division_tests, spatial_sub_division_fixture );
@@ -478,7 +485,6 @@ BOOST_AUTO_TEST_CASE( update_object_move_away_y_test )
 
 BOOST_AUTO_TEST_CASE( contruct_performance_test )
 {
-    const int number_of_objects = 10000;
     std::uniform_real_distribution<float> real_uniform_dist(0.0f, std::pow(number_of_objects, 1.0f / 3.0f) * 5.0f);
 
     /* Create some random objects on a grid moving in random directions */
@@ -494,7 +500,7 @@ BOOST_AUTO_TEST_CASE( contruct_performance_test )
     const auto t0(std::chrono::system_clock::now());
     spatial_sub_division uut(objects);
     const auto t1(std::chrono::system_clock::now());
-    BOOST_LOG_TRIVIAL(fatal) << "Performance test: Sort and Sweep Construct took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF - Sort and Sweep Construct took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
 
     /* Clean up */
     for (auto &p : objects)
@@ -505,7 +511,6 @@ BOOST_AUTO_TEST_CASE( contruct_performance_test )
 
 BOOST_AUTO_TEST_CASE( update_object_performance_test )
 {
-    const int number_of_objects = 10000;
     std::uniform_real_distribution<float> real_uniform_dist(0.0f, std::pow(number_of_objects, 1.0f / 3.0f) * 5.0f);
     std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
 
@@ -522,7 +527,7 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
     /* Do some updates */
     spatial_sub_division uut(objects);
     const auto t0(std::chrono::system_clock::now());
-    for (int i = 0; i < 100000; ++i)
+    for (int i = 0; i < number_of_updates; ++i)
     {
         const int obj       = int_uniform_dist(generator);
         const float t_step  = normal_dist(generator);
@@ -533,7 +538,7 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
         uut.update_object(*objects[obj]);
     }
     const auto t1(std::chrono::system_clock::now());
-    BOOST_LOG_TRIVIAL(fatal) << "Performance test: Sort and Sweep Update Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF - Sort and Sweep Update Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
 
     /* Clean up */
     for (auto &p : objects)
@@ -544,7 +549,6 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
 
 BOOST_AUTO_TEST_CASE( remove_object_performance_test )
 {
-    const int number_of_objects = 10000;
     std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0f / 3.0f) * 5.0f);
     std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
 
@@ -572,7 +576,7 @@ BOOST_AUTO_TEST_CASE( remove_object_performance_test )
         }
     }
     const auto t1(std::chrono::system_clock::now());
-    BOOST_LOG_TRIVIAL(fatal) << "Performance test: Sort and Sweep Remove Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF - Sort and Sweep Remove Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
 
     /* Clean up */
     for (auto &p : objects)
@@ -583,7 +587,6 @@ BOOST_AUTO_TEST_CASE( remove_object_performance_test )
 
 BOOST_AUTO_TEST_CASE( add_object_performance_test )
 {
-    const int number_of_objects = 10000;
     std::uniform_real_distribution<float> real_uniform_dist(0.0, std::pow(number_of_objects, 1.0f / 3.0f) * 5.0f);
     std::uniform_int_distribution<int> int_uniform_dist(0, number_of_objects - 1);
 
@@ -607,7 +610,7 @@ BOOST_AUTO_TEST_CASE( add_object_performance_test )
         uut.add_object(*po);
     }
     const auto t1(std::chrono::system_clock::now());
-    BOOST_LOG_TRIVIAL(fatal) << "Performance test: Sort and Sweep Add Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF - Sort and Sweep Add Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
 
     /* Clean up */
     for (auto &p : objects)
