@@ -35,7 +35,7 @@ struct fragmenter_fixture : public stack_component_fixture<uut>
 };
 
 
-BOOST_FIXTURE_TEST_SUITE( fragmenter_tests, fragmenter_fixture )
+BOOST_FIXTURE_TEST_SUITE( fragmenter_tests, fragmenter_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )

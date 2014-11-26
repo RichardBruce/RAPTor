@@ -40,6 +40,7 @@ class msg_client
                _uni_cast_conn(_io_service, new uni_cast_receiver(), me_addr, send_port, recv_port, port_off, true), 
                _multi_cast_conn(nullptr),
                _group(_uni_cast_conn.stack_group()),
+               _cam(nullptr),
                _subscribed(false)
         {
             _uni_cast_conn.start(10);

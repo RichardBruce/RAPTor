@@ -33,14 +33,11 @@ protocol_stack::protocol_stack(boost::asio::io_service &io_service, data_receive
         _conn = new udp_connection<stack_component>(&_ctrl, grp, send_port, recv_port);
 
 #ifdef __DEBUG__
-        auto *limiter = new rate_limiter<stack_component, stack_component>(_conn, _io_service, MAX_PACKET_SIZE * 0.25);
+        auto *limiter = new rate_limiter<stack_component, stack_component>(_conn, _io_service, MAX_PACKET_SIZE * 0.25f);
         auto *stack_bottom = limiter;
 #else
         auto *limiter = _conn;
-#endif
-
         auto *retran = new ack_retransmission<stack_component, stack_component>(limiter, _io_service, &_ctrl, 1000);
-#ifndef __DEBUG__
         auto *stack_bottom = retran;
 #endif
 
@@ -72,15 +69,12 @@ protocol_stack::protocol_stack(boost::asio::io_service &io_service, data_receive
     _conn = new udp_connection<stack_component>(&_ctrl, grp, addr, multi_addr, port);
 
 #ifdef __DEBUG__
-    auto *limiter = new rate_limiter<stack_component, stack_component>(_conn, _io_service, MAX_PACKET_SIZE * 0.25);
+    auto *limiter = new rate_limiter<stack_component, stack_component>(_conn, _io_service, MAX_PACKET_SIZE * 0.25f);
     auto *stack_bottom = limiter;
 #else
     auto *limiter = _conn;
-#endif
-
     auto *retran = new ack_retransmission<stack_component, stack_component>(limiter, _io_service, &_ctrl, 1000);
-#ifndef __DEBUG__
-        auto *stack_bottom = retran;
+    auto *stack_bottom = retran;
 #endif
 
     auto *frag = new fixed_size_fragmenter<stack_component, stack_component>(limiter, MAX_PACKET_SIZE);

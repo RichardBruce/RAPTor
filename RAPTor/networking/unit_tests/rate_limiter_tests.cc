@@ -35,7 +35,7 @@ struct rate_limiter_fixture : public stack_component_fixture<uut>
 };
 
 
-BOOST_FIXTURE_TEST_SUITE( rate_limiter_tests, rate_limiter_fixture )
+BOOST_FIXTURE_TEST_SUITE( rate_limiter_tests, rate_limiter_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )

@@ -1,6 +1,11 @@
 #ifndef __STACK_COMPONENT_FIXTURE_H__
 #define __STACK_COMPONENT_FIXTURE_H__
 
+/* Standard headers */
+
+/* Boost headers */
+#include "boost/noncopyable.hpp"
+
 /* Networking headers */
 #include "stack_controller.h"
 
@@ -13,7 +18,7 @@ using namespace raptor_networking;
 
 /* Common base class for stack component fixtures */
 template<class Uut>
-struct stack_component_fixture
+struct stack_component_fixture : private boost::noncopyable
 {
     stack_component_fixture()
         : ioservice(),

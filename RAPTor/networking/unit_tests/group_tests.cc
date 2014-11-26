@@ -51,7 +51,7 @@ struct group_fixture : public stack_component_fixture<uut>
 };
 
 
-BOOST_FIXTURE_TEST_SUITE( group_tests, group_fixture )
+BOOST_FIXTURE_TEST_SUITE( group_tests, group_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor0_test )
@@ -258,41 +258,41 @@ BOOST_AUTO_TEST_CASE( recv_unsub_test )
     mid_node->received(acc, subscribe_mg.receive_data(), subscribe_mg.header(from_address, 1));
 
     /* Check group state */
-    BOOST_CHECK(mid_node->group_physical_address() == group_as_address);
-    BOOST_CHECK(mid_node->group_address() != boost::uuids::nil_uuid());
-    BOOST_CHECK(mid_node->group_port() == group_port);
-    BOOST_CHECK(mid_node->size_of_group() == 2);
+    BOOST_CHECK(mid_node->group_physical_address()  == group_as_address);
+    BOOST_CHECK(mid_node->group_address()           != boost::uuids::nil_uuid());
+    BOOST_CHECK(mid_node->group_port()              == group_port);
+    BOOST_CHECK(mid_node->size_of_group()           == 2);
     const auto addr0 = mid_node->my_address();
-    BOOST_CHECK(*mid_node->physical_address(addr0) == me_as_address);
-    BOOST_CHECK(mid_node->port_offset(addr0) == port_offset);
+    BOOST_CHECK(*mid_node->physical_address(addr0)  == me_as_address);
+    BOOST_CHECK(mid_node->port_offset(addr0)        == port_offset);
 
     /* Check number of messages */
-    BOOST_CHECK(bottom_node->data_sent() == 1);
-    BOOST_CHECK(bottom_node->headers_sent() == 1);
-    BOOST_CHECK(top_node->data_received() == 0);
-    BOOST_CHECK(top_node->headers_received() == 0);
+    BOOST_REQUIRE(bottom_node->data_sent()          == 1);
+    BOOST_REQUIRE(bottom_node->headers_sent()       == 1);
+    BOOST_CHECK(top_node->data_received()           == 0);
+    BOOST_CHECK(top_node->headers_received()        == 0);
 
     /* Check message content */
     const msg_header acc0_header(subscribe_mg.from_address(), 0, bottom_node->sent_data()->size(), 1, true);
     BOOST_CHECK(acc0_header == *bottom_node->sent_header());
     /* Dont even attempt to check the message, it's well complicated */
 
-    mid_node->received(acc, unsubscribe_mg.receive_data(), subscribe_mg.header(from_address, 2));
+    mid_node->received(acc, unsubscribe_mg.receive_data(), unsubscribe_mg.header(from_address, 2));
 
     /* Check group state */
-    BOOST_CHECK(mid_node->group_physical_address() == group_as_address);
-    BOOST_CHECK(mid_node->group_address() != boost::uuids::nil_uuid());
-    BOOST_CHECK(mid_node->group_port() == group_port);
-    BOOST_CHECK(mid_node->size_of_group() == 1);
+    BOOST_CHECK(mid_node->group_physical_address()  == group_as_address);
+    BOOST_CHECK(mid_node->group_address()           != boost::uuids::nil_uuid());
+    BOOST_CHECK(mid_node->group_port()              == group_port);
+    BOOST_CHECK(mid_node->size_of_group()           == 1);
     const auto addr1 = mid_node->my_address();
-    BOOST_CHECK(*mid_node->physical_address(addr1) == me_as_address);
-    BOOST_CHECK(mid_node->port_offset(addr1) == port_offset);
+    BOOST_CHECK(*mid_node->physical_address(addr1)  == me_as_address);
+    BOOST_CHECK(mid_node->port_offset(addr1)        == port_offset);
 
     /* Check number of messages */
-    BOOST_CHECK(bottom_node->data_sent() == 1);
-    BOOST_CHECK(bottom_node->headers_sent() == 1);
-    BOOST_CHECK(top_node->data_received() == 0);
-    BOOST_CHECK(top_node->headers_received() == 0);
+    BOOST_REQUIRE(bottom_node->data_sent()      == 1);
+    BOOST_REQUIRE(bottom_node->headers_sent()   == 1);
+    BOOST_CHECK(top_node->data_received()       == 0);
+    BOOST_CHECK(top_node->headers_received()    == 0);
 
     /* Check message content */
     const msg_header acc1_header(subscribe_mg.from_address(), 1, bottom_node->sent_data()->size(), 2, true);

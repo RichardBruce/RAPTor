@@ -57,7 +57,7 @@ struct stack_controller_fixture : public stack_component_fixture<mock_stack_comp
     std::string                 helloworld;
 };
 
-BOOST_FIXTURE_TEST_SUITE( stack_controller_tests, stack_controller_fixture )
+BOOST_FIXTURE_TEST_SUITE( stack_controller_tests, stack_controller_fixture );
 
 /* stack_map_element tests */
 /* Test constructors */

@@ -8,6 +8,7 @@
 
 /* Boost headers */
 #include "boost/asio/io_service.hpp"
+#include "boost/noncopyable.hpp"
 
 /* Networking headers */
 #include "stack_controller.h"
@@ -22,7 +23,7 @@ class group;
 class data_receiver;
 
 /* Class repesenting the top level of a protocol stack */
-class protocol_stack
+class protocol_stack : private boost::noncopyable
 {
     public :
         /* CTOR for unicast */

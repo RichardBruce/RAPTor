@@ -34,7 +34,7 @@ struct nack_retransmission_fixture : public stack_component_fixture<uut>
     const message_generator mg2;
 };
 
-BOOST_FIXTURE_TEST_SUITE( nack_retransmission_tests, nack_retransmission_fixture )
+BOOST_FIXTURE_TEST_SUITE( nack_retransmission_tests, nack_retransmission_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )

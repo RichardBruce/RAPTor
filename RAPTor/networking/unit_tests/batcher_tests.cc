@@ -42,7 +42,7 @@ struct batcher_fixture : public stack_component_fixture<uut>
 };
 
 
-BOOST_FIXTURE_TEST_SUITE( batcher_tests, batcher_fixture )
+BOOST_FIXTURE_TEST_SUITE( batcher_tests, batcher_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )

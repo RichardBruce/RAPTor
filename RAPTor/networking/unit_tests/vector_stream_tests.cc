@@ -58,7 +58,7 @@ struct vector_stream_fixture
         } 
 };
 
-BOOST_FIXTURE_TEST_SUITE( vector_stream_tests, vector_stream_fixture )
+BOOST_FIXTURE_TEST_SUITE( vector_stream_tests, vector_stream_fixture );
 
 /* Test ivector_stream */
 /* Test constructors */

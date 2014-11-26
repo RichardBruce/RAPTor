@@ -50,7 +50,7 @@ struct msg_data_fixture
     const std::vector<char> padded_hellomars;
 };
 
-BOOST_FIXTURE_TEST_SUITE( msg_data_tests, msg_data_fixture )
+BOOST_FIXTURE_TEST_SUITE( msg_data_tests, msg_data_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )

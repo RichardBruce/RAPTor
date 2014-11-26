@@ -36,7 +36,7 @@ struct ack_retransmission_fixture : public stack_component_fixture<uut>
     const unsigned int      resend_ms;
 };
 
-BOOST_FIXTURE_TEST_SUITE( ack_retransmission_tests, ack_retransmission_fixture )
+BOOST_FIXTURE_TEST_SUITE( ack_retransmission_tests, ack_retransmission_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )

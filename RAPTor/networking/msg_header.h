@@ -119,8 +119,8 @@ class msg_header
         static uuid from_stack(const char *const header)
         {
             /* Try to get the group id, if it is null use the individual id */
-            const uuid id = msg_header::parse_uuid(&header[16]);
-            return id.is_nil() ? msg_header::parse_uuid(&header[32]) : id;
+            const uuid id = parse_uuid(&header[16]);
+            return id.is_nil() ? parse_uuid(&header[32]) : id;
         }
 
         msg_header& has_physical_address(const bool has_phy)
@@ -226,9 +226,6 @@ class msg_header
             std::copy(&header[0], &header[uuid::static_size()], id.begin());
             return id;
         }
-
-        /* You cant assign message headers */
-        msg_header& operator=(const msg_header &) { return *this; }
 
         const address       _phy_addr;      /* The physical address the message was received from, not serialised                   */
         const uuid          _to_addr;       /* The logical address the message is being sent to                                     */
