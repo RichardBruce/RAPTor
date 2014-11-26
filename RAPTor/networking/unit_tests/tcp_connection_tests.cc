@@ -44,7 +44,10 @@ struct tcp_connection_fixture : public stack_component_fixture<uut>
     {
         socket.close();
 
+        /* The base fixture only deletes the connection, which in this case doesnt clean the stack above it so do it here */
         delete mid_node;
+        delete top_node;
+        delete group_node;
     }
 
     bool connect(const short port)
@@ -73,10 +76,10 @@ struct tcp_connection_fixture : public stack_component_fixture<uut>
         std::array<char, msg_header::size()> serial_header;
         header->serialise(serial_header.data());
         std::array<boost::asio::const_buffer, 2> send_buf =
-        {{
+        {
             boost::asio::buffer(serial_header), 
             boost::asio::buffer(*data, header->fragment_length())
-        }};
+        };
 
         /* Send the message */
         boost::system::error_code error;
@@ -119,7 +122,7 @@ struct tcp_connection_fixture : public stack_component_fixture<uut>
 };
 
 
-BOOST_FIXTURE_TEST_SUITE( tcp_connection_tests, tcp_connection_fixture )
+BOOST_FIXTURE_TEST_SUITE( tcp_connection_tests, tcp_connection_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )
@@ -138,7 +141,6 @@ BOOST_AUTO_TEST_CASE( clone_test )
     BOOST_CHECK(conn->recv_port() == recv_port);
     BOOST_CHECK(conn->send_port() == send_port);
 
-    conn->build_up_links(new mock_stack_component());
     delete cloned.bottom();
 }
 
@@ -162,8 +164,8 @@ BOOST_AUTO_TEST_CASE( received_test )
     ctrl->run(msg_header::from_stack(serial_header), [this](const stack_accessor &acc)
         {
             auto top_node = dynamic_cast<mock_stack_component*>(acc.stack_bottom());
-            BOOST_CHECK(top_node->data_received() == 1);
-            BOOST_CHECK(top_node->headers_received() == 1);
+            BOOST_REQUIRE(top_node->data_received()     == 1);
+            BOOST_REQUIRE(top_node->headers_received()  == 1);
             
             /* Check message content */
             BOOST_CHECK(this->ab_mg.check_data(top_node->received_data()));
@@ -186,8 +188,8 @@ BOOST_AUTO_TEST_CASE( received_test )
     ctrl->run(msg_header::from_stack(serial_header), [this](const stack_accessor &acc)
         {
             auto top_node = dynamic_cast<mock_stack_component*>(acc.stack_bottom());
-            BOOST_CHECK(top_node->data_received() == 1);
-            BOOST_CHECK(top_node->headers_received() == 1);
+            BOOST_REQUIRE(top_node->data_received()     == 1);
+            BOOST_REQUIRE(top_node->headers_received()  == 1);
             
             /* Check message content */
             BOOST_CHECK(this->helloworld_mg.check_data(top_node->received_data()));
@@ -210,12 +212,11 @@ BOOST_AUTO_TEST_CASE( start_receiving_test )
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     /* Checks */
-    auto ab_header(ab_mg.header(3));
     ctrl->run(ab_mg.from_address(), [this](const stack_accessor &acc)
         {
             auto top_node = dynamic_cast<mock_stack_component*>(acc.stack_bottom());
-            BOOST_CHECK(top_node->data_received() == 1);
-            BOOST_CHECK(top_node->headers_received() == 1);
+            BOOST_REQUIRE(top_node->data_received()     == 1);
+            BOOST_REQUIRE(top_node->headers_received()  == 1);
             
             /* Check message content */
             BOOST_CHECK(this->ab_mg.check_data(top_node->received_data()));
@@ -230,18 +231,17 @@ BOOST_AUTO_TEST_CASE( start_receiving_test )
     /* Send some data */
     socket.close();
     BOOST_CHECK(connect(recv_port));
-    BOOST_CHECK(send(helloworld_mg, 3));
+    BOOST_CHECK(send(helloworld_mg, 12));
 
     /* Pass the data up the stack */
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     /* Checks */
-    auto helloworld_header(helloworld_mg.header(3));
     ctrl->run(helloworld_mg.from_address(), [this](const stack_accessor &acc)
         {
             auto top_node = dynamic_cast<mock_stack_component*>(acc.stack_bottom());
-            BOOST_CHECK(top_node->data_received() == 1);
-            BOOST_CHECK(top_node->headers_received() == 1);
+            BOOST_REQUIRE(top_node->data_received()     == 1);
+            BOOST_REQUIRE(top_node->headers_received()  == 1);
             
             /* Check message content */
             BOOST_CHECK(this->helloworld_mg.check_data(top_node->received_data()));
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE( start_receiving_test )
             BOOST_CHECK(recved_header->has_physical_address());
 
             recved_header->has_physical_address(false);
-            BOOST_CHECK(*this->helloworld_mg.header(3) == *recved_header);
+            BOOST_CHECK(*this->helloworld_mg.header(12) == *recved_header);
         });
 }
 
@@ -281,8 +281,8 @@ BOOST_AUTO_TEST_CASE( send_test )
     {
         std::lock_guard<std::mutex> lock(recv_mutex);
 
-        BOOST_CHECK(recv_data   != nullptr);
-        BOOST_CHECK(recv_header != nullptr);
+        BOOST_REQUIRE(recv_data     != nullptr);
+        BOOST_REQUIRE(recv_header   != nullptr);
 
         /* Check message content */
         BOOST_CHECK(ab_mg.check_data(recv_data));
@@ -308,8 +308,8 @@ BOOST_AUTO_TEST_CASE( send_test )
     {
         std::lock_guard<std::mutex> lock(recv_mutex);
 
-        BOOST_CHECK(recv_data   != nullptr);
-        BOOST_CHECK(recv_header != nullptr);
+        BOOST_REQUIRE(recv_data     != nullptr);
+        BOOST_REQUIRE(recv_header   != nullptr);
 
         /* Check message content */
         BOOST_CHECK(helloworld_mg.check_data(recv_data));
@@ -345,8 +345,8 @@ BOOST_AUTO_TEST_CASE( send_physical_address_test )
     {
         std::lock_guard<std::mutex> lock(recv_mutex);
 
-        BOOST_CHECK(recv_data   != nullptr);
-        BOOST_CHECK(recv_header != nullptr);
+        BOOST_REQUIRE(recv_data     != nullptr);
+        BOOST_REQUIRE(recv_header   != nullptr);
 
         /* Check message content */
         ab_header->has_physical_address(false);
@@ -372,8 +372,8 @@ BOOST_AUTO_TEST_CASE( send_physical_address_test )
     {
         std::lock_guard<std::mutex> lock(recv_mutex);
 
-        BOOST_CHECK(recv_data   != nullptr);
-        BOOST_CHECK(recv_header != nullptr);
+        BOOST_REQUIRE(recv_data     != nullptr);
+        BOOST_REQUIRE(recv_header   != nullptr);
 
         /* Check message content */
         helloworld_header->has_physical_address(false);

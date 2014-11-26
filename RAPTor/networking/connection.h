@@ -1,6 +1,10 @@
 #ifndef __CONNECTION_H__
 #define __CONNECTION_H__
 
+/* Standard headers */
+#include <array>
+#include <memory>
+
 /* Networking headers */
 #include "stack_component.h"
 #include "stack_accessor.h"
@@ -19,6 +23,9 @@ class connection : public stack_component
     public :
         connection(stack_controller *const ctrl, group *const grp)
             : _ctrl(ctrl), _grp(grp) {  };
+
+        /* Virtual DTOR for inheritance */
+        virtual ~connection() { };
 
         /* Access functions */
         group *const stack_group() const { return _grp; }
@@ -48,8 +55,10 @@ class connection : public stack_component
         }
 
     protected :
-        stack_controller *const _ctrl;
-        group *const            _grp;
+        stack_controller *const                 _ctrl;
+        group *const                            _grp;
+        std::array<char, msg_header::size()>    _head_buf;
+        std::unique_ptr<char []>                _data_buf;
 };
 }; /* namespace raptor_networking */
 
