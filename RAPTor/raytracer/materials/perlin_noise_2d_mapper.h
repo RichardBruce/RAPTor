@@ -19,11 +19,11 @@ namespace raptor_raytracer
 class perlin_noise_2d_mapper : public material
 {
     public :
-        perlin_noise_2d_mapper(ext_colour_t &rgb, fp_t p, fp_t z, unsigned int w, unsigned int h, int o, int s) : 
+        perlin_noise_2d_mapper(const ext_colour_t &rgb, const float p, const float z, const unsigned int w, const unsigned int h, const int o, const int s) : 
             material(), perlin(s), rgb(rgb), p(p), z(z), w(w), h(h), o(o)
             {
                 /* Normalize colour multipliers */
-                fp_t max_color_multiplier = this->rgb.r > this->rgb.g ? this->rgb.r : this->rgb.g;
+                float max_color_multiplier = this->rgb.r > this->rgb.g ? this->rgb.r : this->rgb.g;
                 max_color_multiplier = this->rgb.b > max_color_multiplier ? this->rgb.b : max_color_multiplier;
                 this->rgb.r /= max_color_multiplier;
                 this->rgb.g /= max_color_multiplier;
@@ -36,13 +36,13 @@ class perlin_noise_2d_mapper : public material
         void shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c) const;
 
     private :
-        const perlin_noise_2d & perlin;
+        const perlin_noise_2d   perlin;
         ext_colour_t            rgb;
-        fp_t                    p;
-        fp_t                    z;
-        unsigned int            w;
-        unsigned int            h;
-        int                     o;
+        const float             p;
+        const float             z;
+        const unsigned int      w;
+        const unsigned int      h;
+        const int               o;
 };
 }; /* namespace raptor_raytracer */
 

@@ -2,6 +2,13 @@
 use strict;
 use Cwd;
 
+use DateTime::Format::Strptime;
+
+my $parser = DateTime::Format::Strptime->new(
+    pattern => '%Y-%m-%d',
+    on_error => 'croak',
+);
+
 # Check usage
 ($#ARGV != 2)  or die "Two arguments expect " . $#ARGV . " given\n";
 
@@ -11,7 +18,7 @@ my $dir = cwd;
 my $project_name;
 if ($dir =~ m/(\w+)$/)
 {
-	$project_name = $1;
+    $project_name = $1;
 }
 else
 {
@@ -19,15 +26,16 @@ else
 }
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
-my $date =  ($year + 1900) . "-" . ($mon + 1) . "-" . $mday;
-my $output_dir = $ARGV[1] . $project_name . "/" .  $date;
+my $date        =  ($year + 1900) . "-" . ($mon + 1) . "-" . $mday;
+my $today_date  = $parser->parse_datetime($date);
+my $output_dir  = $ARGV[1] . $project_name . "/" .  $date;
 `mkdir -p $output_dir`;
 
 
 # Amend the index with a link to todays data
 my $project_index = $ARGV[1] . $project_name . "/index.html";
 my $new_project_index = $ARGV[1] . $project_name . "/index1.html";
-open (INDEX_T, "<", $project_index) or die "Error: Can't find project index.html";
+open (INDEX_T, "<", $project_index) or die "Error: Can't find project index.html ($project_index)";
 open (INDEX_F, ">", $new_project_index) or die "Error: Can't open new project index.html";
 while (my $line = <INDEX_T>)
 {
@@ -38,11 +46,66 @@ while (my $line = <INDEX_T>)
     {
         print INDEX_F $line;
 
+        # Skip table headers
+        $line = <INDEX_T>;      # <table style="width:100%">
+        print INDEX_F $line;
+        $line = <INDEX_T>;      # <tr>
+        print INDEX_F $line;
+        $line = <INDEX_T>;      # <th>Date</th><th>Hash</th><th>Comments</th>
+        print INDEX_F $line;
+        $line = <INDEX_T>;      # </tr>
+        print INDEX_F $line;
+        $line = <INDEX_T>;      # <tr>
+        print INDEX_F $line;
+
         # Check if todays date was already add and if not add it
         $line = <INDEX_T>;
         if ($line !~ m/$date/)
         {
-            print INDEX_F "    <p><a href=\"./$date\">$date</a></p>\n";
+            # Parse date
+            my $days_since_run;
+            if ($line =~ m/(\d{4}-\d{2}-\d{2})/)
+            {
+                my $last_date = $parser->parse_datetime($1);
+                my $dur = $today_date->delta_days($last_date);
+                $days_since_run = $dur->delta_days;
+            }
+            else
+            {
+                die "Error: Cant find date in index: $line\n";
+            }
+
+            # Get git log
+            # my @git_log = `git log --since=${days_since_run}.day --pretty=oneline`;
+
+            # # Pull out the latest hash
+            # my $git_hash;
+            # if ($git_log[0] =~ m/(\w+)\s/)
+            # {
+            #     $git_hash = $1;
+            # }
+            # else
+            # {
+            #     die "Error: Cant find hash in git log\n";
+            # }
+
+            # # Filter the performance related messages
+            # my @perf_messages;
+            # foreach (@git_log)
+            # {
+            #     if (m/PERF:\s+([\w\s\.]+)$/)
+            #     {
+            #         push @perf_messages, $1;
+            #     }
+            # }
+
+            # my $perf_comment = join(', ', @perf_messages);
+            # print "$perf_comment\n";
+            # exit 0;
+
+            print INDEX_F "            <td><a href=\"./$date\">$date</a></td><td></td><td></td>\n";
+            print INDEX_F "        </tr>\n";
+            print INDEX_F "        <tr>\n";
         }
     }
 
@@ -55,7 +118,7 @@ close (INDEX_F);
 
 
 # Open output file
-open (OUTFILE, ">", $output_dir . "/index.html") or die "Error: Can't open output file";
+open (OUTFILE, ">", $output_dir . "/index.html") or die "Error: Can't open output file: $output_dir";
 
 # Output html header
 print OUTFILE "<!DOCTYPE html>\n";
@@ -94,7 +157,7 @@ open (LOGFILE, "<", $ARGV[0]) or die "Error: Can't find input file";
 while (<LOGFILE>)
 {
     chomp;
-    if (m/Opening\s+input\s+file:\s+.*\/(\w+\/\w+\/\w+\.\w+)/)
+    if (m/PERF - Scene:\s+.*\/(\w+\/\w+\/\w+\.\w+)/)
     {
         # Output last scene
         if ($scene ne "No Scenes Found")
@@ -111,18 +174,22 @@ while (<LOGFILE>)
         $parser_time    = "--";
         $render_time    = "--";
     }
-    elsif (m/Rendering:\s+(\d+)\s+primitives,\s+of\s+which\s+lights:\s+(\d+)/)
+    elsif (m/PERF - # Primitives:\s+(\d+)/)
     {
         # Get primitive counts
         $primitives = $1;
-        $lights     = $2;
     }
-    elsif (m/Parser\s+took:\s+(\d)+ms/)
+    elsif (m/PERF - # Lights:\s+(\d+)/)
+    {
+        # Get light counts
+        $lights     = $1;
+    }
+    elsif (m/PERF - Parser Time ms:\s+(\d+)/)
     {
         # Get parser run time
         $parser_time = $1;
     }
-    elsif (m/Test\s+took:\s+(\d+)ms/)
+    elsif (m/PERF - Render Time ms:\s+(\d+)/)
     {
         # Get rendering run time
         $render_time = $1;

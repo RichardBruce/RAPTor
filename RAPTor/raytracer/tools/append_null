@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+
+use strict;
+use Getopt::Long;
+
+my ($help, $in_file, $out_file, $format, $line, @bytes);
+
+GetOptions (
+    "help"          => \$help,
+    "in:s"          => \$in_file,
+    "out:s"         => \$out_file,
+    "format:s"      => \$format
+    );
+
+# Check arguements
+if ($help or !$in_file or !$out_file or !$format)
+{
+    print "Usage fix_absoloute_paths -in <file> -out <file> -format <format>\n";
+    print "   -in       : Specify the input file name\n";
+    print "   -out      : Specify the output file name\n";
+    print "   -format   : Specify the file format, current supported file formats are lwo\n";
+    print "\n";
+    exit;
+}
+
+# Open files
+open(IN,  "< $in_file")     or die "Error: Cannot open input file $in_file";
+open(OUT, "> $out_file")    or die "Error: Cannot open output file $out_file";
+
+# Parse based on format
+if ($format =~ m/lwo/)
+{
+    my $out_index       = 0;
+    my $surf_size_ptr   = 0;
+    my $surf_size       = 0;
+
+    # Read input
+    while ($line = <IN>)
+    {
+        push @bytes, split(//, $line);
+    }
+
+    # Append null
+    $out_index = $#bytes + 1;
+    if ($out_index & 0x1)
+    {
+        print "Missing byte detected, adding\n";
+        $bytes[$out_index++] = chr(0x00);
+    }
+
+    # Set bytes 4-7 with the new file length
+    my $number_of_bytes_out = $out_index - 8;
+    $bytes[4] = chr(($number_of_bytes_out >> 24) & 0xff);
+    $bytes[5] = chr(($number_of_bytes_out >> 16) & 0xff);
+    $bytes[6] = chr(($number_of_bytes_out >>  8) & 0xff);
+    $bytes[7] = chr( $number_of_bytes_out        & 0xff);
+
+    # Print output
+    print OUT @bytes;
+}
+else
+{
+    print "Error: Unknown file format\n";
+    exit 1;
+}
+
+# Close files
+close IN;
+close OUT;
+
+exit 0;

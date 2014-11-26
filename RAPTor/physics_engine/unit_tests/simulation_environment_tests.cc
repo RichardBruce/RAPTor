@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE( add_object_test )
     BOOST_CHECK(uut.font_initialised() == false);
     BOOST_CHECK(uut.load_screen_initialised() == false);
 
-    uut.add_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, 9.5, 0.0), 10.0));
+    uut.add_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, 9.5, 0.0), std::numeric_limits<float>::infinity()));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 1);
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE( add_object_test )
     BOOST_CHECK(uut.font_initialised() == false);
     BOOST_CHECK(uut.load_screen_initialised() == false);
 
-    uut.add_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, -9.5, 0.0), 10.0));
+    uut.add_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, -9.5, 0.0), std::numeric_limits<float>::infinity()));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 2);

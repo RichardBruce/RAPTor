@@ -18,19 +18,14 @@ namespace raptor_raytracer
 class perlin_noise_3d_mapper : public texture_mapper
 {
     public :
-        perlin_noise_3d_mapper(const ext_colour_t &rgb, fp_t p, fp_t z, int o, int s, fp_t op = 1.0) : 
-            texture_mapper(), perlin(s), rgb(rgb), p(p), z(z), op(op), o(o)
-            {
-	            /* Normalise the colour */
-	            this->rgb.r /= 2.0;
-	            this->rgb.g /= 2.0;
-	            this->rgb.b /= 2.0;
-            };
+        perlin_noise_3d_mapper(const ext_colour_t &rgb, const float p, const float z, const int o, const int s, const float op = 1.0f) : 
+            texture_mapper(), perlin(s), rgb(rgb * 0.5f), p(p), z(z), op(op), o(o) {  };
+
         virtual ~perlin_noise_3d_mapper() { };
 
         /* Texture mapping function. Takes the destination and direction 
-           of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        fp_t texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
+           of the incident ray and returns either a float (alpha, kd, ks, t, r....), a colour (rgb) or both */
+        float texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
 
     private :
         friend class boost::serialization::access;
@@ -39,11 +34,11 @@ class perlin_noise_3d_mapper : public texture_mapper
         template<class Archive>
         void serialize(Archive &ar, const unsigned int version) { }
 
-        const perlin_noise_3d & perlin; /* Perlin noise generator           */
-        ext_colour_t            rgb;    /* The colour of the texture        */
-        const fp_t              p;      /* The persistence of the octaves   */
-        const fp_t              z;      /* Zoom                             */
-        const fp_t              op;     /* Opaqueness of the texture        */
+        const perlin_noise_3d   perlin; /* Perlin noise generator           */
+        const ext_colour_t      rgb;    /* The colour of the texture        */
+        const float             p;      /* The persistence of the octaves   */
+        const float             z;      /* Zoom                             */
+        const float             op;     /* Opaqueness of the texture        */
         const int               o;      /* Number of octaves to include     */
 };
 }; /* namespace raptor_raytracer */
@@ -67,7 +62,7 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::perlin_noise_3d_
 {
     /* Retreive the fields */
     raptor_raytracer::ext_colour_t rgb;
-    fp_t p, z, op;
+    float p, z, op;
     int o, s;
     ar >> rgb;
     ar >> p;

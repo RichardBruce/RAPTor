@@ -28,20 +28,20 @@
 
 
 /* Camera parameters */
-const point_t cam_p( 0.0, -5.0, -25);                               /* Position                 */
-const point_t x_vec( 1.0,  0.0, 0.0);                               /* Horizontal vector        */
-const point_t y_vec( 0.0,  1.0, 0.0);                               /* Virtical vector          */
-const point_t z_vec( 0.0,  0.0, 1.0);                               /* Forward vector           */
-const raptor_raytracer::ext_colour_t bg(0.0, 0.0, 0.0);             /* Background colour        */
-const unsigned xr = 640;                                            /* X resolution             */
-const unsigned yr = 480;                                            /* Y resolution             */
-const unsigned xa = 1;                                              /* X anti-aliasing factor   */
-const unsigned ya = 1;                                              /* Y anti-aliasing factor   */
-const fp_t screen_width     = (fp_t)10.0;                           /* Width of screen          */
-const fp_t screen_height    = screen_width * ((fp_t)yr / (fp_t)xr); /* Height of screen         */
+const point_t cam_p( 0.0, -5.0, -25);                                                           /* Position                 */
+const point_t x_vec( 1.0,  0.0, 0.0);                                                           /* Horizontal vector        */
+const point_t y_vec( 0.0,  1.0, 0.0);                                                           /* Virtical vector          */
+const point_t z_vec( 0.0,  0.0, 1.0);                                                           /* Forward vector           */
+const raptor_raytracer::ext_colour_t bg(0.0, 0.0, 0.0);                                         /* Background colour        */
+const unsigned xr = 640;                                                                        /* X resolution             */
+const unsigned yr = 480;                                                                        /* Y resolution             */
+const unsigned xa = 1;                                                                          /* X anti-aliasing factor   */
+const unsigned ya = 1;                                                                          /* Y anti-aliasing factor   */
+const float screen_width    = 10.0;                                                             /* Width of screen          */
+const float screen_height   = screen_width * (static_cast<float>(yr) / static_cast<float>(xr)); /* Height of screen         */
 
 /* Clocks in a second */
-const fp_t clocks_per_sec_inv = 1.0 / CLOCKS_PER_SEC;
+const float clocks_per_sec_inv = 1.0 / CLOCKS_PER_SEC;
 
 
 namespace raptor_physics
@@ -110,7 +110,7 @@ class simulation_environment
 
         /* Access functions */
         physics_engine *const   engine()                            { return _pe;                       }
-        fp_t                    time_run()                          { return _time_run;                 }
+        float                   time_run()                          { return _time_run;                 }
         int                     number_of_lights()          const   { return _lights.size();            }
         bool                    screen_initialised()        const   { return _texture != nullptr;       }
         bool                    font_initialised()          const   { return _font != nullptr;          }
@@ -124,6 +124,7 @@ class simulation_environment
 
         simulation_environment& add_object(physics_object *const o)
         {
+            assert((o->get_mass() == std::numeric_limits<float>::infinity()) || !"Error: Non moving object must have infinite mass, did you mean to call add_moving_object?");
             _pe->add_object(o);
             return *this;
         }
@@ -132,7 +133,7 @@ class simulation_environment
         {
             if (gravity)
             {
-                o->register_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -raptor_physics::ACCELERATION_UNDER_GRAVITY * o->get_mass(), 0.0), numeric_limits<fp_t>::infinity()));
+                o->register_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -raptor_physics::ACCELERATION_UNDER_GRAVITY * o->get_mass(), 0.0), numeric_limits<float>::infinity()));
             }
             
             _pe->add_moving_object(o);
@@ -151,8 +152,8 @@ class simulation_environment
         raptor_raytracer::light_list            _lights;
         std::unique_ptr<sdl_event_handler_base> _cam_event_handler;
         clock_t                                 _sim_time;
-        fp_t                                    _time_run;
-        fp_t                                    _damped_fps;
+        float                                   _time_run;
+        float                                   _damped_fps;
 };
 }; /* namespace raptor_physics */
 

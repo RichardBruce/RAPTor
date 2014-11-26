@@ -1,0 +1,1 @@
+/usr/bin/c++       CMakeFiles/testHACD.dir/src/main.cpp.o  -o testHACD -rdynamic ../HACD_Lib/libHACD_LIB.a 

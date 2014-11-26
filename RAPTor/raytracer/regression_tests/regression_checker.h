@@ -19,10 +19,11 @@
 
 using namespace raptor_raytracer;
 
-const float result_tolerance = 0.0005f;
-const int pixel_error = 3;
-const int failure_limit = 1000;
-const std::string test_data_location = "test_data/";
+const float result_tolerance            = 0.0005f;
+const int count_error                   = 4;
+const int pixel_error                   = 5;
+const int failure_limit                 = 1000;
+const std::string test_data_location    = "test_data/";
 
 
 #define CREATE_REGRESSION_CHECKER(NAME)  regression_checker NAME( \
@@ -68,37 +69,42 @@ class regression_checker : private boost::noncopyable
             /* Compare */
             int failures = 0;
             std::unique_ptr<unsigned char []> difference(new unsigned char [image_size]);
-            for (unsigned int i = 0; i < image_pixels; ++i)
+            for (unsigned int i = 0; i < x_res; ++i)
             {
-                /* Colour mismatch pixels red */
-                const unsigned int idx = i * 3;
-                if ((abs(actual[idx    ] - expected[idx    ]) > pixel_error) ||
-                    (abs(actual[idx + 1] - expected[idx + 1]) > pixel_error) ||
-                    (abs(actual[idx + 2] - expected[idx + 2]) > pixel_error))
+                for (unsigned int j = 0; j < y_res; ++j)
                 {
-                    ++failures;
-                    difference[idx    ] = 255;
-                    difference[idx + 1] = 0;
-                    difference[idx + 2] = 0;
+                    /* Colour mismatch pixels red */
+                    const unsigned int idx = ((i * y_res) + j) * 3;
+                    if (test_pixel(actual.get(), expected.get(), idx))
+                    {
+                        difference[idx    ] = 255;
+                        difference[idx + 1] = 0;
+                        difference[idx + 2] = 0;
+                    }
+                    else
+                    {
+                        difference[idx    ] = actual[idx    ];
+                        difference[idx + 1] = actual[idx + 1];
+                        difference[idx + 2] = actual[idx + 2];
+                    }
 
-                    /* Check only the failing pixels or we get loads of team city logs */
-                    if (failures < failure_limit)
+                    /* Check for an error a human might notice */
+                    if (preceivable_error_check(actual.get(), expected.get(), i, j, x_res, y_res))
                     {
-                        BOOST_CHECK(actual[idx    ] == expected[idx    ]);
-                        BOOST_CHECK(actual[idx + 1] == expected[idx + 1]);
-                        BOOST_CHECK(actual[idx + 2] == expected[idx + 2]);
+                        /* Check only the failing pixels or we get loads of team city logs */
+                        if (failures < failure_limit)
+                        {
+                            ++failures;
+                            BOOST_CHECK(actual[idx    ] == expected[idx    ]);
+                            BOOST_CHECK(actual[idx + 1] == expected[idx + 1]);
+                            BOOST_CHECK(actual[idx + 2] == expected[idx + 2]);
+                        }
+                        else if (failures == failure_limit)
+                        {
+                            ++failures;
+                            BOOST_LOG_TRIVIAL(warning) << failure_limit << " errors detected, I'm not checking anymore. Go fix your code";
+                        }
                     }
-                    else if (failures == failure_limit)
-                    {
-                        ++failures;
-                        BOOST_LOG_TRIVIAL(warning) << failure_limit << " errors detected, I'm not checking anymore. Go fix your code";
-                    }
-                }
-                else
-                {
-                    difference[idx    ] = actual[idx    ];
-                    difference[idx + 1] = actual[idx + 1];
-                    difference[idx + 2] = actual[idx + 2];
                 }
             }
 
@@ -109,6 +115,56 @@ class regression_checker : private boost::noncopyable
         }
 
     private :
+        bool preceivable_error_check(const unsigned char *const actual, const unsigned char *const expected, const unsigned int i, const unsigned j, const unsigned int x_res, const unsigned int y_res)
+        {
+            /* Cant check the perimeter pixels */
+            if ((i == 0) || (i == x_res - 1) || (j == 0) || (j == y_res - 1))
+            {
+                return false;
+            }
+
+            /* Check 3x3 surrounding pixels */
+            const unsigned int c = (i * y_res) + j;
+            int error_count = test_pixel(actual, expected, c * 3);
+            if (!error_count)
+            {
+                return false;
+            }
+
+            const unsigned int u = c - y_res;
+            error_count += test_pixel(actual, expected, u * 3);
+
+            const unsigned int d = c + y_res;
+            error_count += test_pixel(actual, expected, d * 3);
+
+            const unsigned int l = c - 1;
+            error_count += test_pixel(actual, expected, l * 3);
+
+            const unsigned int r = c + 1;
+            error_count += test_pixel(actual, expected, r * 3);
+
+            const unsigned int ul = u - 1;
+            error_count += test_pixel(actual, expected, ul * 3);
+
+            const unsigned int ur = u + 1;
+            error_count += test_pixel(actual, expected, ur * 3);
+
+            const unsigned int dl = d - 1;
+            error_count += test_pixel(actual, expected, dl * 3);
+
+            const unsigned int dr = d + 1;
+            error_count += test_pixel(actual, expected, dr * 3);
+
+            return error_count > count_error;
+        }
+
+        bool test_pixel(const unsigned char *const actual, const unsigned char *const expected, const unsigned int idx)
+        {
+            return ((abs(actual[idx    ] - expected[idx    ]) > pixel_error) ||
+                    (abs(actual[idx + 1] - expected[idx + 1]) > pixel_error) ||
+                    (abs(actual[idx + 2] - expected[idx + 2]) > pixel_error));
+        }
+
         const std::string _expected;
         const std::string _difference;
         const std::string _actual;

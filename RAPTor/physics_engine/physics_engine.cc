@@ -25,7 +25,7 @@ physics_engine& physics_engine::advance_time(const float t)
     {
         /* Calculate the time step that means the max displacement cant be exceeded */
         float max_v = 0.0;
-        for (auto &p : (*_moving_objects))
+        for (auto &p : (*_objects))
         {
             max_v = std::max(max_v, p.second->get_speed());
         }    
@@ -34,7 +34,7 @@ physics_engine& physics_engine::advance_time(const float t)
     
 
         /* Calculate the movement of all objects, but dont commit to it */
-        for (auto &p : (*_moving_objects))
+        for (auto &p : (*_objects))
         {
             p.second->begin_time_step(t_step);
             BOOST_LOG_TRIVIAL(trace) << p.first << " started frame segment at: " << p.second->get_center_of_mass() << " moving: " << p.second->get_velocity() << " force: " << p.second->get_force();
@@ -217,7 +217,7 @@ physics_engine& physics_engine::advance_time(const float t)
         }
 
         /* Commit all remaining movement */
-        for (auto& p : (*_moving_objects))
+        for (auto& p : (*_objects))
         {
             p.second->commit_movement(t_step);
         }

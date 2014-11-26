@@ -21,7 +21,7 @@
 /* Terrain generator headers */
 #include "height_map.h"
 #include "grid_cell.h"
-#include "convex_decomposition.h"
+// #include "convex_decomposition.h"
 
 using raptor_terrain::grid_cell;
 using raptor_terrain::neighbour_t;
@@ -95,11 +95,6 @@ neighbour_t track_anti_clockwise_edge(grid_cell **const grid_cells, const grid_c
 }
 
 
-void CallBack(const char * msg, double progress, double concavity, size_t nVertices)
-{
-    std::cout << msg;
-}
-
 int main()
 {
     const int x = 128;
@@ -158,95 +153,92 @@ int main()
     std::unique_ptr<point_t []> verts(hm.generate(xs, ys));
 
 
-    std::vector< raptor_terrain::Vec3<raptor_terrain::Real> > points;
-    for (int i = 0; i < (x * y); ++i)
-    {
-        points.emplace_back(verts[i].x, verts[i].y, verts[i].z);
-    }
+    // std::vector< raptor_terrain::Vec3<raptor_terrain::Real> > points;
+    // for (int i = 0; i < (x * y); ++i)
+    // {
+    //     points.emplace_back(verts[i].x, verts[i].y, verts[i].z);
+    // }
 
-    std::vector< raptor_terrain::Vec3<long> > triangles;
-    for (int i = 0; i < (x - 1); ++i)
-    {
-        /* Calculate row offsets for vertices */
-        const int vert_row = i * y;
-        const int vert_row_p1 = vert_row + y;
+    // std::vector< raptor_terrain::Vec3<long> > triangles;
+    // for (int i = 0; i < (x - 1); ++i)
+    // {
+    //      Calculate row offsets for vertices 
+    //     const int vert_row = i * y;
+    //     const int vert_row_p1 = vert_row + y;
 
-        for (int j = 0; j < (y - 1); ++j)
-        {
-            triangles.emplace_back(vert_row + j, vert_row + j + 1, vert_row_p1 + j + 1);
-            triangles.emplace_back(vert_row_p1 + j, vert_row + j, vert_row_p1 + j + 1);
-        }
-    }
+    //     for (int j = 0; j < (y - 1); ++j)
+    //     {
+    //         triangles.emplace_back(vert_row + j, vert_row + j + 1, vert_row_p1 + j + 1);
+    //         triangles.emplace_back(vert_row_p1 + j, vert_row + j, vert_row_p1 + j + 1);
+    //     }
+    // }
 
-    raptor_terrain::HeapManager * heapManager = raptor_terrain::createHeapManager(65536*(1000));
-    raptor_terrain::HACD * const myHACD = raptor_terrain::CreateHACD(heapManager);
-    myHACD->SetPoints(&points[0]);
-    myHACD->SetNPoints(points.size());
-    myHACD->SetTriangles(&triangles[0]);
-    myHACD->SetNTriangles(triangles.size());
-    myHACD->SetCompacityWeight(0.0001);
-    myHACD->SetVolumeWeight(0.0);
-    myHACD->SetConnectDist(0.001);               // if two connected components are seperated by distance < ccConnectDist
-                                                        // then create a virtual edge between them so the can be merged during 
-                                                        // the simplification process
+    // raptor_terrain::HeapManager * heapManager = raptor_terrain::createHeapManager(65536*(1000));
+    // raptor_terrain::HACD * const myHACD = raptor_terrain::CreateHACD(heapManager);
+    // myHACD->SetPoints(&points[0]);
+    // myHACD->SetNPoints(points.size());
+    // myHACD->SetTriangles(&triangles[0]);
+    // myHACD->SetNTriangles(triangles.size());
+    // myHACD->SetCompacityWeight(0.0001);
+    // myHACD->SetVolumeWeight(0.0);
+    // myHACD->SetConnectDist(0.001);               // if two connected components are seperated by distance < ccConnectDist
+    //                                                     // then create a virtual edge between them so the can be merged during 
+    //                                                     // the simplification process
           
-    myHACD->SetNClusters(16);                     // minimum number of clusters
-    myHACD->SetNVerticesPerCH(100);                      // max of 100 vertices per convex-hull
-    myHACD->SetConcavity(1.0);                     // maximum concavity
-    myHACD->SetSmallClusterThreshold(0.075);                 // threshold to detect small clusters
-    myHACD->SetNTargetTrianglesDecimatedMesh(2000); // # triangles in the decimated mesh
-    myHACD->SetCallBack(&CallBack);
-    myHACD->SetAddExtraDistPoints(false);   
-    myHACD->SetAddFacesPoints(true); 
+    // myHACD->SetNClusters(16);                     // minimum number of clusters
+    // myHACD->SetNVerticesPerCH(100);                      // max of 100 vertices per convex-hull
+    // myHACD->SetConcavity(1.0);                     // maximum concavity
+    // myHACD->SetSmallClusterThreshold(0.075);                 // threshold to detect small clusters
+    // myHACD->SetNTargetTrianglesDecimatedMesh(2000); // # triangles in the decimated mesh
+    // myHACD->SetCallBack(&CallBack);
+    // myHACD->SetAddExtraDistPoints(false);   
+    // myHACD->SetAddFacesPoints(true); 
     
-    myHACD->Compute();
-    const size_t nClusters = myHACD->GetNClusters();
+    // myHACD->Compute();
+    // const size_t nClusters = myHACD->GetNClusters();
 
-    BOOST_LOG_TRIVIAL(trace) << "Number of convex hulls: " << nClusters;
-    for(size_t c = 0; c < nClusters; ++c)
-    {
-        std::cout << std::endl << "Convex-Hull " << c << std::endl;
-        size_t nPoints = myHACD->GetNPointsCH(c);
-        size_t nTriangles = myHACD->GetNTrianglesCH(c);
-        std::unique_ptr<raptor_terrain::Vec3<raptor_terrain::Real> []> pointsCH(new raptor_terrain::Vec3<raptor_terrain::Real>[nPoints]);
-        std::unique_ptr<raptor_terrain::Vec3<long> []> trianglesCH(new raptor_terrain::Vec3<long>[nTriangles]);
-        myHACD->GetCH(c, pointsCH.get(), trianglesCH.get());
-        BOOST_LOG_TRIVIAL(trace) << "Number of vertices: " << nPoints;
-        BOOST_LOG_TRIVIAL(trace) << "Number of triangles: " << nTriangles;
+    // BOOST_LOG_TRIVIAL(trace) << "Number of convex hulls: " << nClusters;
+    // for(size_t c = 0; c < nClusters; ++c)
+    // {
+    //     std::cout << std::endl << "Convex-Hull " << c << std::endl;
+    //     size_t nPoints = myHACD->GetNPointsCH(c);
+    //     size_t nTriangles = myHACD->GetNTrianglesCH(c);
+    //     std::unique_ptr<raptor_terrain::Vec3<raptor_terrain::Real> []> pointsCH(new raptor_terrain::Vec3<raptor_terrain::Real>[nPoints]);
+    //     std::unique_ptr<raptor_terrain::Vec3<long> []> trianglesCH(new raptor_terrain::Vec3<long>[nTriangles]);
+    //     myHACD->GetCH(c, pointsCH.get(), trianglesCH.get());
+    //     BOOST_LOG_TRIVIAL(trace) << "Number of vertices: " << nPoints;
+    //     BOOST_LOG_TRIVIAL(trace) << "Number of triangles: " << nTriangles;
 
-        std::vector<point_t> patch_verts;
-        for(size_t v = 0; v < nPoints; ++v)
-        {
-            patch_verts.emplace_back(pointsCH[v].X(), pointsCH[v].Y(), pointsCH[v].Z());
-        }
+    //     std::vector<point_t> patch_verts;
+    //     for(size_t v = 0; v < nPoints; ++v)
+    //     {
+    //         patch_verts.emplace_back(pointsCH[v].X(), pointsCH[v].Y(), pointsCH[v].Z());
+    //     }
 
-        std::vector<int> *const tris = new std::vector<int>();
-        for(size_t f = 0; f < nTriangles; ++f)
-        {
-            tris->push_back(trianglesCH[f].X());
-            tris->push_back(trianglesCH[f].Y());
-            tris->push_back(trianglesCH[f].Z());
-        }
+    //     std::vector<int> *const tris = new std::vector<int>();
+    //     for(size_t f = 0; f < nTriangles; ++f)
+    //     {
+    //         tris->push_back(trianglesCH[f].X());
+    //         tris->push_back(trianglesCH[f].Y());
+    //         tris->push_back(trianglesCH[f].Z());
+    //     }
 
 
-        /* Add static objects */
-        raptor_physics::vertex_group *const vg = new raptor_physics::vertex_group(patch_verts, tris, m[c & 0xf].get());
-        raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0, 0.0, 0.0), numeric_limits<fp_t>::infinity());
-        se.add_object(phy_obj);
-    }
+    //     /* Add static objects */
+    //     raptor_physics::vertex_group *const vg = new raptor_physics::vertex_group(patch_verts, tris, m[c & 0xf].get());
+    //     raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0, 0.0, 0.0), numeric_limits<fp_t>::infinity());
+    //     se.add_object(phy_obj);
+    // }
 
-    DestroyHACD(myHACD);
-    releaseHeapManager(heapManager);
+    // DestroyHACD(myHACD);
+    // releaseHeapManager(heapManager);
     
-    // return 1;
+    // // return 1;
     
-    /* Run physics simulation */
-    se.run();
+    // /* Run physics simulation */
+    // se.run();
 
-    return 0;
-
-
-
+    // return 0;
 
     /* Build grid cells */
     std::unique_ptr<grid_cell *[]> raw_grid_cells(raptor_terrain::vertices_to_grid_cells(verts.get(), y, cell_x, cell_y));

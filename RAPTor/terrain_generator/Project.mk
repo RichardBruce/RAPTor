@@ -1,6 +1,5 @@
 # Source
 SOURCE  = main.cc \
-    graph.cc convex_decomposition.cc convex_hull.cc manifold_mesh.cc mesh_decimator.cc allocator.cc raycast_mesh.cc \
     perlin_noise_2d.cc perlin_noise_3d.cc simplex_noise_2d.cc simplex_noise_3d.cc
 
 # Includes
@@ -19,7 +18,7 @@ INCLUDE = $(LOCAL_INCLUDES) \
     $(LIBARYS_PATH)/SDL2_image-2.0.0/include/SDL2/ \
     $(LIBARYS_PATH)/tbb$(TBB_VER)/include/ \
     $(LIBARYS_PATH)/fftw-$(FFTW_VER)/include 
-LOCAL_INCLUDES  = . $(RAPTOR_HOME)/common/ $(RAPTOR_HOME)/terrain_generator/convex_decomposition/
+LOCAL_INCLUDES  = . $(RAPTOR_HOME)/common/
 vpath %.cc $(INCLUDE)
 
 # Libraries

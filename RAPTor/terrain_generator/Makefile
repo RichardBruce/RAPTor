@@ -27,6 +27,7 @@ spotless ::
 	$(RM) libterrain_generator.so
 	$(RM) libterrain_generator.so.1
 	$(RM) libterrain_generator.so.1.0.1
+	$(RM) todo
 	$(RM) cppcheck.xml
 	$(RM) lines_of_code
 	$(MAKE) -C unit_tests spotless

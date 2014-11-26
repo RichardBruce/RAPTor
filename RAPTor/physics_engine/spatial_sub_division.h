@@ -86,7 +86,12 @@ class spatial_sub_division : private boost::noncopyable
             collision_detect();
         }
 
-        /* Allow default DTOR */
+        /* DTOR */
+        ~spatial_sub_division()
+        {
+            delete _min_sentinel;
+            delete _max_sentinel;
+        }
 
         spatial_sub_division& add_object(const physics_object &po)
         {
@@ -311,7 +316,7 @@ class spatial_sub_division : private boost::noncopyable
 
         void update_possibles(const object_bound *const moving_lo, const object_bound *const moving_hi, const axis_t axis)
         {
-            if (moving_lo->min() & !moving_hi->min())
+            if (moving_lo->min() & (!moving_hi->min()))
             {
                 const std::pair<const physics_object*, const physics_object*> *pair = _axis_possibles[axis].insert(moving_lo->object(), moving_hi->object());
 
@@ -340,7 +345,7 @@ class spatial_sub_division : private boost::noncopyable
                         break;
                 }
             }
-            else if (!moving_lo->min() & moving_hi->min())
+            else if ((!moving_lo->min()) & moving_hi->min())
             {
                 _axis_possibles[axis].erase(moving_lo->object(), moving_hi->object());
                 _possibles.erase(moving_lo->object(), moving_hi->object());

@@ -5,20 +5,20 @@ namespace raptor_raytracer
 {
 void perlin_noise_2d_mapper::shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c) const
 {
-    fp_t x = i.get_x1();
-    fp_t y = i.get_y1();
-    fp_t total = 0.0;
-    fp_t frequency = 1.0;
-    fp_t amplitude = 1.0;
+    const float x   = i.get_x1();
+    const float y   = i.get_y1();
+    float total     = 0.0f;
+    float frequency = 1.0f;
+    float amplitude = 1.0f;
 
     for (int i = 0; i < this->o; ++i)
     {
         total = total + this->perlin.interpolated_noise(x * frequency / this->z, y * frequency / this->z) * amplitude;
-        frequency *= 2.0;
+        frequency *= 2.0f;
         amplitude *= this->p;
     }
 
-    (*c) = ext_colour_t((this->rgb.r * (total + 1.0) * 127.5), (this->rgb.g * (total + 1.0) * 127.5), (this->rgb.b * (total + 1.0) * 127.5));
+    (*c) = ext_colour_t((this->rgb.r * (total + 1.0f) * 127.5f), (this->rgb.g * (total + 1.0f) * 127.5f), (this->rgb.b * (total + 1.0f) * 127.5f));
 }
 
 
@@ -28,9 +28,9 @@ void perlin_noise_2d_mapper::shade(const ray_trace_engine &r, ray &i, const line
 //    {
 //        for (unsigned int x = 0; x < this->w; ++x)
 //        {
-//            fp_t total = 0;
-//            fp_t frequency = 1;
-//            fp_t amplitude = 1;
+//            float total = 0;
+//            float frequency = 1;
+//            float amplitude = 1;
 //
 //            for (int i = 0; i < this->o; ++i)
 //            {
@@ -47,19 +47,19 @@ void perlin_noise_2d_mapper::shade(const ray_trace_engine &r, ray &i, const line
 //
 //void perlin_noise_2d_mapper::GenerateNormalized()
 //{    
-//    fp_t min = 0;
-//    fp_t max = 0;
-//    fp_t maxColorMultiplier;
-//    fp_t * pDataFloat = new fp_t[this->w * this->h];
+//    float min = 0;
+//    float max = 0;
+//    float maxColorMultiplier;
+//    float * pDataFloat = new float[this->w * this->h];
 //
-//    //Generate raw fp_t data
+//    //Generate raw float data
 //    for (unsigned int y = 0; y < this->h; ++y)
 //    {
 //        for (unsigned int x = 0; x < this->w; ++x)
 //        {
-//            fp_t total = 0;
-//            fp_t frequency = 1;
-//            fp_t amplitude = 1;
+//            float total = 0;
+//            float frequency = 1;
+//            float amplitude = 1;
 //
 //            for (int i = 0; i < this->o; ++i)
 //            {

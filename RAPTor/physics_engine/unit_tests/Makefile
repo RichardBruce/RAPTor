@@ -33,7 +33,7 @@ $(eval $(call test_suite_template, physics_options_tests.out, ))
 $(eval $(call test_suite_template, rigid_body_collider_tests.out, physics_common.o))
 $(eval $(call test_suite_template, simplex_tests.out, simplex.o))
 $(eval $(call test_suite_template, simulation_environment_tests.out, simulation_environment.o physics_engine.o vertex_group.o physics_object.o physics_common.o gjk.o simplex.o common.o phong_shader.o sdl_wrapper.o sdl_event_handler_factory.o)) # rendering not covered
-$(eval $(call test_suite_template, spatial_sub_division_tests.out, spatial_sub_division.o))
+$(eval $(call test_suite_template, spatial_sub_division_tests.out, ))
 $(eval $(call test_suite_template, tracking_info_tests.out, simplex.o))
 $(eval $(call test_suite_template, vertex_group_tests.out, physics_common.o))
 # find support vertex not covered in physics common
