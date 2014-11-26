@@ -3,6 +3,7 @@
 
 /* Standard headers */
 #include <deque>
+#include <mutex>
 
 /* Networking headers */
 #include "stack_component.h"
@@ -28,6 +29,8 @@ class mock_stack_component : public stack_component_impl<stack_component, stack_
 
         std::shared_ptr<msg_header> received_header()
         {
+            std::lock_guard<std::mutex> lock(_data_mutex);
+
             if (_recv_header.empty())
             {
                 return nullptr;
@@ -42,6 +45,8 @@ class mock_stack_component : public stack_component_impl<stack_component, stack_
 
         std::shared_ptr<msg_header> sent_header()
         {
+            std::lock_guard<std::mutex> lock(_data_mutex);
+
             if (_send_header.empty())
             {
                 return nullptr;
@@ -56,6 +61,8 @@ class mock_stack_component : public stack_component_impl<stack_component, stack_
 
         std::shared_ptr<msg_data> received_data()
         {
+            std::lock_guard<std::mutex> lock(_data_mutex);
+
             if (_recv_data.empty())
             {
                 return nullptr;
@@ -70,6 +77,8 @@ class mock_stack_component : public stack_component_impl<stack_component, stack_
 
         std::shared_ptr<std::vector<char>> sent_data()
         {
+            std::lock_guard<std::mutex> lock(_data_mutex);
+
             if (_send_data.empty())
             {
                 return nullptr;
@@ -102,12 +111,14 @@ class mock_stack_component : public stack_component_impl<stack_component, stack_
         /* Virtual functions for sending and receiving messages */
         virtual void received(const stack_accessor &acc, const std::shared_ptr<msg_data> &data, const std::shared_ptr<msg_header> &header)
         {
+            std::lock_guard<std::mutex> lock(_data_mutex);
             _recv_header.push_back(header);
             _recv_data.push_back(data);
         }
 
         virtual void send(const stack_accessor &acc, const std::shared_ptr<std::vector<char>> &data, const std::shared_ptr<msg_header> &header, boost::system::error_code &ec)
         {
+            std::lock_guard<std::mutex> lock(_data_mutex);
             _send_header.push_back(header);
             _send_data.push_back(data);
         }
@@ -156,6 +167,7 @@ class mock_stack_component : public stack_component_impl<stack_component, stack_
         std::deque<std::shared_ptr<msg_header>>         _send_header;
         std::deque<std::shared_ptr<msg_data>>           _recv_data;
         std::deque<std::shared_ptr<std::vector<char>>>  _send_data;
+        std::mutex                                      _data_mutex;
         const bool                                      _conn;
 };
 }; /* namespace raptor_networking */

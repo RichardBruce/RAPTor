@@ -50,7 +50,7 @@ struct msg_data_fixture
     const std::vector<char> padded_hellomars;
 };
 
-BOOST_FIXTURE_TEST_SUITE( msg_data_tests, msg_data_fixture )
+BOOST_FIXTURE_TEST_SUITE( msg_data_tests, msg_data_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )
@@ -103,32 +103,6 @@ BOOST_AUTO_TEST_CASE( can_peek_test )
     /* Check */
     BOOST_CHECK(data0.can_peek(helloworld.size()));
     BOOST_CHECK(!data0.can_peek(helloworld.size() + 1));
-}
-
-
-/* Check pre-checks */
-BOOST_AUTO_TEST_CASE( expand_checks_test )
-{
-    msg_data data(new_helloworld(), helloworld.size());
-    BOOST_CHECK(data.complete());
-
-    BOOST_CHECK_THROW(data.expand_slots(0, hellomars.size()), invalid_argument);
-    BOOST_CHECK_THROW(data.expand_slots(5, hellomars.size()), invalid_argument);
-}
-
-
-BOOST_AUTO_TEST_CASE( move_checks_test )
-{
-    msg_data data0(new_helloworld(), helloworld.size());
-    std::shared_ptr<msg_data> data1(new msg_data(new_helloworld(), helloworld.size()));
-    std::shared_ptr<msg_data> data2(new msg_data(new_hellomars(), hellomars.size()));
-    BOOST_CHECK(data0.complete());
-    BOOST_CHECK(data1->complete());
-    BOOST_CHECK(data2->complete());
-
-    data0.expand_slots(3, 3 * helloworld.size());
-    BOOST_CHECK_THROW(data0.move(data1, 3), invalid_argument);
-    BOOST_CHECK_THROW(data0.move(data2, 1), invalid_argument);
 }
 
 

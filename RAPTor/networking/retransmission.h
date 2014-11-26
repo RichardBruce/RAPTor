@@ -342,9 +342,11 @@ class nack_retransmission : public stack_component_impl<UpNode, DnNode>
             _seen.insert(insert_iter, re_id);
 
             /* Retire leading sequential entries */
-            while (*(++_seen.begin()) == (_seen.front() + 1))
+            auto next_seen_iter = ++_seen.begin();
+            while ((next_seen_iter != _seen.end()) && (*next_seen_iter == (_seen.front() + 1)))
             {
                 _seen.pop_front();
+                ++next_seen_iter;
             }
 
             /* Check if everything is ok */
@@ -422,9 +424,9 @@ class nack_retransmission : public stack_component_impl<UpNode, DnNode>
 
     private :
         typedef std::list<int> seen_list;
-        stack_controller *const _ctrl;      /* Safe access to the protocol stack            */
-        seen_list               _seen;      /* Map of sequence ids seen                     */
-        resend_info             _resend;    /* Information needed for resend per context    */
+        stack_controller *const _ctrl;          /* Safe access to the protocol stack            */
+        seen_list               _seen;          /* Map of sequence ids seen                     */
+        resend_info             _resend;        /* Information needed for resend per context    */
         std::uint32_t           _resend_id;     /* The message id to be used for resending      */
 };
 }; /* namespace raptor_networking */

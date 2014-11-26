@@ -14,7 +14,7 @@
 
 void my_terminate()
 {
-    std::cout << "program about to terminate" << std::endl;
+    std::cout << "Program about to terminate" << std::endl;
     abort();
 }
 

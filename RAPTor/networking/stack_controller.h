@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <thread>
+#include <vector>
 
 /* Boost headers */
 #include "boost/uuid/uuid.hpp"
@@ -34,6 +35,16 @@ class stack_controller
 
         ~stack_controller()
         {
+            /* Stop io service */
+            _io_service.stop();
+
+            /* Wait for threads to complete */
+            for (auto *const thread : _threads)
+            {
+                thread->join();
+                delete thread;
+            }
+
             /* Clean the base stack */
             if (_clean_stack_bottom != nullptr)
             {
@@ -56,12 +67,13 @@ class stack_controller
 
         stack_controller& start(const size_t nr_threads)
         {
-            /* Start the io service thread pool */            
+            /* Start the io service thread pool */
+            _threads.reserve(nr_threads);
             for (size_t i = 0; i < nr_threads; ++i)
             {
-                std::thread thread(std::bind(
+                std::thread *const thread = new std::thread(std::bind(
                     (std::size_t(boost::asio::io_service::*)())&boost::asio::io_service::run, &_io_service));
-                thread.detach();
+                _threads.push_back(thread);
             }
 
             return *this;
@@ -112,6 +124,7 @@ class stack_controller
         typedef tbb::concurrent_hash_map<uuid, stack_map_element*, hash_compare<uuid>> stack_map;
 
         boost::asio::io_service &   _io_service;
+        std::vector<std::thread *>  _threads;
         stack_map                   _stacks;
         message_delivery *          _clean_stack_top;
         stack_component *           _clean_stack_bottom;

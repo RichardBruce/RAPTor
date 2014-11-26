@@ -40,6 +40,7 @@ class msg_client
                _uni_cast_conn(_io_service, new uni_cast_receiver(), me_addr, send_port, recv_port, port_off, true), 
                _multi_cast_conn(nullptr),
                _group(_uni_cast_conn.stack_group()),
+               _cam(nullptr),
                _subscribed(false)
         {
             _uni_cast_conn.start(10);
@@ -131,7 +132,7 @@ class msg_client
 
         sdl_event_handler_base* event_handler()
         {
-            return get_camera_event_handler(_cam);
+            return get_camera_event_handler(_cam, "networking");
         }
 
         msg_client& send_request(std::shared_ptr<std::vector<char>> &msg)
@@ -214,9 +215,9 @@ class msg_client
 
                     /* Update time */
                     const clock_t time_now  = clock();
-                    const fp_t time_step    = (time_now - _sim_time) * _clocks_per_sec_inv;
+                    const float time_step   = (time_now - _sim_time) * _clocks_per_sec_inv;
                     _sim_time               = time_now;
-                    _damped_fps             = (0.5 * _damped_fps) + (0.5 / time_step);
+                    _damped_fps             = (0.5f * _damped_fps) + (0.5f / time_step);
                     
                     _fps.str(std::string());
                     _fps << _damped_fps;
@@ -245,10 +246,10 @@ class msg_client
                 raptor_raytracer::camera *const _cam;
                 std::ostringstream              _fps;
                 clock_t                         _sim_time;
-                fp_t                            _damped_fps;
+                float                           _damped_fps;
                 unsigned char *const            _screen_data;
 
-                static constexpr fp_t   _clocks_per_sec_inv  = (1.0 / CLOCKS_PER_SEC);
+                static constexpr float _clocks_per_sec_inv  = (1.0f / CLOCKS_PER_SEC);
         };
 
 

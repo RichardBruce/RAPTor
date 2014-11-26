@@ -35,7 +35,7 @@ struct fragmenter_fixture : public stack_component_fixture<uut>
 };
 
 
-BOOST_FIXTURE_TEST_SUITE( fragmenter_tests, fragmenter_fixture )
+BOOST_FIXTURE_TEST_SUITE( fragmenter_tests, fragmenter_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )
@@ -199,8 +199,13 @@ BOOST_AUTO_TEST_CASE( recv_test_fragmented )
     BOOST_CHECK(top_node->data_received() == messages);
     BOOST_CHECK(top_node->headers_received() == messages);
 
+    /* Check header physics address then remove */
+    auto header = top_node->received_header();
+    BOOST_CHECK(header->has_physical_address());
+    header->has_physical_address(false);
+    
     /* Check message content */
-    BOOST_CHECK(*helloworld_mg.header(1) == *top_node->received_header());
+    BOOST_CHECK(*helloworld_mg.header(1) == *header);
     BOOST_CHECK(helloworld_mg.check_data(top_node->received_data()));
 }
 
@@ -226,9 +231,14 @@ BOOST_AUTO_TEST_CASE( recv_test_fragmented_out_of_order )
     BOOST_CHECK(bottom_node->headers_sent() == 0);
     BOOST_CHECK(top_node->data_received() == messages);
     BOOST_CHECK(top_node->headers_received() == messages);
-
+    
+    /* Check header physics address then remove */
+    auto header = top_node->received_header();
+    BOOST_CHECK(header->has_physical_address());
+    header->has_physical_address(false);
+    
     /* Check message content */
-    BOOST_CHECK(*helloworld_mg.header(1) == *top_node->received_header());
+    BOOST_CHECK(*helloworld_mg.header(1) == *header);
     BOOST_CHECK(helloworld_mg.check_data(top_node->received_data()));
 }
 

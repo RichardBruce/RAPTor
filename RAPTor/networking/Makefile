@@ -1,4 +1,6 @@
 # Include project makefile
+SOURCE += video_receiver.cc 
+
 include $(RAPTOR_TOOLS)/Common.mk
 include Project.mk
 
