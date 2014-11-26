@@ -37,6 +37,10 @@ unsigned ave_ob     = 0;    /* Averafe size of an elementary node */
 unsigned max_depth  = 0;    /* Maximum depth of the tree */
 #endif
 
+#ifdef THREADED_RAY_TRACE
+    /* Start the thread scheduler */
+    task_scheduler_init init(task_scheduler_init::automatic);
+#endif
 
 /**********************************************************
  
@@ -582,16 +586,9 @@ void ray_trace_engine::operator() (const blocked_range2d<unsigned>& r) const
  'x_vec', 'y_vec' and 'z_vec'  specify the axis for ray 
  launch. The generated picture is put in camera.
 **********************************************************/
-void ray_tracer(const light_list &lights, const primitive_list &everything, camera &c)
+template<class SpatialSubDivision>
+void ray_tracer(const SpatialSubDivision *const ssd, const light_list &lights, const primitive_list &everything, camera &c)
 {
-#ifdef THREADED_RAY_TRACE
-    /* Start the thread scheduler */
-    task_scheduler_init init(task_scheduler_init::automatic);
-#endif
-
-    /* Build acceleration structure */
-    SpatialSubDivision *const ssd = SpatialSubDivision::build(everything);
-
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
     std::cout << "Static properties of the tree :" << std::endl;
     std::cout << "Scene primitves                                             (nsp) : " << everything.size()                                     << std::endl;

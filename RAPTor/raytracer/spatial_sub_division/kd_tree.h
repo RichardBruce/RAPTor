@@ -11,14 +11,16 @@
 
 /* Ray tracer headers */
 #include "common.h"
+#include "ssd.h"
 
 
-namespace raptor_physics
+namespace raptor_raytracer
 {
-class kd_tree
+class kd_tree : public ssd
 {
     public :
-        static void build(const primitive_list &everything)
+        /* CTOR, build the tree */
+        kd_tree(const primitive_list &everything)
         {
             kdt_node kdt_base;
 
@@ -30,24 +32,16 @@ class kd_tree
 
 #ifdef SIMD_PACKET_TRACING
         /* SIMD KD-tree traversal */
-        inline void find_kdt_leaf_node(const packet_ray *const r, kdt_stack_element **const out, kdt_stack_element *const entry_point, const vfp_t *const i_rd, const int *const near_offset) const;
-        inline bool find_kdt_leaf_node(const frustrum &r, kdt_stack_element *const entry_point, kdt_stack_element **const out, const int *const near_offset, unsigned size) const;
+        void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const override;
+        vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t) const override;
 
-        void        kdt_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const;
-        vfp_t       kdt_found_nearer_object(const packet_ray *const r, const vfp_t &t) const;
-
-        void        kdt_frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, unsigned size) const;
-        void        kdt_frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const;
-
-        void        kdt_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h,
-                                                kdt_stack_element entry_point, kdt_stack_element *exit_point) const;
-        vfp_t       kdt_found_nearer_object(const packet_ray *const r, const vfp_t &t, kdt_stack_element entry_point, kdt_stack_element *exit_point) const;
-
+        void        frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, unsigned size) const override;
+        void        frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const override;
 #endif /* #ifdef SIMD_PACKET_TRACING */
+
         /* kdt traversal */
-        inline void find_kdt_leaf_node(const ray *const r, const kdt_node **const n, kdt_stack_element **const out, const kdt_stack_element *const entry_point) const;
-        triangle*   kdt_find_nearest_object(const ray *const r, hit_description *const h) const;
-        bool        kdt_found_nearer_object(const ray *const r, const fp_t t) const;
+        triangle*   find_nearest_object(const ray *const r, hit_description *const h) const override;
+        bool        found_nearer_object(const ray *const r, const fp_t t) const override;
 
     private :
         /* Stack element for tracing through the kd tree */
@@ -68,9 +62,20 @@ class kd_tree
             float               d;
         };
  
+#ifdef SIMD_PACKET_TRACING
+        inline void find_leaf_node(const packet_ray *const r, kdt_stack_element **const out, kdt_stack_element *const entry_point, const vfp_t *const i_rd, const int *const near_offset) const;
+        inline bool find_leaf_node(const frustrum &r, kdt_stack_element *const entry_point, kdt_stack_element **const out, const int *const near_offset, unsigned size) const;
+
+        void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h,
+                                                kdt_stack_element entry_point, kdt_stack_element *exit_point) const;
+        vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t, kdt_stack_element entry_point, kdt_stack_element *exit_point) const;
+#endif /* #ifdef SIMD_PACKET_TRACING */
+
+        inline void find_leaf_node(const ray *const r, const kdt_node **const n, kdt_stack_element **const out, const kdt_stack_element *const entry_point) const;
+
         /* The stack is mutable because it will never be known to a user of this class */
         mutable kdt_stack_element   kdt_stack[MAX_KDT_STACK_HEIGHT];
 };
-}; /* namespace */
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __KD_TREE_H__ */

@@ -1,3 +1,4 @@
+/* Raytracer headers */
 #include "common.h"
 #include "scene.h"
 #include "camera.h"
@@ -8,6 +9,8 @@
 #include "obj_parser.h"
 #include "ply_parser.h"
 #include "vrml_parser.h"
+#include "bih.h"
+#include "kd_tree.h"
 #include "raytracer.h"
 
 /* Display headers */
@@ -677,6 +680,9 @@ int main (int argc, char **argv)
     cam->tilt(rx);
     cam->pan(ry);
     cam->roll(rz);
+
+    /* Build spatial sub division */
+    kd_tree ssd(everything);
     
     /* Run in interactive mode */
     if (interactive)
@@ -703,7 +709,7 @@ int main (int argc, char **argv)
             if (do_next == 0)
             {
                 /* Display output for interactive mode */
-                ray_tracer(lights, everything, *cam);
+                ray_tracer(&ssd, lights, everything, *cam);
 
                 /* Display the output */
                 cam->clip_image_to_bgr(screen_data.get());
@@ -723,7 +729,7 @@ int main (int argc, char **argv)
     else
     {
         /* Ray trace the scene */
-        ray_tracer(lights, everything, *cam);
+        ray_tracer(&ssd, lights, everything, *cam);
         
         /* Tone mapping */
         //cam->tone_map(local_human_histogram, 0.75, (1.0/3.0), (1.0/3.0), false, false, false);

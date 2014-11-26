@@ -119,7 +119,8 @@ class ray_trace_engine
 };
 
 /* Ray tracer main function */
-void ray_tracer(const light_list &lights, const primitive_list &everything, camera &c);
+template<class SpatialSubDivision>
+void ray_tracer(const SpatialSubDivision *const ssd, const light_list &lights, const primitive_list &everything, camera &c)
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __RAYTRACER_H__ */
