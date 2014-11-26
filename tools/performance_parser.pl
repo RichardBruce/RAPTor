@@ -76,34 +76,30 @@ while (my $line = <INDEX_T>)
             }
 
             # Get git log
-            # my @git_log = `git log --since=${days_since_run}.day --pretty=oneline`;
+            my @git_log = `git log --since=${days_since_run}.day --pretty=oneline`;
 
-            # # Pull out the latest hash
-            # my $git_hash;
-            # if ($git_log[0] =~ m/(\w+)\s/)
-            # {
-            #     $git_hash = $1;
-            # }
-            # else
-            # {
-            #     die "Error: Cant find hash in git log\n";
-            # }
+            # Pull out the latest hash
+            my $git_hash;
+            if ($git_log[0] =~ m/(\w+)\s/)
+            {
+                $git_hash = $1;
+            }
+            else
+            {
+                die "Error: Cant find hash in git log\n";
+            }
 
-            # # Filter the performance related messages
-            # my @perf_messages;
-            # foreach (@git_log)
-            # {
-            #     if (m/PERF:\s+([\w\s\.]+)$/)
-            #     {
-            #         push @perf_messages, $1;
-            #     }
-            # }
+            # Filter the performance related messages
+            my @perf_messages;
+            foreach (@git_log)
+            {
+                if (m/PERF:\s+([\w\s\.]+)$/)
+                {
+                    push @perf_messages, $1;
+                }
+            }
 
-            # my $perf_comment = join(', ', @perf_messages);
-            # print "$perf_comment\n";
-            # exit 0;
-
-            print INDEX_F "            <td><a href=\"./$date\">$date</a></td><td></td><td></td>\n";
+            print INDEX_F "            <td><a href=\"./$date\">$date</a></td><td>$git_hash</td><td>" . join(', ', @perf_messages) , "</td>\n";
             print INDEX_F "        </tr>\n";
             print INDEX_F "        <tr>\n";
         }
