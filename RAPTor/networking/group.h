@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <thread>
+#include <vector>
 
 /* Boost */
 #include "boost/archive/text_oarchive.hpp"
@@ -167,6 +168,7 @@ class group : public stack_component_impl<stack_component, stack_component>
         group& add_to_group(const uuid &id, const address &addr, const std::uint16_t port_offset)
         {
             _pimpl->_group.insert({ id, group_member(addr, port_offset, false) });
+            _pimpl->_ages.push_back(id);
             return *this;
         }
 
@@ -201,8 +203,10 @@ class group : public stack_component_impl<stack_component, stack_component>
 
                 return;
             }
+
             /* Otherwise the message is only relavent to the group coordinator (the oldest member of the group) */
-            else if (_pimpl->_group.begin()->second.is_me())
+            const auto oldest_iter = _pimpl->_group.find(_pimpl->_ages.front());
+            if ((oldest_iter != _pimpl->_group.end()) && oldest_iter->second.is_me())
             {
                 if (data->first_fragment_begins(MSG_SUBSCRIBE.data(), MSG_SUBSCRIBE.size()))
                 {
@@ -212,6 +216,7 @@ class group : public stack_component_impl<stack_component, stack_component>
                     {
                         /* TODO -- get group and phy addr from the data */
                         _pimpl->_group.insert({ header->from_address(), group_member(*header->physical_address(), 0, false) });
+                        _pimpl->_ages.push_back(header->from_address());
                     }
 
                 }
@@ -223,6 +228,7 @@ class group : public stack_component_impl<stack_component, stack_component>
                     {
                         /* Remove it */
                         _pimpl->_group.erase(group_iter);
+                        _pimpl->_ages.erase(std::remove(_pimpl->_ages.begin(), _pimpl->_ages.end(), header->from_address()), _pimpl->_ages.end()); 
                     }
                 }
 
@@ -278,16 +284,17 @@ class group : public stack_component_impl<stack_component, stack_component>
         struct group_impl
         {
             group_impl(const group_member &mem, const std::string &grp_addr, const uuid &grp_id, const uuid &id, const std::uint16_t grp_port)
-                : _group({{id, mem}}), _addr(address::from_string(grp_addr)), _id(grp_id), _port(grp_port) {  };
+                : _group({{id, mem}}), _ages(1, id), _addr(address::from_string(grp_addr)), _id(grp_id), _port(grp_port) {  };
 
             group_impl(const group_member &mem, const uuid &grp_id, const uuid &id)
-                : _group({{id, mem}}), _addr(address()), _id(grp_id), _port(0) {  };
+                : _group({{id, mem}}), _ages(1, id), _addr(address()), _id(grp_id), _port(0) {  };
 
             /* Serialise */
             template<class Archive>
             void serialize(Archive &ar, const unsigned int version)
             {
                 ar & _group;
+                ar & _ages;
                 ar & _addr;
                 ar & _id;
                 ar & _port;
@@ -295,10 +302,11 @@ class group : public stack_component_impl<stack_component, stack_component>
 
             friend class boost::serialization::access;
             typedef std::map<uuid, group_member> group_map;
-            group_map               _group; /* All the group members                        */
-            address                 _addr;  /* The physical multicast address of the group  */
-            uuid                    _id;    /* The logical address of the group             */
-            std::uint16_t           _port;  /* Port the multicast group operates on         */
+            group_map           _group; /* All the group members                        */
+            std::vector<uuid>   _ages;  /* Age order of the group members               */
+            address             _addr;  /* The physical multicast address of the group  */
+            uuid                _id;    /* The logical address of the group             */
+            std::uint16_t       _port;  /* Port the multicast group operates on         */
         };
 
         boost::mt19937                                  _ran_gen;   /* Random number generator to drive the uuid generator  */
