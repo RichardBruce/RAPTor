@@ -211,17 +211,13 @@ namespace raptor_raytracer
 /* Primitive list to hold primitives */
 class triangle;
 class light;
-#ifdef SPATIAL_SUBDIVISION_BIH
-typedef vector<triangle *>                                  primitive_list;
-#else
 #ifdef THREADED_RAY_TRACE
-typedef vector<triangle *, scalable_allocator<triangle *> > primitive_list;
+typedef std::vector<triangle *, scalable_allocator<triangle *> >    primitive_list;
 #else
-typedef vector<triangle *>                                  primitive_list;
+typedef std::vector<triangle *>                                     primitive_list;
 #endif /* #ifdef THREADED_RAY_TRACE */
-#endif /* #ifdef SPATIAL_SUBDIVISION_BIH */
 
-typedef vector<light>                                       light_list;
+typedef std::vector<light> light_list;
 
 /* Common numbers */
 extern const fp_t       FP_DELTA;
