@@ -14,7 +14,7 @@ LOCAL_INCLUDES = . $(RAPTOR_HOME)/common/ $(RAPTOR_HOME)/raytracer/ $(RAPTOR_HOM
 vpath %.cc $(LOCAL_INCLUDES)
 
 # Libraries
-LIBPATH = $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib $(LIBARYS_PATH)/SDL2_ttf-$(SDLTTF_VER)/lib $(BOOST_LIB_PATH) $(TBB_LIB_PATH) $(RAYTRACER_HOME) $(LIBARYS_PATH)/fftw-$(FFTW_VER)/lib
+LIBPATH = $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib $(LIBARYS_PATH)/SDL2_ttf-$(SDLTTF_VER)/lib $(BOOST_LIB_PATH) $(LIBARYS_PATH)/tbb$(TBB_VER)/build/build_release $(RAYTRACER_HOME) $(LIBARYS_PATH)/fftw-$(FFTW_VER)/lib
 SO_LIBS = raytracer SDL2 SDL2_ttf tbb boost_system boost_log boost_serialization
 LIBRARY = $(SO_LIBS) fftw3f
 
