@@ -14,8 +14,8 @@ vpath %.cc $(LOCAL_INCLUDES)
 
 # Libraries
 LIBPATH = $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib $(LIBARYS_PATH)/SDL2_ttf-$(SDLTTF_VER)/lib $(BOOST_LIB_PATH) $(TBB_LIB_PATH) $(RAYTRACER_HOME) $(LIBARYS_PATH)/fftw-$(FFTW_VER)/lib
-SO_LIBS = raytracer SDL2 SDL2_ttf boost_system boost_serialization tbb
+SO_LIBS = raytracer SDL2 SDL2_ttf tbb boost_system boost_log boost_serialization
 LIBRARY = $(SO_LIBS) fftw3f
 
 # Defines
-DEFINES = 
+DEFINES = BOOST_LOG_DYN_LINK BOOST_LOG_LEVEL=boost::log::trivial::trace
