@@ -176,71 +176,77 @@ print OUTFILE "<body>\n";
 print OUTFILE "<h1>Performance as of $date</h1>\n";
 
 # Open input file and parse
-my %headers;
+my %headers = ();
+my @header_order;
 my ( $scene, $primitives, $lights, $parser_time, $render_time );
-for (@log_files)
+for my $input_file (@log_files)
 {
-    open (LOGFILE, "<", $_) or die "Error: Can't find input file";
+    # 1 Pass of the file to find the headers and track the order they are found
+    open (LOGFILE, "<", $input_file) or die "Error: Can't find input file";
+    while (<LOGFILE>)
+    {
+        if (m/PERF (\d+) - ([\w\s#]+):/)
+        {
+            if ($headers{$2} != 1)
+            {
+                $header_order[$1] = $2;
+            }
+            $headers{$2} = 1;
+        }
+    }
+    close (LOGFILE);
 
-    $_ =~ m/(\w+)/;
-
+    # Check we have something to output
+    next if ($#header_order < 0);
+    
+    $input_file =~ m/(\w+)/;
     open (CSVFILE, ">", $output_dir . "/$1.csv") or die "Error: Can't open output file: $output_dir/$1.csv";
+
+    # Output headers
     print OUTFILE "<h2>$1</h2>\n";
     print OUTFILE "<table style=\"width:100%\">\n";
     print OUTFILE "    <tr>\n";
-    print OUTFILE "        <th>Scene</th>\n";
-    print OUTFILE "        <th># Primitives</th>\n";
-    print OUTFILE "        <th># Lights</th>\n";
-    print OUTFILE "        <th>Parser Time ms</th>\n";
-    print OUTFILE "        <th>Render Time ms</th>\n";
+    for (@header_order)
+    {
+        print OUTFILE "        <th>$_</th>\n";
+    }
     print OUTFILE "    </tr>\n";
     
-    print CSVFILE "Scene,# Primitives,# Lights,Parser Time ms,Render Time ms\n";
+    print CSVFILE join(',', @header_order) . "\n";
 
-    $scene       = "No Scenes Found";
-    $primitives  = "--";
-    $lights      = "--";
-    $parser_time = "--";
-    $render_time = "--";
-    while (<LOGFILE>)
+    open (LOGFILE, "<", $input_file) or die "Error: Can't find input file";
+    $headers{"Test"} = "No Scenes Found";
+    while (my $line = <LOGFILE>)
     {
-        chomp;
-        if (m/PERF - Scene:\s+.*\/(\w+\/\w+\/\w+\.\w+)/)
+        chomp $line;
+
+        if ($line =~ m/PERF \d+ - Test:\s+(.*)/)
         {
             # Output last scene
-            if ($scene ne "No Scenes Found")
+            if ($headers{"Test"} ne "No Scenes Found")
             {
                 output_scene();
             }
 
-            # Graph new scene name
-            $scene = $1;
-
             # Reset data
-            $primitives     = "--";
-            $lights         = "--";
-            $parser_time    = "--";
-            $render_time    = "--";
+            for (keys %headers)
+            {
+                $headers{$_} = "--";
+            }
+
+            # Graph new scene name
+            $headers{"Test"} = $1;
         }
-        elsif (m/PERF - # Primitives:\s+(\d+)/)
+        # Check if we have a value for this key
+        else
         {
-            # Get primitive counts
-            $primitives = $1;
-        }
-        elsif (m/PERF - # Lights:\s+(\d+)/)
-        {
-            # Get light counts
-            $lights     = $1;
-        }
-        elsif (m/PERF - Parser Time ms:\s+(\d+)/)
-        {
-            # Get parser run time
-            $parser_time = $1;
-        }
-        elsif (m/PERF - Render Time ms:\s+(\d+)/)
-        {
-            # Get rendering run time
-            $render_time = $1;
+            for (keys %headers)
+            {
+                if ($line =~ m/PERF \d+ - $_:\s+(.*)/)
+                {
+                    $headers{$_} = $1;
+                }
+            }
         }
     }
 
@@ -262,14 +268,22 @@ exit 0;
 
 sub output_scene
 {
-    # Output html table row
     print OUTFILE "    <tr>\n";
-    print OUTFILE "        <td>${scene}</td>\n";
-    print OUTFILE "        <td>${primitives}</td>\n";
-    print OUTFILE "        <td>${lights}</td>\n";
-    print OUTFILE "        <td>${parser_time}</td>\n";
-    print OUTFILE "        <td>${render_time}</td>\n";
+    for (@header_order)
+    {
+        # Output html table row
+        print OUTFILE "        <td>$headers{$_}</td>\n";
+        
+        # Output csv
+        print CSVFILE "$headers{$_}";
+        if ($_ eq $header_order[$#header_order])
+        {
+            print CSVFILE "\n";
+        }
+        else
+        {
+            print CSVFILE ",";
+        }
+    }
     print OUTFILE "    </tr>\n";
-
-    print CSVFILE "${scene},${primitives},${lights},${parser_time},${render_time}\n";
 }

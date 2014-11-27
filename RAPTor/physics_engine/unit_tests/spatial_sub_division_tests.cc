@@ -505,7 +505,8 @@ BOOST_AUTO_TEST_CASE( contruct_performance_test )
     const auto t0(std::chrono::system_clock::now());
     spatial_sub_division uut(objects);
     const auto t1(std::chrono::system_clock::now());
-    BOOST_LOG_TRIVIAL(fatal) << "PERF - Sort and Sweep Construct took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: Sort and Sweep Construct";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
     /* Clean up */
     for (auto &p : objects)
@@ -543,7 +544,8 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
         uut.update_object(*objects[obj]);
     }
     const auto t1(std::chrono::system_clock::now());
-    BOOST_LOG_TRIVIAL(fatal) << "PERF - Sort and Sweep Update Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: Sort and Sweep Update Object";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
     /* Clean up */
     for (auto &p : objects)
@@ -581,7 +583,8 @@ BOOST_AUTO_TEST_CASE( remove_object_performance_test )
         }
     }
     const auto t1(std::chrono::system_clock::now());
-    BOOST_LOG_TRIVIAL(fatal) << "PERF - Sort and Sweep Remove Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: Sort and Sweep Remove Object";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
     /* Clean up */
     for (auto &p : objects)
@@ -616,7 +619,8 @@ BOOST_AUTO_TEST_CASE( add_object_performance_test )
         uut.add_object(*po);
     }
     const auto t1(std::chrono::system_clock::now());
-    BOOST_LOG_TRIVIAL(fatal) << "PERF - Sort and Sweep Add Object took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << "ms";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: Sort and Sweep Add Object";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
     /* Clean up */
     for (auto &p : objects)
