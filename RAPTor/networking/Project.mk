@@ -8,7 +8,8 @@ INCLUDE = $(LOCAL_INCLUDES) \
     ${BOOST_INCLUDE_PATH} \
     $(LIBARYS_PATH)/tbb$(TBB_VER)/include/ \
     $(LIBARYS_PATH)/SDL2-$(SDL_VER)/include/ \
-    $(LIBARYS_PATH)/SDL2_ttf-$(SDLTTF_VER)/include/SDL2/
+    $(LIBARYS_PATH)/SDL2_ttf-$(SDLTTF_VER)/include/SDL2/ \
+    $(LIBARYS_PATH)/tbb$(TBB_VER)/include/tbb/ 
 LOCAL_INCLUDES = . $(RAPTOR_HOME)/common/ $(RAPTOR_HOME)/raytracer/ $(RAPTOR_HOME)/raytracer/materials/ $(RAPTOR_HOME)/sdl_wrappers
 vpath %.cc $(LOCAL_INCLUDES)
 
