@@ -48,7 +48,6 @@ struct regression_fixture : private boost::noncopyable
 
             const std::string data_dir(getenv("RAPTOR_DATA"));
             const std::string input_path(data_dir + input_file);
-            BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << input_file;
 
             int last_slash;
             std::string path;
