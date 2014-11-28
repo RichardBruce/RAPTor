@@ -1,9 +1,11 @@
+# me specific ignores
+performance_regression.log
+
 # Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
-
 # Code coverage files
 *.gcno
 *.gcda
