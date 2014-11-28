@@ -36,7 +36,6 @@ class udp_connection : public connection<UpNode>
               _recv_endpoint(udp::v4(), recv_port), 
               _send_socket(ctrl->io_service()),
               _recv_socket(ctrl->io_service(), _recv_endpoint),
-              _head_buf(new char[HEADER_SIZE]),
               _send_port(send_port)
         {  };
 
@@ -47,7 +46,6 @@ class udp_connection : public connection<UpNode>
               _recv_endpoint(addr, port),
               _send_socket(ctrl->io_service()),
               _recv_socket(ctrl->io_service()),
-              _head_buf(new char[HEADER_SIZE]),
               _send_port(port)
         {
             /* Create a socket that can share an address, for multicast receive */
@@ -64,38 +62,46 @@ class udp_connection : public connection<UpNode>
         {
             _send_socket.close();
             _recv_socket.close();
-
-            delete [] _head_buf;
         }
+
+        /* Access functions */
+        short recv_port() const { return _recv_socket. local_endpoint().port();   }
+        short send_port() const { return _send_port;                              }
 
         /* Start waiting for data on the socket */
         virtual void start_receiving() override
         {
-            while (true)
+            /* Prepare buffers */
+            this->_data_buf.reset(new char [MAX_UDP_SIZE]);
+            _recv_buf = 
             {
-                /* Prepare receive buffer */
-                char *data_buf = new char [MAX_UDP_SIZE];
-                char *head_buf = new char [HEADER_SIZE];
-                std::array<boost::asio::mutable_buffer, 2> recv_buf =
-                {{
-                    boost::asio::buffer(head_buf, HEADER_SIZE),
-                    boost::asio::buffer(data_buf, MAX_UDP_SIZE)
-                }};
+                boost::asio::buffer(this->_head_buf),
+                boost::asio::buffer(this->_data_buf.get(), MAX_UDP_SIZE)
+            };
 
-                /* Wait for data */
-                udp::endpoint recv_endpoint;
-                std::cout << "recv started" << std::endl;
-                const size_t bytes = _recv_socket.receive_from(recv_buf, recv_endpoint);
-                boost::asio::ip::address recv_address(recv_endpoint.address());
-
-                std::cout << "Receiving from: " << msg_header::from_stack(head_buf) << std::endl;
-                this->_ctrl->post(msg_header::from_stack(head_buf), [this, recv_address, head_buf, data_buf, bytes](const stack_accessor &acc)
+            /* Wait for data */
+            _recv_socket.async_receive_from(_recv_buf, _recv_endpoint, [this](const boost::system::error_code &ec, size_t bytes)
+                {
+                    /* Check for error */
+                    if (ec)
                     {
-                        std::shared_ptr<msg_header> header(new msg_header(head_buf, recv_address));
-                        delete [] head_buf;
-                        received(acc, std::shared_ptr<msg_data>(new msg_data(data_buf, bytes - HEADER_SIZE)), header);
-                    });
-            }
+                        std::cout << "Receive failed: " << ec.message() << std::endl;
+                        return;
+                    }
+
+                    /* Get the data from the receive buffers */
+                    const auto addr(_recv_endpoint.address());
+                    std::shared_ptr<msg_header> header(new msg_header(this->_head_buf.data(), addr));
+                    char *data_buf = this->_data_buf.release();
+
+                    /* Start next receive */
+                    start_receiving();
+
+                    /* Start up the stack */
+                    stack_accessor acc;
+                    this->_ctrl->lock_stack(acc, header->from_address());
+                    received(acc, std::shared_ptr<msg_data>(new msg_data(data_buf, bytes - msg_header::size())), header);
+                });
         }
 
         /* Virtual functions for sending and receiving messages */
@@ -116,12 +122,12 @@ class udp_connection : public connection<UpNode>
                 to_addr = this->_grp->physical_address(header->to_address());
             }
 
-            udp::endpoint send_endpoint(*to_addr, _send_port);
-
             /* Connect to the endpoint */
+            udp::endpoint send_endpoint(*to_addr, _send_port);
             _send_socket.connect(send_endpoint, ec);
             if (ec)
             {
+                std::cout << "Connect failed: " << ec.message() << std::endl;
                 return;
             }
 
@@ -129,64 +135,26 @@ class udp_connection : public connection<UpNode>
             std::array<char, HEADER_SIZE> serial_header;
             header->serialise(serial_header.data());
             std::array<boost::asio::const_buffer, 2> send_buf =
-            {{
+            {
                 boost::asio::buffer(serial_header), 
                 boost::asio::buffer(*data, header->fragment_length())
-            }};
+            };
 
             /* Send the message to the given endpoint */
             _send_socket.send_to(send_buf, send_endpoint, 0, ec);
+            if (ec)
+            {
+                std::cout << "Send failed: " << ec.message() << std::endl;
+            }
         }
 
     private :
-        udp::endpoint           _recv_endpoint;
-        udp::socket             _send_socket;
-        udp::socket             _recv_socket;
-        char *const             _head_buf;
-        const short             _send_port;
+        udp::endpoint                               _recv_endpoint;
+        udp::socket                                 _send_socket;
+        udp::socket                                 _recv_socket;
+        std::array<boost::asio::mutable_buffer, 2>  _recv_buf;
+        const short                                 _send_port;
 };
 }; /* namespace raptor_networking */
 
 #endif /* #ifndef __UDP_CONNECTION_H__ */
-
-        // /* Start waiting for data on the socket */
-        // virtual void start_receiving() override
-        // {
-        //     /* Prepare receive buffer */
-        //     char *data_buf = new char [MAX_UDP_SIZE];
-        //     std::array<boost::asio::mutable_buffer, 2> recv_buf =
-        //     {{
-        //         boost::asio::buffer(_head_buf, HEADER_SIZE),
-        //         boost::asio::buffer(data_buf, MAX_UDP_SIZE)
-        //     }};
-
-        //     /* Wait for data */
-        //     _recv_socket.async_receive_from(recv_buf, _recv_endpoint,
-        //         [&,data_buf](const boost::system::error_code &, size_t bytes_transferred)
-        //         {
-        //             received(_recv_endpoint.address(), new msg_data(data_buf, bytes_transferred - HEADER_SIZE), new msg_header(_head_buf));
-        //         });
-        // }
-
-        // /* Virtual functions for sending and receiving messages */
-        // virtual void received(const boost::asio::ip::address &addr, msg_data *const data, const msg_header *const header) override
-        // {
-        //     /* Pend the next read */
-        //     start_receiving();
-
-        //     /* Check if there exists a parallel stack for this address, if not create it */
-        //     //std::cout << "Receiving " << header->sequence() << ", " << header->fragment() << " at: " << clock() << std::endl;
-        //     typename stack_map::accessor stack_acc;
-        //     if (_strands.insert(stack_acc, addr.to_string()))
-        //     {
-        //         std::cout << "cloning stack: " << addr.to_string() << std::endl;
-        //         stack_acc->second = this->_up_node->clean_clone();
-        //     }
-
-        //     /* While holding the lock on this stack, propagate the message */
-        //     stack_acc->second->received(addr, data, header);
-
-        //     /* Pass the data up the stack */
-        //     //std::cout << "Got seq: " << header->sequence() << " frag: " << header->fragment() << std::endl;
-        //     //this->_up_node->received(addr, data, header);
-        // }

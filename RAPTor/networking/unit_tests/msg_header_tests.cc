@@ -51,7 +51,7 @@ struct msg_header_fixture
     const address   phy_addr2;
 };
 
-BOOST_FIXTURE_TEST_SUITE( msg_header_tests, msg_header_fixture )
+BOOST_FIXTURE_TEST_SUITE( msg_header_tests, msg_header_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_0_test )

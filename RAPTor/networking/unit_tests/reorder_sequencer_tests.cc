@@ -34,7 +34,7 @@ struct reorder_sequencer_fixture : public stack_component_fixture<uut>
     const message_generator mg2;
 };
 
-BOOST_FIXTURE_TEST_SUITE( reorder_sequencer_tests, reorder_sequencer_fixture )
+BOOST_FIXTURE_TEST_SUITE( reorder_sequencer_tests, reorder_sequencer_fixture );
 
 
 /* Test constructors */

@@ -34,7 +34,7 @@ struct drop_late_sequencer_fixture : public stack_component_fixture<uut>
     const message_generator mg2;
 };
 
-BOOST_FIXTURE_TEST_SUITE( drop_late_sequencer_tests, drop_late_sequencer_fixture )
+BOOST_FIXTURE_TEST_SUITE( drop_late_sequencer_tests, drop_late_sequencer_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )

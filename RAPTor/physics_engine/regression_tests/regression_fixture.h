@@ -57,7 +57,7 @@ struct regression_fixture : private boost::noncopyable
             delete m;
 
             /* Log run time */
-            BOOST_LOG_TRIVIAL(fatal) << "PERF - Physics Time us: " << _runtime;
+            BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - Physics Time us: " << _runtime;
         }
 
         /* Add objects for testing */
@@ -98,6 +98,7 @@ struct regression_fixture : private boost::noncopyable
             /* Check starting state */
             if (initial)
             {
+                BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - # of frames: " << total_frames;
                 checker->check(pe, 0);
                 _frames_inv = 1.0f / static_cast<float>(total_frames);
             }

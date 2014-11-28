@@ -38,7 +38,7 @@ struct message_delivery_fixture : public stack_component_fixture<mock_stack_comp
     boost::system::error_code   ec;
 };
 
-BOOST_FIXTURE_TEST_SUITE( message_delivery_tests, message_delivery_fixture )
+BOOST_FIXTURE_TEST_SUITE( message_delivery_tests, message_delivery_fixture );
 
 /* Test constructors */
 BOOST_AUTO_TEST_CASE( ctor_test )

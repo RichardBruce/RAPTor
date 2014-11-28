@@ -31,7 +31,7 @@ class fixed_size_fragmenter : public stack_component_impl<UpNode, DnNode>
         {
             /* Check if there is any defragmentation to do */
             const std::uint32_t len = header->length();
-            const size_t nr_frags   = static_cast<size_t>(std::ceil(len / static_cast<fp_t>(_frag_size)));
+            const size_t nr_frags   = static_cast<size_t>(std::ceil(len / static_cast<float>(_frag_size)));
             if (nr_frags == 1)
             {
                 this->_up_node->received(acc, data, header);
@@ -76,7 +76,7 @@ class fixed_size_fragmenter : public stack_component_impl<UpNode, DnNode>
         {
             /* Work out the number of fragments to send */
             const std::uint32_t size = header->length();
-            const std::uint32_t nr_frags = static_cast<std::uint32_t>(std::ceil(size / static_cast<fp_t>(_frag_size)));
+            const std::uint32_t nr_frags = static_cast<std::uint32_t>(std::ceil(size / static_cast<float>(_frag_size)));
             if (nr_frags == 1)
             {
                 this->_dn_node->send(acc, data, header, ec);

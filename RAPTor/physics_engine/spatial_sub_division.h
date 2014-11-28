@@ -84,9 +84,19 @@ class spatial_sub_division : private boost::noncopyable
             _axis_possibles[2].load_factor(0.7f);
             _possibles.load_factor(0.7f);
             collision_detect();
+
+            _axis_possibles[0].load_factor(1.0f);
+            _axis_possibles[1].load_factor(1.0f);
+            _axis_possibles[2].load_factor(1.0f);
+            _possibles.load_factor(1.0f);
         }
 
-        /* Allow default DTOR */
+        /* DTOR */
+        ~spatial_sub_division()
+        {
+            delete _min_sentinel;
+            delete _max_sentinel;
+        }
 
         spatial_sub_division& add_object(const physics_object &po)
         {
@@ -280,29 +290,28 @@ class spatial_sub_division : private boost::noncopyable
 
             /* Adjust bounds tracking changes in collision set */
             /* Moving lower bound down */
-            while ((lower_bound->index() > 0) && (_bounds[axis][lower_bound->index()]->compare_and_swap(_bounds[axis][lower_bound->index() - 1])))
+            while (_bounds[axis][lower_bound->index()]->compare_and_swap(_bounds[axis][lower_bound->index() - 1]))
             {
                 std::swap(_bounds[axis][lower_bound->index()], _bounds[axis][lower_bound->index() + 1]);
                 update_possibles(_bounds[axis][lower_bound->index()], _bounds[axis][lower_bound->index() + 1], axis);
             }
 
             /* Moving upper bound down */
-            while ((upper_bound->index() > 0) && (_bounds[axis][upper_bound->index()]->compare_and_swap(_bounds[axis][upper_bound->index() - 1])))
+            while (_bounds[axis][upper_bound->index()]->compare_and_swap(_bounds[axis][upper_bound->index() - 1]))
             {
                 std::swap(_bounds[axis][upper_bound->index()], _bounds[axis][upper_bound->index() + 1]);
                 update_possibles(_bounds[axis][upper_bound->index()], _bounds[axis][upper_bound->index() + 1], axis);
             }
 
             /* Moving upper bound up */
-            const int axis_size = _bounds[axis].size() - 1;
-            while ((upper_bound->index() < axis_size) && (_bounds[axis][upper_bound->index() + 1]->compare_and_swap(_bounds[axis][upper_bound->index()])))
+            while (_bounds[axis][upper_bound->index() + 1]->compare_and_swap(_bounds[axis][upper_bound->index()]))
             {
                 std::swap(_bounds[axis][upper_bound->index() - 1], _bounds[axis][upper_bound->index()]);
                 update_possibles(_bounds[axis][upper_bound->index() - 1], _bounds[axis][upper_bound->index()], axis);
             }
 
             /* Moving lower bound up */
-            while ((lower_bound->index() < axis_size) && (_bounds[axis][lower_bound->index() + 1]->compare_and_swap(_bounds[axis][lower_bound->index()])))
+            while (_bounds[axis][lower_bound->index() + 1]->compare_and_swap(_bounds[axis][lower_bound->index()]))
             {
                 std::swap(_bounds[axis][lower_bound->index() - 1], _bounds[axis][lower_bound->index()]);
                 update_possibles(_bounds[axis][lower_bound->index() - 1], _bounds[axis][lower_bound->index()], axis);

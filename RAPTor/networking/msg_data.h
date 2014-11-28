@@ -34,19 +34,12 @@ class msg_data
         /* Allow more messages to be combined */
         msg_data& expand_slots(const size_t nr_frags, const size_t total_size)
         {
-#ifdef __DEBUG_CHECKS__
             /* Check that the number of slots are expanded */
-            if (nr_frags < _data->size())
-            {
-                throw invalid_argument("nr_frag is less than current number of slots.");
-            }
+            assert((nr_frags >= _data->size()) || !"Error: nr_frag is less than current number of slots");
 
             /* The total size must also be increasing */
-            if (total_size < _total_size)
-            {
-                throw invalid_argument("total_size is being reduced by reducing the fragment size.");
-            }
-#endif
+            assert((total_size >= _total_size) || !"Error: total_size is being reduced by reducing the fragment size");
+
             /* Assumes size is always increasing */
             _missing += (nr_frags - _data->size());
 
@@ -61,19 +54,12 @@ class msg_data
             /* Calculate the upper limit of iteration */
             const int limit = (comb.get() == this) ? _data->size() : (start + comb->_data->size());
 
-#ifdef __DEBUG_CHECKS__
             /* The fragment sizes must be the same */
-            if ((static_cast<unsigned int>(limit) != _data->size()) && (comb->_frag_size != _frag_size))
-            {
-                throw invalid_argument("fragment sizes miss match.");
-            }
+            assert(((static_cast<unsigned int>(limit) == _data->size()) || (comb->_frag_size == _frag_size)) || !"Error: Fragment sizes miss match");
 
             /* Check the upper range for data movement */
-            if (static_cast<unsigned int>(limit) > _data->size())
-            {
-                throw invalid_argument("data to be moved out of range.");
-            }
-#endif 
+            assert((static_cast<unsigned int>(limit) <= _data->size()) || !"Error: Data to be moved out of range");
+
             /* Move data from comb */
             for (int i = limit - 1; i >= start; --i)
             {

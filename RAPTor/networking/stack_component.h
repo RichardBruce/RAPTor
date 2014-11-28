@@ -36,7 +36,7 @@ class stack_component
 
                 copied_pair& update(stack_component *const last)
                 {
-                    /* Connditional update of bottom */
+                    /* Conditional update of bottom */
                     if (_bot == nullptr)
                     {
                         _bot = last;

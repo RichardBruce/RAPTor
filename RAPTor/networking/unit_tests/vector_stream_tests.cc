@@ -58,7 +58,7 @@ struct vector_stream_fixture
         } 
 };
 
-BOOST_FIXTURE_TEST_SUITE( vector_stream_tests, vector_stream_fixture )
+BOOST_FIXTURE_TEST_SUITE( vector_stream_tests, vector_stream_fixture );
 
 /* Test ivector_stream */
 /* Test constructors */
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE( ibuf_stream_read_small_chunks_test )
 BOOST_AUTO_TEST_CASE( ibuf_stream_read_small_last_fragment_test )
 {
     const int frag_size = helloworld.size();
-    const int total_size = segmented_data_ptr->size() * frag_size;
+    const int total_size = (2 * frag_size) + hellomars.size();
     ivectorbuf_stream stream0(segmented_data_ptr, total_size, frag_size);
     
     std::vector<char> read0(total_size);
