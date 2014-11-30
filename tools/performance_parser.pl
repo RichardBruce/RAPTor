@@ -63,7 +63,7 @@ else
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
 my $date        =  ($year + 1900) . "-" . ($mon + 1) . "-" . $mday;
 my $today_date  = $parser->parse_datetime($date);
-my $output_dir  = $website_dir . $project_name . "/" .  $date;
+my $output_dir  = "$website_dir$project_name/$date";
 `mkdir -p $output_dir`;
 
 ###############################################
@@ -200,7 +200,7 @@ for my $input_file (@log_files)
     next if ($#header_order < 0);
     
     $input_file =~ m/(\w+)/;
-    open (CSVFILE, ">", $output_dir . "/$1.csv") or die "Error: Can't open output file: $output_dir/$1.csv";
+    open (CSVFILE, ">", "$output_dir/$1.csv") or die "Error: Can't open output file: $output_dir/$1.csv";
 
     # Output headers
     print OUTFILE "<h2>$1</h2>\n";
@@ -264,6 +264,19 @@ print OUTFILE "</html>\n";
 close (CSVFILE);
 close (LOGFILE);
 close (OUTFILE);
+
+###############################################
+# Make graphs
+###############################################
+for (@test_dirs)
+{
+    my $plot_file = "$_/summary_plot.sh";
+    if (-e $plot_file)
+    {
+        `$plot_file $website_dir$project_name/$date/$_.csv $website_dir$project_name/$_.png`;
+    }
+}
+
 exit 0;
 
 sub output_scene
