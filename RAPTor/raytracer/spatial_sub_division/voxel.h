@@ -6,8 +6,12 @@
 //#include "primitive_count.h"
 #endif
 
+/* Common headers */
 #include "common.h"
+
+/* Ray tracer headers */
 #include "sort.h"
+#include "simd.h"
 #include "triangle.h"
 #include "kdt_node.h"
 

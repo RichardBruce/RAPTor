@@ -39,7 +39,6 @@ class bih : public ssd
 
         void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const override;
         vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t) const override;
-
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
         /* bih traversal */

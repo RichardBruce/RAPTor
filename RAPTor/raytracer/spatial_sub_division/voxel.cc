@@ -33,11 +33,7 @@ voxel voxel::divide(kdt_node *const k)
     /* Invoke the exact builder for small node */
     if (this->p->size() <= MIN_APPROX_KDT_BUILDER_NODE_SIZE)
     {
-#ifdef SIMD_PACKET_TRACING
         best_split = this->brute_force_split_all_axis(&lowest_cost, &normal);
-#else
-        best_split = this->split_all_axis(&lowest_cost, &normal);
-#endif
     }
     else
     {
@@ -1027,115 +1023,115 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
 
 /**********************************************************
  
-**********************************************************/
-inline fp_t voxel::count_primitives(fp_t *const r, const fp_t s, const axis_t normal) const
-{
-    /* Sub divide the objects */
-    fp_t left_objects  = (fp_t)0.0;
-    fp_t right_objects = (fp_t)0.0;
-    switch (normal)
-    {
-        case axis_t::x_axis:
-            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
-            {
-                left_objects  += (int)((*i)->lowest_x()  < s);
-                right_objects += (int)((*i)->highest_x() > s);
-            }
-            break;
-        case axis_t::y_axis:
-            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
-            {
-                left_objects  += (int)((*i)->lowest_y()  < s);
-                right_objects += (int)((*i)->highest_y() > s);
-            }
-            break;
-        case axis_t::z_axis:
-            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
-            {
-                left_objects  += (int)((*i)->lowest_z()  < s);
-                right_objects += (int)((*i)->highest_z() > s);
-            }
-            break;
-        default :
-            assert(false);
-            break;
-    }
+// **********************************************************/
+// inline fp_t voxel::count_primitives(fp_t *const r, const fp_t s, const axis_t normal) const
+// {
+//     /* Sub divide the objects */
+//     fp_t left_objects  = (fp_t)0.0;
+//     fp_t right_objects = (fp_t)0.0;
+//     switch (normal)
+//     {
+//         case axis_t::x_axis:
+//             for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
+//             {
+//                 left_objects  += (int)((*i)->lowest_x()  < s);
+//                 right_objects += (int)((*i)->highest_x() > s);
+//             }
+//             break;
+//         case axis_t::y_axis:
+//             for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
+//             {
+//                 left_objects  += (int)((*i)->lowest_y()  < s);
+//                 right_objects += (int)((*i)->highest_y() > s);
+//             }
+//             break;
+//         case axis_t::z_axis:
+//             for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
+//             {
+//                 left_objects  += (int)((*i)->lowest_z()  < s);
+//                 right_objects += (int)((*i)->highest_z() > s);
+//             }
+//             break;
+//         default :
+//             assert(false);
+//             break;
+//     }
 
-    *r = right_objects;
-    return left_objects;
-}
+//     *r = right_objects;
+//     return left_objects;
+// }
 
 
-#ifndef SIMD_PACKET_TRACING
-/**********************************************************
+// #ifndef SIMD_PACKET_TRACING
+// /**********************************************************
  
-**********************************************************/
-inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis_t n) const
-{
-//    if (this->p->size() > 1000000)
-//    {
-//        primitive_count pc(this->p, s, n);
-//        parallel_reduce(blocked_range<size_t>(0,this->p->size()), pc, auto_partitioner());
-//    
-//        for (int i = 0; i < 8; i++)
-//        {
-//            l[i] = pc.sum_l[i];
-//            r[i] = pc.sum_r[i];
-//        }
-//    }
-//    else
-//    {
-    /* Clear the counters */
-    for (int i = 0; i < len; i++)
-    {
-        l[i] = (fp_t)0.0;
-        r[i] = (fp_t)0.0;
-    }
+// **********************************************************/
+// inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis_t n) const
+// {
+// //    if (this->p->size() > 1000000)
+// //    {
+// //        primitive_count pc(this->p, s, n);
+// //        parallel_reduce(blocked_range<size_t>(0,this->p->size()), pc, auto_partitioner());
+// //    
+// //        for (int i = 0; i < 8; i++)
+// //        {
+// //            l[i] = pc.sum_l[i];
+// //            r[i] = pc.sum_r[i];
+// //        }
+// //    }
+// //    else
+// //    {
+//     /* Clear the counters */
+//     for (int i = 0; i < len; i++)
+//     {
+//         l[i] = (fp_t)0.0;
+//         r[i] = (fp_t)0.0;
+//     }
 
-    /* Count in the given axis */
-    switch (n)
-    {
-        case axis_t::x_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                for (int j = 0; j < len; j++)
-                {
-                    l[j] += (int)((*i)->lowest_x()  < s[j]);
-                    r[j] += (int)((*i)->highest_x() > s[j]);
-                }
-            }
-            break;
+//     /* Count in the given axis */
+//     switch (n)
+//     {
+//         case axis_t::x_axis:
+//             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
+//             {
+//                 for (int j = 0; j < len; j++)
+//                 {
+//                     l[j] += (int)((*i)->lowest_x()  < s[j]);
+//                     r[j] += (int)((*i)->highest_x() > s[j]);
+//                 }
+//             }
+//             break;
 
-        case axis_t::y_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                for (int j = 0; j < len; j++)
-                {
-                    l[j] += (int)((*i)->lowest_y()  < s[j]);
-                    r[j] += (int)((*i)->highest_y() > s[j]);
-                }
-            }
-            break;
+//         case axis_t::y_axis:
+//             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
+//             {
+//                 for (int j = 0; j < len; j++)
+//                 {
+//                     l[j] += (int)((*i)->lowest_y()  < s[j]);
+//                     r[j] += (int)((*i)->highest_y() > s[j]);
+//                 }
+//             }
+//             break;
 
-    case axis_t::z_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                for (int j = 0; j < len; j++)
-                {
-                    l[j] += (int)((*i)->lowest_z()  < s[j]);
-                    r[j] += (int)((*i)->highest_z() > s[j]);
-                }
-            }
-            break;
-        default :
-            assert(false);
-            break;
-    }
-//    }
-}
+//     case axis_t::z_axis:
+//             for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
+//             {
+//                 for (int j = 0; j < len; j++)
+//                 {
+//                     l[j] += (int)((*i)->lowest_z()  < s[j]);
+//                     r[j] += (int)((*i)->highest_z() > s[j]);
+//                 }
+//             }
+//             break;
+//         default :
+//             assert(false);
+//             break;
+//     }
+// //    }
+// }
 
 
-#else
+// #else
 /**********************************************************
  
 **********************************************************/
@@ -1541,7 +1537,6 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
     /* cost of traversal + cost of intersection * (left cell count * left area + right cell count * right area) */
     return vfp_t(COST_OF_TRAVERSAL) + (vfp_t(COST_OF_INTERSECTION) * ((l * left_area) + (r * right_area)));
 }
-#endif /* #ifndef SIMD_PACKET_TRACING */
 
 
 /**********************************************************

@@ -147,6 +147,16 @@ namespace raptor_raytracer
 #endif
 
 /* SIMD numbers */
+/* The number of elements in the SIMD vetor */
+#ifndef SIMD_WIDTH
+#define SIMD_WIDTH              4
+#endif
+
+/* Log base 2 of the SIMD_WIDTH */
+#ifndef LOG2_SIMD_WIDTH
+#define LOG2_SIMD_WIDTH         2
+#endif
+
 #ifdef SIMD_PACKET_TRACING
 /* The maximum allowed number of SIMD vectors in a packet */
 /* Must be a power of 4, including 0 */
@@ -166,17 +176,7 @@ namespace raptor_raytracer
 #define SPLIT_PACKET_DIVISOR    4
 #endif
 
-/* The number of elements in the SIMD vetor */
-#ifndef SIMD_WIDTH
-#define SIMD_WIDTH              4
-#endif
-
 #define PACKET_WIDTH            (unsigned)sqrt(MAXIMUM_PACKET_SIZE * SIMD_WIDTH)
-
-/* Log base 2 of the SIMD_WIDTH */
-#ifndef LOG2_SIMD_WIDTH
-#define LOG2_SIMD_WIDTH         2
-#endif
 
 #else   /* #ifdef SIMD_PACKET_TRACING */
 

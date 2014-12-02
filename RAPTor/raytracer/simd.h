@@ -1,12 +1,12 @@
 #ifndef __SIMD_H__
 #define __SIMD_H__
 
-#ifdef SIMD_PACKET_TRACING
-
+/* Standard headers */
 #include <xmmintrin.h>
 #include <iostream>
 #include <cmath>
 
+/* Common headers */
 #include "common.h"
 
 class vfp_t;
@@ -321,6 +321,4 @@ inline void transpose(vfp_t &a, vfp_t &b, vfp_t &c, vfp_t &d)
 
     return;
 }
-
-#endif /* #ifdef SIMD_PACKET_TRACING */
 #endif /* #ifndef __SIMD_H__ */

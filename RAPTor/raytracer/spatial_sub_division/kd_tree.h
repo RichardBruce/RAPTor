@@ -69,7 +69,7 @@ class kd_tree : public ssd
         void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h,
                                                 kdt_stack_element entry_point, kdt_stack_element *exit_point) const;
         vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t, kdt_stack_element entry_point, kdt_stack_element *exit_point) const;
-#endif /* #ifdef SIMD_PACKET_TRACING */
+#endif
 
         inline void find_leaf_node(const ray *const r, const kdt_node **const n, kdt_stack_element **const out, const kdt_stack_element *const entry_point) const;
 

@@ -397,10 +397,14 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
                               (z_entry > y_exit) | (y_entry > z_exit);
 
     const int int_mask = move_mask(mask);
+    std::cout << "bih: " << entry_point.l << " to " << entry_point.u << std::endl;
+    // bih: 3.38997, 4.82565, 9.52361 to -3.38867, -3.04499, -9.46704
     if ((int_mask & 0x3) && (int_mask & 0xc))
     {
         return;
     }
+    std::cout << "hit world" << std::endl;
+    assert(false);
     
     const float near    = std::min(std::min(x_entry[0], y_entry[0]), z_entry[0]);
     const float far     = std::max(std::max(x_exit[2],  y_exit[2] ), y_exit[2] );
@@ -1052,7 +1056,6 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t, bih_st
         entry_point.vt_max = std::min(entry_point.vt_max, h.d);
     }
 }
-#endif /* #ifdef SIMD_PACKET_TRACING */
 
 
 /**********************************************************
@@ -1115,6 +1118,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
         entry_point.vt_max = std::min(entry_point.vt_max, h.d);
     }
 }
+#endif /* #ifdef SIMD_PACKET_TRACING */
 
 
 /**********************************************************

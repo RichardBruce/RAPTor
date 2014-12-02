@@ -62,7 +62,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
             const int shader   = (i * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH));
             for (int l = 0; l < this->nr_pending_shadows[shader]; ++l)
             {
-                if (!this->_ssd->found_nearer_object(&this->pending_shadows[ray_addr + l], this->pending_shadows[ray_addr + l].get_length()))
+                if (!_ssd->found_nearer_object(&this->pending_shadows[ray_addr + l], this->pending_shadows[ray_addr + l].get_length()))
                 {
                     ++made_it;
                 }
@@ -144,7 +144,7 @@ void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *cons
                 for (int k = 0; k < SIMD_WIDTH; ++k)
                 {
                     int addr = (j << LOG2_SIMD_WIDTH) + k;
-                    if(!this->_ssd->found_nearer_object(sr[addr], sr[addr]->get_length()))
+                    if(!_ssd->found_nearer_object(sr[addr], sr[addr]->get_length()))
                     {
                         m[r_to_s[addr]]++;
                     }  
@@ -152,7 +152,7 @@ void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *cons
             }
             else
             {
-                vfp_t closer(this->_ssd->found_nearer_object(&r[j], t[j]));
+                vfp_t closer(_ssd->found_nearer_object(&r[j], t[j]));
                 for (int k = 0; k < SIMD_WIDTH; ++k)
                 {
                     int addr = (j << LOG2_SIMD_WIDTH) + k;
@@ -166,7 +166,7 @@ void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *cons
         vfp_t closer[MAXIMUM_PACKET_SIZE];
         memset(closer, 0, MAXIMUM_PACKET_SIZE * sizeof(vfp_t));
 
-        this->_ssd->frustrum_found_nearer_object(&r[0], &t[0], &closer[0], s);
+        _ssd->frustrum_found_nearer_object(&r[0], &t[0], &closer[0], s);
         for (int k = 0; k < (s << LOG2_SIMD_WIDTH); ++k)
         {
             m[r_to_s[k]] += static_cast<int>(closer[k >> LOG2_SIMD_WIDTH][k & 0x3] == 0.0f);
@@ -225,7 +225,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
                 {
                     ray             ray_0 = r[i].extract(j);
                     hit_description hit_0 = h[i][j];
-                    intersecting_object[(i * SIMD_WIDTH) + j]  = this->_ssd->find_nearest_object(&ray_0, &hit_0);
+                    intersecting_object[(i * SIMD_WIDTH) + j]  = _ssd->find_nearest_object(&ray_0, &hit_0);
                     h[i].d[j] = hit_0.d;
                     h[i].u[j] = hit_0.u;
                     h[i].v[j] = hit_0.v;
@@ -233,13 +233,13 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             }
             else
             {
-                this->_ssd->find_nearest_object(&r[i], &intersecting_object[i << LOG2_SIMD_WIDTH], &h[i]);
+                _ssd->find_nearest_object(&r[i], &intersecting_object[i << LOG2_SIMD_WIDTH], &h[i]);
             }
         }
     }
     else
     {
-        this->_ssd->frustrum_find_nearest_object(r, &intersecting_object[0], &h[0], s);
+        _ssd->frustrum_find_nearest_object(r, &intersecting_object[0], &h[0], s);
     }
 
     /* Generate secondary rays, currently limited to shadow rays */
@@ -288,7 +288,6 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
         }
     }
 
-    
     /* Trace the shadow rays to each light */
     packet_ray      next_packet[MAXIMUM_PACKET_SIZE];
     int             made_it[MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
@@ -334,7 +333,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
         for (int k = 0; k < packed; ++k)
         {
             int addr = (nr_of_packets << LOG2_SIMD_WIDTH) + k;
-            if(!this->_ssd->found_nearer_object(rays_this_packet[addr], rays_this_packet[addr]->get_length()))
+            if(!_ssd->found_nearer_object(rays_this_packet[addr], rays_this_packet[addr]->get_length()))
             {
                 made_it[ray_to_shader[addr]]++;
             }
@@ -373,7 +372,6 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             c[addr] = this->c.shade(ray_p[i]);
         }
     }
-    
 
     /* Recurse for reflections */
     /* Pack the rays into a packet */

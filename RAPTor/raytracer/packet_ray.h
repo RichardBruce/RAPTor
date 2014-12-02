@@ -5,9 +5,8 @@
 #include "simd.h"
 #include "ray.h"
 
+
 #ifdef SIMD_PACKET_TRACING
-
-
 namespace raptor_raytracer
 {
 /* Forward declarations */
