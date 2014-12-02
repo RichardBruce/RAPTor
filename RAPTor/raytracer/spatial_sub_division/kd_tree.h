@@ -12,6 +12,8 @@
 /* Ray tracer headers */
 #include "common.h"
 #include "ssd.h"
+#include "kdt_node.h"
+#include "kd_tree_builder.h"
 
 
 namespace raptor_raytracer
@@ -22,12 +24,10 @@ class kd_tree : public ssd
         /* CTOR, build the tree */
         kd_tree(const primitive_list &everything)
         {
-            kdt_node kdt_base;
-
             /* Build a KD-tree to speed up ray tracing */    
             /* The base of the tree will hold everything for now, but adding it will 
               just be a waste of time for now */
-            build_kd_tree(&everything, &kdt_base, axis_t::x_axis);
+            build_kd_tree(&everything, &_kdt_base, axis_t::x_axis);
         }
 
 #ifdef SIMD_PACKET_TRACING
@@ -74,7 +74,8 @@ class kd_tree : public ssd
         inline void find_leaf_node(const ray *const r, const kdt_node **const n, kdt_stack_element **const out, const kdt_stack_element *const entry_point) const;
 
         /* The stack is mutable because it will never be known to a user of this class */
-        mutable kdt_stack_element   kdt_stack[MAX_KDT_STACK_HEIGHT];
+        kdt_node                    _kdt_base;
+        mutable kdt_stack_element   _kdt_stack[MAX_KDT_STACK_HEIGHT];
 };
 }; /* namespace raptor_raytracer */
 

@@ -1,20 +1,6 @@
-#include "common.h"
+/* Ray tracer headers */
 #include "raytracer.h"
-
-#include "scene.h"
-
-#include "line.h"
-#include "triangle.h"
-
-#include "ray.h"
-#include "packet_ray.h"
-#include "frustrum.h"
-
-#include "kdt_node.h"
-#include "kd_tree_builder.h"
-
-#include "bih_node.h"
-#include "bih_builder.h"
+#include "ssd.h"
 
 namespace raptor_raytracer
 {
@@ -39,12 +25,9 @@ unsigned max_depth  = 0;    /* Maximum depth of the tree */
 
 #ifdef THREADED_RAY_TRACE
     /* Start the thread scheduler */
-    task_scheduler_init init(task_scheduler_init::automatic);
+    tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
 #endif
 
-/**********************************************************
- 
-**********************************************************/
 void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
 {
     /* Does the ray intersect any objects */
@@ -52,7 +35,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
     const triangle *intersecting_object;
     hit_description hit_type;
     
-    intersecting_object = ssd->find_nearest_object(&r, &hit_type);
+    intersecting_object = _ssd->find_nearest_object(&r, &hit_type);
 
     /* If there was an intersection set the rays endpoint and call that objects shader */
     if (hit_type.d < MAX_DIST)
@@ -79,7 +62,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
             const int shader   = (i * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH));
             for (int l = 0; l < this->nr_pending_shadows[shader]; ++l)
             {
-                if (!this->ssd->found_nearer_object(&this->pending_shadows[ray_addr + l], this->pending_shadows[ray_addr + l].get_length()))
+                if (!this->_ssd->found_nearer_object(&this->pending_shadows[ray_addr + l], this->pending_shadows[ray_addr + l].get_length()))
                 {
                     ++made_it;
                 }
@@ -117,9 +100,6 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
 
 
 #ifdef SIMD_PACKET_TRACING
-/**********************************************************
- 
-**********************************************************/
 void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *const sr, vfp_t *const t, unsigned int *r_to_s, int *m, const int s, const int l) const
 {
     /* Coherency check */
@@ -164,7 +144,7 @@ void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *cons
                 for (int k = 0; k < SIMD_WIDTH; ++k)
                 {
                     int addr = (j << LOG2_SIMD_WIDTH) + k;
-                    if(!this->ssd->found_nearer_object(sr[addr], sr[addr]->get_length()))
+                    if(!this->_ssd->found_nearer_object(sr[addr], sr[addr]->get_length()))
                     {
                         m[r_to_s[addr]]++;
                     }  
@@ -172,7 +152,7 @@ void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *cons
             }
             else
             {
-                vfp_t closer(this->ssd->found_nearer_object(&r[j], t[j]));
+                vfp_t closer(this->_ssd->found_nearer_object(&r[j], t[j]));
                 for (int k = 0; k < SIMD_WIDTH; ++k)
                 {
                     int addr = (j << LOG2_SIMD_WIDTH) + k;
@@ -186,7 +166,7 @@ void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *cons
         vfp_t closer[MAXIMUM_PACKET_SIZE];
         memset(closer, 0, MAXIMUM_PACKET_SIZE * sizeof(vfp_t));
 
-        this->ssd->frustrum_found_nearer_object(&r[0], &t[0], &closer[0], s);
+        this->_ssd->frustrum_found_nearer_object(&r[0], &t[0], &closer[0], s);
         for (int k = 0; k < (s << LOG2_SIMD_WIDTH); ++k)
         {
             m[r_to_s[k]] += static_cast<int>(closer[k >> LOG2_SIMD_WIDTH][k & 0x3] == 0.0f);
@@ -197,10 +177,6 @@ void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *cons
 }
 
 
-
-/**********************************************************
- 
-**********************************************************/
 void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, const unsigned int *const ray_to_colour_lut, const int s) const
 {
     const triangle *intersecting_object[MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
@@ -249,7 +225,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
                 {
                     ray             ray_0 = r[i].extract(j);
                     hit_description hit_0 = h[i][j];
-                    intersecting_object[(i * SIMD_WIDTH) + j]  = this->ssd->find_nearest_object(&ray_0, &hit_0);
+                    intersecting_object[(i * SIMD_WIDTH) + j]  = this->_ssd->find_nearest_object(&ray_0, &hit_0);
                     h[i].d[j] = hit_0.d;
                     h[i].u[j] = hit_0.u;
                     h[i].v[j] = hit_0.v;
@@ -257,13 +233,13 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             }
             else
             {
-                this->ssd->kdt_find_nearest_object(&r[i], &intersecting_object[i << LOG2_SIMD_WIDTH], &h[i]);
+                this->_ssd->find_nearest_object(&r[i], &intersecting_object[i << LOG2_SIMD_WIDTH], &h[i]);
             }
         }
     }
     else
     {
-        this->ssd->frustrum_find_nearest_object(r, &intersecting_object[0], &h[0], s);
+        this->_ssd->frustrum_find_nearest_object(r, &intersecting_object[0], &h[0], s);
     }
 
     /* Generate secondary rays, currently limited to shadow rays */
@@ -358,7 +334,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
         for (int k = 0; k < packed; ++k)
         {
             int addr = (nr_of_packets << LOG2_SIMD_WIDTH) + k;
-            if(!this->ssd->found_nearer_object(rays_this_packet[addr], rays_this_packet[addr]->get_length()))
+            if(!this->_ssd->found_nearer_object(rays_this_packet[addr], rays_this_packet[addr]->get_length()))
             {
                 made_it[ray_to_shader[addr]]++;
             }
@@ -500,9 +476,6 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
 }
 
 
-/**********************************************************
- 
-**********************************************************/
 void ray_trace_engine::ray_trace_one_packet(const int x, const int y) const
 {
     /* Create a packet of rays through the screen */
@@ -526,9 +499,6 @@ void ray_trace_engine::ray_trace_one_packet(const int x, const int y) const
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
 
-/**********************************************************
- 
-**********************************************************/
 inline void ray_trace_engine::ray_trace_one_pixel(const int x, const int y) const
 {
     /* Convert to co-ordinate system */
@@ -548,10 +518,7 @@ inline void ray_trace_engine::ray_trace_one_pixel(const int x, const int y) cons
 
 
 #ifdef THREADED_RAY_TRACE
-/**********************************************************
- 
-**********************************************************/
-void ray_trace_engine::operator() (const blocked_range2d<unsigned>& r) const
+void ray_trace_engine::operator() (const tbb::blocked_range2d<unsigned>& r) const
 {
 #ifdef SIMD_PACKET_TRACING
     for (unsigned y = r.rows().begin(); y != r.rows().end(); ++y)
@@ -575,19 +542,8 @@ void ray_trace_engine::operator() (const blocked_range2d<unsigned>& r) const
 }
 #endif /* #ifdef THREADED_RAY_TRACE */
 
-
-/**********************************************************
- ray_tracer is the main ray tracing function. 
- 
- The whole screen is ray traced based on the X/Y resolution, 
- minimum X/Y values and the X/Y increments. The scene is 
- passed in 'everything' and the light sources passrd in 
- 'lights'. 'eye' specifies the launch point of the rays.
- 'x_vec', 'y_vec' and 'z_vec'  specify the axis for ray 
- launch. The generated picture is put in camera.
-**********************************************************/
-template<class SpatialSubDivision>
-void ray_tracer(const SpatialSubDivision *const ssd, const light_list &lights, const primitive_list &everything, camera &c)
+/* Ray tracer main function */
+void ray_tracer(const ssd *const sub_division, const light_list &lights, const primitive_list &everything, camera &c)
 {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
     std::cout << "Static properties of the tree :" << std::endl;
@@ -611,16 +567,16 @@ void ray_tracer(const SpatialSubDivision *const ssd, const light_list &lights, c
     /* Make the screen 20 wide and 20 high ie/ -10 to 10 */
 #ifdef THREADED_RAY_TRACE
 #ifdef SIMD_PACKET_TRACING
-    parallel_for(blocked_range2d<unsigned>(0, (unsigned)c.y_number_of_rays()/PACKET_WIDTH, 4, 0, (unsigned)c.x_number_of_rays()/PACKET_WIDTH, 4), ray_trace_engine(lights, c, ssd));
+    tbb::parallel_for(tbb:blocked_range2d<unsigned>(0, (unsigned)c.y_number_of_rays()/PACKET_WIDTH, 4, 0, (unsigned)c.x_number_of_rays()/PACKET_WIDTH, 4), ray_trace_engine(lights, c, sub_division));
 
 #else
     /* Thread using blocked_range2d to specify the size and triangle of block to trace */
-    parallel_for(blocked_range2d<unsigned>(0, c.y_number_of_rays(), 32, 0, c.x_number_of_rays(), 32), ray_trace_engine(lights, c, ssd));
+    tbb::parallel_for(tbb:blocked_range2d<unsigned>(0, c.y_number_of_rays(), 32, 0, c.x_number_of_rays(), 32), ray_trace_engine(lights, c, sub_division));
 
 #endif /* #ifdef SIMD_PACKET_TRACING */
 #else
     /* Instantiate the ray trace engine */
-    ray_trace_engine engine(lights, c, ssd);
+    ray_trace_engine engine(lights, c, sub_division);
     
     /* Trace a ray through each pixel of the screen working bottom left to top right */
 #ifdef SIMD_PACKET_TRACING

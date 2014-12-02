@@ -1,8 +1,10 @@
 #ifndef __RAYTRACER_H__
 #define __RAYTRACER_H__
 
-
+/* Common headers */
 #include "point_t.h"
+
+/* Ray tracer headers */
 #include "camera.h"
 #include "light.h"
 
@@ -12,8 +14,6 @@
 #include "task_scheduler_init.h"
 #include "parallel_for.h"
 #include "blocked_range2d.h"
-
-using namespace tbb;
 #endif /* #ifdef THREADED_RAY_TRACE */
 
 namespace raptor_raytracer
@@ -30,48 +30,43 @@ extern unsigned ave_ob;         /* Average size of an elementary node */
 extern unsigned max_depth;      /* Maximum depth of the tree */
 #endif
 
-class ray;
-class packet_ray;
-class frustrum;
-class line;
-class triangle;
-class kdt_node;
-class bih_node;
+/* Forward declarations */
+class ssd;
+
 
 /* Class for threaded ray tracing */
-template<class SpatialSubDivision>
 class ray_trace_engine 
 {
     public :
         using light_iterator        = light_list::iterator;
         using const_light_iterator  = light_list::const_iterator;
 
-        ray_trace_engine(const light_list &l, camera &c, const SpatialSubDivision *const ssd) :    
-            ssd(ssd), c(c), lights(l) 
+        ray_trace_engine(const light_list &l, camera &c, const ssd *const sub_division)
+        :   _ssd(sub_division), c(c), lights(l) 
             {
                 this->pending_shadows      = static_cast<ray *>(scalable_malloc(  this->lights.size() * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(ray))));
                 this->nr_pending_shadows   = static_cast<fp_t *>(scalable_malloc( this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(fp_t))));
-            };
+            }
 
-        ray_trace_engine(const ray_trace_engine &r) :    
-            ssd(r.ssd), c(r.c), lights(r.lights) 
+        ray_trace_engine(const ray_trace_engine &r)
+        :   _ssd(r._ssd), c(r.c), lights(r.lights) 
             {
                 this->pending_shadows       = static_cast<ray *>(scalable_malloc( this->lights.size() * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(ray))));
                 this->nr_pending_shadows    = static_cast<fp_t *>(scalable_malloc(this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(fp_t))));
-            };
+            }
 
         ~ray_trace_engine() 
         {
             scalable_free(this->pending_shadows);
             scalable_free(this->nr_pending_shadows);
-        };
+        }
 
         /* Access functions */
         const light_list & get_scene_lights() const { return this->lights; }
         
 #ifdef THREADED_RAY_TRACE
         /* Operators for TBB to ray trace a 2-D blocks */
-        void operator() (const blocked_range2d<unsigned> &r) const;
+        void operator() (const tbb::blocked_range2d<unsigned> &r) const;
 #endif /* #ifdef THREADED_RAY_TRACE */
         
         /* Member to find nearest intersector and call the shader */
@@ -109,18 +104,17 @@ class ray_trace_engine
         inline void shoot_shadow_packet(packet_ray *const r, ray *const *const sr, vfp_t *const t, unsigned int *r_to_s, int *m, const int s, const int l) const;
 #endif
         
-        const SpatialSubDivision *const ssd;
-        camera                          &c;    
-        const light_list                &lights;
+        const ssd *const    _ssd;
+        camera              &c;    
+        const light_list    &lights;
         
-        mutable ray                     *pending_shadows;
-        mutable fp_t                    *nr_pending_shadows;
-        mutable int                     shader_nr;
+        mutable ray         *pending_shadows;
+        mutable fp_t        *nr_pending_shadows;
+        mutable int         shader_nr;
 };
 
-/* Ray tracer main function */
-template<class SpatialSubDivision>
-void ray_tracer(const SpatialSubDivision *const ssd, const light_list &lights, const primitive_list &everything, camera &c)
+/* Main ray tracer function */
+void ray_tracer(const ssd *const sub_division, const light_list &lights, const primitive_list &everything, camera &c);
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __RAYTRACER_H__ */

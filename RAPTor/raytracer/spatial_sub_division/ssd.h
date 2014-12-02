@@ -10,9 +10,18 @@
 
 /* Raytracer headers */
 
+/* Forward declarations */
+class vfp_t;
 
 namespace raptor_raytracer
 {
+/* Forward declarations */
+class hit_description;
+class packet_hit_description;
+class packet_ray;
+class ray;
+class triangle;
+
 /* Vritual class to be implemented by all types of spatial sub division */
 class ssd : private boost::noncopyable
 {

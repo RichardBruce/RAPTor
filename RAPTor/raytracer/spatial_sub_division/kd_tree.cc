@@ -78,7 +78,7 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
 #endif
     
     /* exit point setting */
-    kdt_stack_element *exit_point = &(this->kdt_stack[0]);
+    kdt_stack_element *exit_point = &(_kdt_stack[0]);
     exit_point->vt_max  = vfp_t(MAX_DIST);
     exit_point->vt_min  = vfp_zero;
     exit_point->n       = nullptr;
@@ -88,7 +88,7 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
     kdt_stack_element entry_point;
     entry_point.vt_max  = vfp_t(MAX_DIST);
     entry_point.vt_min  = vfp_zero;
-    entry_point.n       = this->kdt_base;
+    entry_point.n       = &_kdt_base;
     entry_point.m       = vfp_true;
 
     /* Take the inverse direction of the ray for faster traversal */
@@ -121,7 +121,7 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
         {
             /* If the whole tree is traversed without finding an intersection 
                return a null pointer */
-            if (exit_point == &(this->kdt_stack[0]))
+            if (exit_point == &(_kdt_stack[0]))
             {
                 return;
             }
@@ -205,7 +205,7 @@ vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t) co
 #endif
 
     /* exit point setting */
-    kdt_stack_element *exit_point = &(this->kdt_stack[0]);
+    kdt_stack_element *exit_point = &(_kdt_stack[0]);
     exit_point->vt_max  = t;
     exit_point->vt_min  = vfp_zero;
     exit_point->n       = nullptr;
@@ -215,7 +215,7 @@ vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t) co
     kdt_stack_element entry_point;
     entry_point.vt_max  = t;
     entry_point.vt_min  = vfp_zero;
-    entry_point.n       = this->kdt_base;
+    entry_point.n       = &_kdt_base;
     entry_point.m       = vfp_true;
 
     /* Traverse the whole tree */
@@ -257,7 +257,7 @@ vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t) co
         {
             /* If the whole tree is traversed without finding an intersection 
                return a null pointer */
-            if (exit_point == &(this->kdt_stack[0]))
+            if (exit_point == &(_kdt_stack[0]))
             {
                 return closer;
             }
@@ -540,13 +540,13 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
     ++nr;
 #endif
     /* state of stack */
-    kdt_stack_element *exit_point = &(this->kdt_stack[0]);
+    kdt_stack_element *exit_point = &(_kdt_stack[0]);
     exit_point->n       = nullptr;
     exit_point->t_max   = MAX_DIST;
     exit_point->t_min   = 0.0f;
 
     kdt_stack_element  entry_point;
-    entry_point.n      = this->kdt_base;
+    entry_point.n      = &_kdt_base;
     entry_point.t_max  = MAX_DIST;
     entry_point.t_min  = 0.0f;
     entry_point.s      = nullptr;
@@ -711,7 +711,7 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
         do
         {
             /* If the whole tree has been traversed, return */
-            if (exit_point == &(this->kdt_stack[0]))
+            if (exit_point == &(_kdt_stack[0]))
             {
                 return;
             }
@@ -751,13 +751,13 @@ void kd_tree::frustrum_found_nearer_object(const packet_ray *const r, const vfp_
     float min_d = std::min(std::min(vmin_d[0], vmin_d[1]), std::min(vmin_d[2], vmin_d[3]));
 
     /* state of stack */
-    kdt_stack_element *exit_point = &(this->kdt_stack[0]);
+    kdt_stack_element *exit_point = &(_kdt_stack[0]);
     exit_point->n       = nullptr;
     exit_point->t_max   = max_d;
     exit_point->t_min   = 0.0f;
 
     kdt_stack_element entry_point;
-    entry_point.n       = this->kdt_base;
+    entry_point.n       = &_kdt_base;
     entry_point.t_max   = max_d;
     entry_point.t_min   = 0.0f;
     entry_point.s       = nullptr;
@@ -911,7 +911,7 @@ void kd_tree::frustrum_found_nearer_object(const packet_ray *const r, const vfp_
         do
         {
             /* If the whole tree has been traversed, return */
-            if (exit_point == &(this->kdt_stack[0]))
+            if (exit_point == &(_kdt_stack[0]))
             {
                 return;
             }
@@ -1108,17 +1108,17 @@ triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *cons
 //    if (!GetMinMaxT(&bbox, r, &tmin, &tmax))
 //      return nullptr; /* no object can be intersected */
 
-    const kdt_node *current_node = this->kdt_base; /* start from the root node */
+    const kdt_node *current_node = &_kdt_base; /* start from the root node */
 
     /* exit point setting */
-    kdt_stack_element *exit_point = &(this->kdt_stack[1]);
+    kdt_stack_element *exit_point = &(_kdt_stack[1]);
     exit_point->p.x = r->get_x0() + h->d * r->get_x_grad();
     exit_point->p.y = r->get_y0() + h->d * r->get_y_grad();
     exit_point->p.z = r->get_z0() + h->d * r->get_z_grad();
     exit_point->n = nullptr;
     exit_point->s = nullptr;
     exit_point->d = MAX_DIST;
-//    point *extp = &(this->kdt_stack[1]);
+//    point *extp = &(_kdt_stack[1]);
 //    extp->x = r->get_x0() + r->get_x_grad() * tmax;
 //    extp->y = r->get_y0() + r->get_y_grad() * tmax;
 //    extp->z = r->get_z0() + r->get_z_grad() * tmax;
@@ -1127,13 +1127,13 @@ triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *cons
 //    extp->t = tmax;
 
     /* entry point setting */
-    kdt_stack_element *entry_point = &(this->kdt_stack[0]);
+    kdt_stack_element *entry_point = &(_kdt_stack[0]);
     entry_point->p = r->get_ogn();
     entry_point->n = nullptr;
     entry_point->s = nullptr;
     entry_point->d = 0.0f;
 
-//    point *entp = &(this->kdt_stack[0]);
+//    point *entp = &(_kdt_stack[0]);
 //    entp->nodep = nullptr;
 //    entp->prev = nullptr;
     /* entry point setting, tmin > 0.0 */
@@ -1208,10 +1208,10 @@ bool kd_tree::found_nearer_object(const ray *const r, const float t) const
 #endif
 
     /* Signed distances */
-    const kdt_node *current_node = this->kdt_base; /* Start from the root node */
+    const kdt_node *current_node = &_kdt_base; /* Start from the root node */
 
     /* exit point setting */
-    kdt_stack_element *exit_point = &(this->kdt_stack[1]);
+    kdt_stack_element *exit_point = &(_kdt_stack[1]);
     exit_point->p.x = r->get_x0() + t * r->get_x_grad();
     exit_point->p.y = r->get_y0() + t * r->get_y_grad();
     exit_point->p.z = r->get_z0() + t * r->get_z_grad();
@@ -1220,7 +1220,7 @@ bool kd_tree::found_nearer_object(const ray *const r, const float t) const
     exit_point->d = MAX_DIST;
 
     /* entry point setting */
-    kdt_stack_element *entry_point = &(this->kdt_stack[0]);
+    kdt_stack_element *entry_point = &(_kdt_stack[0]);
     entry_point->p = r->get_ogn();
     entry_point->n = nullptr;
     entry_point->s = nullptr;

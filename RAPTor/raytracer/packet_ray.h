@@ -1,6 +1,7 @@
 #ifndef __PACKET_RAY_H__
 #define __PACKET_RAY_H__
 
+/* Ray tracer headers */
 #include "simd.h"
 #include "ray.h"
 

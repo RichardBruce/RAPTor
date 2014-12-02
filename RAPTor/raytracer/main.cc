@@ -1,4 +1,5 @@
 /* Raytracer headers */
+#include "raytracer.h"
 #include "common.h"
 #include "scene.h"
 #include "camera.h"
@@ -11,7 +12,6 @@
 #include "vrml_parser.h"
 #include "bih.h"
 #include "kd_tree.h"
-#include "raytracer.h"
 
 /* Display headers */
 #include "sdl_wrapper.h"

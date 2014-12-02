@@ -26,6 +26,8 @@
 #include "ply_parser.h"
 #include "vrml_parser.h"
 #include "raytracer.h"
+#include "kd_tree.h"
+#include "bih.h"
 
 /* Test headers */
 #include "regression_checker.h"
@@ -179,13 +181,17 @@ struct regression_fixture : private boost::noncopyable
             BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - # Primitives: " << _everything.size();
             BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - # Lights: " << _lights.size();
 
-            /* Render */
-            const auto t0(std::chrono::system_clock::now());
-            ray_tracer(_lights, _everything, *_cam);
-            const auto t1(std::chrono::system_clock::now());
+            /* Build kd tree */
+            const auto ssd_build_t0(std::chrono::system_clock::now());
+            bih ssd(_everything);
+            const auto ssd_build_t1(std::chrono::system_clock::now());
+            BOOST_LOG_TRIVIAL(fatal) << "PERF 5 - KDT Build Time ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(ssd_build_t1 - ssd_build_t0).count();
 
-            /* Log test duration */
-            BOOST_LOG_TRIVIAL(fatal) << "PERF 4 - Render Time ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+            /* Render */
+            const auto kdt_render_t0(std::chrono::system_clock::now());
+            ray_tracer(&ssd, _lights, _everything, *_cam);
+            const auto kdt_render_t1(std::chrono::system_clock::now());
+            BOOST_LOG_TRIVIAL(fatal) << "PERF 4 - Render Time ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(kdt_render_t1 - kdt_render_t0).count();
 
             return *this;
         }

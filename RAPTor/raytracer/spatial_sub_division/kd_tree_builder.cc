@@ -66,8 +66,8 @@ void build_kd_tree(const primitive_list *const objects, kdt_node *const kdt_subd
 
 #ifdef THREADED_RAY_TRACE
     /* Allocate and spawn the root node */
-    kd_tree_build_task& root = *new(task::allocate_root()) kd_tree_build_task(&base, kdt_subdiv);
-    task::spawn_root_and_wait(root);
+    kd_tree_build_task& root = *new(tbb::task::allocate_root()) kd_tree_build_task(&base, kdt_subdiv);
+    tbb::task::spawn_root_and_wait(root);
 #else
     /* Build the tree, top down */
     divide_kdt_node(&base, kdt_subdiv);

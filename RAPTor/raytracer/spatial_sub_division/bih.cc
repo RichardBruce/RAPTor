@@ -15,7 +15,7 @@ std::vector<bih_node> *     bih_node::bih   = nullptr;
 
 #ifdef SIMD_PACKET_TRACING
 /* Find the next leaf node intersected by the frustrum */
-inline int bih::find_bih_leaf_node(const frustrum &r, bih_stack_element *const entry_point, bih_stack_element **const out, unsigned int size) const
+inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry_point, bih_stack_element **const out, unsigned int size) const
 {
     bih_stack_element *exit_point = *out;
     const bih_node *current_node = entry_point->n;
@@ -416,7 +416,7 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
     while (true)
     {
         /* Find a leaf node */
-        const int cmd = this->find_bih_leaf_node(f, &entry_point, &exit_point, size);
+        const int cmd = this->find_leaf_node(f, &entry_point, &exit_point, size);
 
         /* If the leaf contains objects find the closest intersecting object */
         if ((cmd == 1) && !entry_point.n->is_empty())
@@ -584,7 +584,7 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
     while (true)
     {
         /* Find a leaf node */
-        const int cmd = this->find_bih_leaf_node(f, &entry_point, &exit_point, size);
+        const int cmd = this->find_leaf_node(f, &entry_point, &exit_point, size);
 
         /* If the leaf contains objects find the closest intersecting object */
         if ((cmd == 1) && !entry_point.n->is_empty())
@@ -927,7 +927,7 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
     while (true)
     {
         /* Find a leaf node */
-        const bool cmd = this->find_bih_leaf_node(*r, &entry_point, &exit_point, &i_rd[0]);
+        const bool cmd = this->find_leaf_node(*r, &entry_point, &exit_point, &i_rd[0]);
 
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
@@ -973,7 +973,7 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
     while (true)
     {
         /* Find a leaf node */
-        const bool cmd = this->find_bih_leaf_node(*r, &entry_point, &exit_point, &i_rd[0]);
+        const bool cmd = this->find_leaf_node(*r, &entry_point, &exit_point, &i_rd[0]);
 
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
@@ -1019,7 +1019,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t, bih_st
     while (true)
     {
         /* Find a leaf node */
-        const bool cmd = this->find_bih_leaf_node(*r, &entry_point, &exit_point, &i_rd[0]);
+        const bool cmd = this->find_leaf_node(*r, &entry_point, &exit_point, &i_rd[0]);
 
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
@@ -1082,7 +1082,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
     while (true)
     {
         /* Find a leaf node */
-        const bool cmd = this->find_bih_leaf_node(*r, &entry_point, &exit_point, &i_rd[0]);
+        const bool cmd = this->find_leaf_node(*r, &entry_point, &exit_point, &i_rd[0]);
 
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
@@ -1404,7 +1404,7 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
     while (true)
     {
         /* Find a leaf node */
-        const bool leaf = this->find_bih_leaf_node(*r, &entry_point, &exit_point, i_ray_dir);
+        const bool leaf = this->find_leaf_node(*r, &entry_point, &exit_point, i_ray_dir);
 
         /* If the leaf contains objects find the closest intersecting object */
         if (leaf)
@@ -1443,7 +1443,7 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
 /**********************************************************
  
 **********************************************************/
-bool bih::bih_found_nearer_object(const ray *const r, const float t) const
+bool bih::found_nearer_object(const ray *const r, const float t) const
 {
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
     /* Count number of rays shot */
@@ -1529,7 +1529,7 @@ bool bih::bih_found_nearer_object(const ray *const r, const float t) const
     while (true)
     {
         /* Find a leaf node */
-        const bool leaf = this->find_bih_leaf_node(*r, &entry_point, &exit_point, i_ray_dir);
+        const bool leaf = this->find_leaf_node(*r, &entry_point, &exit_point, i_ray_dir);
         
         /* If the leaf contains objects find the closest intersecting object */
         if (leaf)
