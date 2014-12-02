@@ -99,7 +99,7 @@ class triangle : private boost::noncopyable
             point_t text(MAX_DIST);
             if (this->vt != NULL)
             {
-                text = (h.u * this->vt[2]) + (h.v * this->vt[1]) + (((fp_t)1.0 - (h.u + h.v)) * this->vt[0]);
+                text = (h.u * this->vt[2]) + (h.v * this->vt[1]) + ((1.0f - (h.u + h.v)) * this->vt[0]);
             }
 
             /* Call the material shader */
@@ -131,12 +131,12 @@ class triangle : private boost::noncopyable
         point_t         n;              /* Normal of the triangle                               */
         point_t         t;              /* Triangle bounding box upper vertex                   */
         point_t         b;              /* Triangle bounding box lower vertex                   */
-        fp_t            n_u;
-        fp_t            n_v;
-        fp_t            b_n_u;
-        fp_t            b_n_v;
-        fp_t            c_n_u;
-        fp_t            c_n_v;
+        float           n_u;
+        float           n_v;
+        float           b_n_u;
+        float           b_n_v;
+        float           c_n_u;
+        float           c_n_v;
         int             k;
         bool            light;
 };
@@ -646,7 +646,7 @@ inline line triangle::normal_at_point(ray *const r, hit_description *const h) co
     point_t normal;
     if (this->vn != NULL)
     {
-        normal = (h->u * this->vn[2]) + (h->v * this->vn[1]) + (((fp_t)1.0 - (h->u + h->v)) * this->vn[0]);
+        normal = (h->u * this->vn[2]) + (h->v * this->vn[1]) + ((1.0f - (h->u + h->v)) * this->vn[0]);
     }
     else
     {
@@ -684,9 +684,9 @@ inline point_t triangle::get_random_point(const int i) const
     fp_t y_h8 = (this->highest_y() - this->lowest_y())/8.0;
     fp_t z_h8 = (this->highest_z() - this->lowest_z())/8.0;
     
-    fp_t x = this->vertex_c.x + ((fp_t) (i     & 0x3) * x_h8) + (gen_random_mersenne_twister() * x_h8);
-    fp_t y = this->vertex_c.z + ((fp_t)((i>>2) & 0x3) * y_h8) + (gen_random_mersenne_twister() * y_h8);
-    fp_t z = this->vertex_c.y + ((fp_t)((i>>2) & 0x3) * z_h8) + (gen_random_mersenne_twister() * z_h8);
+    fp_t x = this->vertex_c.x + (static_cast<float> (i     & 0x3) * x_h8) + (gen_random_mersenne_twister() * x_h8);
+    fp_t y = this->vertex_c.z + (static_cast<float>((i>>2) & 0x3) * y_h8) + (gen_random_mersenne_twister() * y_h8);
+    fp_t z = this->vertex_c.y + (static_cast<float>((i>>2) & 0x3) * z_h8) + (gen_random_mersenne_twister() * z_h8);
     
     return point_t(x,y,z);
 }
@@ -698,17 +698,17 @@ inline point_t triangle::get_random_point(const int i) const
 inline void triangle::find_rays(ray *const r, const point_t &d, const int n) const
 {
     /* Scales */
-    const fp_t beta_scale    = (fp_t)1.0/(fp_t)((n >> 4) + ((n & 0xe) != 0) + 1);
-    const fp_t gamma_scale   = (fp_t)1.0/(fp_t)((n >> 4) + ((n & 0xc) != 0) + 1);
+    const fp_t beta_scale    = 1.0f / static_cast<float>((n >> 4) + ((n & 0xe) != 0) + 1);
+    const fp_t gamma_scale   = 1.0f / static_cast<float>((n >> 4) + ((n & 0xc) != 0) + 1);
 
     /* Create n rays, each with a random offset in a fixed volume */
     for (int i = 0; i < n; i++)
     {
         /* Generate a legal barycenrtic co-ordinate */
         const int eigths    = (i >> 2) & ~0x1;
-        const fp_t beta     = gen_random_mersenne_twister() * (beta_scale  * (fp_t)(eigths + (i & 0x1)));
-        const fp_t gamma    = gen_random_mersenne_twister() * (gamma_scale * (fp_t)(eigths + (i & 0x2))) * ((fp_t)1.0 - beta);
-        const fp_t alpha    =(fp_t)1.0 - (beta + gamma);
+        const fp_t beta     = gen_random_mersenne_twister() * (beta_scale  * static_cast<float>(eigths + (i & 0x1)));
+        const fp_t gamma    = gen_random_mersenne_twister() * (gamma_scale * static_cast<float>(eigths + (i & 0x2))) * (1.0f - beta);
+        const fp_t alpha    =1.0f - (beta + gamma);
 
         /* Convert to cartesian co-ordinates */
         point_t p = (this->vertex_a * alpha) + (this->vertex_b * beta) + (this->vertex_c * gamma);
@@ -732,27 +732,27 @@ inline void intersect(const point_t &v, const point_t &d, fp_t *const interval)
 
 inline void compute_intervals(const point_t &v, const point_t &d, const fp_t d0d1, const fp_t d0d2, fp_t *const interval)
 {
-    if (d0d1 > (fp_t)0.0)                      
+    if (d0d1 > 0.0f)                      
     {                                  
         /* here we know that d0d2<=0.0 */
         /* that is d0, d1 are on the same side, d2 on the other or on the plane */
         intersect(point_t(v.z, v.x, v.y), point_t(d.z, d.x, d.y), interval);       
     }                                                  
-    else if (d0d2 > (fp_t)0.0)                                 
+    else if (d0d2 > 0.0f)                                 
     {                                                  
         /* here we know that d0d1<=0.0 */                
         intersect(point_t(v.y, v.x, v.z), point_t(d.y, d.x, d.z), interval);       
     }                                                  
-    else if (((d.y * d.z) > (fp_t)0.0) || (d.x != (fp_t)0.0))
+    else if (((d.y * d.z) > 0.0f) || (d.x != 0.0f))
     {                                                  
         /* here we know that d0d1<=0.0 or that d0!=0.0 */
         intersect(v, d, interval);       
     }                                                  
-    else if (d.y != (fp_t)0.0)                                  
+    else if (d.y != 0.0f)                                  
     {                                                  
         intersect(point_t(v.y, v.x, v.z), point_t(d.y, d.x, d.z), interval);       
     }                                                  
-    else if (d.z != (fp_t)0.0)                                  
+    else if (d.z != 0.0f)                                  
     {                                                  
         intersect(point_t(v.z, v.x, v.y), point_t(d.z, d.x, d.y), interval);       
     }                                                  
