@@ -397,8 +397,19 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
                               (z_entry > y_exit) | (y_entry > z_exit);
 
     const int int_mask = move_mask(mask);
-    std::cout << "bih: " << entry_point.l << " to " << entry_point.u << std::endl;
-    // bih: 3.38997, 4.82565, 9.52361 to -3.38867, -3.04499, -9.46704
+    std::cout << x0[0] << ", " << x0[1]   << ", " << x0[2]   << ", " << x0[3]   << std::endl;
+    std::cout << y0[0]  << ", " << y0[1]    << ", " << y0[2]    << ", " << y0[3]    << std::endl;
+    std::cout << z0[0] << ", " << z0[1]   << ", " << z0[2]   << ", " << z0[3]   << std::endl;
+    std::cout << x_zip[0]  << ", " << x_zip[1]    << ", " << x_zip[2]    << ", " << x_zip[3]    << std::endl;
+    std::cout << y_zip[0] << ", " << y_zip[1]   << ", " << y_zip[2]   << ", " << y_zip[3]   << std::endl;
+    std::cout << z_zip[0]  << ", " << z_zip[1]    << ", " << z_zip[2]    << ", " << z_zip[3]    << std::endl;
+// 24.2733, 15.9082, 24.3348, 15.9485
+// 17.8919, 4.38882, 17.9903, 4.41294
+// 11.7173, -209.668, 12.1687, -217.744
+// 15.9082, 24.2733, 15.9485, 24.3348
+// 4.38882, 17.8919, 4.41294, 17.9903
+// -209.668, 11.7173, -217.744, 12.1687
+    assert(false);
     if ((int_mask & 0x3) && (int_mask & 0xc))
     {
         return;
