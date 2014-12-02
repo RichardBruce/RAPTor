@@ -15,21 +15,21 @@ class line;
 
 /* Change the following to suit your standard */
 /* These are constants for colour space conversion */
-const fp_t CIE_x_r  = 0.640;      /* nominal CRT primaries */
-const fp_t CIE_y_r  = 0.330;
-const fp_t CIE_x_g  = 0.290;
-const fp_t CIE_y_g  = 0.600;
-const fp_t CIE_x_b  = 0.150;
-const fp_t CIE_y_b  = 0.060;
-const fp_t CIE_x_w  = 0.3333;     /* use true white */
-const fp_t CIE_y_w  = 0.3333;
+const float CIE_x_r = 0.640f;      /* nominal CRT primaries */
+const float CIE_y_r = 0.330f;
+const float CIE_x_g = 0.290f;
+const float CIE_y_g = 0.600f;
+const float CIE_x_b = 0.150f;
+const float CIE_y_b = 0.060f;
+const float CIE_x_w = 0.3333f;     /* use true white */
+const float CIE_y_w = 0.3333f;
 
-const fp_t CIE_C_rD = (((fp_t)1.0 / CIE_y_w) * (CIE_x_w * (CIE_y_g - CIE_y_b) - CIE_y_w * (CIE_x_g - CIE_x_b) + CIE_x_g * CIE_y_b - CIE_x_b * CIE_y_g));
-const fp_t CIE_C_gD	= (((fp_t)1.0 / CIE_y_w) * (CIE_x_w * (CIE_y_b - CIE_y_r) - CIE_y_w * (CIE_x_b - CIE_x_r) - CIE_x_r * CIE_y_b + CIE_x_b * CIE_y_r));
-const fp_t CIE_C_bD	= (((fp_t)1.0 / CIE_y_w) * (CIE_x_w * (CIE_y_r - CIE_y_g) - CIE_y_w * (CIE_x_r - CIE_x_g) + CIE_x_r * CIE_y_g - CIE_x_g * CIE_y_r));
+const float CIE_C_rD = ((1.0f / CIE_y_w) * (CIE_x_w * (CIE_y_g - CIE_y_b) - CIE_y_w * (CIE_x_g - CIE_x_b) + CIE_x_g * CIE_y_b - CIE_x_b * CIE_y_g));
+const float CIE_C_gD = ((1.0f / CIE_y_w) * (CIE_x_w * (CIE_y_b - CIE_y_r) - CIE_y_w * (CIE_x_b - CIE_x_r) - CIE_x_r * CIE_y_b + CIE_x_b * CIE_y_r));
+const float CIE_C_bD = ((1.0f / CIE_y_w) * (CIE_x_w * (CIE_y_r - CIE_y_g) - CIE_y_w * (CIE_x_r - CIE_x_g) + CIE_x_r * CIE_y_g - CIE_x_g * CIE_y_r));
 
 /* XYZ to RGB conversion matrix */
-const fp_t xyz2rgbmat[3][3] = {
+const float xyz2rgbmat[3][3] = {
     { (CIE_y_g - CIE_y_b - CIE_x_b * CIE_y_g + CIE_y_b * CIE_x_g) / CIE_C_rD,
       (CIE_x_b - CIE_x_g - CIE_x_b * CIE_y_g + CIE_x_g * CIE_y_b) / CIE_C_rD,
       (                    CIE_x_g * CIE_y_b - CIE_x_b * CIE_y_g) / CIE_C_rD },
@@ -52,19 +52,19 @@ class material
         virtual ~material() { };
 
         /* Pure virtual function to the allow the shader a chance to generate SIMD packets */
-        virtual void generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, fp_t *const n_rl, fp_t *const n_rf) const = 0;
+        virtual void generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const = 0;
 
         /* Pure virtual shading function. To allow the shader to shade the current object */
         virtual void shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const = 0;
 
         /* Pure virtual function to the allow the shader a combined SIMD packets traced secondary rays into the image */
-        virtual void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const fp_t *const n_rl, const fp_t *const n_rf) const = 0;
+        virtual void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const = 0;
 
         /* Allow read transparency */
-        const bool      is_transparent()    const   { return t; }
+        const bool is_transparent() const { return t; }
 
     private :
-        const bool      t;  /* Is the material transparent */
+        const bool  t;  /* Is the material transparent */
 };
 
 /* Function for calculating the Fresnell componant */
@@ -81,54 +81,54 @@ class material
   
   The return value is the Fresnel componant.
 **********************************************************/
-inline fp_t direct_fresnell(const fp_t r, const fp_t t, const fp_t k)
+inline float direct_fresnell(const float r, const float t, const float k)
 {
     /* Some repeatedly used variables */
-    fp_t r_sq = r * r;
-    fp_t k_sq = k * k;
-    fp_t t_sq = t * t;
+    const float r_sq = r * r;
+    const float k_sq = k * k;
+    const float t_sq = t * t;
     
     /* g^2 = n^2 - 1 + t^2; where n is the complex index of refraction */
-    fp_t  re_g_sq = r_sq - k_sq - (fp_t)1.0 + t_sq;
-    fp_t  im_g_sq = (fp_t)2.0 * r * k;
+    const float re_g_sq = r_sq - k_sq - 1.0f + t_sq;
+    const float im_g_sq = 2.0f * r * k;
     
     /* Take the absolute of g^2; Where g^2 = g_re^2 + i * g_im^2 */
-    fp_t abs_re_g_sq = fabs(re_g_sq);
-    fp_t abs_im_g_sq = fabs(im_g_sq);
+    const float abs_re_g_sq = fabs(re_g_sq);
+    const float abs_im_g_sq = fabs(im_g_sq);
 
-    fp_t abs_g_sq;
-    if ((re_g_sq == (fp_t)0.0) && (im_g_sq == (fp_t)0.0))
+    float abs_g_sq;
+    if ((re_g_sq == 0.0f) && (im_g_sq == 0.0f))
     {
-        abs_g_sq = (fp_t)0.0;
+        abs_g_sq = 0.0f;
     }
     else if (abs_re_g_sq >= abs_im_g_sq)
     {
-        fp_t d   = abs_im_g_sq / abs_re_g_sq;
+        float d   = abs_im_g_sq / abs_re_g_sq;
         abs_g_sq = abs_re_g_sq * sqrt(1.0 + (d * d));
     }
     else
     {
-        fp_t d   = abs_re_g_sq / abs_im_g_sq;
+        float d   = abs_re_g_sq / abs_im_g_sq;
         abs_g_sq = abs_im_g_sq * sqrt(1.0 + (d * d));
     }
     
     /* s = (1 - t^2) / t */
-    fp_t s = ((fp_t)1.0 - t_sq) / t;
+    const float s = (1.0f - t_sq) / t;
 
     /* a = sqrt((abs(g^2) + re(g^2)) / 2) */
     /* b = sqrt((abs(g^2) - re(g^2)) / 2) */
-    fp_t a    = sqrt((abs_g_sq + re_g_sq) * (fp_t)0.5);
-    fp_t b    = sqrt((abs_g_sq - re_g_sq) * (fp_t)0.5);
-    fp_t b_sq = b * b;
+    const float a     = sqrt((abs_g_sq + re_g_sq) * 0.5f);
+    const float b     = sqrt((abs_g_sq - re_g_sq) * 0.5f);
+    const float b_sq  = b * b;
     
     /* Some repeatedly used Fresnel terms */
-    fp_t a_m_t = a - t;
-    fp_t a_p_t = a + t;
-    fp_t a_m_s = a - s;
-    fp_t a_p_s = a + s;
+    const float a_m_t = a - t;
+    const float a_p_t = a + t;
+    const float a_m_s = a - s;
+    const float a_p_s = a + s;
     
-    fp_t f0 = (fp_t)0.5 * (((a_m_t * a_m_t) + b_sq)/((a_p_t * a_p_t) + b_sq));
-    fp_t f1 = (fp_t)1.0 + (((a_m_s * a_m_s) + b_sq)/((a_p_s * a_p_s) + b_sq));
+    const float f0 = 0.5f * (((a_m_t * a_m_t) + b_sq)/((a_p_t * a_p_t) + b_sq));
+    const float f1 = 1.0f + (((a_m_s * a_m_s) + b_sq)/((a_p_s * a_p_s) + b_sq));
     return f0 * f1;
 }
 
@@ -144,9 +144,9 @@ inline fp_t direct_fresnell(const fp_t r, const fp_t t, const fp_t k)
 
   The return value is the Fresnel componant.
 **********************************************************/
-inline fp_t schlick_fresnell(const fp_t r, const fp_t t, const fp_t k)
+inline float schlick_fresnell(const float r, const float t, const float k)
 {
-    return (r + ((fp_t)1.0 - r) * pow((fp_t)1.0 - t, (fp_t)5.0));
+    return (r + (1.0f - r) * pow(1.0f - t, 5.0f));
 }
 
 
@@ -163,13 +163,13 @@ inline fp_t schlick_fresnell(const fp_t r, const fp_t t, const fp_t k)
 
   The return value is the Fresnel componant.
 **********************************************************/
-inline fp_t rescaled_schlick_fresnell(const fp_t r, const fp_t t, const fp_t k)
+inline float rescaled_schlick_fresnell(const float r, const float t, const float k)
 {
-    fp_t r_m1 = r - (fp_t)1.0;
-    fp_t r_p1 = r + (fp_t)1.0;
-    fp_t k_sq = k * k;
+    const float r_m1 = r - 1.0f;
+    const float r_p1 = r + 1.0f;
+    const float k_sq = k * k;
     
-    return ((r_m1 * r_m1) + ((fp_t)4.0 * r * pow(((fp_t)1.0 - t), (fp_t)5.0)) + k_sq) / ((r_p1 * r_p1) + k_sq);
+    return ((r_m1 * r_m1) + (4.0f * r * pow((1.0f - t), 5.0f)) + k_sq) / ((r_p1 * r_p1) + k_sq);
 }
 
 
@@ -186,11 +186,11 @@ inline fp_t rescaled_schlick_fresnell(const fp_t r, const fp_t t, const fp_t k)
 
   The return value is the geometric attenuation factor.
 **********************************************************/
-inline fp_t geometric_attenuation_factor(const fp_t nh, const fp_t nv, const fp_t nl, const fp_t vh)
+inline float geometric_attenuation_factor(const float nh, const float nv, const float nl, const float vh)
 {
-    fp_t g0 = ((fp_t)2.0 * nh * nv ) / vh;
-    fp_t g1 = ((fp_t)2.0 * nh * nl ) / vh;
-    return min((fp_t)1.0, max((fp_t)0.0, min(g0, g1)));
+    const float g0 = (2.0f * nh * nv ) / vh;
+    const float g1 = (2.0f * nh * nl ) / vh;
+    return min(1.0f, max(0.0f, min(g0, g1)));
 }
 
 
@@ -208,10 +208,10 @@ inline fp_t geometric_attenuation_factor(const fp_t nh, const fp_t nv, const fp_
 
   The return value is the facet distribution.
 **********************************************************/
-inline fp_t gaussian_facet_distribution(const fp_t a, const fp_t m, const fp_t c)
+inline float gaussian_facet_distribution(const float a, const float m, const float c)
 {
     /* ce^-((alpha/m)^2) */
-    fp_t a_div_m = a / m;
+    const float a_div_m = a / m;
     return c * exp(-(a_div_m * a_div_m));
 }
 
@@ -228,16 +228,16 @@ inline fp_t gaussian_facet_distribution(const fp_t a, const fp_t m, const fp_t c
 
   The return value is the facet distribution.
 **********************************************************/
-inline fp_t beckmann_facet_distribution(const fp_t a, const fp_t m, const fp_t c)
+inline float beckmann_facet_distribution(const float a, const float m, const float c)
 {
-    fp_t cos_4_a  = pow(cos(a), (fp_t)4.0);
-    fp_t tan_a    = tan(a);
-    fp_t tan_a_sq = tan_a * tan_a;
+    const float cos_4_a  = pow(cos(a), 4.0f);
+    const float tan_a    = tan(a);
+    const float tan_a_sq = tan_a * tan_a;
     
-    fp_t m_sq = m * m;
+    const float m_sq = m * m;
     
     /* 1/(m^2 * cos^4(alpha)) * e^-(tan^2(alpha)/m^2) */
-    return (((fp_t)1.0 / (m_sq * cos_4_a)) * exp(-(tan_a_sq / m_sq)));
+    return ((1.0f / (m_sq * cos_4_a)) * exp(-(tan_a_sq / m_sq)));
 }
 
 
@@ -258,10 +258,10 @@ inline fp_t beckmann_facet_distribution(const fp_t a, const fp_t m, const fp_t c
     
   The return value is the attenuated colour.
 **********************************************************/
-inline fp_t linear_colour_shift(const fp_t c0, const fp_t c90, const fp_t fa, const fp_t f0, const fp_t f90)
+inline float linear_colour_shift(const float c0, const float c90, const float fa, const float f0, const float f90)
 {
     /* calpha = c0 + ((c90 - c0) * (max(0,Falpha - F0)/F90- F0)) */
-    return c0 + ((c90 - c0) * (max((fp_t)0.0, (fa - f0)) / (f90- f0)));
+    return c0 + ((c90 - c0) * (max(0.0f, (fa - f0)) / (f90- f0)));
 }
 
 
@@ -282,19 +282,19 @@ inline fp_t linear_colour_shift(const fp_t c0, const fp_t c90, const fp_t fa, co
     
   The return value is the colour of the light emitter.
 **********************************************************/
-inline void black_body_temperature_to_cxy(const fp_t t, fp_t *const x, fp_t *const y)
+inline void black_body_temperature_to_cxy(const float t, float *const x, float *const y)
 {
     /* Convert temperature to CXY X value */
-    fp_t c_x;
-    fp_t t_sq = t    * t;
-    fp_t t_3  = t_sq * t;
-    if (((fp_t)1667.0 <= t) && (t <= (fp_t)4000.0))
+    float c_x;
+    const float t_sq = t    * t;
+    const float t_3  = t_sq * t;
+    if ((1667.0f <= t) && (t <= 4000.0f))
     {
-        c_x = (fp_t)-0.2661239 * ((fp_t)10e9 / t_3) - (fp_t)0.2343580 * ((fp_t)10e6 / t_sq) + (fp_t)0.8776956 * ((fp_t)10e3 / t) + (fp_t)0.179910;
+        c_x = -0.2661239f * (10e9f / t_3) - 0.2343580f * (10e6f / t_sq) + 0.8776956f * (10e3f / t) + 0.179910f;
     }
-    else if (((fp_t)4000.0 <= t) && (t <= (fp_t)25000.0))
+    else if ((4000.0f <= t) && (t <= 25000.0f))
     {
-        c_x = (fp_t)-3.0258469 * ((fp_t)10e9 / t_3) + (fp_t)2.1070379 * ((fp_t)10e6 / t_sq) + (fp_t)0.2226347 * ((fp_t)10e3 / t) + (fp_t)0.24039;
+        c_x = -3.0258469f * (10e9f / t_3) + 2.1070379f * (10e6f / t_sq) + 0.2226347f * (10e3f / t) + 0.24039f;
     }
     else
     {
@@ -303,19 +303,19 @@ inline void black_body_temperature_to_cxy(const fp_t t, fp_t *const x, fp_t *con
     *x = c_x;
     
     /* Convert temperature and CXY X value to CXY Y value */
-    fp_t c_x_sq = c_x    * c_x;
-    fp_t c_x_3  = c_x_sq * c_x;
-    if (((fp_t)1667.0 <= t) && (t <= (fp_t)2222.0))
+    const float c_x_sq = c_x    * c_x;
+    const float c_x_3  = c_x_sq * c_x;
+    if ((1667.0f <= t) && (t <= 2222.0f))
     {
-        *y = -(fp_t)1.1063814 * c_x_3 - (fp_t)1.34811020 * c_x_sq + (fp_t)2.18555832 * c_x - (fp_t)0.20219683;
+        *y = -1.1063814f * c_x_3 - 1.34811020f * c_x_sq + 2.18555832f * c_x - 0.20219683f;
     }
-    else if (((fp_t)2222.0 <= t) && (t <= (fp_t)4000.0))
+    else if ((2222.0f <= t) && (t <= 4000.0f))
     {
-        *y = (fp_t)-0.9549476 * c_x_3 - (fp_t)1.37418593 * c_x_sq + (fp_t)2.09137015 * c_x - (fp_t)0.16748867;
+        *y = -0.9549476f * c_x_3 - 1.37418593f * c_x_sq + 2.09137015f * c_x - 0.16748867f;
     }
-    else if (((fp_t)4000.0 <= t) && (t <= (fp_t)25000.0))
+    else if ((4000.0f <= t) && (t <= 25000.0f))
     {
-        *y =  (fp_t)3.0817580 * c_x_3 - (fp_t)5.87338670 * c_x_sq + (fp_t)3.75112997 * c_x - (fp_t)0.37001483;
+        *y =  3.0817580f * c_x_3 - 5.87338670f * c_x_sq + 3.75112997f * c_x - 0.37001483f;
     }
     else
     {
@@ -324,13 +324,13 @@ inline void black_body_temperature_to_cxy(const fp_t t, fp_t *const x, fp_t *con
 }
 
 /* Function for colour space conversion */
-inline ext_colour_t& cxy_to_rgb(const fp_t c_x, const fp_t c_y, const fp_t y, ext_colour_t *const rgb)
+inline ext_colour_t& cxy_to_rgb(const float c_x, const float c_y, const float y, ext_colour_t *const rgb)
 {
-    fp_t cie[3], cout[3];
+    float cie[3], cout[3];
     
     cie[0] = y * c_x/c_y;
     cie[1] = y;
-    cie[2] = y * ((fp_t)1.0/c_y - (fp_t)1.0) - cie[0];
+    cie[2] = y * (1.0f/c_y - 1.0f) - cie[0];
 
     /* convert to RGB */
     cout[0] = (xyz2rgbmat[0][0] * cie[0]) + (xyz2rgbmat[0][1] * cie[1]) + (xyz2rgbmat[0][2] * cie[2]);
@@ -338,9 +338,9 @@ inline ext_colour_t& cxy_to_rgb(const fp_t c_x, const fp_t c_y, const fp_t y, ex
     cout[2] = (xyz2rgbmat[2][0] * cie[0]) + (xyz2rgbmat[2][1] * cie[1]) + (xyz2rgbmat[2][2] * cie[2]);
 
     /* Bound the rgb value */
-    rgb->r = max((fp_t)0.0, min((fp_t)1.0, cout[0])) * (fp_t)255.0;
-    rgb->g = max((fp_t)0.0, min((fp_t)1.0, cout[1])) * (fp_t)255.0;
-    rgb->b = max((fp_t)0.0, min((fp_t)1.0, cout[2])) * (fp_t)255.0;
+    rgb->r = max(0.0f, min(1.0f, cout[0])) * 255.0f;
+    rgb->g = max(0.0f, min(1.0f, cout[1])) * 255.0f;
+    rgb->b = max(0.0f, min(1.0f, cout[2])) * 255.0f;
     return *rgb;
 }
 }; /* namespace raptor_raytracer */
