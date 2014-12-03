@@ -12,7 +12,7 @@
 
 namespace raptor_raytracer
 {
-const std::vector<triangle *> * build_bih(const primitive_list *const o, std::vector<bih_node> *const bih);
+const std::vector<bih_node> * build_bih(primitive_list *const o);
 }; /* namespace raptor_raytracer */
 
 #endif /* __BIH_BUILDER_H__ */

@@ -48,11 +48,11 @@ inline void kd_tree::find_leaf_node(const packet_ray *const r, kdt_stack_element
         {
             ++exit_point;
             exit_point->n       = furthest;
-            exit_point->vt_min  = std::max(dist, t_min);
+            exit_point->vt_min  = max(dist, t_min);
             exit_point->vt_max  = t_max;
             exit_point->m       = mask;
 
-            t_max   = std::min(dist, t_max);
+            t_max   = min(dist, t_max);
             mask    = (t_min < t_max); 
         }
     }
@@ -133,7 +133,7 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
             --exit_point;
         } while (move_mask((entry_point.vt_min >= h->d) & entry_point.m) == ((1 << SIMD_WIDTH) - 1));
     
-        entry_point.vt_max = std::min(entry_point.vt_max, h->d);
+        entry_point.vt_max = min(entry_point.vt_max, h->d);
     }
 }
 
@@ -189,7 +189,7 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
             --exit_point;
         } while (move_mask((entry_point.vt_min >= h->d) & entry_point.m) == ((1 << SIMD_WIDTH) - 1));
     
-        entry_point.vt_max = std::min(entry_point.vt_max, h->d);
+        entry_point.vt_max = min(entry_point.vt_max, h->d);
     }
 }
 
@@ -270,7 +270,7 @@ vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t) co
 
         } while (move_mask((entry_point.vt_min >= h.d) & entry_point.m) == ((1 << SIMD_WIDTH) - 1));
     
-        entry_point.vt_max = std::min(entry_point.vt_max, h.d);
+        entry_point.vt_max = min(entry_point.vt_max, h.d);
     }
 }
 
@@ -335,7 +335,7 @@ vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t, kd
 
         } while (move_mask((entry_point.vt_min >= h.d) & entry_point.m) == ((1 << SIMD_WIDTH) - 1));
     
-        entry_point.vt_max = std::min(entry_point.vt_max, h.d);
+        entry_point.vt_max = min(entry_point.vt_max, h.d);
     }
 }
 
@@ -606,12 +606,12 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
     const vfp_t y_zip       = shuffle<2, 3, 0, 1>(y0, y0); 
     const vfp_t z_zip       = shuffle<2, 3, 0, 1>(z0, z0); 
 
-    const vfp_t x_entry     = std::min(x0, x_zip);
-    const vfp_t x_exit      = std::max(x0, x_zip);
-    const vfp_t y_entry     = std::min(y0, y_zip);
-    const vfp_t y_exit      = std::max(y0, y_zip);
-    const vfp_t z_entry     = std::min(z0, z_zip);
-    const vfp_t z_exit      = std::max(z0, z_zip);
+    const vfp_t x_entry     = min(x0, x_zip);
+    const vfp_t x_exit      = max(x0, x_zip);
+    const vfp_t y_entry     = min(y0, y_zip);
+    const vfp_t y_exit      = max(y0, y_zip);
+    const vfp_t z_entry     = min(z0, z_zip);
+    const vfp_t z_exit      = max(z0, z_zip);
 
     const vfp_t mask        = (y_entry > x_exit) | (x_entry > y_exit) | 
                               (z_entry > x_exit) | (x_entry > z_exit) | 
@@ -694,7 +694,7 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
             vfp_t vmax_d = h[0].d;
             for (int i = 1; i < size; ++i)
             {
-                vmax_d = std::max(vmax_d, h[i].d);
+                vmax_d = max(vmax_d, h[i].d);
             }
             max_d = std::max(std::max(vmax_d[0], vmax_d[1]), std::max(vmax_d[2], vmax_d[3]));
 
@@ -743,8 +743,8 @@ void kd_tree::frustrum_found_nearer_object(const packet_ray *const r, const vfp_
     packet_hit_description h[MAXIMUM_PACKET_SIZE];
     for (unsigned i = 1; i < size; ++i)
     {
-        vmax_d = std::max(vmax_d, t[i]);
-        vmin_d = std::min(vmin_d, t[i]);
+        vmax_d = max(vmax_d, t[i]);
+        vmin_d = min(vmin_d, t[i]);
         h[i].d = t[i];
     }
     float max_d = std::max(std::max(vmax_d[0], vmax_d[1]), std::max(vmax_d[2], vmax_d[3]));
@@ -886,7 +886,7 @@ void kd_tree::frustrum_found_nearer_object(const packet_ray *const r, const vfp_
             vmax_d = h[0].d;
             for (unsigned i = 1; i < size; ++i)
             {
-                vmax_d = std::max(vmax_d, h[i].d);
+                vmax_d = max(vmax_d, h[i].d);
             }
             max_d = std::max(std::max(vmax_d[0], vmax_d[1]), std::max(vmax_d[2], vmax_d[3]));
             

@@ -32,6 +32,27 @@
 /* Test headers */
 #include "regression_checker.h"
 
+/* Log message generating traits classes */
+template <typename T>
+struct log_statement
+{
+    static std::string build_time()     { return "SSD"; }
+    static std::string render_time()    { return "SSD"; }
+};
+
+template <>
+struct log_statement<bih>
+{
+    static std::string build_time()     { return "4 - BIH"; }
+    static std::string render_time()    { return "5 - BIH"; }
+};
+
+template <>
+struct log_statement<kd_tree>
+{
+    static std::string build_time()     { return "6 - KDT"; }
+    static std::string render_time()    { return "7 - KDT"; }
+};
 
 /* Test data */
 struct regression_fixture : private boost::noncopyable
@@ -166,6 +187,7 @@ struct regression_fixture : private boost::noncopyable
             return *this;
         }
 
+        template<class SpatialSubDivision = bih>
         regression_fixture& render()
         {
             /* Assert there must be some lights to light the scene */
@@ -181,17 +203,17 @@ struct regression_fixture : private boost::noncopyable
             BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - # Primitives: " << _everything.size();
             BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - # Lights: " << _lights.size();
 
-            /* Build kd tree */
+            /* Build ssd */
             const auto ssd_build_t0(std::chrono::system_clock::now());
-            bih ssd(_everything);
+            SpatialSubDivision ssd(_everything);
             const auto ssd_build_t1(std::chrono::system_clock::now());
-            BOOST_LOG_TRIVIAL(fatal) << "PERF 5 - KDT Build Time ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(ssd_build_t1 - ssd_build_t0).count();
+            BOOST_LOG_TRIVIAL(fatal) << "PERF " << log_statement<SpatialSubDivision>::build_time() << " Build Time ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(ssd_build_t1 - ssd_build_t0).count();
 
             /* Render */
-            const auto kdt_render_t0(std::chrono::system_clock::now());
+            const auto render_t0(std::chrono::system_clock::now());
             ray_tracer(&ssd, _lights, _everything, *_cam);
-            const auto kdt_render_t1(std::chrono::system_clock::now());
-            BOOST_LOG_TRIVIAL(fatal) << "PERF 4 - Render Time ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(kdt_render_t1 - kdt_render_t0).count();
+            const auto render_t1(std::chrono::system_clock::now());
+            BOOST_LOG_TRIVIAL(fatal) << "PERF " << log_statement<SpatialSubDivision>::render_time() << " Render Time ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(render_t1 - render_t0).count();
 
             return *this;
         }

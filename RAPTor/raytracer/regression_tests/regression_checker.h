@@ -36,16 +36,16 @@ const std::string test_data_location    = "test_data/";
 class regression_checker : private boost::noncopyable
 {
     public :
-        regression_checker(const std::string &suite, const std::string& test)
-        : _expected(test_data_location + suite + "/" + test + "_exp.png"), _difference(test_data_location + suite + "/" +  test + "_diff.png"), _actual(test_data_location + suite + "/" +  test + "_act.png")
-        {  }
+        regression_checker(const std::string &suite, const std::string& test) :
+            _suite(suite), _test(test) {  }
 
         /* Allow default DTOR */
 
-        regression_checker& check(const camera &c)
+        regression_checker& check(const camera &c, const std::string ssd_name)
         {
             /* Write out actual picture */
-            c.write_png_file(_actual);
+            const std::string actual_file(test_data_location + _suite + "/" +  _test + "_" + ssd_name + "_act.png");
+            c.write_png_file(actual_file);
 
             /* Get actual image */
             const unsigned int x_res = c.x_resolution();
@@ -59,9 +59,10 @@ class regression_checker : private boost::noncopyable
             /* Load expected image */
             unsigned int exp_x_res;
             unsigned int exp_y_res;
-            BOOST_REQUIRE(boost::filesystem::exists(_expected));
+            const std::string expected_file(test_data_location + _suite + "/" + _test + "_exp.png");
+            BOOST_REQUIRE(boost::filesystem::exists(expected_file));
             std::unique_ptr<unsigned char []> expected(new unsigned char [image_size]);
-            read_png_file(_expected, expected.get(), &exp_x_res, &exp_y_res);
+            read_png_file(expected_file, expected.get(), &exp_x_res, &exp_y_res);
 
             /* Check image dimensions, if this fails theres no point even trying */
             BOOST_REQUIRE(x_res == exp_x_res);
@@ -110,7 +111,8 @@ class regression_checker : private boost::noncopyable
             }
 
             /* Write out the difference image */
-            write_png_file(_difference, difference.get(), x_res, y_res);
+            const std::string difference_file(test_data_location + _suite + "/" +  _test + "_" + ssd_name + "_diff.png");
+            write_png_file(difference_file, difference.get(), x_res, y_res);
 
             return *this;
         }
@@ -166,9 +168,8 @@ class regression_checker : private boost::noncopyable
                     (abs(actual[idx + 2] - expected[idx + 2]) > pixel_error));
         }
 
-        const std::string _expected;
-        const std::string _difference;
-        const std::string _actual;
+        const std::string _suite;
+        const std::string _test;
 };
 
 #endif /* #ifndef __REGRESSION_CHECKER_H__ */

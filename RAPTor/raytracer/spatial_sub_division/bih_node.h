@@ -35,18 +35,22 @@ class bih_node
         }
         
         /* Set statics */
-        static void set_primitives(std::vector<triangle *> *const p)    { bih_node::o   = p;    }
-        static void set_node_array(std::vector<bih_node> *const b)      { bih_node::bih = b;    }
+        static void set_primitives(std::vector<triangle *> *const p)    { bih_node::o   = p;            }
+        static const std::vector<bih_node> * resize_node_array(const int size)
+        {
+            bih_node::bih.resize(size);
+            return &bih_node::bih;
+        }
 
         /* Get elements of statics */
         static bih_node & get_node_array(const unsigned int i)
         {
-            if (i >= bih_node::bih->size())
+            if (i >= bih_node::bih.size())
             {
-                bih_node::bih->resize(i + 1);
+                bih_node::bih.resize(i + 1);
             }
 
-            return (*bih_node::bih)[i];
+            return bih_node::bih[i];
         }
 
 
@@ -68,12 +72,12 @@ class bih_node
 
         const bih_node * get_left_child() const
         {
-            return &(*bih_node::bih)[(this->c & 0x3fffffff)];
+            return &bih_node::bih[(this->c & 0x3fffffff)];
         }
 
         const bih_node * get_right_child() const
         {
-            return &(*bih_node::bih)[(this->c & 0x3fffffff) + 1];
+            return &bih_node::bih[(this->c & 0x3fffffff) + 1];
         }
 
 
@@ -244,7 +248,7 @@ class bih_node
 
         unsigned                            c;      /* Index to the left child              */
         static std::vector<triangle *> *    o;      /* Vector of primitives                 */
-        static std::vector<bih_node> *      bih;    /* BIH nodes                            */
+        static std::vector<bih_node>        bih;    /* BIH nodes                            */
 };
 }; /* namespace raptor_raytracer */
 

@@ -11,7 +11,7 @@
 namespace raptor_raytracer
 {
 std::vector<triangle *> *   bih_node::o     = nullptr;
-std::vector<bih_node> *     bih_node::bih   = nullptr;
+std::vector<bih_node>       bih_node::bih;
 
 #ifdef SIMD_PACKET_TRACING
 /* Find the next leaf node intersected by the frustrum */
@@ -322,13 +322,13 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
     ++nr;
 #endif
     /* state of stack */
-    bih_stack_element *exit_point = &(this->bih_stack[0]);
+    bih_stack_element *exit_point = &(_bih_stack[0]);
     exit_point->n       = nullptr;
     exit_point->t_max   = MAX_DIST;
     exit_point->t_min   = 0.0f;
 
     bih_stack_element  entry_point;
-    entry_point.n      = &this->bih_base[0];
+    entry_point.n      = &(*_bih_base)[0];
     entry_point.t_max  = MAX_DIST;
     entry_point.t_min  = 0.0f;
     
@@ -385,37 +385,22 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
     const vfp_t y_zip       = shuffle<2, 3, 0, 1>(y0, y0); 
     const vfp_t z_zip       = shuffle<2, 3, 0, 1>(z0, z0); 
 
-    const vfp_t x_entry     = std::min(x0, x_zip);
-    const vfp_t x_exit      = std::max(x0, x_zip);
-    const vfp_t y_entry     = std::min(y0, y_zip);
-    const vfp_t y_exit      = std::max(y0, y_zip);
-    const vfp_t z_entry     = std::min(z0, z_zip);
-    const vfp_t z_exit      = std::max(z0, z_zip);
+    const vfp_t x_entry     = min(x0, x_zip);
+    const vfp_t x_exit      = max(x0, x_zip);
+    const vfp_t y_entry     = min(y0, y_zip);
+    const vfp_t y_exit      = max(y0, y_zip);
+    const vfp_t z_entry     = min(z0, z_zip);
+    const vfp_t z_exit      = max(z0, z_zip);
 
     const vfp_t mask        = (y_entry > x_exit) | (x_entry > y_exit) | 
                               (z_entry > x_exit) | (x_entry > z_exit) | 
                               (z_entry > y_exit) | (y_entry > z_exit);
 
     const int int_mask = move_mask(mask);
-    std::cout << x0[0] << ", " << x0[1]   << ", " << x0[2]   << ", " << x0[3]   << std::endl;
-    std::cout << y0[0]  << ", " << y0[1]    << ", " << y0[2]    << ", " << y0[3]    << std::endl;
-    std::cout << z0[0] << ", " << z0[1]   << ", " << z0[2]   << ", " << z0[3]   << std::endl;
-    std::cout << x_zip[0]  << ", " << x_zip[1]    << ", " << x_zip[2]    << ", " << x_zip[3]    << std::endl;
-    std::cout << y_zip[0] << ", " << y_zip[1]   << ", " << y_zip[2]   << ", " << y_zip[3]   << std::endl;
-    std::cout << z_zip[0]  << ", " << z_zip[1]    << ", " << z_zip[2]    << ", " << z_zip[3]    << std::endl;
-// 24.2733, 15.9082, 24.3348, 15.9485
-// 17.8919, 4.38882, 17.9903, 4.41294
-// 11.7173, -209.668, 12.1687, -217.744
-// 15.9082, 24.2733, 15.9485, 24.3348
-// 4.38882, 17.8919, 4.41294, 17.9903
-// -209.668, 11.7173, -217.744, 12.1687
-    assert(false);
     if ((int_mask & 0x3) && (int_mask & 0xc))
     {
         return;
     }
-    std::cout << "hit world" << std::endl;
-    assert(false);
     
     const float near    = std::min(std::min(x_entry[0], y_entry[0]), z_entry[0]);
     const float far     = std::max(std::max(x_exit[2],  y_exit[2] ), y_exit[2] );
@@ -477,7 +462,7 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
             vfp_t vmax_d = h[0].d;
             for (int i = 1; i < size; ++i)
             {
-                vmax_d = std::max(vmax_d, h[i].d);
+                vmax_d = max(vmax_d, h[i].d);
             }
             max_d = std::max(std::max(vmax_d[0], vmax_d[1]), std::max(vmax_d[2], vmax_d[3]));
 
@@ -498,7 +483,7 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
         do
         {
             /* If the whole tree has been traversed, return */
-            if (exit_point == &(this->bih_stack[0]))
+            if (exit_point == &(_bih_stack[0]))
             {
                 return;
             }
@@ -531,21 +516,21 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
     packet_hit_description h[MAXIMUM_PACKET_SIZE];
     for (unsigned i = 1; i < size; ++i)
     {
-        vmax_d = std::max(vmax_d, t[i]);
-        vmin_d = std::min(vmin_d, t[i]);
+        vmax_d = max(vmax_d, t[i]);
+        vmin_d = min(vmin_d, t[i]);
         h[i].d = t[i];
     }
     float max_d = std::max(std::max(vmax_d[0], vmax_d[1]), std::max(vmax_d[2], vmax_d[3]));
     float min_d = std::min(std::min(vmin_d[0], vmin_d[1]), std::min(vmin_d[2], vmin_d[3]));
 
     /* state of stack */
-    bih_stack_element *exit_point = &(this->bih_stack[0]);
+    bih_stack_element *exit_point = &(_bih_stack[0]);
     exit_point->n       = nullptr;
     exit_point->t_max   = max_d;
     exit_point->t_min   = 0.0f;
 
     bih_stack_element  entry_point;
-    entry_point.n      = &this->bih_base[0];
+    entry_point.n      = &(*_bih_base)[0];
     entry_point.t_max  = max_d;
     entry_point.t_min  = 0.0f;
     
@@ -661,7 +646,7 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
             vmax_d = h[0].d;
             for (unsigned i = 1; i < size; ++i)
             {
-                vmax_d = std::max(vmax_d, h[i].d);
+                vmax_d = max(vmax_d, h[i].d);
             }
             max_d = std::max(std::max(vmax_d[0], vmax_d[1]), std::max(vmax_d[2], vmax_d[3]));
             
@@ -686,7 +671,7 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
         do
         {
             /* If the whole tree has been traversed, return */
-            if (exit_point == &(this->bih_stack[0]))
+            if (exit_point == &(_bih_stack[0]))
             {
                 return;
             }
@@ -774,13 +759,13 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                 int o_near  = move_mask(t_max > far_plane);
                 if (!o_far)
                 {
-                    t_min           = std::max(t_min, far_plane);
+                    t_min           = max(t_min, far_plane);
                     current_node    = far_node;
                 }
                 /* Only the near node is traversed */
                 else if (!o_near)
                 {
-                    t_max           = std::min(t_max, near_plane);
+                    t_max           = min(t_max, near_plane);
                     current_node    = near_node;
                 }
                 /* Both nodes are traversed, near node first */
@@ -790,9 +775,9 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                     ++exit_point;
                     exit_point->n       = far_node;
                     exit_point->vt_max  = t_max;
-                    exit_point->vt_min  = std::max(t_min, far_plane);
+                    exit_point->vt_min  = max(t_min, far_plane);
 
-                    t_max           = std::min(t_max, near_plane);
+                    t_max           = min(t_max, near_plane);
                     current_node    = near_node;
                 }
                 continue;
@@ -832,13 +817,13 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                 int o_near  = move_mask(t_max > far_plane);
                 if (!o_far)
                 {
-                    t_min           = std::max(t_min, far_plane);
+                    t_min           = max(t_min, far_plane);
                     current_node    = far_node;
                 }
                 /* Only the near node is traversed */
                 else if (!o_near)
                 {
-                    t_max           = std::min(t_max, near_plane);
+                    t_max           = min(t_max, near_plane);
                     current_node    = near_node;
                 }
                 /* Both nodes are traversed, near node first */
@@ -848,9 +833,9 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                     ++exit_point;
                     exit_point->n       = far_node;
                     exit_point->vt_max  = t_max;
-                    exit_point->vt_min  = std::max(t_min, far_plane);
+                    exit_point->vt_min  = max(t_min, far_plane);
 
-                    t_max           = std::min(t_max, near_plane);
+                    t_max           = min(t_max, near_plane);
                     current_node    = near_node;
                 } 
                 continue;
@@ -890,13 +875,13 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                 int o_near  = move_mask(t_max > far_plane);
                 if (!o_far)
                 {
-                    t_min           = std::max(t_min, far_plane);
+                    t_min           = max(t_min, far_plane);
                     current_node    = far_node;
                 }
                 /* Only the near node is traversed */
                 else if (!o_near)
                 {
-                    t_max           = std::min(t_max, near_plane);
+                    t_max           = min(t_max, near_plane);
                     current_node    = near_node;
                 }
                 /* Both nodes are traversed, near node first */
@@ -906,9 +891,9 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                     ++exit_point;
                     exit_point->n       = far_node;
                     exit_point->vt_max  = t_max;
-                    exit_point->vt_min  = std::max(t_min, far_plane);
+                    exit_point->vt_min  = max(t_min, far_plane);
 
-                    t_max           = std::min(t_max, near_plane);
+                    t_max           = min(t_max, near_plane);
                     current_node    = near_node;
                 } 
                 continue;
@@ -928,10 +913,10 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
     ++nr;
 #endif
     /* state of stack */
-    bih_stack_element *exit_point = &(this->bih_stack[0]);
+    bih_stack_element *exit_point = &(_bih_stack[0]);
 
     bih_stack_element   entry_point;
-    entry_point.n       = &this->bih_base[0];
+    entry_point.n       = &(*_bih_base)[0];
     entry_point.vt_max  = vfp_t(MAX_DIST);
     entry_point.vt_min  = vfp_t(0.0f);
     
@@ -954,7 +939,7 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
         do
         {
             /* If the whole tree has been traversed, return */
-            if (exit_point == &(this->bih_stack[0]))
+            if (exit_point == &(_bih_stack[0]))
             {
                 return;
             }
@@ -966,7 +951,7 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
             
         } while (!move_mask(entry_point.vt_min < h->d));
                 
-        entry_point.vt_max = std::min(entry_point.vt_max, h->d);
+        entry_point.vt_max = min(entry_point.vt_max, h->d);
     }
 }
 
@@ -1012,7 +997,7 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
             
         } while (!move_mask(entry_point.vt_min < h->d));
                 
-        entry_point.vt_max = std::min(entry_point.vt_max, h->d);
+        entry_point.vt_max = min(entry_point.vt_max, h->d);
     }
 }
 
@@ -1064,7 +1049,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t, bih_st
             
         } while (!move_mask(entry_point.vt_min < h.d));
                 
-        entry_point.vt_max = std::min(entry_point.vt_max, h.d);
+        entry_point.vt_max = min(entry_point.vt_max, h.d);
     }
 }
 
@@ -1079,10 +1064,10 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
     ++nr;
 #endif
     /* state of stack */
-    bih_stack_element *exit_point = &(this->bih_stack[0]);
+    bih_stack_element *exit_point = &(_bih_stack[0]);
 
     bih_stack_element   entry_point;
-    entry_point.n       = &this->bih_base[0];
+    entry_point.n       = &(*_bih_base)[0];
     entry_point.vt_max  = t;
     entry_point.vt_min  = vfp_zero;
     
@@ -1114,7 +1099,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
         do
         {
             /* If the whole tree has been traversed, return */
-            if (exit_point == &(this->bih_stack[0]))
+            if (exit_point == &(_bih_stack[0]))
             {
                 return closer;
             }
@@ -1126,7 +1111,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
             
         } while (!move_mask(entry_point.vt_min < h.d));
                 
-        entry_point.vt_max = std::min(entry_point.vt_max, h.d);
+        entry_point.vt_max = min(entry_point.vt_max, h.d);
     }
 }
 #endif /* #ifdef SIMD_PACKET_TRACING */
@@ -1341,13 +1326,13 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
 #endif
     
     /* state of stack */
-    bih_stack_element *exit_point = &(this->bih_stack[0]);
+    bih_stack_element *exit_point = &(_bih_stack[0]);
     exit_point->n       = nullptr;
     exit_point->t_max   = MAX_DIST;
     exit_point->t_min   = 0.0f;
 
     bih_stack_element   entry_point;
-    entry_point.n       = &this->bih_base[0];
+    entry_point.n       = &(*_bih_base)[0];
     entry_point.t_max   = MAX_DIST;
     entry_point.t_min   = 0.0;
 
@@ -1437,7 +1422,7 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
         do
         {
             /* If the whole tree has been traversed, return */
-            if (exit_point == &(this->bih_stack[0]))
+            if (exit_point == &(_bih_stack[0]))
             {
                 *h = nearest_hit;
                 return hit_object;
@@ -1466,13 +1451,13 @@ bool bih::found_nearer_object(const ray *const r, const float t) const
 #endif
 
     /* state of stack */
-    bih_stack_element *exit_point = &(this->bih_stack[0]);
+    bih_stack_element *exit_point = &(_bih_stack[0]);
     exit_point->n       = nullptr;
     exit_point->t_max   = t;
     exit_point->t_min   = 0.0f;
 
     bih_stack_element   entry_point;
-    entry_point.n       = &this->bih_base[0];
+    entry_point.n       = &(*_bih_base)[0];
     entry_point.t_max   = t;
     entry_point.t_min   = 0.0f;
 
@@ -1558,7 +1543,7 @@ bool bih::found_nearer_object(const ray *const r, const float t) const
         }
   
         /* If the whole tree is traversed without finding an intersection return false */
-        if (exit_point == &(this->bih_stack[0]))
+        if (exit_point == &(_bih_stack[0]))
         {
             return false;
         }

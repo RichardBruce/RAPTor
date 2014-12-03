@@ -21,14 +21,18 @@ namespace raptor_raytracer
 class bih : public ssd
 {
     public :
-        /* CTOR, build the tree */
-        /* Maximum theoretical size is everything.size() * 6, but this is very unlikely */
-        bih(const primitive_list &everything)
-        : bih_base(everything.size() * 3)
+        /* CTOR */
+        bih(primitive_list &everything)
         {            
-            /* Grab an array to hold the BIH */
-            const vector<triangle *> *bih_prim = build_bih(&everything, &bih_base);
+            /* Build the heirarchy */
+            _bih_base = build_bih(&everything);
         }
+
+        /* Copy CTOR */
+        bih(const bih&b) : _bih_base(b._bih_base) {  }
+
+        /* Assignment prohibited by base class */
+        /* Allow default DTOR */
 
         /* Traversal functions */
 #ifdef SIMD_PACKET_TRACING
@@ -73,8 +77,8 @@ class bih : public ssd
         inline bool find_leaf_node(const ray &r, bih_stack_element *const entry_point, bih_stack_element **const out, const point_t &i_rd) const;
 
         /* The stack is mutable because it will never be known to a user of this class */
-        mutable bih_stack_element   bih_stack[MAX_BIH_STACK_HEIGHT];
-        std::vector<bih_node>       bih_base;
+        mutable bih_stack_element       _bih_stack[MAX_BIH_STACK_HEIGHT];
+        const std::vector<bih_node> *   _bih_base;
 };
 }; /* namespace raptor_raytracer */
 
