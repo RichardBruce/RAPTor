@@ -19,16 +19,16 @@ namespace raptor_raytracer
 class triangle : private boost::noncopyable
 {
     public :
-        triangle(material *const m, const point_t &a, const point_t &b, const point_t &c, bool l=false, const point_t *v_n=NULL, const point_t *v_t=NULL);
+        triangle(material *const m, const point_t &a, const point_t &b, const point_t &c, bool l = false, const point_t *v_n = nullptr, const point_t *v_t = nullptr);
         ~triangle()
         {
             /* REVISIT -- Consider using indices for these */
-            if (this->vn != NULL)
+            if (this->vn != nullptr)
             {
                 delete [] this->vn;
             }
 
-            if (this->vt != NULL)
+            if (this->vt != nullptr)
             {
                 delete [] this->vt;
             }
@@ -97,7 +97,7 @@ class triangle : private boost::noncopyable
         {
             /* Interpolate the texture co-ordinate if possible */
             point_t text(MAX_DIST);
-            if (this->vt != NULL)
+            if (this->vt != nullptr)
             {
                 text = (h.u * this->vt[2]) + (h.v * this->vt[1]) + ((1.0f - (h.u + h.v)) * this->vt[0]);
             }
@@ -122,8 +122,8 @@ class triangle : private boost::noncopyable
         material        *const m;       /* Pointer to the triangles shader                      */
         static point_t  scene_top;      /* Scene bounding box upper vertex                      */
         static point_t  scene_bot;      /* Scene bounding box lower vertex                      */
-        point_t         *vn;            /* Pointer to vertex normals, if available else NULL    */
-        point_t         *vt;            /* Pointer to vertex textures, if available else NULL   */
+        point_t         *vn;            /* Pointer to vertex normals, if available else nullptr    */
+        point_t         *vt;            /* Pointer to vertex textures, if available else nullptr   */
         point_t         a;              /* Projected vertex a                                   */
         point_t         vertex_a;       /* Vertex a of the triangle                             */
         point_t         vertex_b;       /* Vertex b of the triangle                             */
@@ -168,17 +168,20 @@ inline void triangle::calculate_pre_computes()
     lo_z = min(this->vertex_a.z, min(this->vertex_b.z, this->vertex_c.z));
     
     /* If the triangle falls into a plane add some width to it */
-    if (lo_x == hi_x)
+    if (fabs(hi_x - lo_x) < EPSILON)
     {
-        hi_x += EPSILON;
+        lo_x -= (EPSILON * 0.5f);
+        hi_x += (EPSILON * 0.5f);
     }
-    if (lo_y == hi_y)
+    if (fabs(hi_y - lo_y) < EPSILON)
     {
-        hi_y += EPSILON;
+        lo_y -= (EPSILON * 0.5f);
+        hi_y += (EPSILON * 0.5f);
     }
-    if (lo_z == hi_z)
+    if (fabs(hi_z - lo_z) < EPSILON)
     {
-        hi_z += EPSILON;
+        lo_z -= (EPSILON * 0.5f);
+        hi_z += (EPSILON * 0.5f);
     }
     this->t = point_t(hi_x, hi_y, hi_z);
     this->b = point_t(lo_x, lo_y, lo_z);
@@ -293,7 +296,7 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
             m(m), a(a), vertex_a(a), vertex_b(b), vertex_c(c), n_u(0.0), n_v(0.0), b_n_u(0.0), b_n_v(0.0), c_n_u(0.0), c_n_v(0.0), k(0), light(l)
 { 
     /* Store vertex normals */
-    if (v_n != NULL)
+    if (v_n != nullptr)
     {
         this->vn = new point_t [3];
         this->vn[0] = v_n[0];
@@ -302,11 +305,11 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
     }
     else
     {
-        this->vn = NULL;
+        this->vn = nullptr;
     }
     
     /* Store texture vertex */
-    if (v_t != NULL)
+    if (v_t != nullptr)
     {
         this->vt = new point_t [3];
         this->vt[0] = v_t[0];
@@ -315,7 +318,7 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
     }
     else
     {
-        this->vt = NULL;
+        this->vt = nullptr;
     }
     
     this->calculate_pre_computes();
@@ -644,7 +647,7 @@ inline line triangle::normal_at_point(ray *const r, hit_description *const h) co
 
     /* Interpolate the vertex normals */
     point_t normal;
-    if (this->vn != NULL)
+    if (this->vn != nullptr)
     {
         normal = (h->u * this->vn[2]) + (h->v * this->vn[1]) + ((1.0f - (h->u + h->v)) * this->vn[0]);
     }
