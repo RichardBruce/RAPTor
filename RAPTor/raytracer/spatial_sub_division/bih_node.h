@@ -1,7 +1,15 @@
 #ifndef __BIH_NODE_H__
 #define __BIH_NODE_H__
 
+/* Standard headers */
+
+/* Boost headers */
+#include "boost/noncopyable.hpp"
+
+/* Common headers */
 #include "common.h"
+
+/* Ray tracer headers */
 #include "raytracer.h"
 #include "triangle.h"
 #include "ray.h"
@@ -14,13 +22,12 @@ namespace raptor_raytracer
 class bih_node
 {
     public :
-        /* Constructor */
-        bih_node() : c(0) { };
+        /* Allow default CTOR, DTOR, copy CTOR and assignment operator (for using in vector) */
         
         /* Tree construction */
         void create_leaf_node(const int b, const int e)
         {
-            assert(static_cast<axis_t>(this->c & 0x3) == axis_t::not_set);
+            this->c = 0;
             this->b = b;
             this->e = e;
         }
@@ -38,7 +45,7 @@ class bih_node
         static void set_primitives(std::vector<triangle *> *const p)    { bih_node::o   = p;            }
         static const std::vector<bih_node> * resize_node_array(const int size)
         {
-            bih_node::bih.resize(size);
+            bih_node::bih.resize(size, bih_node());
             return &bih_node::bih;
         }
 
