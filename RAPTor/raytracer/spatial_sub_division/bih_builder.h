@@ -12,7 +12,7 @@
 
 namespace raptor_raytracer
 {
-const std::vector<bih_node> * build_bih(primitive_list *const o);
+const std::vector<bih_node> * build_bih(primitive_list *const o, const int max_node_size = MAX_BIH_NODE_SIZE);
 }; /* namespace raptor_raytracer */
 
 #endif /* __BIH_BUILDER_H__ */
