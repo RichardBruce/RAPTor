@@ -1,21 +1,27 @@
+/* Standard headers */
+
+/* Boost headers */
+
+/* Common headers */
+#include "logging.h"
+
+/* Ray tracer headers */
 #include "bih_builder.h"
 
 
 namespace raptor_raytracer
 {
 /* Tree depth */
-static unsigned depth = 0;
+static int depth = 0;
 
-/**********************************************************
- 
-**********************************************************/
-void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *child, point_t bl, point_t tr, int b, int e)
+/* Find a split position and divide the bih node in 2 */
+void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *child, point_t bl, point_t tr, int b, int e, const int max_node_size)
 {
     /* Depth check */
     ++depth;
     assert(depth < MAX_BIH_STACK_HEIGHT);
-    assert((unsigned)e < o->size());
-    assert(((unsigned)b < o->size()) || (b > e));
+    assert(static_cast<unsigned int>(e) < o->size());
+    assert((static_cast<unsigned int>(b) < o->size()) || (b > e));
     
     /* Pick longest side to divide in */
     point_t bm;
@@ -153,10 +159,8 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
     }
 
     /* Construct the BIH nodes */
+    // BOOST_LOG_TRIVIAL(trace) << "Creating internal node at index: " << cur << " with splits at: " << max_left << ", " << min_right << " in: " << static_cast<int>(split_axis);
     bih_node::get_node_array(cur).create_generic_node(*child, max_left, min_right, split_axis);
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    ++ng;
-#endif
 
     /* Reduce the bouding boxes to just fit the new split */
     float pos;
@@ -220,62 +224,59 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
 
     /* Recurse left */
     int node_size = bottom - b;
-    if ((node_size < (MAX_BIH_NODE_SIZE + 1)) || ((depth + 1) == MAX_BIH_STACK_HEIGHT))
+    if ((node_size <= max_node_size) || ((depth + 1) == MAX_BIH_STACK_HEIGHT))
     {
+        // BOOST_LOG_TRIVIAL(trace) << "Creating leaf for left child at index: " << left_child;
         bih_node::get_node_array(left_child).create_leaf_node(b, max(0, bottom - 1));
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        ++ne;
-        nee       += (node_size < 2);
-        ave_ob    +=  node_size;
-        max_depth  = std::max(max_depth, depth + 1);
-        ner        = std::max(ner, (unsigned)node_size);
-#endif /* #ifdef SPATIAL_SUBDIVISION_STATISTICS */
     }
     else
     {
         (*child) += 2;
-        divide_bih_node(o, left_child, child, bl, tm, b, bottom - 1);
+        // BOOST_LOG_TRIVIAL(trace) << "Recursing for left child";
+        divide_bih_node(o, left_child, child, bl, tm, b, bottom - 1, max_node_size);
     }
 
     /* Recurse right */
-    node_size = e - bottom;
-    if ((node_size < MAX_BIH_NODE_SIZE) || ((depth + 1) == MAX_BIH_STACK_HEIGHT))
+    node_size = e - bottom; /* 1 less than the actual node size */
+    if ((node_size < max_node_size) || ((depth + 1) == MAX_BIH_STACK_HEIGHT))
     {
+        // BOOST_LOG_TRIVIAL(trace) << "Creating leaf for right child at index: " << right_child;
         bih_node::get_node_array(right_child).create_leaf_node(bottom, e);
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        ++ne;
-        nee       += (node_size < 1);
-        ave_ob    +=  node_size + 1;
-        max_depth  = std::max(max_depth, depth + 1);
-        ner        = std::max(ner, (unsigned)node_size + 1);
-#endif /* #ifdef SPATIAL_SUBDIVISION_STATISTICS */
     }
     else
     {
         (*child) += 2;
-        divide_bih_node(o, right_child, child, bm, tr, bottom, e);
+        // BOOST_LOG_TRIVIAL(trace) << "Recursing for right child";
+        divide_bih_node(o, right_child, child, bm, tr, bottom, e, max_node_size);
     }
     
     --depth;
     return;
 }
 
-/**********************************************************
- 
-**********************************************************/
-const std::vector<bih_node> * build_bih(primitive_list *const o)
+/* Build a Bounding Interval Heirarchy for the primitives in o */
+const std::vector<bih_node> * build_bih(primitive_list *const o, const int max_node_size)
 {
-//    cout << "BIH construction has begun" << endl;
+    // BOOST_LOG_TRIVIAL(trace) << "BIH construction has begun";
 
     /* Maximum theoretical size is everything.size() * 6, but this is very unlikely */
     bih_node::set_primitives(o);
     auto ret = bih_node::resize_node_array(o->size() * 3);
 
-    /* Divide the nodes */
-    depth = 0;
-    unsigned grand_child = 1;
-    divide_bih_node(o, 0, &grand_child, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, o->size() - 1);
-    assert(depth == 0);
+    /* Check if we have anything to do */
+    if (o->size() <= static_cast<unsigned int>(max_node_size))
+    {
+        /* Create one leaf node that hold the whole scene */
+        bih_node::get_node_array(0).create_leaf_node(0, o->size() - 1);
+    }
+    else
+    {
+        /* Divide the nodes */
+        depth = 0;
+        unsigned grand_child = 1;
+        divide_bih_node(o, 0, &grand_child, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, o->size() - 1, max_node_size);
+        assert(depth == 0);
+    }
     
     return ret;
 }
