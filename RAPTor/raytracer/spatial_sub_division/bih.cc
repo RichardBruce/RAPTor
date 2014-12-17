@@ -3,6 +3,7 @@
 /* Boost headers */
 
 /* Comonn heders */
+#include "logging.h"
 
 /* Ray tracer headers */
 #include "bih.h"
@@ -11,41 +12,37 @@
 namespace raptor_raytracer
 {
 std::vector<triangle *> *   bih_node::o     = nullptr;
-std::vector<bih_node>       bih_node::bih;
 
 #ifdef SIMD_PACKET_TRACING
 /* Find the next leaf node intersected by the frustrum */
 inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry_point, bih_stack_element **const out, unsigned int size) const
 {
     bih_stack_element *exit_point = *out;
-    const bih_node *current_node = entry_point->n;
+    
+    /* Pull out indices of the current node */
+    const int cur_idx = entry_point->idx;
+    int bih_block   = block_index(cur_idx);
+    int bih_node    = node_index(cur_idx);
+
     point_t u   = entry_point->u;
     point_t l   = entry_point->l;
     float t_max = entry_point->t_max;
     float t_min = entry_point->t_min;
     while (true)
     {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count nodes accessed */
-        ++nts;
-#endif
-        float    near_split         = current_node->get_left_split();
-        float    far_split          = current_node->get_right_split();
-        const bih_node *near_node   = current_node->get_left_child();
-        const bih_node *far_node    = current_node->get_right_child();
+        float near_split    = (*_bih_base)[bih_block].get_node(bih_node)->get_left_split();
+        float far_split     = (*_bih_base)[bih_block].get_node(bih_node)->get_right_split();
+        int   near_idx      = (*_bih_base)[bih_block].get_left_child(bih_block, bih_node);
+        int   far_idx       = (*_bih_base)[bih_block].get_right_child(bih_block, bih_node);
 
-        switch (current_node->get_split_axis())
+        switch ((*_bih_base)[bih_block].get_split_axis(bih_node))
         {
             /* This node is not split in any plane, ie/ it is a leaf */
             case axis_t::not_set : 
             {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                /* Count elementary nodes accessed */
-                ++nets;
-#endif
                 /* update the state and return 1 for intersection testing */
                 *out = exit_point;
-                entry_point->n = current_node;
+                entry_point->idx = bih_index(bih_block, bih_node);
                 entry_point->u = u;
                 entry_point->l = l;
                 return 1;
@@ -69,9 +66,9 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                     near_split = far_split;
                     far_split  = tmp_split;
     
-                    const bih_node *tmp_node = near_node;
-                    near_node = far_node;
-                    far_node  = tmp_node;
+                    const int tmp_idx = near_idx;
+                    near_idx = far_idx;
+                    far_idx  = tmp_idx;
                 }
                 else
                 {
@@ -84,10 +81,6 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                 /* Empty space is traversed, return 0 to pop the stack */
                 if ((t_min > max_near_plane) && (t_max < min_far_plane))
                 {   
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    /* Count empty elementary nodes accessed */
-                    ++neets;
-#endif
                     *out = exit_point;
                     return 0;         
                 }
@@ -97,7 +90,7 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                      ((t_max <  max_far_plane) && (t_max >  min_far_plane))) && (size > MINIMUM_PACKET_SIZE))
                 {
                     *out = exit_point;
-                    entry_point->n      = current_node;
+                    entry_point->idx    = bih_index(bih_block, bih_node);
                     entry_point->t_max  = t_max;
                     entry_point->t_min  = t_min;
                     entry_point->u      = u;
@@ -108,31 +101,34 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                 /* Only the far node is traversed */
                 if (t_min > max_near_plane)
                 {
-                    l.x             = far_split;
-                    t_min           = std::max(t_min, min_far_plane);
-                    current_node    = far_node;
+                    l.x         = far_split;
+                    t_min       = std::max(t_min, min_far_plane);
+                    bih_block   = block_index(far_idx);
+                    bih_node    = node_index(far_idx);
                 }
                 /* Only the near node is traversed */
                 else if (t_max < min_far_plane)
                 {
-                    u.x             = near_split;
-                    t_max           = std::min(t_max, max_near_plane);
-                    current_node    = near_node;
+                    u.x         = near_split;
+                    t_max       = std::min(t_max, max_near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 }
                 /* Both nodes are traversed, near node first */
                 else
                 {
                     /* Stack the far node */
                     ++exit_point;
-                    exit_point->n       = far_node;
+                    exit_point->idx     = far_idx;
                     exit_point->l       = point_t(far_split, l.y, l.z);
                     exit_point->u       = u;
                     exit_point->t_max   = t_max;
                     exit_point->t_min   = std::max(t_min, min_far_plane);
         
-                    u.x             = near_split;
-                    t_max           = std::min(t_max, max_near_plane);
-                    current_node    = near_node;
+                    u.x         = near_split;
+                    t_max       = std::min(t_max, max_near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 }
                 continue;
             }
@@ -155,9 +151,9 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                     near_split = far_split;
                     far_split  = tmp_split;
     
-                    const bih_node *tmp_node = near_node;
-                    near_node = far_node;
-                    far_node  = tmp_node;
+                    const int tmp_idx = near_idx;
+                    near_idx = far_idx;
+                    far_idx  = tmp_idx;
                 }
                 else
                 {
@@ -170,10 +166,6 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                 /* Empty space is traversed, return 0 to pop the stack */
                 if ((t_min > max_near_plane) && (t_max < min_far_plane))
                 {   
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    /* Count empty elementary nodes accessed */
-                    ++neets;
-#endif
                     *out = exit_point;
                     return 0;         
                 }
@@ -183,7 +175,7 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                      ((t_max <  max_far_plane) && (t_max >  min_far_plane))) && (size > MINIMUM_PACKET_SIZE))
                 {
                     *out = exit_point;
-                    entry_point->n      = current_node;
+                    entry_point->idx    = bih_index(bih_block, bih_node);
                     entry_point->t_max  = t_max;
                     entry_point->t_min  = t_min;
                     entry_point->u      = u;
@@ -194,31 +186,34 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                 /* Only the far node is traversed */
                 if (t_min > max_near_plane)
                 {
-                    l.y             = far_split;
-                    t_min           = std::max(t_min, min_far_plane);
-                    current_node    = far_node;
+                    l.y         = far_split;
+                    t_min       = std::max(t_min, min_far_plane);
+                    bih_block   = block_index(far_idx);
+                    bih_node    = node_index(far_idx);
                 }
                 /* Only the near node is traversed */
                 else if (t_max < min_far_plane)
                 {
-                    u.y             = near_split;
-                    t_max           = std::min(t_max, max_near_plane);
-                    current_node    = near_node;
+                    u.y         = near_split;
+                    t_max       = std::min(t_max, max_near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 }
                 /* Both nodes are traversed, near node first */
                 else
                 {
                     /* Stack the far node */
                     ++exit_point;
-                    exit_point->n       = far_node;
+                    exit_point->idx     = far_idx;
                     exit_point->l       = point_t(l.x, far_split, l.z);
                     exit_point->u       = u;
                     exit_point->t_max   = t_max;
                     exit_point->t_min   = std::max(t_min, min_far_plane);
 
-                    u.y             = near_split;
-                    t_max           = std::min(t_max, max_near_plane);
-                    current_node    = near_node;
+                    u.y         = near_split;
+                    t_max       = std::min(t_max, max_near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 }
                 continue;
             }
@@ -241,9 +236,9 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                     near_split = far_split;
                     far_split  = tmp_split;
     
-                    const bih_node *tmp_node = near_node;
-                    near_node = far_node;
-                    far_node  = tmp_node;
+                    const int tmp_idx = near_idx;
+                    near_idx = far_idx;
+                    far_idx  = tmp_idx;
                 }
                 else
                 {
@@ -256,10 +251,6 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                 /* Empty space is traversed, return 0 to pop the stack */
                 if ((t_min > max_near_plane) && (t_max < min_far_plane))
                 {   
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    /* Count empty elementary nodes accessed */
-                    ++neets;
-#endif
                     *out = exit_point;
                     return 0;         
                 }
@@ -269,7 +260,7 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                      ((t_max <  max_far_plane) && (t_max >  min_far_plane))) && (size > MINIMUM_PACKET_SIZE))
                 {
                     *out = exit_point;
-                    entry_point->n      = current_node;
+                    entry_point->idx    = bih_index(bih_block, bih_node);
                     entry_point->t_max  = t_max;
                     entry_point->t_min  = t_min;
                     entry_point->u      = u;
@@ -280,31 +271,34 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                 /* Only the far node is traversed */
                 if (t_min > max_near_plane)
                 {
-                    l.z             = far_split;
-                    t_min           = std::max(t_min, min_far_plane);
-                    current_node    = far_node;
+                    l.z         = far_split;
+                    t_min       = std::max(t_min, min_far_plane);
+                    bih_block   = block_index(far_idx);
+                    bih_node    = node_index(far_idx);
                 }
                 /* Only the near node is traversed */
                 else if (t_max < min_far_plane)
                 {
-                    u.z             = near_split;
-                    t_max           = std::min(t_max, max_near_plane);
-                    current_node    = near_node;
+                    u.z         = near_split;
+                    t_max       = std::min(t_max, max_near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 }
                 /* Both nodes are traversed, near node first */
                 else
                 {
                     /* Stack the far node */
                     ++exit_point;
-                    exit_point->n       = far_node;
+                    exit_point->idx     = far_idx;
                     exit_point->l       = point_t(l.x, l.y, far_split);
                     exit_point->u       = u;
                     exit_point->t_max   = t_max;
                     exit_point->t_min   = std::max(t_min, min_far_plane);
 
-                    u.z             = near_split;
-                    t_max           = std::min(t_max, max_near_plane);
-                    current_node    = near_node;
+                    u.z         = near_split;
+                    t_max       = std::min(t_max, max_near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 }
                 continue;
             }
@@ -317,18 +311,14 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
 **********************************************************/
 void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
     /* state of stack */
     bih_stack_element *exit_point = &(_bih_stack[0]);
-    exit_point->n       = nullptr;
+    exit_point->idx     = 0;
     exit_point->t_max   = MAX_DIST;
     exit_point->t_min   = 0.0f;
 
     bih_stack_element  entry_point;
-    entry_point.n      = &(*_bih_base)[0];
+    entry_point.idx    = 0;
     entry_point.t_max  = MAX_DIST;
     entry_point.t_min  = 0.0f;
     
@@ -419,7 +409,8 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
         const int cmd = this->find_leaf_node(f, &entry_point, &exit_point, size);
 
         /* If the leaf contains objects find the closest intersecting object */
-        if ((cmd == 1) && !entry_point.n->is_empty())
+        auto leaf_node = (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx));
+        if ((cmd == 1) && !leaf_node->is_empty())
         {
 #ifdef FRUSTRUM_CULLING
             unsigned clipped_size = 0;
@@ -447,7 +438,7 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
 #ifdef FRUSTRUM_CULLING
                     clipped_r[clipped_size++] = i;
 #else
-                    entry_point.n->test_leaf_node_nearest(&r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i], 1);
+                    leaf_node->test_leaf_node_nearest(&r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i], 1);
 #endif
                 }
             }
@@ -455,7 +446,7 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
             if (clipped_size > 0)
             {
                 f.adapt_to_leaf(r, entry_point.u, entry_point.l, clipped_r, clipped_size);
-                entry_point.n->test_leaf_node_nearest(f, r, i_o, h, clipped_r, clipped_size);
+                leaf_node->test_leaf_node_nearest(f, r, i_o, h, clipped_r, clipped_size);
             }
 #endif
             /* Update furthest intersection */
@@ -488,12 +479,12 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
                 return;
             }
             
-            entry_point.n       = exit_point->n;
+            entry_point.idx     = exit_point->idx;
             entry_point.t_max   = exit_point->t_max;
             entry_point.t_min   = exit_point->t_min;
             entry_point.u       = exit_point->u;
             entry_point.l       = exit_point->l;
-            exit_point--;
+            --exit_point;
             
         } while (entry_point.t_min >= max_d);
         
@@ -507,10 +498,6 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
 **********************************************************/
 void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, unsigned size) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
     vfp_t vmax_d = t[0];
     vfp_t vmin_d = t[0];
     packet_hit_description h[MAXIMUM_PACKET_SIZE];
@@ -525,12 +512,12 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
 
     /* state of stack */
     bih_stack_element *exit_point = &(_bih_stack[0]);
-    exit_point->n       = nullptr;
+    exit_point->idx     = 0;
     exit_point->t_max   = max_d;
     exit_point->t_min   = 0.0f;
 
     bih_stack_element  entry_point;
-    entry_point.n      = &(*_bih_base)[0];
+    entry_point.idx    = 0;
     entry_point.t_max  = max_d;
     entry_point.t_min  = 0.0f;
     
@@ -587,7 +574,8 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
         const int cmd = this->find_leaf_node(f, &entry_point, &exit_point, size);
 
         /* If the leaf contains objects find the closest intersecting object */
-        if ((cmd == 1) && !entry_point.n->is_empty())
+        auto leaf_node = (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx));
+        if ((cmd == 1) && !leaf_node->is_empty())
         {
 #ifdef FRUSTRUM_CULLING
             unsigned clipped_size = 0;
@@ -630,7 +618,7 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
 #ifdef FRUSTRUM_CULLING
                     clipped_r[clipped_size++] = i;
 #else
-                    entry_point.n->test_leaf_node_nearer(&r[i], &closer[i], t[i], &h[i]);
+                    leaf_node->test_leaf_node_nearer(&r[i], &closer[i], t[i], &h[i]);
 #endif
                 }
             }
@@ -638,7 +626,7 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
             if (clipped_size > 0)
             {
                 f.adapt_to_leaf(r, entry_point.u, entry_point.l, clipped_r, clipped_size);
-                entry_point.n->test_leaf_node_nearer(f, r, closer, t, h, clipped_r, clipped_size);
+                leaf_node->test_leaf_node_nearer(f, r, closer, t, h, clipped_r, clipped_size);
             }
 #endif
 
@@ -676,12 +664,12 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
                 return;
             }
             
-            entry_point.n       = exit_point->n;
+            entry_point.idx     = exit_point->idx;
             entry_point.t_max   = exit_point->t_max;
             entry_point.t_min   = exit_point->t_min;
             entry_point.u       = exit_point->u;
             entry_point.l       = exit_point->l;
-            exit_point--;
+            --exit_point;
             
         } while (entry_point.t_min >= max_d);
         
@@ -696,31 +684,28 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
 inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const entry_point, bih_stack_element **const out, const vfp_t *const i_rd) const
 {
     bih_stack_element *exit_point = *out;
-    const bih_node *current_node = entry_point->n;
+
+    /* Pull out indices of the current node */
+    const int cur_idx = entry_point->idx;
+    int bih_block   = block_index(cur_idx);
+    int bih_node    = node_index(cur_idx);
+
     vfp_t t_max = entry_point->vt_max;
     vfp_t t_min = entry_point->vt_min;
     while (true)
     {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count nodes accessed */
-        ++nts;
-#endif
-        const vfp_t     near_split(current_node->get_left_split());
-        const vfp_t     far_split (current_node->get_right_split());
-        const bih_node *near_node   = current_node->get_left_child();
-        const bih_node *far_node    = current_node->get_right_child();
+        const vfp_t near_split((*_bih_base)[bih_block].get_node(bih_node)->get_left_split());
+        const vfp_t far_split ((*_bih_base)[bih_block].get_node(bih_node)->get_right_split());
+        int   near_idx  = (*_bih_base)[bih_block].get_left_child(bih_block, bih_node);
+        int   far_idx   = (*_bih_base)[bih_block].get_right_child(bih_block, bih_node);
 
-        switch (current_node->get_split_axis())
+        switch ((*_bih_base)[bih_block].get_split_axis(bih_node))
         {
             /* This node is not split in any plane, ie/ it is a leaf */
             case axis_t::not_set : 
             {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                /* Count elementary nodes accessed */
-                ++nets;
-#endif
                 /* update the state and return 1 for intersection testing */
-                entry_point->n  = current_node;
+                entry_point->idx = bih_index(bih_block, bih_node);
                 *out = exit_point;
                 return true;
             }
@@ -737,19 +722,15 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                     near_plane = far_plane;
                     far_plane  = tmp_plane;
     
-                    const bih_node *tmp_node = near_node;
-                    near_node = far_node;
-                    far_node  = tmp_node;
+                    const int tmp_idx = near_idx;
+                    near_idx = far_idx;
+                    far_idx  = tmp_idx;
                 }
 
                 /* Empty space is traversed, return 0 to pop the stack */
                 int a_node = move_mask((t_min < near_plane) | (t_max > far_plane));
                 if (!a_node)
                 {   
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    /* Count empty elementary nodes accessed */
-                    ++neets;
-#endif
                    *out = exit_point;
                     return false;         
                 }
@@ -759,26 +740,29 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                 int o_near  = move_mask(t_max > far_plane);
                 if (!o_far)
                 {
-                    t_min           = max(t_min, far_plane);
-                    current_node    = far_node;
+                    t_min       = max(t_min, far_plane);
+                    bih_block   = block_index(far_idx);
+                    bih_node    = node_index(far_idx);
                 }
                 /* Only the near node is traversed */
                 else if (!o_near)
                 {
-                    t_max           = min(t_max, near_plane);
-                    current_node    = near_node;
+                    t_max       = min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 }
                 /* Both nodes are traversed, near node first */
                 else
                 {
                     /* Stack the far node */
                     ++exit_point;
-                    exit_point->n       = far_node;
+                    exit_point->idx     = far_idx;
                     exit_point->vt_max  = t_max;
                     exit_point->vt_min  = max(t_min, far_plane);
 
-                    t_max           = min(t_max, near_plane);
-                    current_node    = near_node;
+                    t_max       = min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 }
                 continue;
             }
@@ -795,19 +779,15 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                     near_plane = far_plane;
                     far_plane  = tmp_plane;
     
-                    const bih_node *tmp_node = near_node;
-                    near_node = far_node;
-                    far_node  = tmp_node;
+                    const int tmp_idx = near_idx;
+                    near_idx = far_idx;
+                    far_idx  = tmp_idx;
                 }
  
                 /* Empty space is traversed, return 0 to pop the stack */
                 int a_node = move_mask((t_min < near_plane) | (t_max > far_plane));
                 if (!a_node)
                 {   
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    /* Count empty elementary nodes accessed */
-                    ++neets;
-#endif
                    *out = exit_point;
                     return false;         
                 }
@@ -817,26 +797,29 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                 int o_near  = move_mask(t_max > far_plane);
                 if (!o_far)
                 {
-                    t_min           = max(t_min, far_plane);
-                    current_node    = far_node;
+                    t_min       = max(t_min, far_plane);
+                    bih_block   = block_index(far_idx);
+                    bih_node    = node_index(far_idx);
                 }
                 /* Only the near node is traversed */
                 else if (!o_near)
                 {
-                    t_max           = min(t_max, near_plane);
-                    current_node    = near_node;
+                    t_max       = min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 }
                 /* Both nodes are traversed, near node first */
                 else
                 {
                     /* Stack the far node */
                     ++exit_point;
-                    exit_point->n       = far_node;
+                    exit_point->idx     = far_idx;
                     exit_point->vt_max  = t_max;
                     exit_point->vt_min  = max(t_min, far_plane);
 
-                    t_max           = min(t_max, near_plane);
-                    current_node    = near_node;
+                    t_max       = min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 } 
                 continue;
             }
@@ -853,19 +836,15 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                     near_plane = far_plane;
                     far_plane  = tmp_plane;
     
-                    const bih_node *tmp_node = near_node;
-                    near_node = far_node;
-                    far_node  = tmp_node;
+                    const int tmp_idx = near_idx;
+                    near_idx = far_idx;
+                    far_idx  = tmp_idx;
                 }
 
                 /* Empty space is traversed, return 0 to pop the stack */
                 int a_node = move_mask((t_min < near_plane) | (t_max > far_plane));
                 if (!a_node)
                 {   
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    /* Count empty elementary nodes accessed */
-                    ++neets;
-#endif
                     *out = exit_point;
                     return false;         
                 }
@@ -875,26 +854,29 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
                 int o_near  = move_mask(t_max > far_plane);
                 if (!o_far)
                 {
-                    t_min           = max(t_min, far_plane);
-                    current_node    = far_node;
+                    t_min       = max(t_min, far_plane);
+                    bih_block   = block_index(far_idx);
+                    bih_node    = node_index(far_idx);
                 }
                 /* Only the near node is traversed */
                 else if (!o_near)
                 {
-                    t_max           = min(t_max, near_plane);
-                    current_node    = near_node;
+                    t_max       = min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 }
                 /* Both nodes are traversed, near node first */
                 else
                 {
                     /* Stack the far node */
                     ++exit_point;
-                    exit_point->n       = far_node;
+                    exit_point->idx     = far_idx;
                     exit_point->vt_max  = t_max;
                     exit_point->vt_min  = max(t_min, far_plane);
 
-                    t_max           = min(t_max, near_plane);
-                    current_node    = near_node;
+                    t_max       = min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
                 } 
                 continue;
             }
@@ -908,15 +890,11 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
 **********************************************************/
 void bih::find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
     /* state of stack */
     bih_stack_element *exit_point = &(_bih_stack[0]);
 
     bih_stack_element   entry_point;
-    entry_point.n       = &(*_bih_base)[0];
+    entry_point.idx     = 0;
     entry_point.vt_max  = vfp_t(MAX_DIST);
     entry_point.vt_min  = vfp_t(0.0f);
     
@@ -932,7 +910,7 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
         {
-            entry_point.n->test_leaf_node_nearest(r, i_o, h, 1);
+            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(r, i_o, h, 1);
         }
 
         /* Unwind the stack */
@@ -944,10 +922,10 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
                 return;
             }
             
-            entry_point.n      = exit_point->n;
+            entry_point.idx    = exit_point->idx;
             entry_point.vt_max = exit_point->vt_max;
             entry_point.vt_min = exit_point->vt_min;
-            exit_point--;
+            --exit_point;
             
         } while (!move_mask(entry_point.vt_min < h->d));
                 
@@ -978,7 +956,7 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
         {
-            entry_point.n->test_leaf_node_nearest(r, i_o, h, 1);
+            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(r, i_o, h, 1);
         }
 
         /* Unwind the stack */
@@ -990,10 +968,10 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
                 return;
             }
             
-            entry_point.n      = exit_point->n;
+            entry_point.idx    = exit_point->idx;
             entry_point.vt_max = exit_point->vt_max;
             entry_point.vt_min = exit_point->vt_min;
-            exit_point--;
+            --exit_point;
             
         } while (!move_mask(entry_point.vt_min < h->d));
                 
@@ -1024,7 +1002,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t, bih_st
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
         {
-            entry_point.n->test_leaf_node_nearer(r, &closer, t, &h);
+            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearer(r, &closer, t, &h);
             
             /* If all rays have been occluded, return */
             if (move_mask(closer) == ((1 << SIMD_WIDTH) - 1))
@@ -1042,10 +1020,10 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t, bih_st
                 return closer;
             }
             
-            entry_point.n      = exit_point->n;
+            entry_point.idx    = exit_point->idx;
             entry_point.vt_max = exit_point->vt_max;
             entry_point.vt_min = exit_point->vt_min;
-            exit_point--;
+            --exit_point;
             
         } while (!move_mask(entry_point.vt_min < h.d));
                 
@@ -1059,15 +1037,11 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t, bih_st
 **********************************************************/
 vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
     /* state of stack */
     bih_stack_element *exit_point = &(_bih_stack[0]);
 
     bih_stack_element   entry_point;
-    entry_point.n       = &(*_bih_base)[0];
+    entry_point.idx     = 0;
     entry_point.vt_max  = t;
     entry_point.vt_min  = vfp_zero;
     
@@ -1086,7 +1060,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
         {
-            entry_point.n->test_leaf_node_nearer(r, &closer, t, &h);
+            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearer(r, &closer, t, &h);
             
             /* If all rays have been occluded, return */
             if (move_mask(closer) == ((1 << SIMD_WIDTH) - 1))
@@ -1104,7 +1078,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
                 return closer;
             }
             
-            entry_point.n      = exit_point->n;
+            entry_point.idx    = exit_point->idx;
             entry_point.vt_max = exit_point->vt_max;
             entry_point.vt_min = exit_point->vt_min;
             --exit_point;
@@ -1123,32 +1097,30 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
 inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_point, bih_stack_element **const out, const point_t &i_rd) const
 {
     bih_stack_element *exit_point = *out;
-    const bih_node *current_node = entry_point->n;
+
+    /* Pull out indices of the current node */
+    const int cur_idx = entry_point->idx;
+    int bih_block   = block_index(cur_idx);
+    int bih_node    = node_index(cur_idx);
+
     float t_max = entry_point->t_max;
     float t_min = entry_point->t_min;
     while (true)
     {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count nodes accessed */
-        ++nts;
-#endif
-        float near_split            = current_node->get_left_split();
-        float far_split             = current_node->get_right_split();
-        const bih_node *near_node   = current_node->get_left_child();
-        const bih_node *far_node    = current_node->get_right_child();
+        float near_split    = (*_bih_base)[bih_block].get_node(bih_node)->get_left_split();
+        float far_split     = (*_bih_base)[bih_block].get_node(bih_node)->get_right_split();
+        int   near_idx      = (*_bih_base)[bih_block].get_left_child(bih_block, bih_node);
+        int   far_idx       = (*_bih_base)[bih_block].get_right_child(bih_block, bih_node);
 
-        switch (current_node->get_split_axis())
+        switch ((*_bih_base)[bih_block].get_split_axis(bih_node))
         {
             /* This node is not split in any plane, ie/ it is a leaf */
             case axis_t::not_set : 
             {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                /* Count elementary nodes accessed */
-                ++nets;
-#endif
                 /* update the state and return */
-                entry_point->n  = current_node;
+                entry_point->idx = bih_index(bih_block, bih_node);
                 *out = exit_point;
+                // BOOST_LOG_TRIVIAL(trace) << "Found leaf at index: " << entry_point->idx;
                 return true;
             }
     
@@ -1162,18 +1134,16 @@ inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_poi
                    near_plane = far_plane;
                    far_plane  = tmp_plane;
     
-                   const bih_node *tmp_node = near_node;
-                   near_node = far_node;
-                   far_node  = tmp_node;
+                   const int tmp_idx = near_idx;
+                   near_idx = far_idx;
+                   far_idx  = tmp_idx;
                 }
+
+                // BOOST_LOG_TRIVIAL(trace) << "Split planes in x at: " << near_split << ", " << far_split;
 
                 /* Empty space is traversed, return false to pop the stack */
                 if ((t_min > near_plane) && (t_max < far_plane))
                 {   
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    /* Count empty elementary nodes accessed */
-                    ++neets;
-#endif
                    *out = exit_point;
                     return false;         
                 }
@@ -1181,26 +1151,32 @@ inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_poi
                 /* Only the far node is traversed */
                 if (t_min > near_plane)
                 {
-                    t_min           = std::max(t_min, far_plane);
-                    current_node    = far_node;
+                    t_min       = std::max(t_min, far_plane);
+                    bih_block   = block_index(far_idx);
+                    bih_node    = node_index(far_idx);
+                    // BOOST_LOG_TRIVIAL(trace) << "Traversing near node";
                 }
                 /* Only the near node is traversed */
                 else if (t_max < far_plane)
                 {
-                    t_max           = std::min(t_max, near_plane);
-                    current_node    = near_node;
+                    t_max       = std::min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
+                    // BOOST_LOG_TRIVIAL(trace) << "Traversing far node";
                 }
                 /* Both nodes are traversed, near node first */
                 else
                 {
                     /* Stack the far node */
                     ++exit_point;
-                    exit_point->n       = far_node;
+                    exit_point->idx     = far_idx;
                     exit_point->t_max   = t_max;
                     exit_point->t_min   = std::max(t_min, far_plane);
 
-                    t_max           = std::min(t_max, near_plane);
-                    current_node    = near_node;
+                    t_max       = std::min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
+                    // BOOST_LOG_TRIVIAL(trace) << "Traversing both nodes";
                 }
                 continue;
             }
@@ -1215,18 +1191,16 @@ inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_poi
                    near_plane = far_plane;
                    far_plane  = tmp_plane;
     
-                   const bih_node *tmp_node = near_node;
-                   near_node = far_node;
-                   far_node  = tmp_node;
+                   const int tmp_idx = near_idx;
+                   near_idx = far_idx;
+                   far_idx  = tmp_idx;
                 }
+
+                // BOOST_LOG_TRIVIAL(trace) << "Split planes in y at: " << near_split << ", " << far_split;
  
                 /* Empty space is traversed, return false to pop the stack */
                 if ((t_min > near_plane) && (t_max < far_plane))
                 {   
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    /* Count empty elementary nodes accessed */
-                    ++neets;
-#endif
                    *out = exit_point;
                     return false;         
                 }
@@ -1234,27 +1208,33 @@ inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_poi
                 /* Only the far node is traversed */
                 if (t_min > near_plane)
                 {
-                    t_min           = std::max(t_min, far_plane);
-                    current_node    = far_node;
+                    t_min       = std::max(t_min, far_plane);
+                    bih_block   = block_index(far_idx);
+                    bih_node    = node_index(far_idx);
+                    // BOOST_LOG_TRIVIAL(trace) << "Traversing near node";
                 }
                 /* Only the near node is traversed */
                 else if (t_max < far_plane)
                 {
-                    t_max           = std::min(t_max, near_plane);
-                    current_node    = near_node;
+                    t_max       = std::min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
+                    // BOOST_LOG_TRIVIAL(trace) << "Traversing far node";
                 }
                 /* Both nodes are traversed, near node first */
                 else
                 {
                     /* Stack the far node */
                     ++exit_point;
-                    exit_point->n       = far_node;
+                    exit_point->idx     = far_idx;
                     exit_point->t_max   = t_max;
                     exit_point->t_min   = std::max(t_min, far_plane);
 
-                    t_max           = std::min(t_max, near_plane);
-                    current_node    = near_node;
-                } 
+                    t_max       = std::min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
+                    // BOOST_LOG_TRIVIAL(trace) << "Traversing both nodes";
+                }
                 continue;
             }
 
@@ -1268,18 +1248,16 @@ inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_poi
                    near_plane = far_plane;
                    far_plane  = tmp_plane;
     
-                   const bih_node *tmp_node = near_node;
-                   near_node = far_node;
-                   far_node  = tmp_node;
+                   const int tmp_idx = near_idx;
+                   near_idx = far_idx;
+                   far_idx  = tmp_idx;
                 }
+
+                // BOOST_LOG_TRIVIAL(trace) << "Split planes in z at: " << near_split << ", " << far_split;
 
                 /* Empty space is traversed, return false to pop the stack */
                 if ((t_min > near_plane) && (t_max < far_plane))
                 {   
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    /* Count empty elementary nodes accessed */
-                    ++neets;
-#endif
                     *out = exit_point;
                     return false;         
                 }
@@ -1287,27 +1265,33 @@ inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_poi
                 /* Only the far node is traversed */
                 if (t_min > near_plane)
                 {
-                    t_min           = std::max(t_min, far_plane);
-                    current_node    = far_node;
+                    t_min       = std::max(t_min, far_plane);
+                    bih_block   = block_index(far_idx);
+                    bih_node    = node_index(far_idx);
+                    // BOOST_LOG_TRIVIAL(trace) << "Traversing near node";
                 }
                 /* Only the near node is traversed */
                 else if (t_max < far_plane)
                 {
-                    t_max           = std::min(t_max, near_plane);
-                    current_node    = near_node;
+                    t_max       = std::min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
+                    // BOOST_LOG_TRIVIAL(trace) << "Traversing far node";
                 }
                 /* Both nodes are traversed, near node first */
                 else
                 {
                     /* Stack the far node */
                     ++exit_point;
-                    exit_point->n       = far_node;
+                    exit_point->idx     = far_idx;
                     exit_point->t_max   = t_max;
                     exit_point->t_min   = std::max(t_min, far_plane);
 
-                    t_max           = std::min(t_max, near_plane);
-                    current_node    = near_node;
-                } 
+                    t_max       = std::min(t_max, near_plane);
+                    bih_block   = block_index(near_idx);
+                    bih_node    = node_index(near_idx);
+                    // BOOST_LOG_TRIVIAL(trace) << "Traversing both nodes";
+                }
                 continue;
             }
         }
@@ -1320,19 +1304,14 @@ inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_poi
 **********************************************************/
 triangle* bih::find_nearest_object(const ray *const r, hit_description *const h) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
-    
     /* state of stack */
     bih_stack_element *exit_point = &(_bih_stack[0]);
-    exit_point->n       = nullptr;
+    exit_point->idx     = 0;
     exit_point->t_max   = MAX_DIST;
     exit_point->t_min   = 0.0f;
 
     bih_stack_element   entry_point;
-    entry_point.n       = &(*_bih_base)[0];
+    entry_point.idx     = 0;
     entry_point.t_max   = MAX_DIST;
     entry_point.t_min   = 0.0;
 
@@ -1401,6 +1380,7 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
     /* Traverse the whole tree */
     triangle        *hit_object  = nullptr;
     hit_description nearest_hit;
+    // BOOST_LOG_TRIVIAL(trace) << "Beginning search for nearest object";
     while (true)
     {
         /* Find a leaf node */
@@ -1409,12 +1389,14 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
         /* If the leaf contains objects find the closest intersecting object */
         if (leaf)
         {
-            triangle *intersecting_object = entry_point.n->test_leaf_node_nearest(r, &nearest_hit);
+            // BOOST_LOG_TRIVIAL(trace) << "Found leaf node";
+            triangle *intersecting_object = (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(r, &nearest_hit);
 
             /* If an intersecting object is found it is the closest so return */
             if (intersecting_object != nullptr)
             {
                 hit_object = intersecting_object;
+                // BOOST_LOG_TRIVIAL(trace) << "Found intersecting object";
             }
         }
 
@@ -1424,15 +1406,16 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
             /* If the whole tree has been traversed, return */
             if (exit_point == &(_bih_stack[0]))
             {
+                // BOOST_LOG_TRIVIAL(trace) << "Search complete";
                 *h = nearest_hit;
                 return hit_object;
             }
       
-            entry_point.n      = exit_point->n;
+            entry_point.idx    = exit_point->idx;
             entry_point.t_max  = exit_point->t_max;
             entry_point.t_min  = exit_point->t_min;
-            exit_point--;
-
+            --exit_point;
+            // BOOST_LOG_TRIVIAL(trace) << "Unwound one stack level";
         } while (entry_point.t_min >= nearest_hit.d);
         
         entry_point.t_max = std::min(entry_point.t_max, nearest_hit.d);
@@ -1445,19 +1428,14 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
 **********************************************************/
 bool bih::found_nearer_object(const ray *const r, const float t) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
-
     /* state of stack */
     bih_stack_element *exit_point = &(_bih_stack[0]);
-    exit_point->n       = nullptr;
+    exit_point->idx     = 0;
     exit_point->t_max   = t;
     exit_point->t_min   = 0.0f;
 
     bih_stack_element   entry_point;
-    entry_point.n       = &(*_bih_base)[0];
+    entry_point.idx     = 0;
     entry_point.t_max   = t;
     entry_point.t_min   = 0.0f;
 
@@ -1526,6 +1504,7 @@ bool bih::found_nearer_object(const ray *const r, const float t) const
     point_t i_ray_dir(i_x_grad, i_y_grad, i_z_grad);
 
     /* Traverse the whole tree */
+    // BOOST_LOG_TRIVIAL(trace) << "Beginning search for nearer object";
     while (true)
     {
         /* Find a leaf node */
@@ -1534,10 +1513,13 @@ bool bih::found_nearer_object(const ray *const r, const float t) const
         /* If the leaf contains objects find the closest intersecting object */
         if (leaf)
         {
-            const bool closer = entry_point.n->test_leaf_node_nearer(r, t);
+            // BOOST_LOG_TRIVIAL(trace) << "Testing leaf node: " << entry_point.idx << ", " << t;
+            const bool closer = (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearer(r, t);
+
             /* If an intersecting object is found it is the closest so return */
             if (closer) 
             {
+                // BOOST_LOG_TRIVIAL(trace) << "Found closer object, search complete";
                return true;
             }
         }
@@ -1545,15 +1527,16 @@ bool bih::found_nearer_object(const ray *const r, const float t) const
         /* If the whole tree is traversed without finding an intersection return false */
         if (exit_point == &(_bih_stack[0]))
         {
+            // BOOST_LOG_TRIVIAL(trace) << "Stack unwound, no object hit";
             return false;
         }
   
         /* Unwind the stack */
-        entry_point.n      = exit_point->n;
+        entry_point.idx    = exit_point->idx;
         entry_point.t_max  = exit_point->t_max;
         entry_point.t_min  = exit_point->t_min;
-      
-        exit_point--;
+        --exit_point;
+        // BOOST_LOG_TRIVIAL(trace) << "Unwound one stack level";
     }
 }
 }; /* namespace raptor_raytracer*/

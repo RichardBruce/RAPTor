@@ -2,6 +2,7 @@
 #define __BIH_H__
 
 /* Standard headers */
+#include <vector>
 
 /* Boost headers */
 
@@ -12,6 +13,7 @@
 /* Ray tracer headers */
 #include "common.h"
 #include "ssd.h"
+#include "bih_block.h"
 #include "bih_node.h"
 #include "bih_builder.h"
 
@@ -22,10 +24,13 @@ class bih : public ssd
 {
     public :
         /* CTOR */
-        bih(primitive_list &everything)
-        {            
+        bih(primitive_list &everything, const int max_node_size = MAX_BIH_NODE_SIZE) :
+        _builder(), _bih_base(new std::vector<bih_block>())
+        {
+            bih_node::set_primitives(&everything);
+
             /* Build the heirarchy */
-            _bih_base = build_bih(&everything);
+            _builder.build(&everything, _bih_base);
         }
 
         /* Copy CTOR */
@@ -54,14 +59,14 @@ class bih : public ssd
         struct bih_stack_element
         {
 #ifdef SIMD_PACKET_TRACING
-            vfp_t               vt_max;
-            vfp_t               vt_min;
+            vfp_t   vt_max;
+            vfp_t   vt_min;
 #endif
-            point_t             u;
-            point_t             l;
-            const bih_node     *n;
-            float               t_max;
-            float               t_min;
+            point_t u;
+            point_t l;
+            float   t_max;
+            float   t_min;
+            int     idx;
         };
 
 #ifdef SIMD_PACKET_TRACING
@@ -77,8 +82,9 @@ class bih : public ssd
         inline bool find_leaf_node(const ray &r, bih_stack_element *const entry_point, bih_stack_element **const out, const point_t &i_rd) const;
 
         /* The stack is mutable because it will never be known to a user of this class */
-        mutable bih_stack_element       _bih_stack[MAX_BIH_STACK_HEIGHT];
-        const std::vector<bih_node> *   _bih_base;
+        mutable bih_stack_element   _bih_stack[MAX_BIH_STACK_HEIGHT];
+        bih_builder                 _builder;
+        std::vector<bih_block> *    _bih_base;
 };
 }; /* namespace raptor_raytracer */
 

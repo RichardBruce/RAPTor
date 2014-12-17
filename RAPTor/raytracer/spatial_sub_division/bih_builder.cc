@@ -11,17 +11,44 @@
 
 namespace raptor_raytracer
 {
-/* Tree depth */
-static int depth = 0;
+/* Build a Bounding Interval Heirarchy for primitives into blocks */
+void bih_builder::build(primitive_list *const primitives, std::vector<bih_block> *const blocks)
+{
+    // BOOST_LOG_TRIVIAL(trace) << "BIH construction has begun";
+
+    /* Maximum theoretical size is everything.size() * 6 node, but this is very unlikely */
+    _primitives = primitives;
+    _blocks = blocks;
+    _blocks->resize(std::max(1ul, _primitives->size() >> 1));
+
+    /* Check if we have anything to do */
+    if (_primitives->size() <= static_cast<unsigned int>(_max_node_size))
+    {
+        /* Create one leaf node that hold the whole scene */
+        (*_blocks)[0].create_leaf_node(0, _primitives->size() - 1, 0);
+    }
+    else
+    {
+        /* Divide the nodes */
+        _depth = 0;
+        _next_block = 1;
+        divide_bih_node(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, 0, _primitives->size() - 1);
+        assert(_depth == 0);
+    }
+    // BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
+}
+
 
 /* Find a split position and divide the bih node in 2 */
-void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *child, point_t bl, point_t tr, int b, int e, const int max_node_size)
+void bih_builder::divide_bih_node(point_t bl, point_t tr, const int block_idx, const int node_idx, const int b, const int e)
 {
-    /* Depth check */
-    ++depth;
-    assert(depth < MAX_BIH_STACK_HEIGHT);
-    assert(static_cast<unsigned int>(e) < o->size());
-    assert((static_cast<unsigned int>(b) < o->size()) || (b > e));
+    // BOOST_LOG_TRIVIAL(trace) << "Node bounding box " << bl << " - " << tr;
+
+    /* _depth check */
+    ++_depth;
+    assert(_depth < MAX_BIH_STACK_HEIGHT);
+    assert(static_cast<unsigned int>(e) < _primitives->size());
+    assert((static_cast<unsigned int>(b) < _primitives->size()) || (b > e));
     
     /* Pick longest side to divide in */
     point_t bm;
@@ -65,7 +92,8 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             tm         = point_t(tr.x, tr.y, split_pnt);
         }
     }
-    
+    // BOOST_LOG_TRIVIAL(trace) << "Attempting to split at: " << split_pnt;
+
     /* Partition primitives */
     float max_left  = -MAX_DIST;
     float min_right =  MAX_DIST;
@@ -74,100 +102,33 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
     switch (split_axis)
     {
         case axis_t::x_axis :
+        {
             while (bottom < top)
             {
-                while (split_pnt < (((*o)[top]->highest_x() + (*o)[top]->lowest_x()) * 0.5f) && top > bottom)
+                while (split_pnt < (((*_primitives)[top]->highest_x() + (*_primitives)[top]->lowest_x()) * 0.5f) && top > bottom)
                 {
-                    min_right = std::min(min_right, (*o)[top--]->lowest_x());
+                    min_right = std::min(min_right, (*_primitives)[top--]->lowest_x());
                 }
-                std::swap((*o)[bottom], (*o)[top]);
+                std::swap((*_primitives)[bottom], (*_primitives)[top]);
                 
-                while(split_pnt >= (((*o)[bottom]->highest_x() + (*o)[bottom]->lowest_x()) * 0.5f) && bottom < top)
+                while (split_pnt >= (((*_primitives)[bottom]->highest_x() + (*_primitives)[bottom]->lowest_x()) * 0.5f) && bottom < top)
                 {
-                    max_left = std::max(max_left, (*o)[bottom++]->highest_x());
+                    max_left = std::max(max_left, (*_primitives)[bottom++]->highest_x());
                 }
-                std::swap((*o)[bottom], (*o)[top]);
+                std::swap((*_primitives)[bottom], (*_primitives)[top]);
             }             
 
             /* Parition the last primitive */
-            if (split_pnt >= (((*o)[bottom]->highest_x() + (*o)[bottom]->lowest_x()) * 0.5f))
+            if (split_pnt >= (((*_primitives)[bottom]->highest_x() + (*_primitives)[bottom]->lowest_x()) * 0.5f))
             {
-                max_left = std::max(max_left, (*o)[bottom++]->highest_x());
+                max_left = std::max(max_left, (*_primitives)[bottom++]->highest_x());
             }
             else
             {
-                min_right = std::min(min_right, (*o)[top]->lowest_x());
+                min_right = std::min(min_right, (*_primitives)[top]->lowest_x());
             }
-            break;
-    
-        case axis_t::y_axis :
-            while(bottom < top)
-            {
-                while(split_pnt < (((*o)[top]->highest_y() + (*o)[top]->lowest_y()) * 0.5f) && top > bottom)
-                {
-                    min_right = std::min(min_right, (*o)[top--]->lowest_y());
-                }
-                std::swap((*o)[bottom], (*o)[top]);
-         
-                while(split_pnt >= (((*o)[bottom]->highest_y() + (*o)[bottom]->lowest_y()) * 0.5f) && bottom < top)
-                {
-                    max_left = std::max(max_left, (*o)[bottom++]->highest_y());
-                }
-                std::swap((*o)[bottom], (*o)[top]);
-            }
-
-            /* Parition the last primitive */
-            if (split_pnt >= (((*o)[bottom]->highest_y() + (*o)[bottom]->lowest_y()) * 0.5f))
-            {
-                max_left = std::max(max_left, (*o)[bottom++]->highest_y());
-            }
-            else
-            {
-                min_right = std::min(min_right, (*o)[top]->lowest_y());
-            }
-            break;
-    
-         case axis_t::z_axis :
-            while(bottom < top)
-            {
-                while(split_pnt < (((*o)[top]->highest_z() + (*o)[top]->lowest_z()) * 0.5f) && top > bottom)
-                {
-                    min_right = std::min(min_right, (*o)[top--]->lowest_z());
-                }
-                std::swap((*o)[bottom], (*o)[top]);
-         
-                while(split_pnt >= (((*o)[bottom]->highest_z() + (*o)[bottom]->lowest_z()) * 0.5f) && bottom < top)
-                {
-                    max_left = std::max(max_left, (*o)[bottom++]->highest_z());
-                }
-                std::swap((*o)[bottom], (*o)[top]);
-            }
-
-            /* Parition the last primitive */
-            if (split_pnt >= (((*o)[bottom]->highest_z() + (*o)[bottom]->lowest_z()) * 0.5f))
-            {
-                max_left = std::max(max_left, (*o)[bottom++]->highest_z());
-            }
-            else
-            {
-                min_right = std::min(min_right, (*o)[top]->lowest_z());
-            }
-            break;
-
-        default :
-            assert(false);
-    }
-
-    /* Construct the BIH nodes */
-    // BOOST_LOG_TRIVIAL(trace) << "Creating internal node at index: " << cur << " with splits at: " << max_left << ", " << min_right << " in: " << static_cast<int>(split_axis);
-    bih_node::get_node_array(cur).create_generic_node(*child, max_left, min_right, split_axis);
-
-    /* Reduce the bouding boxes to just fit the new split */
-    float pos;
-    switch (split_axis)
-    {
-        case axis_t::x_axis :
-            pos = (tm.x - bl.x) * 0.5f;
+            
+            float pos = (tm.x - bl.x) * 0.5f;
             while (((bl.x + pos) > max_left) && (max_left > -MAX_DIST))
             {
                 tm.x = bl.x + pos;
@@ -180,10 +141,37 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 bm.x = tr.x - pos;
                 pos *= 0.5f;
             }
-            break;
 
+            break;
+        }
         case axis_t::y_axis :
-            pos = (tm.y - bl.y) * 0.5f;
+        {
+            while (bottom < top)
+            {
+                while (split_pnt < (((*_primitives)[top]->highest_y() + (*_primitives)[top]->lowest_y()) * 0.5f) && top > bottom)
+                {
+                    min_right = std::min(min_right, (*_primitives)[top--]->lowest_y());
+                }
+                std::swap((*_primitives)[bottom], (*_primitives)[top]);
+         
+                while (split_pnt >= (((*_primitives)[bottom]->highest_y() + (*_primitives)[bottom]->lowest_y()) * 0.5f) && bottom < top)
+                {
+                    max_left = std::max(max_left, (*_primitives)[bottom++]->highest_y());
+                }
+                std::swap((*_primitives)[bottom], (*_primitives)[top]);
+            }
+
+            /* Parition the last primitive */
+            if (split_pnt >= (((*_primitives)[bottom]->highest_y() + (*_primitives)[bottom]->lowest_y()) * 0.5f))
+            {
+                max_left = std::max(max_left, (*_primitives)[bottom++]->highest_y());
+            }
+            else
+            {
+                min_right = std::min(min_right, (*_primitives)[top]->lowest_y());
+            }
+
+            float pos = (tm.y - bl.y) * 0.5f;
             while (((bl.y + pos) > max_left) && (max_left > -MAX_DIST))
             {
                 tm.y = bl.y + pos;
@@ -197,11 +185,38 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 pos *= 0.5f;
             }
             break;
-
+        }
         case axis_t::z_axis :
-            pos = (tm.z - bl.z) * 0.5f;
+        {
+            while (bottom < top)
+            {
+                while (split_pnt < (((*_primitives)[top]->highest_z() + (*_primitives)[top]->lowest_z()) * 0.5f) && top > bottom)
+                {
+                    min_right = std::min(min_right, (*_primitives)[top--]->lowest_z());
+                }
+                std::swap((*_primitives)[bottom], (*_primitives)[top]);
+         
+                while (split_pnt >= (((*_primitives)[bottom]->highest_z() + (*_primitives)[bottom]->lowest_z()) * 0.5f) && bottom < top)
+                {
+                    max_left = std::max(max_left, (*_primitives)[bottom++]->highest_z());
+                }
+                std::swap((*_primitives)[bottom], (*_primitives)[top]);
+            }
+
+            /* Parition the last primitive */
+            if (split_pnt >= (((*_primitives)[bottom]->highest_z() + (*_primitives)[bottom]->lowest_z()) * 0.5f))
+            {
+                max_left = std::max(max_left, (*_primitives)[bottom++]->highest_z());
+            }
+            else
+            {
+                min_right = std::min(min_right, (*_primitives)[top]->lowest_z());
+            }
+
+            float pos = (tm.z - bl.z) * 0.5f;
             while (((bl.z + pos) > max_left) && (max_left > -MAX_DIST))
             {
+                // BOOST_LOG_TRIVIAL(trace) << "Max left: " << tm.z << ", " << bl.z << ", " << pos << ", " << max_left;
                 tm.z = bl.z + pos;
                 pos *= 0.5f;
             }
@@ -209,75 +224,105 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             pos = (tr.z - bm.z) * 0.5f;
             while (((tr.z - pos) < min_right) && (min_right < MAX_DIST))
             {
+                // BOOST_LOG_TRIVIAL(trace) << "Min right: " << bm.z << ", " << tr.z << ", " << pos << ", " << min_right;
                 bm.z = tr.z - pos;
                 pos *= 0.5f;
             }
             break;
-
+        }
         default :
             assert(false);
-   }
-  
-    /* Recurse */
-    unsigned left_child  = *child;
-    unsigned right_child = *child + 1;
+    }
+
+    /* If right node is empty forget about this layer and recurse left */
+    // if (right_size == -1)
+    // {
+    //     --_depth;
+    //     const point_t width(tm - bl);
+    //     if ((width.x * width.y * width.z) < 1.0f)
+    //     {
+    //         (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
+    //     }
+    //     else
+    //     {
+    //         // BOOST_LOG_TRIVIAL(trace) << "Discovered empty right node, ignoring this layer and recursing left with: " << b << " - " << (bottom - 1);
+    //         divide_bih_node(bl, tm, block_idx, node_idx, b, e);
+    //     }
+    //     return;
+    // }
+
+    /* If left node is empty forget about this layer and recurse right */
+    // if (left_size == 0)
+    // {
+    //     --_depth;
+    //     const point_t width(tr - bm);
+    //     if ((width.x * width.y * width.z) < 1.0f)
+    //     {
+    //         (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
+    //     }
+    //     else
+    //     {
+    //         // BOOST_LOG_TRIVIAL(trace) << "Discovered empty left node, ignoring this layer and recursing right with: " << bottom << " - " << e;
+    //         divide_bih_node(bm, tr, block_idx, node_idx, b, e);
+    //     }
+    //     return;
+    // }
+
+    /* Get extra blocks if needed */
+    if ((*_blocks)[block_idx].requires_block_children(node_idx))
+    {
+        const int blocks_required = bih_block::child_blocks_required();
+        const int child = _next_block.fetch_add(blocks_required);
+
+        const int new_size = child + blocks_required;
+        if (new_size > static_cast<int>(_blocks->size()))
+        {
+            _blocks->resize(new_size);
+        }
+        
+        (*_blocks)[block_idx].set_child_block(child << 3);
+        // BOOST_LOG_TRIVIAL(trace) << "Set child block: " << (child << 3);
+    }
+
+    /* Construct the BIH nodes */
+    // BOOST_LOG_TRIVIAL(trace) << "Creating internal node at index: " << bih_index(block_idx, node_idx) << " with splits at: " << max_left << ", " << min_right << " in: " << static_cast<int>(split_axis);
+    (*_blocks)[block_idx].create_generic_node(max_left, min_right, node_idx, split_axis);
 
     /* Recurse left */
-    int node_size = bottom - b;
-    if ((node_size <= max_node_size) || ((depth + 1) == MAX_BIH_STACK_HEIGHT))
+    const int left_idx = (*_blocks)[block_idx].get_left_child(block_idx, node_idx);
+    const int left_block = block_index(left_idx);
+    const int left_node = node_index(left_idx);
+
+    const int left_size = bottom - b;
+    if ((left_size <= _max_node_size) || ((_depth + 1) == MAX_BIH_STACK_HEIGHT))
     {
-        // BOOST_LOG_TRIVIAL(trace) << "Creating leaf for left child at index: " << left_child;
-        bih_node::get_node_array(left_child).create_leaf_node(b, max(0, bottom - 1));
+        // BOOST_LOG_TRIVIAL(trace) << "Creating leaf for left child at index: " << bih_index(left_block, left_node) << " with indices: " << b << " - " << (bottom - 1);
+        (*_blocks)[left_block].create_leaf_node(b, std::max(0, bottom - 1), left_node);
     }
     else
     {
-        (*child) += 2;
-        // BOOST_LOG_TRIVIAL(trace) << "Recursing for left child";
-        divide_bih_node(o, left_child, child, bl, tm, b, bottom - 1, max_node_size);
+        // BOOST_LOG_TRIVIAL(trace) << "Recursing for left child with indices: " << b << " - " << (bottom - 1);
+        divide_bih_node(bl, tm, left_block, left_node, b, bottom - 1);
     }
 
     /* Recurse right */
-    node_size = e - bottom; /* 1 less than the actual node size */
-    if ((node_size < max_node_size) || ((depth + 1) == MAX_BIH_STACK_HEIGHT))
+    const int right_idx = (*_blocks)[block_idx].get_right_child(block_idx, node_idx);
+    const int right_block = block_index(right_idx);
+    const int right_node = node_index(right_idx);
+
+    const int right_size = e - bottom; /* 1 less than the actual node size */
+    if ((right_size < _max_node_size) || ((_depth + 1) == MAX_BIH_STACK_HEIGHT))
     {
-        // BOOST_LOG_TRIVIAL(trace) << "Creating leaf for right child at index: " << right_child;
-        bih_node::get_node_array(right_child).create_leaf_node(bottom, e);
+        // BOOST_LOG_TRIVIAL(trace) << "Creating leaf for right child at index: " << bih_index(right_block, right_node) << "  with indices: " << bottom << " - " << e;
+        (*_blocks)[right_block].create_leaf_node(bottom, e, right_node);
     }
     else
     {
-        (*child) += 2;
-        // BOOST_LOG_TRIVIAL(trace) << "Recursing for right child";
-        divide_bih_node(o, right_child, child, bm, tr, bottom, e, max_node_size);
+        // BOOST_LOG_TRIVIAL(trace) << "Recursing for right child with indices: " << bottom << " - " << e;
+        divide_bih_node(bm, tr, right_block, right_node, bottom, e);
     }
     
-    --depth;
+    --_depth;
     return;
-}
-
-/* Build a Bounding Interval Heirarchy for the primitives in o */
-const std::vector<bih_node> * build_bih(primitive_list *const o, const int max_node_size)
-{
-    // BOOST_LOG_TRIVIAL(trace) << "BIH construction has begun";
-
-    /* Maximum theoretical size is everything.size() * 6, but this is very unlikely */
-    bih_node::set_primitives(o);
-    auto ret = bih_node::resize_node_array(o->size() * 3);
-
-    /* Check if we have anything to do */
-    if (o->size() <= static_cast<unsigned int>(max_node_size))
-    {
-        /* Create one leaf node that hold the whole scene */
-        bih_node::get_node_array(0).create_leaf_node(0, o->size() - 1);
-    }
-    else
-    {
-        /* Divide the nodes */
-        depth = 0;
-        unsigned grand_child = 1;
-        divide_bih_node(o, 0, &grand_child, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, o->size() - 1, max_node_size);
-        assert(depth == 0);
-    }
-    
-    return ret;
 }
 }; /* namespace raptor_raytracer */

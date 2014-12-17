@@ -19,6 +19,7 @@
 
 namespace raptor_raytracer
 {
+/* This is most of a bih node, but it doesnt know where is children are or which access it is split in */
 class bih_node
 {
     public :
@@ -27,66 +28,29 @@ class bih_node
         /* Tree construction */
         void create_leaf_node(const int b, const int e)
         {
-            this->c = 0;
             this->b = b;
             this->e = e;
         }
 
-        void create_generic_node(const unsigned c, const float l, const float r, const axis_t a)
+        void create_generic_node(const float l, const float r)
         {
-            assert((static_cast<int>(a) & 0xfffffffc) == 0);
-            assert((c & 0xc0000000) == 0);
             this->l = l;
             this->r = r;
-            this->c = c | (static_cast<int>(a) << 30);
         }
         
         /* Set statics */
-        static void set_primitives(std::vector<triangle *> *const p)    { bih_node::o   = p;            }
-        static const std::vector<bih_node> * resize_node_array(const int size)
-        {
-            bih_node::bih.resize(size, bih_node());
-            return &bih_node::bih;
-        }
-
-        /* Get elements of statics */
-        static bih_node & get_node_array(const unsigned int i)
-        {
-            if (i >= bih_node::bih.size())
-            {
-                bih_node::bih.resize(i + 1);
-            }
-
-            return bih_node::bih[i];
-        }
-
+        static void set_primitives(std::vector<triangle *> *const p) { bih_node::o = p; }
 
         /* Tree traversal */        
-        const axis_t get_split_axis() const
-        {
-            return static_cast<axis_t>((this->c >> 30) & 0x3);
-        }
-
-        const float get_left_split() const
+        float get_left_split() const
         {
             return this->l;
         }
 
-        const float get_right_split() const
+        float get_right_split() const
         {
             return this->r;
         }
-
-        const bih_node * get_left_child() const
-        {
-            return &bih_node::bih[(this->c & 0x3fffffff)];
-        }
-
-        const bih_node * get_right_child() const
-        {
-            return &bih_node::bih[(this->c & 0x3fffffff) + 1];
-        }
-
 
         /* Leaf node tests */
         bool is_empty() const
@@ -101,14 +65,11 @@ class bih_node
 
         triangle * test_leaf_node_nearest(const ray *const r, hit_description *const h) const
         {
-            triangle *intersecting_object = NULL;
+            triangle *intersecting_object = nullptr;
     
             int end = this->e;
-            for (int i = this->b; i <= end; i++)
+            for (int i = this->b; i <= end; ++i)
             {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                ++nit;
-#endif
                 hit_description hit_type(h->d);
                 (*bih_node::o)[i]->is_intersecting(r, &hit_type);
                 if (hit_type.d < h->d)
@@ -117,13 +78,6 @@ class bih_node
                     intersecting_object = (*bih_node::o)[i];
                 }
             }
-
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-            if (h->d < MAX_DIST)
-            {
-                ++ritm;
-            }
-#endif
     
             return intersecting_object;
         }
@@ -131,11 +85,8 @@ class bih_node
         bool test_leaf_node_nearer(const ray *const r, const float max) const
         {
             int end = this->e;
-            for (int i = this->b; i <= end; i++)
+            for (int i = this->b; i <= end; ++i)
             {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                ++nit;
-#endif
                 if ((*bih_node::o)[i]->get_light() || (*bih_node::o)[i]->is_transparent())
                 {
                     continue;
@@ -145,12 +96,10 @@ class bih_node
                 (*bih_node::o)[i]->is_intersecting(r, &hit_type);
                 if (hit_type.d < max)
                 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                    ++ritm;
-#endif
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -158,7 +107,7 @@ class bih_node
         void test_leaf_node_nearest(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned int size) const
         {
             int end = this->e;
-            for (int i = this->b; i <= end; i++)
+            for (int i = this->b; i <= end; ++i)
             {
                 (*bih_node::o)[i]->is_intersecting(r, h, i_o, size);
             }
@@ -169,9 +118,9 @@ class bih_node
         void test_leaf_node_nearest(frustrum &f, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
         {
             int end = this->e;
-            for (int i = this->b; i <= end; i++)
+            for (int i = this->b; i <= end; ++i)
             {
-                bool outside = f.cull((*bih_node::o)[i]->get_vertex_a(), (*bih_node::o)[i]->get_vertex_b(), (*bih_node::o)[i]->get_vertex_c());
+                const bool outside = f.cull((*bih_node::o)[i]->get_vertex_a(), (*bih_node::o)[i]->get_vertex_b(), (*bih_node::o)[i]->get_vertex_c());
                 if (!outside)
                 {
                     (*bih_node::o)[i]->is_intersecting(f, r, h, i_o, c, size);
@@ -186,7 +135,7 @@ class bih_node
             const triangle * i_o[SIMD_WIDTH];
 
             int end = this->e;
-            for (int i = this->b; i <= end; i++)
+            for (int i = this->b; i <= end; ++i)
             {
                 if ((*bih_node::o)[i]->get_light() || (*bih_node::o)[i]->is_transparent())
                 {
@@ -209,19 +158,19 @@ class bih_node
             const triangle * i_o[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
             
             int end = this->e;
-            for (int i = this->b; i <= end; i++)
+            for (int i = this->b; i <= end; ++i)
             {
                 if ((*bih_node::o)[i]->get_light() || (*bih_node::o)[i]->is_transparent())
                 {
                     continue;
                 }
 
-                bool outside = f.cull((*bih_node::o)[i]->get_vertex_a(), (*bih_node::o)[i]->get_vertex_b(), (*bih_node::o)[i]->get_vertex_c());
+                const bool outside = f.cull((*bih_node::o)[i]->get_vertex_a(), (*bih_node::o)[i]->get_vertex_b(), (*bih_node::o)[i]->get_vertex_c());
                 if (!outside)
                 {
                     (*bih_node::o)[i]->is_intersecting(f, r, h, i_o, c, size);
                     vfp_t done = vfp_true;
-                    for (unsigned int j = 0; j < size; j++)
+                    for (unsigned int j = 0; j < size; ++j)
                     {
                         closer[c[j]] |= (h[c[j]].d < t[c[j]]);
                         done &= closer[c[j]];
@@ -237,7 +186,6 @@ class bih_node
             return;
         }
 #endif /* #ifdef SIMD_PACKET_TRACING */
-
         
     private : 
         /* Unions of mutually exclusive data */
@@ -253,9 +201,7 @@ class bih_node
             float   r;  /* Position of the right split plane    */
         };
 
-        unsigned                            c;      /* Index to the left child              */
-        static std::vector<triangle *> *    o;      /* Vector of primitives                 */
-        static std::vector<bih_node>        bih;    /* BIH nodes                            */
+        static std::vector<triangle *> *    o;  /* Vector of primitives */
 };
 }; /* namespace raptor_raytracer */
 
