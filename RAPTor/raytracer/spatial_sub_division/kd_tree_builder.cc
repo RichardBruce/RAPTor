@@ -3,8 +3,6 @@
 #ifdef THREADED_RAY_TRACE
 #include "task.h"
 #include "task_scheduler_init.h"
-
-using namespace tbb;
 #endif /* #ifdef THREADED_RAY_TRACE */
 
 

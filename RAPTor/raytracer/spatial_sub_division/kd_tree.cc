@@ -626,7 +626,7 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
     const float near    = std::min(std::min(x_entry[0], y_entry[0]), z_entry[0]);
     const float far     = std::max(std::max(x_exit[2],  y_exit[2] ), y_exit[2] );
     entry_point.t_max   = far;
-    entry_point.t_min   = max(0.0f, near);
+    entry_point.t_min   = std::max(0.0f, near);
     if (entry_point.t_min > entry_point.t_max)
     {
         return;

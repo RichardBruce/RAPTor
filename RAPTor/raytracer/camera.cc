@@ -16,27 +16,27 @@ extern "C"
 /* Componant glare functions as defined by Spencer */
 inline fp_t f0(const fp_t t)
 {
-    const fp_t tmp = t * (fp_t)(1.0 / 0.02);
-    return (fp_t)2.61e6 * exp(-(tmp * tmp));
+    const fp_t tmp = t * (1.0f / 0.02f);
+    return 2.61e6f * exp(-(tmp * tmp));
 }
 
 
 inline fp_t f1(const fp_t t)
 {
-    const fp_t tmp = t + (fp_t)0.02;
-    return (fp_t)20.91 / (tmp * tmp * tmp);
+    const fp_t tmp = t + 0.02f;
+    return 20.91f / (tmp * tmp * tmp);
 }
 
 inline fp_t f2(const fp_t t)
 {
-    const fp_t tmp = t + (fp_t)0.02;
-    return (fp_t)72.37 / (tmp * tmp);
+    const fp_t tmp = t + 0.02f;
+    return 72.37f / (tmp * tmp);
 }
 
 inline fp_t f3(const fp_t t, const fp_t l)
 {
-    const fp_t tmp = t - (fp_t)3.0 * l * (fp_t)(1.0 / 568.0);
-    return (fp_t)436.9 * ((fp_t)568.0 / l) * exp((fp_t)-19.75 * (tmp * tmp));
+    const fp_t tmp = t - 3.0f * l * (1.0f / 568.0f);
+    return 436.9f * (568.0f / l) * exp(-19.75f * (tmp * tmp));
 }
 
 struct scotopic_corona_t
@@ -45,8 +45,8 @@ struct scotopic_corona_t
     {
         const fp_t dist = sqrt((x * x) + (y * y));
         const fp_t deg  = dist * p;
-        const fp_t a    = ((fp_t)0.478 * f1(deg)) + ((fp_t)0.207 * f2(deg));
-        return ext_colour_t(a,a,a);
+        const fp_t a    = (0.478f * f1(deg)) + (0.207f * f2(deg));
+        return ext_colour_t(a, a, a);
     }
 };
 
@@ -57,7 +57,7 @@ struct scotopic_halo_t
     {
         const fp_t dist = sqrt((x * x) + (y * y));
         const fp_t deg  = dist * p;
-        return (fp_t)0.033 * ext_colour_t(f3(deg, (fp_t)611.0), f3(deg, (fp_t)549.0), f3(deg, (fp_t)467.0));
+        return 0.033f * ext_colour_t(f3(deg, 611.0f), f3(deg, 549.0f), f3(deg, 467.0f));
     }
 };
 
@@ -68,7 +68,7 @@ struct scotopic_bloom_t
     {
         const fp_t dist = sqrt((x * x) + (y * y));
         const fp_t deg  = dist * p;
-        const fp_t a    = (fp_t)0.282 * f0(deg);
+        const fp_t a    = 0.282f * f0(deg);
         return ext_colour_t(a,a,a);
     }
 };
@@ -80,7 +80,7 @@ struct mesopic_corona_t
     {
         const fp_t dist = sqrt((x * x) + (y * y));
         const fp_t deg  = dist * p;
-        const fp_t a    = ((fp_t)0.478 * f1(deg)) + ((fp_t)0.138 * f2(deg));
+        const fp_t a    = (0.478f * f1(deg)) + (0.138f * f2(deg));
         return ext_colour_t(a, a, a);
     }
 };
@@ -92,7 +92,7 @@ struct mesopic_halo_t
     {
         const fp_t dist = sqrt((x * x) + (y * y));
         const fp_t deg  = dist * p;
-        return (fp_t)0.016 * ext_colour_t(f3(deg, (fp_t)611.0), f3(deg, (fp_t)549.0), f3(deg, (fp_t)467.0)); 
+        return 0.016f * ext_colour_t(f3(deg, 611.0f), f3(deg, 549.0f), f3(deg, 467.0f)); 
     }
 };
 
@@ -103,8 +103,8 @@ struct mesopic_bloom_t
     {
         const fp_t dist = sqrt((x * x) + (y * y));
         const fp_t deg  = dist * p;
-        const fp_t a    = (fp_t)0.368 * f0(deg);
-        return ext_colour_t(a,a,a);
+        const fp_t a    = 0.368f * f0(deg);
+        return ext_colour_t(a, a, a);
     }
 };
 
@@ -115,8 +115,8 @@ struct photopic_corona_t
     {
         const fp_t dist = sqrt((x * x) + (y * y));
         const fp_t deg  = dist * p;
-        const fp_t a    = ((fp_t)0.478 * f1(deg)) + ((fp_t)0.138 * f2(deg));
-        return ext_colour_t(a,a,a);
+        const fp_t a    = (0.478f * f1(deg)) + (0.138f * f2(deg));
+        return ext_colour_t(a, a, a);
     }
 };
 
@@ -125,7 +125,7 @@ struct photopic_halo_t
 {
     inline ext_colour_t operator()(const fp_t x, const fp_t y, const fp_t p) const
     {
-        return ext_colour_t((fp_t)0.0, (fp_t)0.0, (fp_t)0.0);
+        return ext_colour_t(0.0f, 0.0f, 0.0f);
     }
 };
 
@@ -136,7 +136,7 @@ struct photopic_bloom_t
     {
         const fp_t dist = sqrt((x * x) + (y * y));
         const fp_t deg  = dist * p;
-        const fp_t a    = (fp_t)0.384 * f0(deg);
+        const fp_t a    = 0.384f * f0(deg);
         return ext_colour_t(a,a,a);
     }
 };
@@ -144,25 +144,25 @@ struct photopic_bloom_t
 
 fp_t camera::generate_flare_lines(ext_colour_t *const f)
 {
-    fp_t sum = (fp_t)0.0;
+    fp_t sum = 0.0f;
     int nr_of_lines = 200;
     for (int i = 0; i < nr_of_lines; i++)
     {
         fp_t lineIntens = gen_random_mersenne_twister();
         fp_t lineRad = 1.0;//(gen_random_mersenne_twister() * 2.0);
     
-        fp_t theta = ((i + gen_random_mersenne_twister()) * (2.0*PI)) / nr_of_lines;  // stratified
-        fp_t dir[2] = { cos(theta), sin(theta) };
+        fp_t theta = ((i + gen_random_mersenne_twister()) * (2.0f * PI)) / nr_of_lines;  // stratified
+        fp_t dir[2] = { std::cos(theta), std::sin(theta) };
                 
-        int dj = (theta<=PI) ? 1 : -1;
-        int j = (int)(this->y_res/2.0 - (lineRad-0.5)*dj);
+        int dj = (theta <= PI) ? 1 : -1;
+        int j = (int)(this->y_res / 2.0f - (lineRad - 0.5f) * dj);
 
         /* Write the intensity of the pixel for each row */
         while ((j >= 0) && (j < (int)this->y_res))
         {
             /* Calculate the x bounds of the line on this row */
-            fp_t jminf = (j+0.0-this->y_res/2.0);
-            fp_t jmaxf = (j+1.0-this->y_res/2.0);
+            fp_t jminf = (j + 0.0f - this->y_res / 2.0f);
+            fp_t jmaxf = (j + 1.0f - this->y_res / 2.0f);
             fp_t iminf = jminf/tan(theta);
             fp_t imaxf = jmaxf/tan(theta);
 
@@ -175,21 +175,21 @@ fp_t camera::generate_flare_lines(ext_colour_t *const f)
             }
 
             fp_t dif = fabs(lineRad/sin(theta));
-            int imin = (int)(iminf-dif+0.5+this->x_res/2.0);
-            int imax = (int)(imaxf+dif-0.5+this->x_res/2.0);
+            int imin = (int)(iminf - dif + 0.5f + this->x_res / 2.0f);
+            int imax = (int)(imaxf + dif - 0.5f + this->x_res / 2.0f);
 
             /* Set the magnitude of each pixel on this row */
-            for (int k = max(imin, 0); k < min((imax + 1), (int)this->x_res); k++)
+            for (int k = std::max(imin, 0); k < std::min((imax + 1), (int)this->x_res); k++)
             {
                 // find pixel center in spatial coordinates
                 fp_t p[2];
-                p[0] = k-this->x_res/2.0+0.5;
-                p[1] = j-this->y_res/2.0+0.5;
+                p[0] = k-this->x_res / 2.0f + 0.5f;
+                p[1] = j-this->y_res / 2.0f + 0.5f;
 
                 // find distance of p to line
                 fp_t dp = (p[0] * dir[0]) + (p[1] * dir[1]);
                 fp_t dist;
-                if (dp>0.0)
+                if (dp > 0.0f)
                 {
                     fp_t vec[2] = { (p[0] - dp * dir[0]), (p[0] - dp * dir[0]) };
                     dist = sqrt((vec[0] * vec[0]) + (vec[1] * vec[1]));
@@ -202,10 +202,10 @@ fp_t camera::generate_flare_lines(ext_colour_t *const f)
                 // tent filter
                 if (dist>=lineRad)
                     continue;
-                fp_t filt = 1.0/lineRad - 1.0/(lineRad*lineRad)*dist;
+                fp_t filt = 1.0f / lineRad - 1.0f / (lineRad * lineRad) * dist;
                 
                 fp_t len = sqrt((p[0] * p[0]) + (p[1] * p[1]));
-                fp_t flo = max((fp_t)(len*2.0*PI)/nr_of_lines, (fp_t)1.0/nr_of_lines);
+                fp_t flo = std::max((fp_t)(len * 2.0f * PI) / nr_of_lines, (fp_t)1.0f / nr_of_lines);
                 fp_t val = filt*flo*lineIntens;
                 f[k + (j * this->x_res)] += ext_colour_t(val, val, val);
                 sum += val;
@@ -224,15 +224,15 @@ fp_t camera::generate_flare_lines(ext_colour_t *const f)
 template<typename T>
 void camera::apply_point_spreading_function(T p, ext_colour_t *const f)
 {
-    const fp_t pixdeg = (atan(-this->x_m / this->t) * (fp_t)2.0) / this->x_res;
+    const fp_t pixdeg = (atan(-this->x_m / this->t) * 2.0f) / this->x_res;
 
-    for (int j = 0; j < (int)this->y_res; j++)
+    for (int j = 0; j < static_cast<int>(this->y_res); ++j)
     {
-        for (int i = 0; i < (int)this->x_res; i++)
+        for (int i = 0; i < static_cast<int>(this->x_res); ++i)
         {
             // perform 2D trapezoidal integration
-            fp_t w = (fp_t)i-this->x_res/2.0, x=w+1.0;
-            fp_t y = (fp_t)j-this->y_res/2.0, z=y+1.0;
+            fp_t w = (fp_t)i - this->x_res / 2.0f, x = w + 1.0f;
+            fp_t y = (fp_t)j - this->y_res / 2.0f, z = y + 1.0f;
       
             // determine four corners, find ratio
             fp_t max, min;
@@ -306,7 +306,7 @@ void camera::apply_point_spreading_function(T p, ext_colour_t *const f)
 void camera::generate_glare_filter(ext_colour_t **gf, const light_level_t ll)
 {
 //    fp_t pixdeg = atan(-this->x_m / this->t) * (fp_t)2.0;
-//    cout << "angle : " << pixdeg * (180.0/PI) << endl;
+//    std::cout << "angle : " << pixdeg * (180.0/PI) << std::endl;
 
     (*gf) = new ext_colour_t[this->x_res * this->y_res * 3];
 
@@ -427,8 +427,8 @@ void camera::generate_glare_filter(ext_colour_t **gf, const light_level_t ll)
     {
         mul.b = (amountScattered * this->x_res * this->y_res)/sum.b;
     }
-    cout << "Sum = " << sum.r << ", " << sum.g << ", " << sum.b << endl;
-    cout << "Mul = " << mul.r << "," << mul.g << "," << mul.b << endl;
+    std::cout << "Sum = " << sum.r << ", " << sum.g << ", " << sum.b << std::endl;
+    std::cout << "Mul = " << mul.r << "," << mul.g << "," << mul.b << std::endl;
 
     for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
     {
@@ -440,7 +440,7 @@ void camera::generate_glare_filter(ext_colour_t **gf, const light_level_t ll)
 
 
     
-//    cout << "dumping glare filter" << endl;
+//    std::cout << "dumping glare filter" << std::endl;
 //    char * tga_data = new char [this->x_res * this->y_res * 3];
 //    for (int i = 0; i < (int)this->x_res; i++)
 //    {
@@ -455,7 +455,7 @@ void camera::generate_glare_filter(ext_colour_t **gf, const light_level_t ll)
 //    /* Open output file */
 //    ostringstream file_name(ostringstream::out);
 //    file_name <<"glare_filter" << ".tga";
-//    ofstream tga_output(file_name.str().c_str(), ios::out);
+//    std::ofstream tga_output(file_name.str().c_str(), ios::out);
 //    
 //    /* Write the header to the tga file */
 //    tga_output << (char)0;
@@ -535,9 +535,9 @@ void camera::draw_circle(fp_t *o, const int x, const int y, const fp_t s, const 
         {
             const fp_t x_dist_sq    = s_sq - y_dist_sq;
             const fp_t x_dist       = sqrt(x_dist_sq);
-            const int  x_pixel_dist = (int)x_dist;
-            const int  min_x        = max(x - x_pixel_dist, 0);
-            const int  max_x        = min(x + x_pixel_dist, (int)picture_resolution);
+            const int  x_pixel_dist = static_cast<int>(x_dist);
+            const int  min_x        = std::max(x - x_pixel_dist, 0);
+            const int  max_x        = std::min(x + x_pixel_dist, picture_resolution);
             
             for (int i = min_x; i < max_x; i++)
             {
@@ -571,7 +571,7 @@ void camera::generate_temporal_psf(const fp_t y)
     /* Calculate the pupil diameter */
     const fp_t p        = (fp_t)4.9 - ((fp_t)3.0 * tanh((fp_t)0.4 * (log(y) + (fp_t)1.0)));
     const fp_t p_max    = 9.0;
-    cout << "pupil: " << p << endl;
+    std::cout << "pupil: " << p << std::endl;
     
     const int noise_octaves = 3;
     fp_t frequency  = 1.0;
@@ -613,14 +613,14 @@ void camera::generate_temporal_psf(const fp_t y)
     	frequency *= 2.0;
     	amplitude *= fall_off;
     }
-//    cout << "noise: " << noise << endl;
+//    std::cout << "noise: " << noise << std::endl;
 
     const fp_t pixel_scale  = pixel_resolution;//(p_max * 10.0e-3) / picture_resolution_y;
-    cout << "pixel_scale: " << pixel_scale << endl;
+    std::cout << "pixel_scale: " << pixel_scale << std::endl;
 
     const fp_t pupil_scale  = (fp_t)0.5e-3 / pixel_resolution;//(min(-this->x_m, -this->y_m) / p_max) * (picture_resolution_y / (-2.0 * this->y_m));
     const fp_t p_hippus     = (p + (noise * (p_max / p) * sqrt((fp_t)1.0 - (p / p_max)))) * pupil_scale;
-//    cout << "hippus: " << p_hippus << endl;
+//    std::cout << "hippus: " << p_hippus << std::endl;
     
     /* Draw the pupil */
     memset(&image_componants[0],  0, (picture_resolution * picture_resolution_y * sizeof(fp_t)));
@@ -748,8 +748,8 @@ void camera::generate_temporal_psf(const fp_t y)
     const int downsampled_resolution = 1000;
     const int x_samples = (picture_resolution   / downsampled_resolution);
     const int y_samples = (picture_resolution_y / downsampled_resolution);
-    cout << picture_resolution << ", " << picture_resolution_y << endl;
-    cout << x_samples << ", " << y_samples << endl;
+    std::cout << picture_resolution << ", " << picture_resolution_y << std::endl;
+    std::cout << x_samples << ", " << y_samples << std::endl;
     
     int image_addr = 0;
     for (int j = 0; j < downsampled_resolution; j++)
@@ -771,22 +771,22 @@ void camera::generate_temporal_psf(const fp_t y)
 
 #if 1
 {
-    cout << "dumping complete image" << endl;
+    std::cout << "dumping complete image" << std::endl;
     char * tga_data = new char [downsampled_resolution * downsampled_resolution * 3];
     for (int i = 0; i < (int)downsampled_resolution; i++)
     {
         for (int j = 0; j < (int)downsampled_resolution; j++)
         {
-            tga_data[((i + (j * downsampled_resolution)) * 3)    ] = (char)min(max(image_componants[complete_image_offset + (i + (j * downsampled_resolution))] * (fp_t)255.0, (fp_t)0.0), (fp_t)255.0);
-            tga_data[((i + (j * downsampled_resolution)) * 3) + 1] = (char)min(max(image_componants[complete_image_offset + (i + (j * downsampled_resolution))] * (fp_t)255.0, (fp_t)0.0), (fp_t)255.0);
-            tga_data[((i + (j * downsampled_resolution)) * 3) + 2] = (char)min(max(image_componants[complete_image_offset + (i + (j * downsampled_resolution))] * (fp_t)255.0, (fp_t)0.0), (fp_t)255.0);
+            tga_data[((i + (j * downsampled_resolution)) * 3)    ] = static_cast<char>(std::min(std::max(image_componants[complete_image_offset + (i + (j * downsampled_resolution))] * 255.0f, 0.0f), 255.0f));
+            tga_data[((i + (j * downsampled_resolution)) * 3) + 1] = static_cast<char>(std::min(std::max(image_componants[complete_image_offset + (i + (j * downsampled_resolution))] * 255.0f, 0.0f), 255.0f));
+            tga_data[((i + (j * downsampled_resolution)) * 3) + 2] = static_cast<char>(std::min(std::max(image_componants[complete_image_offset + (i + (j * downsampled_resolution))] * 255.0f, 0.0f), 255.0f));
         }
     }
     
     /* Open output file */
-    ostringstream file_name(ostringstream::out);
+    std::ostringstream file_name(std::ostringstream::out);
     file_name <<"complete_image" << ".tga";
-    ofstream tga_output(file_name.str().c_str(), ios::out);
+    std::ofstream tga_output(file_name.str().c_str(), std::ios::out);
     
     /* Write the header to the tga file */
     tga_output << (char)0;
@@ -833,8 +833,8 @@ void camera::generate_temporal_psf(const fp_t y)
 //    const fp_t pupil_to_retina_dist = (fp_t)24.0e-3;
 //    const fp_t lambda               = (fp_t)575.0e-9;
     const fp_t lambda_d             = 5.0e-4;//lambda * pupil_to_retina_dist;
-    cout << "lambda_d          : " << lambda_d           << endl;
-    cout << "image_scale_factor: " << image_scale_factor << endl;
+    std::cout << "lambda_d          : " << lambda_d           << std::endl;
+    std::cout << "image_scale_factor: " << image_scale_factor << std::endl;
     for (int j = 0; j < (int)downsampled_resolution; j++)
     {
         const fp_t yq = ((fp_t)j - ((fp_t)downsampled_resolution * (fp_t)0.5)) * (5.0 * pixel_scale) * (fp_t)0.5;
@@ -845,8 +845,8 @@ void camera::generate_temporal_psf(const fp_t y)
             
             const int image_addr = i + (downsampled_resolution * j);
 
-            const int xp_addr    = max(min((int)((xp / (5.0 * pixel_scale)) + ((fp_t)downsampled_resolution * (fp_t)0.5)), (int)downsampled_resolution - 1), 0);
-            const int yq_addr    = max(min((int)((yq / (5.0 * pixel_scale)) + ((fp_t)downsampled_resolution * (fp_t)0.5)), (int)downsampled_resolution - 1), 0);
+            const int xp_addr    = std::max(std::min((int)((xp / (5.0f * pixel_scale)) + ((fp_t)downsampled_resolution * 0.5f)), (int)downsampled_resolution - 1), 0);
+            const int yq_addr    = std::max(std::min((int)((yq / (5.0f * pixel_scale)) + ((fp_t)downsampled_resolution * 0.5f)), (int)downsampled_resolution - 1), 0);
             const int pupil_addr = complete_image_offset + xp_addr + (downsampled_resolution * yq_addr);
 
             image_in[image_addr][0] = cos(exponential) * image_componants[pupil_addr];
@@ -856,22 +856,22 @@ void camera::generate_temporal_psf(const fp_t y)
 
 #if 1
 {
-    cout << "dumping pre fft image" << endl;
+    std::cout << "dumping pre fft image" << std::endl;
     char * tga_data = new char [downsampled_resolution * downsampled_resolution * 3];
     for (int i = 0; i < (int)downsampled_resolution; i++)
     {
         for (int j = 0; j < (int)downsampled_resolution; j++)
         {
-            tga_data[((i + (j * downsampled_resolution)) * 3)    ] = (char)min(max(image_in[i + (j * downsampled_resolution)][0] * (fp_t)255.0, (fp_t)0.0), (fp_t)255.0);
-            tga_data[((i + (j * downsampled_resolution)) * 3) + 1] = (char)min(max(image_in[i + (j * downsampled_resolution)][0] * (fp_t)255.0, (fp_t)0.0), (fp_t)255.0);
-            tga_data[((i + (j * downsampled_resolution)) * 3) + 2] = (char)min(max(image_in[i + (j * downsampled_resolution)][0] * (fp_t)255.0, (fp_t)0.0), (fp_t)255.0);
+            tga_data[((i + (j * downsampled_resolution)) * 3)    ] = static_cast<char>(std::min(std::max(image_in[i + (j * downsampled_resolution)][0] * 255.0f, 0.0f), 255.0f));
+            tga_data[((i + (j * downsampled_resolution)) * 3) + 1] = static_cast<char>(std::min(std::max(image_in[i + (j * downsampled_resolution)][0] * 255.0f, 0.0f), 255.0f));
+            tga_data[((i + (j * downsampled_resolution)) * 3) + 2] = static_cast<char>(std::min(std::max(image_in[i + (j * downsampled_resolution)][0] * 255.0f, 0.0f), 255.0f));
         }
     }
     
     /* Open output file */
-    ostringstream file_name(ostringstream::out);
+    std::ostringstream file_name(std::ostringstream::out);
     file_name <<"pre_fft_image" << ".tga";
-    ofstream tga_output(file_name.str().c_str(), ios::out);
+    std::ofstream tga_output(file_name.str().c_str(), std::ios::out);
     
     /* Write the header to the tga file */
     tga_output << (char)0;
@@ -919,7 +919,7 @@ void camera::generate_temporal_psf(const fp_t y)
     /* FFT, take square magnitude and scale */    
     fftwf_execute(image_p);
 
-    const fp_t fft_scale = (fp_t)1.0;// / (lambda_d * lambda_d);
+    const fp_t fft_scale = 1.0f;// / (lambda_d * lambda_d);
     for (int i = 0; i < (int)(downsampled_resolution * downsampled_resolution); i++)
     {
         image_in[i][0] /= (downsampled_resolution * downsampled_resolution);
@@ -929,22 +929,22 @@ void camera::generate_temporal_psf(const fp_t y)
 
 #if 1
 {
-    cout << "dumping fft image" << endl;
+    std::cout << "dumping fft image" << std::endl;
     char * tga_data = new char [downsampled_resolution * downsampled_resolution * 3];
     for (int i = 0; i < (int)downsampled_resolution; i++)
     {
         for (int j = 0; j < (int)downsampled_resolution; j++)
         {
-            tga_data[((i + (j * downsampled_resolution)) * 3)    ] = (char)min(max(image_in[i + (j * downsampled_resolution)][0] / (fp_t)100.0, (fp_t)0.0), (fp_t)255.0);
-            tga_data[((i + (j * downsampled_resolution)) * 3) + 1] = (char)min(max(image_in[i + (j * downsampled_resolution)][0] / (fp_t)100.0, (fp_t)0.0), (fp_t)255.0);
-            tga_data[((i + (j * downsampled_resolution)) * 3) + 2] = (char)min(max(image_in[i + (j * downsampled_resolution)][0] / (fp_t)100.0, (fp_t)0.0), (fp_t)255.0);
+            tga_data[((i + (j * downsampled_resolution)) * 3)    ] = static_cast<char>(std::min(std::max(image_in[i + (j * downsampled_resolution)][0] / 100.0f, 0.0f), 255.0f));
+            tga_data[((i + (j * downsampled_resolution)) * 3) + 1] = static_cast<char>(std::min(std::max(image_in[i + (j * downsampled_resolution)][0] / 100.0f, 0.0f), 255.0f));
+            tga_data[((i + (j * downsampled_resolution)) * 3) + 2] = static_cast<char>(std::min(std::max(image_in[i + (j * downsampled_resolution)][0] / 100.0f, 0.0f), 255.0f));
         }
     }
     
     /* Open output file */
-    ostringstream file_name(ostringstream::out);
+    std::ostringstream file_name(std::ostringstream::out);
     file_name <<"fft_image" << ".tga";
-    ofstream tga_output(file_name.str().c_str(), ios::out);
+    std::ofstream tga_output(file_name.str().c_str(), std::ios::out);
     
     /* Write the header to the tga file */
     tga_output << (char)0;
@@ -980,59 +980,59 @@ void camera::generate_temporal_psf(const fp_t y)
     memset(&this->temporal_glare_filter[0],  0, (downsampled_resolution * downsampled_resolution * sizeof(ext_colour_t)));
     
     /* CIE conversion factors / 4 for bi-linear filtering */
-    static const fp_t cie_xf[] = { (fp_t)(  14.0 / (4.0 * 106836.0)),  (fp_t)(   42.0 / (4.0 * 106836.0)), (fp_t)(  143.0 / (4.0 * 106836.0)), (fp_t)(  435.0 / (4.0 * 106836.0)), (fp_t)(1344.0 / (4.0 * 106836.0)),  
-                                   (fp_t)(2839.0 / (4.0 * 106836.0)),  (fp_t)( 3483.0 / (4.0 * 106836.0)), (fp_t)( 3362.0 / (4.0 * 106836.0)), (fp_t)( 2908.0 / (4.0 * 106836.0)), (fp_t)(1954.0 / (4.0 * 106836.0)), 
-                                   (fp_t)( 956.0 / (4.0 * 106836.0)),  (fp_t)(  320.0 / (4.0 * 106836.0)), (fp_t)(   49.0 / (4.0 * 106836.0)), (fp_t)(   93.0 / (4.0 * 106836.0)), (fp_t)( 633.0 / (4.0 * 106836.0)),  
-                                   (fp_t)(1655.0 / (4.0 * 106836.0)),  (fp_t)( 2904.0 / (4.0 * 106836.0)), (fp_t)( 4334.0 / (4.0 * 106836.0)), (fp_t)( 5945.0 / (4.0 * 106836.0)), (fp_t)(7621.0 / (4.0 * 106836.0)), 
-                                   (fp_t)(9163.0 / (4.0 * 106836.0)),  (fp_t)(10263.0 / (4.0 * 106836.0)), (fp_t)(10622.0 / (4.0 * 106836.0)), (fp_t)(10026.0 / (4.0 * 106836.0)), (fp_t)(8544.0 / (4.0 * 106836.0)),  
-                                   (fp_t)(6424.0 / (4.0 * 106836.0)),  (fp_t)( 4479.0 / (4.0 * 106836.0)), (fp_t)( 2835.0 / (4.0 * 106836.0)), (fp_t)( 1649.0 / (4.0 * 106836.0)), (fp_t)( 874.0 / (4.0 * 106836.0)),  
-                                   (fp_t)( 468.0 / (4.0 * 106836.0)),  (fp_t)(  227.0 / (4.0 * 106836.0)), (fp_t)(  114.0 / (4.0 * 106836.0)), (fp_t)(   58.0 / (4.0 * 106836.0)), (fp_t)(  29.0 / (4.0 * 106836.0)),  
-                                   (fp_t)(  14.0 / (4.0 * 106836.0)),  (fp_t)(    7.0 / (4.0 * 106836.0)), (fp_t)(    3.0 / (4.0 * 106836.0)), (fp_t)(    2.0 / (4.0 * 106836.0)), (fp_t)(   1.0 / (4.0 * 106836.0)), (fp_t)(0.0 / (4.0 * 106836.0)) };//106836L
+    static const fp_t cie_xf[] = {   14.0f / (4.0f * 106836.0f),     42.0f / (4.0f * 106836.0f),   143.0f / (4.0f * 106836.0f),   435.0f / (4.0f * 106836.0f), 1344.0f / (4.0f * 106836.0f),  
+                                   2839.0f / (4.0f * 106836.0f),   3483.0f / (4.0f * 106836.0f),  3362.0f / (4.0f * 106836.0f),  2908.0f / (4.0f * 106836.0f), 1954.0f / (4.0f * 106836.0f), 
+                                    956.0f / (4.0f * 106836.0f),    320.0f / (4.0f * 106836.0f),    49.0f / (4.0f * 106836.0f),    93.0f / (4.0f * 106836.0f),  633.0f / (4.0f * 106836.0f),  
+                                   1655.0f / (4.0f * 106836.0f),   2904.0f / (4.0f * 106836.0f),  4334.0f / (4.0f * 106836.0f),  5945.0f / (4.0f * 106836.0f), 7621.0f / (4.0f * 106836.0f), 
+                                   9163.0f / (4.0f * 106836.0f),  10263.0f / (4.0f * 106836.0f), 10622.0f / (4.0f * 106836.0f), 10026.0f / (4.0f * 106836.0f), 8544.0f / (4.0f * 106836.0f),  
+                                   6424.0f / (4.0f * 106836.0f),   4479.0f / (4.0f * 106836.0f),  2835.0f / (4.0f * 106836.0f),  1649.0f / (4.0f * 106836.0f),  874.0f / (4.0f * 106836.0f),  
+                                    468.0f / (4.0f * 106836.0f),    227.0f / (4.0f * 106836.0f),   114.0f / (4.0f * 106836.0f),    58.0f / (4.0f * 106836.0f),   29.0f / (4.0f * 106836.0f),  
+                                     14.0f / (4.0f * 106836.0f),      7.0f / (4.0f * 106836.0f),     3.0f / (4.0f * 106836.0f),     2.0f / (4.0f * 106836.0f),    1.0f / (4.0f * 106836.0f), 0.0f / (4.0f * 106836.0f) };//106836L
 
-    static const fp_t cie_yf[] = { (fp_t)(   0.0 / (4.0 * 106856.0)),  (fp_t)(   1.0 / (4.0 * 106856.0)),  (fp_t)(   4.0 / (4.0 * 106856.0)),  (fp_t)(  12.0 / (4.0 * 106856.0)),  (fp_t)(  40.0 / (4.0 * 106856.0)),
-                                   (fp_t)( 116.0 / (4.0 * 106856.0)),  (fp_t)( 230.0 / (4.0 * 106856.0)),  (fp_t)( 380.0 / (4.0 * 106856.0)),  (fp_t)( 600.0 / (4.0 * 106856.0)),  (fp_t)( 910.0 / (4.0 * 106856.0)),
-                                   (fp_t)(1390.0 / (4.0 * 106856.0)),  (fp_t)(2080.0 / (4.0 * 106856.0)),  (fp_t)(3230.0 / (4.0 * 106856.0)),  (fp_t)(5030.0 / (4.0 * 106856.0)),  (fp_t)(7100.0 / (4.0 * 106856.0)),
-                                   (fp_t)(8620.0 / (4.0 * 106856.0)),  (fp_t)(9540.0 / (4.0 * 106856.0)),  (fp_t)(9950.0 / (4.0 * 106856.0)),  (fp_t)(9950.0 / (4.0 * 106856.0)),  (fp_t)(9520.0 / (4.0 * 106856.0)),
-                                   (fp_t)(8700.0 / (4.0 * 106856.0)),  (fp_t)(7570.0 / (4.0 * 106856.0)),  (fp_t)(6310.0 / (4.0 * 106856.0)),  (fp_t)(5030.0 / (4.0 * 106856.0)),  (fp_t)(3810.0 / (4.0 * 106856.0)),  
-                                   (fp_t)(2650.0 / (4.0 * 106856.0)),  (fp_t)(1750.0 / (4.0 * 106856.0)),  (fp_t)(1070.0 / (4.0 * 106856.0)),  (fp_t)( 610.0 / (4.0 * 106856.0)),  (fp_t)( 320.0 / (4.0 * 106856.0)),
-                                   (fp_t)( 170.0 / (4.0 * 106856.0)),  (fp_t)(  82.0 / (4.0 * 106856.0)),  (fp_t)(  41.0 / (4.0 * 106856.0)),  (fp_t)(  21.0 / (4.0 * 106856.0)),  (fp_t)(  10.0 / (4.0 * 106856.0)),     
-                                   (fp_t)(   5.0 / (4.0 * 106856.0)),  (fp_t)(   2.0 / (4.0 * 106856.0)),  (fp_t)(   1.0 / (4.0 * 106856.0)),  (fp_t)(   1.0 / (4.0 * 106856.0)),  (fp_t)(   0.0 / (4.0 * 106856.0)),  (fp_t)(0.0 / (4.0 * 106856.0)) };//106856L
+    static const fp_t cie_yf[] = {    0.0f / (4.0f * 106856.0f),     1.0f / (4.0f * 106856.0f),     4.0f / (4.0f * 106856.0f),    12.0f / (4.0f * 106856.0f),    40.0f / (4.0f * 106856.0f),
+                                    116.0f / (4.0f * 106856.0f),   230.0f / (4.0f * 106856.0f),   380.0f / (4.0f * 106856.0f),   600.0f / (4.0f * 106856.0f),   910.0f / (4.0f * 106856.0f),
+                                   1390.0f / (4.0f * 106856.0f),  2080.0f / (4.0f * 106856.0f),  3230.0f / (4.0f * 106856.0f),  5030.0f / (4.0f * 106856.0f),  7100.0f / (4.0f * 106856.0f),
+                                   8620.0f / (4.0f * 106856.0f),  9540.0f / (4.0f * 106856.0f),  9950.0f / (4.0f * 106856.0f),  9950.0f / (4.0f * 106856.0f),  9520.0f / (4.0f * 106856.0f),
+                                   8700.0f / (4.0f * 106856.0f),  7570.0f / (4.0f * 106856.0f),  6310.0f / (4.0f * 106856.0f),  5030.0f / (4.0f * 106856.0f),  3810.0f / (4.0f * 106856.0f),  
+                                   2650.0f / (4.0f * 106856.0f),  1750.0f / (4.0f * 106856.0f),  1070.0f / (4.0f * 106856.0f),   610.0f / (4.0f * 106856.0f),   320.0f / (4.0f * 106856.0f),
+                                    170.0f / (4.0f * 106856.0f),    82.0f / (4.0f * 106856.0f),    41.0f / (4.0f * 106856.0f),    21.0f / (4.0f * 106856.0f),    10.0f / (4.0f * 106856.0f),     
+                                      5.0f / (4.0f * 106856.0f),     2.0f / (4.0f * 106856.0f),     1.0f / (4.0f * 106856.0f),     1.0f / (4.0f * 106856.0f),     0.0f / (4.0f * 106856.0f),  0.0f / (4.0f * 106856.0f) };//106856L
 
-    static const fp_t cie_zf[] = { (fp_t)(   65.0 / (4.0 * 106836.0)), (fp_t)(  201.0 / (4.0 * 106836.0)), (fp_t)(  679.0 / (4.0 * 106836.0)), (fp_t)( 2074.0 / (4.0 * 106836.0)), (fp_t)( 6456.0 / (4.0 * 106836.0)), 
-                                   (fp_t)(13856.0 / (4.0 * 106836.0)), (fp_t)(17471.0 / (4.0 * 106836.0)), (fp_t)(17721.0 / (4.0 * 106836.0)), (fp_t)(16692.0 / (4.0 * 106836.0)), (fp_t)(12876.0 / (4.0 * 106836.0)),
-                                   (fp_t)( 8130.0 / (4.0 * 106836.0)), (fp_t)( 4652.0 / (4.0 * 106836.0)), (fp_t)( 2720.0 / (4.0 * 106836.0)), (fp_t)( 1582.0 / (4.0 * 106836.0)), (fp_t)(  782.0 / (4.0 * 106836.0)), 
-                                   (fp_t)(  422.0 / (4.0 * 106836.0)), (fp_t)(  203.0 / (4.0 * 106836.0)), (fp_t)(   87.0 / (4.0 * 106836.0)), (fp_t)(   39.0 / (4.0 * 106836.0)), (fp_t)(   21.0 / (4.0 * 106836.0)),
-                                   (fp_t)(   17.0 / (4.0 * 106836.0)), (fp_t)(   11.0 / (4.0 * 106836.0)), (fp_t)(    8.0 / (4.0 * 106836.0)), (fp_t)(    3.0 / (4.0 * 106836.0)), (fp_t)(    2.0 / (4.0 * 106836.0)),     
-                                   (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)),
-                                   (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)),     
-                                   (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(    0.0 / (4.0 * 106836.0)), (fp_t)(0.0 / (4.0 * 106836.0)) };//106770L
+    static const fp_t cie_zf[] = {    65.0f / (4.0f * 106836.0f),   201.0f / (4.0f * 106836.0f),   679.0f / (4.0f * 106836.0f),  2074.0f / (4.0f * 106836.0f),  6456.0f / (4.0f * 106836.0f), 
+                                   13856.0f / (4.0f * 106836.0f), 17471.0f / (4.0f * 106836.0f), 17721.0f / (4.0f * 106836.0f), 16692.0f / (4.0f * 106836.0f), 12876.0f / (4.0f * 106836.0f),
+                                    8130.0f / (4.0f * 106836.0f),  4652.0f / (4.0f * 106836.0f),  2720.0f / (4.0f * 106836.0f),  1582.0f / (4.0f * 106836.0f),   782.0f / (4.0f * 106836.0f), 
+                                     422.0f / (4.0f * 106836.0f),   203.0f / (4.0f * 106836.0f),    87.0f / (4.0f * 106836.0f),    39.0f / (4.0f * 106836.0f),    21.0f / (4.0f * 106836.0f),
+                                      17.0f / (4.0f * 106836.0f),    11.0f / (4.0f * 106836.0f),     8.0f / (4.0f * 106836.0f),     3.0f / (4.0f * 106836.0f),     2.0f / (4.0f * 106836.0f),     
+                                       0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),
+                                       0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),     
+                                       0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f),     0.0f / (4.0f * 106836.0f), 0.0f / (4.0f * 106836.0f) };//106770L
 
     for (int j = 0; j < (int)downsampled_resolution; j++)
     {
         for (int i = 0; i < (int)downsampled_resolution; i++)
         {
-            const fp_t x_o  = (fp_t)i - (downsampled_resolution * (fp_t)0.5);
-            const fp_t y_o  = (fp_t)j - (downsampled_resolution * (fp_t)0.5);
-            fp_t lambda_i   = (fp_t)380.0;
+            const fp_t x_o  = (fp_t)i - (downsampled_resolution * 0.5f);
+            const fp_t y_o  = (fp_t)j - (downsampled_resolution * 0.5f);
+            fp_t lambda_i   = 380.0f;
 
             for (int f = 0; f < 41; f++)
             {
                 /* X, Y co-ordinate of the frequency */
                 const fp_t scale    = (fp_t)575.0 / lambda_i;
-                const fp_t x_i      = min(max((fp_t)((x_o * scale) + ((fp_t)downsampled_resolution * (fp_t)0.5)), (fp_t)0.0), (fp_t)(downsampled_resolution - 1.0));
-                const fp_t y_i      = min(max((fp_t)((y_o * scale) + ((fp_t)downsampled_resolution * (fp_t)0.5)), (fp_t)0.0), (fp_t)(downsampled_resolution - 1.0));
+                const fp_t x_i      = std::min(std::max((fp_t)((x_o * scale) + ((fp_t)downsampled_resolution * 0.5f)), 0.0f), (fp_t)(downsampled_resolution - 1.0f));
+                const fp_t y_i      = std::min(std::max((fp_t)((y_o * scale) + ((fp_t)downsampled_resolution * 0.5f)), 0.0f), (fp_t)(downsampled_resolution - 1.0f));
                 
                 /* Bi-linear interpolation co-ordinates and weights */
-                const int x_index   = max((int)0, min((int)x_i,    (int)(downsampled_resolution - 1)));
-                const int xx_index  = max((int)0, min(x_index + 1, (int)(downsampled_resolution - 1)));
+                const int x_index   = std::max((int)0, std::min((int)x_i,    (int)(downsampled_resolution - 1)));
+                const int xx_index  = std::max((int)0, std::min(x_index + 1, (int)(downsampled_resolution - 1)));
     
-                const int y_index   = max((int)0, min((int)y_i,    (int)(downsampled_resolution - 1)));
-                const int yy_index  = max((int)0, min(y_index + 1, (int)(downsampled_resolution - 1)));
+                const int y_index   = std::max((int)0, std::min((int)y_i,    (int)(downsampled_resolution - 1)));
+                const int yy_index  = std::max((int)0, std::min(y_index + 1, (int)(downsampled_resolution - 1)));
 
                 const fp_t x_alpha      = x_i - (fp_t)x_index;
                 const fp_t y_alpha      = y_i - (fp_t)y_index;
-                const fp_t m_x_alpha    = (fp_t)1.0 - x_alpha;
-                const fp_t m_y_alpha    = (fp_t)1.0 - y_alpha;
+                const fp_t m_x_alpha    = 1.0f - x_alpha;
+                const fp_t m_y_alpha    = 1.0f - y_alpha;
                 const fp_t x_y_alpha    = m_x_alpha * m_y_alpha;
                 const fp_t xx_y_alpha   =   x_alpha * m_y_alpha;
                 const fp_t x_yy_alpha   = m_x_alpha *   y_alpha;
@@ -1055,7 +1055,7 @@ void camera::generate_temporal_psf(const fp_t y)
                 this->temporal_glare_filter[output_addr].g += xx_yy_alpha * cie_yf[f] * image_in[xx_index + (yy_index * downsampled_resolution)][0];
                 this->temporal_glare_filter[output_addr].b += xx_yy_alpha * cie_zf[f] * image_in[xx_index + (yy_index * downsampled_resolution)][0];
                 
-                lambda_i += (fp_t)((770.0 - 380.0) / 40.0);
+                lambda_i += ((770.0f - 380.0f) / 40.0f);
             }
         }
     }
@@ -1064,22 +1064,22 @@ void camera::generate_temporal_psf(const fp_t y)
 
 #if 1
 {
-    cout << "dumping rgb spectral image" << endl;
+    std::cout << "dumping rgb spectral image" << std::endl;
     char * tga_data = new char [downsampled_resolution * downsampled_resolution * 3];
     for (int i = 0; i < (int)downsampled_resolution; i++)
     {
         for (int j = 0; j < (int)downsampled_resolution; j++)
         {
-            tga_data[((i + (j * downsampled_resolution)) * 3)    ] = (char)min(max(this->temporal_glare_filter[i + (j * downsampled_resolution)].b / (fp_t)25500.0, (fp_t)0.0), (fp_t)255.0);
-            tga_data[((i + (j * downsampled_resolution)) * 3) + 1] = (char)min(max(this->temporal_glare_filter[i + (j * downsampled_resolution)].g / (fp_t)25500.0, (fp_t)0.0), (fp_t)255.0);
-            tga_data[((i + (j * downsampled_resolution)) * 3) + 2] = (char)min(max(this->temporal_glare_filter[i + (j * downsampled_resolution)].r / (fp_t)25500.0, (fp_t)0.0), (fp_t)255.0);
+            tga_data[((i + (j * downsampled_resolution)) * 3)    ] = static_cast<char>(std::min(std::max(this->temporal_glare_filter[i + (j * downsampled_resolution)].b / 25500.0f, 0.0f), 255.0f));
+            tga_data[((i + (j * downsampled_resolution)) * 3) + 1] = static_cast<char>(std::min(std::max(this->temporal_glare_filter[i + (j * downsampled_resolution)].g / 25500.0f, 0.0f), 255.0f));
+            tga_data[((i + (j * downsampled_resolution)) * 3) + 2] = static_cast<char>(std::min(std::max(this->temporal_glare_filter[i + (j * downsampled_resolution)].r / 25500.0f, 0.0f), 255.0f));
         }
     }
     
     /* Open output file */
-    ostringstream file_name(ostringstream::out);
+    std::ostringstream file_name(std::ostringstream::out);
     file_name <<"rgb_spectral_image" << ".tga";
-    ofstream tga_output(file_name.str().c_str(), ios::out);
+    std::ofstream tga_output(file_name.str().c_str(), std::ios::out);
     
     /* Write the header to the tga file */
     tga_output << (char)0;
@@ -1130,33 +1130,33 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
     static const fp_t vb[3] = { 0.01477, 0.497,  0.631  };
     
     /* Convert to CIE Yxy */
-    fp_t Yi     = (fp_t)0.0;
-    fp_t maxY   = (fp_t)0.0;
-    fp_t rgbAvg = (fp_t)0.0;
+    fp_t Yi     = 0.0f;
+    fp_t maxY   = 0.0f;
+    fp_t rgbAvg = 0.0f;
     int numpix  = 0;
     for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
     {
-        this->image[i] /= (fp_t)255.0;
+        this->image[i] /= 255.0f;
 
         /* Find average rgb value for average tone mapper */
         if (tone_map == tone_mapping_mode_t::global_exposure)
         {
-            rgbAvg += (this->image[i].r + this->image[i].g + this->image[i].b) * (fp_t)(1.0 / 3.0);
+            rgbAvg += (this->image[i].r + this->image[i].g + this->image[i].b) * (1.0f / 3.0f);
         }
 
         /* Convert to CIE xyz */
         ext_colour_t xyz;
-        xyz.r = (fp_t)683.0 * ((xb[0] * this->image[i].r) + (xb[1] * this->image[i].g) + (xb[2] * this->image[i].b));
-        xyz.g = (fp_t)683.0 * ((yb[0] * this->image[i].r) + (yb[1] * this->image[i].g) + (yb[2] * this->image[i].b));
-        xyz.b = (fp_t)683.0 * ((zb[0] * this->image[i].r) + (zb[1] * this->image[i].g) + (zb[2] * this->image[i].b));
-        if (xyz.g < (fp_t)3.18e-7)
+        xyz.r = 683.0f * ((xb[0] * this->image[i].r) + (xb[1] * this->image[i].g) + (xb[2] * this->image[i].b));
+        xyz.g = 683.0f * ((yb[0] * this->image[i].r) + (yb[1] * this->image[i].g) + (yb[2] * this->image[i].b));
+        xyz.b = 683.0f * ((zb[0] * this->image[i].r) + (zb[1] * this->image[i].g) + (zb[2] * this->image[i].b));
+        if (xyz.g < 3.18e-7f)
         {
-            xyz.g = (fp_t)3.18e-7;
+            xyz.g = 3.18e-7f;
         }
         else
         {
             numpix++;
-            maxY = max(maxY, xyz.g);
+            maxY = std::max(maxY, xyz.g);
             Yi += log10(xyz.g);
         }
 
@@ -1170,23 +1170,23 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         {
             fp_t s;
             const fp_t log10_Y = log10(xyz.g);
-            if (log10_Y < (fp_t)-2.0)
+            if (log10_Y < -2.0f)
             {
-                s = (fp_t)0.0;
+                s = 0.0f;
             }
-            else if (log10_Y < (fp_t)0.6)
+            else if (log10_Y < 0.6f)
             {
-                const fp_t scaled_log10_y       = (log10_Y + (fp_t)2.0) / (fp_t)2.6;
+                const fp_t scaled_log10_y       = (log10_Y + 2.0f) / 2.6f;
                 const fp_t sq_scaled_log10_y    = scaled_log10_y * scaled_log10_y;
-                s = ((fp_t)3.0 * sq_scaled_log10_y) -  ((fp_t)2.0 * scaled_log10_y * sq_scaled_log10_y);
+                s = (3.0f * sq_scaled_log10_y) -  (2.0f * scaled_log10_y * sq_scaled_log10_y);
             }
             else
             {
-                s = (fp_t)1.0;
+                s = 1.0f;
             }
 
             /* Scotopic luminance */
-            const fp_t V = (fp_t)1700.0 * ((vb[0] * this->image[i].r) + (vb[1] * this->image[i].g) + (vb[2] * this->image[i].b));
+            const fp_t V = 1700.0f * ((vb[0] * this->image[i].r) + (vb[1] * this->image[i].g) + (vb[2] * this->image[i].b));
     
             x     = (((fp_t)1.0 - s) * xw) + (s * (x + xw - (fp_t)(1.0/3.0)));
             y     = (((fp_t)1.0 - s) * yw) + (s * (y + yw - (fp_t)(1.0/3.0)));
@@ -1264,7 +1264,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
             this->adatption_level = (((fp_t)1.0 - k) * a_cone) + (k * a_rod);
         }
         
-        cout << Yi << " -> " << this->adatption_level << endl;
+        std::cout << Yi << " -> " << this->adatption_level << std::endl;
         Yi = this->adatption_level;
     }
     else
@@ -1323,7 +1323,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
             this->image[i].g *= sf;
             if (maxY)
             {
-                this->image[i].g = (fp_t)1.0 - exp(-this->image[i].g);
+                this->image[i].g = 1.0f - exp(-this->image[i].g);
             }
         }
     }
@@ -1331,10 +1331,10 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
     else if (tone_map == tone_mapping_mode_t::global_avg_luminance)
     {
         /* Map average luminance to 0.5 */
-        fp_t sf = (fp_t)1.0;
+        fp_t sf = 1.0f;
         if (rgbAvg)
         {
-            sf *= key * ((fp_t)0.5 / (rgbAvg * 683.0));
+            sf *= key * (0.5f / (rgbAvg * 683.0f));
         }
 
         for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
@@ -1353,36 +1353,36 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
     }
     else if (tone_map == tone_mapping_mode_t::global_bilateral_filter)
     {
-        const fp_t s_s = (fp_t)0.02 * min(this->x_res, this->y_res);
-        this->bilateral_filter_tone_map((fp_t)0.4, s_s, (fp_t)0.4, s_s);
+        const fp_t s_s = 0.02f * std::min(this->x_res, this->y_res);
+        this->bilateral_filter_tone_map(0.4f, s_s, 0.4f, s_s);
     }
     else if (tone_map == tone_mapping_mode_t::global_ferwerda)
     {
-        const fp_t lda      = (fp_t)800.0;
-        const fp_t log_lda  = log(lda * (fp_t)0.5);
+        const fp_t lda      = 800.0f;
+        const fp_t log_lda  = log(lda * 0.5f);
         const fp_t log_la   = log(Yi);
 
         /* Cone response */
         fp_t tp;
-        if (log_la <= (fp_t)-2.6)
+        if (log_la <= -2.6f)
         {
-            tp = (fp_t)-0.72;
+            tp = -0.72f;
         }
         else if (log_la <= (fp_t)1.9)
         {
-            tp = std::pow((((fp_t)0.249 * log_la) + (fp_t)0.65), (fp_t)2.7) - (fp_t)0.72;
+            tp = std::pow(((0.249f * log_la) + 0.65f), 2.7f) - 0.72f;
         }
         else
         {
-            tp = log_la - (fp_t)1.255;
+            tp = log_la - 1.255f;
         }
-        const fp_t mp   = (log_lda - (fp_t)1.255) / tp;
+        const fp_t mp   = (log_lda - 1.255f) / tp;
 
         /* Rod response */
         fp_t ts;
-        if (log_la <= (fp_t)-3.94)
+        if (log_la <= -3.94f)
         {
-            ts = (fp_t)-2.86;
+            ts = -2.86f;
         }
         else if (log_la < (fp_t)-1.44)
         {
@@ -1412,14 +1412,14 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         {
             const fp_t ldp  = mp * this->image[i].g;
             const fp_t lds  = ms * this->image[i].g;
-            this->image[i].g = ((fp_t)1.0 / lda) * (ldp + (k * lds));
+            this->image[i].g = (1.0f / lda) * (ldp + (k * lds));
         }
     }
     /* No tone mapping */
     else
     {
         /* Remove the k conversion factor */
-        const fp_t sf = (fp_t)1.0 / 683.0;
+        const fp_t sf = 1.0f / 683.0f;
         for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
         {
             this->image[i].g *= sf;
@@ -1434,14 +1434,14 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const fp_t key, co
         fp_t minY2 =  MAX_DIST;
         for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
         {
-            maxY2 = max(maxY2, this->image[i].g);
-            minY2 = min(minY2, this->image[i].g);
+            maxY2 = std::max(maxY2, this->image[i].g);
+            minY2 = std::min(minY2, this->image[i].g);
         }
       
-        if (((minY2 > (fp_t)0.0) || (maxY2 < (fp_t)0.0)) && (minY2 < maxY2))
+        if (((minY2 > 0.0f) || (maxY2 < 0.0f)) && (minY2 < maxY2))
         {
-            const fp_t offset = min(-minY2, (fp_t)0.0);
-            const fp_t scale  = (fp_t)1.0 / (min((fp_t)1.0, maxY2) - max((fp_t)0.0, minY2));
+            const fp_t offset = std::min(-minY2, 0.0f);
+            const fp_t scale  = 1.0f / (std::min(1.0f, maxY2) - std::max(0.0f, minY2));
             for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
             {
                 this->image[i].g = (this->image[i].g + offset) * scale;
@@ -1467,34 +1467,34 @@ camera & camera::gamma_correct(const fp_t gamma)
 {
     for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
     {
-        fp_t r = this->image[i].r / (fp_t)255.0;
-        fp_t g = this->image[i].g / (fp_t)255.0;
-        fp_t b = this->image[i].b / (fp_t)255.0;
+        fp_t r = this->image[i].r / 255.0f;
+        fp_t g = this->image[i].g / 255.0f;
+        fp_t b = this->image[i].b / 255.0f;
 
         /* Saturate */
-        r = min(max(r, (fp_t)0.0), (fp_t)1.0);
-        g = min(max(g, (fp_t)0.0), (fp_t)1.0);
-        b = min(max(b, (fp_t)0.0), (fp_t)1.0);
+        r = std::min(std::max(r, 0.0f), 1.0f);
+        g = std::min(std::max(g, 0.0f), 1.0f);
+        b = std::min(std::max(b, 0.0f), 1.0f);
 
         /* Gamma correct */
-        if (fabs(gamma - (fp_t)2.2) > 0.001)
+        if (fabs(gamma - 2.2f) > 0.001)
         {
             /* regular gamma correction */
-            r = std::pow(r, (fp_t)1.0/gamma);
-            g = std::pow(g, (fp_t)1.0/gamma);
-            b = std::pow(b, (fp_t)1.0/gamma);
+            r = std::pow(r, 1.0f / gamma);
+            g = std::pow(g, 1.0f / gamma);
+            b = std::pow(b, 1.0f / gamma);
         }
-        else if (fabs(gamma - (fp_t)1.0) > 0.001)
+        else if (fabs(gamma - 1.0f) > 0.001)
         {
             /* sRGB standard gamma correction (similar to regular w/2.2) */
-            r = (r <= (fp_t)0.0031308) ? ((fp_t)12.92 * r) : ((fp_t)1.055 * std::pow(r, (fp_t)(1.0 / 2.4)) - (fp_t)0.055);
-            g = (g <= (fp_t)0.0031308) ? ((fp_t)12.92 * g) : ((fp_t)1.055 * std::pow(g, (fp_t)(1.0 / 2.4)) - (fp_t)0.055);
-            b = (b <= (fp_t)0.0031308) ? ((fp_t)12.92 * b) : ((fp_t)1.055 * std::pow(b, (fp_t)(1.0 / 2.4)) - (fp_t)0.055);
+            r = (r <= 0.0031308f) ? (12.92f * r) : (1.055f * std::pow(r, (1.0f / 2.4f)) - 0.055f);
+            g = (g <= 0.0031308f) ? (12.92f * g) : (1.055f * std::pow(g, (1.0f / 2.4f)) - 0.055f);
+            b = (b <= 0.0031308f) ? (12.92f * b) : (1.055f * std::pow(b, (1.0f / 2.4f)) - 0.055f);
         }
 
-        this->image[i].r = r * (fp_t)255.0;
-        this->image[i].g = g * (fp_t)255.0;
-        this->image[i].b = b * (fp_t)255.0;
+        this->image[i].r = r * 255.0f;
+        this->image[i].g = g * 255.0f;
+        this->image[i].b = b * 255.0f;
     }
 
     return *this;
@@ -1508,21 +1508,21 @@ void camera::perform_glare_filter(const fp_t Yi, const fp_t Yw)
     light_level_t current_light_level;
     ext_colour_t *glare_filter;
     ext_colour_t **glare_filter_ptr;
-    if (log10_yi < (fp_t)-2.0)
+    if (log10_yi < -2.0f)
     {
-        cout << "lighting is scotopic" << endl;
+        std::cout << "lighting is scotopic" << std::endl;
         current_light_level = light_level_t::scotopic;
         glare_filter_ptr    = &this->scotopic_glare_filter;
     }
-    else if (log10_yi < (fp_t)0.6)
+    else if (log10_yi < 0.6f)
     {
-        cout << "lighting is mesopic" << endl;
+        std::cout << "lighting is mesopic" << std::endl;
         current_light_level = light_level_t::mesopic;
         glare_filter_ptr    = &this->mesopic_glare_filter;
     }
     else
     {
-        cout << "lighting is photopic" << endl;
+        std::cout << "lighting is photopic" << std::endl;
         current_light_level = light_level_t::photopic;
         glare_filter_ptr    = &this->photopic_glare_filter;
     }
@@ -1635,13 +1635,13 @@ void camera::bilateral_filter_tone_map(const fp_t r_s, const fp_t s_s, const fp_
     fp_t *log_intensity = new fp_t [ this->x_res * this->y_res ];
     fp_t input_max = -MAX_DIST;
     fp_t input_min =  MAX_DIST;
-    for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
+    for (int i = 0; i < static_cast<int>(this->x_res * this->y_res); i++)
     {
-        if (this->image[i].g > (fp_t)3.18e-7)
+        if (this->image[i].g > 3.18e-7f)
         {
             log_intensity[i] = log10(this->image[i].g);
-            input_max = max(input_max, log_intensity[i]);
-            input_min = min(input_min, log_intensity[i]);
+            input_max = std::max(input_max, log_intensity[i]);
+            input_min = std::min(input_min, log_intensity[i]);
         }
     }
 
@@ -1741,45 +1741,45 @@ void camera::bilateral_filter_tone_map(const fp_t r_s, const fp_t s_s, const fp_
             const fp_t z = log_intensity[x + (this->x_res * y)] - input_min;
 
             const fp_t x_addr   = (fp_t)(x) / s_sa + padding_xy;
-            const int x_index   = max(0, min((int)x_addr,   small_width-1));
-            const int xx_index  = max(0, min(x_index+1,     small_width-1));
+            const int x_index   = std::max(0, std::min(static_cast<int>(x_addr),    small_width - 1));
+            const int xx_index  = std::max(0, std::min(x_index + 1,                 small_width - 1));
     
             const fp_t y_addr   = (fp_t)(y) / s_sa + padding_xy;
-            const int y_index   = max(0, min((int)y_addr,   small_height-1));
-            const int yy_index  = max(0, min(y_index+1,     small_height-1));
+            const int y_index   = std::max(0, std::min(static_cast<int>(y_addr),    small_height - 1));
+            const int yy_index  = std::max(0, std::min(y_index + 1,                 small_height - 1));
 
             const fp_t z_addr   = (fp_t)(z) / r_sa + padding_z;
-            const int z_index   = max(0, min((int)z_addr,   small_depth-1));
-            const int zz_index  = max(0, min(z_index+1,     small_depth-1));
+            const int z_index   = std::max(0, std::min(static_cast<int>(z_addr),    small_depth - 1));
+            const int zz_index  = std::max(0, std::min(z_index + 1,                 small_depth - 1));
 
             const fp_t x_alpha  = x_addr - x_index;
             const fp_t y_alpha  = y_addr - y_index;
             const fp_t z_alpha  = z_addr - z_index;
 
             const fp_t IW = 
-                ((fp_t)1.0 - x_alpha) * ((fp_t)1.0 - y_alpha) * ((fp_t)1.0 - z_alpha) * wiw[x_index  + (small_width * (y_index  + (small_height * z_index ))) + iw_offset] +
-                x_alpha               * ((fp_t)1.0 - y_alpha) * ((fp_t)1.0 - z_alpha) * wiw[xx_index + (small_width * (y_index  + (small_height * z_index ))) + iw_offset] +
-                ((fp_t)1.0 - x_alpha) * y_alpha               * ((fp_t)1.0 - z_alpha) * wiw[x_index  + (small_width * (yy_index + (small_height * z_index ))) + iw_offset] +
-                x_alpha               * y_alpha               * ((fp_t)1.0 - z_alpha) * wiw[xx_index + (small_width * (yy_index + (small_height * z_index ))) + iw_offset] +
-                ((fp_t)1.0 - x_alpha) * ((fp_t)1.0 - y_alpha) * z_alpha               * wiw[x_index  + (small_width * (y_index  + (small_height * zz_index))) + iw_offset] +
-                x_alpha               * ((fp_t)1.0 - y_alpha) * z_alpha               * wiw[xx_index + (small_width * (y_index  + (small_height * zz_index))) + iw_offset] +
-                ((fp_t)1.0 - x_alpha) * y_alpha               * z_alpha               * wiw[x_index  + (small_width * (yy_index + (small_height * zz_index))) + iw_offset] +
-                x_alpha               * y_alpha               * z_alpha               * wiw[xx_index + (small_width * (yy_index + (small_height * zz_index))) + iw_offset];
+                (1.0f - x_alpha) * (1.0f - y_alpha) * (1.0f - z_alpha) * wiw[x_index  + (small_width * (y_index  + (small_height * z_index ))) + iw_offset] +
+                x_alpha          * (1.0f - y_alpha) * (1.0f - z_alpha) * wiw[xx_index + (small_width * (y_index  + (small_height * z_index ))) + iw_offset] +
+                (1.0f - x_alpha) * y_alpha          * (1.0f - z_alpha) * wiw[x_index  + (small_width * (yy_index + (small_height * z_index ))) + iw_offset] +
+                x_alpha          * y_alpha          * (1.0f - z_alpha) * wiw[xx_index + (small_width * (yy_index + (small_height * z_index ))) + iw_offset] +
+                (1.0f - x_alpha) * (1.0f - y_alpha) * z_alpha          * wiw[x_index  + (small_width * (y_index  + (small_height * zz_index))) + iw_offset] +
+                x_alpha          * (1.0f - y_alpha) * z_alpha          * wiw[xx_index + (small_width * (y_index  + (small_height * zz_index))) + iw_offset] +
+                (1.0f - x_alpha) * y_alpha          * z_alpha          * wiw[x_index  + (small_width * (yy_index + (small_height * zz_index))) + iw_offset] +
+                x_alpha          * y_alpha          * z_alpha          * wiw[xx_index + (small_width * (yy_index + (small_height * zz_index))) + iw_offset];
 
 
             const fp_t W = 
-                ((fp_t)1.0 - x_alpha) * ((fp_t)1.0 - y_alpha) * ((fp_t)1.0 - z_alpha) * wiw[x_index  + (small_width * (y_index  + (small_height * z_index )))] +
-                x_alpha               * ((fp_t)1.0 - y_alpha) * ((fp_t)1.0 - z_alpha) * wiw[xx_index + (small_width * (y_index  + (small_height * z_index )))] +
-                ((fp_t)1.0 - x_alpha) * y_alpha               * ((fp_t)1.0 - z_alpha) * wiw[x_index  + (small_width * (yy_index + (small_height * z_index )))] +
-                x_alpha               * y_alpha               * ((fp_t)1.0 - z_alpha) * wiw[xx_index + (small_width * (yy_index + (small_height * z_index )))] +
-                ((fp_t)1.0 - x_alpha) * ((fp_t)1.0 - y_alpha) * z_alpha               * wiw[x_index  + (small_width * (y_index  + (small_height * zz_index)))] +
-                x_alpha               * ((fp_t)1.0 - y_alpha) * z_alpha               * wiw[xx_index + (small_width * (y_index  + (small_height * zz_index)))] +
-                ((fp_t)1.0 - x_alpha) * y_alpha               * z_alpha               * wiw[x_index  + (small_width * (yy_index + (small_height * zz_index)))] +
-                x_alpha               * y_alpha               * z_alpha               * wiw[xx_index + (small_width * (yy_index + (small_height * zz_index)))];
+                (1.0f - x_alpha) * (1.0f - y_alpha) * (1.0f - z_alpha) * wiw[x_index  + (small_width * (y_index  + (small_height * z_index )))] +
+                x_alpha          * (1.0f - y_alpha) * (1.0f - z_alpha) * wiw[xx_index + (small_width * (y_index  + (small_height * z_index )))] +
+                (1.0f - x_alpha) * y_alpha          * (1.0f - z_alpha) * wiw[x_index  + (small_width * (yy_index + (small_height * z_index )))] +
+                x_alpha          * y_alpha          * (1.0f - z_alpha) * wiw[xx_index + (small_width * (yy_index + (small_height * z_index )))] +
+                (1.0f - x_alpha) * (1.0f - y_alpha) * z_alpha          * wiw[x_index  + (small_width * (y_index  + (small_height * zz_index)))] +
+                x_alpha          * (1.0f - y_alpha) * z_alpha          * wiw[xx_index + (small_width * (y_index  + (small_height * zz_index)))] +
+                (1.0f - x_alpha) * y_alpha          * z_alpha          * wiw[x_index  + (small_width * (yy_index + (small_height * zz_index)))] +
+                x_alpha          * y_alpha          * z_alpha          * wiw[xx_index + (small_width * (yy_index + (small_height * zz_index)))];
 
             result[x + (this->x_res * y)] = IW / W;
-            max_value = max(max_value, result[x + (this->x_res * y)]);
-            min_value = min(min_value, result[x + (this->x_res * y)]);
+            max_value = std::max(max_value, result[x + (this->x_res * y)]);
+            min_value = std::min(min_value, result[x + (this->x_res * y)]);
         }
     }
 
@@ -1845,27 +1845,27 @@ void camera::histogram_tone_map(const bool h)
     /* Scale the image to one pixel per view degree */
     const fp_t x_angle = (-2.0 * this->x_m) / this->t;
     const fp_t y_angle = (-2.0 * this->y_m) / this->t;
-    const int scaled_x_res = (int)(x_angle * (fp_t)(360.0 / (2.0 * PI)));
-    const int scaled_y_res = (int)(y_angle * (fp_t)(360.0 / (2.0 * PI)));
+    const int scaled_x_res = static_cast<int>(x_angle * (360.0f / (2.0f * PI)));
+    const int scaled_y_res = static_cast<int>(y_angle * (360.0f / (2.0f * PI)));
 
     fp_t * scaled_luminance = new fp_t [scaled_x_res * scaled_y_res];
     memset(scaled_luminance, 0, (scaled_x_res * scaled_y_res * sizeof(fp_t)));
     
-    const fp_t scaled_x_inc = (fp_t)this->x_res / (fp_t)scaled_x_res;
-    const fp_t scaled_y_inc = (fp_t)this->y_res / (fp_t)scaled_y_res;
-    fp_t y0 = (fp_t)0.0;
+    const fp_t scaled_x_inc = static_cast<float>(this->x_res) / static_cast<float>(scaled_x_res);
+    const fp_t scaled_y_inc = static_cast<float>(this->y_res) / static_cast<float>(scaled_y_res);
+    fp_t y0 = 0.0f;
     fp_t y1 = scaled_y_inc;
-    for (int j = 0; j < scaled_y_res; j++)
+    for (int j = 0; j < scaled_y_res; ++j)
     {
-        fp_t x0 = (fp_t)0.0;
+        fp_t x0 = 0.0f;
         fp_t x1 = scaled_x_inc;
         
-        for (int i = 0; i < scaled_x_res; i++)
+        for (int i = 0; i < scaled_x_res; ++i)
         {
             /* Average the 1 degree block to one pixel */
-            for (int y = (int)y0; y <= (int)y1; y++)
+            for (int y = static_cast<int>(y0); y <= static_cast<int>(y1); ++y)
             {
-                for (int x = (int)x0; x <= (int)x1; x++)
+                for (int x = static_cast<int>(x0); x <= static_cast<int>(x1); ++x)
                 {
                     scaled_luminance[(j * scaled_x_res) + i] += this->image[(y * this->x_res) + x].g;
                 }
@@ -1875,11 +1875,11 @@ void camera::histogram_tone_map(const bool h)
             scaled_luminance[(j * scaled_x_res) + i] /= ((x1 - x0) + 1) * ((y1 - y0) + 1);
             
             x0 = x1;
-            x1 = min((fp_t)(this->x_res - (fp_t)1.0), (x1 + scaled_x_inc));
+            x1 = std::min((this->x_res - 1.0f), (x1 + scaled_x_inc));
         }
 
         y0 = y1;
-        y1 = min((fp_t)(this->y_res - (fp_t)1.0), (y1 + scaled_y_inc));
+        y1 = std::min((this->y_res - 1.0f), (y1 + scaled_y_inc));
     }
 
 
@@ -1890,26 +1890,26 @@ void camera::histogram_tone_map(const bool h)
     fp_t lw_max = 0.0;
     for (int i = 0; i< (scaled_x_res * scaled_y_res); i++)
     {
-        if (scaled_luminance[i] > 0.0)
+        if (scaled_luminance[i] > 0.0f)
         {
-            lw_min = min(lw_min, scaled_luminance[i]);
-            lw_max = max(lw_max, scaled_luminance[i]);
+            lw_min = std::min(lw_min, scaled_luminance[i]);
+            lw_max = std::max(lw_max, scaled_luminance[i]);
 
-            pix_gt0++;
+            ++pix_gt0;
         }
     }
     
     /* Black image, no further work required */
-    if (lw_min <= (fp_t)0.0)
+    if (lw_min <= 0.0f)
     {
-        cout << "black image" << endl;
+        std::cout << "black image" << std::endl;
         delete [] scaled_luminance;
         return;
     }
 
     /* Convert to log scale */
-    const fp_t min_lum  = (fp_t)1.0e-4;
-    lw_min              = max(lw_min, min_lum);
+    const fp_t min_lum  = 1.0e-4f;
+    lw_min              = std::max(lw_min, min_lum);
     fp_t bw_min         = log(lw_min);
     fp_t bw_max         = log(lw_max);
     if (bw_max == bw_min)
@@ -1918,13 +1918,13 @@ void camera::histogram_tone_map(const bool h)
     }
 
     /* Check for image within displayable range */
-    const fp_t ld_max = (fp_t)300.0;
-    const fp_t ld_min = (fp_t)1.0;
+    const fp_t ld_max = 300.0f;
+    const fp_t ld_min = 1.0f;
     const fp_t bd_max = log(ld_max);
     const fp_t bd_min = log(ld_min);
     if ((bd_max - bd_min) > (bw_max - bw_min))
     {
-        cout << "using linear scale factor" << endl;
+        std::cout << "using linear scale factor" << std::endl;
         const fp_t sf = (bd_max - bd_min) / (bw_max - bw_min);
         for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
         {
@@ -1946,8 +1946,8 @@ void camera::histogram_tone_map(const bool h)
     {
         if (scaled_luminance[i] > 0.0)
         {
-            int b = (int)((log(scaled_luminance[i]) - bw_min) / (bw_max - bw_min) * bins) + 1;
-            b = min(max(b, 0), bins);
+            int b = static_cast<int>((log(scaled_luminance[i]) - bw_min) / (bw_max - bw_min) * bins) + 1;
+            b = std::min(std::max(b, 0), bins);
             his[b]++;
 
             scaled_pixel_gt0++;
@@ -1967,9 +1967,9 @@ void camera::histogram_tone_map(const bool h)
 
     
     /* Adjust the histogram */
-    const fp_t tolerance = (fp_t)0.025 * (fp_t)pix_gt0;
+    const fp_t tolerance = 0.025f * (fp_t)pix_gt0;
     const fp_t bin_step_size = (bw_max - bw_min) / bins;
-    const fp_t lw_step = (fp_t)1.0 / (fp_t)bins * (bw_max - bw_min);
+    const fp_t lw_step = 1.0f / (fp_t)bins * (bw_max - bw_min);
     int trimmings;
     do
     {
@@ -1979,11 +1979,11 @@ void camera::histogram_tone_map(const bool h)
         /* Apply a linear scale */
         if (pix_gt0 < tolerance)
         {
-            cout << "using contrast based scale factor" << endl;
-            const fp_t num = (fp_t)1.219 + std::pow(ld_max * (fp_t)0.5, (fp_t)0.4);
-            const fp_t den = (fp_t)1.219 + std::pow(lw_avg , (fp_t)0.4);
+            std::cout << "using contrast based scale factor" << std::endl;
+            const fp_t num = 1.219f + std::pow(ld_max * 0.5f, 0.4f);
+            const fp_t den = 1.219f + std::pow(lw_avg , 0.4f);
 
-            const fp_t sf  = ((fp_t)1.0 / ld_max) * std::pow((num / den), (fp_t)2.5);
+            const fp_t sf  = (1.0f / ld_max) * std::pow((num / den), 2.5f);
 
             for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
             {
@@ -2044,9 +2044,9 @@ void camera::histogram_tone_map(const bool h)
             const fp_t bw = log(this->image[i].g);
 
             fp_t bf = (bw - bw_min) / (bw_max - bw_min) * bins;
-            bf = min(max(bf, (fp_t)0.0), (fp_t)bins);
+            bf = std::min(std::max(bf, 0.0f), static_cast<float>(bins));
             const int b0 = (int)bf;
-            const int b1 = min((b0 + 1), bins);
+            const int b1 = std::min((b0 + 1), bins);
             const fp_t s = bf - b0;
             const fp_t pbw = (1 - s) * cdf[b0] + s * cdf[b1];
     
@@ -2068,9 +2068,9 @@ void camera::convert_xyz_to_rgb(ext_colour_t *const p, const int x, const int y)
         const ext_colour_t xyz = p[i];
 
         /* Conversion matrix assumes Y is in the range 0-1.0 and scales up by 255 */
-        p[i].r = ( 826.353  * xyz.r) + (-391.986 * xyz.g) + (-127.143  * xyz.b);
-        p[i].g = (-247.0695 * xyz.r) + ( 478.329 * xyz.g) + (  10.5825 * xyz.b);
-        p[i].b = ( 14.2035  * xyz.r) + ( -52.02  * xyz.g) + ( 269.535  * xyz.b);
+        p[i].r = ( 826.353f  * xyz.r) + (-391.986f * xyz.g) + (-127.143f  * xyz.b);
+        p[i].g = (-247.0695f * xyz.r) + ( 478.329f * xyz.g) + (  10.5825f * xyz.b);
+        p[i].b = ( 14.2035f  * xyz.r) + ( -52.02f  * xyz.g) + ( 269.535f  * xyz.b);
     }
 
     return;
@@ -2099,10 +2099,10 @@ void camera::convert_Yxy_to_rgb()
 }
 
 
-const camera & camera::write_tga_file(const string &file_name, unsigned char *o) const
+const camera & camera::write_tga_file(const std::string &file_name, unsigned char *o) const
 {
     /* Open output file */
-    ofstream tga_output(file_name.c_str(), ios::out);
+    std::ofstream tga_output(file_name.c_str(), std::ios::out);
 
     /* Clip image */
     unsigned char * tga_data;
@@ -2116,7 +2116,7 @@ const camera & camera::write_tga_file(const string &file_name, unsigned char *o)
         tga_data = o;
     }
 
-    cout << "Writing snapshot taken to " << file_name << endl;
+    std::cout << "Writing snapshot taken to " << file_name << std::endl;
 
     /* Write the header to the tga file */
     tga_output << (char)0;                                                          /* Length of the ID section                                 */
@@ -2157,7 +2157,7 @@ const camera & camera::write_tga_file(const string &file_name, unsigned char *o)
 void write_png_file(const std::string &file_name, unsigned char *png_data, const unsigned int x, const unsigned int y)
 {
     /* Open output file */
-    cout << "Writing snapshot taken to " << file_name << endl;
+    std::cout << "Writing snapshot taken to " << file_name << std::endl;
 
     /* Initialise png objects */
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
@@ -2181,7 +2181,7 @@ void write_png_file(const std::string &file_name, unsigned char *png_data, const
     FILE *fp;
     if ((fp = fopen(file_name.c_str(), "wb")) == nullptr)
     {
-    	cout << "Error opening png file " << file_name << " for output" << endl;
+    	std::cout << "Error opening png file " << file_name << " for output" << std::endl;
     	assert(!"Cannot open file");
     }
 
@@ -2211,7 +2211,7 @@ void write_png_file(const std::string &file_name, unsigned char *png_data, const
 }
 
 
-const camera & camera::write_png_file(const string &file_name) const
+const camera & camera::write_png_file(const std::string &file_name) const
 {
     /* Convert data to rgb */
     unsigned char * png_data = new unsigned char [this->out_x_res * this->out_y_res * 3];
@@ -2227,13 +2227,13 @@ const camera & camera::write_png_file(const string &file_name) const
 void read_png_file(const std::string &file_name, unsigned char *png_data, unsigned int *const x, unsigned int *const y)
 {
     /* Open output file */
-    cout << "Reading png from " << file_name << endl;
+    std::cout << "Reading png from " << file_name << std::endl;
 
     /* Open file and check it is a png file */
     FILE *fp;
     if ((fp = fopen(file_name.c_str(), "rb")) == nullptr)
     {
-        cout << "Error opening png file " << file_name << " for input" << endl;
+        std::cout << "Error opening png file " << file_name << " for input" << std::endl;
         assert(!"Cannot open file");
     }
 
@@ -2302,7 +2302,7 @@ void read_png_file(const std::string &file_name, unsigned char *png_data, unsign
 }
 
         
-const camera & camera::write_jpeg_file(const string &file_name, const int q, unsigned char *o) const
+const camera & camera::write_jpeg_file(const std::string &file_name, const int q, unsigned char *o) const
 {
     /* q must be in the range 0-100 */
     assert(q >=   0);
@@ -2320,7 +2320,7 @@ const camera & camera::write_jpeg_file(const string &file_name, const int q, uns
         jpeg_data = o;
     }
 
-    cout << "Writing snapshot taken to " << file_name << endl;
+    std::cout << "Writing snapshot taken to " << file_name << std::endl;
 
     /* Initialise jpeg objects */
     struct jpeg_compress_struct cinfo;
@@ -2332,7 +2332,7 @@ const camera & camera::write_jpeg_file(const string &file_name, const int q, uns
     FILE * outfile;
     if ((outfile = fopen(file_name.c_str(), "wb")) == nullptr)
     {
-    	cout << "Error opening jpeg file " << file_name << " for output" << endl;
+    	std::cout << "Error opening jpeg file " << file_name << " for output" << std::endl;
     	assert(!"Cannot open file");
     }
     jpeg_stdio_dest(&cinfo, outfile);

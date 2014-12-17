@@ -691,7 +691,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
             last_cl         = 0.0;
             last_cr         = this->p->size();
             sp              = this->b.x;
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 9; ++i)
             {
                 /* Process any adaptive samples in this bin first because they will be encountered first */
                 for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
@@ -705,12 +705,12 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                     const fp_t sp_zw    = sp * zw;
                     
                     /* Minima point bound to this bin */
-                    const fp_t a    = 2.0 * ((clg * yw_p_zw) - (crg * yw_p_zw));
+                    const fp_t a    = 2.0f * ((clg * yw_p_zw) - (crg * yw_p_zw));
                     const fp_t b    =   ( last_cl * yw_p_zw) - (clg * (xb_yw + xb_zw - yw_zw + sp_yw + sp_zw))
                                       + (-last_cr * yw_p_zw) + (crg * (xt_yw + xt_zw + yw_zw + sp_yw + sp_zw));
                     
-                    const fp_t delta    = adaptive_width[i] * 0.05;
-                    const fp_t xm       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                    const fp_t delta    = adaptive_width[i] * 0.05f;
+                    const fp_t xm       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
         
                     /* Cost at minima */
                     const fp_t xmb  = xm - this->b.x;
@@ -730,7 +730,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                     last_cr = cra[j];
                     sp     += adaptive_width[i];
                 }
-                adaptive_offset += (int)bins_per_sample[i];
+                adaptive_offset += static_cast<int>(bins_per_sample[i]);
         
                 /* Bin primitive gradients */
                 const fp_t clg = (cl[i] - last_cl) / adaptive_width[i];
@@ -741,12 +741,12 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                 const fp_t sp_zw    = sp * zw;
               
                 /* Minima point bound to this bin */
-                const fp_t a    = 2.0 * ((clg * yw_p_zw) - (crg * yw_p_zw));
+                const fp_t a    = 2.0f * ((clg * yw_p_zw) - (crg * yw_p_zw));
                 const fp_t b    =   ( last_cl * yw_p_zw) - (clg * (xb_yw + xb_zw - yw_zw + sp_yw + sp_zw))
                                   + (-last_cr * yw_p_zw) + (crg * (xt_yw + xt_zw + yw_zw + sp_yw + sp_zw));
               
-                const fp_t delta    = adaptive_width[i] * 0.05;
-                const fp_t xm       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                const fp_t delta    = adaptive_width[i] * 0.05f;
+                const fp_t xm       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
               
                 /* Cost at minima */
                 const fp_t xmb  = xm - this->b.x;
@@ -770,17 +770,17 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
             
         case axis_t::y_axis :
             /* Pick fixed points to evaluate */
-            dw          = yw * (1.0 / 9.0);
+            dw          = yw * (1.0f / 9.0f);
             evaluate    = this->t.y;
             
             /* Fixed points samples and adaptive bin boundaries */
             cl[8]               = this->p->size();
-            cr[8]               = 0.0;
-            bins_per_sample[8]  = 8.0;
+            cr[8]               = 0.0f;
+            bins_per_sample[8]  = 8.0f;
         
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; ++i)
             {
-                sample[i] = this->b.y + (dw * (fp_t)(i+1));
+                sample[i] = this->b.y + (dw * static_cast<float>(i + 1));
             }
             this->count_primitives(cl, cr, sample, 8, axis_t::y_axis);
         
@@ -809,10 +809,10 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
             
             /* Evaluate SAH minima for each sample as -b/2a */
             adaptive_offset = 0;
-            last_cl         = 0.0;
+            last_cl         = 0.0f;
             last_cr         = this->p->size();
             sp              = this->b.y;
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 9; ++i)
             {
                 /* Process any adaptive samples in this bin first because they will be encountered first */
                 for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
@@ -826,12 +826,12 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                     const fp_t sp_zw    = sp * zw;
                     
                     /* Minima point bound to this bin */
-                    const fp_t a    = 2.0 * ((clg * xw_p_zw) - (crg * xw_p_zw));
+                    const fp_t a    = 2.0f * ((clg * xw_p_zw) - (crg * xw_p_zw));
                     const fp_t b    =   ( last_cl * xw_p_zw) - (clg * (yb_xw + yb_zw - xw_zw + sp_xw + sp_zw))
                                       + (-last_cr * xw_p_zw) + (crg * (yt_xw + yt_zw + xw_zw + sp_xw + sp_zw));
                     
-                    const fp_t delta    = adaptive_width[i] * 0.05;
-                    const fp_t ym       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                    const fp_t delta    = adaptive_width[i] * 0.05f;
+                    const fp_t ym       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
                     
                     /* Cost at minima */
                     const fp_t ymb  = ym - this->b.y;
@@ -851,7 +851,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                     last_cr = cra[j];
                     sp     += adaptive_width[i];
                 }
-                adaptive_offset += (int)bins_per_sample[i];
+                adaptive_offset += static_cast<int>(bins_per_sample[i]);
         
                 /* Bin primitive gradients */
                 const fp_t clg = (cl[i] - last_cl) / adaptive_width[i];
@@ -862,12 +862,12 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                 const fp_t sp_zw    = sp * zw;
               
                 /* Minima point bound to this bin */
-                const fp_t a    = 2.0 * ((clg * xw_p_zw) - (crg * xw_p_zw));
+                const fp_t a    = 2.0f * ((clg * xw_p_zw) - (crg * xw_p_zw));
                 const fp_t b    =   ( last_cl * xw_p_zw) - (clg * (yb_xw + yb_zw - xw_zw + sp_xw + sp_zw))
                                   + (-last_cr * xw_p_zw) + (crg * (yt_xw + yt_zw + xw_zw + sp_xw + sp_zw));
               
-                const fp_t delta    = adaptive_width[i] * 0.05;
-                const fp_t ym       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                const fp_t delta    = adaptive_width[i] * 0.05f;
+                const fp_t ym       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
               
                 /* Cost at minima */
                 const fp_t ymb  = ym - this->b.y;
@@ -891,7 +891,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
 
         case axis_t::z_axis :
             /* Pick fixed points to evaluate */
-            dw          = zw * (1.0 / 9.0);
+            dw          = zw * (1.0f / 9.0f);
             evaluate    = this->t.z;
             
             /* Fixed points samples and adaptive bin boundaries */
@@ -901,16 +901,16 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
         
             for (int i = 0; i < 8; i++)
             {
-                sample[i] = this->b.z + (dw * (fp_t)(i+1));
+                sample[i] = this->b.z + (dw * static_cast<float>(i + 1));
             }
             this->count_primitives(cl, cr, sample, 8, axis_t::z_axis);
         
             /* Fix adaptive sample width per bin */
-            for (int i = 7; i >= 0; i--)
+            for (int i = 7; i >= 0; --i)
             {
                 bins_per_sample[i] = int((cl[i] - cr[i]) / adapt_bin_size) + 4;
                 bins_per_sample[i+1]   -= bins_per_sample[i];
-                adaptive_width[i+1]     = dw / (bins_per_sample[i+1] + 1.0);
+                adaptive_width[i+1]     = dw / (bins_per_sample[i + 1] + 1.0);
             }
             adaptive_width[0]   = dw / (bins_per_sample[0] + 1.0);
             
@@ -930,10 +930,10 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
             
             /* Evaluate SAH minima for each sample as -b/2a */
             adaptive_offset = 0;
-            last_cl         = 0.0;
+            last_cl         = 0.0f;
             last_cr         = this->p->size();
             sp              = this->b.z;
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 9; ++i)
             {
                 /* Process any adaptive samples in this bin first because they will be encountered first */
                 for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
@@ -947,12 +947,12 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                     const fp_t sp_yw    = sp * yw;
                     
                     /* Minima point bound to this bin */
-                    const fp_t a    = 2.0 * ((clg * xw_p_yw) - (crg * xw_p_zw));
+                    const fp_t a    = 2.0f * ((clg * xw_p_yw) - (crg * xw_p_zw));
                     const fp_t b    =   ( last_cl * xw_p_yw) - (clg * (zb_xw + zb_yw - xw_yw + sp_xw + sp_yw))
                                       + (-last_cr * xw_p_yw) + (crg * (zt_xw + zt_yw + xw_yw + sp_xw + sp_yw));
                     
-                    const fp_t delta    = adaptive_width[i] * 0.05;
-                    const fp_t zm       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                    const fp_t delta    = adaptive_width[i] * 0.05f;
+                    const fp_t zm       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
                     
                     /* Cost at minima */
                     const fp_t zmb  = zm - this->b.z;
@@ -972,7 +972,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                     last_cr = cra[j];
                     sp     += adaptive_width[i];
                 }
-                adaptive_offset += (int)bins_per_sample[i];
+                adaptive_offset += static_cast<int>(bins_per_sample[i]);
         
                 /* Bin primitive gradients */
                 const fp_t clg = (cl[i] - last_cl) / adaptive_width[i];
@@ -983,12 +983,12 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                 const fp_t sp_yw    = sp * yw;
              
                 /* Minima point bound to this bin */
-                const fp_t a    = 2.0 * ((clg * xw_p_yw) - (crg * xw_p_zw));
+                const fp_t a    = 2.0f * ((clg * xw_p_yw) - (crg * xw_p_zw));
                 const fp_t b    =   ( last_cl * xw_p_yw) - (clg * (zb_xw + zb_yw - xw_yw + sp_xw + sp_yw))
                                   + (-last_cr * xw_p_yw) + (crg * (zt_xw + zt_yw + xw_yw + sp_xw + sp_yw));
               
-                const fp_t delta    = adaptive_width[i] * 0.05;
-                const fp_t zm       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                const fp_t delta    = adaptive_width[i] * 0.05f;
+                const fp_t zm       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
               
                 /* Cost at minima */
                 const fp_t zmb  = zm - this->b.z;
@@ -1404,7 +1404,7 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis_t * normal) const
     valid_mask[1] = (bucketted & SIMD_WIDTH) ? index_to_mask_lut[bucketted - SIMD_WIDTH] : vfp_zero;
     
     this->count_primitives(l_vec, r_vec, s_vec, axis_t::z_axis);
-    for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + (int)(bucketted > 0)); ++j)
+    for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + static_cast<int>(bucketted > 0)); ++j)
     {
         vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::z_axis);
         vfp_t mask = (cost < lc_vec) & valid_mask[j];
@@ -1415,7 +1415,7 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis_t * normal) const
     }
     
     /* Collect results */
-    (*s) = min(min(lc_vec[0], lc_vec[1]), min(lc_vec[2], lc_vec[3]));
+    (*s) = std::min(std::min(lc_vec[0], lc_vec[1]), std::min(lc_vec[2], lc_vec[3]));
 
     const int index = mask_to_index_lut[move_mask(vfp_t(*s) == lc_vec)];
     (*normal) = static_cast<axis_t>(ba_vec[index]);

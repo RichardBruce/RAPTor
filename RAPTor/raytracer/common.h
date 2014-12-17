@@ -27,12 +27,8 @@ typedef double fp_t;
 /* Threading headers */
 #ifdef THREADED_RAY_TRACE
 #include "scalable_allocator.h"
-
-using namespace tbb;
 #endif
 
-
-using namespace std;
 
 /* Template for casting bits from one type to another */
 template<class T, class S>

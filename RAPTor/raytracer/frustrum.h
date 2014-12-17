@@ -52,19 +52,19 @@ class frustrum
             }
             
             /* Max and min accross vector */
-            this->n_ogn.x = min(min(min_x_ogn[3], min_x_ogn[2]), min(min_x_ogn[1], min_x_ogn[0]));
-            this->n_ogn.y = min(min(min_y_ogn[3], min_y_ogn[2]), min(min_y_ogn[1], min_y_ogn[0]));
-            this->n_ogn.z = min(min(min_z_ogn[3], min_z_ogn[2]), min(min_z_ogn[1], min_z_ogn[0]));
-            this->n_dir.x = (fp_t)1.0/min(min(min_x_dir[3], min_x_dir[2]), min(min_x_dir[1], min_x_dir[0]));
-            this->n_dir.y = (fp_t)1.0/min(min(min_y_dir[3], min_y_dir[2]), min(min_y_dir[1], min_y_dir[0]));
-            this->n_dir.z = (fp_t)1.0/min(min(min_z_dir[3], min_z_dir[2]), min(min_z_dir[1], min_z_dir[0]));
+            this->n_ogn.x = std::min(std::min(min_x_ogn[3], min_x_ogn[2]), std::min(min_x_ogn[1], min_x_ogn[0]));
+            this->n_ogn.y = std::min(std::min(min_y_ogn[3], min_y_ogn[2]), std::min(min_y_ogn[1], min_y_ogn[0]));
+            this->n_ogn.z = std::min(std::min(min_z_ogn[3], min_z_ogn[2]), std::min(min_z_ogn[1], min_z_ogn[0]));
+            this->n_dir.x = 1.0f / std::min(std::min(min_x_dir[3], min_x_dir[2]), std::min(min_x_dir[1], min_x_dir[0]));
+            this->n_dir.y = 1.0f / std::min(std::min(min_y_dir[3], min_y_dir[2]), std::min(min_y_dir[1], min_y_dir[0]));
+            this->n_dir.z = 1.0f / std::min(std::min(min_z_dir[3], min_z_dir[2]), std::min(min_z_dir[1], min_z_dir[0]));
             
-            this->p_ogn.x = max(max(max_x_ogn[3], max_x_ogn[2]), max(max_x_ogn[1], max_x_ogn[0]));
-            this->p_ogn.y = max(max(max_y_ogn[3], max_y_ogn[2]), max(max_y_ogn[1], max_y_ogn[0]));
-            this->p_ogn.z = max(max(max_z_ogn[3], max_z_ogn[2]), max(max_z_ogn[1], max_z_ogn[0]));
-            this->p_dir.x = (fp_t)1.0/max(max(max_x_dir[3], max_x_dir[2]), max(max_x_dir[1], max_x_dir[0]));
-            this->p_dir.y = (fp_t)1.0/max(max(max_y_dir[3], max_y_dir[2]), max(max_y_dir[1], max_y_dir[0]));
-            this->p_dir.z = (fp_t)1.0/max(max(max_z_dir[3], max_z_dir[2]), max(max_z_dir[1], max_z_dir[0]));
+            this->p_ogn.x = std::max(std::max(max_x_ogn[3], max_x_ogn[2]), std::max(max_x_ogn[1], max_x_ogn[0]));
+            this->p_ogn.y = std::max(std::max(max_y_ogn[3], max_y_ogn[2]), std::max(max_y_ogn[1], max_y_ogn[0]));
+            this->p_ogn.z = std::max(std::max(max_z_ogn[3], max_z_ogn[2]), std::max(max_z_ogn[1], max_z_ogn[0]));
+            this->p_dir.x = 1.0f / std::max(std::max(max_x_dir[3], max_x_dir[2]), std::max(max_x_dir[1], max_x_dir[0]));
+            this->p_dir.y = 1.0f / std::max(std::max(max_y_dir[3], max_y_dir[2]), std::max(max_y_dir[1], max_y_dir[0]));
+            this->p_dir.z = 1.0f / std::max(std::max(max_z_dir[3], max_z_dir[2]), std::max(max_z_dir[1], max_z_dir[0]));
             
             this->mm_ogn[0] = vfp_t(this->n_ogn.x, this->n_ogn.x, this->p_ogn.x, this->p_ogn.x);
             this->mm_ogn[1] = vfp_t(this->n_ogn.y, this->n_ogn.y, this->p_ogn.y, this->p_ogn.y);
@@ -79,22 +79,22 @@ class frustrum
             {
                 if (fabs(this->p_dir.x) < fabs(this->p_dir.z))
                 {
-                    this->n = 0 + ((int)(this->p_dir.x < (fp_t)0.0) << 2);
+                    this->n = 0 + ((int)(this->p_dir.x < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(this->p_dir.z < (fp_t)0.0) << 2);
+                    this->n = 2 + ((int)(this->p_dir.z < 0.0f) << 2);
                 }
             }
             else
             {
                 if (fabs(this->p_dir.y) < fabs(this->p_dir.z))
                 {
-                    this->n = 1 + ((int)(this->p_dir.y < (fp_t)0.0) << 2);
+                    this->n = 1 + ((int)(this->p_dir.y < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(this->p_dir.z < (fp_t)0.0) << 2);
+                    this->n = 2 + ((int)(this->p_dir.z < 0.0f) << 2);
                 }
             }
 
@@ -126,16 +126,16 @@ class frustrum
             this->n_ogn.x = o.x;
             this->n_ogn.y = o.y;
             this->n_ogn.z = o.z;
-            this->p_dir.x = (fp_t)1.0/-min(min(min_x_dir[3], min_x_dir[2]), min(min_x_dir[1], min_x_dir[0]));
-            this->p_dir.y = (fp_t)1.0/-min(min(min_y_dir[3], min_y_dir[2]), min(min_y_dir[1], min_y_dir[0]));
-            this->p_dir.z = (fp_t)1.0/-min(min(min_z_dir[3], min_z_dir[2]), min(min_z_dir[1], min_z_dir[0]));
+            this->p_dir.x = 1.0f / -std::min(std::min(min_x_dir[3], min_x_dir[2]), std::min(min_x_dir[1], min_x_dir[0]));
+            this->p_dir.y = 1.0f / -std::min(std::min(min_y_dir[3], min_y_dir[2]), std::min(min_y_dir[1], min_y_dir[0]));
+            this->p_dir.z = 1.0f / -std::min(std::min(min_z_dir[3], min_z_dir[2]), std::min(min_z_dir[1], min_z_dir[0]));
             
             this->p_ogn.x = o.x;
             this->p_ogn.y = o.y;
             this->p_ogn.z = o.z;
-            this->n_dir.x = (fp_t)1.0/-max(max(max_x_dir[3], max_x_dir[2]), max(max_x_dir[1], max_x_dir[0]));
-            this->n_dir.y = (fp_t)1.0/-max(max(max_y_dir[3], max_y_dir[2]), max(max_y_dir[1], max_y_dir[0]));
-            this->n_dir.z = (fp_t)1.0/-max(max(max_z_dir[3], max_z_dir[2]), max(max_z_dir[1], max_z_dir[0]));
+            this->n_dir.x = 1.0f / -std::max(std::max(max_x_dir[3], max_x_dir[2]), std::max(max_x_dir[1], max_x_dir[0]));
+            this->n_dir.y = 1.0f / -std::max(std::max(max_y_dir[3], max_y_dir[2]), std::max(max_y_dir[1], max_y_dir[0]));
+            this->n_dir.z = 1.0f / -std::max(std::max(max_z_dir[3], max_z_dir[2]), std::max(max_z_dir[1], max_z_dir[0]));
             
             this->mm_ogn[0] = vfp_t(o.x);
             this->mm_ogn[1] = vfp_t(o.y);
@@ -150,22 +150,22 @@ class frustrum
             {
                 if (fabs(this->p_dir.x) < fabs(this->p_dir.z))
                 {
-                    this->n = 0 + ((int)(this->p_dir.x < (fp_t)0.0) << 2);
+                    this->n = 0 + ((int)(this->p_dir.x < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(this->p_dir.z < (fp_t)0.0) << 2);
+                    this->n = 2 + ((int)(this->p_dir.z < 0.0f) << 2);
                 }
             }
             else
             {
                 if (fabs(this->p_dir.y) < fabs(this->p_dir.z))
                 {
-                    this->n = 1 + ((int)(this->p_dir.y < (fp_t)0.0) << 2);
+                    this->n = 1 + ((int)(this->p_dir.y < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(this->p_dir.z < (fp_t)0.0) << 2);
+                    this->n = 2 + ((int)(this->p_dir.z < 0.0f) << 2);
                 }
             }
 
@@ -182,8 +182,8 @@ class frustrum
             const int I2 = mod_3_lut[I0 + 2];
 
             /* Width of the leaf node */
-            fp_t bminf;
-            fp_t bmaxf;
+            float bminf;
+            float bmaxf;
             switch (I0)
             {
                 case 0 :
@@ -206,8 +206,8 @@ class frustrum
             /* Avoid flat leaves */
             if (bminf == bmaxf) 
             { 
-                bminf -= (fp_t)0.5;
-                bmaxf += (fp_t)0.5;
+                bminf -= 0.5f;
+                bmaxf += 0.5f;
             } 
 
             const vfp_t bmin = vfp_t(bminf);
@@ -341,26 +341,26 @@ class frustrum
         }
        
         /* Access functions */
-        fp_t get_min_x0()                   const { return this->n_ogn.x;               }
-        fp_t get_min_y0()                   const { return this->n_ogn.y;               }
-        fp_t get_min_z0()                   const { return this->n_ogn.z;               }
-        fp_t get_max_x0()                   const { return this->p_ogn.x;               }
-        fp_t get_max_y0()                   const { return this->p_ogn.y;               }
-        fp_t get_max_z0()                   const { return this->p_ogn.z;               }
+        float get_min_x0()                  const { return this->n_ogn.x;               }
+        float get_min_y0()                  const { return this->n_ogn.y;               }
+        float get_min_z0()                  const { return this->n_ogn.z;               }
+        float get_max_x0()                  const { return this->p_ogn.x;               }
+        float get_max_y0()                  const { return this->p_ogn.y;               }
+        float get_max_z0()                  const { return this->p_ogn.z;               }
        
-        fp_t get_min_x_grad()               const { return (fp_t)1.0/this->n_dir.x;     }
-        fp_t get_min_y_grad()               const { return (fp_t)1.0/this->n_dir.y;     }
-        fp_t get_min_z_grad()               const { return (fp_t)1.0/this->n_dir.z;     }
-        fp_t get_max_x_grad()               const { return (fp_t)1.0/this->p_dir.x;     }
-        fp_t get_max_y_grad()               const { return (fp_t)1.0/this->p_dir.y;     }
-        fp_t get_max_z_grad()               const { return (fp_t)1.0/this->p_dir.z;     }
+        float get_min_x_grad()              const { return 1.0f / this->n_dir.x;        }
+        float get_min_y_grad()              const { return 1.0f / this->n_dir.y;        }
+        float get_min_z_grad()              const { return 1.0f / this->n_dir.z;        }
+        float get_max_x_grad()              const { return 1.0f / this->p_dir.x;        }
+        float get_max_y_grad()              const { return 1.0f / this->p_dir.y;        }
+        float get_max_z_grad()              const { return 1.0f / this->p_dir.z;        }
         
-        fp_t get_min_x_igrad()              const { return this->n_dir.x;               }
-        fp_t get_min_y_igrad()              const { return this->n_dir.y;               }
-        fp_t get_min_z_igrad()              const { return this->n_dir.z;               }
-        fp_t get_max_x_igrad()              const { return this->p_dir.x;               }
-        fp_t get_max_y_igrad()              const { return this->p_dir.y;               }
-        fp_t get_max_z_igrad()              const { return this->p_dir.z;               }
+        float get_min_x_igrad()             const { return this->n_dir.x;               }
+        float get_min_y_igrad()             const { return this->n_dir.y;               }
+        float get_min_z_igrad()             const { return this->n_dir.z;               }
+        float get_max_x_igrad()             const { return this->p_dir.x;               }
+        float get_max_y_igrad()             const { return this->p_dir.y;               }
+        float get_max_z_igrad()             const { return this->p_dir.z;               }
         
         vfp_t get_ogn(unsigned int i)       const { return this->ogn[i];                }
         vfp_t get_dir(unsigned int i)       const { return this->dir[i];                }

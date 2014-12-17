@@ -57,22 +57,22 @@ class triangle : private boost::noncopyable
         point_t get_vertex_c()                      const       { return this->vertex_c;                        }
 
         /* KD-tree node classification */
-        fp_t get_x0()                               const       { return this->vertex_c.x;                      }
-        fp_t get_y0()                               const       { return this->vertex_c.y;                      }
-        fp_t get_z0()                               const       { return this->vertex_c.z;                      }
+        float get_x0()                               const       { return this->vertex_c.x;                      }
+        float get_y0()                               const       { return this->vertex_c.y;                      }
+        float get_z0()                               const       { return this->vertex_c.z;                      }
         
         /* Bounding box access functions for spatial subdivision */
-        fp_t    lowest_x()                          const       { return this->b.x;                             }
-        fp_t    lowest_y()                          const       { return this->b.y;                             }
-        fp_t    lowest_z()                          const       { return this->b.z;                             }
+        float    lowest_x()                          const       { return this->b.x;                             }
+        float    lowest_y()                          const       { return this->b.y;                             }
+        float    lowest_z()                          const       { return this->b.z;                             }
         point_t lowest_point()                      const       { return this->b;                               }
-        fp_t    highest_x()                         const       { return this->t.x;                             }
-        fp_t    highest_y()                         const       { return this->t.y;                             }
-        fp_t    highest_z()                         const       { return this->t.z;                             }
+        float    highest_x()                         const       { return this->t.x;                             }
+        float    highest_y()                         const       { return this->t.y;                             }
+        float    highest_z()                         const       { return this->t.z;                             }
         point_t highest_point()                     const       { return this->t;                               }
-        bool    is_intersecting_x(const fp_t s)     const       { return ((this->t.x > s) && (this->b.x < s));  }
-        bool    is_intersecting_y(const fp_t s)     const       { return ((this->t.y > s) && (this->b.y < s));  }
-        bool    is_intersecting_z(const fp_t s)     const       { return ((this->t.z > s) && (this->b.z < s));  }
+        bool    is_intersecting_x(const float s)     const       { return ((this->t.x > s) && (this->b.x < s));  }
+        bool    is_intersecting_y(const float s)     const       { return ((this->t.y > s) && (this->b.y < s));  }
+        bool    is_intersecting_z(const float s)     const       { return ((this->t.z > s) && (this->b.z < s));  }
         
         /* Ray tracing functions */
         inline void         is_intersecting(const ray *const r, hit_description *const h) const;
@@ -85,7 +85,7 @@ class triangle : private boost::noncopyable
         inline point_t      get_random_point(const int i) const;
         
         /* Generate secondary rays for packet tracing */
-        inline line generate_rays(const ray_trace_engine &r, ray &i, hit_description *const h, ray *const rl, ray *const rf, fp_t *const n_rl, fp_t *const n_rf) const
+        inline line generate_rays(const ray_trace_engine &r, ray &i, hit_description *const h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const
         {
             line norm = this->normal_at_point(&i, h);
             this->m->generate_rays(r, i, norm, h->h, rl, rf, n_rl, n_rf);
@@ -106,14 +106,14 @@ class triangle : private boost::noncopyable
             this->m->shade(r, i, n, h.h, c, text);
         }
         
-        inline void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const fp_t *const n_rl, const fp_t *const n_rf) const
+        inline void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const
         {
             this->m->combind_secondary_rays(r, c, rl, rf, c_rl, c_rf, n_rl, n_rf);
         }
 
     
     /* Physics functions */
-    inline fp_t is_intersecting(const triangle *const t, const point_t &tp, const point_t &p) const;
+    inline float is_intersecting(const triangle *const t, const point_t &tp, const point_t &p) const;
 
     private : 
         /* Primvate functions */
@@ -159,13 +159,13 @@ inline void triangle::calculate_pre_computes()
     assert(this->vertex_b != this->vertex_c);
 
     /* Pick the bounds of the triangle */
-    fp_t hi_x, lo_x, hi_y, lo_y, hi_z, lo_z;
-    hi_x = max(this->vertex_a.x, max(this->vertex_b.x, this->vertex_c.x));
-    lo_x = min(this->vertex_a.x, min(this->vertex_b.x, this->vertex_c.x));
-    hi_y = max(this->vertex_a.y, max(this->vertex_b.y, this->vertex_c.y));
-    lo_y = min(this->vertex_a.y, min(this->vertex_b.y, this->vertex_c.y));
-    hi_z = max(this->vertex_a.z, max(this->vertex_b.z, this->vertex_c.z));
-    lo_z = min(this->vertex_a.z, min(this->vertex_b.z, this->vertex_c.z));
+    float hi_x, lo_x, hi_y, lo_y, hi_z, lo_z;
+    hi_x = std::max(this->vertex_a.x, std::max(this->vertex_b.x, this->vertex_c.x));
+    lo_x = std::min(this->vertex_a.x, std::min(this->vertex_b.x, this->vertex_c.x));
+    hi_y = std::max(this->vertex_a.y, std::max(this->vertex_b.y, this->vertex_c.y));
+    lo_y = std::min(this->vertex_a.y, std::min(this->vertex_b.y, this->vertex_c.y));
+    hi_z = std::max(this->vertex_a.z, std::max(this->vertex_b.z, this->vertex_c.z));
+    lo_z = std::min(this->vertex_a.z, std::min(this->vertex_b.z, this->vertex_c.z));
     
     /* If the triangle falls into a plane add some width to it */
     if (fabs(hi_x - lo_x) < EPSILON)
@@ -187,21 +187,21 @@ inline void triangle::calculate_pre_computes()
     this->b = point_t(lo_x, lo_y, lo_z);
     
     /* Update scene bounding box */
-    triangle::scene_top.x = max(triangle::scene_top.x, hi_x);
-    triangle::scene_top.y = max(triangle::scene_top.y, hi_y);
-    triangle::scene_top.z = max(triangle::scene_top.z, hi_z);
-    triangle::scene_bot.x = min(triangle::scene_bot.x, lo_x);
-    triangle::scene_bot.y = min(triangle::scene_bot.y, lo_y);
-    triangle::scene_bot.z = min(triangle::scene_bot.z, lo_z);
+    triangle::scene_top.x = std::max(triangle::scene_top.x, hi_x);
+    triangle::scene_top.y = std::max(triangle::scene_top.y, hi_y);
+    triangle::scene_top.z = std::max(triangle::scene_top.z, hi_z);
+    triangle::scene_bot.x = std::min(triangle::scene_bot.x, lo_x);
+    triangle::scene_bot.y = std::min(triangle::scene_bot.y, lo_y);
+    triangle::scene_bot.z = std::min(triangle::scene_bot.z, lo_z);
 
     /* Calculate the normal */
     const point_t dir_b(this->vertex_b - this->vertex_a);
     const point_t dir_c(this->vertex_c - this->vertex_a);
     cross_product(dir_b, dir_c, &this->n);
-    assert(this->n != 0.0);
+    assert(this->n != 0.0f);
     
     /* Pick the major axis */
-    fp_t k_value, u_value, v_value, b_u_value, b_v_value, c_u_value, c_v_value;
+    float k_value, u_value, v_value, b_u_value, b_v_value, c_u_value, c_v_value;
     if (fabs(this->n.x) > fabs(this->n.y))
     {
         if (fabs(this->n.x) > fabs(this->n.z))
@@ -263,12 +263,12 @@ inline void triangle::calculate_pre_computes()
     }
     
     /* Precompute for intersection */
-    fp_t k_normal = 1.0/k_value;
+    float k_normal = 1.0/k_value;
     this->n_u = u_value * k_normal;
     this->n_v = v_value * k_normal;
     this->a.x = dot_product(this->n, this->vertex_a) * k_normal;
     
-    fp_t i_normal = 1.0/((b_u_value * c_v_value) - (b_v_value * c_u_value));
+    float i_normal = 1.0/((b_u_value * c_v_value) - (b_v_value * c_u_value));
     this->b_n_u =  b_u_value * i_normal;
     this->b_n_v = -b_v_value * i_normal;
     this->c_n_u =  c_v_value * i_normal;
@@ -339,7 +339,7 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
 inline void triangle::is_intersecting(const ray *const r, hit_description *const h) const 
 {
     /* Pick componants based on the major axis of the triangle */
-    fp_t r_k, r_u, r_v, dir_k, dir_u, dir_v;
+    float r_k, r_u, r_v, dir_k, dir_u, dir_v;
     switch (this->k)
     {
         case  0 : r_k   = r->get_x0();
@@ -368,15 +368,15 @@ inline void triangle::is_intersecting(const ray *const r, hit_description *const
     }
     
     /* Calculate distance to intersection with the plane of the triangle */
-    fp_t ray_dot_normal = dir_k + (this->n_u * dir_u) + (this->n_v * dir_v);
-    if (ray_dot_normal == 0.0)
+    float ray_dot_normal = dir_k + (this->n_u * dir_u) + (this->n_v * dir_v);
+    if (ray_dot_normal == 0.0f)
     {
         h->d = MAX_DIST;
         return;
     }
 
     /* NOTE -- this->a.x stores (n dot a) * (1.0 / k_value) */
-    fp_t dist = (this->a.x - r_k - (this->n_u * r_u) - (this->n_v * r_v)) / ray_dot_normal;
+    float dist = (this->a.x - r_k - (this->n_u * r_u) - (this->n_v * r_v)) / ray_dot_normal;
     if ((dist < EPSILON) || (dist > h->d))
     {
         h->d = MAX_DIST;
@@ -385,17 +385,17 @@ inline void triangle::is_intersecting(const ray *const r, hit_description *const
 
     /* Check intersection is within the bounds of the triangle */
     /* NOTE -- this->a has already been translated into the major axis */
-    fp_t h_u  = (r_u - this->a.y) + (dist * dir_u);
-    fp_t h_v  = (r_v - this->a.z) + (dist * dir_v);
-    fp_t beta = (h_v * this->b_n_u) + (h_u  * this->b_n_v);
-    if (beta < 0.0)
+    float h_u  = (r_u - this->a.y) + (dist * dir_u);
+    float h_v  = (r_v - this->a.z) + (dist * dir_v);
+    float beta = (h_v * this->b_n_u) + (h_u  * this->b_n_v);
+    if (beta < 0.0f)
     {
         h->d = MAX_DIST;
         return;
     }
     
-    fp_t gamma = (h_u * this->c_n_u) + (h_v * this->c_n_v);
-    if ((gamma < 0.0) || ((beta + gamma) > 1.0))
+    float gamma = (h_u * this->c_n_u) + (h_v * this->c_n_v);
+    if ((gamma < 0.0f) || ((beta + gamma) > 1.0f))
     {
         h->d = MAX_DIST;
         return;
@@ -637,11 +637,11 @@ inline void triangle::is_intersecting(const frustrum &f, const packet_ray *const
 ************************************************************/
 inline line triangle::normal_at_point(ray *const r, hit_description *const h) const
 {
-    const fp_t denom  = dot_product(this->n, r->get_dir());
+    const float denom  = dot_product(this->n, r->get_dir());
 #ifdef SINGLE_PRECISION
     /* Re-calculate the intesection of the ray with the plane of the triangle */
     /* This gives a more accurate hit point to adjust the ray to */
-    const fp_t num    = dot_product(this->n, (this->vertex_c - r->get_dst()));
+    const float num    = dot_product(this->n, (this->vertex_c - r->get_dst()));
     r->change_length(num/denom);
 #endif /* #ifdef SINGLE_PRECISION */
 
@@ -683,13 +683,13 @@ inline line triangle::normal_at_point(ray *const r, hit_description *const h) co
 ************************************************************/
 inline point_t triangle::get_random_point(const int i) const
 {
-    fp_t x_h8 = (this->highest_x() - this->lowest_x())/8.0;
-    fp_t y_h8 = (this->highest_y() - this->lowest_y())/8.0;
-    fp_t z_h8 = (this->highest_z() - this->lowest_z())/8.0;
+    float x_h8 = (this->highest_x() - this->lowest_x())/8.0;
+    float y_h8 = (this->highest_y() - this->lowest_y())/8.0;
+    float z_h8 = (this->highest_z() - this->lowest_z())/8.0;
     
-    fp_t x = this->vertex_c.x + (static_cast<float> (i     & 0x3) * x_h8) + (gen_random_mersenne_twister() * x_h8);
-    fp_t y = this->vertex_c.z + (static_cast<float>((i>>2) & 0x3) * y_h8) + (gen_random_mersenne_twister() * y_h8);
-    fp_t z = this->vertex_c.y + (static_cast<float>((i>>2) & 0x3) * z_h8) + (gen_random_mersenne_twister() * z_h8);
+    float x = this->vertex_c.x + (static_cast<float> (i     & 0x3) * x_h8) + (gen_random_mersenne_twister() * x_h8);
+    float y = this->vertex_c.z + (static_cast<float>((i>>2) & 0x3) * y_h8) + (gen_random_mersenne_twister() * y_h8);
+    float z = this->vertex_c.y + (static_cast<float>((i>>2) & 0x3) * z_h8) + (gen_random_mersenne_twister() * z_h8);
     
     return point_t(x,y,z);
 }
@@ -701,17 +701,17 @@ inline point_t triangle::get_random_point(const int i) const
 inline void triangle::find_rays(ray *const r, const point_t &d, const int n) const
 {
     /* Scales */
-    const fp_t beta_scale    = 1.0f / static_cast<float>((n >> 4) + ((n & 0xe) != 0) + 1);
-    const fp_t gamma_scale   = 1.0f / static_cast<float>((n >> 4) + ((n & 0xc) != 0) + 1);
+    const float beta_scale    = 1.0f / static_cast<float>((n >> 4) + ((n & 0xe) != 0) + 1);
+    const float gamma_scale   = 1.0f / static_cast<float>((n >> 4) + ((n & 0xc) != 0) + 1);
 
     /* Create n rays, each with a random offset in a fixed volume */
     for (int i = 0; i < n; i++)
     {
         /* Generate a legal barycenrtic co-ordinate */
         const int eigths    = (i >> 2) & ~0x1;
-        const fp_t beta     = gen_random_mersenne_twister() * (beta_scale  * static_cast<float>(eigths + (i & 0x1)));
-        const fp_t gamma    = gen_random_mersenne_twister() * (gamma_scale * static_cast<float>(eigths + (i & 0x2))) * (1.0f - beta);
-        const fp_t alpha    =1.0f - (beta + gamma);
+        const float beta     = gen_random_mersenne_twister() * (beta_scale  * static_cast<float>(eigths + (i & 0x1)));
+        const float gamma    = gen_random_mersenne_twister() * (gamma_scale * static_cast<float>(eigths + (i & 0x2))) * (1.0f - beta);
+        const float alpha    =1.0f - (beta + gamma);
 
         /* Convert to cartesian co-ordinates */
         point_t p = (this->vertex_a * alpha) + (this->vertex_b * beta) + (this->vertex_c * gamma);
@@ -724,7 +724,7 @@ inline void triangle::find_rays(ray *const r, const point_t &d, const int n) con
 }
 
 
-inline void intersect(const point_t &v, const point_t &d, fp_t *const interval)
+inline void intersect(const point_t &v, const point_t &d, float *const interval)
 {
     (interval[0]) = v.x + (v.y - v.x) * d.x / (d.x - d.y);
     (interval[1]) = v.x + (v.z - v.x) * d.x / (d.x - d.z);
@@ -733,7 +733,7 @@ inline void intersect(const point_t &v, const point_t &d, fp_t *const interval)
 }
 
 
-inline void compute_intervals(const point_t &v, const point_t &d, const fp_t d0d1, const fp_t d0d2, fp_t *const interval)
+inline void compute_intervals(const point_t &v, const point_t &d, const float d0d1, const float d0d2, float *const interval)
 {
     if (d0d1 > 0.0f)                      
     {                                  
@@ -762,7 +762,7 @@ inline void compute_intervals(const point_t &v, const point_t &d, const fp_t d0d
     else                                               
     {
         /* triangles are coplanar */
-        cout << "co planar" << endl;
+        std::cout << "co planar" << std::endl;
         return;// coplanar_tri_tri(n1,v0,v1,v2,u0,u1,u2);
     }
 }
@@ -771,13 +771,13 @@ inline void compute_intervals(const point_t &v, const point_t &d, const fp_t d0d
 /***********************************************************
   .
 ************************************************************/
-inline fp_t triangle::is_intersecting(const triangle *const t, const point_t &tp, const point_t &p) const
+inline float triangle::is_intersecting(const triangle *const t, const point_t &tp, const point_t &p) const
 {
     /* Test the vertices of t are on the same side of this */
-    const fp_t this_d   = dot_product(-this->n, this->vertex_a + p);
-    const fp_t t_da     = dot_product(t->vertex_a + tp, this->n) + this_d;
-    const fp_t t_db     = dot_product(t->vertex_b + tp, this->n) + this_d;
-    const fp_t t_dc     = dot_product(t->vertex_c + tp, this->n) + this_d;
+    const float this_d   = dot_product(-this->n, this->vertex_a + p);
+    const float t_da     = dot_product(t->vertex_a + tp, this->n) + this_d;
+    const float t_db     = dot_product(t->vertex_b + tp, this->n) + this_d;
+    const float t_dc     = dot_product(t->vertex_c + tp, this->n) + this_d;
     if (((t_da < 0.0) && (t_db < 0.0) && (t_dc < 0.0)) ||
         ((t_da > 0.0) && (t_db > 0.0) && (t_dc > 0.0)))
     {
@@ -786,10 +786,10 @@ inline fp_t triangle::is_intersecting(const triangle *const t, const point_t &tp
     }
 
     /* Test the vertices of this are on the same side of t */
-    const fp_t t_d      = dot_product(-t->n, t->vertex_a + tp);
-    const fp_t this_da  = dot_product(this->vertex_a + p, t->n) + t_d;
-    const fp_t this_db  = dot_product(this->vertex_b + p, t->n) + t_d;
-    const fp_t this_dc  = dot_product(this->vertex_c + p, t->n) + t_d;
+    const float t_d      = dot_product(-t->n, t->vertex_a + tp);
+    const float this_da  = dot_product(this->vertex_a + p, t->n) + t_d;
+    const float this_db  = dot_product(this->vertex_b + p, t->n) + t_d;
+    const float this_dc  = dot_product(this->vertex_c + p, t->n) + t_d;
     if (((this_da < 0.0) && (this_db < 0.0) && (this_dc < 0.0)) ||
         ((this_da > 0.0) && (this_db > 0.0) && (this_dc > 0.0)))
     {
@@ -802,9 +802,9 @@ inline fp_t triangle::is_intersecting(const triangle *const t, const point_t &tp
     cross_product(this->n, t->n, &l);
     
     /* compute and index to the largest component of l */
-    fp_t max_l  = fabs(l.x);
-    fp_t b      = fabs(l.y);
-    fp_t c      = fabs(l.z);
+    float max_l  = fabs(l.x);
+    float b      = fabs(l.y);
+    float c      = fabs(l.z);
     int  index  = 0;
     if(b > max_l) 
     {
@@ -825,25 +825,25 @@ inline fp_t triangle::is_intersecting(const triangle *const t, const point_t &tp
                             t->vertex_c[index] + tp[index]);
 
     /* compute interval for triangle 1 */
-    fp_t this_inter[2] = { 0.0, 0.0 };
+    float this_inter[2] = { 0.0f, 0.0f };
     compute_intervals(this_p, point_t(this_da, this_db, this_dc), (this_da * this_db), (this_da * this_dc), this_inter);
 
     /* compute interval for triangle 2 */
-    fp_t t_inter[2] = { 0.0, 0.0 };
+    float t_inter[2] = { 0.0f, 0.0f };
     compute_intervals(t_p, point_t(t_da, t_db, t_dc), (t_da * this_db), (t_da * this_dc), t_inter);
 
-    const fp_t this_lower   = min(this_inter[0], this_inter[1]);
-    const fp_t this_upper   = max(this_inter[0], this_inter[1]);
-    const fp_t t_lower      = min(t_inter[0],    t_inter[1]);
-    const fp_t t_upper      = max(t_inter[0],    t_inter[1]);
+    const float this_lower   = std::min(this_inter[0], this_inter[1]);
+    const float this_upper   = std::max(this_inter[0], this_inter[1]);
+    const float t_lower      = std::min(t_inter[0],    t_inter[1]);
+    const float t_upper      = std::max(t_inter[0],    t_inter[1]);
 
     if((this_upper < t_lower) || (t_upper < this_lower))
     {
-        return 0.0;
+        return 0.0f;
     }
 
     /* Collision */
-    return min((this_upper - t_lower), (t_upper - this_lower));
+    return std::min((this_upper - t_lower), (t_upper - this_lower));
 }
 
 
