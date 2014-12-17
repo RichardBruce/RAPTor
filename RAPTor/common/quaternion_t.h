@@ -21,16 +21,16 @@ class quaternion_t
     public :
         /* CTOR */
         /* From components */
-        quaternion_t(const fp_t w = 1.0, const fp_t x = 0.0, const fp_t y = 0.0, const fp_t z = 0.0)
+        quaternion_t(const float w = 1.0f, const float x = 0.0f, const float y = 0.0f, const float z = 0.0f)
             : w(w), x(x), y(y), z(z) { };
 
         /* From axis and angle */
-        quaternion_t(const point_t &axis, const fp_t theta)
+        quaternion_t(const point_t &axis, const float theta)
             : w(), x(axis.x), y(axis.y), z(axis.z)
             {
-                const fp_t half_theta = theta * 0.5;
-                const fp_t cos_theta = cos(half_theta);
-                const fp_t sin_theta = sin(half_theta);
+                const float half_theta = theta * 0.5f;
+                const float cos_theta = cos(half_theta);
+                const float sin_theta = sin(half_theta);
                 w = cos_theta;
                 x *= sin_theta;
                 y *= sin_theta;
@@ -40,13 +40,13 @@ class quaternion_t
         /* From Euler angles */
         quaternion_t(const point_t &a)
         {
-            const fp_t cos_x = cos(a.x * 0.5);
-            const fp_t cos_y = cos(a.y * 0.5);
-            const fp_t cos_z = cos(a.z * 0.5);
+            const float cos_x = cos(a.x * 0.5f);
+            const float cos_y = cos(a.y * 0.5f);
+            const float cos_z = cos(a.z * 0.5f);
 
-            const fp_t sin_x = sin(a.x * 0.5);
-            const fp_t sin_y = sin(a.y * 0.5);
-            const fp_t sin_z = sin(a.z * 0.5);
+            const float sin_x = sin(a.x * 0.5f);
+            const float sin_y = sin(a.y * 0.5f);
+            const float sin_z = sin(a.z * 0.5f);
 
             w = (cos_x * cos_y * cos_z) + (sin_x * sin_y * sin_z);
             x = (sin_x * cos_y * cos_z) - (cos_x * sin_y * sin_z);
@@ -82,10 +82,10 @@ class quaternion_t
 
         quaternion_t& operator*=(const quaternion_t &rhs)
         {
-            const fp_t tmp_w = (w * rhs.w) - (x * rhs.x) - (y * rhs.y) - (z * rhs.z);
-            const fp_t tmp_x = (w * rhs.x) + (x * rhs.w) + (y * rhs.z) - (z * rhs.y);
-            const fp_t tmp_y = (w * rhs.y) - (x * rhs.z) + (y * rhs.w) + (z * rhs.x);
-            const fp_t tmp_z = (w * rhs.z) + (x * rhs.y) - (y * rhs.x) + (z * rhs.w);
+            const float tmp_w = (w * rhs.w) - (x * rhs.x) - (y * rhs.y) - (z * rhs.z);
+            const float tmp_x = (w * rhs.x) + (x * rhs.w) + (y * rhs.z) - (z * rhs.y);
+            const float tmp_y = (w * rhs.y) - (x * rhs.z) + (y * rhs.w) + (z * rhs.x);
+            const float tmp_z = (w * rhs.z) + (x * rhs.y) - (y * rhs.x) + (z * rhs.w);
 
             w = tmp_w;
             x = tmp_x;
@@ -110,13 +110,13 @@ class quaternion_t
             return *this;
         }
 
-        quaternion_t& operator+=(const fp_t &rhs)
+        quaternion_t& operator+=(const float &rhs)
         {
             w += rhs;
             return *this;
         }
 
-        quaternion_t& operator-=(const fp_t &rhs)
+        quaternion_t& operator-=(const float &rhs)
         {
             w -= rhs;
             return *this;
@@ -138,49 +138,49 @@ class quaternion_t
 
         point_t rotate(const point_t p) const
         {
-            return p + (2.0 * cross_product(*this, cross_product(*this, p))) + (2.0 * w * cross_product(*this, p));
+            return p + (2.0f * cross_product(*this, cross_product(*this, p))) + (2.0f * w * cross_product(*this, p));
         }
 
         quaternion_t rotate(point_t *const p) const
         {
-            (*p) = (*p) + (2.0 * cross_product(*this, cross_product(*this, (*p)))) + (2.0 * w * cross_product(*this, (*p)));
+            (*p) = (*p) + (2.0f * cross_product(*this, cross_product(*this, (*p)))) + (2.0f * w * cross_product(*this, (*p)));
             return *this;
         }
 
-        const quaternion_t& rotation_matrix(fp_t *const r) const
+        const quaternion_t& rotation_matrix(float *const r) const
         {
-            const fp_t xx = x * x;
-            const fp_t xy = x * y;
-            const fp_t xz = x * z;
-            const fp_t xw = x * w;
+            const float xx = x * x;
+            const float xy = x * y;
+            const float xz = x * z;
+            const float xw = x * w;
 
-            const fp_t yy = y * y;
-            const fp_t yz = y * z;
-            const fp_t yw = y * w;
+            const float yy = y * y;
+            const float yz = y * z;
+            const float yw = y * w;
 
-            const fp_t zz = z * z;
-            const fp_t zw = z * w;
+            const float zz = z * z;
+            const float zw = z * w;
 
-            r[0] = 1.0 - 2.0 * (yy + zz);
-            r[1] =       2.0 * (xy - zw);
-            r[2] =       2.0 * (xz + yw);
+            r[0] = 1.0f - 2.0f * (yy + zz);
+            r[1] =        2.0f * (xy - zw);
+            r[2] =        2.0f * (xz + yw);
 
-            r[3] =       2.0 * (xy + zw);
-            r[4] = 1.0 - 2.0 * (xx + zz);
-            r[5] =       2.0 * (yz - xw);
+            r[3] =        2.0f * (xy + zw);
+            r[4] = 1.0f - 2.0f * (xx + zz);
+            r[5] =        2.0f * (yz - xw);
 
-            r[6] =       2.0 * (xz - yw);
-            r[7] =       2.0 * (yz + xw);
-            r[8] = 1.0 - 2.0 * (xx + yy);
+            r[6] =        2.0f * (xz - yw);
+            r[7] =        2.0f * (yz + xw);
+            r[8] = 1.0f - 2.0f * (xx + yy);
 
             return *this;
         }
 
         /* Data members */
-        fp_t w;
-        fp_t x;
-        fp_t y;
-        fp_t z;
+        float w;
+        float x;
+        float y;
+        float z;
 
     private :
         friend class boost::serialization::access;
@@ -197,23 +197,23 @@ class quaternion_t
 
 
 /* Degugging */
-inline ostream& operator<<(ostream &os, const quaternion_t &p)
+inline std::ostream& operator<<(std::ostream &os, const quaternion_t &p)
 {
     return os << p.w << ", " << p.x << ", " << p.y << ", " << p.z;
 }
 
 /* Binary operators */
-inline const quaternion_t operator+(const quaternion_t &lhs, const fp_t rhs)
+inline const quaternion_t operator+(const quaternion_t &lhs, const float rhs)
 {
    return quaternion_t(lhs.w + rhs, lhs.x + rhs, lhs.y + rhs, lhs.z + rhs);
 }
 
-inline const quaternion_t operator-(const quaternion_t &lhs, const fp_t rhs)
+inline const quaternion_t operator-(const quaternion_t &lhs, const float rhs)
 {
    return quaternion_t(lhs.w - rhs, lhs.x - rhs, lhs.y - rhs, lhs.z - rhs);
 }
 
-inline const quaternion_t operator*(const quaternion_t &lhs, const fp_t rhs)
+inline const quaternion_t operator*(const quaternion_t &lhs, const float rhs)
 {
    return quaternion_t(lhs.w * rhs, lhs.x * rhs, lhs.y * rhs, lhs.z * rhs);
 }
@@ -231,29 +231,29 @@ inline const quaternion_t operator-(const quaternion_t &lhs, const quaternion_t 
 inline const quaternion_t operator*(const quaternion_t &lhs, const quaternion_t &rhs)
 {
     return quaternion_t((lhs.w * rhs.w) - (lhs.x * rhs.x) - (lhs.y * rhs.y) - (lhs.z * rhs.z),
-                      (lhs.w * rhs.x) + (lhs.x * rhs.w) + (lhs.y * rhs.z) - (lhs.z * rhs.y),
-                      (lhs.w * rhs.y) - (lhs.x * rhs.z) + (lhs.y * rhs.w) + (lhs.z * rhs.x),
-                      (lhs.w * rhs.z) + (lhs.x * rhs.y) - (lhs.y * rhs.x) + (lhs.z * rhs.w));
+                        (lhs.w * rhs.x) + (lhs.x * rhs.w) + (lhs.y * rhs.z) - (lhs.z * rhs.y),
+                        (lhs.w * rhs.y) - (lhs.x * rhs.z) + (lhs.y * rhs.w) + (lhs.z * rhs.x),
+                        (lhs.w * rhs.z) + (lhs.x * rhs.y) - (lhs.y * rhs.x) + (lhs.z * rhs.w));
 }
 
-inline const quaternion_t operator+(const fp_t lhs, const quaternion_t &rhs)
+inline const quaternion_t operator+(const float lhs, const quaternion_t &rhs)
 {
    return quaternion_t(lhs + rhs.w, lhs + rhs.x, lhs + rhs.y, lhs + rhs.z);
 }
 
-inline const quaternion_t operator-(const fp_t lhs, const quaternion_t &rhs)
+inline const quaternion_t operator-(const float lhs, const quaternion_t &rhs)
 {
    return quaternion_t(lhs - rhs.w, lhs - rhs.x, lhs - rhs.y, lhs - rhs.z);
 }
 
-inline const quaternion_t operator*(const fp_t lhs, const quaternion_t &rhs)
+inline const quaternion_t operator*(const float lhs, const quaternion_t &rhs)
 {
    return quaternion_t(lhs * rhs.w, lhs * rhs.x, lhs * rhs.y, lhs * rhs.z);
 }
 
 
 /* Special functions */
-inline fp_t magnitude(const quaternion_t &a)
+inline float magnitude(const quaternion_t &a)
 {
     return sqrt((a.w * a.w) + (a.x * a.x) + (a.y * a.y) + (a.z * a.z));
 }
@@ -261,7 +261,7 @@ inline fp_t magnitude(const quaternion_t &a)
 
 inline void normalise(quaternion_t *const a)
 {
-    const fp_t dist = sqrt((a->w * a->w) + (a->x * a->x) + (a->y * a->y) + (a->z * a->z));
+    const float dist = sqrt((a->w * a->w) + (a->x * a->x) + (a->y * a->y) + (a->z * a->z));
     a->w /= dist;
     a->x /= dist;
     a->y /= dist;
@@ -272,7 +272,7 @@ inline void normalise(quaternion_t *const a)
 
 inline quaternion_t normalise(quaternion_t a)
 {
-    const fp_t dist = sqrt((a.w * a.w) + (a.x * a.x) + (a.y * a.y) + (a.z * a.z));
+    const float dist = sqrt((a.w * a.w) + (a.x * a.x) + (a.y * a.y) + (a.z * a.z));
     a.w /= dist;
     a.x /= dist;
     a.y /= dist;

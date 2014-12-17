@@ -131,7 +131,7 @@ class physics_object : private boost::noncopyable
         physics_object& apply_force(const point_t &at, const point_t &f, const float t)
         {
             /* No point pushing an infinite mass object */
-            if (get_mass() == numeric_limits<float>::infinity())
+            if (get_mass() == std::numeric_limits<float>::infinity())
             {
                 return *this;
             }
@@ -249,13 +249,13 @@ class physics_object : private boost::noncopyable
         const point_t get_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
-            return (_i->mass() == numeric_limits<float>::infinity()) ? 0.0 : ( _i->mass() * _v);
+            return (_i->mass() == std::numeric_limits<float>::infinity()) ? 0.0 : ( _i->mass() * _v);
         }
 
         const point_t get_angular_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
-            return (_i->mass() == numeric_limits<float>::infinity()) ? point_t(0.0, 0.0, 0.0) : (get_orientated_tensor() * _w);
+            return (_i->mass() == std::numeric_limits<float>::infinity()) ? point_t(0.0, 0.0, 0.0) : (get_orientated_tensor() * _w);
         }
 
         /* Vertex getters */
