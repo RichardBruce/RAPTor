@@ -15,7 +15,7 @@ class phong_shader : public material
 {
     public :
         /* Constructor with white co-efficient */
-        phong_shader(const ext_colour_t &rgb, const float kd =0.0f, const float ks =0.0f, const float s =0.0f, const float tran =0.0f, const float ri =1.0f, const float rf =0.0f, 
+        phong_shader(const ext_colour_t &rgb, const float kd = 0.0f, const float ks = 0.0f, const float s = 0.0f, const float tran = 0.0f, const float ri = 1.0f, const float rf = 0.0f, 
             const float td = 0.0f, const float rfd = 0.0f) : 
             material(tran > 0.0f), ka(ext_colour_t(0.0f, 0.0f, 0.0f)), kd(rgb * kd), ks(rgb * ks), s(s), tran(tran), ri(ri), rf(rf), td(td), rfd(rfd) 
             {
@@ -32,7 +32,7 @@ class phong_shader : public material
             };
 
         /* Constructor with coloured co-efficient */
-        phong_shader(const ext_colour_t &ka, const ext_colour_t &kd, const ext_colour_t &ks, const float s =0.0f, const float tran =0.0f, const float ri =1.0f, const float rf =0.0f, 
+        phong_shader(const ext_colour_t &ka, const ext_colour_t &kd, const ext_colour_t &ks, const float s = 0.0f, const float tran = 0.0f, const float ri = 1.0f, const float rf = 0.0f, 
             const float td = 0.0f, const float rfd = 0.0f) : 
             material(tran > 0.0f), ka(ka), kd(kd), ks(ks), s(s), tran(tran), ri(ri), rf(rf), td(td), rfd(rfd) 
             {

@@ -29,20 +29,20 @@ class texture_mapper
         virtual ~texture_mapper() { };
 
         /* Pure virtual texture mapping function. Takes the destination of the incident ray and normal of the hit surface.
-           returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        virtual fp_t texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const = 0;
+           returns either a float (alpha, kd, ks, t, r....), a colour (rgb) or both */
+        virtual float texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const = 0;
 
     private :
 };
 
 
-inline unsigned read_jpeg(fp_t **img, const char *const filename, unsigned *const h, unsigned *const w)
+inline unsigned read_jpeg(float **img, const char *const filename, unsigned *const h, unsigned *const w)
 {
     /* Open the input file */
     FILE *infile = fopen(filename, "rb");
     if (!infile)
     {
-    	cout << "Error opening jpeg file " << filename << " for input"  << endl;
+    	std::cout << "Error opening jpeg file " << filename << " for input"  << std::endl;
     	assert(!"Cannot open file");
     }
 
@@ -60,7 +60,7 @@ inline unsigned read_jpeg(fp_t **img, const char *const filename, unsigned *cons
     jpeg_start_decompress(&cinfo);
 
     /* Allocate memory to hold the uncompressed image */
-    *img = new fp_t[cinfo.output_width * cinfo.output_height * cinfo.num_components];
+    *img = new float[cinfo.output_width * cinfo.output_height * cinfo.num_components];
     *h   = cinfo.output_height;
     *w   = cinfo.output_width;
 

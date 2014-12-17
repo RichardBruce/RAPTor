@@ -23,7 +23,7 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const line &n, cons
     /* Get the colour of the material */
     ext_colour_t rgb = this->rgb;
     float alpha  = 1.0f;
-    for (list<texture_mapper *>::const_iterator j = this->ctex.begin(); j != this->ctex.end() ; ++j)
+    for (auto j = this->ctex.begin(); j != this->ctex.end() ; ++j)
     {
         alpha *= (*j)->texture_map(&rgb, i.get_dst(), n.get_dir(), vt);
         
@@ -37,7 +37,7 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const line &n, cons
     float cur_kd    = this->kd;
     alpha           = 1.0f;
     ext_colour_t param;
-    for (list<texture_mapper *>::const_iterator j = this->dtex.begin(); j != this->dtex.end() ; ++j)
+    for (auto j = this->dtex.begin(); j != this->dtex.end() ; ++j)
     {
         alpha *= (*j)->texture_map(&param, i.get_dst(), n.get_dir(), vt);
         cur_kd = magnitude(param) / 255.0f;
@@ -91,7 +91,7 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const line &n, cons
     /* Get the transparency of the material */
     float refl  = this->rf;
     alpha       = 1.0f;
-    for (list<texture_mapper *>::const_iterator j = this->rtex.begin(); j != this->rtex.end() ; ++j)
+    for (auto j = this->rtex.begin(); j != this->rtex.end() ; ++j)
     {
         alpha *= (*j)->texture_map(&rgb, i.get_dst(), n.get_dir(), vt);
         refl = rgb.r / 255.0f;
@@ -128,7 +128,7 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const line &n, cons
     /* Get the transparency of the material */
     float trans = tran;
     alpha       = 1.0f;
-    for (list<texture_mapper *>::const_iterator j = this->ttex.begin(); j != this->ttex.end() ; ++j)
+    for (auto j = this->ttex.begin(); j != this->ttex.end() ; ++j)
     {
         alpha *= (*j)->texture_map(&rgb, i.get_dst(), n.get_dir(), vt);
         trans = rgb.r / 255.0f;

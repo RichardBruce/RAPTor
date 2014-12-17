@@ -190,7 +190,7 @@ inline float geometric_attenuation_factor(const float nh, const float nv, const 
 {
     const float g0 = (2.0f * nh * nv ) / vh;
     const float g1 = (2.0f * nh * nl ) / vh;
-    return min(1.0f, max(0.0f, min(g0, g1)));
+    return std::min(1.0f, std::max(0.0f, std::min(g0, g1)));
 }
 
 
@@ -261,7 +261,7 @@ inline float beckmann_facet_distribution(const float a, const float m, const flo
 inline float linear_colour_shift(const float c0, const float c90, const float fa, const float f0, const float f90)
 {
     /* calpha = c0 + ((c90 - c0) * (max(0,Falpha - F0)/F90- F0)) */
-    return c0 + ((c90 - c0) * (max(0.0f, (fa - f0)) / (f90- f0)));
+    return c0 + ((c90 - c0) * (std::max(0.0f, (fa - f0)) / (f90- f0)));
 }
 
 
@@ -338,9 +338,9 @@ inline ext_colour_t& cxy_to_rgb(const float c_x, const float c_y, const float y,
     cout[2] = (xyz2rgbmat[2][0] * cie[0]) + (xyz2rgbmat[2][1] * cie[1]) + (xyz2rgbmat[2][2] * cie[2]);
 
     /* Bound the rgb value */
-    rgb->r = max(0.0f, min(1.0f, cout[0])) * 255.0f;
-    rgb->g = max(0.0f, min(1.0f, cout[1])) * 255.0f;
-    rgb->b = max(0.0f, min(1.0f, cout[2])) * 255.0f;
+    rgb->r = std::max(0.0f, std::min(1.0f, cout[0])) * 255.0f;
+    rgb->g = std::max(0.0f, std::min(1.0f, cout[1])) * 255.0f;
+    rgb->b = std::max(0.0f, std::min(1.0f, cout[2])) * 255.0f;
     return *rgb;
 }
 }; /* namespace raptor_raytracer */
