@@ -10,11 +10,11 @@ extern "C"
 
 namespace raptor_raytracer
 {
-bool                cur_light   = false;
-light_list          *global_l   = nullptr;
-primitive_list      *global_e   = nullptr;
-list<material *>    *global_m   = nullptr;
-material            *cur_mat    = nullptr;
+bool                    cur_light   = false;
+light_list              *global_l   = nullptr;
+primitive_list          *global_e   = nullptr;
+std::list<material *>   *global_m   = nullptr;
+material                *cur_mat    = nullptr;
 
 
 void appply_material()
@@ -51,12 +51,12 @@ void appply_material()
 //		return(MG_EARGC);
 //    }
 //    
-//    if ((vp0 = c_getvert(av[1])) == NULL)	        /* vertex from name */
+//    if ((vp0 = c_getvert(av[1])) == nullptr)	        /* vertex from name */
 //    {
 //    	return(MG_EUNDEF);
 //    }
 //
-//    if ((vp1 = c_getvert(av[3])) == NULL)	        /* vertex from name */
+//    if ((vp1 = c_getvert(av[3])) == nullptr)	        /* vertex from name */
 //    {
 //    	return(MG_EUNDEF);
 //    }
@@ -91,12 +91,12 @@ void appply_material()
 //		return(MG_EARGC);
 //    }
 //    
-//    if ((vp0 = c_getvert(av[1])) == NULL)	        /* vertex from name */
+//    if ((vp0 = c_getvert(av[1])) == nullptr)	        /* vertex from name */
 //    {
 //    	return(MG_EUNDEF);
 //    }
 //
-//    if ((vp1 = c_getvert(av[3])) == NULL)	        /* vertex from name */
+//    if ((vp1 = c_getvert(av[3])) == nullptr)	        /* vertex from name */
 //    {
 //    	return(MG_EUNDEF);
 //    }
@@ -143,7 +143,7 @@ void appply_material()
 //		return(MG_EARGC);
 //    }
 //    
-//    if ((vp = c_getvert(av[1])) == NULL)	        /* vertex from name */
+//    if ((vp = c_getvert(av[1])) == nullptr)	        /* vertex from name */
 //    {
 //    	return(MG_EUNDEF);
 //    }
@@ -174,7 +174,7 @@ void appply_material()
 //		return(MG_EARGC);
 //    }
 //    
-//    if ((vp = c_getvert(av[1])) == NULL)            /* vertex from name */
+//    if ((vp = c_getvert(av[1])) == nullptr)            /* vertex from name */
 //    {
 //    	return(MG_EUNDEF);
 //    }
@@ -208,19 +208,19 @@ void appply_material()
 //}
 
 
-int mgf_face_handler(int ac, char **av)             /* face handling routine */
+int mgf_face_handler(int ac, char **av)     /* face handling routine */
 {
-    vector<point_t> points;
-    vector<point_t> normals;
-	C_VERTEX        *vp;	                    /* vertex structure pointer */
-	FVECT           vert;		                /* vertex point location */
-	FVECT           norm;		                /* vertex normal */
-	int	            i;
+    std::vector<point_t>    points;
+    std::vector<point_t>    normals;
+    C_VERTEX                *vp;            /* vertex structure pointer */
+    FVECT                   vert;           /* vertex point location */
+    FVECT                   norm;           /* vertex normal */
+    int                     i;
 
     /* check # arguments */
-	if (ac < 4)
+    if (ac < 4)
     {
-		return(MG_EARGC);
+        return(MG_EARGC);
     }
     
     /* Make sure the first and last vertex arnt the same */
@@ -230,7 +230,7 @@ int mgf_face_handler(int ac, char **av)             /* face handling routine */
     }
     
     /* Check for vertex normals */
-    if ((vp = c_getvert(av[1])) == NULL)
+    if ((vp = c_getvert(av[1])) == nullptr)
     {
     	return(MG_EUNDEF);
     }
@@ -239,12 +239,12 @@ int mgf_face_handler(int ac, char **av)             /* face handling routine */
     xf_rotvect(norm, vp->n);
 
     /* No vertex normals */
-    if ((norm[0] == 0.0) && (norm[1] == 0.0) && (norm[2] == 0.0))
+    if ((norm[0] == 0.0f) && (norm[1] == 0.0f) && (norm[2] == 0.0f))
     {
-    	for (i = 1; i < ac; i++)
+    	for (i = 1; i < ac; ++i)
         {
             /* get vertex from name */
-    		if ((vp = c_getvert(av[i])) == NULL)
+    		if ((vp = c_getvert(av[i])) == nullptr)
             {
         			return(MG_EUNDEF);
             }
@@ -264,9 +264,9 @@ int mgf_face_handler(int ac, char **av)             /* face handling routine */
     /* Vertex normals */
     else
     {
-    	for (i = 1; i < ac; i++)
+    	for (i = 1; i < ac; ++i)
         {
-    		if ((vp = c_getvert(av[i])) == NULL)	    /* vertex from name */
+    		if ((vp = c_getvert(av[i])) == nullptr)	    /* vertex from name */
             {
     			return(MG_EUNDEF);
             }
@@ -278,7 +278,7 @@ int mgf_face_handler(int ac, char **av)             /* face handling routine */
             points.emplace_back(vert[0], vert[1], vert[2]);
 
             normals.emplace_back(norm[0], norm[1], norm[2]);
-            assert(normals.back() != 0.0);
+            assert(normals.back() != 0.0f);
     	}
 
         /* apply material */
@@ -295,15 +295,15 @@ int mgf_face_handler(int ac, char **av)             /* face handling routine */
     points.clear();
 
     /* normal exit */
-	return (MG_OK);
+    return (MG_OK);
 }
 
 
 void mgf_parser(
-    const char          *mgf_file,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m)
+    const char              *mgf_file,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m)
 {
     global_l = &l;
     global_e = &e;
@@ -356,7 +356,7 @@ MG_E_IES
     /* Parse */
     if (mg_load(mgf_file) != MG_OK)
     {
-        cout << "MGF parsing failed" << endl;
+        std::cout << "MGF parsing failed" << std::endl;
     }
 
     return;

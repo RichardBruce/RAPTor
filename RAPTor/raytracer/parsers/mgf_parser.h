@@ -8,10 +8,10 @@
 namespace raptor_raytracer
 {
 void mgf_parser(
-    const char         *mgf_file,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m);
+    const char              *mgf_file,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m);
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __MGF_PARSER_H__ */

@@ -34,7 +34,7 @@ bool group_done(const char *a)
 
 void parser_bg(const char *a, const char *eob, ext_colour_t *const bg)
 {
-//    cout << "finding background" << endl;
+//    std::cout << "finding background" << std::endl;
     while ((a != eob) && (strncmp(a, "Background {", 12) != 0))
     {
         ++a;
@@ -42,7 +42,7 @@ void parser_bg(const char *a, const char *eob, ext_colour_t *const bg)
 
     if (a != eob)
     {
-//        cout << "background found" << endl;
+//        std::cout << "background found" << std::endl;
         find_next_line(&a);
         skip_white_space(&a);
         assert(strncmp(a, "skyColor [", 10) == 0);
@@ -52,14 +52,14 @@ void parser_bg(const char *a, const char *eob, ext_colour_t *const bg)
 }
 
 
-fp_t parse_directional_light(light_list &l, const char *a, const char *eob)
+float parse_directional_light(light_list &l, const char *a, const char *eob)
 {
     while ((a != eob) && (strncmp(a, "DirectionalLight {", 18) != 0))
     {
         ++a;
     }
 
-    fp_t ambient = (fp_t)0.0;
+    float ambient = 0.0f;
     if (a != eob)
     {
         find_next_line(&a);
@@ -84,30 +84,30 @@ fp_t parse_directional_light(light_list &l, const char *a, const char *eob)
         d.x = get_next_float(&a);
         d.y = get_next_float(&a);
         d.z = get_next_float(&a);
-        point_t c(-d * (fp_t)1000.0);
+        point_t c(-d * 1000.0f);
 
 
         find_next_line(&a);
         skip_white_space(&a);
         assert(strncmp(a, "intensity", 9) == 0);
-        rgb *= get_next_float(&a) * (fp_t)255.0;
-//        cout << "rgb: " << rgb.r << ", " << rgb.g << ", " << rgb.b << endl;
+        rgb *= get_next_float(&a) * 255.0f;
+//        std::cout << "rgb: " << rgb.r << ", " << rgb.g << ", " << rgb.b << std::endl;
         
-        new_light(&l, rgb, c, (fp_t)0.0, (fp_t)0.0);
+        new_light(&l, rgb, c, 0.0f, 0.0f);
     }
     
     return ambient;
 }
 
 
-void parse_viewpoint(camera *c, const string &v, const char *a, const char *eob)
+void parse_viewpoint(camera *c, const std::string &v, const char *a, const char *eob)
 {
-    string desc = "";
-    fp_t angle  = (fp_t)0.0;
+    std::string desc = "";
+    float angle  = 0.0f;
     point_t p, r;
     while ((a != eob) && (v != desc))
     {
-//        cout << "finding viewpoint" << endl;
+//        std::cout << "finding viewpoint" << std::endl;
         while ((a != eob) && (strncmp(a, "Viewpoint {", 11) != 0))
         {
             ++a;
@@ -115,7 +115,7 @@ void parse_viewpoint(camera *c, const string &v, const char *a, const char *eob)
     
         if (a != eob)
         {
-//            cout << "viewpoint found" << endl;
+//            std::cout << "viewpoint found" << std::endl;
     
             find_next_line(&a);
             skip_white_space(&a);
@@ -137,14 +137,14 @@ void parse_viewpoint(camera *c, const string &v, const char *a, const char *eob)
             assert(strncmp(a, "description", 11) == 0);
             desc = get_quoted_string(&a);
 
-//            cout << "Viewpoint is: " << desc << endl;
+//            std::cout << "Viewpoint is: " << desc << std::endl;
         }
     }
 
     /* Warn if default view point is used */
     if (v != desc)
     {
-        cout << "Warning: View point '" << v << "' not found, using default" << endl;
+        std::cout << "Warning: View point '" << v << "' not found, using default" << std::endl;
     }
     /* Set specified view point */
     else
@@ -157,9 +157,9 @@ void parse_viewpoint(camera *c, const string &v, const char *a, const char *eob)
 }
 
 
-void parse_points(vector<point_t> *p, const char *a, const char *eob)
+void parse_points(std::vector<point_t> *p, const char *a, const char *eob)
 {
-//    cout << "finding points" << endl;
+//    std::cout << "finding points" << std::endl;
     while ((a != eob) && (strncmp(a, "point [", 7) != 0))
     {
         ++a;
@@ -167,7 +167,7 @@ void parse_points(vector<point_t> *p, const char *a, const char *eob)
 
     if (a != eob)
     {
-//        cout << "points found" << endl;
+//        std::cout << "points found" << std::endl;
         do 
         {
             point_t tp;
@@ -177,18 +177,18 @@ void parse_points(vector<point_t> *p, const char *a, const char *eob)
             tp.z = get_next_float(&a);
             p->push_back(tp);
         
-//            cout << tp.x << ", " << tp.y << ", " << tp.z << endl;
+//            std::cout << tp.x << ", " << tp.y << ", " << tp.z << std::endl;
         } while (!group_done(a));
     }
-//    cout << "end of points" << endl;
+//    std::cout << "end of points" << std::endl;
     return;
 }
 
 
-void parse_triangles(primitive_list &prim, list<material *> &m, const vector<point_t> &p, const vector<ext_colour_t> &c, const fp_t ka, const char *a, const char *eob)
+void parse_triangles(primitive_list &prim, std::list<material *> &m, const std::vector<point_t> &p, const std::vector<ext_colour_t> &c, const float ka, const char *a, const char *eob)
 {
-//    cout << "finding coordIndex" << endl;
-    cout << "ka: " << ka << endl;
+//    std::cout << "finding coordIndex" << std::endl;
+    std::cout << "ka: " << ka << std::endl;
     while ((a != eob) && (strncmp(a, "coordIndex [", 12) != 0))
     {
         ++a;
@@ -196,7 +196,7 @@ void parse_triangles(primitive_list &prim, list<material *> &m, const vector<poi
 
     if (a != eob)
     {
-//        cout << "coordIndex found" << endl;
+//        std::cout << "coordIndex found" << std::endl;
         do 
         {
             /* Parse the vertex data */
@@ -207,26 +207,26 @@ void parse_triangles(primitive_list &prim, list<material *> &m, const vector<poi
             assert(get_next_unsigned(&a) == (unsigned int)-1);
             
             /* Mix the current colour */
-            const ext_colour_t mix((c[va] + c[vb] + c[vc]) * (fp_t)(1.0 / 3.0));
-            material *cur_mat = new phong_shader((mix * ka), mix, ext_colour_t(0.0, 0.0, 0.0));
+            const ext_colour_t mix((c[va] + c[vb] + c[vc]) * (1.0f / 3.0f));
+            material *cur_mat = new phong_shader((mix * ka), mix, ext_colour_t(0.0f, 0.0f, 0.0f));
             m.push_back(cur_mat);
 
             /* Create the triangle */
-            vector<triangle *> *t = nullptr;
+            std::vector<triangle *> *t = nullptr;
             new_triangle(&prim, t, cur_mat, p[va], p[vb], p[vc], false);
         
-//            cout << va << ", " << vb << ", " << vc << endl;
+//            std::cout << va << ", " << vb << ", " << vc << std::endl;
         } while (!group_done(a));
     }
 
-//    cout << "end of coordIndex" << endl;
+//    std::cout << "end of coordIndex" << std::endl;
     return;
 }
 
 
-void parse_colours(vector<ext_colour_t> *c, const char *a, const char *eob)
+void parse_colours(std::vector<ext_colour_t> *c, const char *a, const char *eob)
 {
-    cout << "finding colours" << endl;
+    std::cout << "finding colours" << std::endl;
     while ((a != eob) && (strncmp(a, "color [", 7) != 0))
     {
         ++a;
@@ -234,35 +234,35 @@ void parse_colours(vector<ext_colour_t> *c, const char *a, const char *eob)
 
     if (a != eob)
     {
-        cout << "colours found" << endl;
+        std::cout << "colours found" << std::endl;
         do 
         {
             find_next_line(&a);
             ext_colour_t rgb;
-            rgb.r = get_next_float(&a) * (fp_t)255.0;
-            rgb.g = get_next_float(&a) * (fp_t)255.0;
-            rgb.b = get_next_float(&a) * (fp_t)255.0;
+            rgb.r = get_next_float(&a) * 255.0f;
+            rgb.g = get_next_float(&a) * 255.0f;
+            rgb.b = get_next_float(&a) * 255.0f;
             c->push_back(rgb);
         } while (!group_done(a));
     }
 
-    cout << "end of colours" << endl;
+    std::cout << "end of colours" << std::endl;
     return;
 }
 
 
 void vrml_parser(
-    ifstream            &vrml_file,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m,
-    camera              *c,
-    const string        &v)
+    std::ifstream           &vrml_file,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m,
+    camera                  *c,
+    const std::string       &v)
 {
     /* Find the size of the file */
-    vrml_file.seekg(0, ios::end);
+    vrml_file.seekg(0, std::ios::end);
     size_t len = vrml_file.tellg();
-    vrml_file.seekg(0, ios::beg);
+    vrml_file.seekg(0, std::ios::beg);
     
     /* Read the whole file into a buffer */
     char *buffer = new char [len];
@@ -273,13 +273,13 @@ void vrml_parser(
     ext_colour_t bg;
 
     /* Vector for face to triangle conversion */
-    vector<point_t>         points;
-    vector<ext_colour_t>    colours;
+    std::vector<point_t>        points;
+    std::vector<ext_colour_t>   colours;
 
     /* Parse the file */
     parser_bg(at, &buffer[len - 1], &bg);
     
-    const fp_t ka = parse_directional_light(l, at, &buffer[len - 1]);
+    const float ka = parse_directional_light(l, at, &buffer[len - 1]);
     
     parse_viewpoint(c, v, at, &buffer[len - 1]);
     

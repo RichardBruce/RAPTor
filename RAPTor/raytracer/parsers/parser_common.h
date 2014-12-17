@@ -158,7 +158,7 @@ inline void skip_white_space(const char **a)
 
 
 /* String to float conversion */
-inline fp_t get_next_float(const string &s, size_t *const fst_space)
+inline fp_t get_next_float(const std::string &s, size_t *const fst_space)
 {
     /* Eat the string until white space is found */
     *fst_space = s.find(' ', *fst_space) + 1;
@@ -209,7 +209,7 @@ inline unsigned get_next_unsigned(const char **c)
 
 
 /* Char* to string conversion where string is quoted */
-inline string get_quoted_string(const char **c)
+inline std::string get_quoted_string(const char **c)
 {
     /* Eat to a quote */
     while ((**c) != '"')
@@ -227,12 +227,12 @@ inline string get_quoted_string(const char **c)
         (*c)++;
     }
     
-    return string(start, ((*c) - start));
+    return std::string(start, ((*c) - start));
 }
 
 
 /* Char* to string conversion */
-inline string get_next_string(const char **c)
+inline std::string get_next_string(const char **c)
 {
     /* Eat the string until white space is found */
     while ((**c) != ' ')
@@ -256,11 +256,11 @@ inline string get_next_string(const char **c)
     }
     (*c)--;
     
-    return string(start, (((*c) + 1) - start));
+    return std::string(start, (((*c) + 1) - start));
 }
 
 
-inline string get_this_string(const char **c)
+inline std::string get_this_string(const char **c)
 {
     /* Eat the white space */
     while ((**c) == ' ')
@@ -277,7 +277,7 @@ inline string get_this_string(const char **c)
         (*c)++;
     }
     
-    return string(start, ((*c) - start));
+    return std::string(start, ((*c) - start));
 }
 
 
@@ -334,7 +334,7 @@ inline void find_next_line(const char **c)
 
 
 /* Declare triangle */
-inline void new_triangle(primitive_list *e, vector<triangle *> *t, material *m, const point_t &a, const point_t &b, const point_t &c, const bool li, const point_t *vn=nullptr, const point_t *vt=nullptr)
+inline void new_triangle(primitive_list *e, std::vector<triangle *> *t, material *m, const point_t &a, const point_t &b, const point_t &c, const bool li, const point_t *vn=nullptr, const point_t *vt=nullptr)
 {
     triangle *tr = new triangle(m, a, b, c, li, vn, vt);
     e->push_back(tr);
@@ -352,7 +352,7 @@ inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_
 }
 
 
-inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const fp_t d, const vector<triangle *> *const t)
+inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const fp_t d, const std::vector<triangle *> *const t)
 {
     l->push_back(light(rgb, c, d, t));
 }
@@ -369,7 +369,7 @@ inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_
     l->push_back(light(rgb, n, d));
 }
 
-inline point_t find_centre(const vector<point_t> &p)
+inline point_t find_centre(const std::vector<point_t> &p)
 {
     /* Add all the points together */
     point_t total;
@@ -382,7 +382,7 @@ inline point_t find_centre(const vector<point_t> &p)
     return total/(fp_t)p.size();
 }
 
-inline int find_furthest(const vector<point_t> &p, const point_t &c)
+inline int find_furthest(const std::vector<point_t> &p, const point_t &c)
 {
     int max_point = 0;
     fp_t max_dist = 0.0;
@@ -432,7 +432,7 @@ inline bool same_side(const point_t &p, const point_t &a, const point_t &ab, con
 }
 
 
-inline bool is_in_triangle(const vector<point_t> &p, const point_t &a, const point_t &b, const point_t &c, const point_t &fn)
+inline bool is_in_triangle(const std::vector<point_t> &p, const point_t &a, const point_t &b, const point_t &c, const point_t &fn)
 {
     /* Pre-calculate some useful vectors */
     const point_t ab(a - b);
@@ -561,7 +561,7 @@ inline void face_to_triangle_edges(std::vector<int> *const tris, std::vector<poi
 }
 
 
-inline void face_to_triangles(primitive_list *e, light_list *l, vector<point_t> &p, material *const m, const bool li, vector<point_t> *vn = nullptr, vector<point_t> *vt = nullptr, const fp_t d = 0.0)
+inline void face_to_triangles(primitive_list *e, light_list *l, std::vector<point_t> &p, material *const m, const bool li, std::vector<point_t> *vn = nullptr, std::vector<point_t> *vt = nullptr, const fp_t d = 0.0)
 {
     /* Progress tracking */
     unsigned size = p.size();
@@ -586,12 +586,12 @@ inline void face_to_triangles(primitive_list *e, light_list *l, vector<point_t> 
     
 
     /* Triangle list for lights */
-    vector<triangle *>  *t  = nullptr;
+    std::vector<triangle *>  *t  = nullptr;
     
     if (li)
     {
         /* To be deleted by the light destructor */
-        t   = new vector<triangle *>;
+        t   = new std::vector<triangle *>;
     }
 
     /* Find the furthest point from the center */
