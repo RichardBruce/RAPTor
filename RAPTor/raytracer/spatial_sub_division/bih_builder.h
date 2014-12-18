@@ -20,7 +20,7 @@ class bih_builder
         void build(primitive_list *const primitives, std::vector<bih_block> *const blocks);
     
     private :
-        void divide_bih_node(point_t bl, point_t tr, const int block_idx, const int node_idx, const int b, const int e);
+        void divide_bih_node(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int node_idx, const int b, const int e);
 
         primitive_list *            _primitives;
         std::vector<bih_block> *    _blocks;

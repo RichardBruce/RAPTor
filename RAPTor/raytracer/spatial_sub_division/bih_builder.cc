@@ -32,17 +32,18 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
         /* Divide the nodes */
         _depth = 0;
         _next_block = 1;
-        divide_bih_node(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, 0, _primitives->size() - 1);
+        divide_bih_node(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, 0, _primitives->size() - 1);
         assert(_depth == 0);
     }
-    // BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
+    BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
 }
 
 
 /* Find a split position and divide the bih node in 2 */
-void bih_builder::divide_bih_node(point_t bl, point_t tr, const int block_idx, const int node_idx, const int b, const int e)
+void bih_builder::divide_bih_node(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int node_idx, const int b, const int e)
 {
-    // BOOST_LOG_TRIVIAL(trace) << "Node bounding box " << bl << " - " << tr;
+    // BOOST_LOG_TRIVIAL(trace) << "Grid bounding box " << bl << " - " << tr;
+    // BOOST_LOG_TRIVIAL(trace) << "Node bounding box " << node_bl << " - " << node_tr;
 
     /* _depth check */
     ++_depth;
@@ -95,6 +96,10 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const int block_idx, c
     // BOOST_LOG_TRIVIAL(trace) << "Attempting to split at: " << split_pnt;
 
     /* Partition primitives */
+    int left_size;
+    int right_size;
+    point_t node_tm(node_tr);
+    point_t node_bm(node_bl);
     float max_left  = -MAX_DIST;
     float min_right =  MAX_DIST;
     int top         = e;
@@ -127,7 +132,7 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const int block_idx, c
             {
                 min_right = std::min(min_right, (*_primitives)[top]->lowest_x());
             }
-            
+
             float pos = (tm.x - bl.x) * 0.5f;
             while (((bl.x + pos) > max_left) && (max_left > -MAX_DIST))
             {
@@ -141,6 +146,43 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const int block_idx, c
                 bm.x = tr.x - pos;
                 pos *= 0.5f;
             }
+
+            right_size = e - bottom; /* 1 less than the actual node size */
+            if ((right_size == -1) && (max_left == node_tm.x))
+            {
+                // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.x;
+                --_depth;
+                const point_t width(tm - bl);
+                if ((width.x * width.y * width.z) < 1.0f)
+                {
+                    (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
+                }
+                else
+                {
+                    divide_bih_node(bl, tm, node_bl, node_tr, block_idx, node_idx, b, e);
+                }
+                return;
+            }
+
+            left_size = bottom - b;
+            if ((left_size == 0) && (min_right == node_bm.x))
+            {
+                // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.x;
+                --_depth;
+                const point_t width(tr - bm);
+                if ((width.x * width.y * width.z) < 1.0f)
+                {
+                    (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
+                }
+                else
+                {
+                    divide_bih_node(bm, tr, node_bl, node_tr, block_idx, node_idx, b, e);
+                }
+                return;
+            }
+
+            node_tm.x = max_left;
+            node_bm.x = min_right;
 
             break;
         }
@@ -184,6 +226,43 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const int block_idx, c
                 bm.y = tr.y - pos;
                 pos *= 0.5f;
             }
+
+            right_size = e - bottom; /* 1 less than the actual node size */
+            if ((right_size == -1) && (max_left == node_tm.y))
+            {
+                // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.y;
+                --_depth;
+                const point_t width(tm - bl);
+                if ((width.x * width.y * width.z) < 1.0f)
+                {
+                    (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
+                }
+                else
+                {
+                    divide_bih_node(bl, tm, node_bl, node_tr, block_idx, node_idx, b, e);
+                }
+                return;
+            }
+
+            left_size = bottom - b;
+            if ((left_size == 0) && (min_right == node_bm.y))
+            {
+                // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.y;
+                --_depth;
+                const point_t width(tr - bm);
+                if ((width.x * width.y * width.z) < 1.0f)
+                {
+                    (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
+                }
+                else
+                {
+                    divide_bih_node(bm, tr, node_bl, node_tr, block_idx, node_idx, b, e);
+                }
+                return;
+            }
+
+            node_tm.y = max_left;
+            node_bm.y = min_right;
             break;
         }
         case axis_t::z_axis :
@@ -228,45 +307,48 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const int block_idx, c
                 bm.z = tr.z - pos;
                 pos *= 0.5f;
             }
+
+            right_size = e - bottom; /* 1 less than the actual node size */
+            if ((right_size == -1) && (max_left == node_tm.z))
+            {
+                // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.z;
+                --_depth;
+                const point_t width(tm - bl);
+                if ((width.x * width.y * width.z) < 1.0f)
+                {
+                    (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
+                }
+                else
+                {
+                    divide_bih_node(bl, tm, node_bl, node_tr, block_idx, node_idx, b, e);
+                }
+                return;
+            }
+
+            left_size = bottom - b;
+            if ((left_size == 0) && (min_right == node_bm.z))
+            {
+                // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.z;
+                --_depth;
+                const point_t width(tr - bm);
+                if ((width.x * width.y * width.z) < 1.0f)
+                {
+                    (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
+                }
+                else
+                {
+                    divide_bih_node(bm, tr, node_bl, node_tr, block_idx, node_idx, b, e);
+                }
+                return;
+            }
+
+            node_tm.z = max_left;
+            node_bm.z = min_right;
             break;
         }
         default :
             assert(false);
     }
-
-    /* If right node is empty forget about this layer and recurse left */
-    // if (right_size == -1)
-    // {
-    //     --_depth;
-    //     const point_t width(tm - bl);
-    //     if ((width.x * width.y * width.z) < 1.0f)
-    //     {
-    //         (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
-    //     }
-    //     else
-    //     {
-    //         // BOOST_LOG_TRIVIAL(trace) << "Discovered empty right node, ignoring this layer and recursing left with: " << b << " - " << (bottom - 1);
-    //         divide_bih_node(bl, tm, block_idx, node_idx, b, e);
-    //     }
-    //     return;
-    // }
-
-    /* If left node is empty forget about this layer and recurse right */
-    // if (left_size == 0)
-    // {
-    //     --_depth;
-    //     const point_t width(tr - bm);
-    //     if ((width.x * width.y * width.z) < 1.0f)
-    //     {
-    //         (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
-    //     }
-    //     else
-    //     {
-    //         // BOOST_LOG_TRIVIAL(trace) << "Discovered empty left node, ignoring this layer and recursing right with: " << bottom << " - " << e;
-    //         divide_bih_node(bm, tr, block_idx, node_idx, b, e);
-    //     }
-    //     return;
-    // }
 
     /* Get extra blocks if needed */
     if ((*_blocks)[block_idx].requires_block_children(node_idx))
@@ -292,8 +374,6 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const int block_idx, c
     const int left_idx = (*_blocks)[block_idx].get_left_child(block_idx, node_idx);
     const int left_block = block_index(left_idx);
     const int left_node = node_index(left_idx);
-
-    const int left_size = bottom - b;
     if ((left_size <= _max_node_size) || ((_depth + 1) == MAX_BIH_STACK_HEIGHT))
     {
         // BOOST_LOG_TRIVIAL(trace) << "Creating leaf for left child at index: " << bih_index(left_block, left_node) << " with indices: " << b << " - " << (bottom - 1);
@@ -302,15 +382,13 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const int block_idx, c
     else
     {
         // BOOST_LOG_TRIVIAL(trace) << "Recursing for left child with indices: " << b << " - " << (bottom - 1);
-        divide_bih_node(bl, tm, left_block, left_node, b, bottom - 1);
+        divide_bih_node(bl, tm, node_bl, node_tm, left_block, left_node, b, bottom - 1);
     }
 
     /* Recurse right */
     const int right_idx = (*_blocks)[block_idx].get_right_child(block_idx, node_idx);
     const int right_block = block_index(right_idx);
     const int right_node = node_index(right_idx);
-
-    const int right_size = e - bottom; /* 1 less than the actual node size */
     if ((right_size < _max_node_size) || ((_depth + 1) == MAX_BIH_STACK_HEIGHT))
     {
         // BOOST_LOG_TRIVIAL(trace) << "Creating leaf for right child at index: " << bih_index(right_block, right_node) << "  with indices: " << bottom << " - " << e;
@@ -319,7 +397,7 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const int block_idx, c
     else
     {
         // BOOST_LOG_TRIVIAL(trace) << "Recursing for right child with indices: " << bottom << " - " << e;
-        divide_bih_node(bm, tr, right_block, right_node, bottom, e);
+        divide_bih_node(bm, tr, node_bm, node_tr, right_block, right_node, bottom, e);
     }
     
     --_depth;
