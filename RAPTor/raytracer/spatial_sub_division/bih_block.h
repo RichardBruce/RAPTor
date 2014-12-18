@@ -121,7 +121,7 @@ class bih_block
         bih_node                        _nodes[7];  /* 3 levels of bih nodes                */
         unsigned int                    _child;     /* Index to the left child              */
         unsigned int                    _axes;      /* Axes of all nodes packed together    */
-};
+} __attribute__ ((aligned(64)));
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __BIH_BLOCK_H__ */
