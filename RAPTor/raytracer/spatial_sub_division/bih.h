@@ -44,7 +44,7 @@ class bih : public ssd
         /* SIMD BIH traversal */
 
         void        frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const override;
-        void        frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, unsigned int size) const override;
+        void        frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, const unsigned int size) const override;
 
         void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const override;
         vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t) const override;

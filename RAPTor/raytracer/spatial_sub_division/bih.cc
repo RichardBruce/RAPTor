@@ -35,6 +35,19 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
         int   near_idx      = (*_bih_base)[bih_block].get_left_child(bih_block, bih_node);
         int   far_idx       = (*_bih_base)[bih_block].get_right_child(bih_block, bih_node);
 
+        if (bih_node == 0)
+        {
+            const int child_block = block_index((*_bih_base)[bih_block].get_child_block());
+            _mm_prefetch((char *)&(*_bih_base)[child_block], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 1], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 2], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 3], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 4], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 5], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 6], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 7], _MM_HINT_T0);
+        }
+
         switch ((*_bih_base)[bih_block].get_split_axis(bih_node))
         {
             /* This node is not split in any plane, ie/ it is a leaf */
@@ -55,27 +68,21 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                 float min_far_plane;
                 float max_near_plane;
                 float max_far_plane;
-                if (r.get_max_x_grad() < 0.0f)
+                if (r.get_max_x_igrad() < 0.0f)
                 {
-                    min_near_plane = (far_split  - r.get_min_x0()) * r.get_min_x_igrad();
-                    min_far_plane  = (near_split - r.get_min_x0()) * r.get_min_x_igrad();
                     max_near_plane = (far_split  - r.get_max_x0()) * r.get_max_x_igrad();
                     max_far_plane  = (near_split - r.get_max_x0()) * r.get_max_x_igrad();
-
-                    const float tmp_split = near_split;
-                    near_split = far_split;
-                    far_split  = tmp_split;
-    
-                    const int tmp_idx = near_idx;
-                    near_idx = far_idx;
-                    far_idx  = tmp_idx;
+                    min_near_plane = (far_split  - r.get_min_x0()) * r.get_min_x_igrad();
+                    min_far_plane  = (near_split - r.get_min_x0()) * r.get_min_x_igrad();
+                    std::swap(near_split, far_split);
+                    std::swap(near_idx, far_idx);
                 }
                 else
                 {
-                    max_near_plane = (near_split - r.get_min_x0()) * r.get_min_x_igrad();
-                    max_far_plane  = (far_split  - r.get_min_x0()) * r.get_min_x_igrad();
                     min_near_plane = (near_split - r.get_max_x0()) * r.get_max_x_igrad();
                     min_far_plane  = (far_split  - r.get_max_x0()) * r.get_max_x_igrad();
+                    max_near_plane = (near_split - r.get_min_x0()) * r.get_min_x_igrad();
+                    max_far_plane  = (far_split  - r.get_min_x0()) * r.get_min_x_igrad();
                 }
                 
                 /* Empty space is traversed, return 0 to pop the stack */
@@ -140,27 +147,21 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                 float min_far_plane;
                 float max_near_plane;
                 float max_far_plane;
-                if (r.get_max_y_grad() < 0.0f)
+                if (r.get_max_y_igrad() < 0.0f)
                 {
-                    min_near_plane = (far_split  - r.get_min_y0()) * r.get_min_y_igrad();
-                    min_far_plane  = (near_split - r.get_min_y0()) * r.get_min_y_igrad();
                     max_near_plane = (far_split  - r.get_max_y0()) * r.get_max_y_igrad();
                     max_far_plane  = (near_split - r.get_max_y0()) * r.get_max_y_igrad();
-
-                    const float tmp_split = near_split;
-                    near_split = far_split;
-                    far_split  = tmp_split;
-    
-                    const int tmp_idx = near_idx;
-                    near_idx = far_idx;
-                    far_idx  = tmp_idx;
+                    min_near_plane = (far_split  - r.get_min_y0()) * r.get_min_y_igrad();
+                    min_far_plane  = (near_split - r.get_min_y0()) * r.get_min_y_igrad();
+                    std::swap(near_split, far_split);
+                    std::swap(near_idx, far_idx);
                 }
                 else
                 {
-                    max_near_plane = (near_split - r.get_min_y0()) * r.get_min_y_igrad();
-                    max_far_plane  = (far_split  - r.get_min_y0()) * r.get_min_y_igrad();
                     min_near_plane = (near_split - r.get_max_y0()) * r.get_max_y_igrad();
                     min_far_plane  = (far_split  - r.get_max_y0()) * r.get_max_y_igrad();
+                    max_near_plane = (near_split - r.get_min_y0()) * r.get_min_y_igrad();
+                    max_far_plane  = (far_split  - r.get_min_y0()) * r.get_min_y_igrad();
                 }
 
                 /* Empty space is traversed, return 0 to pop the stack */
@@ -225,27 +226,21 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                 float min_far_plane;
                 float max_near_plane;
                 float max_far_plane;
-                if (r.get_max_z_grad() < 0.0f)
+                if (r.get_max_z_igrad() < 0.0f)
                 {
-                    min_near_plane = (far_split  - r.get_min_z0()) * r.get_min_z_igrad();
-                    min_far_plane  = (near_split - r.get_min_z0()) * r.get_min_z_igrad();
                     max_near_plane = (far_split  - r.get_max_z0()) * r.get_max_z_igrad();
                     max_far_plane  = (near_split - r.get_max_z0()) * r.get_max_z_igrad();
-
-                    const float tmp_split = near_split;
-                    near_split = far_split;
-                    far_split  = tmp_split;
-    
-                    const int tmp_idx = near_idx;
-                    near_idx = far_idx;
-                    far_idx  = tmp_idx;
+                    min_near_plane = (far_split  - r.get_min_z0()) * r.get_min_z_igrad();
+                    min_far_plane  = (near_split - r.get_min_z0()) * r.get_min_z_igrad();
+                    std::swap(near_split, far_split);
+                    std::swap(near_idx, far_idx);
                 }
                 else
                 {
-                    max_near_plane = (near_split - r.get_min_z0()) * r.get_min_z_igrad();
-                    max_far_plane  = (far_split  - r.get_min_z0()) * r.get_min_z_igrad();
                     min_near_plane = (near_split - r.get_max_z0()) * r.get_max_z_igrad();
                     min_far_plane  = (far_split  - r.get_max_z0()) * r.get_max_z_igrad();
+                    max_near_plane = (near_split - r.get_min_z0()) * r.get_min_z_igrad();
+                    max_far_plane  = (far_split  - r.get_min_z0()) * r.get_min_z_igrad();
                 }
                 
                 /* Empty space is traversed, return 0 to pop the stack */
@@ -311,6 +306,12 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
 **********************************************************/
 void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const
 {
+    _mm_prefetch((char *)&(*_bih_base)[0], _MM_HINT_T0);
+    for (int i = size; i < MAXIMUM_PACKET_SIZE; ++i)
+    {
+        h[i].d = vfp_zero;
+    }
+
     /* state of stack */
     bih_stack_element *exit_point = &(_bih_stack[0]);
     exit_point->idx     = 0;
@@ -450,12 +451,10 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
             }
 #endif
             /* Update furthest intersection */
-            vfp_t vmax_d = h[0].d;
-            for (int i = 1; i < size; ++i)
-            {
-                vmax_d = max(vmax_d, h[i].d);
-            }
-            max_d = std::max(std::max(vmax_d[0], vmax_d[1]), std::max(vmax_d[2], vmax_d[3]));
+            static_assert(MAXIMUM_PACKET_SIZE == 16, "Error: Max expects MAXIMUM_PACKET_SIZE to be 16");
+            max_d = horizontal_max(
+                        max(max(max(max(h[0].d, h[1].d), max(h[ 2].d, h[ 3].d)), max(max(h[ 4].d, h[ 5].d), max(h[ 6].d, h[ 7].d))), 
+                            max(max(max(h[8].d, h[9].d), max(h[10].d, h[11].d)), max(max(h[12].d, h[13].d), max(h[14].d, h[15].d)))));
 
         }
         else if (cmd == -1)
@@ -496,10 +495,12 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
 /**********************************************************
  
 **********************************************************/
-void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, unsigned size) const
+void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, const unsigned int size) const
 {
-    vfp_t vmax_d = t[0];
-    vfp_t vmin_d = t[0];
+    _mm_prefetch((char *)&(*_bih_base)[0], _MM_HINT_T0);
+
+    vfp_t vmax_d(t[0]);
+    vfp_t vmin_d(t[0]);
     packet_hit_description h[MAXIMUM_PACKET_SIZE];
     for (unsigned i = 1; i < size; ++i)
     {
@@ -507,8 +508,13 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
         vmin_d = min(vmin_d, t[i]);
         h[i].d = t[i];
     }
-    float max_d = std::max(std::max(vmax_d[0], vmax_d[1]), std::max(vmax_d[2], vmax_d[3]));
-    float min_d = std::min(std::min(vmin_d[0], vmin_d[1]), std::min(vmin_d[2], vmin_d[3]));
+
+    for (int i = size; i < MAXIMUM_PACKET_SIZE; ++i)
+    {
+        h[i].d = vfp_zero;
+    }
+    float max_d = horizontal_max(vmax_d);
+    float min_d = horizontal_min(vmin_d);
 
     /* state of stack */
     bih_stack_element *exit_point = &(_bih_stack[0]);
@@ -631,12 +637,10 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
 #endif
 
             /* Update furthest intersection */
-            vmax_d = h[0].d;
-            for (unsigned i = 1; i < size; ++i)
-            {
-                vmax_d = max(vmax_d, h[i].d);
-            }
-            max_d = std::max(std::max(vmax_d[0], vmax_d[1]), std::max(vmax_d[2], vmax_d[3]));
+            static_assert(MAXIMUM_PACKET_SIZE == 16, "Error: Max expects MAXIMUM_PACKET_SIZE to be 16");
+            vmax_d = max(max(max(max(h[0].d, h[1].d), max(h[ 2].d, h[ 3].d)), max(max(h[ 4].d, h[ 5].d), max(h[ 6].d, h[ 7].d))), 
+                         max(max(max(h[8].d, h[9].d), max(h[10].d, h[11].d)), max(max(h[12].d, h[13].d), max(h[14].d, h[15].d))));
+            max_d = horizontal_max(vmax_d);
             
             /* Early exit for all rays occluded */
             if (max_d < min_d)

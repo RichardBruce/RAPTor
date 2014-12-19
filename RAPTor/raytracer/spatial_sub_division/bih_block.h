@@ -54,6 +54,11 @@ class bih_block
             assert((child & 0x7) == 0x0);
             _child = child;
         }
+
+        int get_child_block() const
+        {
+            return _child;
+        }
         
         /* Get size of next block layer */
         static int child_blocks_required()
