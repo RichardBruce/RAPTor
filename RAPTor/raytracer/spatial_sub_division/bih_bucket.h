@@ -44,16 +44,16 @@ class bih_bucket
         int size() const { return this->end - this->begin + 1; }
         
         /* Bounding box access functions for spatial subdivision */
-        fp_t    lowest_x()          const   { return this->b.x;     }
-        fp_t    lowest_y()          const   { return this->b.y;     }
-        fp_t    lowest_z()          const   { return this->b.z;     }
-        fp_t    highest_x()         const   { return this->t.x;     }
-        fp_t    highest_y()         const   { return this->t.y;     }
-        fp_t    highest_z()         const   { return this->t.z;     }
+        float lowest_x()    const { return this->b.x; }
+        float lowest_y()    const { return this->b.y; }
+        float lowest_z()    const { return this->b.z; }
+        float highest_x()   const { return this->t.x; }
+        float highest_y()   const { return this->t.y; }
+        float highest_z()   const { return this->t.z; }
         
         /* Index access to swicth to normal builder */
-        int get_begin()             const   { return this->begin;   }
-        int get_end()               const   { return this->end;     }
+        int get_begin() const { return this->begin; }
+        int get_end()   const { return this->end;   }
 
     private : 
         point_t     t;      /*  */
