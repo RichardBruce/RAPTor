@@ -38,6 +38,218 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
 }
 
+// void node_size(const primitive_list &primitives, point_t *const bl, point_t *const tr, const int b, const int e)
+// {
+//     *bl = primitives[b]->lowest_point();
+//     *tr = primitives[b]->highest_point();
+//     for (int i = b + 1; i < e; ++i)
+//     {
+//         *bl = min(*bl, primitives[i]->lowest_point());
+//         *tr = max(*tr, primitives[i]->highest_point());
+//     }
+// }
+
+// void bucket_build(primitive_list *const primitives, std::vector<bih_block> *const blocks)
+// {
+//     /* Calculate the average primitive sizes */
+//     float x_width = 0.0f;
+//     float y_width = 0.0f;
+//     float z_width = 0.0f;
+//     for (for auto t : *primitives)
+//     {
+//         x_width += t->highest_x() - t->lowest_x();
+//         y_width += t->highest_y() - t->lowest_y();
+//         z_width += t->highest_z() - t->lowest_z();
+//     }
+
+//     const float nr_primitives_inv = 1.0f / primitives->size();
+//     x_width *= nr_primitives_inv;
+//     y_width *= nr_primitives_inv;
+//     z_width *= nr_primitives_inv;
+
+//     /* Calculate Morton codes */
+//     const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
+//     const vfp_t x_div(scene_width.x / x_width);
+//     const vfp_t y_div(scene_width.y / y_width);
+//     const vfp_t z_div(scene_width.z / z_width);
+//     std::vector<int> morton_codes(primitives->size());
+//     for (int i = 0; i < (primitives->size() - SIMD_WIDTH); ++i)
+//     {
+//         const point_t t0((*primitives)[i]->get_vertex_a());
+//         const point_t t1((*primitives)[i + 1]->get_vertex_a());
+//         const point_t t2((*primitives)[i + 2]->get_vertex_a());
+//         const point_t t3((*primitives)[i + 3]->get_vertex_a());
+//         vint_t mc(morton_code(vfp_t(t0.x, t1.x, t2.x, t3.x), vfp_t(t0.y, t1.y, t2.y, t3.y), vfp_t(t0.z, t1.z, t2.z, t3.z), x_div, y_div, z_div));
+//         mc.save(&morton_codes[i]);
+//     }
+
+//     /* Begin MSB radix sort */
+//     std::vector<int> sort_buffer(primitives->size());
+
+//     /* Build histogram */
+//     const int histogram_size = 2049;
+//     unsigned int hist[histogram_size];
+//     memset(hist, 0, histogram_size * sizeof(float));
+//     for (int i = 0; i < primitives->size(); ++i)
+//     {
+//         ++hist[morton_codes[i] >> 22];
+//     }
+    
+//     /* Sum the histogram */
+//     unsigned int sum = 0;
+//     for (int i = 0; i < histogram_size; ++i)
+//     {
+//         const unsigned int tmp = hist[i] + sum;
+//         hist[i] = sum - 1;
+//         sum = tmp;
+//     }
+
+//     /* Move based on histogram */
+//     for (int i = 0; i < primitives->size(); ++i)
+//     {
+//         const unsigned int data = array[i];
+//         const unsigned int pos = data >> 22;
+//         sort_buffer[++hist[pos]] = data;
+//     }
+
+//     /* For bins containing a lot of data radix sort again, for bins not much data bin normal sub division procedure */
+//     for (int i = 1; i < histogram_size - 1; ++i)
+//     {
+//         const int bucket_size = hist[i] - hist[i - 1];
+//         if (bucket_size > 512)
+//         {
+//             bucket_build_mid();
+//         }
+//         else if (bucket_size > 0)
+//         {
+//             point_t node_bl;
+//             point_t node_tr;
+//             node_size(const primitive_list &primitives, &bl, &tr, hist[i - 1], hist[i]);
+//             divide_bih_node(point_t bl, point_t tr, node_bl, node_tr, const int block_idx, const int node_idx, hist[i - 1], hist[i]);
+//         }
+//     }
+
+//     /* Breadth first, bottom up, partitioning of the data */
+//     for (int stride = 2; stride <= histogram_size; stride <<= 1)
+//     {
+//         for (int i = (stride >> 1); i < histogram_size; i += stride)
+//         {
+//             /* If there are primitives in either partition then we should split here */
+//             if (((hist[i] - hist[i - stride]) > 0) || ((hist[i + stride] - hist[i]) > 0))
+//             {
+//     // (*_blocks)[block_idx].create_generic_node(max_left, min_right, node_idx, split_axis);
+//             }
+//         }
+//     }
+// }
+
+// void bucket_build_mid(std::vector<int> *const morton_codes, std::vector<int> *const sort_buffer, const int b, const int e)
+// {
+//     /* Build histogram */
+//     const int histogram_size = 2049;
+//     unsigned int hist[histogram_size];
+//     memset(hist, 0, histogram_size * sizeof(float));
+//     for (int i = b; i < e; ++i)
+//     {
+//         ++hist[(morton_codes[i] >> 11) & 0x7ff];
+//     }
+    
+//     /* Sum the histogram */
+//     unsigned int sum = 0;
+//     for (int i = 0; i < histogram_size; ++i)
+//     {
+//         const unsigned int tmp = hist[i] + sum;
+//         hist[i] = sum - 1;
+//         sum = tmp;
+//     }
+
+//     /* Move based on histogram */
+//     for (int i = b; i < e; ++i)
+//     {
+//         const unsigned int data = morton_codes[i];
+//         const unsigned int pos = (data >> 11) & 0x7ff;
+//         sort_buffer[b + ++hist[pos]] = data;
+//     }
+
+//     /* Breadth first partitioning of the data */
+//     for (int stride = histogram_size; stride > 1; stride >>= 1)
+//     {
+//         for (int i = (stride >> 1); i < histogram_size; i += stride)
+//         {
+//             /* If there are primitives in either partition then we should split here */
+//             if (((hist[i] - hist[i - stride]) > 0) || ((hist[i + stride] - hist[i]) > 0))
+//             {
+//     // (*_blocks)[block_idx].create_generic_node(max_left, min_right, node_idx, split_axis);
+//             }
+//         }
+//     }
+
+//     /* For bins containing a lot of data radix sort again, for bins not much data bin normal sub division procedure */
+//     for (int i = 1; i < histogram_size - 1; ++i)
+//     {
+//         const int bucket_size = hist[i] - hist[i - 1];
+//         if (bucket_size > 512)
+//         {
+//             bucket_build_low();
+//         }
+//         else if (bucket_size > 0)
+//         {
+//             divide_bih_node(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int node_idx, hist[i - 1], hist[i]);
+//         }
+//     }
+// }
+
+// void bucket_build_low(std::vector<int> *const morton_codes, std::vector<int> *const sort_buffer, const int b, const int e)
+// {
+//     /* Build histogram */
+//     const int histogram_size = 2049;
+//     unsigned int hist[histogram_size];
+//     memset(hist, 0, histogram_size * sizeof(float));
+//     for (int i = b; i < e; ++i)
+//     {
+//         ++hist[morton_codes[i] & 0x7ff];
+//     }
+    
+//     /* Sum the histogram */
+//     unsigned int sum = 0;
+//     for (int i = 0; i < histogram_size; ++i)
+//     {
+//         const unsigned int tmp = hist[i] + sum;
+//         hist[i] = sum - 1;
+//         sum = tmp;
+//     }
+
+//     /* Move based on histogram */
+//     for (int i = b; i < e; ++i)
+//     {
+//         const unsigned int data = morton_codes[i];
+//         const unsigned int pos = data & 0x7ff;
+//         sort_buffer[b + ++hist[pos]] = data;
+//     }
+
+//     /* Breadth first partitioning of the data */
+//     for (int stride = histogram_size; stride > 1; stride >>= 1)
+//     {
+//         for (int i = (stride >> 1); i < histogram_size; i += stride)
+//         {
+//             /* If there are primitives in either partition then we should split here */
+//             if (((hist[i] - hist[i - stride]) > 0) || ((hist[i + stride] - hist[i]) > 0))
+//             {
+//     // (*_blocks)[block_idx].create_generic_node(max_left, min_right, node_idx, split_axis);
+//             }
+//         }
+//     }
+
+//     /* For bins containing a data begin normal sub division procedure */
+//     for (int i = 1; i < histogram_size - 1; ++i)
+//     {
+//         const int bucket_size = hist[i] - hist[i - 1];
+//         if (bucket_size > 0)
+//         {
+//             divide_bih_node(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int node_idx, hist[i - 1], hist[i]);
+//         }
+//     }
+// }
 
 /* Find a split position and divide the bih node in 2 */
 void bih_builder::divide_bih_node(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int node_idx, const int b, const int e)
