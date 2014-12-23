@@ -57,22 +57,22 @@ class triangle : private boost::noncopyable
         point_t get_vertex_c()                      const       { return this->vertex_c;                        }
 
         /* KD-tree node classification */
-        float get_x0()                               const       { return this->vertex_c.x;                      }
-        float get_y0()                               const       { return this->vertex_c.y;                      }
-        float get_z0()                               const       { return this->vertex_c.z;                      }
+        float get_x0()                              const       { return this->vertex_c.x;                      }
+        float get_y0()                              const       { return this->vertex_c.y;                      }
+        float get_z0()                              const       { return this->vertex_c.z;                      }
         
         /* Bounding box access functions for spatial subdivision */
-        float    lowest_x()                          const       { return this->b.x;                             }
-        float    lowest_y()                          const       { return this->b.y;                             }
-        float    lowest_z()                          const       { return this->b.z;                             }
+        float   lowest_x()                          const       { return this->b.x;                             }
+        float   lowest_y()                          const       { return this->b.y;                             }
+        float   lowest_z()                          const       { return this->b.z;                             }
         point_t lowest_point()                      const       { return this->b;                               }
-        float    highest_x()                         const       { return this->t.x;                             }
-        float    highest_y()                         const       { return this->t.y;                             }
-        float    highest_z()                         const       { return this->t.z;                             }
+        float   highest_x()                         const       { return this->t.x;                             }
+        float   highest_y()                         const       { return this->t.y;                             }
+        float   highest_z()                         const       { return this->t.z;                             }
         point_t highest_point()                     const       { return this->t;                               }
-        bool    is_intersecting_x(const float s)     const       { return ((this->t.x > s) && (this->b.x < s));  }
-        bool    is_intersecting_y(const float s)     const       { return ((this->t.y > s) && (this->b.y < s));  }
-        bool    is_intersecting_z(const float s)     const       { return ((this->t.z > s) && (this->b.z < s));  }
+        bool    is_intersecting_x(const float s)    const       { return ((this->t.x > s) && (this->b.x < s));  }
+        bool    is_intersecting_y(const float s)    const       { return ((this->t.y > s) && (this->b.y < s));  }
+        bool    is_intersecting_z(const float s)    const       { return ((this->t.z > s) && (this->b.z < s));  }
         
         /* Ray tracing functions */
         inline void         is_intersecting(const ray *const r, hit_description *const h) const;
