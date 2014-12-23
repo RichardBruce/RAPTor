@@ -26,66 +26,66 @@ using namespace raptor_raytracer;
 *****************************************************/
 void help()
 {
-    cout << "Usage: raytracer [-i] [-f file_name] [-mgf|-nff|-lwo|-obj|-vrml] [-cam x y z]"                                 << endl;
-    cout << "                 [-at x y z] [-rx x] [-ry x] [-rz x] [-bg r g b]  "            	                            << endl;
-    cout << "                 [-light x y z ra r g b d]"                                                                    << endl;
-    cout << "       -i                      	                    : enables interactive mode."                            << endl;
-    cout << "       -tga        f                                   : f is tga snapshot file."                              << endl;
-    cout << "       -png        f                                   : f is png snapshot file."                              << endl;
-    cout << "       -jpg        f q                                 : f is jpeg snapshot file. q is image quality."         << endl;
-    cout << "       -mgf        f                                   : f is mgf format scene."                               << endl;
-    cout << "       -nff        f                                   : f is nff format scene."                               << endl;
-    cout << "       -lwo        f                                   : f is lwo format scene."                               << endl;
-    cout << "       -obj        f                                   : f is obj format scene."                               << endl;
-    cout << "       -vrml       f v                                 : f is vrml format scene. v is the view point."         << endl;
-    cout << "       -res        x y                                 : x y are the image resolutions."                       << endl;
-    cout << "       -anti_alias x y                                 : x y are the image anti-aliasing factors."             << endl;
-    cout << "       -cam        x y z                               : x y z are the camera's co-ordinate."                  << endl;
-    cout << "       -at         x y z                               : x y z are the co-ordinates looked at."                << endl;
-    cout << "       -rx         x                                   : x is an angle to rotate about the x axis."            << endl;
-    cout << "       -ry         x                                   : x is an angle to rotate about the y axis."            << endl;
-    cout << "       -rz         x                                   : x is an angle to rotate about the z axis."            << endl;
-    cout << "       -bg         r g b                               : r g b is the rgb background colour."                  << endl;
-    cout << "       -light      x y z ra r g b d                    : x y z are the lights co-ordinates."                   << endl;
-    cout << "                               	                      ra is the lights radius."                             << endl;
-    cout << "                               	                      r g b is the lights colour."                          << endl;
-    cout << "                               	                      d intensity fall off with distance scale."            << endl;
-    cout << "       -spotlight  cx cy cz ra r g b d ax ay az sa sb  : cx cy cz are the lights co-ordinates."                << endl;
-    cout << "                               	                      ra is the lights radius."                             << endl;
-    cout << "                               	                      r g b is the lights colour."                          << endl;
-    cout << "                               	                      d intensity fall off with distance scale."            << endl;
-    cout << "                               	                      ax ay az are the lights target co-ordinates."         << endl;
-    cout << "                               	                      sa is the angle at which the light begins to fade."   << endl;
-    cout << "                               	                      sb is the angle at which the light has to faded."     << endl;
-    cout << "       -directionallight  cx cy cz ra g b d ax ay az   : cx cy cz are the lights co-ordinates."                << endl;
-    cout << "                               	                      r g b is the lights colour."                          << endl;
-    cout << "                               	                      d intensity fall off with distance scale."            << endl;
-    cout << "                               	                      ax ay az are the lights target co-ordinates."         << endl;
-    cout << ""                                                                              	                            << endl;
-    cout << " Any number of lights may be added."                                           	                            << endl;
-    cout << " All angles are in degrees."                                                                                   << endl;
-    cout << " The last camera parameters specified will take presidence."                   	                            << endl;
-    cout << " The input file specified will take presidence."                               	                            << endl;
-    cout << ""                                                                              	                            << endl;
-    cout << "----------------------------------------"                                      	                            << endl;
-    cout << "-      Interactive key mappings        -"                                      	                            << endl;
-    cout << "----------------------------------------"                                      	                            << endl;
-    cout << "   w           :   move forward."                                              	                            << endl;
-    cout << "   s           :   move backward."                                             	                            << endl;
-    cout << "   a           :   move left."                                                 	                            << endl;
-    cout << "   d           :   move right."                                                	                            << endl;
-    cout << "   right arrow :   look left."                                                 	                            << endl;
-    cout << "   left arrow  :   look right."                                                	                            << endl;
-    cout << "   up arrow    :   look up."                                                   	                            << endl;
-    cout << "   down arrow  :   look down."                                                 	                            << endl;
-    cout << "   space       :   move up."                                                   	                            << endl;
-    cout << "   ctrl        :   move down."                                                 	                            << endl;
-    cout << "   page up     :   roll anti-clockwise."                                       	                            << endl;
-    cout << "   page down   :   roll clockwise."                                            	                            << endl;
-    cout << "   escape      :   quit."                                                      	                            << endl;
-    cout << "   q           :   quit."                                                      	                            << endl;
-    cout << "   f           :   snapshot."                                                  	                            << endl;
-    cout << "   p           :   dump position data."                                        	                            << endl;
+    std::cout << "Usage: raytracer [-i] [-f file_name] [-mgf|-nff|-lwo|-obj|-vrml] [-cam x y z]"                              << std::endl;
+    std::cout << "                 [-at x y z] [-rx x] [-ry x] [-rz x] [-bg r g b]  "            	                          << std::endl;
+    std::cout << "                 [-light x y z ra r g b d]"                                                                 << std::endl;
+    std::cout << "       -i                      	                    : enables interactive mode."                          << std::endl;
+    std::cout << "       -tga        f                                   : f is tga snapshot file."                           << std::endl;
+    std::cout << "       -png        f                                   : f is png snapshot file."                           << std::endl;
+    std::cout << "       -jpg        f q                                 : f is jpeg snapshot file. q is image quality."      << std::endl;
+    std::cout << "       -mgf        f                                   : f is mgf format scene."                            << std::endl;
+    std::cout << "       -nff        f                                   : f is nff format scene."                            << std::endl;
+    std::cout << "       -lwo        f                                   : f is lwo format scene."                            << std::endl;
+    std::cout << "       -obj        f                                   : f is obj format scene."                            << std::endl;
+    std::cout << "       -vrml       f v                                 : f is vrml format scene. v is the view point."      << std::endl;
+    std::cout << "       -res        x y                                 : x y are the image resolutions."                    << std::endl;
+    std::cout << "       -anti_alias x y                                 : x y are the image anti-aliasing factors."          << std::endl;
+    std::cout << "       -cam        x y z                               : x y z are the camera's co-ordinate."               << std::endl;
+    std::cout << "       -at         x y z                               : x y z are the co-ordinates looked at."             << std::endl;
+    std::cout << "       -rx         x                                   : x is an angle to rotate about the x axis."         << std::endl;
+    std::cout << "       -ry         x                                   : x is an angle to rotate about the y axis."         << std::endl;
+    std::cout << "       -rz         x                                   : x is an angle to rotate about the z axis."         << std::endl;
+    std::cout << "       -bg         r g b                               : r g b is the rgb background colour."               << std::endl;
+    std::cout << "       -light      x y z ra r g b d                    : x y z are the lights co-ordinates."                << std::endl;
+    std::cout << "                               	                      ra is the lights radius."                           << std::endl;
+    std::cout << "                               	                      r g b is the lights colour."                        << std::endl;
+    std::cout << "                               	                      d intensity fall off with distance scale."          << std::endl;
+    std::cout << "       -spotlight  cx cy cz ra r g b d ax ay az sa sb  : cx cy cz are the lights co-ordinates."             << std::endl;
+    std::cout << "                               	                      ra is the lights radius."                           << std::endl;
+    std::cout << "                               	                      r g b is the lights colour."                        << std::endl;
+    std::cout << "                               	                      d intensity fall off with distance scale."          << std::endl;
+    std::cout << "                               	                      ax ay az are the lights target co-ordinates."       << std::endl;
+    std::cout << "                               	                      sa is the angle at which the light begins to fade." << std::endl;
+    std::cout << "                               	                      sb is the angle at which the light has to faded."   << std::endl;
+    std::cout << "       -directionallight  cx cy cz ra g b d ax ay az   : cx cy cz are the lights co-ordinates."             << std::endl;
+    std::cout << "                               	                      r g b is the lights colour."                        << std::endl;
+    std::cout << "                               	                      d intensity fall off with distance scale."          << std::endl;
+    std::cout << "                               	                      ax ay az are the lights target co-ordinates."       << std::endl;
+    std::cout << ""                                                                              	                          << std::endl;
+    std::cout << " Any number of lights may be added."                                           	                          << std::endl;
+    std::cout << " All angles are in degrees."                                                                                << std::endl;
+    std::cout << " The last camera parameters specified will take presidence."                   	                          << std::endl;
+    std::cout << " The input file specified will take presidence."                               	                          << std::endl;
+    std::cout << ""                                                                              	                          << std::endl;
+    std::cout << "----------------------------------------"                                      	                          << std::endl;
+    std::cout << "-      Interactive key mappings        -"                                      	                          << std::endl;
+    std::cout << "----------------------------------------"                                      	                          << std::endl;
+    std::cout << "   w           :   move forward."                                              	                          << std::endl;
+    std::cout << "   s           :   move backward."                                             	                          << std::endl;
+    std::cout << "   a           :   move left."                                                 	                          << std::endl;
+    std::cout << "   d           :   move right."                                                	                          << std::endl;
+    std::cout << "   right arrow :   look left."                                                 	                          << std::endl;
+    std::cout << "   left arrow  :   look right."                                                	                          << std::endl;
+    std::cout << "   up arrow    :   look up."                                                   	                          << std::endl;
+    std::cout << "   down arrow  :   look down."                                                 	                          << std::endl;
+    std::cout << "   space       :   move up."                                                   	                          << std::endl;
+    std::cout << "   ctrl        :   move down."                                                 	                          << std::endl;
+    std::cout << "   page up     :   roll anti-clockwise."                                       	                          << std::endl;
+    std::cout << "   page down   :   roll clockwise."                                            	                          << std::endl;
+    std::cout << "   escape      :   quit."                                                      	                          << std::endl;
+    std::cout << "   q           :   quit."                                                      	                          << std::endl;
+    std::cout << "   f           :   snapshot."                                                  	                          << std::endl;
+    std::cout << "   p           :   dump position data."                                        	                          << std::endl;
 }
 
 
@@ -100,29 +100,29 @@ int main (int argc, char **argv)
     image_format_t  image_format    = image_format_t::tga;
     int             jpg_quality     = 50;
     ext_colour_t    bg;
-    string          input_file;
-    string          view_point;
-    string          output_file     = "snapshot";
-    string          caption         = "raytracer ";
+    std::string     input_file;
+    std::string     view_point;
+    std::string     output_file     = "snapshot";
+    std::string     caption         = "raytracer ";
 
     /* Camera parameters */
     camera   *cam = nullptr;
-    point_t  cam_p( 0.0, 0.0, -10);     /* Position                         */
-    vector_t x_vec( 1.0, 0.0, 0.0);     /* Horizontal vector                */
-    vector_t y_vec( 0.0, 1.0, 0.0);     /* Virtical vector                  */
-    vector_t z_vec( 0.0, 0.0, 1.0);     /* Forward vector                   */
-    fp_t     rx = 0.0;                  /* Rotation about horizontal vector */
-    fp_t     ry = 0.0;                  /* Rotation about virtical vector   */
-    fp_t     rz = 0.0;                  /* Rotation about forward vector    */
-    unsigned xr = 640;                  /* X resolution                     */
-    unsigned yr = 480;                  /* Y resolution                     */
-    unsigned xa = 1;                    /* X anti-aliasing factor           */
-    unsigned ya = 1;                    /* Y anti-aliasing factor           */
+    point_t  cam_p( 0.0f, 0.0f, -10.0f);    /* Position                         */
+    point_t  x_vec( 1.0f, 0.0f, 0.0f);      /* Horizontal vector                */
+    point_t  y_vec( 0.0f, 1.0f, 0.0f);      /* Virtical vector                  */
+    point_t  z_vec( 0.0f, 0.0f, 1.0f);      /* Forward vector                   */
+    fp_t     rx = 0.0f;                     /* Rotation about horizontal vector */
+    fp_t     ry = 0.0f;                     /* Rotation about virtical vector   */
+    fp_t     rz = 0.0f;                     /* Rotation about forward vector    */
+    unsigned xr = 640;                      /* X resolution                     */
+    unsigned yr = 480;                      /* Y resolution                     */
+    unsigned xa = 1;                        /* X anti-aliasing factor           */
+    unsigned ya = 1;                        /* Y anti-aliasing factor           */
 
     /* Scene data */
-    light_list          lights;
-    primitive_list      everything;
-    list<material *>    materials;
+    light_list              lights;
+    primitive_list          everything;
+    std::list<material *>   materials;
 
     /* Parse input arguements */
     if (argc > 1)
@@ -145,7 +145,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified tga output file" << endl;
+                    std::cout << "Incorrectly specified tga output file" << std::endl;
                     help();
                     return 1;
                 }
@@ -161,7 +161,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified png output file" << endl;
+                    std::cout << "Incorrectly specified png output file" << std::endl;
                     help();
                     return 1;
                 }
@@ -177,7 +177,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 3)
                 {
-                    cout << "Incorrectly specified jpeg output file" << endl;
+                    std::cout << "Incorrectly specified jpeg output file" << std::endl;
                     help();
                     return 1;
                 }
@@ -196,7 +196,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified cfg file" << endl;
+                    std::cout << "Incorrectly specified cfg file" << std::endl;
                     help();
                     return 1;
                 }
@@ -209,7 +209,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified mgf file" << endl;
+                    std::cout << "Incorrectly specified mgf file" << std::endl;
                     help();
                     return 1;
                 }
@@ -222,7 +222,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified nff file" << endl;
+                    std::cout << "Incorrectly specified nff file" << std::endl;
                     help();
                     return 1;
                 }
@@ -235,7 +235,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified lwo file" << endl;
+                    std::cout << "Incorrectly specified lwo file" << std::endl;
                     help();
                     return 1;
                 }
@@ -248,7 +248,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified obj file" << endl;
+                    std::cout << "Incorrectly specified obj file" << std::endl;
                     help();
                     return 1;
                 }
@@ -261,7 +261,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified ply file" << endl;
+                    std::cout << "Incorrectly specified ply file" << std::endl;
                     help();
                     return 1;
                 }
@@ -274,7 +274,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 3)
                 {
-                    cout << "Incorrectly specified vrml file" << endl;
+                    std::cout << "Incorrectly specified vrml file" << std::endl;
                     help();
                     return 1;
                 }
@@ -288,7 +288,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 3)
                 {
-                    cout << "Incorrectly specified resolution" << endl;
+                    std::cout << "Incorrectly specified resolution" << std::endl;
                     help();
                     return 1;
                 }
@@ -301,7 +301,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 3)
                 {
-                    cout << "Incorrectly specified anti-aliasing factor" << endl;
+                    std::cout << "Incorrectly specified anti-aliasing factor" << std::endl;
                     help();
                     return 1;
                 }
@@ -314,7 +314,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 4)
                 {
-                    cout << "Incorrectly specified camera position" << endl;
+                    std::cout << "Incorrectly specified camera position" << std::endl;
                     help();
                     return 1;
                 }
@@ -328,7 +328,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 4)
                 {
-                    cout << "Incorrectly specified model position" << endl;
+                    std::cout << "Incorrectly specified model position" << std::endl;
                     help();
                     return 1;
                 }
@@ -351,7 +351,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 4)
                 {
-                    cout << "Incorrectly specified x vector" << endl;
+                    std::cout << "Incorrectly specified x vector" << std::endl;
                     help();
                     return 1;
                 }
@@ -365,7 +365,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 4)
                 {
-                    cout << "Incorrectly specified y vector" << endl;
+                    std::cout << "Incorrectly specified y vector" << std::endl;
                     help();
                     return 1;
                 }
@@ -379,7 +379,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 4)
                 {
-                    cout << "Incorrectly specified z vector" << endl;
+                    std::cout << "Incorrectly specified z vector" << std::endl;
                     help();
                     return 1;
                 }
@@ -393,7 +393,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified x rotate" << endl;
+                    std::cout << "Incorrectly specified x rotate" << std::endl;
                     help();
                     return 1;
                 }
@@ -405,7 +405,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified y rotate" << endl;
+                    std::cout << "Incorrectly specified y rotate" << std::endl;
                     help();
                     return 1;
                 }
@@ -417,7 +417,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 2)
                 {
-                    cout << "Incorrectly specified z rotate" << endl;
+                    std::cout << "Incorrectly specified z rotate" << std::endl;
                     help();
                     return 1;
                 }
@@ -429,7 +429,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 4)
                 {
-                    cout << "Incorrectly specified background colour" << endl;
+                    std::cout << "Incorrectly specified background colour" << std::endl;
                     help();
                     return 1;
                 }
@@ -443,7 +443,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 9)
                 {
-                    cout << "Incorrectly specified light" << endl;
+                    std::cout << "Incorrectly specified light" << std::endl;
                     help();
                     return 1;
                 }
@@ -507,7 +507,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 14)
                 {
-                    cout << "Incorrectly specified spotlight" << endl;
+                    std::cout << "Incorrectly specified spotlight" << std::endl;
                     help();
                     return 1;
                 }
@@ -544,7 +544,7 @@ int main (int argc, char **argv)
             {
                 if ((argc - i) < 11)
                 {
-                    cout << "Incorrectly specified directional light" << endl;
+                    std::cout << "Incorrectly specified directional light" << std::endl;
                     help();
                     return 1;
                 }
@@ -572,7 +572,7 @@ int main (int argc, char **argv)
             }
             else
             {
-                cout << "Unknown option: " << argv[i] << endl;
+                std::cout << "Unknown option: " << argv[i] << std::endl;
                 help();
                 return 1;
             }
@@ -580,13 +580,13 @@ int main (int argc, char **argv)
     }
 
     /* initialise the scene */
-    ifstream    input_stream;
-    string      path;
-    size_t      last_slash;
+    std::ifstream   input_stream;
+    std::string     path;
+    size_t          last_slash;
     
     /* Get the screen aspect ratio */
-    const fp_t screen_width     = (fp_t)10.0;
-    const fp_t screen_height    = screen_width * ((fp_t)yr / (fp_t)xr);
+    const float screen_width    = 10.0f;
+    const float screen_height   = screen_width * (static_cast<float>(yr) / static_cast<float>(xr));
     switch (input_format)
     {
         case model_format_t::cfg :
@@ -735,7 +735,7 @@ int main (int argc, char **argv)
         //cam->tone_map(local_human_histogram, 0.75, (1.0/3.0), (1.0/3.0), false, false, false);
 
         /* Output image */
-        ostringstream file_name(ostringstream::out);
+        std::ostringstream file_name(std::ostringstream::out);
         switch (image_format)
         {
             case image_format_t::tga :
