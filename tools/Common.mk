@@ -4,7 +4,7 @@ CC = gcc
 # Compile and linker options 
 COMMON_OPT  = -fPIC -Wno-unused-local-typedefs -Wall -pipe
 DEBUG_OPT   = $(COMMON_OPT) -g3 -O0 --coverage
-RELEASE_OPT = $(COMMON_OPT) -O3 -mfpmath=sse -msse4a -fexpensive-optimizations #-march=native
+RELEASE_OPT = $(COMMON_OPT) -O3 -g -mfpmath=sse -msse4a -fexpensive-optimizations # -funroll-loops -march=native
 ifeq ($(BUILD), DEBUG)
 	LD_OPT = --coverage
 	CC_OPT = $(DEBUG_OPT) --std=c11
