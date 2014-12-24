@@ -429,7 +429,7 @@ void ray_trace_engine::bih_frustrum_find_nearest_object(const packet_ray *const 
         {
             vmax_d = max(vmax_d, h[i].d);
         }
-        const fp_t max_d = max(max(vmax_d[0], vmax_d[1]), max(vmax_d[2], vmax_d[3]));
+        const fp_t max_d = horizontal_max(vmax_d);
 
         do
         {
@@ -458,6 +458,11 @@ void ray_trace_engine::bih_frustrum_find_nearest_object(const packet_ray *const 
 **********************************************************/
 void ray_trace_engine::bih_frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const
 {
+    for (int i = size; i < MAXIMUM_PACKET_SIZE; ++i)
+    {
+        h[i].d = vfp_zero;
+    }
+
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
     /* Count number of rays shot */
     ++nr;
@@ -600,12 +605,10 @@ void ray_trace_engine::bih_frustrum_find_nearest_object(const packet_ray *const 
             }
 #endif
             /* Update furthest intersection */
-            vfp_t vmax_d = h[0].d;
-            for (int i = 1; i < size; ++i)
-            {
-                vmax_d = max(vmax_d, h[i].d);
-            }
-            max_d = max(max(vmax_d[0], vmax_d[1]), max(vmax_d[2], vmax_d[3]));
+            static_assert(MAXIMUM_PACKET_SIZE == 16, "Error: Max expects MAXIMUM_PACKET_SIZE to be 16");
+            max_d = horizontal_max(
+                        max(max(max(max(h[0].d, h[1].d), max(h[ 2].d, h[ 3].d)), max(max(h[ 4].d, h[ 5].d), max(h[ 6].d, h[ 7].d))), 
+                            max(max(max(h[8].d, h[9].d), max(h[10].d, h[11].d)), max(max(h[12].d, h[13].d), max(h[14].d, h[15].d)))));
 
         }
         else if (cmd == -1)
@@ -661,8 +664,13 @@ void ray_trace_engine::bih_frustrum_found_nearer_object(const packet_ray *const 
         vmin_d = min(vmin_d, t[i]);
         h[i].d = t[i];
     }
-    fp_t max_d = max(max(vmax_d[0], vmax_d[1]), max(vmax_d[2], vmax_d[3]));
-    fp_t min_d = min(min(vmin_d[0], vmin_d[1]), min(vmin_d[2], vmin_d[3]));
+    for (int i = size; i < MAXIMUM_PACKET_SIZE; ++i)
+    {
+        h[i].d = vfp_zero;
+    }
+
+    fp_t max_d = horizontal_max(vmax_d);
+    fp_t min_d = horizontal_min(vmin_d);
 
     /* state of stack */
     bih_stack_element *exit_point = &(this->bih_stack[0]);
@@ -784,12 +792,10 @@ void ray_trace_engine::bih_frustrum_found_nearer_object(const packet_ray *const 
 #endif
 
             /* Update furthest intersection */
-            vmax_d = h[0].d;
-            for (unsigned i = 1; i < size; ++i)
-            {
-                vmax_d = max(vmax_d, h[i].d);
-            }
-            max_d = max(max(vmax_d[0], vmax_d[1]), max(vmax_d[2], vmax_d[3]));
+            static_assert(MAXIMUM_PACKET_SIZE == 16, "Error: Max expects MAXIMUM_PACKET_SIZE to be 16");
+            vmax_d = max(max(max(max(h[0].d, h[1].d), max(h[ 2].d, h[ 3].d)), max(max(h[ 4].d, h[ 5].d), max(h[ 6].d, h[ 7].d))), 
+                         max(max(max(h[8].d, h[9].d), max(h[10].d, h[11].d)), max(max(h[12].d, h[13].d), max(h[14].d, h[15].d))));
+            max_d = horizontal_max(vmax_d);
             
             /* Early exit for all rays occluded */
             if (max_d < min_d)
@@ -2394,7 +2400,7 @@ void ray_trace_engine::kdt_frustrum_find_nearest_object(const packet_ray *const 
             {
                 vmax_d = max(vmax_d, h[i].d);
             }
-            max_d = max(max(vmax_d[0], vmax_d[1]), max(vmax_d[2], vmax_d[3]));
+            max_d = horizontal_max(vmax_d);
 
         }
         else
@@ -2446,8 +2452,8 @@ void ray_trace_engine::kdt_frustrum_found_nearer_object(const packet_ray *const 
         vmin_d = min(vmin_d, t[i]);
         h[i].d = t[i];
     }
-    fp_t max_d = max(max(vmax_d[0], vmax_d[1]), max(vmax_d[2], vmax_d[3]));
-    fp_t min_d = min(min(vmin_d[0], vmin_d[1]), min(vmin_d[2], vmin_d[3]));
+    fp_t max_d = horizontal_max(vmax_d);
+    fp_t min_d = horizontal_min(vmin_d);
 
     /* state of stack */
     kdt_stack_element *exit_point = &(this->kdt_stack[0]);
@@ -2587,7 +2593,7 @@ void ray_trace_engine::kdt_frustrum_found_nearer_object(const packet_ray *const 
             {
                 vmax_d = max(vmax_d, h[i].d);
             }
-            max_d = max(max(vmax_d[0], vmax_d[1]), max(vmax_d[2], vmax_d[3]));
+            max_d = horizontal_max(vmax_d);
             
             /* Early exit for all rays occluded */
             if (max_d < min_d)
