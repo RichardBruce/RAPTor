@@ -6,6 +6,7 @@ namespace raptor_raytracer
 {
 /* Tree depth */
 static unsigned depth = 0;
+static float min_node_size = 0.0f;
 
 
 /**********************************************************
@@ -140,7 +141,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.x;
                 --depth;
                 const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < min_node_size)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(b, max(0, bottom - 1));
                 }
@@ -157,7 +158,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.x;
                 --depth;
                 const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < min_node_size)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(bottom, e);
                 }
@@ -220,7 +221,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.y;
                 --depth;
                 const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < min_node_size)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(b, max(0, bottom - 1));
                 }
@@ -237,7 +238,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.y;
                 --depth;
                 const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < min_node_size)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(bottom, e);
                 }
@@ -300,7 +301,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.z;
                 --depth;
                 const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < min_node_size)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(b, max(0, bottom - 1));
                 }
@@ -317,7 +318,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.z;
                 --depth;
                 const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < min_node_size)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(bottom, e);
                 }
@@ -786,6 +787,8 @@ const std::vector<triangle *> * build_bih(const primitive_list *const o, std::ve
     unsigned grand_child = 1;
 
     depth = 0;
+    const point_t min_node((triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds()) * 0.01f);
+    min_node_size = min_node.x * min_node.y * min_node.z;
     divide_bih_node(object_copy, 0, &grand_child, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, object_copy->size() - 1);
 
 //    approximate_sort(o, object_copy);
