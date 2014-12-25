@@ -703,6 +703,19 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
         int   near_idx  = (*_bih_base)[bih_block].get_left_child(bih_block, bih_node);
         int   far_idx   = (*_bih_base)[bih_block].get_right_child(bih_block, bih_node);
 
+        if (bih_node == 0)
+        {
+            const int child_block = block_index((*_bih_base)[bih_block].get_child_block());
+            _mm_prefetch((char *)&(*_bih_base)[child_block], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 1], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 2], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 3], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 4], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 5], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 6], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 7], _MM_HINT_T0);
+        }
+
         switch ((*_bih_base)[bih_block].get_split_axis(bih_node))
         {
             /* This node is not split in any plane, ie/ it is a leaf */
@@ -1116,6 +1129,19 @@ inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_poi
         int   near_idx      = (*_bih_base)[bih_block].get_left_child(bih_block, bih_node);
         int   far_idx       = (*_bih_base)[bih_block].get_right_child(bih_block, bih_node);
 
+        if (bih_node == 0)
+        {
+            const int child_block = block_index((*_bih_base)[bih_block].get_child_block());
+            _mm_prefetch((char *)&(*_bih_base)[child_block], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 1], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 2], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 3], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 4], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 5], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 6], _MM_HINT_T0);
+            _mm_prefetch((char *)&(*_bih_base)[child_block + 7], _MM_HINT_T0);
+        }
+        
         switch ((*_bih_base)[bih_block].get_split_axis(bih_node))
         {
             /* This node is not split in any plane, ie/ it is a leaf */
