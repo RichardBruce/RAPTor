@@ -365,7 +365,7 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const point_t &node_bl
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.x;
                 --_depth;
                 const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < _min_node_volume)
                 {
                     (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
                 }
@@ -382,7 +382,7 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const point_t &node_bl
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.x;
                 --_depth;
                 const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < _min_node_volume)
                 {
                     (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
                 }
@@ -445,7 +445,7 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const point_t &node_bl
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.y;
                 --_depth;
                 const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < _min_node_volume)
                 {
                     (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
                 }
@@ -462,7 +462,7 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const point_t &node_bl
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.y;
                 --_depth;
                 const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < _min_node_volume)
                 {
                     (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
                 }
@@ -526,7 +526,7 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const point_t &node_bl
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.z;
                 --_depth;
                 const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < _min_node_volume)
                 {
                     (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
                 }
@@ -543,7 +543,7 @@ void bih_builder::divide_bih_node(point_t bl, point_t tr, const point_t &node_bl
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.z;
                 --_depth;
                 const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < 1.0f)
+                if ((width.x * width.y * width.z) < _min_node_volume)
                 {
                     (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
                 }
