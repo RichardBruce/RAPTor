@@ -2,6 +2,7 @@
 #define __BIH_BLOCK_H__
 
 /* Standard headers */
+#include <intrin.h>
 
 /* Boost headers */
 
@@ -36,7 +37,7 @@ class bih_block
             assert((idx != 5) || (static_cast<axis_t>((_axes >> 4) & 0x3) != axis_t::not_set) || !"Error: Parent of index 5 is a leaf");
             assert((idx != 6) || (static_cast<axis_t>((_axes >> 4) & 0x3) != axis_t::not_set) || !"Error: Parent of index 6 is a leaf");
 
-            _axes &= ~(0x3 << (idx << 1));
+            _axes &= ~((0x3 << (idx << 1)) | (1 << (idx + 16)));
             _nodes[idx].create_leaf_node(b, e);
         }
 
@@ -44,7 +45,7 @@ class bih_block
         {
             assert((idx < 7) || !"Error: Index of node is too large");
             assert((static_cast<int>(a) & 0xfffffffc) == 0);
-            _axes |= (static_cast<int>(a) << (idx << 1));
+            _axes |= (static_cast<int>(a) << (idx << 1)) | (0x1 << (idx + 16));
 
             _nodes[idx].create_generic_node(l, r);
         }
@@ -61,9 +62,9 @@ class bih_block
         }
         
         /* Get size of next block layer */
-        static int child_blocks_required()
+        int child_blocks_required()
         {
-            return 8;
+            return __popcnt16(_axes >> 16);
         }
 
         /* Tree traversal */        
@@ -71,13 +72,6 @@ class bih_block
         {
             assert((idx < 7) || !"Error: Index of node is too large");
             return static_cast<axis_t>((_axes >> (idx << 1)) & 0x3);
-        }
-
-        /* Check if a new layer of blocks are needed */
-        bool requires_block_children(const int idx) const
-        {
-            assert((idx < 7) || !"Error: Index of node is too large");
-            return (idx > 2) && (_axes < 0x40);
         }
 
         int get_left_child(const int block_idx, const int node_idx) const
