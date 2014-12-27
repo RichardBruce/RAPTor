@@ -143,6 +143,7 @@ class bih_node
             return false;
         }
 
+#ifdef SIMD_PACKET_TRACING
         void test_leaf_node_nearest(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned int size) const
         {
             int end = this->e;
@@ -224,7 +225,7 @@ class bih_node
 
             return;
         }
-
+#endif /* #ifdef SIMD_PACKET_TRACING */
         
     private : 
         /* Unions of mutually exclusive data */

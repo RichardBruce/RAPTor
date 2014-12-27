@@ -1199,7 +1199,6 @@ vfp_t ray_trace_engine::bih_found_nearer_object(const packet_ray *const r, const
         entry_point.vt_max = min(entry_point.vt_max, h.d);
     }
 }
-#endif /* #ifdef SIMD_PACKET_TRACING */
 
 
 /**********************************************************
@@ -1262,6 +1261,7 @@ vfp_t ray_trace_engine::bih_found_nearer_object(const packet_ray *const r, const
         entry_point.vt_max = min(entry_point.vt_max, h.d);
     }
 }
+#endif /* #ifdef SIMD_PACKET_TRACING */
 
 
 /**********************************************************

@@ -31,12 +31,15 @@ extern unsigned max_depth;      /* Maximum depth of the tree */
 #endif
 
 class ray;
-class packet_ray;
-class frustrum;
 class line;
 class triangle;
 class kdt_node;
 class bih_node;
+
+#ifdef SIMD_PACKET_TRACING
+class packet_ray;
+class frustrum;
+#endif /* #ifdef SIMD_PACKET_TRACING */
 
 #ifndef SPATIAL_SUBDIVISION_BIH
 /* Stack element for tracing through the kd tree */

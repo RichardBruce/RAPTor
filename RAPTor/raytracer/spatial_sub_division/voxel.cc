@@ -33,11 +33,11 @@ voxel voxel::divide(kdt_node *const k)
     /* Invoke the exact builder for small node */
     if (this->p->size() <= MIN_APPROX_KDT_BUILDER_NODE_SIZE)
     {
-#ifdef SIMD_PACKET_TRACING
+// #ifdef SIMD_PACKET_TRACING
         best_split = this->brute_force_split_all_axis(&lowest_cost, &normal);
-#else
-        best_split = this->split_all_axis(&lowest_cost, &normal);
-#endif
+// #else
+//         best_split = this->split_all_axis(&lowest_cost, &normal);
+// #endif
     }
     else
     {
@@ -1065,162 +1065,6 @@ inline fp_t voxel::count_primitives(fp_t *const r, const fp_t s, const axis_t no
     return left_objects;
 }
 
-
-#ifndef SIMD_PACKET_TRACING
-/**********************************************************
- 
-**********************************************************/
-inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis_t n) const
-{
-//    if (this->p->size() > 1000000)
-//    {
-//        primitive_count pc(this->p, s, n);
-//        parallel_reduce(blocked_range<size_t>(0,this->p->size()), pc, auto_partitioner());
-//    
-//        for (int i = 0; i < 8; i++)
-//        {
-//            l[i] = pc.sum_l[i];
-//            r[i] = pc.sum_r[i];
-//        }
-//    }
-//    else
-//    {
-    /* Clear the counters */
-    for (int i = 0; i < len; i++)
-    {
-        l[i] = (fp_t)0.0;
-        r[i] = (fp_t)0.0;
-    }
-
-    /* Count in the given axis */
-    switch (n)
-    {
-        case axis_t::x_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                for (int j = 0; j < len; j++)
-                {
-                    l[j] += (int)((*i)->lowest_x()  < s[j]);
-                    r[j] += (int)((*i)->highest_x() > s[j]);
-                }
-            }
-            break;
-
-        case axis_t::y_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                for (int j = 0; j < len; j++)
-                {
-                    l[j] += (int)((*i)->lowest_y()  < s[j]);
-                    r[j] += (int)((*i)->highest_y() > s[j]);
-                }
-            }
-            break;
-
-    case axis_t::z_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                for (int j = 0; j < len; j++)
-                {
-                    l[j] += (int)((*i)->lowest_z()  < s[j]);
-                    r[j] += (int)((*i)->highest_z() > s[j]);
-                }
-            }
-            break;
-        default :
-            assert(false);
-            break;
-    }
-//    }
-}
-
-
-#else
-/**********************************************************
- 
-**********************************************************/
-inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis_t n) const
-{
-    assert(len == 8);
-    vfp_t l_vec[2] = { vfp_zero, vfp_zero };
-    vfp_t r_vec[2] = { vfp_zero, vfp_zero };
-    vfp_t s_vec[2] = { &s[0], &s[SIMD_WIDTH] };
-
-
-    /* Count in the given axis */
-    switch (n)
-    {
-        case axis_t::x_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                const vfp_t hi((*i)->highest_x());
-                const vfp_t lo((*i)->lowest_x());
-                
-                l_vec[0] += (lo < s_vec[0]) & vfp_one;
-                r_vec[0] += (hi > s_vec[0]) & vfp_one;
-                l_vec[1] += (lo < s_vec[1]) & vfp_one;
-                r_vec[1] += (hi > s_vec[1]) & vfp_one;
-            }
-            break;
-
-        case axis_t::y_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                const vfp_t hi((*i)->highest_y());
-                const vfp_t lo((*i)->lowest_y());
-                
-                l_vec[0] += (lo < s_vec[0]) & vfp_one;
-                r_vec[0] += (hi > s_vec[0]) & vfp_one;
-                l_vec[1] += (lo < s_vec[1]) & vfp_one;
-                r_vec[1] += (hi > s_vec[1]) & vfp_one;
-            }
-            break;
-
-        case axis_t::z_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                const vfp_t hi((*i)->highest_z());
-                const vfp_t lo((*i)->lowest_z());
-                
-                l_vec[0] += (lo < s_vec[0]) & vfp_one;
-                r_vec[0] += (hi > s_vec[0]) & vfp_one;
-                l_vec[1] += (lo < s_vec[1]) & vfp_one;
-                r_vec[1] += (hi > s_vec[1]) & vfp_one;
-            }
-            break;
-        default :
-            assert(false);
-            break;
-    }
-
-    for (int i = 0; i < 2; i++)
-    {
-        for (int j = 0; j < SIMD_WIDTH; j++)
-        {
-            l[(i << LOG2_SIMD_WIDTH) + j] = l_vec[i][j];
-            r[(i << LOG2_SIMD_WIDTH) + j] = r_vec[i][j];
-        }
-    }
-}
-
-//Static properties of the tree :
-//Scene primitves                                             (nsp) : 76152
-//Tree primitves                                              (ntp) : 226924
-//Number of generic nodes                                     (ng ) : 19642
-//Number of elementary nodes                                  (ne ) : 19643
-//Number of empty elementary nodes                            (nee) : 2223
-//Maximum size of an elementary node                          (ner) : 38
-//Average size of an elementary node                          (nea) : 11.5524
-//Maximum depth of the tree                                   (d  ) : 26
-//
-//Dynamic properties of the KD-tree :
-//Number of rays shot                                       (nr   ) : 38077
-//Intersection tests performed                              (nit  ) : 374006
-//Intersection tests performed : to minimum required tests  (ritm ) : 80.9362
-//Average number of nodes accessed per ray                  (nts  ) : 54.3604
-//Average number of elementary nodes accessed per ray       (nets ) : 15.2664
-//Average number of empty elementary nodes accessed per ray (neets) : 1.64764
-
 /**********************************************************
  
 **********************************************************/
@@ -1426,6 +1270,73 @@ fp_t voxel::brute_force_split_all_axis(fp_t *s, axis_t * normal) const
     return bs_vec[index];
 }
 
+/**********************************************************
+ 
+**********************************************************/
+inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis_t n) const
+{
+    assert(len == 8);
+    vfp_t l_vec[2] = { vfp_zero, vfp_zero };
+    vfp_t r_vec[2] = { vfp_zero, vfp_zero };
+    vfp_t s_vec[2] = { &s[0], &s[SIMD_WIDTH] };
+
+
+    /* Count in the given axis */
+    switch (n)
+    {
+        case axis_t::x_axis:
+            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
+            {
+                const vfp_t hi((*i)->highest_x());
+                const vfp_t lo((*i)->lowest_x());
+                
+                l_vec[0] += (lo < s_vec[0]) & vfp_one;
+                r_vec[0] += (hi > s_vec[0]) & vfp_one;
+                l_vec[1] += (lo < s_vec[1]) & vfp_one;
+                r_vec[1] += (hi > s_vec[1]) & vfp_one;
+            }
+            break;
+
+        case axis_t::y_axis:
+            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
+            {
+                const vfp_t hi((*i)->highest_y());
+                const vfp_t lo((*i)->lowest_y());
+                
+                l_vec[0] += (lo < s_vec[0]) & vfp_one;
+                r_vec[0] += (hi > s_vec[0]) & vfp_one;
+                l_vec[1] += (lo < s_vec[1]) & vfp_one;
+                r_vec[1] += (hi > s_vec[1]) & vfp_one;
+            }
+            break;
+
+        case axis_t::z_axis:
+            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
+            {
+                const vfp_t hi((*i)->highest_z());
+                const vfp_t lo((*i)->lowest_z());
+                
+                l_vec[0] += (lo < s_vec[0]) & vfp_one;
+                r_vec[0] += (hi > s_vec[0]) & vfp_one;
+                l_vec[1] += (lo < s_vec[1]) & vfp_one;
+                r_vec[1] += (hi > s_vec[1]) & vfp_one;
+            }
+            break;
+        default :
+            assert(false);
+            break;
+    }
+
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < SIMD_WIDTH; j++)
+        {
+            l[(i << LOG2_SIMD_WIDTH) + j] = l_vec[i][j];
+            r[(i << LOG2_SIMD_WIDTH) + j] = r_vec[i][j];
+        }
+    }
+}
+
 
 /**********************************************************
  
@@ -1541,7 +1452,6 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
     /* cost of traversal + cost of intersection * (left cell count * left area + right cell count * right area) */
     return vfp_t(COST_OF_TRAVERSAL) + (vfp_t(COST_OF_INTERSECTION) * ((l * left_area) + (r * right_area)));
 }
-#endif /* #ifndef SIMD_PACKET_TRACING */
 
 
 /**********************************************************
