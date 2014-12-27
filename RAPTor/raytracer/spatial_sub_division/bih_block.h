@@ -2,7 +2,6 @@
 #define __BIH_BLOCK_H__
 
 /* Standard headers */
-#include <intrin.h>
 
 /* Boost headers */
 
@@ -64,7 +63,7 @@ class bih_block
         /* Get size of next block layer */
         int child_blocks_required()
         {
-            return __popcnt16(_axes >> 16);
+            return __builtin_popcount(_axes >> 16);
         }
 
         /* Tree traversal */        

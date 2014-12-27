@@ -261,19 +261,19 @@ void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_b
     
     /* Split block root */
     ++_depth;
-    split_axis(&split_data, 0, 2, block_idx, 0);
+    divide_bih_node(&split_data, 0, 2, block_idx, 0);
 
     /* Split level 1 */
     ++_depth;
-    split_axis(&split_data, 2, 4, block_idx, 1);
-    split_axis(&split_data, 3, 6, block_idx, 2);
+    divide_bih_node(&split_data, 2, 4, block_idx, 1);
+    divide_bih_node(&split_data, 3, 6, block_idx, 2);
 
     /* Split level 2 */
     ++_depth;
-    split_axis(&split_data, 4, 0, block_idx, 3);
-    split_axis(&split_data, 5, 2, block_idx, 4);
-    split_axis(&split_data, 6, 4, block_idx, 5);
-    split_axis(&split_data, 7, 6, block_idx, 6);
+    divide_bih_node(&split_data, 4, 0, block_idx, 3);
+    divide_bih_node(&split_data, 5, 2, block_idx, 4);
+    divide_bih_node(&split_data, 6, 4, block_idx, 5);
+    divide_bih_node(&split_data, 7, 6, block_idx, 6);
 
     /* Get extra blocks if needed */
     const int blocks_required = (*_blocks)[block_idx].child_blocks_required();
@@ -296,7 +296,7 @@ void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_b
     {
         if ((*_blocks)[block_idx].get_split_axis(i) != axis_t::not_set)
         {
-            divide_bih_block(split_data->bl[i], split_data->tm[i], split_data->node_bl[i], split_data->node_tm[i], block_idx + child_idx, split_data->begin[i], split_data->end[i]);
+            divide_bih_block(split_data.bl[i], split_data.tr[i], split_data.node_bl[i], split_data.node_tr[i], block_idx + child_idx, split_data.begin[i], split_data.end[i]);
             ++child_idx;
         }
     }
