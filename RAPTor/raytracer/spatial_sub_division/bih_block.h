@@ -63,7 +63,7 @@ class bih_block
         /* Get size of next block layer */
         int child_blocks_required()
         {
-            return __builtin_popcount(_axes >> 16);
+            return __builtin_popcount(_axes >> 19) << 1;
         }
 
         /* Tree traversal */        
@@ -82,7 +82,8 @@ class bih_block
             if (node_idx_m3 >= 0)
             {
                 /* Child indices should be handed out in multiples of 8 block of 7 nodes*/
-                return _child + (node_idx_m3 << 4);
+                const int pre_children = __builtin_popcount((_axes >> 19) & ((1 << node_idx_m3) - 1));
+                return _child + (pre_children << 4);
             }
             /* The child is in one of the upper levels */
             else
@@ -100,7 +101,8 @@ class bih_block
             if (node_idx_m3 >= 0)
             {
                 /* Child indices should be handed out in multiples of 8 block of 7 nodes*/
-                return _child + ((node_idx_m3 << 4) | 0x8);
+                const int pre_children = __builtin_popcount((_axes >> 19) & ((1 << node_idx_m3) - 1));
+                return _child + ((pre_children << 4) | 0x8);
             }
             /* The child is in one of the upper levels */
             else
