@@ -18,7 +18,7 @@ GetOptions( "website_dir=s" => \$website_dir,
             "test_dirs=s"   => \$test_dir,
             "log_file=s"    => \$log_file) or die("Error: Cant parse command line arguments\n");
 my @git_branch = `git rev-parse --abbrev-ref HEAD`;
-$website_dir = $website_dir . "/" . $git_branch[0];
+$website_dir = $website_dir . "/" . $git_branch[0] . "/performance/";
 
 ###############################################
 # Check there is atleast 1 output file
