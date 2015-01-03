@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-MOVE_TO="$1/${PWD##*/}/"
+GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+MOVE_TO="$1/$GIT_BRANCH/$2/${PWD##*/}/"
 
 # Clean destination
 rm -rf $MOVE_TO/*
