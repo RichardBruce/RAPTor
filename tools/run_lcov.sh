@@ -43,7 +43,8 @@ genhtml -q -o ./test_coverage --legend -t "Test Coverage" --num-spaces 4 $COVERA
 if [ ! -z "$3" ]; then
     TEST_FOLDER="${PWD##*/}"
     PROJECT_PATH="${PWD%/*}"
-    COPY_TO="$3/${PROJECT_PATH##*/}/$TEST_FOLDER"
+    GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+    COPY_TO="$3/$GIT_BRANCH/$4/${PROJECT_PATH##*/}/$TEST_FOLDER"
     if [ ! -d "$DIRECTORY" ]; then
         mkdir -p $COPY_TO
     fi
