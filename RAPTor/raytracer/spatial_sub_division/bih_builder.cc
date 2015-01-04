@@ -83,8 +83,8 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
     }
     
     /* Partition primitives */
-    int left_size;
-    int right_size;
+    // int left_size;
+    // int right_size;
     point_t node_tm(node_tr);
     point_t node_bm(node_bl);
     float max_left  = -MAX_DIST;
@@ -135,7 +135,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 pos *= 0.5f;
             }
 
-            right_size = e - bottom; /* 1 less than the actual node size */
+            // right_size = e - bottom; /* 1 less than the actual node size */
             // if ((right_size == -1) && (max_left == node_tm.x))
             // {
             //     // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.x;
@@ -152,7 +152,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             //     return;
             // }
 
-            left_size = bottom - b;
+            // left_size = bottom - b;
             // if ((left_size == 0) && (min_right == node_bm.x))
             // {
             //     // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.x;
@@ -215,7 +215,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 pos *= 0.5f;
             }
 
-            right_size = e - bottom; /* 1 less than the actual node size */
+            // right_size = e - bottom; /* 1 less than the actual node size */
             // if ((right_size == -1) && (max_left == node_tm.y))
             // {
             //     // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.y;
@@ -232,7 +232,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             //     return;
             // }
 
-            left_size = bottom - b;
+            // left_size = bottom - b;
             // if ((left_size == 0) && (min_right == node_bm.y))
             // {
             //     // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.y;
@@ -295,7 +295,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 pos *= 0.5f;
             }
 
-            right_size = e - bottom; /* 1 less than the actual node size */
+            // right_size = e - bottom; /* 1 less than the actual node size */
             // if ((right_size == -1) && (max_left == node_tm.z))
             // {
             //     // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.z;
@@ -312,7 +312,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             //     return;
             // }
 
-            left_size = bottom - b;
+            // left_size = bottom - b;
             // if ((left_size == 0) && (min_right == node_bm.z))
             // {
             //     // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.z;
