@@ -108,7 +108,7 @@ while (my $line = <INDEX_T>)
 
         # Parse date
         my $days_since_run;
-        if ($line =~ m/(\d{4}-\d{2}-\d{2})/)
+        if ($line =~ m/(\d{4}-\d{1,2}-\d{1,2})/)
         {
             my $last_date = $parser->parse_datetime($1);
             my $dur = $today_date->delta_days($last_date);
