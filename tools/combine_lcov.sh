@@ -3,6 +3,7 @@ COVERAGE_FILE="./test_coverage/coverage.info"
 UNIT_COVERAGE_FILE="./unit_tests/test_coverage/coverage.info"
 REGRESSION_COVERAGE_FILE="./regression_tests/test_coverage/coverage.info"
 
+
 # Clear the last run
 rm -rf ./test_coverage
 mkdir ./test_coverage
@@ -16,7 +17,8 @@ genhtml -q -o ./test_coverage --legend -t "Test Coverage" --num-spaces 4 $COVERA
 # Publish code coverage
 if [ ! -z "$1" ]; then
     PROJECT_FOLDER="${PWD##*/}"
-    COPY_TO="$1/$PROJECT_FOLDER/combined"
+    GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+    COPY_TO="$1/$GIT_BRANCH/$2/$PROJECT_FOLDER/combined"
     if [ ! -d "$DIRECTORY" ]; then
         mkdir -p $COPY_TO
     fi

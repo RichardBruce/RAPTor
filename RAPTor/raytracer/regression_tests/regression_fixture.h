@@ -30,6 +30,11 @@
 /* Test headers */
 #include "regression_checker.h"
 
+#ifndef VALGRIND_TESTS
+const int test_iterations = 5;
+#else
+const int test_iterations = 1;
+#endif
 
 /* Test data */
 struct regression_fixture : private boost::noncopyable
@@ -180,12 +185,27 @@ struct regression_fixture : private boost::noncopyable
             BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - # Lights: " << _lights.size();
 
             /* Render */
-            const auto t0(std::chrono::system_clock::now());
-            ray_tracer(_lights, _everything, *_cam);
-            const auto t1(std::chrono::system_clock::now());
+            int max_runtime = 0;
+            int total_runtime = 0;
+            for (int i = 0; i < test_iterations; ++i)
+            {
+                const auto t0(std::chrono::system_clock::now());
+                ray_tracer(_lights, _everything, *_cam);
+                const auto t1(std::chrono::system_clock::now());
+
+                /* Track run time and outliers */
+                const int runtime = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+                total_runtime += runtime;
+                max_runtime = std::max(max_runtime, runtime);
+            }
 
             /* Log test duration */
-            BOOST_LOG_TRIVIAL(fatal) << "PERF 4 - Render Time ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+            if (test_iterations > 1)
+            {
+                total_runtime -= max_runtime;
+            }
+            const int avg_runtime = total_runtime / (std::max(1, test_iterations - 1) * 1000);
+            BOOST_LOG_TRIVIAL(fatal) << "PERF 4 - Render Time ms: " << avg_runtime;
 
             return *this;
         }
