@@ -23,7 +23,8 @@ class bih_builder
     private :
         struct block_splitting_data
         {
-            const primitive_list *  active_prims[8];
+            const point_t *         hist_bl[8];
+            const point_t *         hist_tr[8];
             point_t                 bl[8];
             point_t                 tr[8];
             point_t                 node_bl[8];
@@ -36,12 +37,12 @@ class bih_builder
 
         /* Radix sort */
         void bucket_build();
-        void bucket_build_mid(unsigned int *const hist, const int b, const int e);
-        void bucket_build_low(unsigned int *const hist, const int b, const int e);
+        void bucket_build_mid(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
+        void bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
 
         void level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx);
 
-        void divide_bih_block(const primitive_list *const active_prims, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level = 2);
+        void divide_bih_block(const point_t *const bl, const point_t *const tr, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level = 2);
         void divide_bih_block(block_splitting_data *const split_data, const int block_idx, const int node_idx);
         bool divide_bih_node_binned(block_splitting_data *const split_data, const int in_idx, const int out_idx, const int block_idx, const int node_idx);
 

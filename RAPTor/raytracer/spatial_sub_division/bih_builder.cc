@@ -54,7 +54,6 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     //BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
 }
 
-// __attribute__((optimize("unroll-loops")))
 void bih_builder::bucket_build()
 {
     /* Calculate Morton codes and build MSB histogram */
@@ -114,6 +113,8 @@ void bih_builder::bucket_build()
     /* Move based on histogram */
     point_t bl[histogram_size];
     point_t tr[histogram_size];
+    std::fill_n(bl, histogram_size, point_t( MAX_DIST,  MAX_DIST,  MAX_DIST));
+    std::fill_n(tr, histogram_size, point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST));
     for (int i = 0; i < static_cast<int>(_primitives->size()); ++i)
     {
         const unsigned int data = _morton_codes[i];
@@ -134,10 +135,10 @@ void bih_builder::bucket_build()
     hist[0] = 0;
 
     /* Kick of the block builder, breadth first within blocks, depth first outside blocks */
-    divide_bih_block(&_prim_buffer, hist, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, histogram_size);
+    divide_bih_block(bl, tr, hist, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, histogram_size);
 }
 
-void bih_builder::bucket_build_mid(unsigned int *const hist, const int b, const int e)
+void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e)
 {
     //BOOST_LOG_TRIVIAL(trace) << "Radix sort based on mid 11 bits";
 
@@ -165,8 +166,12 @@ void bih_builder::bucket_build_mid(unsigned int *const hist, const int b, const 
     {
         const unsigned int data = _code_buffer[i];
         const unsigned int pos = (data >> 10) & 0x3ff;
-        (*_primitives)[++hist[pos]] = _prim_buffer[i];
-        _morton_codes[hist[pos]] = data;
+        _morton_codes[++hist[pos]] = data;
+
+        auto prim = _prim_buffer[i];
+        (*_primitives)[hist[pos]] = prim;
+        bl[pos] = min(bl[pos], prim->lowest_point());
+        tr[pos] = max(tr[pos], prim->highest_point());
     }
 
     /* Un-increment the histogram */
@@ -177,7 +182,8 @@ void bih_builder::bucket_build_mid(unsigned int *const hist, const int b, const 
     hist[0] = b;
 }
 
-void bih_builder::bucket_build_low(unsigned int *const hist, const int b, const int e)
+// __attribute__((optimize("unroll-loops")))
+void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e)
 {
     //BOOST_LOG_TRIVIAL(trace) << "Radix sort based on low 11 bits";
     
@@ -203,8 +209,12 @@ void bih_builder::bucket_build_low(unsigned int *const hist, const int b, const 
     {
         const unsigned int data = _morton_codes[i];
         const unsigned int pos = data & 0x3ff;
-        _prim_buffer[++hist[pos]] = (*_primitives)[i];
-        _code_buffer[hist[pos]] = data;
+        _code_buffer[++hist[pos]] = data;
+
+        auto prim = (*_primitives)[i];
+        _prim_buffer[hist[pos]] = prim;
+        bl[pos] = min(bl[pos], prim->lowest_point());
+        tr[pos] = max(tr[pos], prim->highest_point());
     }
 
     /* Un-increment the histogram */
@@ -243,7 +253,12 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
     unsigned int hist[histogram_size + 1];
     memset(hist, 0, histogram_size * sizeof(float));
     
-    //BOOST_LOG_TRIVIAL(trace) << "Level: " << level << " complete moving to next level with bins: " << b << " - " << e << " and primitives: " << bins[b] << " - " << bins[e];
+    point_t bl[histogram_size];
+    point_t tr[histogram_size];
+    std::fill_n(bl, histogram_size, point_t( MAX_DIST,  MAX_DIST,  MAX_DIST));
+    std::fill_n(tr, histogram_size, point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST));
+
+   //BOOST_LOG_TRIVIAL(trace) << "Level: " << level << " complete moving to next level with bins: " << b << " - " << e << " and primitives: " << bins[b] << " - " << bins[e];
     switch (level)
     {
         /* Level 0 complete, call standard divider */
@@ -275,26 +290,28 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
         }
         /* Level 1 complete, call low bits radix sort*/
         case 1 :
-            bucket_build_low(hist, bins[b], bins[e]);
+            bucket_build_low(bl, tr, hist, bins[b], bins[e]);
 
             /* Kick of the block builder, breadth first within blocks, depth first outside blocks */
-            split_data->active_prims[data_idx]  = &_prim_buffer;
-            split_data->begin[data_idx]         = 0;
-            split_data->end[data_idx]           = histogram_size;
-            split_data->level[data_idx]         = 0;
-            split_data->bins[data_idx]          = hist;
+            split_data->hist_bl[data_idx]   = bl;
+            split_data->hist_tr[data_idx]   = tr;
+            split_data->begin[data_idx]     = 0;
+            split_data->end[data_idx]       = histogram_size;
+            split_data->level[data_idx]     = 0;
+            split_data->bins[data_idx]      = hist;
             divide_bih_block(split_data, block_idx, node_idx);
             break;
         /* Level 2 complete, call mid bits radix sort */
         case 2 :
-            bucket_build_mid(hist, bins[b], bins[e]);
+            bucket_build_mid(bl, tr, hist, bins[b], bins[e]);
 
             /* Kick of the block builder, breadth first within blocks, depth first outside blocks */
-            split_data->active_prims[data_idx]  = _primitives;
-            split_data->begin[data_idx]         = 0;
-            split_data->end[data_idx]           = histogram_size;
-            split_data->level[data_idx]         = 1;
-            split_data->bins[data_idx]          = hist;
+            split_data->hist_bl[data_idx]   = bl;
+            split_data->hist_tr[data_idx]   = tr;
+            split_data->begin[data_idx]     = 0;
+            split_data->end[data_idx]       = histogram_size;
+            split_data->level[data_idx]     = 1;
+            split_data->bins[data_idx]      = hist;
             divide_bih_block(split_data, block_idx, node_idx);
             break;
         default :
@@ -303,12 +320,13 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
 }
 
 /* Divide within a block, breadth first, with outside the block depth first */
-void bih_builder::divide_bih_block(const primitive_list *const active_prims, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level)
+void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const tr, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level)
 {
     //BOOST_LOG_TRIVIAL(trace) << "Building block: " << block_idx << " for bins: " << b << " - " << e << " at level: " << level;
 
     block_splitting_data split_data;
-    split_data.active_prims[0]  = active_prims;
+    split_data.hist_bl[0]       = bl;
+    split_data.hist_tr[0]       = tr;
     split_data.end[0]           = e;
     split_data.begin[0]         = b;
     split_data.bins[0]          = bins;
@@ -396,15 +414,28 @@ void bih_builder::divide_bih_block(const primitive_list *const active_prims, con
     {
         if ((*_blocks)[block_idx].get_split_axis(i + 3) != axis_t::not_set)
         {
-            /* Recurse left */
-            const int left_idx = i << 1;
-            divide_bih_block(split_data.active_prims[left_idx], split_data.bins[left_idx], split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, split_data.begin[left_idx], split_data.end[left_idx], split_data.level[left_idx]);
-            ++child_idx;
-            
-            /* Recurse right */
-            const int right_idx = left_idx + 1;
-            divide_bih_block(split_data.active_prims[right_idx], split_data.bins[right_idx], split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, split_data.begin[right_idx], split_data.end[right_idx], split_data.level[right_idx]);
-            ++child_idx;
+            // if ((*_blocks)[block_idx].get_node(i + 3)->size() < 100)
+            // {
+            //     /* Recurse left */
+            //     divide_bih_block(split_data->bl[left_idx], split_data->tr[left_idx], split_data->node_bl[left_idx], split_data->node_tr[left_idx], child_idx, split_data->begin[left_idx], split_data->end[left_idx]);
+            //     ++child_idx;
+                
+            //     /* Recurse right */
+            //     divide_bih_block(split_data->bl[right_idx], split_data->tr[right_idx], split_data->node_bl[right_idx], split_data->node_tr[right_idx], child_idx, split_data->begin[right_idx], split_data->end[right_idx]);
+            //     ++child_idx;
+            // }
+            // else
+            // {
+                /* Recurse left */
+                const int left_idx = i << 1;
+                divide_bih_block(split_data.hist_bl[left_idx], split_data.hist_tr[left_idx], split_data.bins[left_idx], split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, split_data.begin[left_idx], split_data.end[left_idx], split_data.level[left_idx]);
+                ++child_idx;
+                
+                /* Recurse right */
+                const int right_idx = left_idx + 1;
+                divide_bih_block(split_data.hist_bl[right_idx], split_data.hist_tr[right_idx], split_data.bins[right_idx], split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, split_data.begin[right_idx], split_data.end[right_idx], split_data.level[right_idx]);
+                ++child_idx;
+            // }
         }
     }
 
@@ -505,11 +536,11 @@ void bih_builder::divide_bih_block(block_splitting_data *const split_data, const
             else
             {
                 /* Recurse left */
-                divide_bih_block(split_data->active_prims[left_idx], split_data->bins[left_idx], split_data->node_bl[left_idx], split_data->node_tr[left_idx], child_idx, split_data->begin[left_idx], split_data->end[left_idx], split_data->level[left_idx]);
+                divide_bih_block(split_data->hist_bl[left_idx], split_data->hist_tr[left_idx], split_data->bins[left_idx], split_data->node_bl[left_idx], split_data->node_tr[left_idx], child_idx, split_data->begin[left_idx], split_data->end[left_idx], split_data->level[left_idx]);
                 ++child_idx;
                 
                 /* Recurse right */
-                divide_bih_block(split_data->active_prims[right_idx], split_data->bins[right_idx], split_data->node_bl[right_idx], split_data->node_tr[right_idx], child_idx, split_data->begin[right_idx], split_data->end[right_idx], split_data->level[right_idx]);
+                divide_bih_block(split_data->hist_bl[right_idx], split_data->hist_tr[right_idx], split_data->bins[right_idx], split_data->node_bl[right_idx], split_data->node_tr[right_idx], child_idx, split_data->begin[right_idx], split_data->end[right_idx], split_data->level[right_idx]);
                 ++child_idx;
             }
         }
@@ -527,8 +558,9 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     const int level = split_data->level[in_idx];
     const point_t &node_tr = split_data->node_tr[in_idx];
     const point_t &node_bl = split_data->node_bl[in_idx];
+    const point_t *const bl = split_data->hist_bl[in_idx];
+    const point_t *const tr = split_data->hist_tr[in_idx];
     const unsigned int *const bins = split_data->bins[in_idx];
-    const primitive_list *const active_prims = split_data->active_prims[in_idx];
     //BOOST_LOG_TRIVIAL(trace) << "Building node: " << node_idx << " for bins: " << std::hex << b << " - " << e << std::dec;
 
     /* Checks */
@@ -613,15 +645,15 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     {
         case axis_t::x_axis :
         {
-            unsigned int i = bins[b];
-            for (; i < bins[split_idx]; ++i)
+            int i = b;
+            for (; i < split_idx; ++i)
             {
-                max_left = std::max(max_left, (*active_prims)[i]->highest_x());
+                max_left = std::max(max_left, tr[i].x);
             }
 
-            for (; i < bins[e]; ++i)
+            for (; i < e; ++i)
             {
-                min_right = std::min(min_right, (*active_prims)[i]->lowest_x());
+                min_right = std::min(min_right, bl[i].x);
             }
 
             node_tm.x = max_left;
@@ -630,15 +662,15 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
         }
         case axis_t::y_axis :
         {
-            unsigned int i = bins[b];
-            for (; i < bins[split_idx]; ++i)
+            int i = b;
+            for (; i < split_idx; ++i)
             {
-                max_left = std::max(max_left, (*active_prims)[i]->highest_y());
+                max_left = std::max(max_left, tr[i].y);
             }
 
-            for (; i < bins[e]; ++i)
+            for (; i < e; ++i)
             {
-                min_right = std::min(min_right, (*active_prims)[i]->lowest_y());
+                min_right = std::min(min_right, bl[i].y);
             }
 
             node_tm.y = max_left;
@@ -647,15 +679,15 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
         }
         case axis_t::z_axis :
         {
-            unsigned int i = bins[b];
-            for (; i < bins[split_idx]; ++i)
+            int i = b;
+            for (; i < split_idx; ++i)
             {
-                max_left = std::max(max_left, (*active_prims)[i]->highest_z());
+                max_left = std::max(max_left, tr[i].z);
             }
 
-            for (; i < bins[e]; ++i)
+            for (; i < e; ++i)
             {
-                min_right = std::min(min_right, (*active_prims)[i]->lowest_z());
+                min_right = std::min(min_right, bl[i].z);
             }
 
             node_tm.z = max_left;
@@ -673,23 +705,25 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     (*_blocks)[block_idx].create_generic_node(max_left, min_right, node_idx, split_axis);
 
     /* Left node recursion data */
-    split_data->active_prims[out_idx]   = active_prims;
-    split_data->begin[out_idx]          = b;
-    split_data->end[out_idx]            = split_idx;
-    split_data->bins[out_idx]           = bins;
-    split_data->level[out_idx]          = level;
-    split_data->node_bl[out_idx]        = node_bl;
-    split_data->node_tr[out_idx]        = node_tm;
+    split_data->hist_bl[out_idx]    = bl;
+    split_data->hist_tr[out_idx]    = tr;
+    split_data->begin[out_idx]      = b;
+    split_data->end[out_idx]        = split_idx;
+    split_data->bins[out_idx]       = bins;
+    split_data->level[out_idx]      = level;
+    split_data->node_bl[out_idx]    = node_bl;
+    split_data->node_tr[out_idx]    = node_tm;
 
     /* Right node recursion data */
     const int out_idx_p1 = out_idx + 1;
-    split_data->active_prims[out_idx_p1]    = active_prims;
-    split_data->begin[out_idx_p1]           = split_idx;
-    split_data->end[out_idx_p1]             = split_idx + bin_range;
-    split_data->bins[out_idx_p1]            = bins;
-    split_data->level[out_idx_p1]           = level;
-    split_data->node_bl[out_idx_p1]         = node_bm;
-    split_data->node_tr[out_idx_p1]         = node_tr;
+    split_data->hist_bl[out_idx_p1] = bl;
+    split_data->hist_tr[out_idx_p1] = tr;
+    split_data->begin[out_idx_p1]   = split_idx;
+    split_data->end[out_idx_p1]     = split_idx + bin_range;
+    split_data->bins[out_idx_p1]    = bins;
+    split_data->level[out_idx_p1]   = level;
+    split_data->node_bl[out_idx_p1] = node_bm;
+    split_data->node_tr[out_idx_p1] = node_tr;
     return false;
 }
 
@@ -798,10 +832,10 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
         // //BOOST_LOG_TRIVIAL(trace) << "Creating leaf at index: " << bih_index(block_idx, node_idx) << " with indices: " << b << " - " << e;
         (*_blocks)[block_idx].create_leaf_node(b, e, node_idx);
         
-        for (unsigned int i = b; i <= e; ++i)
-        {
-            //BOOST_LOG_TRIVIAL(trace) << "creating leaf for: " << i;
-        }
+        // for (unsigned int i = b; i <= e; ++i)
+        // {
+        //     BOOST_LOG_TRIVIAL(trace) << "creating leaf for: " << i;
+        // }
         return;
     }
 
