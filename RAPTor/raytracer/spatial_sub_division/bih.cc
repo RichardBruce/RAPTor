@@ -1,4 +1,5 @@
 /* Standard headers */
+#include <fstream>
 
 /* Boost headers */
 
@@ -30,10 +31,11 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
     float t_min = entry_point->t_min;
     while (true)
     {
-        float near_split    = (*_bih_base)[bih_block].get_node(bih_node)->get_left_split();
-        float far_split     = (*_bih_base)[bih_block].get_node(bih_node)->get_right_split();
-        int   near_idx      = (*_bih_base)[bih_block].get_left_child(bih_block, bih_node);
-        int   far_idx       = (*_bih_base)[bih_block].get_right_child(bih_block, bih_node);
+        float near_split = (*_bih_base)[bih_block].get_node(bih_node)->get_left_split();
+        float far_split  = (*_bih_base)[bih_block].get_node(bih_node)->get_right_split();
+        
+        int far_idx;
+        int near_idx = (*_bih_base)[bih_block].get_siblings(&far_idx, bih_block, bih_node);
 
         if (bih_node == 0)
         {
@@ -700,8 +702,9 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
     {
         const vfp_t near_split((*_bih_base)[bih_block].get_node(bih_node)->get_left_split());
         const vfp_t far_split ((*_bih_base)[bih_block].get_node(bih_node)->get_right_split());
-        int   near_idx  = (*_bih_base)[bih_block].get_left_child(bih_block, bih_node);
-        int   far_idx   = (*_bih_base)[bih_block].get_right_child(bih_block, bih_node);
+
+        int far_idx;
+        int near_idx = (*_bih_base)[bih_block].get_siblings(&far_idx, bih_block, bih_node);
 
         if (bih_node == 0)
         {
@@ -1124,10 +1127,11 @@ inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_poi
     float t_min = entry_point->t_min;
     while (true)
     {
-        float near_split    = (*_bih_base)[bih_block].get_node(bih_node)->get_left_split();
-        float far_split     = (*_bih_base)[bih_block].get_node(bih_node)->get_right_split();
-        int   near_idx      = (*_bih_base)[bih_block].get_left_child(bih_block, bih_node);
-        int   far_idx       = (*_bih_base)[bih_block].get_right_child(bih_block, bih_node);
+        float near_split = (*_bih_base)[bih_block].get_node(bih_node)->get_left_split();
+        float far_split  = (*_bih_base)[bih_block].get_node(bih_node)->get_right_split();
+        
+        int far_idx;
+        int near_idx = (*_bih_base)[bih_block].get_siblings(&far_idx, bih_block, bih_node);
 
         if (bih_node == 0)
         {
@@ -1568,5 +1572,86 @@ bool bih::found_nearer_object(const ray *const r, const float t) const
         --exit_point;
         // BOOST_LOG_TRIVIAL(trace) << "Unwound one stack level";
     }
+}
+
+void bih::dump(const std::string &output_file) const
+{
+    /* Open file and pre */
+    std::ofstream file;
+    file.open(output_file);
+    file << "digraph bih {\n";
+    
+    /* Traverse blocks dumping each as a subgraph */
+    for (unsigned int i = 0; i < _bih_base->size(); ++i)
+    {
+        /* If populated write out nodes */
+        if ((*_bih_base)[i].get_split_axis(0) == axis_t::not_set)
+        {
+            continue;
+        }
+     
+        file << "subgraph block_" << i << " {\n";
+        file << "    style=filled;\n";
+        file << "    color=lightgrey;\n";
+
+        int node_2;
+        int node_1 = (*_bih_base)[i].get_siblings(&node_2, i, 0);
+        file << "    node_" << bih_index(i, 0) << " -> node_" << node_1 << ";\n";
+        file << "    node_" << bih_index(i, 0) << " -> node_" << node_2 << ";\n";
+
+        if ((*_bih_base)[i].get_split_axis(1) != axis_t::not_set)
+        {
+            int node_4;
+            int node_3 = (*_bih_base)[i].get_siblings(&node_4, i, 1);
+            file << "    node_" << bih_index(i, 1) << " -> node_" << node_3 << ";\n";
+            file << "    node_" << bih_index(i, 1) << " -> node_" << node_4 << ";\n";
+
+            if ((*_bih_base)[i].get_split_axis(3) != axis_t::not_set)
+            {
+                int node_3_r;
+                int node_3_l = (*_bih_base)[i].get_siblings(&node_3_r, i, 3);
+                file << "    node_" << bih_index(i, 3) << " -> node_" << node_3_l << ";\n";
+                file << "    node_" << bih_index(i, 3) << " -> node_" << node_3_r << ";\n";
+            }
+
+            if ((*_bih_base)[i].get_split_axis(4) != axis_t::not_set)
+            {
+                int node_4_r;
+                int node_4_l = (*_bih_base)[i].get_siblings(&node_4_r, i, 4);
+                file << "    node_" << bih_index(i, 4) << " -> node_" << node_4_l << ";\n";
+                file << "    node_" << bih_index(i, 4) << " -> node_" << node_4_r << ";\n";
+            }
+        }
+
+        if ((*_bih_base)[i].get_split_axis(2) != axis_t::not_set)
+        {
+            int node_6;
+            int node_5 = (*_bih_base)[i].get_siblings(&node_6, i, 2);
+            file << "    node_" << bih_index(i, 2) << " -> node_" << node_5 << ";\n";
+            file << "    node_" << bih_index(i, 2) << " -> node_" << node_6 << ";\n";
+
+            if ((*_bih_base)[i].get_split_axis(5) != axis_t::not_set)
+            {
+                int node_5_r;
+                int node_5_l = (*_bih_base)[i].get_siblings(&node_5_r, i, 5);
+                file << "    node_" << bih_index(i, 5) << " -> node_" << node_5_l << ";\n";
+                file << "    node_" << bih_index(i, 5) << " -> node_" << node_5_r << ";\n";
+            }
+
+            if ((*_bih_base)[i].get_split_axis(6) != axis_t::not_set)
+            {
+                int node_6_r;
+                int node_6_l = (*_bih_base)[i].get_siblings(&node_6_r, i, 6);
+                file << "    node_" << bih_index(i, 6) << " -> node_" << node_6_l << ";\n";
+                file << "    node_" << bih_index(i, 6) << " -> node_" << node_6_r << ";\n";
+            }
+        }
+        
+        file << "}\n";
+    }
+
+    /* Post and close file */
+    file << "}\n";
+    file.close();
 }
 }; /* namespace raptor_raytracer*/

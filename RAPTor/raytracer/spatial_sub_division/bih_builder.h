@@ -23,25 +23,43 @@ class bih_builder
     private :
         struct block_splitting_data
         {
-            point_t bl[8];
-            point_t tr[8];
-            point_t node_bl[8];
-            point_t node_tr[8];
-            int     end[8];
-            int     begin[8];
+            const primitive_list *  active_prims[8];
+            point_t                 bl[8];
+            point_t                 tr[8];
+            point_t                 node_bl[8];
+            point_t                 node_tr[8];
+            const unsigned int *    bins[8];
+            int                     level[8];
+            int                     end[8];
+            int                     begin[8];
         };
 
-        void divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e);
+        /* Radix sort */
+        void bucket_build();
+        void bucket_build_mid(unsigned int *const hist, const int b, const int e);
+        void bucket_build_low(unsigned int *const hist, const int b, const int e);
+
+        void level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx);
+
+        void divide_bih_block(const primitive_list *const active_prims, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level = 2);
+        void divide_bih_block(block_splitting_data *const split_data, const int block_idx, const int node_idx);
+        bool divide_bih_node_binned(block_splitting_data *const split_data, const int in_idx, const int out_idx, const int block_idx, const int node_idx);
+
+        void divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int node_idx = 0);
         void divide_bih_node(block_splitting_data *const split_data, const int in_idx, const int out_idx, const int block_idx, const int node_idx);
 
         float calculate_min_node_volume() const
         {
-            const point_t min_node((triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds()) * 0.01f);
+            const point_t min_node((triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds()) * 0.003f);
             return min_node.x * min_node.y * min_node.z;
         }
 
         primitive_list *            _primitives;
+        primitive_list              _prim_buffer;
+        std::vector<int>            _morton_codes;
+        std::vector<int>            _code_buffer;
         std::vector<bih_block> *    _blocks;
+        point_t                     _widths;
         const float                 _min_node_volume;
         const int                   _max_node_size;
         int                         _depth;

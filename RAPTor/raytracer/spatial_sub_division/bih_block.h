@@ -73,7 +73,7 @@ class bih_block
             return static_cast<axis_t>((_axes >> (idx << 1)) & 0x3);
         }
 
-        int get_left_child(const int block_idx, const int node_idx) const
+        int get_siblings(int *const right_idx, const int block_idx, const int node_idx) const
         {
             assert((node_idx < 7) || !"Error: Index of node is too large");
 
@@ -83,31 +83,16 @@ class bih_block
             {
                 /* Child indices should be handed out in multiples of 8 block of 7 nodes*/
                 const int pre_children = __builtin_popcount((_axes >> 19) & ((1 << node_idx_m3) - 1));
-                return _child + (pre_children << 4);
+                const int left_idx = _child + (pre_children << 4);
+                (*right_idx) = left_idx + 0x8;
+                return left_idx;
             }
             /* The child is in one of the upper levels */
             else
             {
-                return (block_idx << 3) | ((node_idx << 1) | 0x1);
-            }
-        }
-
-        int get_right_child(const int block_idx, const int node_idx) const
-        {
-            assert((node_idx < 7) || !"Error: Index of node is too large");
-
-            /* Child is part of another block */
-            const int node_idx_m3 = node_idx - 3;
-            if (node_idx_m3 >= 0)
-            {
-                /* Child indices should be handed out in multiples of 8 block of 7 nodes*/
-                const int pre_children = __builtin_popcount((_axes >> 19) & ((1 << node_idx_m3) - 1));
-                return _child + ((pre_children << 4) | 0x8);
-            }
-            /* The child is in one of the upper levels */
-            else
-            {
-                return (block_idx << 3) | ((node_idx + 1) << 1);
+                const int offset_block = (block_idx << 3);
+                (*right_idx) = offset_block | ((node_idx + 1) << 1);
+                return offset_block | ((node_idx << 1) | 0x1);
             }
         }
 

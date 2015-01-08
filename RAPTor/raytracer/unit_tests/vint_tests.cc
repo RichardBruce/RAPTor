@@ -97,9 +97,9 @@ BOOST_AUTO_TEST_CASE( float_copy_ctor_test )
     /* Checks */
     /* Note -- It rounds nearest with 0.5 getting round down */
     BOOST_CHECK(uut1[0] == -100);
-    BOOST_CHECK(uut1[1] ==   -1);
-    BOOST_CHECK(uut1[2] ==    1);
-    BOOST_CHECK(uut1[3] ==  101);
+    BOOST_CHECK(uut1[1] ==    0);
+    BOOST_CHECK(uut1[2] ==    0);
+    BOOST_CHECK(uut1[3] ==  100);
 }
 
 /* Element access */
@@ -821,11 +821,11 @@ BOOST_AUTO_TEST_CASE( simple_divisior_morton_code_test )
     const vfp_t x(1.0f, 2.0f, 3.0f, 4.0f);
     const vfp_t y(1.1f, 2.1f, 3.1f, 4.1f);
     const vfp_t z(1.2f, 2.2f, 3.2f, 4.2f);
-    const vfp_t x_div(1.0f);
-    const vfp_t y_div(1.0f);
-    const vfp_t z_div(1.0f);
+    const vfp_t x_mul(1.0f);
+    const vfp_t y_mul(1.0f);
+    const vfp_t z_mul(1.0f);
 
-    const vint_t mc(morton_code(x, y, z, x_div, y_div, z_div));
+    const vint_t mc(morton_code(x, y, z, x_mul, y_mul, z_mul));
     BOOST_CHECK(mc[0] == 0x007);
     BOOST_CHECK(mc[1] == 0x038);
     BOOST_CHECK(mc[2] == 0x03f);
@@ -837,11 +837,11 @@ BOOST_AUTO_TEST_CASE( max_bit_range_morton_code_test )
     const vfp_t x(1023.0f, 1023.0f, 1023.0f, 1023.0f);
     const vfp_t y(2046.1f, 2046.1f, 2046.1f, 2046.1f);
     const vfp_t z(3069.2f, 3069.2f, 3069.2f, 3069.2f);
-    const vfp_t x_div(1.0f);
-    const vfp_t y_div(2.0f);
-    const vfp_t z_div(3.0f);
+    const vfp_t x_mul(1.0f / 1.0f);
+    const vfp_t y_mul(1.0f / 2.0f);
+    const vfp_t z_mul(1.0f / 3.0f);
 
-    const vint_t mc(morton_code(x, y, z, x_div, y_div, z_div));
+    const vint_t mc(morton_code(x, y, z, x_mul, y_mul, z_mul));
     BOOST_CHECK(mc[0] == 0x3fffffff);
     BOOST_CHECK(mc[1] == 0x3fffffff);
     BOOST_CHECK(mc[2] == 0x3fffffff);
@@ -853,44 +853,15 @@ BOOST_AUTO_TEST_CASE( morton_code_test )
     const vfp_t x(1023.0f,  10.0f,  523.0f,   6.0f);
     const vfp_t y( 246.1f,  26.1f,  146.1f,  92.1f);
     const vfp_t z(  39.2f, 369.2f, 1569.2f, 184.2f);
-    const vfp_t x_div(1.0f, 4.5f, 8.3f, 1.4f);
-    const vfp_t y_div(2.0f, 3.6f, 7.1f, 2.7f);
-    const vfp_t z_div(3.0f, 2.7f, 6.0f, 3.3f);
+    const vfp_t x_mul(1.0f / 1.0f, 1.0f / 4.5f, 1.0f / 8.3f, 1.0f / 1.4f);
+    const vfp_t y_mul(1.0f / 2.0f, 1.0f / 3.6f, 1.0f / 7.1f, 1.0f / 2.7f);
+    const vfp_t z_mul(1.0f / 3.0f, 1.0f / 2.7f, 1.0f / 6.0f, 1.0f / 3.3f);
 
-    const vint_t mc(morton_code(x, y, z, x_div, y_div, z_div));
+    const vint_t mc(morton_code(x, y, z, x_mul, y_mul, z_mul));
     BOOST_CHECK(mc[0] == 0x92dbf5f);
-    BOOST_CHECK(mc[1] == 0x080089e);
-    BOOST_CHECK(mc[2] == 0x400b3eb);
-    BOOST_CHECK(mc[3] == 0x0034850);
-}
-
-inline void split_by_three(int &a)
-{
-    a |= (a << 16);
-    a &= 0x030000FF;
-
-    a |= (a <<  8);
-    a &= 0x0300F00F;
-
-    a |= (a <<  4);
-    a &= 0x030C30C3;
-
-    a |= (a <<  2);
-    a &= 0x09249249;
-}
-
-int morton_code(const float x, const float y, const float z, const float x_div, const float y_div, const float z_div)
-{
-    /* Bin to nearest grid cell */
-    int x_int(x / x_div);
-    int y_int(y / y_div);
-    int z_int(z / z_div);
-
-    /* Split by three and or together */
-    split_by_three(x_int);
-    split_by_three(y_int);
-    split_by_three(z_int);
-    return x_int | (y_int << 1) | (z_int << 2);
+    BOOST_CHECK(mc[1] == 0x080089a);
+    BOOST_CHECK(mc[2] == 0x400b3cd);
+    BOOST_CHECK(mc[3] == 0x0034174);
 }
 
 BOOST_AUTO_TEST_CASE( morton_code_performance_test )
@@ -900,9 +871,9 @@ BOOST_AUTO_TEST_CASE( morton_code_performance_test )
     std::vector<float> x(test_size);
     std::vector<float> y(test_size);
     std::vector<float> z(test_size);
-    std::vector<float> x_div(test_size);
-    std::vector<float> y_div(test_size);
-    std::vector<float> z_div(test_size);
+    std::vector<float> x_mul(test_size);
+    std::vector<float> y_mul(test_size);
+    std::vector<float> z_mul(test_size);
 
     std::default_random_engine gen;
     std::uniform_real_distribution<float> scaled_dist(-511.0f, 511.0f);
@@ -912,9 +883,9 @@ BOOST_AUTO_TEST_CASE( morton_code_performance_test )
         x[i] = unscaled_dist(gen);
         y[i] = unscaled_dist(gen);
         z[i] = unscaled_dist(gen);
-        x_div[i] = x[i] / scaled_dist(gen);
-        y_div[i] = y[i] / scaled_dist(gen);
-        z_div[i] = z[i] / scaled_dist(gen);
+        x_mul[i] = scaled_dist(gen) / x[i];
+        y_mul[i] = scaled_dist(gen) / y[i];
+        z_mul[i] = scaled_dist(gen) / z[i];
     }
 
     /* Run scalar code */
@@ -922,7 +893,7 @@ BOOST_AUTO_TEST_CASE( morton_code_performance_test )
     auto scalar_t0(std::chrono::system_clock::now());
     for (int i = 0; i < test_size; ++i)
     {
-        scalar_mc[i] = morton_code(x[i], y[i], z[i], x_div[i], y_div[i], z_div[i]);
+        scalar_mc[i] = morton_code(x[i], y[i], z[i], x_mul[i], y_mul[i], z_mul[i]);
     }
     auto scalar_t1(std::chrono::system_clock::now());
     std::cout << "Scalar test took: " << std::chrono::duration_cast<std::chrono::microseconds>(scalar_t1 - scalar_t0).count() << "us" << std::endl;
@@ -932,7 +903,7 @@ BOOST_AUTO_TEST_CASE( morton_code_performance_test )
     auto vector_t0(std::chrono::system_clock::now());
     for (int i = 0; i < test_size; i += SIMD_WIDTH)
     {
-        const vint_t mc(morton_code(vfp_t(&x[i]), vfp_t(&y[i]), vfp_t(&z[i]), vfp_t(&x_div[i]), vfp_t(&y_div[i]), vfp_t(&z_div[i])));
+        const vint_t mc(morton_code(vfp_t(&x[i]), vfp_t(&y[i]), vfp_t(&z[i]), vfp_t(&x_mul[i]), vfp_t(&y_mul[i]), vfp_t(&z_mul[i])));
         mc.store(&vector_mc[i]);
     }
     auto vector_t1(std::chrono::system_clock::now());

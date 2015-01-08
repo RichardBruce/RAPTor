@@ -32,6 +32,12 @@
 /* Test headers */
 #include "regression_checker.h"
 
+#ifndef VALGRIND_TESTS
+const int test_iterations = 1;
+#else 
+const int test_iterations = 1;
+#endif
+
 /* Log message generating traits classes */
 template <typename T>
 struct log_statement
@@ -204,16 +210,35 @@ struct regression_fixture : private boost::noncopyable
             BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - # Lights: " << _lights.size();
 
             /* Build ssd */
-            const auto ssd_build_t0(std::chrono::system_clock::now());
-            SpatialSubDivision ssd(_everything);
-            const auto ssd_build_t1(std::chrono::system_clock::now());
-            BOOST_LOG_TRIVIAL(fatal) << "PERF " << log_statement<SpatialSubDivision>::build_time() << " Build Time ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(ssd_build_t1 - ssd_build_t0).count();
+            std::unique_ptr<SpatialSubDivision> ssd;
+            int max_ssd_runtime = 0;
+            int total_ssd_runtime = 0;
+            for (int i = 0; i < test_iterations; ++i)
+            {
+                const auto ssd_build_t0(std::chrono::system_clock::now());
+                ssd.reset(new SpatialSubDivision(_everything));
+                const auto ssd_build_t1(std::chrono::system_clock::now());
+
+                const int runtime = std::chrono::duration_cast<std::chrono::microseconds>(ssd_build_t1 - ssd_build_t0).count();
+                total_ssd_runtime += runtime;
+                max_ssd_runtime = std::max(max_ssd_runtime, runtime);
+            }
+            BOOST_LOG_TRIVIAL(fatal) << "PERF " << log_statement<SpatialSubDivision>::build_time() << " Build Time ms: " << average_runtime(total_ssd_runtime, max_ssd_runtime);
 
             /* Render */
-            const auto render_t0(std::chrono::system_clock::now());
-            ray_tracer(&ssd, _lights, _everything, *_cam);
-            const auto render_t1(std::chrono::system_clock::now());
-            BOOST_LOG_TRIVIAL(fatal) << "PERF " << log_statement<SpatialSubDivision>::render_time() << " Render Time ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(render_t1 - render_t0).count();
+            int max_render_runtime = 0;
+            int total_render_runtime = 0;
+            for (int i = 0; i < test_iterations; ++i)
+            {
+                const auto render_t0(std::chrono::system_clock::now());
+                ray_tracer(ssd.get(), _lights, _everything, *_cam);
+                const auto render_t1(std::chrono::system_clock::now());
+
+                const int runtime = std::chrono::duration_cast<std::chrono::microseconds>(render_t1 - render_t0).count();
+                total_render_runtime += runtime;
+                max_render_runtime = std::max(max_render_runtime, runtime);
+            }
+            BOOST_LOG_TRIVIAL(fatal) << "PERF " << log_statement<SpatialSubDivision>::render_time() << " Render Time ms: " << average_runtime(total_render_runtime, max_render_runtime);
 
             return *this;
         }
@@ -224,6 +249,16 @@ struct regression_fixture : private boost::noncopyable
         }
 
     private :
+        int average_runtime(int total_runtime, const int max_runtime)
+        {
+            if (test_iterations > 1)
+            {
+                total_runtime -= max_runtime;
+            }
+
+            return total_runtime / (std::max(1, test_iterations - 1) * 1000);
+        }
+
         camera              *   _cam;
         light_list              _lights;
         primitive_list          _everything;
