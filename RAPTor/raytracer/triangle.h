@@ -592,51 +592,6 @@ inline void triangle::find_rays(ray *const r, const point_t &d, const int n) con
     return;
 }
 
-
-inline void intersect(const point_t &v, const point_t &d, fp_t *const interval)
-{
-    (interval[0]) = v.x + (v.y - v.x) * d.x / (d.x - d.y);
-    (interval[1]) = v.x + (v.z - v.x) * d.x / (d.x - d.z);
-    
-    return;
-}
-
-
-inline void compute_intervals(const point_t &v, const point_t &d, const fp_t d0d1, const fp_t d0d2, fp_t *const interval)
-{
-    if (d0d1 > (fp_t)0.0)                      
-    {                                  
-        /* here we know that d0d2<=0.0 */
-        /* that is d0, d1 are on the same side, d2 on the other or on the plane */
-        intersect(point_t(v.z, v.x, v.y), point_t(d.z, d.x, d.y), interval);       
-    }                                                  
-    else if (d0d2 > (fp_t)0.0)                                 
-    {                                                  
-        /* here we know that d0d1<=0.0 */                
-        intersect(point_t(v.y, v.x, v.z), point_t(d.y, d.x, d.z), interval);       
-    }                                                  
-    else if (((d.y * d.z) > (fp_t)0.0) || (d.x != (fp_t)0.0))
-    {                                                  
-        /* here we know that d0d1<=0.0 or that d0!=0.0 */
-        intersect(v, d, interval);       
-    }                                                  
-    else if (d.y != (fp_t)0.0)                                  
-    {                                                  
-        intersect(point_t(v.y, v.x, v.z), point_t(d.y, d.x, d.z), interval);       
-    }                                                  
-    else if (d.z != (fp_t)0.0)                                  
-    {                                                  
-        intersect(point_t(v.z, v.x, v.y), point_t(d.z, d.x, d.y), interval);       
-    }                                                  
-    else                                               
-    {
-        /* triangles are coplanar */
-        cout << "co planar" << endl;
-        return;// coplanar_tri_tri(n1,v0,v1,v2,u0,u1,u2);
-    }
-}
-
-
 /* Useful sort criteria for triangles */
 class sort_triangle_by_lowest_x
 {
