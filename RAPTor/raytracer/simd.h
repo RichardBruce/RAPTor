@@ -1,8 +1,6 @@
 #ifndef __SIMD_H__
 #define __SIMD_H__
 
-#ifdef SIMD_PACKET_TRACING
-
 #include <immintrin.h>
 #include <iostream>
 #include <cmath>
@@ -763,7 +761,4 @@ inline vint_t morton_code(const vfp_t &x, const vfp_t &y, const vfp_t &z, const 
     split_by_three(z_int);
     return x_int | (y_int << 1) | (z_int << 2);
 }
-
-
-#endif /* #ifdef SIMD_PACKET_TRACING */
 #endif /* #ifndef __SIMD_H__ */

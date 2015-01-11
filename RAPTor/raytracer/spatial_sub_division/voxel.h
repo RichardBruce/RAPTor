@@ -7,6 +7,7 @@
 #endif
 
 #include "common.h"
+#include "simd.h"
 #include "sort.h"
 #include "triangle.h"
 #include "kdt_node.h"

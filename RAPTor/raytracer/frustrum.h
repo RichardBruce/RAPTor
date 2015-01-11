@@ -396,6 +396,6 @@ class frustrum
         int         n;              /* Major direction of the frustrum                      */
 };
 
-#endif /* #ifdef SIMD_PACKET_TRACING */
 }; /* namespace raptor_raytracer */
+#endif /* #ifdef SIMD_PACKET_TRACING */
 #endif /* #ifndef __FRUSTRUM_H__ */
