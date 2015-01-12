@@ -40,7 +40,8 @@ class bih_builder
         void bucket_build_mid(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
         void bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
 
-        point_t convert_to_primitve_builder(point_t *const bl, const primitive_list *const active_prims, const int b, const int e, const int cells_wide = 1);
+        point_t convert_to_primitve_builder(point_t *const bl, const primitive_list *const active_prims, const int b, const int e);
+        point_t convert_to_primitve_builder(point_t *const bl, const primitive_list *const active_prims, const int b, const int e, const int begin_mc, const int end_mc, const int level);
         void level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx);
 
         void divide_bih_block(const point_t *const bl, const point_t *const tr, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level = 2);
