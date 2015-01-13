@@ -33,7 +33,6 @@ extern unsigned max_depth;      /* Maximum depth of the tree */
 /* Forward declarations */
 class ssd;
 
-
 /* Class for threaded ray tracing */
 class ray_trace_engine 
 {

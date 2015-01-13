@@ -54,7 +54,6 @@ class kdt_node
            obeject is found true is return otherwise false is returned */
         bool    test_leaf_node_nearer(const ray *const r, const fp_t max) const;
 
-
 #ifdef SIMD_PACKET_TRACING
         void test_leaf_node_nearest(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const
         {
@@ -134,7 +133,6 @@ class kdt_node
             return;
         }
 #endif /* #ifdef SIMD_PACKET_TRACING */
-
 
     private :
         /* Prevent copying of this class */

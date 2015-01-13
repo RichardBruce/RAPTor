@@ -8,6 +8,7 @@
 
 /* Ray tracer headers */
 #include "bih_builder.h"
+#include <chrono>
 
 
 namespace raptor_raytracer

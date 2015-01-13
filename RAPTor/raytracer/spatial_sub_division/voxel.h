@@ -10,6 +10,7 @@
 #include "common.h"
 
 /* Ray tracer headers */
+#include "simd.h"
 #include "sort.h"
 #include "simd.h"
 #include "triangle.h"

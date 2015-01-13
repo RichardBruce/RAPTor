@@ -125,6 +125,23 @@ BOOST_AUTO_TEST_CASE( cfg_unc_powerplant_test )
     fixture.render<bih>();
     checker.check(fixture.get_camera(), "bih");
 }
+
+BOOST_AUTO_TEST_CASE( cfg_unc_powerplant_2_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/ply_scenes/unc_powerplant/unc_powerplant.cfg", model_format_t::cfg, point_t(-98371.6, 14684.6, 90946), point_t(-0.512434, 0.0539994, -0.857031), point_t(-0.21419, 0.95844, 0.188457), point_t(0.831589, 0.280139, -0.479571), ext_colour_t(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-500000.0, 50000.0, 100000.0), 0.0, 10.0);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-100000.0, 50000.0, 500000.0), 0.0, 10.0);
+
+    /* Ray trace the scene */
+    fixture.render();
+
+    /* Check image */
+    checker.check(fixture.get_camera());
+}
 #endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( cfg_dif_ww_low_res_test )
