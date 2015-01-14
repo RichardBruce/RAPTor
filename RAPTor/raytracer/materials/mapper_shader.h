@@ -22,10 +22,10 @@ class mapper_shader : public material
             {
                 /* A whole bunch of sanity checking asserts */
                 /* Note rgb is stored in light_intensity in the format ( r, g, b ) */
+                assert(this->kd  >= (fp_t)0.0);
                 assert((rgb.r    >= (fp_t)0.0) &&  (rgb.r    <= (fp_t)255.0));                                /* Best the rgb values are in the correct range */
                 assert((rgb.g    >= (fp_t)0.0) &&  (rgb.g    <= (fp_t)255.0));
                 assert((rgb.b    >= (fp_t)0.0) &&  (rgb.b    <= (fp_t)255.0));
-                assert((this->kd >= (fp_t)0.0) &&  (this->kd <= (fp_t)  1.0));
                 assert((this->ks >= (fp_t)0.0) &&  (this->ks <= (fp_t)  1.0));
                 assert((tran     >= (fp_t)0.0) &&  (tran     <= (fp_t)  1.0));
                 assert((tran     == (fp_t)0.0) || ((this->ri >= (fp_t)  1.0) && (this->ri <= (fp_t)  5.0)));  /* 2.49 is the highest real refractive index */
