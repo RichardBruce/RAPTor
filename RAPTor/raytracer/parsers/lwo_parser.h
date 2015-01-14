@@ -12,11 +12,11 @@ class camera;
   If the comparison is correct a is updated past the chunk
   name otherwise the program is aborted through assert()
 ************************************************************/
-inline void check_for_chunk(const char **const a, const char *const e, const int l)
+inline void check_for_chunk(const char **const a, const char *const e, const int l, const int line = 0)
 {
     if (strncmp(*a, e, l) != 0)
     {
-        BOOST_LOG_TRIVIAL(error) << (*a) << " found where " << e << " chunk expected";
+        BOOST_LOG_TRIVIAL(error) << (*a) << " found where " << e << " chunk expected at line: " << line;
         assert(false);
     }
     (*a) += l;

@@ -14,6 +14,7 @@
 #include "mapper_shader.h"
 #include "coloured_mapper_shader.h"
 #include "perlin_noise_3d_mapper.h"
+#include "checker_board_mapper.h"
 #include "cubic_mapper.h"
 #include "cylindrical_mapper.h"
 #include "planar_mapper.h"
