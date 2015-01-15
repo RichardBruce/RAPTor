@@ -19,18 +19,13 @@ namespace raptor_raytracer
 class triangle : private boost::noncopyable
 {
     public :
-        triangle(material *const m, const point_t &a, const point_t &b, const point_t &c, bool l=false, const point_t *v_n=NULL, const point_t *v_t=NULL);
+        triangle(material *const m, const point_t &a, const point_t &b, const point_t &c, bool l = false, const point_t *v_n = nullptr, const point_t *v_t = nullptr);
         ~triangle()
         {
             /* REVISIT -- Consider using indices for these */
-            if (this->vn != NULL)
+            if (this->vnt != nullptr)
             {
-                delete [] this->vn;
-            }
-
-            if (this->vt != NULL)
-            {
-                delete [] this->vt;
+                delete [] this->vnt;
             }
         };
         
@@ -45,8 +40,8 @@ class triangle : private boost::noncopyable
         static point_t & get_scene_lower_bounds()               { return triangle::scene_bot;                   }
         
         /* Find out if this is a light/transparent object for shadow rays to ignore */
-        bool get_light()                            const       { return this->light;                           }
-        bool is_transparent()                       const       { return this->m->is_transparent();             }
+        bool get_light()                            const       { return this->m & 0x1;                         }
+        bool is_transparent()                       const       { return get_material()->is_transparent();      }
 
         /* Shadow ray targetting */
         const point_t& get_centre()	                const       { return this->vertex_c;                        }
@@ -87,7 +82,7 @@ class triangle : private boost::noncopyable
         inline line generate_rays(const ray_trace_engine &r, ray &i, hit_description *const h, ray *const rl, ray *const rf, fp_t *const n_rl, fp_t *const n_rf) const
         {
             line norm = this->normal_at_point(&i, h);
-            this->m->generate_rays(r, i, norm, h->h, rl, rf, n_rl, n_rf);
+            get_material()->generate_rays(r, i, norm, h->h, rl, rf, n_rl, n_rf);
             return norm;
         }
         
@@ -96,33 +91,37 @@ class triangle : private boost::noncopyable
         {
             /* Interpolate the texture co-ordinate if possible */
             point_t text(MAX_DIST);
-            if (this->vt != NULL)
+            if ((this->vnt != nullptr) && (this->vnt[3] != MAX_DIST))
             {
-                text = (h.u * this->vt[2]) + (h.v * this->vt[1]) + (((fp_t)1.0 - (h.u + h.v)) * this->vt[0]);
+                text = (h.u * this->vnt[5]) + (h.v * this->vnt[4]) + (((fp_t)1.0 - (h.u + h.v)) * this->vnt[3]);
             }
 
             /* Call the material shader */
-            this->m->shade(r, i, n, h.h, c, text);
+            get_material()->shade(r, i, n, h.h, c, text);
         }
         
         inline void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const fp_t *const n_rl, const fp_t *const n_rf) const
         {
-            this->m->combind_secondary_rays(r, c, rl, rf, c_rl, c_rf, n_rl, n_rf);
+            get_material()->combind_secondary_rays(r, c, rl, rf, c_rl, c_rf, n_rl, n_rf);
         }
 
     private : 
-        material        *const m;       /* Pointer to the triangles shader                      */
-        static point_t  scene_top;      /* Scene bounding box upper vertex                      */
-        static point_t  scene_bot;      /* Scene bounding box lower vertex                      */
-        point_t         *vn;            /* Pointer to vertex normals, if available else NULL    */
-        point_t         *vt;            /* Pointer to vertex textures, if available else NULL   */
-        point_t         vertex_a;       /* Vertex a of the triangle                             */
-        point_t         vertex_b;       /* Vertex b of the triangle                             */
-        point_t         vertex_c;       /* Vertex c of the triangle                             */
-        point_t         n;              /* Normal of the triangle                               */
-        point_t         t;              /* Triangle bounding box upper vertex                   */
-        point_t         b;              /* Triangle bounding box lower vertex                   */
-        bool            light;
+        material * get_material() const
+        {
+            return reinterpret_cast<material *>(this->m & ~0x1);
+        }
+
+        static_assert(sizeof(std::int64_t) == sizeof(material *), "Error: Material pointers dont fit in std::int64_t");
+        std::int64_t    m;          /* Pointer to the triangles shader          */
+        static point_t  scene_top;  /* Scene bounding box upper vertex          */
+        static point_t  scene_bot;  /* Scene bounding box lower vertex          */
+        point_t       * vnt;        /* Pointer to vertex normals and textures   */
+        point_t         vertex_a;   /* Vertex a of the triangle                 */
+        point_t         vertex_b;   /* Vertex b of the triangle                 */
+        point_t         vertex_c;   /* Vertex c of the triangle                 */
+        point_t         n;          /* Normal of the triangle                   */
+        point_t         t;          /* Triangle bounding box upper vertex       */
+        point_t         b;          /* Triangle bounding box lower vertex       */
 };
 
 
@@ -136,39 +135,51 @@ class triangle : private boost::noncopyable
  precomputed.
 ************************************************************/
 inline triangle::triangle(material *const m, const point_t &a, const point_t &b, const point_t &c, bool l, const point_t *v_n, const point_t *v_t) : 
-    m(m), vertex_a(a), vertex_b(b), vertex_c(c), light(l)
+    m(reinterpret_cast<std::int64_t>(m)), vertex_a(a), vertex_b(b), vertex_c(c)
 { 
     /* Vertex checks */
     assert(this->vertex_a != this->vertex_b);
     assert(this->vertex_a != this->vertex_c);
     assert(this->vertex_b != this->vertex_c);
 
+    if (l)
+    {
+        this->m |= 0x1;
+    }
+
+    if ((v_n != nullptr) || (v_t != nullptr))
+    {
+        this->vnt = new point_t [6];
+    }
+    else
+    {
+        this->vnt = nullptr;
+    }
+
     /* Store vertex normals */
-    if (v_n != NULL)
+    if (v_n != nullptr)
     {
-        this->vn = new point_t [3];
-        this->vn[0] = v_n[0];
-        this->vn[1] = v_n[1];
-        this->vn[2] = v_n[2];
+        this->vnt[0] = v_n[0];
+        this->vnt[1] = v_n[1];
+        this->vnt[2] = v_n[2];
     }
-    else
+    else if (v_t != nullptr)
     {
-        this->vn = NULL;
+        this->vnt[0] = MAX_DIST;
     }
-    
+
     /* Store texture vertex */
-    if (v_t != NULL)
+    if (v_t != nullptr)
     {
-        this->vt = new point_t [3];
-        this->vt[0] = v_t[0];
-        this->vt[1] = v_t[1];
-        this->vt[2] = v_t[2];
+        this->vnt[3] = v_t[0];
+        this->vnt[4] = v_t[1];
+        this->vnt[5] = v_t[2];
     }
-    else
+    else if (v_n != nullptr)
     {
-        this->vt = NULL;
+        this->vnt[4] = MAX_DIST;
     }
-    
+
     /* Pick the bounds of the triangle */
     this->t = max(this->vertex_a, max(this->vertex_b, this->vertex_c));
     this->b = min(this->vertex_a, min(this->vertex_b, this->vertex_c));
@@ -536,9 +547,9 @@ inline line triangle::normal_at_point(ray *const r, hit_description *const h) co
 
     /* Interpolate the vertex normals */
     point_t normal;
-    if (this->vn != NULL)
+    if ((this->vnt != nullptr) && (this->vnt[0] != MAX_DIST))
     {
-        normal = (h->u * this->vn[2]) + (h->v * this->vn[1]) + (((fp_t)1.0 - (h->u + h->v)) * this->vn[0]);
+        normal = (h->u * this->vnt[2]) + (h->v * this->vnt[1]) + (((fp_t)1.0 - (h->u + h->v)) * this->vnt[0]);
     }
     else
     {
