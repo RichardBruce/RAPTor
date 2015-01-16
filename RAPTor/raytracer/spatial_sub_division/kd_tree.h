@@ -22,6 +22,7 @@ class kd_tree : public ssd
 {
     public :
         /* CTOR, build the tree */
+        // cppcheck-suppress uninitMemberVar
         kd_tree(const primitive_list &everything)
         {
             /* Build a KD-tree to speed up ray tracing */    

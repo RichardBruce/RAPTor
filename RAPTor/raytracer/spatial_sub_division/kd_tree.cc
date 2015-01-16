@@ -29,10 +29,6 @@ inline void kd_tree::find_leaf_node(const packet_ray *const r, kdt_stack_element
     {
         int axis = (int)current_node->get_normal() - 1;
         vfp_t split_pos(current_node->get_split_position());
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count nodes accessed */
-        ++nts;
-#endif
 
         dist        = (split_pos - r->get_ogn(axis)) * i_rd[axis];
         furthest    = current_node->get_left() +  near_offset[axis];
@@ -59,10 +55,6 @@ inline void kd_tree::find_leaf_node(const packet_ray *const r, kdt_stack_element
 
     entry_point->n  = current_node;
     *out            = exit_point;
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-     /* Count elementary nodes accessed */
-     ++nets;
-#endif
     return;
 }
 
@@ -72,11 +64,6 @@ inline void kd_tree::find_leaf_node(const packet_ray *const r, kdt_stack_element
 **********************************************************/
 void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
-    
     /* exit point setting */
     kdt_stack_element *exit_point = &(_kdt_stack[0]);
     exit_point->vt_max  = vfp_t(MAX_DIST);
@@ -108,13 +95,6 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
         {
             entry_point.n->test_leaf_node_nearest(r, i_o, h);
         } 
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count empty elementary nodes accessed */
-        else
-        {
-            ++neets;
-        }
-#endif
   
         /* Work back up the tree by poping form the stack */
         do 
@@ -164,13 +144,6 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
         {
             entry_point.n->test_leaf_node_nearest(r, i_o, h);
         } 
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count empty elementary nodes accessed */
-        else
-        {
-            ++neets;
-        }
-#endif
   
         /* Work back up the tree by poping form the stack */
         do 
@@ -199,11 +172,6 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
 **********************************************************/
 vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
-
     /* exit point setting */
     kdt_stack_element *exit_point = &(_kdt_stack[0]);
     exit_point->vt_max  = t;
@@ -244,13 +212,6 @@ vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t) co
                return closer;
             }
         }
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count empty elementary nodes accessed */
-        else
-        {
-            ++neets;
-        }
-#endif
   
         /* Work back up the tree by poping form the stack */
         do
@@ -309,13 +270,6 @@ vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t, kd
                return closer;
             }
         }
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count empty elementary nodes accessed */
-        else
-        {
-            ++neets;
-        }
-#endif
   
         /* Work back up the tree by poping form the stack */
         do
@@ -356,21 +310,12 @@ inline bool kd_tree::find_leaf_node(const frustrum &r, kdt_stack_element *const 
     float min_dist, max_dist;
     while (true)
     {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count nodes accessed */
-        ++nts;
-#endif
-
         float split_pos = current_node->get_split_position();
         switch (current_node->get_normal())
         {
             /* This node is not split in any plane, ie/ it is a leaf */
             case axis_t::not_set : 
             {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                /* Count elementary nodes accessed */
-                ++nets;
-#endif
                 /* update the state and return 1 for intersection testing */
                 *out = exit_point;
                 entry_point->n = current_node;
@@ -535,10 +480,6 @@ inline bool kd_tree::find_leaf_node(const frustrum &r, kdt_stack_element *const 
 **********************************************************/
 void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
     /* state of stack */
     kdt_stack_element *exit_point = &(_kdt_stack[0]);
     exit_point->n       = nullptr;
@@ -734,10 +675,6 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
 **********************************************************/
 void kd_tree::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, unsigned size) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
     vfp_t vmax_d = t[0];
     vfp_t vmin_d = t[0];
     packet_hit_description h[MAXIMUM_PACKET_SIZE];
@@ -942,11 +879,6 @@ inline void kd_tree::find_leaf_node(const ray *const r, const kdt_node **const n
     while (true)
     {
         float split_pos = current_node->get_split_position();
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count nodes accessed */
-        ++nts;
-#endif
-
 
         /* Based on the normal of the plane and which side of the plane
            the ray start search for leaves */
@@ -957,10 +889,6 @@ inline void kd_tree::find_leaf_node(const ray *const r, const kdt_node **const n
             {
                 *n   = current_node;
                 *out = exit_point;
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                /* Count elementary nodes accessed */
-                ++nets;
-#endif
                 return;
             }
 
@@ -1097,11 +1025,6 @@ inline void kd_tree::find_leaf_node(const ray *const r, const kdt_node **const n
 **********************************************************/
 triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *const h) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
-    
     hit_description nearest_hit;
   
     /* test if the whole BSP tree is missed by the input ray or not */
@@ -1173,13 +1096,6 @@ triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *cons
                 return intersecting_object;
             }
         } 
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count empty elementary nodes accessed */
-        else
-        {
-            ++neets;
-        }
-#endif
   
         /* Work back up the tree by poping form the stack */
         entry_point  = exit_point;
@@ -1202,11 +1118,6 @@ triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *cons
 **********************************************************/
 bool kd_tree::found_nearer_object(const ray *const r, const float t) const
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    /* Count number of rays shot */
-    ++nr;
-#endif
-
     /* Signed distances */
     const kdt_node *current_node = &_kdt_base; /* Start from the root node */
 
@@ -1242,13 +1153,6 @@ bool kd_tree::found_nearer_object(const ray *const r, const float t) const
                return true;
             }
         }
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        /* Count empty elementary nodes accessed */
-        else
-        {
-            ++neets;
-        }
-#endif
   
         /* Work back up the tree by poping form the stack */
         entry_point  = exit_point;

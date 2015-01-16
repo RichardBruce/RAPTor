@@ -18,18 +18,6 @@
 
 namespace raptor_raytracer
 {
-/* Global performance counters for the spatial sub division */
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-extern unsigned nit;            /* Number of intersection tests */
-extern unsigned ritm;           /* Ratio of intersection tests performed to minimum required tests */
-extern unsigned ng;             /* Number of generic nodes */
-extern unsigned ne;             /* Number of elementary nodes */
-extern unsigned nee;            /* Number of empty elementary nodes */
-extern unsigned ner;            /* Maximum size of an elementary node */
-extern unsigned ave_ob;         /* Average size of an elementary node */
-extern unsigned max_depth;      /* Maximum depth of the tree */
-#endif
-
 /* Forward declarations */
 class ssd;
 

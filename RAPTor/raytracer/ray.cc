@@ -81,46 +81,6 @@ ray ray::rotate(const vector_t &r, const point_t &c, const fp_t theta) const
 
 
 /**********************************************************
- rotate_dst returns the rays destination rotated theta 
- radians about vector r, through point c.
- 
- A general rotation algorithm is used. The cos_lut is used
- for the sin and cos function calls.
-**********************************************************/
-point_t ray::rotate_dst(const vector_t &r, const point_t &c, const fp_t theta) const
-{
-    /* Rotate the origin into the new coordinate system */
-    point_t p = this->dst;
-    point_t q(0.0,0.0,0.0);
-   
-    fp_t costheta = cos_lut.get_cos(theta);
-    fp_t sintheta = cos_lut.get_sin(theta);
-    
-    /* Transform r into the origin */
-    p -= c;
-
-    /* Rotate about r */
-    q.x += (costheta + ((fp_t)1.0 - costheta) * r.x * r.x) * p.x;
-    q.x += (((fp_t)1.0 - costheta) * r.x * r.y - r.z * sintheta) * p.y;
-    q.x += (((fp_t)1.0 - costheta) * r.x * r.z + r.y * sintheta) * p.z;
-
-    q.y += (((fp_t)1.0 - costheta) * r.x * r.y + r.z * sintheta) * p.x;
-    q.y += (costheta + ((fp_t)1.0 - costheta) * r.y * r.y) * p.y;
-    q.y += (((fp_t)1.0 - costheta) * r.y * r.z - r.x * sintheta) * p.z;
-
-    q.z += (((fp_t)1.0 - costheta) * r.x * r.z - r.y * sintheta) * p.x;
-    q.z += (((fp_t)1.0 - costheta) * r.y * r.z + r.x * sintheta) * p.y;
-    q.z += (costheta + ((fp_t)1.0 - costheta) * r.z * r.z) * p.z;
-    
-    
-    /* Move points back to where they came from */
-    q  += c;
-    
-    return q;
-}
-
-
-/**********************************************************
  find_rays returns the number of shadow rays generate and 
  a list of rays from the rays destination to the object l.
  

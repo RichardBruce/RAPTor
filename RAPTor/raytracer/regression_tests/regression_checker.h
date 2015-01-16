@@ -41,7 +41,7 @@ class regression_checker : private boost::noncopyable
 
         /* Allow default DTOR */
 
-        regression_checker& check(const camera &c, const std::string ssd_name)
+        regression_checker& check(const camera &c, const std::string &ssd_name)
         {
             /* Write out actual picture */
             const std::string actual_file(test_data_location + _suite + "/" +  _test + "_" + ssd_name + "_act.png");

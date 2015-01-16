@@ -26,7 +26,7 @@ const float result_tolerance = 0.00001f;
 struct bih_builder_fixture
 {
     bih_builder_fixture() :
-    uut(1)
+    uut(1), half_epsilon(0.5f * EPSILON)
     {  }
 
     ~bih_builder_fixture()
@@ -52,7 +52,7 @@ struct bih_builder_fixture
     primitive_list          primitives;
     std::vector<bih_block>  bih;
     bih_builder             uut;
-    const float half_epsilon = 0.5f * EPSILON;
+    const float             half_epsilon;
 };
 
 BOOST_FIXTURE_TEST_SUITE( bih_builder_tests, bih_builder_fixture );

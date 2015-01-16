@@ -27,24 +27,10 @@ void divide_kdt_node(voxel *const base, kdt_node *const kdt_subdiv)
     /* Check if a leaf node was create */
     if (kdt_subdiv->get_normal() != axis_t::not_set)
     {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-        ++ng;
-#endif
         /* If no leaf node was created recurse */
         divide_kdt_node(base,          kdt_subdiv->get_left());
         divide_kdt_node(&right_divide, kdt_subdiv->get_right());
     }
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    else
-    {
-        /* Collect stats on the leaf node */
-        ++ne;
-        max_depth    = max(max_depth, depth);
-        nee         += kdt_subdiv->is_empty();
-        ner          = max(ner, (unsigned)kdt_subdiv->get_size());       
-        ave_ob      += kdt_subdiv->get_size();
-    }
-#endif
     
     /* Decrease the depth */
     --depth;

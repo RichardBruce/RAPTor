@@ -23,6 +23,7 @@ namespace raptor_raytracer
 class bih_node
 {
     public :
+        bih_node() = default;
         /* Allow default CTOR, DTOR, copy CTOR and assignment operator (for using in vector) */
         
         /* Tree construction */

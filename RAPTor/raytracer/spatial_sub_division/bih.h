@@ -24,13 +24,14 @@ class bih : public ssd
 {
     public :
         /* CTOR */
+        // cppcheck-suppress uninitMemberVar
         bih(primitive_list &everything, const int max_node_size = MAX_BIH_NODE_SIZE) :
         _builder(), _bih_base(new std::vector<bih_block>())
         {
             bih_node::set_primitives(&everything);
 
             /* Build the heirarchy */
-            _builder.build(&everything, _bih_base);
+            _builder.build(&everything, _bih_base.get());
         }
 
         /* Copy CTOR */
@@ -85,9 +86,9 @@ class bih : public ssd
         inline bool find_leaf_node(const ray &r, bih_stack_element *const entry_point, bih_stack_element **const out, const point_t &i_rd) const;
 
         /* The stack is mutable because it will never be known to a user of this class */
-        mutable bih_stack_element   _bih_stack[MAX_BIH_STACK_HEIGHT];
-        bih_builder                 _builder;
-        std::vector<bih_block> *    _bih_base;
+        mutable bih_stack_element               _bih_stack[MAX_BIH_STACK_HEIGHT];
+        bih_builder                             _builder;
+        std::shared_ptr<std::vector<bih_block>> _bih_base;
 };
 }; /* namespace raptor_raytracer */
 

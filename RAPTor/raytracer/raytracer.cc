@@ -4,25 +4,6 @@
 
 namespace raptor_raytracer
 {
-/* Global performance counters for the spatial sub division */
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-/* Dynamic properties */
-unsigned nr         = 0;    /* Number of rays shot */
-unsigned nit        = 0;    /* Number of intersection tests */
-unsigned ritm       = 0;    /* Ratio of intersection tests performed to minimum required tests */
-unsigned nts        = 0;    /* Average number of nodes accessed per ray */
-unsigned nets       = 0;    /* Average number of elementary nodes accessed per ray */
-unsigned neets      = 0;    /* Average number of empty elementary nodes accessed per ray */
-
-/* Static properties */
-unsigned ng         = 0;    /* Number of generic nodes */
-unsigned ne         = 0;    /* Number of elementary nodes */
-unsigned nee        = 0;    /* Number of empty elementary nodes */
-unsigned ner        = 0;    /* Maximum size of an elementary node */
-unsigned ave_ob     = 0;    /* Averafe size of an elementary node */
-unsigned max_depth  = 0;    /* Maximum depth of the tree */
-#endif
-
 #ifdef THREADED_RAY_TRACE
     /* Start the thread scheduler */
     tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
@@ -543,25 +524,6 @@ void ray_trace_engine::operator() (const tbb::blocked_range2d<unsigned>& r) cons
 /* Ray tracer main function */
 void ray_tracer(const ssd *const sub_division, const light_list &lights, const primitive_list &everything, camera &c)
 {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    std::cout << "Static properties of the tree :" << std::endl;
-    std::cout << "Scene primitves                                             (nsp) : " << everything.size()                                     << std::endl;
-    std::cout << "Tree primitves                                              (ntp) : " << ave_ob                                                << std::endl;
-    std::cout << "Number of generic nodes                                     (ng ) : " << ng                                                    << std::endl;
-    std::cout << "Number of elementary nodes                                  (ne ) : " << ne                                                    << std::endl;
-    std::cout << "Number of empty elementary nodes                            (nee) : " << nee                                                   << std::endl;
-    std::cout << "Maximum size of an elementary node                          (ner) : " << ner                                                   << std::endl;
-    std::cout << "Average size of an elementary node                          (nea) : " << (static_cast<float>(ave_ob) / static_cast<float>(ne)) << std::endl;
-    std::cout << "Maximum depth of the tree                                   (d  ) : " << max_depth                                             << std::endl << std::endl;
-    
-    ng          = 0;
-    ne          = 0;
-    nee         = 0;
-    ner         = 0;
-    ave_ob      = 0;
-    max_depth   = 0;
-#endif /* #ifdef SPATIAL_SUBDIVISION_STATISTICS */
-    
     /* Make the screen 20 wide and 20 high ie/ -10 to 10 */
 #ifdef THREADED_RAY_TRACE
 #ifdef SIMD_PACKET_TRACING
@@ -595,17 +557,5 @@ void ray_tracer(const ssd *const sub_division, const light_list &lights, const p
     }
 #endif /* #ifdef SIMD_PACKET_TRACING */
 #endif /* #ifdef THREADED_RAY_TRACE */
-
-
-    /* Output dynamc statistics about the scene */
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-    std::cout << "Dynamic properties of the KD-tree :"  << std::endl;
-    std::cout << "Number of rays shot                                       (nr   ) : " << nr                                                           << std::endl;
-    std::cout << "Intersection tests performed                              (nit  ) : " << nit                                                          << std::endl;
-    std::cout << "Intersection tests performed : to minimum required tests  (ritm ) : " << (static_cast<float>(nit)      / static_cast<float>(ritm))    << std::endl;
-    std::cout << "Average number of nodes accessed per ray                  (nts  ) : " << (static_cast<float>(nts)      / static_cast<float>(nr))      << std::endl;
-    std::cout << "Average number of elementary nodes accessed per ray       (nets ) : " << (static_cast<float>(nets)     / static_cast<float>(nr))      << std::endl;
-    std::cout << "Average number of empty elementary nodes accessed per ray (neets) : " << (static_cast<float>(neets)    / static_cast<float>(nr))      << std::endl;
-#endif
 }
 }; /* namespace raptor_raytracer */

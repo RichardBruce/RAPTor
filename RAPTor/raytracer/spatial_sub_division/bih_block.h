@@ -22,6 +22,9 @@ inline int bih_index(const int block_idx, const int node_idx) { return (block_id
 class bih_block
 {
     public :
+        bih_block() = default;
+        /* Allow default CTOR, DTOR, copy CTOR and assignment operator (for using in vector) */
+
         /* Tree construction */
         void create_leaf_node(const int b, const int e, const int idx)
         {

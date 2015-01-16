@@ -365,84 +365,6 @@ void vmerge_8x8_no_scalar(float *const a, float *const b, const int left_idx, co
 }
 
 
-void vmerge(float *const a, float *const b, const int left_idx, const int right_idx, const int end_idx)
-{
-    /* Not enough data for vector merge so use scalar code */
-    if ((end_idx - right_idx) < SIMD_WIDTH)
-    {
-        merge(a, b, left_idx, right_idx, end_idx);
-        return;
-    }
-
-
-    int i0 = left_idx + SIMD_WIDTH;
-    int i1 = right_idx + SIMD_WIDTH;
- 
-    /* Prime the merge pass */
-    vfp_t left(&a[left_idx ]);
-    vfp_t right(&a[right_idx]);
-    merge(left, right);
-    left.store(&b[left_idx]);
-
-    /* Vector iteratations */
-    int i = i0;
-    while (i1 <= (end_idx - SIMD_WIDTH))
-    {
-        /* If left run head exists and is <= existing right run head */
-        int load_idx;
-        if ((i0 < right_idx) && (a[i0] < a[i1]))
-        {
-            load_idx = i0;
-            i0 += SIMD_WIDTH;
-        }
-        else
-        {
-            load_idx = i1;
-            i1 += SIMD_WIDTH;
-        }
-
-        vfp_t left(&a[load_idx]);
-        merge(left, right);
-        left.store(&b[i]);
-
-        i += SIMD_WIDTH;
-    }
-
-    /* Scalar iterations if required */
-    if (i != (end_idx - SIMD_WIDTH))
-    {
-        if (i0 == right_idx)
-        {
-            i0 -= SIMD_WIDTH;
-            right.store(&a[i0]);
-        }
-        else
-        {
-            i1 -= SIMD_WIDTH;
-            right.store(&a[i1]);
-        }
-
-        for (; i < end_idx; ++i)
-        {
-            /* If left run head exists and is <= existing right run head */
-            if ((i0 < right_idx) && ((i1 >= end_idx) || (a[i0] < a[i1])))
-            {
-                b[i] = a[i0++];
-            }
-            else
-            {
-                b[i] = a[i1++];
-            }
-        }
-    }
-    /* Clear out the last element */
-    else
-    {
-        right.store(&b[i]);
-    }
-}
-
-
 bool vmerge_sort(float *a, float *b, const int length)
 {
     /* Check if we have enough data to be worth vectorising */
@@ -559,8 +481,11 @@ inline unsigned int inverse_float_flip(unsigned int f)
 __attribute__((optimize("unroll-loops")))
 void radix_sort(float *const farray, float *const sorted, const int elements)
 {
-    unsigned int *sort = (unsigned int*)sorted;
-    unsigned int *array = (unsigned int*)farray;
+    static_assert(sizeof(unsigned int) == sizeof(float), "Error: Float and unsigned int dont have the same size");
+    // cppcheck-suppress invalidPointerCast
+    unsigned int *sort = reinterpret_cast<unsigned int*>(sorted);
+    // cppcheck-suppress invalidPointerCast
+    unsigned int *array = reinterpret_cast<unsigned int*>(farray);
 
     const int histogram_size = 2048;
     unsigned int hist0[histogram_size * 3];

@@ -155,7 +155,6 @@ class ray
         /* Ray Functions */
         point_t calculate_destination(const float d);
         ray     rotate(const vector_t &r, const point_t &c, const float theta) const;
-        point_t rotate_dst(const vector_t &r, const point_t &c, const float theta) const;
         float   find_rays(ray rays[], const light &l, const line &n, const hit_t h) const;
         float   get_magnitude_beer(const float a);
         float   reflect(ray rays[], const line &n, const float r, const float dr = 0.0f) const;

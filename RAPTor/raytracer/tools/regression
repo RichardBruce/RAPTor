@@ -267,7 +267,7 @@ if ($help)
 
 
 # Set the compile defines
-my $compile_defines             = "SPATIAL_SUBDIVISION_STATISTICS";
+my $compile_defines             = "";
 my $threaded_compile_defines    = "";
 
 
@@ -284,7 +284,6 @@ if (!$summary_only)
     
     # Remove the performance counter and add threading
     $threaded_compile_defines = $compile_defines . "DEFINES+=THREADED_RAY_TRACE";
-    $threaded_compile_defines =~ s/DEFINES\+=SPATIAL_SUBDIVISION_STATISTICS//;
     print "Theaded compiler defines are: $threaded_compile_defines\n\n" unless ( !$verbose );
     
     if ( !$no_clean_log )
