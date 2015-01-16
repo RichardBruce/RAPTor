@@ -109,10 +109,12 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_std_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 0.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(data[i] == i);
+            passed &= (data[i] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -132,10 +134,12 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_std_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 1.0f; i <= data.size(); ++i)
         {
-            BOOST_CHECK(data[i - 1] == i);
+            passed &= (data[i - 1] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -155,10 +159,12 @@ BOOST_AUTO_TEST_CASE( large_random_std_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 1.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(data[i] >= data[i - 1]);
+            passed &= (data[i] >= data[i - 1]);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -177,13 +183,15 @@ BOOST_AUTO_TEST_CASE( l1_cache_random_std_sort_test )
     auto t1(std::chrono::system_clock::now());
     
     /* Checks */
+    bool passed = true;
     for (int i = 0; i < large_test_size_to; i += test_size)
     {
         for (float j = 1; j < test_size; ++j)
         {
-            BOOST_CHECK(data[i + j] >= data[i + j - 1]);
+            passed &= (data[i + j] >= data[i + j - 1]);
         }
     }
+    BOOST_CHECK(passed);
 
     BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: l1_cache_random_std_sort_test " << test_size;
     BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << (std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() * (static_cast<float>(test_size) / large_test_size_to));
@@ -205,10 +213,12 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_std_stable_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 0.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(data[i] == i);
+            passed &= (data[i] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -228,10 +238,12 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_std_stable_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 1.0f; i <= data.size(); ++i)
         {
-            BOOST_CHECK(data[i - 1] == i);
+            passed &= (data[i - 1] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -251,10 +263,12 @@ BOOST_AUTO_TEST_CASE( large_random_std_stable_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 1.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(data[i] >= data[i - 1]);
+            passed &= (data[i] >= data[i - 1]);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -516,11 +530,13 @@ BOOST_AUTO_TEST_CASE( odd_size_sweep_random_vector_merge_sort_test )
         const bool check = vmerge_sort(data.data(), output.data(), data.size());
 
         /* Checks */
+        bool passed = true;
         const auto &check_array = check ? data : output;
         for (int j = 1; j < i; ++j)
         {
-            BOOST_CHECK(check_array[j] >= check_array[j - 1]);
+            passed &= (check_array[j] >= check_array[j - 1]);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -540,11 +556,13 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_vector_merge_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         const auto &check_array = check ? data : output;
         for (float i = 0.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(check_array[i] == i);
+            passed &= (check_array[i] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -564,11 +582,13 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_vector_merge_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         const auto &check_array = check ? data : output;
         for (float i = 1.0f; i <= data.size(); ++i)
         {
-            BOOST_CHECK(check_array[i - 1] == i);
+            passed &= (check_array[i - 1] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -588,11 +608,13 @@ BOOST_AUTO_TEST_CASE( large_random_vector_merge_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         const auto &check_array = check ? data : output;
         for (float i = 1.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(check_array[i] >= check_array[i - 1]);
+            passed &= (check_array[i] >= check_array[i - 1]);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -679,11 +701,13 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_merge_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         const auto &check_array = check ? output : data;
         for (float i = 0.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(check_array[i] == i);
+            passed &= (check_array[i] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -703,11 +727,13 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_merge_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         const auto &check_array = check ? output : data;
         for (float i = 1.0f; i <= data.size(); ++i)
         {
-            BOOST_CHECK(check_array[i - 1] == i);
+            passed &= (check_array[i - 1] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -727,11 +753,13 @@ BOOST_AUTO_TEST_CASE( large_random_merge_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         const auto &check_array = check ? output : data;
         for (float i = 1.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(check_array[i] >= check_array[i - 1]);
+            passed &= (check_array[i] >= check_array[i - 1]);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -818,10 +846,12 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_radix_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 0.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(output[i] == i);
+            passed &= (output[i] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -841,10 +871,12 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_radix_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 1.0f; i <= data.size(); ++i)
         {
-            BOOST_CHECK(output[i - 1] == i);
+            passed &= (output[i - 1] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -864,10 +896,12 @@ BOOST_AUTO_TEST_CASE( large_random_radix_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 1.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(output[i] >= output[i - 1]);
+            passed &= (output[i] >= output[i - 1]);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -887,13 +921,15 @@ BOOST_AUTO_TEST_CASE( l1_cache_random_radix_sort_test )
     auto t1(std::chrono::system_clock::now());
     
     /* Checks */
+    bool passed = true;
     for (int i = 0; i < large_test_size_to; i += test_size)
     {
         for (float j = 1; j < test_size; ++j)
         {
-            BOOST_CHECK(output[i + j] >= output[i + j - 1]);
+            passed &= (output[i + j] >= output[i + j - 1]);
         }
     }
+    BOOST_CHECK(passed);
 
     BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: l1_cache_random_radix_sort_test " << test_size;
     BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << (std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() * (static_cast<float>(test_size) / large_test_size_to));
@@ -977,10 +1013,12 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_insertion_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 0.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(data[i] == i);
+            passed &= (data[i] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -999,10 +1037,12 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_insertion_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 1.0f; i <= data.size(); ++i)
         {
-            BOOST_CHECK(data[i - 1] == i);
+            passed &= (data[i - 1] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -1021,10 +1061,12 @@ BOOST_AUTO_TEST_CASE( large_random_insertion_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 1.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(data[i] >= data[i - 1]);
+            passed &= (data[i] >= data[i - 1]);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -1105,10 +1147,12 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_quick_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 0.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(data[i] == i);
+            passed &= (data[i] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -1127,10 +1171,12 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_quick_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 1.0f; i <= data.size(); ++i)
         {
-            BOOST_CHECK(data[i - 1] == i);
+            passed &= (data[i - 1] == i);
         }
+        BOOST_CHECK(passed);
     }
 }
 
@@ -1149,13 +1195,14 @@ BOOST_AUTO_TEST_CASE( large_random_quick_sort_test )
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
         /* Checks */
+        bool passed = true;
         for (float i = 1.0f; i < data.size(); ++i)
         {
-            BOOST_CHECK(data[i] >= data[i - 1]);
+            passed &= (data[i] >= data[i - 1]);
         }
+        BOOST_CHECK(passed);
     }
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
 }; // namespace test
