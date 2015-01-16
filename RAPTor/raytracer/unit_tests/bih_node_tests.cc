@@ -6,6 +6,12 @@
 
 /* Initialise logger */
 const raptor_physics::init_logger init_logger;
+
+namespace raptor_raytracer
+{
+/* Primitives array so we dont need to include more source */
+std::vector<triangle *> *   bih_node::o     = nullptr;
+}
 #endif /* #ifdef STAND_ALONE */
 
 /* Standard headers */
@@ -21,9 +27,6 @@ const raptor_physics::init_logger init_logger;
 
 namespace raptor_raytracer
 {
-/* Primitives array so we dont need to include more source */
-std::vector<triangle *> *   bih_node::o     = nullptr;
-
 namespace test
 {
 const float result_tolerance = 0.00001f;

@@ -43,52 +43,46 @@ BOOST_AUTO_TEST_CASE( size_test )
 /* Static function tests */
 BOOST_AUTO_TEST_CASE( requires_block_children_test )
 {
-    BOOST_CHECK(!bih.at(0).requires_block_children(0));
-    BOOST_CHECK(!bih.at(0).requires_block_children(1));
-    BOOST_CHECK(!bih.at(0).requires_block_children(2));
-    BOOST_CHECK( bih.at(0).requires_block_children(3));
-    BOOST_CHECK( bih.at(0).requires_block_children(4));
-    BOOST_CHECK( bih.at(0).requires_block_children(5));
-    BOOST_CHECK( bih.at(0).requires_block_children(6));
+    BOOST_CHECK(bih.at(0).child_blocks_required() == 0);
 }
 
-BOOST_AUTO_TEST_CASE( leaf_added_added_requires_block_children_test )
+BOOST_AUTO_TEST_CASE( leaf_added_requires_block_children_test )
 {
     /* Fill block 4 with generic nodes at the top and leaves at the bottom */
     bih.at(0).create_generic_node(0.0f, 0.0f, 0, axis_t::x_axis);
     bih.at(0).create_generic_node(1.0f, 0.1f, 1, axis_t::y_axis);
     bih.at(0).create_generic_node(2.0f, 0.2f, 2, axis_t::z_axis);
     bih.at(0).create_leaf_node(3, 10, 3);
-    
-    BOOST_CHECK(!bih.at(0).requires_block_children(0));
-    BOOST_CHECK(!bih.at(0).requires_block_children(1));
-    BOOST_CHECK(!bih.at(0).requires_block_children(2));
-    BOOST_CHECK( bih.at(0).requires_block_children(3));
-    BOOST_CHECK( bih.at(0).requires_block_children(4));
-    BOOST_CHECK( bih.at(0).requires_block_children(5));
-    BOOST_CHECK( bih.at(0).requires_block_children(6));
+    bih.at(0).create_leaf_node(3, 10, 4);
+    bih.at(0).create_leaf_node(3, 10, 5);
+    bih.at(0).create_leaf_node(3, 10, 6);
+    BOOST_CHECK(bih.at(0).child_blocks_required() == 0);
 }
 
-BOOST_AUTO_TEST_CASE( block_added_added_requires_block_children_test )
+BOOST_AUTO_TEST_CASE( block_added_requires_block_children_test )
 {
-    /* Fill block 4 with generic nodes at the top and leaves at the bottom */
+    /* Fill block with generic nodes */
     bih.at(0).create_generic_node(0.0f, 0.0f, 0, axis_t::x_axis);
     bih.at(0).create_generic_node(1.0f, 0.1f, 1, axis_t::y_axis);
     bih.at(0).create_generic_node(2.0f, 0.2f, 2, axis_t::z_axis);
     bih.at(0).create_generic_node(2.0f, 0.2f, 3, axis_t::x_axis);
-    
-    BOOST_CHECK(!bih.at(0).requires_block_children(0));
-    BOOST_CHECK(!bih.at(0).requires_block_children(1));
-    BOOST_CHECK(!bih.at(0).requires_block_children(2));
-    BOOST_CHECK(!bih.at(0).requires_block_children(3));
-    BOOST_CHECK(!bih.at(0).requires_block_children(4));
-    BOOST_CHECK(!bih.at(0).requires_block_children(5));
-    BOOST_CHECK(!bih.at(0).requires_block_children(6));
+    bih.at(0).create_generic_node(2.0f, 0.2f, 4, axis_t::y_axis);
+    bih.at(0).create_generic_node(2.0f, 0.2f, 5, axis_t::y_axis);
+    bih.at(0).create_generic_node(2.0f, 0.2f, 6, axis_t::z_axis);
+    BOOST_CHECK(bih.at(0).child_blocks_required() == 8);
 }
 
-BOOST_AUTO_TEST_CASE( child_blocks_required_test )
+BOOST_AUTO_TEST_CASE( mixed_added_requires_block_children_test )
 {
-    BOOST_CHECK(bih_block::child_blocks_required() == 8);
+    /* Fill block with generic nodes */
+    bih.at(0).create_generic_node(0.0f, 0.0f, 0, axis_t::x_axis);
+    bih.at(0).create_generic_node(1.0f, 0.1f, 1, axis_t::y_axis);
+    bih.at(0).create_generic_node(2.0f, 0.2f, 2, axis_t::z_axis);
+    bih.at(0).create_generic_node(2.0f, 0.2f, 3, axis_t::x_axis);
+    bih.at(0).create_leaf_node(3, 10, 4);
+    bih.at(0).create_leaf_node(3, 10, 5);
+    bih.at(0).create_generic_node(2.0f, 0.2f, 6, axis_t::z_axis);
+    BOOST_CHECK(bih.at(0).child_blocks_required() == 4);
 }
 
 /* Create node tests */
@@ -311,30 +305,30 @@ BOOST_AUTO_TEST_CASE ( traversal_test )
     BOOST_CHECK(bih.at(0).get_node(0) == &reinterpret_cast<const bih_node *>(&bih.at(0))[0]);
 
     /* Level 1 */
-    const int l_0 = bih.at(0).get_left_child(0, 0);
-    const int r_0 = bih.at(0).get_right_child(0, 0);
+    int r_0;
+    const int l_0 = bih.at(0).get_siblings(&r_0, 0, 0);
     BOOST_CHECK(bih.at(block_index(l_0)).get_node(node_index(l_0)) == &reinterpret_cast<const bih_node *>(&bih.at(0))[1]);
     BOOST_CHECK(bih.at(block_index(r_0)).get_node(node_index(r_0)) == &reinterpret_cast<const bih_node *>(&bih.at(0))[2]);
 
     /* Level 2 */
-    const int l_1_0 = bih.at(block_index(l_0)).get_left_child( block_index(l_0), node_index(l_0));
-    const int r_1_0 = bih.at(block_index(l_0)).get_right_child(block_index(l_0), node_index(l_0));
-    const int l_1_1 = bih.at(block_index(r_0)).get_left_child( block_index(r_0), node_index(r_0));
-    const int r_1_1 = bih.at(block_index(r_0)).get_right_child(block_index(r_0), node_index(r_0));
+    int r_1_0;
+    int r_1_1;
+    const int l_1_0 = bih.at(block_index(l_0)).get_siblings(&r_1_0, block_index(l_0), node_index(l_0));
+    const int l_1_1 = bih.at(block_index(r_0)).get_siblings(&r_1_1, block_index(r_0), node_index(r_0));
     BOOST_CHECK(bih.at(block_index(l_1_0)).get_node(node_index(l_1_0)) == &reinterpret_cast<const bih_node *>(&bih.at(0))[3]);
     BOOST_CHECK(bih.at(block_index(r_1_0)).get_node(node_index(r_1_0)) == &reinterpret_cast<const bih_node *>(&bih.at(0))[4]);
     BOOST_CHECK(bih.at(block_index(l_1_1)).get_node(node_index(l_1_1)) == &reinterpret_cast<const bih_node *>(&bih.at(0))[5]);
     BOOST_CHECK(bih.at(block_index(r_1_1)).get_node(node_index(r_1_1)) == &reinterpret_cast<const bih_node *>(&bih.at(0))[6]);
 
     /* Level 3, 1 block down */
-    const int l_2_0 = bih.at(block_index(l_1_0)).get_left_child( block_index(l_1_0), node_index(l_1_0));
-    const int r_2_0 = bih.at(block_index(l_1_0)).get_right_child(block_index(l_1_0), node_index(l_1_0));
-    const int l_2_1 = bih.at(block_index(r_1_0)).get_left_child( block_index(r_1_0), node_index(r_1_0));
-    const int r_2_1 = bih.at(block_index(r_1_0)).get_right_child(block_index(r_1_0), node_index(r_1_0));
-    const int l_2_2 = bih.at(block_index(l_1_1)).get_left_child( block_index(l_1_1), node_index(l_1_1));
-    const int r_2_2 = bih.at(block_index(l_1_1)).get_right_child(block_index(l_1_1), node_index(l_1_1));
-    const int l_2_3 = bih.at(block_index(r_1_1)).get_left_child( block_index(r_1_1), node_index(r_1_1));
-    const int r_2_3 = bih.at(block_index(r_1_1)).get_right_child(block_index(r_1_1), node_index(r_1_1));
+    int r_2_0;
+    int r_2_1;
+    int r_2_2;
+    int r_2_3;
+    const int l_2_0 = bih.at(block_index(l_1_0)).get_siblings(&r_2_0, block_index(l_1_0), node_index(l_1_0));
+    const int l_2_1 = bih.at(block_index(r_1_0)).get_siblings(&r_2_1, block_index(r_1_0), node_index(r_1_0));
+    const int l_2_2 = bih.at(block_index(l_1_1)).get_siblings(&r_2_2, block_index(l_1_1), node_index(l_1_1));
+    const int l_2_3 = bih.at(block_index(r_1_1)).get_siblings(&r_2_3, block_index(r_1_1), node_index(r_1_1));
     BOOST_CHECK(bih.at(block_index(l_2_0)).get_node(node_index(l_2_0)) == &reinterpret_cast<const bih_node *>(&bih.at(8))[0]);
     BOOST_CHECK(bih.at(block_index(r_2_0)).get_node(node_index(r_2_0)) == &reinterpret_cast<const bih_node *>(&bih.at(9))[0]);
     BOOST_CHECK(bih.at(block_index(l_2_1)).get_node(node_index(l_2_1)) == &reinterpret_cast<const bih_node *>(&bih.at(10))[0]);
@@ -345,22 +339,22 @@ BOOST_AUTO_TEST_CASE ( traversal_test )
     BOOST_CHECK(bih.at(block_index(r_2_3)).get_node(node_index(r_2_3)) == &reinterpret_cast<const bih_node *>(&bih.at(15))[0]);
 
     /* Level 4 */
-    const int l_3_0 = bih.at(block_index(l_2_0)).get_left_child( block_index(l_2_0), node_index(l_2_0));
-    const int r_3_0 = bih.at(block_index(l_2_0)).get_right_child(block_index(l_2_0), node_index(l_2_0));
-    const int l_3_1 = bih.at(block_index(r_2_0)).get_left_child( block_index(r_2_0), node_index(r_2_0));
-    const int r_3_1 = bih.at(block_index(r_2_0)).get_right_child(block_index(r_2_0), node_index(r_2_0));
-    const int l_3_2 = bih.at(block_index(l_2_1)).get_left_child( block_index(l_2_1), node_index(l_2_1));
-    const int r_3_2 = bih.at(block_index(l_2_1)).get_right_child(block_index(l_2_1), node_index(l_2_1));
-    const int l_3_3 = bih.at(block_index(r_2_1)).get_left_child( block_index(r_2_1), node_index(r_2_1));
-    const int r_3_3 = bih.at(block_index(r_2_1)).get_right_child(block_index(r_2_1), node_index(r_2_1));
-    const int l_3_4 = bih.at(block_index(l_2_2)).get_left_child( block_index(l_2_2), node_index(l_2_2));
-    const int r_3_4 = bih.at(block_index(l_2_2)).get_right_child(block_index(l_2_2), node_index(l_2_2));
-    const int l_3_5 = bih.at(block_index(r_2_2)).get_left_child( block_index(r_2_2), node_index(r_2_2));
-    const int r_3_5 = bih.at(block_index(r_2_2)).get_right_child(block_index(r_2_2), node_index(r_2_2));
-    const int l_3_6 = bih.at(block_index(l_2_3)).get_left_child( block_index(l_2_3), node_index(l_2_3));
-    const int r_3_6 = bih.at(block_index(l_2_3)).get_right_child(block_index(l_2_3), node_index(l_2_3));
-    const int l_3_7 = bih.at(block_index(r_2_3)).get_left_child( block_index(r_2_3), node_index(r_2_3));
-    const int r_3_7 = bih.at(block_index(r_2_3)).get_right_child(block_index(r_2_3), node_index(r_2_3));
+    int r_3_0;
+    int r_3_1;
+    int r_3_2;
+    int r_3_3;
+    int r_3_4;
+    int r_3_5;
+    int r_3_6;
+    int r_3_7;
+    const int l_3_0 = bih.at(block_index(l_2_0)).get_siblings(&r_3_0, block_index(l_2_0), node_index(l_2_0));
+    const int l_3_1 = bih.at(block_index(r_2_0)).get_siblings(&r_3_1, block_index(r_2_0), node_index(r_2_0));
+    const int l_3_2 = bih.at(block_index(l_2_1)).get_siblings(&r_3_2, block_index(l_2_1), node_index(l_2_1));
+    const int l_3_3 = bih.at(block_index(r_2_1)).get_siblings(&r_3_3, block_index(r_2_1), node_index(r_2_1));
+    const int l_3_4 = bih.at(block_index(l_2_2)).get_siblings(&r_3_4, block_index(l_2_2), node_index(l_2_2));
+    const int l_3_5 = bih.at(block_index(r_2_2)).get_siblings(&r_3_5, block_index(r_2_2), node_index(r_2_2));
+    const int l_3_6 = bih.at(block_index(l_2_3)).get_siblings(&r_3_6, block_index(l_2_3), node_index(l_2_3));
+    const int l_3_7 = bih.at(block_index(r_2_3)).get_siblings(&r_3_7, block_index(r_2_3), node_index(r_2_3));
     BOOST_CHECK(bih.at(block_index(l_3_0)).get_node(node_index(l_3_0)) == &reinterpret_cast<const bih_node *>(&bih.at(8))[1]);
     BOOST_CHECK(bih.at(block_index(r_3_0)).get_node(node_index(r_3_0)) == &reinterpret_cast<const bih_node *>(&bih.at(8))[2]);
     BOOST_CHECK(bih.at(block_index(l_3_1)).get_node(node_index(l_3_1)) == &reinterpret_cast<const bih_node *>(&bih.at(9))[1]);
@@ -379,38 +373,38 @@ BOOST_AUTO_TEST_CASE ( traversal_test )
     BOOST_CHECK(bih.at(block_index(r_3_7)).get_node(node_index(r_3_7)) == &reinterpret_cast<const bih_node *>(&bih.at(15))[2]);
 
     /* Level 5 leaves */
-    const int l_4_0  = bih.at(block_index(l_3_0)).get_left_child( block_index(l_3_0), node_index(l_3_0));
-    const int r_4_0  = bih.at(block_index(l_3_0)).get_right_child(block_index(l_3_0), node_index(l_3_0));
-    const int l_4_1  = bih.at(block_index(r_3_0)).get_left_child( block_index(r_3_0), node_index(r_3_0));
-    const int r_4_1  = bih.at(block_index(r_3_0)).get_right_child(block_index(r_3_0), node_index(r_3_0));
-    const int l_4_2  = bih.at(block_index(l_3_1)).get_left_child( block_index(l_3_1), node_index(l_3_1));
-    const int r_4_2  = bih.at(block_index(l_3_1)).get_right_child(block_index(l_3_1), node_index(l_3_1));
-    const int l_4_3  = bih.at(block_index(r_3_1)).get_left_child( block_index(r_3_1), node_index(r_3_1));
-    const int r_4_3  = bih.at(block_index(r_3_1)).get_right_child(block_index(r_3_1), node_index(r_3_1));
-    const int l_4_4  = bih.at(block_index(l_3_2)).get_left_child( block_index(l_3_2), node_index(l_3_2));
-    const int r_4_4  = bih.at(block_index(l_3_2)).get_right_child(block_index(l_3_2), node_index(l_3_2));
-    const int l_4_5  = bih.at(block_index(r_3_2)).get_left_child( block_index(r_3_2), node_index(r_3_2));
-    const int r_4_5  = bih.at(block_index(r_3_2)).get_right_child(block_index(r_3_2), node_index(r_3_2));
-    const int l_4_6  = bih.at(block_index(l_3_3)).get_left_child( block_index(l_3_3), node_index(l_3_3));
-    const int r_4_6  = bih.at(block_index(l_3_3)).get_right_child(block_index(l_3_3), node_index(l_3_3));
-    const int l_4_7  = bih.at(block_index(r_3_3)).get_left_child( block_index(r_3_3), node_index(r_3_3));
-    const int r_4_7  = bih.at(block_index(r_3_3)).get_right_child(block_index(r_3_3), node_index(r_3_3));
-    const int l_4_8  = bih.at(block_index(l_3_4)).get_left_child( block_index(l_3_4), node_index(l_3_4));
-    const int r_4_8  = bih.at(block_index(l_3_4)).get_right_child(block_index(l_3_4), node_index(l_3_4));
-    const int l_4_9  = bih.at(block_index(r_3_4)).get_left_child( block_index(r_3_4), node_index(r_3_4));
-    const int r_4_9  = bih.at(block_index(r_3_4)).get_right_child(block_index(r_3_4), node_index(r_3_4));
-    const int l_4_10 = bih.at(block_index(l_3_5)).get_left_child( block_index(l_3_5), node_index(l_3_5));
-    const int r_4_10 = bih.at(block_index(l_3_5)).get_right_child(block_index(l_3_5), node_index(l_3_5));
-    const int l_4_11 = bih.at(block_index(r_3_5)).get_left_child( block_index(r_3_5), node_index(r_3_5));
-    const int r_4_11 = bih.at(block_index(r_3_5)).get_right_child(block_index(r_3_5), node_index(r_3_5));
-    const int l_4_12 = bih.at(block_index(l_3_6)).get_left_child( block_index(l_3_6), node_index(l_3_6));
-    const int r_4_12 = bih.at(block_index(l_3_6)).get_right_child(block_index(l_3_6), node_index(l_3_6));
-    const int l_4_13 = bih.at(block_index(r_3_6)).get_left_child( block_index(r_3_6), node_index(r_3_6));
-    const int r_4_13 = bih.at(block_index(r_3_6)).get_right_child(block_index(r_3_6), node_index(r_3_6));
-    const int l_4_14 = bih.at(block_index(l_3_7)).get_left_child( block_index(l_3_7), node_index(l_3_7));
-    const int r_4_14 = bih.at(block_index(l_3_7)).get_right_child(block_index(l_3_7), node_index(l_3_7));
-    const int l_4_15 = bih.at(block_index(r_3_7)).get_left_child( block_index(r_3_7), node_index(r_3_7));
-    const int r_4_15 = bih.at(block_index(r_3_7)).get_right_child(block_index(r_3_7), node_index(r_3_7));
+    int r_4_0;
+    int r_4_1;
+    int r_4_2;
+    int r_4_3;
+    int r_4_4;
+    int r_4_5;
+    int r_4_6;
+    int r_4_7;
+    int r_4_8;
+    int r_4_9;
+    int r_4_10;
+    int r_4_11;
+    int r_4_12;
+    int r_4_13;
+    int r_4_14;
+    int r_4_15;
+    const int l_4_0  = bih.at(block_index(l_3_0)).get_siblings(&r_4_0, block_index(l_3_0), node_index(l_3_0));
+    const int l_4_1  = bih.at(block_index(r_3_0)).get_siblings(&r_4_1, block_index(r_3_0), node_index(r_3_0));
+    const int l_4_2  = bih.at(block_index(l_3_1)).get_siblings(&r_4_2, block_index(l_3_1), node_index(l_3_1));
+    const int l_4_3  = bih.at(block_index(r_3_1)).get_siblings(&r_4_3, block_index(r_3_1), node_index(r_3_1));
+    const int l_4_4  = bih.at(block_index(l_3_2)).get_siblings(&r_4_4, block_index(l_3_2), node_index(l_3_2));
+    const int l_4_5  = bih.at(block_index(r_3_2)).get_siblings(&r_4_5, block_index(r_3_2), node_index(r_3_2));
+    const int l_4_6  = bih.at(block_index(l_3_3)).get_siblings(&r_4_6, block_index(l_3_3), node_index(l_3_3));
+    const int l_4_7  = bih.at(block_index(r_3_3)).get_siblings(&r_4_7, block_index(r_3_3), node_index(r_3_3));
+    const int l_4_8  = bih.at(block_index(l_3_4)).get_siblings(&r_4_8, block_index(l_3_4), node_index(l_3_4));
+    const int l_4_9  = bih.at(block_index(r_3_4)).get_siblings(&r_4_9, block_index(r_3_4), node_index(r_3_4));
+    const int l_4_10 = bih.at(block_index(l_3_5)).get_siblings(&r_4_10, block_index(l_3_5), node_index(l_3_5));
+    const int l_4_11 = bih.at(block_index(r_3_5)).get_siblings(&r_4_11, block_index(r_3_5), node_index(r_3_5));
+    const int l_4_12 = bih.at(block_index(l_3_6)).get_siblings(&r_4_12, block_index(l_3_6), node_index(l_3_6));
+    const int l_4_13 = bih.at(block_index(r_3_6)).get_siblings(&r_4_13, block_index(r_3_6), node_index(r_3_6));
+    const int l_4_14 = bih.at(block_index(l_3_7)).get_siblings(&r_4_14, block_index(l_3_7), node_index(l_3_7));
+    const int l_4_15 = bih.at(block_index(r_3_7)).get_siblings(&r_4_15, block_index(r_3_7), node_index(r_3_7));
     BOOST_CHECK(bih.at(block_index(l_4_0 )).get_node(node_index(l_4_0 )) == &reinterpret_cast<const bih_node *>(&bih.at(8))[3]);
     BOOST_CHECK(bih.at(block_index(r_4_0 )).get_node(node_index(r_4_0 )) == &reinterpret_cast<const bih_node *>(&bih.at(8))[4]);
     BOOST_CHECK(bih.at(block_index(l_4_1 )).get_node(node_index(l_4_1 )) == &reinterpret_cast<const bih_node *>(&bih.at(8))[5]);
