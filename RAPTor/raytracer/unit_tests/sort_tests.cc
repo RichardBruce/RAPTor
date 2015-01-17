@@ -1134,7 +1134,7 @@ BOOST_AUTO_TEST_CASE( small_random_quick_sort_test )
 
 BOOST_AUTO_TEST_CASE( large_ready_sorted_quick_sort_test )
 {
-    for (int data_size = large_test_size_from; data_size <= (large_test_size_from << 1); data_size <<= 1)   /* You should be pretty bored by now */
+    for (int data_size = large_test_size_from; data_size <= large_test_size_from; data_size <<= 1)   /* You should be pretty bored by now */
     {
         /* Generate data */
         auto data(ready_sorted(data_size));
