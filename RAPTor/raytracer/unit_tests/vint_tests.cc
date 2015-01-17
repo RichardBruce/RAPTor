@@ -11,6 +11,9 @@ const raptor_physics::init_logger init_logger;
 /* Standard headers */
 #include <chrono>
 
+/* Common headers */
+#include "logging.h"
+
 /* Boost headers */
 #include "boost/test/unit_test.hpp"
 
