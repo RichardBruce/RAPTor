@@ -748,12 +748,12 @@ inline void split_by_three(int &a)
     a &= 0x09249249;
 }
 
-inline int morton_code(const float x, const float y, const float z, const float x_div, const float y_div, const float z_div)
+inline int morton_code(const float x, const float y, const float z, const float x_mul, const float y_mul, const float z_mul)
 {
     /* Bin to nearest grid cell */
-    int x_int = x / x_div;
-    int y_int = y / y_div;
-    int z_int = z / z_div;
+    int x_int = x * x_mul;
+    int y_int = y * y_mul;
+    int z_int = z * z_mul;
 
     /* Split by three and or together */
     split_by_three(x_int);

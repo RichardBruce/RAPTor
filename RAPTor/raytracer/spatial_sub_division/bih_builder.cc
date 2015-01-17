@@ -67,12 +67,13 @@ void bih_builder::bucket_build()
     _prim_buffer.resize(_primitives->size());
     _morton_codes.resize(_primitives->size());
 
+    const point_t widths_inv(1.0f / _widths.x, 1.0f / _widths.y, 1.0f / _widths.z);
+    const vfp_t x_mul(widths_inv.x);
+    const vfp_t y_mul(widths_inv.y);
+    const vfp_t z_mul(widths_inv.z);
     const vfp_t scene_lo_x(triangle::get_scene_lower_bounds().x);
     const vfp_t scene_lo_y(triangle::get_scene_lower_bounds().y);
     const vfp_t scene_lo_z(triangle::get_scene_lower_bounds().z);
-    const vfp_t x_mul(1.0f / _widths.x);
-    const vfp_t y_mul(1.0f / _widths.y);
-    const vfp_t z_mul(1.0f / _widths.z);
     for (int i = 0; i <= (static_cast<int>(_primitives->size()) - SIMD_WIDTH); i += SIMD_WIDTH)
     {
         const vfp_t lo_x((*_primitives)[i]->lowest_x(), (*_primitives)[i + 1]->lowest_x(), (*_primitives)[i + 2]->lowest_x(), (*_primitives)[i + 3]->lowest_x());
@@ -98,7 +99,7 @@ void bih_builder::bucket_build()
     for (int i = (static_cast<int>(_primitives->size()) & ~(SIMD_WIDTH - 1)); i < static_cast<int>(_primitives->size()); ++i)
     {
         const point_t t((((*_primitives)[i]->highest_point() + (*_primitives)[i]->lowest_point()) * 0.5f) - triangle::get_scene_lower_bounds());
-        _morton_codes[i] = morton_code(t.x, t.y, t.z, _widths.x, _widths.y, _widths.z);
+        _morton_codes[i] = morton_code(t.x, t.y, t.z, widths_inv.x, widths_inv.y, widths_inv.z);
         ++hist[_morton_codes[i] >> 20];
     }
 
@@ -218,6 +219,43 @@ void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigne
         tr[pos] = max(tr[pos], prim->highest_point());
     }
 
+    // /* Remember un-incremented bins */
+    // unsigned int hist_bounds[histogram_size + 1];
+    // memcpy(hist_bounds, hist, (histogram_size + 1) * sizeof(unsigned int));
+
+    // /* For all bins */
+    // for (unsigned int i = 0; i < histogram_size; ++i)
+    // {
+    //     /* Until we have update to top of this bin */
+    //     unsigned int j = hist[i] + 1;
+    //     unsigned int move_to = j;
+    //     auto prim = (*_primitives)[j];
+    //     while (j != (hist_bounds[i + 1] + 1))
+    //     {
+    //         const unsigned int data = _morton_codes[move_to];
+    //         const unsigned int pos = data & 0x3ff;
+    //         _code_buffer[++hist[pos]] = data;
+
+    //         /* Get primitive bounds */
+    //         bl[pos] = min(bl[pos], prim->lowest_point());
+    //         tr[pos] = max(tr[pos], prim->highest_point());
+
+    //         /* Primitive belongs in the empty, move to the next slot */
+    //         if (pos == i)
+    //         {
+    //             (*_primitives)[j++] = prim;
+    //             prim = (*_primitives)[j];
+    //             move_to = j;
+    //         }
+    //         /* Swap primitive to its new position */
+    //         else
+    //         {
+    //             move_to = hist[pos];
+    //             std::swap((*_primitives)[move_to], prim);
+    //         }
+    //     }
+    // }
+
     /* Un-increment the histogram */
     for (int i = histogram_size; i > 0; --i)
     {
@@ -319,7 +357,7 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
         /* Level 0 complete, call standard divider */
         case 0 :
             /* Set up state and call the partial block builder */
-            split_data->tr[data_idx]    = convert_to_primitve_builder(&split_data->bl[data_idx], &_prim_buffer, bins[b], bins[e]);
+            split_data->tr[data_idx]    = convert_to_primitve_builder(&split_data->bl[data_idx], _primitives, bins[b], bins[e]);
             split_data->end[data_idx]   = bins[e] - 1;
             split_data->begin[data_idx] = bins[b];
             split_data->level[data_idx] = -1;
@@ -454,7 +492,7 @@ void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const
     const int blocks_required = (*_blocks)[block_idx].child_blocks_required();
     if (blocks_required > 0)
     {
-        child_idx = _next_block.fetch_add(blocks_required);
+        child_idx = _next_block.fetch_add(blocks_required, std::memory_order_relaxed);
         const int new_size = child_idx + blocks_required;
         if (new_size > static_cast<int>(_blocks->size()))
         {
@@ -585,7 +623,7 @@ void bih_builder::divide_bih_block(block_splitting_data *const split_data, const
     const int blocks_required = (*_blocks)[block_idx].child_blocks_required();
     if (blocks_required > 0)
     {
-        child_idx = _next_block.fetch_add(blocks_required);
+        child_idx = _next_block.fetch_add(blocks_required, std::memory_order_relaxed);
         const int new_size = child_idx + blocks_required;
         if (new_size > static_cast<int>(_blocks->size()))
         {
@@ -854,7 +892,7 @@ void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_b
     const int blocks_required = (*_blocks)[block_idx].child_blocks_required();
     if (blocks_required > 0)
     {
-        child_idx = _next_block.fetch_add(blocks_required);
+        child_idx = _next_block.fetch_add(blocks_required, std::memory_order_relaxed);
         const int new_size = child_idx + blocks_required;
         if (new_size > static_cast<int>(_blocks->size()))
         {

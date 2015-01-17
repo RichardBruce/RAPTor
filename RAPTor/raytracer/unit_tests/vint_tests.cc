@@ -918,7 +918,7 @@ BOOST_AUTO_TEST_CASE( morton_code_performance_test )
     bool passed = true;
     for (int i = 0; i < test_size; ++i)
     {
-        passed &= (scalar_mc[i] = vector_mc[i]);
+        passed &= (scalar_mc[i] == vector_mc[i]);
     }
     BOOST_CHECK(passed);
 }
