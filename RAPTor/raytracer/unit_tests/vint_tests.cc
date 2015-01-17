@@ -896,7 +896,8 @@ BOOST_AUTO_TEST_CASE( morton_code_performance_test )
         scalar_mc[i] = morton_code(x[i], y[i], z[i], x_mul[i], y_mul[i], z_mul[i]);
     }
     auto scalar_t1(std::chrono::system_clock::now());
-    std::cout << "Scalar test took: " << std::chrono::duration_cast<std::chrono::microseconds>(scalar_t1 - scalar_t0).count() << "us" << std::endl;
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: Scalar Morton Code";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(scalar_t1 - scalar_t0).count();
 
     /* Run vector code */
     int vector_mc[test_size];
@@ -907,13 +908,16 @@ BOOST_AUTO_TEST_CASE( morton_code_performance_test )
         mc.store(&vector_mc[i]);
     }
     auto vector_t1(std::chrono::system_clock::now());
-    std::cout << "Vector test took: " << std::chrono::duration_cast<std::chrono::microseconds>(vector_t1 - vector_t0).count() << "us" << std::endl;
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: Vector Morton Code";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(vector_t1 - vector_t0).count();
     
     /* Checks */
+    bool passed = true;
     for (int i = 0; i < test_size; ++i)
     {
-        BOOST_CHECK(scalar_mc[i] = vector_mc[i]);
+        passed &= (scalar_mc[i] = vector_mc[i]);
     }
+    BOOST_CHECK(passed);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
