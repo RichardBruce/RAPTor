@@ -892,7 +892,7 @@ BOOST_AUTO_TEST_CASE( morton_code_performance_test )
     }
 
     /* Run scalar code */
-    int scalar_mc[test_size];
+    std::vector<int> scalar_mc(test_size);
     auto scalar_t0(std::chrono::system_clock::now());
     for (int i = 0; i < test_size; ++i)
     {
@@ -903,7 +903,7 @@ BOOST_AUTO_TEST_CASE( morton_code_performance_test )
     BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(scalar_t1 - scalar_t0).count();
 
     /* Run vector code */
-    int vector_mc[test_size];
+    std::vector<int> vector_mc(test_size);
     auto vector_t0(std::chrono::system_clock::now());
     for (int i = 0; i < test_size; i += SIMD_WIDTH)
     {
