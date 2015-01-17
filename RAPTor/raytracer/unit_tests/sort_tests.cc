@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE( l1_cache_random_std_sort_test )
     BOOST_CHECK(passed);
 
     BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: l1_cache_random_std_sort_test " << test_size;
-    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << (std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() * (static_cast<float>(test_size) / large_test_size_to));
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << (std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() * (static_cast<float>(test_size) / large_test_size_to));
 }
 
 BOOST_AUTO_TEST_CASE( large_ready_sorted_std_stable_sort_test )
@@ -932,7 +932,7 @@ BOOST_AUTO_TEST_CASE( l1_cache_random_radix_sort_test )
     BOOST_CHECK(passed);
 
     BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: l1_cache_random_radix_sort_test " << test_size;
-    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << (std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() * (static_cast<float>(test_size) / large_test_size_to));
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << (std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() * (static_cast<float>(test_size) / large_test_size_to));
 }
 
 
