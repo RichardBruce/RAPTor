@@ -59,7 +59,8 @@ void bih_builder::bucket_build()
 {
     /* Calculate Morton codes and build MSB histogram */
     const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
-    _widths = scene_width / 1024.0f;    /* TODO - Possibly divide down by average primitive width to reduce the number of occupied bins */
+    const float widest = std::max(std::max(scene_width.x, scene_width.y), scene_width.z) / 1024.0f;
+    _widths = point_t(widest, widest, widest);    /* TODO - Possibly divide down by average primitive width to reduce the number of occupied bins */
 
     unsigned int hist[histogram_size + 1];
     memset(hist, 0, histogram_size * sizeof(float));
