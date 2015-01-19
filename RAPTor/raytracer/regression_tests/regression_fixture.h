@@ -72,6 +72,9 @@ struct regression_fixture : private boost::noncopyable
             const unsigned int xr = 640, const unsigned int yr = 480, const unsigned int xa = 1, const unsigned int ya = 1, 
             const std::string &view_point = "")
         {
+            /* Reset scene bounds */
+            triangle::reset_scene_bounding_box();
+            
             const fp_t screen_width     = 10.0;
             const fp_t screen_height    = screen_width * ((fp_t)yr / (fp_t)xr);
 
