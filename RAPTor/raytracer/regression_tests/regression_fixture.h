@@ -33,7 +33,7 @@
 #include "regression_checker.h"
 
 #ifndef VALGRIND_TESTS
-const int test_iterations = 1;
+const int test_iterations = 5;
 #else 
 const int test_iterations = 1;
 #endif
