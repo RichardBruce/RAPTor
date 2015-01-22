@@ -48,8 +48,8 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
         /* Divide the nodes */
         _depth = 0;
         _next_block = 1;
-        // divide_bih_block(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, _primitives->size() - 1);
-        bucket_build();
+        divide_bih_block(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, _primitives->size() - 1);
+        // bucket_build();
         assert(_depth == 0);
     }
     // BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
