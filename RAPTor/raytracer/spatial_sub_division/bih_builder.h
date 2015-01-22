@@ -36,6 +36,7 @@ class bih_builder
         };
 
         /* Radix sort */
+        // cppcheck-suppress unusedPrivateFunction
         void bucket_build();
         void bucket_build_mid(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
         void bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
