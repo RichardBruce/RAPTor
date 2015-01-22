@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "common.h"
 #include "raytracer.h"
 
@@ -3576,13 +3578,14 @@ void ray_trace_engine::operator() (const blocked_range2d<unsigned>& r) const
  'x_vec', 'y_vec' and 'z_vec'  specify the axis for ray 
  launch. The generated picture is put in camera.
 **********************************************************/
-void ray_tracer(const light_list &lights, const primitive_list &everything, camera &c)
+int ray_tracer(const light_list &lights, const primitive_list &everything, camera &c)
 {
 #ifdef THREADED_RAY_TRACE
     /* Start the thread scheduler */
     task_scheduler_init init(task_scheduler_init::automatic);
 #endif
 
+    auto t0(std::chrono::system_clock::now());
     kdt_node kdt_base;
     std::vector<bih_node> bih_base;
 #ifndef SPATIAL_SUBDIVISION_BIH
@@ -3597,6 +3600,7 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
     bih_base.resize(everything.size() * 3);
     const vector<triangle *> *bih_prim = build_bih(&everything, &bih_base);
 #endif /* #ifndef SPATIAL_SUBDIVISION_BIH */
+    auto t1(std::chrono::system_clock::now());
 
 #ifdef SPATIAL_SUBDIVISION_STATISTICS
     cout << "Static properties of the tree :" << endl;
@@ -3667,6 +3671,8 @@ void ray_tracer(const light_list &lights, const primitive_list &everything, came
     /* Clean up */
     delete    bih_prim;
 #endif /* #ifdef SPATIAL_SUBDIVISION_BIH */
+
+    return std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 }
 
 

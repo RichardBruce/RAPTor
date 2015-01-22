@@ -775,7 +775,6 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
 const std::vector<triangle *> * build_bih(const primitive_list *const o, std::vector<bih_node> *const bih)
 {
 //    cout << "BIH construction has begun" << endl;
-    auto t0(std::chrono::system_clock::now());
 
     /* Bound all primitives in the scene and copy them */
     std::vector<triangle *> *object_copy = new std::vector<triangle *>;
@@ -794,8 +793,6 @@ const std::vector<triangle *> * build_bih(const primitive_list *const o, std::ve
 //    approximate_sort(o, object_copy);
     
     assert(depth == 0);
-    auto t1(std::chrono::system_clock::now());
-    std::cout << "builder took: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << std::endl;
     return object_copy;
 }
 }; /* namespace raptor_raytracer */

@@ -190,14 +190,20 @@ struct regression_fixture : private boost::noncopyable
             /* Render */
             int max_runtime = 0;
             int total_runtime = 0;
+            int max_buildtime = 0;
+            int total_buildtime = 0;
             for (int i = 0; i < test_iterations; ++i)
             {
                 const auto t0(std::chrono::system_clock::now());
-                ray_tracer(_lights, _everything, *_cam);
+                const int build_time = ray_tracer(_lights, _everything, *_cam);
                 const auto t1(std::chrono::system_clock::now());
+                
+                /* Track build time and outliers */
+                total_buildtime += build_time;
+                max_buildtime = std::max(max_buildtime, build_time);
 
                 /* Track run time and outliers */
-                const int runtime = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+                const int runtime = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() - build_time;
                 total_runtime += runtime;
                 max_runtime = std::max(max_runtime, runtime);
             }
@@ -206,9 +212,13 @@ struct regression_fixture : private boost::noncopyable
             if (test_iterations > 1)
             {
                 total_runtime -= max_runtime;
+                total_buildtime -= max_buildtime;
             }
+            const int avg_buildtime = total_buildtime / (std::max(1, test_iterations - 1) * 1000);
+            BOOST_LOG_TRIVIAL(fatal) << "PERF 4 - Build Time ms: " << avg_buildtime;
+
             const int avg_runtime = total_runtime / (std::max(1, test_iterations - 1) * 1000);
-            BOOST_LOG_TRIVIAL(fatal) << "PERF 4 - Render Time ms: " << avg_runtime;
+            BOOST_LOG_TRIVIAL(fatal) << "PERF 5 - Render Time ms: " << avg_runtime;
 
             return *this;
         }

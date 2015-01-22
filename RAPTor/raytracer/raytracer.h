@@ -221,7 +221,7 @@ class ray_trace_engine
 };
 
 /* Ray tracer main function */
-void ray_tracer(const light_list &lights, const primitive_list &everything, camera &c);
+int ray_tracer(const light_list &lights, const primitive_list &everything, camera &c);
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __RAYTRACER_H__ */
