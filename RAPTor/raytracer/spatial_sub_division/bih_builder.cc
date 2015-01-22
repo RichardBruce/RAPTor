@@ -787,7 +787,7 @@ const std::vector<triangle *> * build_bih(const primitive_list *const o, std::ve
     unsigned grand_child = 1;
 
     depth = 0;
-    const point_t min_node((triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds()) * 0.01f);
+    const point_t min_node((triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds()) * 0.003f);
     min_node_size = min_node.x * min_node.y * min_node.z;
     divide_bih_node(object_copy, 0, &grand_child, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, object_copy->size() - 1);
 
