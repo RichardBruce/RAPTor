@@ -13,12 +13,14 @@
 class point_t
 {
     public :
-        float x,y,z;
+        float x;
+        float y;
+        float z;
         point_t(const float x = 0.0, const float y = 0.0, const float z = 0.0) : x(x), y(y), z(z) { };
         
         /* Element access */
-        inline       float &     operator[](const int i)                 {       float* a[3] = { &this->x, &this->y, &this->z }; return *(a[i]);      }
-        inline const float &     operator[](const int i) const           { const float* a[3] = { &this->x, &this->y, &this->z }; return *(a[i]);      }
+        inline       float &     operator[](const int i)                 {       float* a = &this->x; return a[i];                                  }
+        inline const float &     operator[](const int i) const           { const float* a = &this->x; return a[i];                                  }
 
         /* Unary operators */
         inline const point_t    operator-()   const                     { return point_t(-this->x, -this->y, -this->z);                             }
