@@ -139,9 +139,8 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             if ((right_size == -1) && (max_left == node_tm.x))
             {
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.x;
-                --depth;
                 const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < min_node_size)
+                if ((depth + 1) == MAX_BIH_STACK_HEIGHT)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(b, max(0, bottom - 1));
                 }
@@ -149,6 +148,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 {
                     divide_bih_node(o, cur, child, bl, tm, node_bl, node_tr, b, e);
                 }
+                --depth;
                 return;
             }
 
@@ -156,9 +156,8 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             if ((left_size == 0) && (min_right == node_bm.x))
             {
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.x;
-                --depth;
                 const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < min_node_size)
+                if ((depth + 1) == MAX_BIH_STACK_HEIGHT)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(bottom, e);
                 }
@@ -166,6 +165,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 {
                     divide_bih_node(o, cur, child, bm, tr, node_bl, node_tr, b, e);
                 }
+                --depth;
                 return;
             }
 
@@ -219,9 +219,8 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             if ((right_size == -1) && (max_left == node_tm.y))
             {
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.y;
-                --depth;
                 const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < min_node_size)
+                if ((depth + 1) == MAX_BIH_STACK_HEIGHT)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(b, max(0, bottom - 1));
                 }
@@ -229,6 +228,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 {
                     divide_bih_node(o, cur, child, bl, tm, node_bl, node_tr, b, e);
                 }
+                --depth;
                 return;
             }
 
@@ -236,9 +236,8 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             if ((left_size == 0) && (min_right == node_bm.y))
             {
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.y;
-                --depth;
                 const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < min_node_size)
+                if ((depth + 1) == MAX_BIH_STACK_HEIGHT)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(bottom, e);
                 }
@@ -246,6 +245,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 {
                     divide_bih_node(o, cur, child, bm, tr, node_bl, node_tr, b, e);
                 }
+                --depth;
                 return;
             }
 
@@ -299,9 +299,8 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             if ((right_size == -1) && (max_left == node_tm.z))
             {
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.z;
-                --depth;
                 const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < min_node_size)
+                if ((depth + 1) == MAX_BIH_STACK_HEIGHT)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(b, max(0, bottom - 1));
                 }
@@ -309,6 +308,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 {
                     divide_bih_node(o, cur, child, bl, tm, node_bl, node_tr, b, e);
                 }
+                --depth;
                 return;
             }
 
@@ -316,9 +316,8 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
             if ((left_size == 0) && (min_right == node_bm.z))
             {
                 // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.z;
-                --depth;
                 const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < min_node_size)
+                if ((depth + 1) == MAX_BIH_STACK_HEIGHT)
                 {
                     bih_node::get_node_array(cur).create_leaf_node(bottom, e);
                 }
@@ -326,6 +325,7 @@ void divide_bih_node(std::vector<triangle *> *const o, unsigned cur, unsigned *c
                 {
                     divide_bih_node(o, cur, child, bm, tr, node_bl, node_tr, b, e);
                 }
+                --depth;
                 return;
             }
 
