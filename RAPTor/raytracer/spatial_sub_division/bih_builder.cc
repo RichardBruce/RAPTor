@@ -20,14 +20,6 @@ inline void swap(std::vector<triangle *> *const o, const int a, const int b)
 }
 
 
-inline void swap(bih_bucket *const o, const int a, const int b)
-{
-     bih_bucket s   = o[a];
-    o[a]            = o[b];
-    o[b]            = s;
-}
-
-
 /**********************************************************
  
 **********************************************************/

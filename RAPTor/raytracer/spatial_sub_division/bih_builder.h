@@ -7,7 +7,6 @@
 /* Ray tracer headers */
 #include "common.h"
 #include "bih_node.h"
-#include "bih_bucket.h"
 
 
 namespace raptor_raytracer
