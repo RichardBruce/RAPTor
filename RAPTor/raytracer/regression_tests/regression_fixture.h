@@ -74,7 +74,7 @@ struct regression_fixture : private boost::noncopyable
         {
             /* Reset scene bounds */
             triangle::reset_scene_bounding_box();
-            
+
             const fp_t screen_width     = 10.0;
             const fp_t screen_height    = screen_width * ((fp_t)yr / (fp_t)xr);
 

@@ -1059,16 +1059,10 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             if ((right_size == -1) && (max_left == node_tm.x))
             {
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.x;
-                const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < _min_node_volume)
-                {
-                    (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
-                }
-                else
-                {
-                    split_data->tr[in_idx] = tm;
-                    divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                }
+                ++_depth;
+                split_data->tr[in_idx] = tm;
+                divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
+                --_depth;
                 return;
             }
 
@@ -1076,22 +1070,15 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             if ((left_size == 0) && (min_right == node_bm.x))
             {
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.x;
-                const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < _min_node_volume)
-                {
-                    (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
-                }
-                else
-                {
-                    split_data->bl[in_idx] = bm;
-                    divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                }
+                ++_depth;
+                split_data->bl[in_idx] = bm;
+                divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
+                --_depth;
                 return;
             }
 
             node_tm.x = max_left;
             node_bm.x = min_right;
-
             break;
         }
         case axis_t::y_axis :
@@ -1141,16 +1128,10 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             if ((right_size == -1) && (max_left == node_tm.y))
             {
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.y;
-                const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < _min_node_volume)
-                {
-                    (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
-                }
-                else
-                {
-                    split_data->tr[in_idx] = tm;
-                    divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                }
+                ++_depth;
+                split_data->tr[in_idx] = tm;
+                divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
+                --_depth;
                 return;
             }
 
@@ -1158,16 +1139,10 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             if ((left_size == 0) && (min_right == node_bm.y))
             {
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.y;
-                const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < _min_node_volume)
-                {
-                    (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
-                }
-                else
-                {
-                    split_data->bl[in_idx] = bm;
-                    divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                }
+                ++_depth;
+                split_data->bl[in_idx] = bm;
+                divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
+                --_depth;
                 return;
             }
 
@@ -1220,16 +1195,10 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             if ((right_size == -1) && (max_left == node_tm.z))
             {
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.z;
-                const point_t width(tm - bl);
-                if ((width.x * width.y * width.z) < _min_node_volume)
-                {
-                    (*_blocks)[block_idx].create_leaf_node(b, std::max(0, bottom - 1), node_idx);
-                }
-                else
-                {
-                    split_data->tr[in_idx] = tm;
-                    divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                }
+                ++_depth;
+                split_data->tr[in_idx] = tm;
+                divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
+                --_depth;
                 return;
             }
 
@@ -1237,16 +1206,10 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             if ((left_size == 0) && (min_right == node_bm.z))
             {
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.z;
-                const point_t width(tr - bm);
-                if ((width.x * width.y * width.z) < _min_node_volume)
-                {
-                    (*_blocks)[block_idx].create_leaf_node(bottom, e, node_idx);
-                }
-                else
-                {
-                    split_data->bl[in_idx] = bm;
-                    divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                }
+                ++_depth;
+                split_data->bl[in_idx] = bm;
+                divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
+                --_depth;
                 return;
             }
 
