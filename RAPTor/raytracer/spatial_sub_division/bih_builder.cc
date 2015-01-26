@@ -48,8 +48,8 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
         /* Divide the nodes */
         _depth = 0;
         _next_block = 1;
-        divide_bih_block(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, _primitives->size() - 1);
-        // bucket_build();
+        // divide_bih_block(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, _primitives->size() - 1);
+        bucket_build();
         assert(_depth == 0);
     }
     // BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
@@ -64,9 +64,9 @@ void bih_builder::bucket_build()
 
     unsigned int hist[histogram_size + 1];
     memset(hist, 0, histogram_size * sizeof(float));
-    _code_buffer.resize(_primitives->size());
-    _prim_buffer.resize(_primitives->size());
-    _morton_codes.resize(_primitives->size());
+    _code_buffer.reset(new int [_primitives->size()]);
+    _prim_buffer.reset(new triangle *[_primitives->size()]);
+    _morton_codes.reset(new int [_primitives->size()]);
 
     const point_t widths_inv(1.0f / _widths.x, 1.0f / _widths.y, 1.0f / _widths.z);
     const vfp_t x_mul(widths_inv.x);
@@ -283,7 +283,7 @@ int morton_decode(int morton)
     return morton;
 }
 
-point_t bih_builder::convert_to_primitve_builder(point_t *const bl, const primitive_list *const active_prims, const int b, const int e)
+point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **const active_prims, const int b, const int e)
 {
     /* Calculate grid cell size */
     const int mc = _code_buffer[b];
@@ -301,9 +301,9 @@ point_t bih_builder::convert_to_primitve_builder(point_t *const bl, const primit
     return grid_bound + _widths;
 }
 
-point_t bih_builder::convert_to_primitve_builder(point_t *const bl, const primitive_list *const active_prims, const int b, const int e, const int begin_mc, const int end_mc, const int level)
+point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **const active_prims, const int b, const int e, const int begin_mc, const int end_mc, const int level)
 {
-    const int mc = (active_prims != _primitives) ? _code_buffer[b] : _morton_codes[b];
+    const int mc = (active_prims != _primitives->data()) ? _code_buffer[b] : _morton_codes[b];
     const int mc_upper_bits = mc & ~((0x400 << (level * 10)) - 1);
     
     /* Calculate grid cell size, this is a little conservative, bit represents the gird so far */
@@ -316,7 +316,7 @@ point_t bih_builder::convert_to_primitve_builder(point_t *const bl, const primit
     // BOOST_LOG_TRIVIAL(trace) << "Cells morton code: " << std::hex << mc << std::dec;
 
     /* Get primitives in the right list for the non-binned node builder */
-    if (active_prims != _primitives)
+    if (active_prims != _primitives->data())
     {
         for (int i = b; i < e; ++i)
         {
@@ -358,7 +358,7 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
         /* Level 0 complete, call standard divider */
         case 0 :
             /* Set up state and call the partial block builder */
-            split_data->tr[data_idx]    = convert_to_primitve_builder(&split_data->bl[data_idx], _primitives, bins[b], bins[e]);
+            split_data->tr[data_idx]    = convert_to_primitve_builder(&split_data->bl[data_idx], _primitives->data(), bins[b], bins[e]);
             split_data->end[data_idx]   = bins[e] - 1;
             split_data->begin[data_idx] = bins[b];
             split_data->level[data_idx] = -1;
