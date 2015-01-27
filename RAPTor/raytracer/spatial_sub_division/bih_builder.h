@@ -35,6 +35,7 @@ class bih_builder
             int                     level[8];
             int                     end[8];
             int                     begin[8];
+            int                     depth[8];
         };
 
         /* Radix sort */
@@ -51,7 +52,7 @@ class bih_builder
         void divide_bih_block(block_splitting_data *const split_data, const int block_idx, const int node_idx);
         bool divide_bih_node_binned(block_splitting_data *const split_data, const int in_idx, const int out_idx, const int block_idx, const int node_idx);
 
-        void divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int node_idx = 0);
+        void divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int depth = 0, const int node_idx = 0);
         void divide_bih_node(block_splitting_data *const split_data, const int in_idx, const int out_idx, const int block_idx, const int node_idx);
 
         primitive_list *                _primitives;

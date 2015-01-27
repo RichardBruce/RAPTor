@@ -848,7 +848,7 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
 }
 
 /* Divide within a block, breadth first, with outside the block depth first */
-void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int node_idx)
+void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int depth, const int node_idx)
 {
     // BOOST_LOG_TRIVIAL(trace) << "Primitive block builder for block: " << block_idx << " and primitives: " << b << " - " << e;
     // BOOST_LOG_TRIVIAL(trace) << "Node size: " << node_bl << " - " << node_tr;
@@ -856,6 +856,7 @@ void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_b
     block_splitting_data split_data;
     split_data.end[0]       = e;
     split_data.begin[0]     = b;
+    split_data.depth[0]     = depth;
     split_data.tr[0]        = tr;
     split_data.bl[0]        = bl;
     split_data.node_tr[0]   = node_tr;
@@ -912,12 +913,12 @@ void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_b
         {
             /* Recurse left */
             const int left_idx = i << 1;
-            divide_bih_block(split_data.bl[left_idx], split_data.tr[left_idx], split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, split_data.begin[left_idx], split_data.end[left_idx]);
+            divide_bih_block(split_data.bl[left_idx], split_data.tr[left_idx], split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, split_data.begin[left_idx], split_data.end[left_idx], split_data.depth[left_idx]);
             ++child_idx;
             
             /* Recurse right */
             const int right_idx = left_idx + 1;
-            divide_bih_block(split_data.bl[right_idx], split_data.tr[right_idx], split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, split_data.begin[right_idx], split_data.end[right_idx]);
+            divide_bih_block(split_data.bl[right_idx], split_data.tr[right_idx], split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, split_data.begin[right_idx], split_data.end[right_idx], split_data.depth[right_idx]);
             ++child_idx;
         }
     }
@@ -932,6 +933,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
 {
     const int e = split_data->end[in_idx];
     const int b = split_data->begin[in_idx];
+    const int depth = split_data->depth[in_idx] + 1;
     const point_t &tr = split_data->tr[in_idx];
     const point_t &bl = split_data->bl[in_idx];
     const point_t &node_tr = split_data->node_tr[in_idx];
@@ -947,7 +949,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
     // BOOST_LOG_TRIVIAL(trace) << "Node bounding box " << node_bl << " - " << node_tr;
 
     /* Create leaf */
-    if (((e - b) <= _max_node_size) || ((_depth + 1) == MAX_BIH_STACK_HEIGHT))
+    if (((e - b) <= _max_node_size) || ((depth + 1) == MAX_BIH_STACK_HEIGHT))
     {
         // // BOOST_LOG_TRIVIAL(trace) << "Creating leaf at index: " << bih_index(block_idx, node_idx) << " with indices: " << b << " - " << e;
         (*_blocks)[block_idx].create_leaf_node(b, e, node_idx);
@@ -1061,6 +1063,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.x;
                 ++_depth;
                 split_data->tr[in_idx] = tm;
+                split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
                 --_depth;
                 return;
@@ -1072,6 +1075,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.x;
                 ++_depth;
                 split_data->bl[in_idx] = bm;
+                split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
                 --_depth;
                 return;
@@ -1130,6 +1134,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.y;
                 ++_depth;
                 split_data->tr[in_idx] = tm;
+                split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
                 --_depth;
                 return;
@@ -1141,6 +1146,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.y;
                 ++_depth;
                 split_data->bl[in_idx] = bm;
+                split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
                 --_depth;
                 return;
@@ -1197,6 +1203,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.z;
                 ++_depth;
                 split_data->tr[in_idx] = tm;
+                split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
                 --_depth;
                 return;
@@ -1208,6 +1215,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                 // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.z;
                 ++_depth;
                 split_data->bl[in_idx] = bm;
+                split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
                 --_depth;
                 return;
@@ -1229,6 +1237,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
     split_data->level[out_idx]      = -1;
     split_data->begin[out_idx]      = b;
     split_data->end[out_idx]        = std::max(0, bottom - 1);
+    split_data->depth[out_idx]      = depth;
     split_data->tr[out_idx]         = tm;
     split_data->bl[out_idx]         = bl;
     split_data->node_tr[out_idx]    = node_tm;
@@ -1239,6 +1248,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
     split_data->level[out_idx_p1]   = -1;
     split_data->begin[out_idx_p1]   = bottom;
     split_data->end[out_idx_p1]     = e;
+    split_data->depth[out_idx_p1]   = depth;
     split_data->tr[out_idx_p1]      = tr;
     split_data->bl[out_idx_p1]      = bm;
     split_data->node_tr[out_idx_p1] = node_tr;
