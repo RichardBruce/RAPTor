@@ -80,18 +80,18 @@ BOOST_AUTO_TEST_CASE( one_triangle_build_test )
     BOOST_CHECK(bih.at(0).get_node(0)->size()   == 1);
 }
 
-BOOST_AUTO_TEST_CASE( full_node_build_test )
-{
-    x_axis_primitives(MAX_BIH_NODE_SIZE);
+// BOOST_AUTO_TEST_CASE( full_node_build_test )
+// {
+//     x_axis_primitives(MAX_BIH_NODE_SIZE);
 
-    bih_builder uut(MAX_BIH_NODE_SIZE);
-    uut.build(&primitives, &bih);
+//     bih_builder uut(MAX_BIH_NODE_SIZE);
+//     uut.build(&primitives, &bih);
     
-    /* Checks - One leaf full of primitives */
-    BOOST_CHECK(bih.size()                      == 2);
-    BOOST_CHECK(bih.at(0).get_split_axis(0)     == axis_t::not_set);
-    BOOST_CHECK(bih.at(0).get_node(0)->size()   == MAX_BIH_NODE_SIZE);
-}
+//      Checks - One leaf full of primitives 
+//     BOOST_CHECK(bih.size()                      == 2);
+//     BOOST_CHECK(bih.at(0).get_split_axis(0)     == axis_t::not_set);
+//     BOOST_CHECK(bih.at(0).get_node(0)->size()   == MAX_BIH_NODE_SIZE);
+// }
 
 // BOOST_AUTO_TEST_CASE( regular_tree_build_test )
 // {
