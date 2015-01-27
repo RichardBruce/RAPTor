@@ -66,17 +66,17 @@ struct regression_fixture : private boost::noncopyable
     public :
         /* CTOR */
         regression_fixture(const std::string &input_file, const model_format_t input_format, 
-            const point_t &cam_p = point_t(0.0, 0.0, -10), const point_t &x_vec = point_t(1.0, 0.0, 0.0), const point_t &y_vec = point_t(0.0, 1.0, 0.0), const point_t &z_vec = point_t(0.0, 0.0, 1.0),
-            const ext_colour_t &bg = ext_colour_t(0.0, 0.0, 0.0),
-            const fp_t rx = 0.0, const fp_t ry = 0.0, const fp_t rz = 0.0, 
+            const point_t &cam_p = point_t(0.0f, 0.0f, -10.0f), const point_t &x_vec = point_t(1.0f, 0.0f, 0.0f), const point_t &y_vec = point_t(0.0f, 1.0f, 0.0f), const point_t &z_vec = point_t(0.0f, 0.0f, 1.0f),
+            const ext_colour_t &bg = ext_colour_t(0.0f, 0.0f, 0.0f),
+            const float rx = 0.0f, const float ry = 0.0f, const float rz = 0.0f, 
             const unsigned int xr = 640, const unsigned int yr = 480, const unsigned int xa = 1, const unsigned int ya = 1, 
             const std::string &view_point = "")
         {
             /* Reset scene bounds */
             triangle::reset_scene_bounding_box();
 
-            const fp_t screen_width     = 10.0;
-            const fp_t screen_height    = screen_width * ((fp_t)yr / (fp_t)xr);
+            const float screen_width    = 10.0f;
+            const float screen_height   = screen_width * (static_cast<float>(yr) / static_cast<float>(xr));
 
             const std::string data_dir(getenv("RAPTOR_DATA"));
             const std::string input_path(data_dir + input_file);
@@ -144,9 +144,9 @@ struct regression_fixture : private boost::noncopyable
 
                 case model_format_t::vrml :
                     /* Deafult camera set up for vrml -- NOTE negative z axis */
-                    _cam = new camera(cam_p, point_t((fp_t)1.0, (fp_t)0.0, (fp_t) 0.0), 
-                                             point_t((fp_t)0.0, (fp_t)1.0, (fp_t) 0.0), 
-                                             point_t((fp_t)0.0, (fp_t)0.0, (fp_t)-1.0), bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                    _cam = new camera(cam_p, point_t(1.0f, 0.0f,  0.0f), 
+                                             point_t(0.0f, 1.0f,  0.0f), 
+                                             point_t(0.0f, 0.0f, -1.0f), bg, screen_width, screen_height, 20, xr, yr, xa, ya);
 
                     input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
@@ -173,14 +173,14 @@ struct regression_fixture : private boost::noncopyable
             scene_clean(&_everything, &_materials, _cam);
         }
 
-        regression_fixture& add_light(const ext_colour_t &rgb, const point_t &c, const fp_t d, const fp_t r)
+        regression_fixture& add_light(const ext_colour_t &rgb, const point_t &c, const float d, const float r)
         {
             new_light(&_lights, rgb, c, d, r);
 
             return *this;
         }
 
-        regression_fixture& add_spotlight(const ext_colour_t &rgb, const point_t &c, const point_t &a, const fp_t r, const fp_t d, const fp_t s_a, const fp_t s_b)
+        regression_fixture& add_spotlight(const ext_colour_t &rgb, const point_t &c, const point_t &a, const float r, const float d, const float s_a, const float s_b)
         {
             const point_t n(normalise(c - a));
             new_light(&_lights, rgb, c, n, d, s_a, s_b, r);
@@ -188,7 +188,7 @@ struct regression_fixture : private boost::noncopyable
             return *this;
         }
 
-        regression_fixture& add_directional_light(const ext_colour_t &rgb, const point_t &c, const point_t &a, const fp_t d)
+        regression_fixture& add_directional_light(const ext_colour_t &rgb, const point_t &c, const point_t &a, const float d)
         {
             const point_t n(normalise(c - a));
             new_light(&_lights, rgb, n, d);
