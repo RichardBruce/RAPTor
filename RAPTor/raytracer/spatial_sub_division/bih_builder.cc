@@ -35,7 +35,7 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     /* Maximum theoretical size is everything.size() * 6 node, but this is very unlikely */
     _primitives = primitives;
     _blocks = blocks;
-    _blocks->resize(std::max(1, static_cast<int>(_primitives->size() * 0.4f)));
+    _blocks->resize(std::max(1, static_cast<int>(_primitives->size() * 0.2f)));
 
     /* Check if we have anything to do */
     if (_primitives->size() <= static_cast<unsigned int>(_max_node_size))
