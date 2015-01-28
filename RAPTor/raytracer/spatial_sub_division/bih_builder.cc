@@ -310,50 +310,6 @@ point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **c
     return grid_bound + _widths;
 }
 
-point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **const active_prims, const int b, const int e, const int begin_mc, const int end_mc, const int level)
-{
-    const int mc = (active_prims != _primitives->data()) ? _code_buffer[b] : _morton_codes[b];
-    const int mc_upper_bits = mc & ~((0x400 << (level * 10)) - 1);
-    
-    /* Calculate grid cell size, this is a little conservative, bit represents the gird so far */
-    const int lower_mc = mc_upper_bits | (begin_mc << (level * 10));
-    const int x_mc = morton_decode(lower_mc);
-    const int y_mc = morton_decode(lower_mc >> 1);
-    const int z_mc = morton_decode(lower_mc >> 2);
-    const point_t lower_mul(x_mc, y_mc, z_mc);
-    const point_t lower_grid((lower_mul * _widths) + triangle::get_scene_lower_bounds());
-    // BOOST_LOG_TRIVIAL(trace) << "Cells morton code: " << std::hex << mc << std::dec;
-
-    /* Get primitives in the right list for the non-binned node builder */
-    if (active_prims != _primitives->data())
-    {
-        for (int i = b; i < e; ++i)
-        {
-            (*_primitives)[i] = _prim_buffer[i];
-        }
-    }
-
-    /* Work out how far to the top of the cell */
-    point_t grid_width(_widths);
-    if (end_mc > 0)
-    {
-        const int upper_mc = mc_upper_bits | ((end_mc << (level * 10)) - 1);
-        // BOOST_LOG_TRIVIAL(trace) << "End bin: " << std::hex << end_mc << std::dec << ", level: " << level;
-        // BOOST_LOG_TRIVIAL(trace) << "End morton code: " << std::hex << upper_mc << std::dec << ", widths: " << _widths;
-
-        const int x_end_mc = morton_decode(upper_mc);
-        const int y_end_mc = morton_decode(upper_mc >> 1);
-        const int z_end_mc = morton_decode(upper_mc >> 2);
-        const point_t end_mul(x_end_mc - x_mc, y_end_mc - y_mc, z_end_mc - z_mc);
-        grid_width += end_mul * _widths;
-    }
-
-    /* Set up state and call the partial block builder */
-    // BOOST_LOG_TRIVIAL(trace) << "Grid points: " << lower_grid << " - " << (lower_grid + grid_width);
-    *bl = lower_grid;
-    return lower_grid + grid_width;
-}
-
 void bih_builder::level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx)
 {
     const int e                     = split_data->end[data_idx];
@@ -522,48 +478,12 @@ void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const
             const int left_idx = i << 1;
             const int right_idx = left_idx + 1;
             
-            // const unsigned int *const left_bins = split_data.bins[left_idx];
-            // const unsigned int *const right_bins = split_data.bins[right_idx];
-            // if ((left_bins[split_data.end[left_idx]] - left_bins[split_data.begin[left_idx]]) < 1000)
-            // {
-            //     /* Recurse left */
-            //     // BOOST_LOG_TRIVIAL(trace) << "Recursing left to primitive builder";
-            //     const int left_begin = left_bins[split_data.begin[left_idx]];
-            //     const int left_end = left_bins[split_data.end[left_idx]];
-            
-            //     point_t left_bl;
-            //     const int left_level = split_data.level[left_idx];
-            //     const primitive_list *const left_active_prims = (left_level == 0x1) ? _primitives : &_prim_buffer;
-            //     const point_t left_tr(convert_to_primitve_builder(&left_bl, left_active_prims, left_begin, left_end, split_data.begin[left_idx], split_data.end[left_idx], left_level));
-
-            //     divide_bih_block(left_bl, left_tr, split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, left_begin, left_end - 1);
-            // }
-            // else
-            // {
-                /* Recurse left */
-                divide_bih_block(split_data.hist_bl[left_idx], split_data.hist_tr[left_idx], split_data.bins[left_idx], split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, split_data.begin[left_idx], split_data.end[left_idx], split_data.level[left_idx]);
-            // }
+            /* Recurse left */
+            divide_bih_block(split_data.hist_bl[left_idx], split_data.hist_tr[left_idx], split_data.bins[left_idx], split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, split_data.begin[left_idx], split_data.end[left_idx], split_data.level[left_idx]);
             ++child_idx;
             
-            // if ((left_bins[split_data.end[right_idx]] - left_bins[split_data.begin[right_idx]]) < 1000)
-            // {
-            //     /* Recurse right */
-            //     // BOOST_LOG_TRIVIAL(trace) << "Recursing right to primitive builder";
-            //     const int right_begin = right_bins[split_data.begin[right_idx]];
-            //     const int right_end = right_bins[split_data.end[right_idx]];
-            
-            //     point_t right_bl;
-            //     const int right_level = split_data.level[right_idx];
-            //     const primitive_list *const right_active_prims = (right_level == 0x1) ? _primitives : &_prim_buffer;
-            //     const point_t right_tr(convert_to_primitve_builder(&right_bl, right_active_prims, right_begin, right_end, split_data.begin[right_idx], split_data.end[right_idx], right_level));
-
-            //     divide_bih_block(right_bl, right_tr, split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, right_begin, right_end - 1);
-            // }
-            // else
-            // {
-                /* Recurse right */
-                divide_bih_block(split_data.hist_bl[right_idx], split_data.hist_tr[right_idx], split_data.bins[right_idx], split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, split_data.begin[right_idx], split_data.end[right_idx], split_data.level[right_idx]);
-            // }
+            /* Recurse right */
+            divide_bih_block(split_data.hist_bl[right_idx], split_data.hist_tr[right_idx], split_data.bins[right_idx], split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, split_data.begin[right_idx], split_data.end[right_idx], split_data.level[right_idx]);
             ++child_idx;
         }
     }
