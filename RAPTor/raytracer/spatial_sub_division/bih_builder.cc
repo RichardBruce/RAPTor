@@ -45,6 +45,15 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     }
     else
     {
+        /* Cache primitive min and max */
+        _min_bounds.reset(new point_t [_primitives->size()]);
+        _max_bounds.reset(new point_t [_primitives->size()]);
+        for (unsigned int i = 0; i < _primitives->size(); ++i)
+        {
+            _min_bounds[i] = (*_primitives)[i]->lowest_point();
+            _max_bounds[i] = (*_primitives)[i]->highest_point();
+        }
+
         /* Divide the nodes */
         _depth = 0;
         _next_block = 1;
@@ -940,24 +949,14 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
     const point_t &node_bl = split_data->node_bl[in_idx];
 
     /* Checks */
-    assert(_depth < MAX_BIH_STACK_HEIGHT);
+    assert(depth < MAX_BIH_STACK_HEIGHT);
     assert(static_cast<unsigned int>(e) < _primitives->size());
     assert((static_cast<unsigned int>(b) < _primitives->size()) || (b > e));
-
-    // BOOST_LOG_TRIVIAL(trace) << "Building node: " << node_idx << " for primitives: " << b << " - " << e;
-    // BOOST_LOG_TRIVIAL(trace) << "Grid bounding box " << bl << " - " << tr;
-    // BOOST_LOG_TRIVIAL(trace) << "Node bounding box " << node_bl << " - " << node_tr;
 
     /* Create leaf */
     if (((e - b) <= _max_node_size) || ((depth + 1) == MAX_BIH_STACK_HEIGHT))
     {
-        // // BOOST_LOG_TRIVIAL(trace) << "Creating leaf at index: " << bih_index(block_idx, node_idx) << " with indices: " << b << " - " << e;
         (*_blocks)[block_idx].create_leaf_node(b, e, node_idx);
-        
-        // for (unsigned int i = b; i <= e; ++i)
-        // {
-        //   // BOOST_LOG_TRIVIAL(trace) << "creating leaf for: " << i;
-        // }
         return;
     }
 
@@ -1003,9 +1002,8 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             tm         = point_t(tr.x, tr.y, split_pnt);
         }
     }
-    // BOOST_LOG_TRIVIAL(trace) << "Attempting to split at: " << split_pnt;
 
-    /* Partition _primitives */
+    /* Partition primitives */
     int left_size;
     int right_size;
     point_t node_tm(node_tr);
@@ -1018,31 +1016,45 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
     {
         case axis_t::x_axis :
         {
+            /* Sort primitives about split and track bounds */
+            const float dbl_split = 2.0f * split_pnt;
             while (bottom < top)
             {
-                while (split_pnt < (((*_primitives)[top]->highest_x() + (*_primitives)[top]->lowest_x()) * 0.5f) && top > bottom)
+                while (dbl_split < (_max_bounds[top].x + _min_bounds[top].x) && bottom < top)
                 {
-                    min_right = std::min(min_right, (*_primitives)[top--]->lowest_x());
+                    min_right = std::min(min_right, _min_bounds[top--].x);
                 }
-                std::swap((*_primitives)[bottom], (*_primitives)[top]);
                 
-                while (split_pnt >= (((*_primitives)[bottom]->highest_x() + (*_primitives)[bottom]->lowest_x()) * 0.5f) && bottom < top)
+                while (dbl_split >= (_max_bounds[bottom].x + _min_bounds[bottom].x) && bottom < top)
                 {
-                    max_left = std::max(max_left, (*_primitives)[bottom++]->highest_x());
+                    max_left = std::max(max_left, _max_bounds[bottom++].x);
                 }
-                std::swap((*_primitives)[bottom], (*_primitives)[top]);
-            }             
+
+                if (bottom < top)
+                {
+                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    std::swap(_min_bounds[bottom], _min_bounds[top]);
+                    std::swap(_max_bounds[bottom], _max_bounds[top]);
+                    
+                    max_left = std::max(max_left, _max_bounds[bottom++].x);
+                    min_right = std::min(min_right, _min_bounds[top--].x);
+                }
+            }
 
             /* Parition the last primitive */
-            if (split_pnt >= (((*_primitives)[bottom]->highest_x() + (*_primitives)[bottom]->lowest_x()) * 0.5f))
+            if (bottom == top)
             {
-                max_left = std::max(max_left, (*_primitives)[bottom++]->highest_x());
-            }
-            else
-            {
-                min_right = std::min(min_right, (*_primitives)[top]->lowest_x());
+                if (dbl_split >= (_max_bounds[bottom].x + _min_bounds[bottom].x))
+                {
+                    max_left = std::max(max_left, _max_bounds[bottom++].x);
+                }
+                else
+                {
+                    min_right = std::min(min_right, _min_bounds[top].x);
+                }
             }
 
+            /* Adjust grid cell bounds */
             float pos = (tm.x - bl.x) * 0.5f;
             while (((bl.x + pos) > max_left) && (max_left > -MAX_DIST))
             {
@@ -1057,27 +1069,22 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                 pos *= 0.5f;
             }
 
+            /* Check this node is small than its parents */
             right_size = e - bottom; /* 1 less than the actual node size */
             if ((right_size == -1) && (max_left == node_tm.x))
             {
-                // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.x;
-                ++_depth;
                 split_data->tr[in_idx] = tm;
                 split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                --_depth;
                 return;
             }
 
             left_size = bottom - b;
             if ((left_size == 0) && (min_right == node_bm.x))
             {
-                // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.x;
-                ++_depth;
                 split_data->bl[in_idx] = bm;
                 split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                --_depth;
                 return;
             }
 
@@ -1087,33 +1094,46 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
         }
         case axis_t::y_axis :
         {
+            /* Sort primitives about split and track bounds */
+            const float dbl_split = 2.0f * split_pnt;
             while (bottom < top)
             {
-                while (split_pnt < (((*_primitives)[top]->highest_y() + (*_primitives)[top]->lowest_y()) * 0.5f) && top > bottom)
+                while (dbl_split < (_max_bounds[top].y + _min_bounds[top].y) && bottom < top)
                 {
-                    min_right = std::min(min_right, (*_primitives)[top--]->lowest_y());
+                    min_right = std::min(min_right, _min_bounds[top--].y);
                 }
-                std::swap((*_primitives)[bottom], (*_primitives)[top]);
-         
-                while (split_pnt >= (((*_primitives)[bottom]->highest_y() + (*_primitives)[bottom]->lowest_y()) * 0.5f) && bottom < top)
+                
+                while (dbl_split >= (_max_bounds[bottom].y + _min_bounds[bottom].y) && bottom < top)
                 {
-                    max_left = std::max(max_left, (*_primitives)[bottom++]->highest_y());
+                    max_left = std::max(max_left, _max_bounds[bottom++].y);
                 }
-                std::swap((*_primitives)[bottom], (*_primitives)[top]);
-            }
+
+                if (bottom < top)
+                {
+                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    std::swap(_min_bounds[bottom], _min_bounds[top]);
+                    std::swap(_max_bounds[bottom], _max_bounds[top]);
+                    
+                    max_left = std::max(max_left, _max_bounds[bottom++].y);
+                    min_right = std::min(min_right, _min_bounds[top--].y);
+                }
+            }             
 
             /* Parition the last primitive */
-            if (split_pnt >= (((*_primitives)[bottom]->highest_y() + (*_primitives)[bottom]->lowest_y()) * 0.5f))
+            if (bottom == top)
             {
-                max_left = std::max(max_left, (*_primitives)[bottom++]->highest_y());
-            }
-            else
-            {
-                min_right = std::min(min_right, (*_primitives)[top]->lowest_y());
+                if (dbl_split >= (_max_bounds[bottom].y + _min_bounds[bottom].y))
+                {
+                    max_left = std::max(max_left, _max_bounds[bottom++].y);
+                }
+                else
+                {
+                    min_right = std::min(min_right, _min_bounds[top].y);
+                }
             }
 
+            /* Adjust grid cell bounds */
             float pos = (tm.y - bl.y) * 0.5f;
-            // BOOST_LOG_TRIVIAL(trace) << "max_left: " << max_left << ", pos: " << pos << ", bl.y: " << bl.y << ", tm.y: " << tm.y;
             while (((bl.y + pos) > max_left) && (max_left > -MAX_DIST))
             {
                 tm.y = bl.y + pos;
@@ -1121,34 +1141,28 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             }
 
             pos = (tr.y - bm.y) * 0.5f;
-            // BOOST_LOG_TRIVIAL(trace) << "min_right: " << min_right << ", pos: " << pos << ", tr.y: " << tr.y << ", bm.y: " << bm.y;
             while (((tr.y - pos) < min_right) && (min_right < MAX_DIST))
             {
                 bm.y = tr.y - pos;
                 pos *= 0.5f;
             }
 
+            /* Check this node is small than its parents */
             right_size = e - bottom; /* 1 less than the actual node size */
             if ((right_size == -1) && (max_left == node_tm.y))
             {
-                // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.y;
-                ++_depth;
                 split_data->tr[in_idx] = tm;
                 split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                --_depth;
                 return;
             }
 
             left_size = bottom - b;
             if ((left_size == 0) && (min_right == node_bm.y))
             {
-                // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.y;
-                ++_depth;
                 split_data->bl[in_idx] = bm;
                 split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                --_depth;
                 return;
             }
 
@@ -1158,31 +1172,45 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
         }
         case axis_t::z_axis :
         {
+            /* Sort primitives about split and track bounds */
+            const float dbl_split = 2.0f * split_pnt;
             while (bottom < top)
             {
-                while (split_pnt < (((*_primitives)[top]->highest_z() + (*_primitives)[top]->lowest_z()) * 0.5f) && top > bottom)
+                while (dbl_split < (_max_bounds[top].z + _min_bounds[top].z) && bottom < top)
                 {
-                    min_right = std::min(min_right, (*_primitives)[top--]->lowest_z());
+                    min_right = std::min(min_right, _min_bounds[top--].z);
                 }
-                std::swap((*_primitives)[bottom], (*_primitives)[top]);
-         
-                while (split_pnt >= (((*_primitives)[bottom]->highest_z() + (*_primitives)[bottom]->lowest_z()) * 0.5f) && bottom < top)
+                
+                while (dbl_split >= (_max_bounds[bottom].z + _min_bounds[bottom].z) && bottom < top)
                 {
-                    max_left = std::max(max_left, (*_primitives)[bottom++]->highest_z());
+                    max_left = std::max(max_left, _max_bounds[bottom++].z);
                 }
-                std::swap((*_primitives)[bottom], (*_primitives)[top]);
-            }
+
+                if (bottom < top)
+                {
+                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    std::swap(_min_bounds[bottom], _min_bounds[top]);
+                    std::swap(_max_bounds[bottom], _max_bounds[top]);
+                    
+                    max_left = std::max(max_left, _max_bounds[bottom++].z);
+                    min_right = std::min(min_right, _min_bounds[top--].z);
+                }
+            }             
 
             /* Parition the last primitive */
-            if (split_pnt >= (((*_primitives)[bottom]->highest_z() + (*_primitives)[bottom]->lowest_z()) * 0.5f))
+            if (bottom == top)
             {
-                max_left = std::max(max_left, (*_primitives)[bottom++]->highest_z());
-            }
-            else
-            {
-                min_right = std::min(min_right, (*_primitives)[top]->lowest_z());
+                if (dbl_split >= (_max_bounds[bottom].z + _min_bounds[bottom].z))
+                {
+                    max_left = std::max(max_left, _max_bounds[bottom++].z);
+                }
+                else
+                {
+                    min_right = std::min(min_right, _min_bounds[top].z);
+                }
             }
 
+            /* Adjust grid cell bounds */
             float pos = (tm.z - bl.z) * 0.5f;
             while (((bl.z + pos) > max_left) && (max_left > -MAX_DIST))
             {
@@ -1197,27 +1225,22 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                 pos *= 0.5f;
             }
 
+            /* Check this node is small than its parents */
             right_size = e - bottom; /* 1 less than the actual node size */
             if ((right_size == -1) && (max_left == node_tm.z))
             {
-                // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing left: " << max_left << ", " << node_tm.z;
-                ++_depth;
                 split_data->tr[in_idx] = tm;
                 split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                --_depth;
                 return;
             }
 
             left_size = bottom - b;
             if ((left_size == 0) && (min_right == node_bm.z))
             {
-                // // BOOST_LOG_TRIVIAL(trace) << "Blank node recursing right: " << min_right << ", " << node_bm.z;
-                ++_depth;
                 split_data->bl[in_idx] = bm;
                 split_data->depth[in_idx] = depth;
                 divide_bih_node(split_data, in_idx, out_idx, block_idx, node_idx);
-                --_depth;
                 return;
             }
 
@@ -1230,7 +1253,6 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
     }
 
     /* Construct the BIH nodes */
-    // BOOST_LOG_TRIVIAL(trace) << "Creating internal node at index: " << bih_index(block_idx, node_idx) << " with splits at: " << max_left << ", " << min_right << " in: " << static_cast<int>(split_axis);
     (*_blocks)[block_idx].create_generic_node(max_left, min_right, node_idx, split_axis);
 
     /* Left node recursion data */

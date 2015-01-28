@@ -60,6 +60,8 @@ class bih_builder
         std::unique_ptr<int []>         _morton_codes;
         std::unique_ptr<int []>         _code_buffer;
         std::vector<bih_block> *        _blocks;
+        std::unique_ptr<point_t []>     _max_bounds;
+        std::unique_ptr<point_t []>     _min_bounds;
         point_t                         _widths;
         const int                       _max_node_size;
         int                             _depth;
