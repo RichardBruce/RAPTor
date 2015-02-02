@@ -18,7 +18,7 @@ class bih_builder
 {
     public :
         bih_builder(const int max_node_size = MAX_BIH_NODE_SIZE) :
-        _primitives(nullptr), _blocks(nullptr), _max_node_size(max_node_size), _depth(0), _next_block(1) {  }
+        _primitives(nullptr), _blocks(nullptr), _max_node_size(max_node_size), _next_block(1) {  }
 
         void build(primitive_list *const primitives, std::vector<bih_block> *const blocks);
     
@@ -45,9 +45,10 @@ class bih_builder
         void bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
 
         point_t convert_to_primitve_builder(point_t *const bl, triangle **const active_prims, const int b, const int e);
+        point_t convert_to_primitve_builder(point_t *const bl, triangle **const active_prims, const int b, const int e, const int begin_mc, const int end_mc, const int level);
         void level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx);
 
-        void divide_bih_block(const point_t *const bl, const point_t *const tr, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level = 2);
+        void divide_bih_block(const point_t *const bl, const point_t *const tr, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level = 2, const int depth = 0);
         void divide_bih_block(block_splitting_data *const split_data, const int block_idx, const int node_idx);
         bool divide_bih_node_binned(block_splitting_data *const split_data, const int in_idx, const int out_idx, const int block_idx, const int node_idx);
 
@@ -63,7 +64,6 @@ class bih_builder
         std::unique_ptr<point_t []>     _min_bounds;
         point_t                         _widths;
         const int                       _max_node_size;
-        int                             _depth;
         std::atomic<int>                _next_block;
 };
 }; /* namespace raptor_raytracer */

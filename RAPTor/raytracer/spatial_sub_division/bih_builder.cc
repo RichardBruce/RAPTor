@@ -29,8 +29,7 @@ const int histogram_size = 1024;
 /* Build a Bounding Interval Heirarchy for _primitives into blocks */
 void bih_builder::build(primitive_list *const primitives, std::vector<bih_block> *const blocks)
 {
-    // // BOOST_LOG_TRIVIAL(trace) << "BIH construction has begun";
-    // BOOST_LOG_TRIVIAL(trace) << "Scene bounds: " << triangle::get_scene_lower_bounds() << " - " << triangle::get_scene_upper_bounds();
+    // BOOST_LOG_TRIVIAL(trace) << "BIH construction has begun";
 
     /* Maximum theoretical size is everything.size() * 6 node, but this is very unlikely */
     _primitives = primitives;
@@ -45,21 +44,27 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     }
     else
     {
-        /* Cache primitive min and max */
+        _next_block = 1;
         _min_bounds.reset(new point_t [_primitives->size()]);
         _max_bounds.reset(new point_t [_primitives->size()]);
-        for (unsigned int i = 0; i < _primitives->size(); ++i)
-        {
-            _min_bounds[i] = (*_primitives)[i]->lowest_point();
-            _max_bounds[i] = (*_primitives)[i]->highest_point();
-        }
 
-        /* Divide the nodes */
-        _depth = 0;
-        _next_block = 1;
-        divide_bih_block(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, _primitives->size() - 1);
-        // bucket_build();
-        assert(_depth == 0);
+        /* For small data sets run the primitive builder */
+        if (_primitives->size() < 750000)
+        {
+            /* Cache primitive min and max */
+            for (unsigned int i = 0; i < _primitives->size(); ++i)
+            {
+                _min_bounds[i] = (*_primitives)[i]->lowest_point();
+                _max_bounds[i] = (*_primitives)[i]->highest_point();
+            }
+    
+            divide_bih_block(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, _primitives->size() - 1);
+        }
+        /* For large data sets run a bucket based builder */
+        else
+        {
+            bucket_build();
+        }
     }
     // BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
 }
@@ -68,7 +73,7 @@ void bih_builder::bucket_build()
 {
     /* Calculate Morton codes and build MSB histogram */
     const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
-    const float widest = std::max(std::max(scene_width.x, scene_width.y), scene_width.z) / 1024.0f;
+    const float widest = std::max(std::max(scene_width.x, scene_width.y), scene_width.z) / 1023.0f;
     _widths = point_t(widest, widest, widest);    /* TODO - Possibly divide down by average primitive width to reduce the number of occupied bins */
 
     unsigned int hist[histogram_size + 1];
@@ -84,8 +89,24 @@ void bih_builder::bucket_build()
     const vfp_t scene_lo_x(triangle::get_scene_lower_bounds().x);
     const vfp_t scene_lo_y(triangle::get_scene_lower_bounds().y);
     const vfp_t scene_lo_z(triangle::get_scene_lower_bounds().z);
+    point_t bl[histogram_size];
+    point_t tr[histogram_size];
+    std::fill_n(bl, histogram_size, point_t( MAX_DIST,  MAX_DIST,  MAX_DIST));
+    std::fill_n(tr, histogram_size, point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST));
     for (int i = 0; i <= (static_cast<int>(_primitives->size()) - SIMD_WIDTH); i += SIMD_WIDTH)
     {
+        /* Cache primitive bounds */
+        // _min_bounds[i    ] = (*_primitives)[i    ]->lowest_point();
+        // _min_bounds[i + 1] = (*_primitives)[i + 1]->lowest_point();
+        // _min_bounds[i + 2] = (*_primitives)[i + 2]->lowest_point();
+        // _min_bounds[i + 3] = (*_primitives)[i + 3]->lowest_point();
+
+        // _max_bounds[i    ] = (*_primitives)[i    ]->highest_point();
+        // _max_bounds[i + 1] = (*_primitives)[i + 1]->highest_point();
+        // _max_bounds[i + 2] = (*_primitives)[i + 2]->highest_point();
+        // _max_bounds[i + 3] = (*_primitives)[i + 3]->highest_point();
+
+        /* Calculate morton code*/
         const vfp_t lo_x((*_primitives)[i]->lowest_x(), (*_primitives)[i + 1]->lowest_x(), (*_primitives)[i + 2]->lowest_x(), (*_primitives)[i + 3]->lowest_x());
         const vfp_t lo_y((*_primitives)[i]->lowest_y(), (*_primitives)[i + 1]->lowest_y(), (*_primitives)[i + 2]->lowest_y(), (*_primitives)[i + 3]->lowest_y());
         const vfp_t lo_z((*_primitives)[i]->lowest_z(), (*_primitives)[i + 1]->lowest_z(), (*_primitives)[i + 2]->lowest_z(), (*_primitives)[i + 3]->lowest_z());
@@ -100,17 +121,42 @@ void bih_builder::bucket_build()
         vint_t mc(morton_code(x, y, z, x_mul, y_mul, z_mul));
         mc.store(&_morton_codes[i]);
 
-        ++hist[_morton_codes[i    ] >> 20];
-        ++hist[_morton_codes[i + 1] >> 20];
-        ++hist[_morton_codes[i + 2] >> 20];
-        ++hist[_morton_codes[i + 3] >> 20];
+        /* Build histogram of morton codes */
+        const unsigned int pos_0 = _morton_codes[i    ] >> 20;
+        const unsigned int pos_1 = _morton_codes[i + 1] >> 20;
+        const unsigned int pos_2 = _morton_codes[i + 2] >> 20;
+        const unsigned int pos_3 = _morton_codes[i + 3] >> 20;
+        ++hist[pos_0];
+        ++hist[pos_1];
+        ++hist[pos_2];
+        ++hist[pos_3];
+
+        /* Move and track primitive bounds */
+        bl[pos_0] = min(bl[pos_0], (*_primitives)[i    ]->lowest_point());
+        tr[pos_0] = max(tr[pos_0], (*_primitives)[i    ]->highest_point());
+        bl[pos_1] = min(bl[pos_1], (*_primitives)[i + 1]->lowest_point());
+        tr[pos_1] = max(tr[pos_1], (*_primitives)[i + 1]->highest_point());
+        bl[pos_2] = min(bl[pos_2], (*_primitives)[i + 2]->lowest_point());
+        tr[pos_2] = max(tr[pos_2], (*_primitives)[i + 2]->highest_point());
+        bl[pos_3] = min(bl[pos_3], (*_primitives)[i + 3]->lowest_point());
+        tr[pos_3] = max(tr[pos_3], (*_primitives)[i + 3]->highest_point());
     }
 
     for (int i = (static_cast<int>(_primitives->size()) & ~(SIMD_WIDTH - 1)); i < static_cast<int>(_primitives->size()); ++i)
     {
+        /* Cache primitive bounds */
+        // _min_bounds[i] = (*_primitives)[i]->lowest_point();
+        // _max_bounds[i] = (*_primitives)[i]->highest_point();
+
+        /* Calculate morton code*/
         const point_t t((((*_primitives)[i]->highest_point() + (*_primitives)[i]->lowest_point()) * 0.5f) - triangle::get_scene_lower_bounds());
         _morton_codes[i] = morton_code(t.x, t.y, t.z, widths_inv.x, widths_inv.y, widths_inv.z);
-        ++hist[_morton_codes[i] >> 20];
+
+        /* Build histogram of morton codes */
+        const unsigned int pos = _morton_codes[i] >> 20;
+        ++hist[pos];
+        bl[pos] = min(bl[pos], (*_primitives)[i]->lowest_point());
+        tr[pos] = max(tr[pos], (*_primitives)[i]->highest_point());
     }
 
     /* Sum the histogram */
@@ -123,20 +169,17 @@ void bih_builder::bucket_build()
     }
 
     /* Move based on histogram */
-    point_t bl[histogram_size];
-    point_t tr[histogram_size];
-    std::fill_n(bl, histogram_size, point_t( MAX_DIST,  MAX_DIST,  MAX_DIST));
-    std::fill_n(tr, histogram_size, point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST));
     for (int i = 0; i < static_cast<int>(_primitives->size()); ++i)
     {
+        /* Calculate destination and move morton code */
         const unsigned int data = _morton_codes[i];
         const unsigned int pos = data >> 20;
         _code_buffer[++hist[pos]] = data;
 
-        auto prim = (*_primitives)[i];
-        _prim_buffer[hist[pos]] = prim;
-        bl[pos] = min(bl[pos], prim->lowest_point());
-        tr[pos] = max(tr[pos], prim->highest_point());
+        /* Move primitive */
+        _prim_buffer[hist[pos]] = (*_primitives)[i];
+        // _min_bounds[hist[pos] + _primitives->size()] = _min_bounds[i];
+        // _max_bounds[hist[pos] + _primitives->size()] = _max_bounds[i];
     }
 
     /* Un-increment the histogram */
@@ -152,14 +195,10 @@ void bih_builder::bucket_build()
 
 void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e)
 {
-    // BOOST_LOG_TRIVIAL(trace) << "Radix sort based on mid 11 bits";
-
     /* Build histogram */
     const int mc_check = _code_buffer[b] >> 22;
-    // BOOST_LOG_TRIVIAL(trace) << "Mid sorting primitives: " << b << " - " << e;
     for (int i = b; i < e; ++i)
     {
-        // BOOST_LOG_TRIVIAL(trace) << "Morton code: " << _code_buffer[i];
         ++hist[(_code_buffer[i] >> 10) & 0x3ff];
         assert((_code_buffer[i] >> 22) == mc_check);
     }
@@ -176,14 +215,19 @@ void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigne
     /* Move based on histogram */
     for (int i = b; i < e; ++i)
     {
+        /* Calculate destination and move morton code */
         const unsigned int data = _code_buffer[i];
         const unsigned int pos = (data >> 10) & 0x3ff;
         _morton_codes[++hist[pos]] = data;
 
-        auto prim = _prim_buffer[i];
-        (*_primitives)[hist[pos]] = prim;
-        bl[pos] = min(bl[pos], prim->lowest_point());
-        tr[pos] = max(tr[pos], prim->highest_point());
+        /* Move primitive */
+        (*_primitives)[hist[pos]] = _prim_buffer[i];
+
+        /* Move and track primitive bounds */
+        bl[pos] = min(bl[pos], _prim_buffer[i]->lowest_point());
+        tr[pos] = max(tr[pos], _prim_buffer[i]->highest_point());
+        // _min_bounds[hist[pos]] = _min_bounds[i + _primitives->size()];
+        // _max_bounds[hist[pos]] = _max_bounds[i + _primitives->size()];
     }
 
     /* Un-increment the histogram */
@@ -197,8 +241,6 @@ void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigne
 // __attribute__((optimize("unroll-loops")))
 void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e)
 {
-    // BOOST_LOG_TRIVIAL(trace) << "Radix sort based on low 11 bits";
-    
     /* Build histogram */
     const int mc_check = _morton_codes[b] >> 11;
     for (int i = b; i < e; ++i)
@@ -219,52 +261,20 @@ void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigne
     /* Move based on histogram, no need to update the morton codes as they arent need again */
     for (int i = b; i < e; ++i)
     {
+        /* Calculate destination and move morton code */
         const unsigned int data = _morton_codes[i];
         const unsigned int pos = data & 0x3ff;
         _code_buffer[++hist[pos]] = data;
 
-        auto prim = (*_primitives)[i];
-        _prim_buffer[hist[pos]] = prim;
-        bl[pos] = min(bl[pos], prim->lowest_point());
-        tr[pos] = max(tr[pos], prim->highest_point());
+        /* Move primitive */
+        _prim_buffer[hist[pos]] = (*_primitives)[i];
+
+        /* Move and track primitive bounds */
+        bl[pos] = min(bl[pos], (*_primitives)[i]->lowest_point());
+        tr[pos] = max(tr[pos], (*_primitives)[i]->highest_point());
+        // _min_bounds[hist[pos] + _primitives->size()] = _min_bounds[i];
+        // _max_bounds[hist[pos] + _primitives->size()] = _max_bounds[i];
     }
-
-    // /* Remember un-incremented bins */
-    // unsigned int hist_bounds[histogram_size + 1];
-    // memcpy(hist_bounds, hist, (histogram_size + 1) * sizeof(unsigned int));
-
-    // /* For all bins */
-    // for (unsigned int i = 0; i < histogram_size; ++i)
-    // {
-    //     /* Until we have update to top of this bin */
-    //     unsigned int j = hist[i] + 1;
-    //     unsigned int move_to = j;
-    //     auto prim = (*_primitives)[j];
-    //     while (j != (hist_bounds[i + 1] + 1))
-    //     {
-    //         const unsigned int data = _morton_codes[move_to];
-    //         const unsigned int pos = data & 0x3ff;
-    //         _code_buffer[++hist[pos]] = data;
-
-    //         /* Get primitive bounds */
-    //         bl[pos] = min(bl[pos], prim->lowest_point());
-    //         tr[pos] = max(tr[pos], prim->highest_point());
-
-    //         /* Primitive belongs in the empty, move to the next slot */
-    //         if (pos == i)
-    //         {
-    //             (*_primitives)[j++] = prim;
-    //             prim = (*_primitives)[j];
-    //             move_to = j;
-    //         }
-    //         /* Swap primitive to its new position */
-    //         else
-    //         {
-    //             move_to = hist[pos];
-    //             std::swap((*_primitives)[move_to], prim);
-    //         }
-    //     }
-    // }
 
     /* Un-increment the histogram */
     for (int i = histogram_size; i > 0; --i)
@@ -303,11 +313,59 @@ point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **c
     for (int i = b; i < e; ++i)
     {
         (*_primitives)[i] = _prim_buffer[i];
+        // _min_bounds[i] = _min_bounds[i + _primitives->size()];
+        // _max_bounds[i] = _max_bounds[i + _primitives->size()];
+        _min_bounds[i] = _prim_buffer[i]->lowest_point();
+        _max_bounds[i] = _prim_buffer[i]->highest_point();
     }
 
     /* Set up state and call the partial block builder */
     *bl = grid_bound;
     return grid_bound + _widths;
+}
+
+point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **const active_prims, const int b, const int e, const int begin_mc, const int end_mc, const int level)
+{
+    /* Get primitives in the right list for the non-binned node builder */
+    if (active_prims != _primitives->data())
+    {
+        for (int i = b; i < e; ++i)
+        {
+            (*_primitives)[i] = _prim_buffer[i];
+        }
+    }
+
+    /* Cache bounds */
+    for (int i = b; i < e; ++i)
+    {
+        _min_bounds[i] = (*_primitives)[i]->lowest_point();
+        _max_bounds[i] = (*_primitives)[i]->highest_point();
+    }
+
+    const int mc = (active_prims != _primitives->data()) ? _code_buffer[b] : _morton_codes[b];
+    const int mc_upper_bits = mc & ~((0x400 << (level * 10)) - 1);
+    
+    /* Calculate grid cell size, this is a little conservative, bit represents the gird so far */
+    const int lower_mc = mc_upper_bits | (begin_mc << (level * 10));
+    const int x_mc = morton_decode(lower_mc);
+    const int y_mc = morton_decode(lower_mc >> 1);
+    const int z_mc = morton_decode(lower_mc >> 2);
+    const point_t lower_mul(x_mc, y_mc, z_mc);
+    const point_t lower_grid((lower_mul * _widths) + triangle::get_scene_lower_bounds());
+
+    /* Work out how far to the top of the cell */
+    point_t grid_width(_widths);
+    const int upper_mc = mc_upper_bits | ((end_mc << (level * 10)) - 1);
+
+    const int x_end_mc = morton_decode(upper_mc);
+    const int y_end_mc = morton_decode(upper_mc >> 1);
+    const int z_end_mc = morton_decode(upper_mc >> 2);
+    const point_t end_mul(x_end_mc - x_mc, y_end_mc - y_mc, z_end_mc - z_mc);
+    grid_width += end_mul * _widths;
+
+    /* Set up state and call the partial block builder */
+    *bl = lower_grid;
+    return lower_grid + grid_width;
 }
 
 void bih_builder::level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx)
@@ -316,8 +374,27 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
     const int b                     = split_data->begin[data_idx];
     const int level                 = split_data->level[data_idx];
     const unsigned int *const bins  = split_data->bins[data_idx];
+
+    /* If not many primitives left call the primitive builder */
+    // if ((level != 0) && ((bins[e] - bins[b]) < 50000))
+    // {
+    //     const int prim_begin = bins[b];
+    //     const int prim_end = bins[e];
+    //     triangle **active_prims = (level == 0x1) ? _primitives->data() : _prim_buffer.get();
+
+    //     split_data->tr[data_idx]    = convert_to_primitve_builder(&split_data->bl[data_idx], active_prims, prim_begin, prim_end, b, e, level);
+    //     split_data->end[data_idx]   = prim_end - 1;
+    //     split_data->begin[data_idx] = prim_begin;
+    //     split_data->level[data_idx] = -1;
+
+    //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder level: " << level << ", bins: " << b << " - " << e << ", size: " << (bins[e] - bins[b]);
+    //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder grid bounds: " << split_data->bl[data_idx] << " - " << split_data->tr[data_idx];
+    //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder node bounds: " << split_data->node_bl[data_idx] << " - " << split_data->node_tr[data_idx];
+    //     divide_bih_block(split_data, block_idx, node_idx);
+    //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder done";
+    //     return;
+    // }
     
-   // BOOST_LOG_TRIVIAL(trace) << "Level: " << level << " complete moving to next level with bins: " << b << " - " << e << " and primitives: " << bins[b] << " - " << bins[e];
     switch (level)
     {
         /* Level 0 complete, call standard divider */
@@ -381,15 +458,14 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
 }
 
 /* Divide within a block, breadth first, with outside the block depth first */
-void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const tr, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level)
+void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const tr, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level, const int depth)
 {
-    // BOOST_LOG_TRIVIAL(trace) << "Building block: " << block_idx << " for bins: " << b << " - " << e << " at level: " << level;
-
     block_splitting_data split_data;
     split_data.hist_bl[0]       = bl;
     split_data.hist_tr[0]       = tr;
     split_data.end[0]           = e;
     split_data.begin[0]         = b;
+    split_data.depth[0]         = depth;
     split_data.bins[0]          = bins;
     split_data.level[0]         = level;
     split_data.node_tr[0]       = node_tr;
@@ -408,7 +484,6 @@ void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const
     }
 
     /* Split level 1 */
-    ++_depth;
     if (divide_bih_node_binned(&split_data, 2, 4, block_idx, 1))
     {
         level_switch(&split_data, block_idx, 1, 2);
@@ -422,7 +497,6 @@ void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const
     }
 
     /* Split level 2 */
-    ++_depth;
     if ((*_blocks)[block_idx].get_split_axis(1) != axis_t::not_set)
     {
         if (divide_bih_node_binned(&split_data, 4, 0, block_idx, 3))
@@ -466,11 +540,9 @@ void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const
         }
         
         (*_blocks)[block_idx].set_child_block(child_idx << 3);
-        // // BOOST_LOG_TRIVIAL(trace) << "Set child block: " << (child_idx << 3);
     }
 
     /* Recurse if required */
-    ++_depth;
     for (int i = 0; i < 4; ++i)
     {
         if ((*_blocks)[block_idx].get_split_axis(i + 3) != axis_t::not_set)
@@ -479,24 +551,20 @@ void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const
             const int right_idx = left_idx + 1;
             
             /* Recurse left */
-            divide_bih_block(split_data.hist_bl[left_idx], split_data.hist_tr[left_idx], split_data.bins[left_idx], split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, split_data.begin[left_idx], split_data.end[left_idx], split_data.level[left_idx]);
+            divide_bih_block(split_data.hist_bl[left_idx], split_data.hist_tr[left_idx], split_data.bins[left_idx], split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, split_data.begin[left_idx], split_data.end[left_idx], split_data.level[left_idx], split_data.depth[left_idx]);
             ++child_idx;
             
             /* Recurse right */
-            divide_bih_block(split_data.hist_bl[right_idx], split_data.hist_tr[right_idx], split_data.bins[right_idx], split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, split_data.begin[right_idx], split_data.end[right_idx], split_data.level[right_idx]);
+            divide_bih_block(split_data.hist_bl[right_idx], split_data.hist_tr[right_idx], split_data.bins[right_idx], split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, split_data.begin[right_idx], split_data.end[right_idx], split_data.level[right_idx], split_data.depth[right_idx]);
             ++child_idx;
         }
     }
 
-    // BOOST_LOG_TRIVIAL(trace) << "Block builder complete";
-    _depth -= 3;
     return;
 }
 
 void bih_builder::divide_bih_block(block_splitting_data *const split_data, const int block_idx, const int node_idx)
 {
-    // BOOST_LOG_TRIVIAL(trace) << "Partial building block: " << block_idx << ", " << node_idx;
-
     /* Split block root */
     if (node_idx <= 0)
     {
@@ -506,7 +574,6 @@ void bih_builder::divide_bih_block(block_splitting_data *const split_data, const
             return;
         }
 
-        ++_depth;
     }
 
     /* Split level 1 */
@@ -518,7 +585,6 @@ void bih_builder::divide_bih_block(block_splitting_data *const split_data, const
     if (node_idx <= 2)
     {
         NODE_BUILD_STEP(3, 6, 2);
-        ++_depth;
     }
 
     /* Split level 2 */
@@ -561,11 +627,9 @@ void bih_builder::divide_bih_block(block_splitting_data *const split_data, const
         }
         
         (*_blocks)[block_idx].set_child_block(child_idx << 3);
-        // // BOOST_LOG_TRIVIAL(trace) << "Set child block: " << (child_idx << 3);
     }
 
     /* Recurse if required */
-    ++_depth;
     for (int i = 0; i < 4; ++i)
     {
         if ((*_blocks)[block_idx].get_split_axis(i + 3) != axis_t::not_set)
@@ -575,28 +639,26 @@ void bih_builder::divide_bih_block(block_splitting_data *const split_data, const
             if (split_data->level[left_idx] == -1)
             {
                 /* Recurse left */
-                divide_bih_block(split_data->bl[left_idx], split_data->tr[left_idx], split_data->node_bl[left_idx], split_data->node_tr[left_idx], child_idx, split_data->begin[left_idx], split_data->end[left_idx]);
+                divide_bih_block(split_data->bl[left_idx], split_data->tr[left_idx], split_data->node_bl[left_idx], split_data->node_tr[left_idx], child_idx, split_data->begin[left_idx], split_data->end[left_idx], split_data->depth[left_idx]);
                 ++child_idx;
                 
                 /* Recurse right */
-                divide_bih_block(split_data->bl[right_idx], split_data->tr[right_idx], split_data->node_bl[right_idx], split_data->node_tr[right_idx], child_idx, split_data->begin[right_idx], split_data->end[right_idx]);
+                divide_bih_block(split_data->bl[right_idx], split_data->tr[right_idx], split_data->node_bl[right_idx], split_data->node_tr[right_idx], child_idx, split_data->begin[right_idx], split_data->end[right_idx], split_data->depth[right_idx]);
                 ++child_idx;
             }
             else
             {
                 /* Recurse left */
-                divide_bih_block(split_data->hist_bl[left_idx], split_data->hist_tr[left_idx], split_data->bins[left_idx], split_data->node_bl[left_idx], split_data->node_tr[left_idx], child_idx, split_data->begin[left_idx], split_data->end[left_idx], split_data->level[left_idx]);
+                divide_bih_block(split_data->hist_bl[left_idx], split_data->hist_tr[left_idx], split_data->bins[left_idx], split_data->node_bl[left_idx], split_data->node_tr[left_idx], child_idx, split_data->begin[left_idx], split_data->end[left_idx], split_data->level[left_idx], split_data->depth[left_idx]);
                 ++child_idx;
                 
                 /* Recurse right */
-                divide_bih_block(split_data->hist_bl[right_idx], split_data->hist_tr[right_idx], split_data->bins[right_idx], split_data->node_bl[right_idx], split_data->node_tr[right_idx], child_idx, split_data->begin[right_idx], split_data->end[right_idx], split_data->level[right_idx]);
+                divide_bih_block(split_data->hist_bl[right_idx], split_data->hist_tr[right_idx], split_data->bins[right_idx], split_data->node_bl[right_idx], split_data->node_tr[right_idx], child_idx, split_data->begin[right_idx], split_data->end[right_idx], split_data->level[right_idx], split_data->depth[right_idx]);
                 ++child_idx;
             }
         }
     }
 
-    // BOOST_LOG_TRIVIAL(trace) << "Block builder complete";
-    _depth -= 3;
     return;
 }
 
@@ -605,15 +667,15 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     int e = split_data->end[in_idx];
     int b = split_data->begin[in_idx];
     const int level = split_data->level[in_idx];
+    const int depth = split_data->depth[in_idx] + 1;
     const point_t &node_tr = split_data->node_tr[in_idx];
     const point_t &node_bl = split_data->node_bl[in_idx];
     const point_t *const bl = split_data->hist_bl[in_idx];
     const point_t *const tr = split_data->hist_tr[in_idx];
     const unsigned int *const bins = split_data->bins[in_idx];
-    // BOOST_LOG_TRIVIAL(trace) << "Building node: " << node_idx << " for bins: " << std::hex << b << " - " << e << std::dec;
 
     /* Checks */
-    assert(_depth < MAX_BIH_STACK_HEIGHT);
+    assert(depth <= MAX_BIH_STACK_HEIGHT);
     assert(static_cast<unsigned int>(e) <= histogram_size);
     
     /* Check if we are down to 1 bin */
@@ -621,12 +683,11 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     {
         split_data->begin[out_idx]  = b;
         split_data->end[out_idx]    = e;
-        // BOOST_LOG_TRIVIAL(trace) << "Run out of bins";
         return true;
     }
     
     /* Create leaf */
-    if ((static_cast<int>(bins[e] - bins[b]) <= _max_node_size) || ((_depth + 1) == MAX_BIH_STACK_HEIGHT))
+    if ((static_cast<int>(bins[e] - bins[b]) <= _max_node_size) || (depth == MAX_BIH_STACK_HEIGHT))
     {
         /* Possibly the primitives need moving back to the right list */
         if (!(level & 0x1))
@@ -637,7 +698,6 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
             }
         }
 
-        // BOOST_LOG_TRIVIAL(trace) << "Creating leaf at index: " << bih_index(block_idx, node_idx) << " with indices: " << bins[b] << " - " << bins[e];
         (*_blocks)[block_idx].create_leaf_node(bins[b], bins[e] - 1, node_idx);
         return false;
     }
@@ -650,7 +710,6 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     assert((b & std::max(0, bin_range - 1)) == 0);
     assert(__builtin_popcount(bin_range) <= 1);
 
-    // BOOST_LOG_TRIVIAL(trace) << "Try to divide bin at: " << std::hex << (b | bin_range) << " checking for primitives between: " << (b | next_bin_level) << " - " << (b | bin_range | next_bin_level) << std::dec;
     while ((bins[b | next_bin_level] == bins[b | bin_range | next_bin_level]) && (bin_range > 0))
     {
         if (bins[b] == bins[split_idx])
@@ -669,17 +728,14 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
         bin_range >>= 1;
         next_bin_level >>= 1;
         split_idx = b | bin_range;
-        // BOOST_LOG_TRIVIAL(trace) << "No primitives, trying again at: " << std::hex << (b | bin_range) << " checking for primitives between: " << (b | next_bin_level) << " - " << (b | bin_range | next_bin_level) << std::dec;
     }
 
     if (bin_range == 0)
     {
         split_data->begin[out_idx]  = b;
         split_data->end[out_idx]    = b + 1;
-        // BOOST_LOG_TRIVIAL(trace) << "Run out of bins";
         return true;
     }
-    // BOOST_LOG_TRIVIAL(trace) << "Success at: " << std::hex << bin_range << " with bins: " << std::dec << bins[b | (bin_range >> 3)] << " - " << bins[b | bin_range | (bin_range >> 3)];
 
     /* Calculate split axis */
     const axis_t split_axis = static_cast<axis_t>(((31 - __builtin_clz(bin_range) + level) % 3) + 1);
@@ -687,9 +743,8 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     /* Iterate over primitive to left and right to find the node bounds */
     point_t node_tm(node_tr);
     point_t node_bm(node_bl);
-    fp_t max_left   = -MAX_DIST;
-    fp_t min_right  =  MAX_DIST;
-    // BOOST_LOG_TRIVIAL(trace) << "Split is in: " << static_cast<int>(split_axis) << " at bin: " << std::hex << split_idx << std::dec << " primitive: " << bins[b] << " - " << bins[b + bin_range] << " - " << bins[b + (bin_range << 1)];
+    float max_left  = -MAX_DIST;
+    float min_right =  MAX_DIST;
     switch (split_axis)
     {
         case axis_t::x_axis :
@@ -748,9 +803,6 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     }
 
     /* Construct the BIH nodes */
-    // BOOST_LOG_TRIVIAL(trace) << "Creating internal node at index: " << bih_index(block_idx, node_idx) << " with splits at: " << max_left << ", " << min_right << " in: " << static_cast<int>(split_axis);
-    // BOOST_LOG_TRIVIAL(trace) << "Left node bounds: " << node_bl << " - " << node_tm;
-    // BOOST_LOG_TRIVIAL(trace) << "Right node bounds: " << node_bm << " - " << node_tr;
     (*_blocks)[block_idx].create_generic_node(max_left, min_right, node_idx, split_axis);
 
     /* Left node recursion data */
@@ -758,6 +810,7 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     split_data->hist_tr[out_idx]    = tr;
     split_data->begin[out_idx]      = b;
     split_data->end[out_idx]        = split_idx;
+    split_data->depth[out_idx]      = depth;
     split_data->bins[out_idx]       = bins;
     split_data->level[out_idx]      = level;
     split_data->node_bl[out_idx]    = node_bl;
@@ -769,6 +822,7 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     split_data->hist_tr[out_idx_p1] = tr;
     split_data->begin[out_idx_p1]   = split_idx;
     split_data->end[out_idx_p1]     = split_idx + bin_range;
+    split_data->depth[out_idx_p1]   = depth;
     split_data->bins[out_idx_p1]    = bins;
     split_data->level[out_idx_p1]   = level;
     split_data->node_bl[out_idx_p1] = node_bm;
@@ -779,9 +833,6 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
 /* Divide within a block, breadth first, with outside the block depth first */
 void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int depth, const int node_idx)
 {
-    // BOOST_LOG_TRIVIAL(trace) << "Primitive block builder for block: " << block_idx << " and primitives: " << b << " - " << e;
-    // BOOST_LOG_TRIVIAL(trace) << "Node size: " << node_bl << " - " << node_tr;
-    // BOOST_LOG_TRIVIAL(trace) << "Grid size: " << bl << " - " << tr;
     block_splitting_data split_data;
     split_data.end[0]       = e;
     split_data.begin[0]     = b;
@@ -795,17 +846,14 @@ void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_b
     divide_bih_node(&split_data, 0, 2, block_idx, 0);
     if ((*_blocks)[block_idx].get_split_axis(0) == axis_t::not_set)
     {
-        // BOOST_LOG_TRIVIAL(trace) << "Primitive block builder complete at root";
         return;
     }
 
     /* Split level 1 */
-    ++_depth;
     divide_bih_node(&split_data, 2, 4, block_idx, 1);
     divide_bih_node(&split_data, 3, 6, block_idx, 2);
 
     /* Split level 2 */
-    ++_depth;
     if ((*_blocks)[block_idx].get_split_axis(1) != axis_t::not_set)
     {
         divide_bih_node(&split_data, 4, 0, block_idx, 3);
@@ -831,11 +879,9 @@ void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_b
         }
         
         (*_blocks)[block_idx].set_child_block(child_idx << 3);
-        // // BOOST_LOG_TRIVIAL(trace) << "Set child block: " << (child_idx << 3);
     }
 
     /* Recurse if required */
-    ++_depth;
     for (int i = 0; i < 4; ++i)
     {
         if ((*_blocks)[block_idx].get_split_axis(i + 3) != axis_t::not_set)
@@ -852,8 +898,6 @@ void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_b
         }
     }
 
-    // BOOST_LOG_TRIVIAL(trace) << "Primitive block builder complete";
-    _depth -= 3;
     return;
 }
 
@@ -869,12 +913,12 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
     const point_t &node_bl = split_data->node_bl[in_idx];
 
     /* Checks */
-    assert(depth < MAX_BIH_STACK_HEIGHT);
+    assert(depth <= MAX_BIH_STACK_HEIGHT);
     assert(static_cast<unsigned int>(e) < _primitives->size());
     assert((static_cast<unsigned int>(b) < _primitives->size()) || (b > e));
 
     /* Create leaf */
-    if (((e - b) <= _max_node_size) || ((depth + 1) == MAX_BIH_STACK_HEIGHT))
+    if (((e - b) <= _max_node_size) || (depth == MAX_BIH_STACK_HEIGHT))
     {
         (*_blocks)[block_idx].create_leaf_node(b, e, node_idx);
         return;
