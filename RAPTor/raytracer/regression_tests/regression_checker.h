@@ -17,8 +17,10 @@
 #include "camera.h"
 
 
-using namespace raptor_raytracer;
-
+namespace raptor_raytracer
+{
+namespace test
+{
 const float result_tolerance            = 0.0005f;
 const int count_error                   = 4;
 const int pixel_error                   = 5;
@@ -171,5 +173,7 @@ class regression_checker : private boost::noncopyable
         const std::string _suite;
         const std::string _test;
 };
+}; /* namespace test */
+}; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __REGRESSION_CHECKER_H__ */

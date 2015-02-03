@@ -18,8 +18,6 @@
 #include "sdl_event_handler.h"
 #include "sdl_event_handler_factory.h"
 
-using namespace raptor_raytracer;
-
 
 /*****************************************************
  Function to write an helpful message to the screen.
@@ -94,6 +92,10 @@ void help()
 *****************************************************/
 int main (int argc, char **argv)
 {
+    using raptor_raytracer::model_format_t;
+    using raptor_raytracer::image_format_t;
+    using raptor_raytracer::ext_colour_t;
+
     /* Default parameters */
     bool            interactive     = false;
     model_format_t  input_format    = model_format_t::code;
@@ -106,7 +108,7 @@ int main (int argc, char **argv)
     std::string     caption         = "raytracer ";
 
     /* Camera parameters */
-    camera   *cam = nullptr;
+    raptor_raytracer::camera   *cam = nullptr;
     point_t  cam_p( 0.0f, 0.0f, -10.0f);    /* Position                         */
     point_t  x_vec( 1.0f, 0.0f, 0.0f);      /* Horizontal vector                */
     point_t  y_vec( 0.0f, 1.0f, 0.0f);      /* Virtical vector                  */
@@ -120,9 +122,9 @@ int main (int argc, char **argv)
     unsigned ya = 1;                        /* Y anti-aliasing factor           */
 
     /* Scene data */
-    light_list              lights;
-    primitive_list          everything;
-    std::list<material *>   materials;
+    raptor_raytracer::light_list            lights;
+    raptor_raytracer::primitive_list        everything;
+    std::list<raptor_raytracer::material *> materials;
 
     /* Parse input arguements */
     if (argc > 1)
@@ -537,7 +539,7 @@ int main (int argc, char **argv)
                 
                 n = c - a;
                 normalise(&n);
-                new_light(&lights, rgb, c, n, d, s_a, s_b, r);
+                raptor_raytracer::new_light(&lights, rgb, c, n, d, s_a, s_b, r);
             }
             /* Directional light */
             else if (strcmp(argv[i], "-directionallight") == 0)
@@ -568,7 +570,7 @@ int main (int argc, char **argv)
                 
                 n = c - a;
                 normalise(&n);
-                new_light(&lights, rgb, n, d);
+                raptor_raytracer::new_light(&lights, rgb, n, d);
             }
             else
             {
@@ -594,30 +596,30 @@ int main (int argc, char **argv)
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());
             const unsigned int path_end = input_file.find_last_of("/\\") + 1;
-            cfg_parser(input_file.substr(0, path_end), input_stream, lights, everything, materials, &cam);
+            raptor_raytracer::cfg_parser(input_file.substr(0, path_end), input_stream, lights, everything, materials, &cam);
 
             /* If camera is not set in the scene so do it here (an nff file would have set the camera) */
             if (cam == nullptr)
             {
-                cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
             }
             break;
         }
         case model_format_t::code :
-            scene_init(lights, everything, materials, &cam);
+            raptor_raytracer::scene_init(lights, everything, materials, &cam);
             break;
 
         case model_format_t::mgf :
-            mgf_parser(input_file.c_str(), lights, everything, materials);
+            raptor_raytracer::mgf_parser(input_file.c_str(), lights, everything, materials);
             
             /* Camera is not set in the scene so do it here */
-            cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya);
+            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya);
             break;
 
         case model_format_t::nff :
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());
-            nff_parser(input_stream, lights, everything, materials, &cam);
+            raptor_raytracer::nff_parser(input_stream, lights, everything, materials, &cam);
             break;
 
         case model_format_t::lwo :
@@ -625,10 +627,10 @@ int main (int argc, char **argv)
             assert(input_stream.is_open());
             last_slash  = input_file.find_last_of('/');
             path        = input_file.substr(0, last_slash + 1);
-            lwo_parser(input_stream, path, lights, everything, materials, &cam);
+            raptor_raytracer::lwo_parser(input_stream, path, lights, everything, materials, &cam);
 
             /* Camera is not set in the scene so do it here */
-            cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
             break;
             
         case model_format_t::obj :
@@ -636,30 +638,30 @@ int main (int argc, char **argv)
             assert(input_stream.is_open());
             last_slash  = input_file.find_last_of('/');
             path        = input_file.substr(0, last_slash + 1);
-            obj_parser(input_stream, path, lights, everything, materials, &cam);
+            raptor_raytracer::obj_parser(input_stream, path, lights, everything, materials, &cam);
             
             /* Camera is not set in the scene so do it here */
-            cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
             break;
 
         case model_format_t::ply :
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());
-            ply_parser(input_stream, lights, everything, materials, &cam);
+            raptor_raytracer::ply_parser(input_stream, lights, everything, materials, &cam);
             
             /* Camera is not set in the scene so do it here */
-            cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
             break;
 
         case model_format_t::vrml :
             /* Deafult camera set up for vrml -- NOTE negative z axis */
-            cam = new camera(cam_p, point_t((fp_t)1.0, (fp_t)0.0, (fp_t) 0.0), 
+            cam = new raptor_raytracer::camera(cam_p, point_t((fp_t)1.0, (fp_t)0.0, (fp_t) 0.0), 
                                     point_t((fp_t)0.0, (fp_t)1.0, (fp_t) 0.0), 
                                     point_t((fp_t)0.0, (fp_t)0.0, (fp_t)-1.0), bg, screen_width, screen_height, 20, xr, yr, xa, ya);
 
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());
-            vrml_parser(input_stream, lights, everything, materials, cam, view_point);
+            raptor_raytracer::vrml_parser(input_stream, lights, everything, materials, cam, view_point);
             break;
 
         default :
@@ -682,7 +684,7 @@ int main (int argc, char **argv)
     cam->roll(rz);
 
     /* Build spatial sub division */
-    kd_tree ssd(everything);
+    raptor_raytracer::kd_tree ssd(everything);
     
     /* Run in interactive mode */
     if (interactive)
@@ -757,6 +759,6 @@ int main (int argc, char **argv)
     }
 
     /* Clean up dynamic memory usage */
-    scene_clean(&everything, &materials, cam);
+    raptor_raytracer::scene_clean(&everything, &materials, cam);
     return 0;
 }

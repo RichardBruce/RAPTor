@@ -12,6 +12,10 @@ const raptor_physics::init_logger init_logger;
 #include "regression_fixture.h"
 
 
+namespace raptor_raytracer
+{
+namespace test
+{
 BOOST_AUTO_TEST_SUITE( mgf_tests );
 
 #ifndef VALGRIND_TESTS
@@ -671,6 +675,8 @@ BOOST_AUTO_TEST_CASE( mgf_wstbskt_test )
 #endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace raptor_raytracer */
+}; /* namespace test */
 
 // ./raytracer --mgf scenes/mgf_scenes/cruiser/shipbatl.mgf --cam 11.5974 6.94461 1.23065 --dx 0.0167102 0.999227 0.0355783 --dy 0.0428478 -0.00725486 0.999056 --dz -0.994753 0.0130228 0.101481 --light 6.0 6.94461 1.23065 0.001 255 255 255 0.0 --light 12.0 6.94461 1.23065 0.001 255 255 255 0.0 --res 1920 1080
 // ./raytracer --mgf scenes/mgf_scenes/cruiser/shipemer.mgf --cam 1.70543 6.82824 1.25482 --dx 0.0115531 -0.999512 0.0290114 --dy 0.0 0.0 1.0 --dz 0.99819 0.0132403 0.0586675 --light 3.0 6.82824 1.2 0.00001 255 255 255 0.0 --res 1920 1080

@@ -12,6 +12,10 @@ const raptor_physics::init_logger init_logger;
 #include "regression_fixture.h"
 
 
+namespace raptor_raytracer
+{
+namespace test
+{
 BOOST_AUTO_TEST_SUITE( cfg_tests );
 
 #ifndef VALGRIND_TESTS
@@ -166,3 +170,5 @@ BOOST_AUTO_TEST_CASE( cfg_dif_ww_low_res_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace raptor_raytracer */
+}; /* namespace test */

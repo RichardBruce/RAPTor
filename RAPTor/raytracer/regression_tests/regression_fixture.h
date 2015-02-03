@@ -32,6 +32,10 @@
 /* Test headers */
 #include "regression_checker.h"
 
+namespace raptor_raytracer
+{
+namespace test
+{
 #ifndef VALGRIND_TESTS
 const int test_iterations = 5;
 #else 
@@ -267,5 +271,7 @@ struct regression_fixture : private boost::noncopyable
         primitive_list          _everything;
         std::list<material *>   _materials;
 };
+}; /* namespace raptor_raytracer */
+}; /* namespace test */
 
 #endif /* #ifndef __REGRESSION_FIXTURE_H__ */

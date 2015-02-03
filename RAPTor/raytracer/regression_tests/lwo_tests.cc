@@ -12,6 +12,10 @@ const raptor_physics::init_logger init_logger;
 #include "regression_fixture.h"
 
 
+namespace raptor_raytracer
+{
+namespace test
+{
 BOOST_AUTO_TEST_SUITE( lwo_tests );
 
 #ifndef VALGRIND_TESTS
@@ -697,3 +701,5 @@ BOOST_AUTO_TEST_CASE( lwo_caterpillar_t530_low_res_test )
 // }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace raptor_raytracer */
+}; /* namespace test */
