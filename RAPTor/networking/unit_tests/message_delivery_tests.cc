@@ -19,8 +19,10 @@
 #include "stack_component_fixture.h"
 
 
-using namespace raptor_networking;
-
+namespace raptor_networking
+{
+namespace test
+{
 /* Test data */
 struct message_delivery_fixture : public stack_component_fixture<mock_stack_component>
 {
@@ -207,7 +209,7 @@ BOOST_AUTO_TEST_CASE( recv_with_promise_test )
     BOOST_CHECK(top_node->data_sent() == 0);
     BOOST_CHECK(top_node->headers_sent() == 0);
     BOOST_CHECK(data_recv->data_received() == 1);
-    BOOST_CHECK(resp.wait_for(std::chrono::seconds(0)) == future_status::ready);
+    BOOST_CHECK(resp.wait_for(std::chrono::seconds(0)) == std::future_status::ready);
 
     /* Check message content */
     BOOST_CHECK(hellomars_mg.check_data(std::unique_ptr<std::istream>(resp.get())));
@@ -215,3 +217,5 @@ BOOST_AUTO_TEST_CASE( recv_with_promise_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_networking */

@@ -13,9 +13,10 @@
 #include "mock_data_receiver.h"
 #include "mock_stack_component.h"
 
-using namespace raptor_networking;
-
-
+namespace raptor_networking
+{
+namespace test
+{
 /* Common base class for stack component fixtures */
 template<class Uut>
 struct stack_component_fixture : private boost::noncopyable
@@ -66,5 +67,7 @@ struct stack_component_fixture : private boost::noncopyable
     message_delivery *const     delivery_node;
     boost::system::error_code   ec;
 };
+}; /* namespace test */
+}; /* namespace raptor_networking */
 
 #endif /* #ifndef __STACK_COMPONENT_FIXTURE_H__ */
