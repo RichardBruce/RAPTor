@@ -226,7 +226,7 @@ int main()
 
     //     /* Add static objects */
     //     raptor_physics::vertex_group *const vg = new raptor_physics::vertex_group(patch_verts, tris, m[c & 0xf].get());
-    //     raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0, 0.0, 0.0), numeric_limits<fp_t>::infinity());
+    //     raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0, 0.0, 0.0), std::numeric_limits<float>::infinity());
     //     se.add_object(phy_obj);
     // }
 
@@ -407,7 +407,7 @@ int main()
 
         /* Add static objects */
         raptor_physics::vertex_group *const vg = new raptor_physics::vertex_group(facet_verts, tris, m[0].get());
-        raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0, 0.0, 0.0), numeric_limits<fp_t>::infinity());
+        raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0, 0.0, 0.0), std::numeric_limits<float>::infinity());
         se.add_object(phy_obj);
     }
 
