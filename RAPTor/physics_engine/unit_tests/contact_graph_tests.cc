@@ -25,31 +25,29 @@ const raptor_physics::init_logger init_logger;
 #include "mock_physics_object.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
-    // BOOST_CHECK_MESSAGE(uut->adjacent(0)[0].info()->get_normal_of_impact() == point_t(0.0, 0.0, 0.0));
-    // BOOST_CHECK_MESSAGE(uut->adjacent(0)[1].info()->get_normal_of_impact() == point_t(0.0, 0.0, 0.0));
-    // BOOST_CHECK_MESSAGE(uut->adjacent(1)[1].info()->get_normal_of_impact() == point_t(0.0, 0.0, 0.0));
-    // BOOST_CHECK_MESSAGE(uut->adjacent(2)[1].info()->get_normal_of_impact() == point_t(0.0, 0.0, 0.0));
 struct contact_graph_base_fixture : private boost::noncopyable
 {
     contact_graph_base_fixture()
     : vg_memory{},
-    po0( new (&vg_memory[alignof(mock_physics_object)                                     ]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5,  2.45 ), 4.0))),
-    po1( new (&vg_memory[alignof(mock_physics_object) + ( 1 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5,  0.45 ), 2.0))),
-    po2( new (&vg_memory[alignof(mock_physics_object) + ( 2 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5, -2.45 ), 2.0))),
-    po3( new (&vg_memory[alignof(mock_physics_object) + ( 3 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5, -4.45 ), 2.0))),
-    po4( new (&vg_memory[alignof(mock_physics_object) + ( 4 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5, -6.45 ), 2.0))),
-    po5( new (&vg_memory[alignof(mock_physics_object) + ( 5 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 1.5, 0.5,  2.45 ), 2.0))),
-    po6( new (&vg_memory[alignof(mock_physics_object) + ( 6 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5,  0.45 ), 4.0))),
-    po7( new (&vg_memory[alignof(mock_physics_object) + ( 7 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 1.5, 0.5, -2.45 ), 2.0))),
-    po8( new (&vg_memory[alignof(mock_physics_object) + ( 8 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 0.5, 0.5,  0.45 ), 4.0))),
-    po9( new (&vg_memory[alignof(mock_physics_object) + ( 9 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 1.0, 0.0, -2.3  ), 4.0))),
-    po10(new (&vg_memory[alignof(mock_physics_object) + (10 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 1.5, 0.5,  1.45000001), 4.0))),
-    po11(new (&vg_memory[alignof(mock_physics_object) + (11 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 2.5, 1.5,  1.44444449), 2.0))),
-    po12(new (&vg_memory[alignof(mock_physics_object) + (12 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 1.5, 0.5,  1.45000001), 4.0))),
-    po13(new (&vg_memory[alignof(mock_physics_object) + (13 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new fp_t[6]{ numeric_limits<fp_t>::infinity(), numeric_limits<fp_t>::infinity(), numeric_limits<fp_t>::infinity(), 0.0,  0.0, 0.0 }, point_t( 2.5, 1.5,  1.44444449), numeric_limits<fp_t>::infinity()))),
+    po0( new (&vg_memory[alignof(mock_physics_object)                                     ]) mock_physics_object(new inertia_tensor(new float[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5,  2.45 ), 4.0))),
+    po1( new (&vg_memory[alignof(mock_physics_object) + ( 1 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5,  0.45 ), 2.0))),
+    po2( new (&vg_memory[alignof(mock_physics_object) + ( 2 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5, -2.45 ), 2.0))),
+    po3( new (&vg_memory[alignof(mock_physics_object) + ( 3 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5, -4.45 ), 2.0))),
+    po4( new (&vg_memory[alignof(mock_physics_object) + ( 4 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5, -6.45 ), 2.0))),
+    po5( new (&vg_memory[alignof(mock_physics_object) + ( 5 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 1.5, 0.5,  2.45 ), 2.0))),
+    po6( new (&vg_memory[alignof(mock_physics_object) + ( 6 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 2.5, 0.5,  0.45 ), 4.0))),
+    po7( new (&vg_memory[alignof(mock_physics_object) + ( 7 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 1.5, 0.5, -2.45 ), 2.0))),
+    po8( new (&vg_memory[alignof(mock_physics_object) + ( 8 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 0.5, 0.5,  0.45 ), 4.0))),
+    po9( new (&vg_memory[alignof(mock_physics_object) + ( 9 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 1.0, 0.0, -2.3  ), 4.0))),
+    po10(new (&vg_memory[alignof(mock_physics_object) + (10 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 1.5, 0.5,  1.45000001), 4.0))),
+    po11(new (&vg_memory[alignof(mock_physics_object) + (11 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 2.5, 1.5,  1.44444449), 2.0))),
+    po12(new (&vg_memory[alignof(mock_physics_object) + (12 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t( 1.5, 0.5,  1.45000001), 4.0))),
+    po13(new (&vg_memory[alignof(mock_physics_object) + (13 * sizeof(mock_physics_object))]) mock_physics_object(new inertia_tensor(new float[6]{ std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), 0.0,  0.0, 0.0 }, point_t( 2.5, 1.5,  1.44444449), std::numeric_limits<float>::infinity()))),
     data0( physics_object_for_simplex_testing(std::vector<point_t>({ point_t(2.5,  0.5,  1.5       ) }))),
     data1( physics_object_for_simplex_testing(std::vector<point_t>({ point_t(2.5,  0.5,  1.4       ) }))),
     data2( physics_object_for_simplex_testing(std::vector<point_t>({ point_t(2.5,  0.5, -1.4       ) }))),
@@ -539,23 +537,23 @@ BOOST_FIXTURE_TEST_CASE ( contact_graph_void_collisions_test, contact_graph_9_di
     uut->void_collisions(&info);
 
     /* Check the stack is void */
-    BOOST_CHECK(info[po0]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po0]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po0]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po0]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po1]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po1]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po1]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po1]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po2]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po2]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po2]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po2]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po3]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po3]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po3]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po3]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po4]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po4]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po4]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po4]->get_first_collision() == nullptr);
 
@@ -581,40 +579,40 @@ BOOST_FIXTURE_TEST_CASE ( contact_graph_void_collisions_test, contact_graph_9_di
     uut->void_collisions(&info);
 
     /* Check the stack is void */
-    BOOST_CHECK(info[po0]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po0]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po0]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po0]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po1]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po1]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po1]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po1]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po2]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po2]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po2]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po2]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po3]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po3]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po3]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po3]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po4]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po4]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po4]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po4]->get_first_collision() == nullptr);
 
     /* Check the circle is void */
-    BOOST_CHECK(info[po5]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po5]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po5]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po5]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po6]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po6]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po6]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po6]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po7]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po7]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po7]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po7]->get_first_collision() == nullptr);
 
-    BOOST_CHECK(info[po8]->get_first_collision_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(info[po8]->get_first_collision_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(info[po8]->get_first_collision_type() == NO_COLLISION);
     BOOST_CHECK(info[po8]->get_first_collision() == nullptr);
 }
@@ -1805,3 +1803,5 @@ BOOST_FIXTURE_TEST_CASE( contact_graph_2_contact_offset_rotational_resting_force
 
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

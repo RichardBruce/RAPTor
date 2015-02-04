@@ -24,8 +24,10 @@ const raptor_physics::init_logger init_logger;
 #include "mock_physics_object.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 struct simplex_fixture : private boost::noncopyable
 {
@@ -790,3 +792,5 @@ BOOST_AUTO_TEST_CASE ( off_center_face_center_of_impact_tests )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

@@ -26,8 +26,10 @@ const raptor_physics::init_logger init_logger;
 #include "mock_force.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 struct physics_object_fixture : private boost::noncopyable
 {
@@ -42,7 +44,7 @@ struct physics_object_fixture : private boost::noncopyable
       vg5(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5))),
       vg6(make_cube(mat, point_t(-0.5, -0.5, -0.5), point_t(0.5,  0.5,  0.5))),
       vg7(make_cube(mat, point_t( 5.5, -1.5, -3.5), point_t(6.5, -0.5, -2.5))),
-      plane_po(new physics_object(vg0, point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity(), 7)),
+      plane_po(new physics_object(vg0, point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity(), 7)),
       cube_po0(new physics_object(vg1, point_t(0.5,  -9.5, 0.0), 1.0)),
       cube_po1(new physics_object(vg2, point_t(0.0,   9.5, 0.0), 1.0)),
       centered_cube(new physics_object(vg7, point_t(-5.0, 10.5, 3.0), 1.0)),
@@ -1480,3 +1482,5 @@ BOOST_FIXTURE_TEST_CASE( one_rotating_resolve_collisions_test, physics_object_fi
 // }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

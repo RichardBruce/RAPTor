@@ -133,7 +133,7 @@ class simulation_environment
         {
             if (gravity)
             {
-                o->register_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -raptor_physics::ACCELERATION_UNDER_GRAVITY * o->get_mass(), 0.0), numeric_limits<float>::infinity()));
+                o->register_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -raptor_physics::ACCELERATION_UNDER_GRAVITY * o->get_mass(), 0.0), std::numeric_limits<float>::infinity()));
             }
             
             _pe->add_moving_object(o);

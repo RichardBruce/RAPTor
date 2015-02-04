@@ -25,6 +25,10 @@
 /* Test headers */
 #include "regression_checker.h"
 
+namespace raptor_physics
+{
+namespace test
+{
 /* Maximum number of objects allowed in the regression tests */
 /* I feel a bit dirty having this, but while the physics engine has maps keyed off pointers it is needed */
 /* I'm not prepared to add size and runtime to the engine for the sake of this */
@@ -137,5 +141,7 @@ struct regression_fixture : private boost::noncopyable
         float   _frames_inv;
         int     _objects_idx;
 };
+}; /* namespace test */
+}; /* namespace raptor_physics */
 
 #endif /* #ifndef __REGRESSION_FIXTURE_H__ */

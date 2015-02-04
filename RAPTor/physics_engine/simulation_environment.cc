@@ -7,6 +7,7 @@
 #include "logging.h"
 
 /* Raytracer headers */
+#include "bih.h"
 #include "raytracer.h"
 
 /* Physics headers */
@@ -19,7 +20,7 @@ int simulation_environment::run()
 {
     BOOST_LOG_TRIVIAL(info) << "Beginning Physics Simulation";
 
-    _time_run = 0.0;
+    _time_run = 0.0f;
     std::unique_ptr<unsigned char[]> screen_data(new unsigned char [_cam.x_resolution() * _cam.y_resolution() * 3]);
 
     std::ostringstream fps;
@@ -35,7 +36,7 @@ int simulation_environment::run()
         /* Update time */
         const clock_t time_now = clock();
         fp_t time_step = std::max(_po->min_timestep(), (time_now - _sim_time) * clocks_per_sec_inv);
-        if (_po->max_timestep() > 0.0)
+        if (_po->max_timestep() > 0.0f)
         {
             time_step = std::min(_po->max_timestep(), time_step);
         }
@@ -53,7 +54,8 @@ int simulation_environment::run()
         if (_po->render())
         {
             raptor_raytracer::primitive_list *tris = _pe->scene_to_triangles();
-            raptor_raytracer::ray_tracer(_lights, *tris, _cam);
+            std::unique_ptr<raptor_raytracer::bih> ssd(new raptor_raytracer::bih(*tris));
+            raptor_raytracer::ray_tracer(ssd.get(), _lights, *tris, _cam);
 
             /* Clean up triangles */        
             for (auto t : (*tris))
@@ -62,7 +64,7 @@ int simulation_environment::run()
             }
             delete tris;
 
-            _damped_fps = (0.5 * _damped_fps) + (0.5 / time_step);
+            _damped_fps = (0.5f * _damped_fps) + (0.5f / time_step);
             fps.str(std::string());
             fps << _damped_fps;            
 

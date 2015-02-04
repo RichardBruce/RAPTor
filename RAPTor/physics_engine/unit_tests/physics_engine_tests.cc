@@ -25,8 +25,10 @@ const raptor_physics::init_logger init_logger;
 #include "mock_force.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 struct physics_engine_fixture : private boost::noncopyable
 {
@@ -918,3 +920,5 @@ BOOST_AUTO_TEST_CASE( advance_time_rotating_in_plane_collide_and_slide_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

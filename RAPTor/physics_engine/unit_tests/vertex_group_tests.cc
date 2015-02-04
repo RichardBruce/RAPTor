@@ -24,8 +24,10 @@ const raptor_physics::init_logger init_logger;
 #include "vertex_group.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 struct vertex_group_fixture : private boost::noncopyable
 {
@@ -108,8 +110,8 @@ BOOST_AUTO_TEST_CASE( get_bounds_test )
 /* Test build inertia tensor */
 BOOST_AUTO_TEST_CASE( build_inertia_tensor_test )
 {
-    std::unique_ptr<inertia_tensor> i0(plane_vg->build_inertia_tensor(numeric_limits<fp_t>::infinity()));
-    BOOST_CHECK(i0->mass() == numeric_limits<fp_t>::infinity());
+    std::unique_ptr<inertia_tensor> i0(plane_vg->build_inertia_tensor(std::numeric_limits<float>::infinity()));
+    BOOST_CHECK(i0->mass() == std::numeric_limits<float>::infinity());
     BOOST_CHECK(i0->center_of_mass() == point_t(0.0, 0.0, 0.0));
 
     std::unique_ptr<inertia_tensor> i1(cube_vg0->build_inertia_tensor(2.0));
@@ -397,3 +399,5 @@ BOOST_AUTO_TEST_CASE( translated_rotated_build_triangles_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

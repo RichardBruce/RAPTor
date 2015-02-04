@@ -12,6 +12,10 @@ const raptor_physics::init_logger init_logger;
 #include "regression_fixture.h"
 
 
+namespace raptor_physics
+{
+namespace test
+{
 BOOST_FIXTURE_TEST_SUITE( free_motion_tests, regression_fixture );
 
 BOOST_AUTO_TEST_CASE( sin_500_n_10_fps_test )
@@ -166,7 +170,7 @@ BOOST_AUTO_TEST_CASE( viscous_10_fps_test )
 
     /* Add moving objects */
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(150.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0), false);
-    pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 50.0, numeric_limits<float>::infinity()), 0);
+    pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 50.0, std::numeric_limits<float>::infinity()), 0);
 
     /* Run physics simulation */
     run(&checker, 150);
@@ -188,7 +192,7 @@ BOOST_AUTO_TEST_CASE( viscous_25_fps_test )
 
     /* Add moving objects */
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(150.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0), false);
-    pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 50.0, numeric_limits<float>::infinity()), 0);
+    pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 50.0, std::numeric_limits<float>::infinity()), 0);
 
     /* Run physics simulation */
     run(&checker, 250);
@@ -210,7 +214,7 @@ BOOST_AUTO_TEST_CASE( viscous_60_fps_test )
 
     /* Add moving objects */
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(150.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0), false);
-    pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 50.0, numeric_limits<float>::infinity()), 0);
+    pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 50.0, std::numeric_limits<float>::infinity()), 0);
 
     /* Run physics simulation */
     run(&checker, 400);
@@ -236,16 +240,16 @@ BOOST_AUTO_TEST_CASE( attract_10_fps_test )
     
     /* Planet */
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, -15.0, 0.0), point_t(10.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1250.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 1);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 1);
 
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, -5.0, 0.0), point_t(15.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1250.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 2);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 2);
 
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, -25.0, 0.0), point_t(5.0, 10.0, 0.0), point_t(0.0, 0.0, 0.0), 250.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 3);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 3);
 
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, 0.0, -15.0), point_t(3.0, 0.0, 15.0), point_t(0.0, 0.0, 0.0), 750.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 4);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 4);
 
     /* Run physics simulation */
     run(&checker, 500);
@@ -271,16 +275,16 @@ BOOST_AUTO_TEST_CASE( attract_25_fps_test )
     
     /* Planet */
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, -15.0, 0.0), point_t(10.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1250.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 1);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 1);
 
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, -5.0, 0.0), point_t(15.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1250.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 2);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 2);
 
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, -25.0, 0.0), point_t(5.0, 10.0, 0.0), point_t(0.0, 0.0, 0.0), 250.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 3);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 3);
 
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, 0.0, -15.0), point_t(3.0, 0.0, 15.0), point_t(0.0, 0.0, 0.0), 750.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 4);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 4);
 
     /* Run physics simulation */
     run(&checker, 1000);
@@ -306,16 +310,16 @@ BOOST_AUTO_TEST_CASE( attract_60_fps_test )
     
     /* Planet */
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, -15.0, 0.0), point_t(10.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1250.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 1);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 1);
 
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, -5.0, 0.0), point_t(15.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1250.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 2);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 2);
 
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, -25.0, 0.0), point_t(5.0, 10.0, 0.0), point_t(0.0, 0.0, 0.0), 250.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 3);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 3);
 
     se.add_moving_object(make_cube(m, point_t(-0.1, -0.1, -0.1), point_t(0.1, 0.1, 0.1), point_t(0.0, 0.0, -15.0), point_t(3.0, 0.0, 15.0), point_t(0.0, 0.0, 0.0), 750.0), false);
-    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), 4);
+    pe.apply_force(new attract_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), 4);
 
 
     /* Run physics simulation */
@@ -359,9 +363,9 @@ BOOST_AUTO_TEST_CASE( repulsive_10_fps_test )
     /* Apply forces */
     for (int i = 2; i < 14; ++i)
     {
-        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(-0.5,  10.0, 0.0), 750.0, 0.0, numeric_limits<float>::infinity()), i);
-        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t( 0.5, -10.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), i);
-        pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 10.0, numeric_limits<float>::infinity()), i);
+        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(-0.5,  10.0, 0.0), 750.0, 0.0, std::numeric_limits<float>::infinity()), i);
+        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t( 0.5, -10.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), i);
+        pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 10.0, std::numeric_limits<float>::infinity()), i);
     }
 
     /* Run some frames and check */
@@ -405,9 +409,9 @@ BOOST_AUTO_TEST_CASE( repulsive_25_fps_test )
     /* Apply forces */
     for (int i = 2; i < 14; ++i)
     {
-        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(-0.5,  10.0, 0.0), 750.0, 0.0, numeric_limits<float>::infinity()), i);
-        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t( 0.5, -10.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), i);
-        pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 10.0, numeric_limits<float>::infinity()), i);
+        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(-0.5,  10.0, 0.0), 750.0, 0.0, std::numeric_limits<float>::infinity()), i);
+        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t( 0.5, -10.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), i);
+        pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 10.0, std::numeric_limits<float>::infinity()), i);
     }
 
     /* Run some frames and check */
@@ -451,9 +455,9 @@ BOOST_AUTO_TEST_CASE( repulsive_60_fps_test )
     /* Apply forces */
     for (int i = 2; i < 14; ++i)
     {
-        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(-0.5,  10.0, 0.0), 750.0, 0.0, numeric_limits<float>::infinity()), i);
-        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t( 0.5, -10.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), i);
-        pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 10.0, numeric_limits<float>::infinity()), i);
+        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(-0.5,  10.0, 0.0), 750.0, 0.0, std::numeric_limits<float>::infinity()), i);
+        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t( 0.5, -10.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), i);
+        pe.apply_force(new viscous_force(point_t(0.0, 0.0, 0.0), 10.0, std::numeric_limits<float>::infinity()), i);
     }
 
     /* Run some frames and check */
@@ -488,7 +492,7 @@ BOOST_AUTO_TEST_CASE( repulsive_drop_10_fps_test )
     /* Apply forces */
     for (int i = 1; i < 7; ++i)
     {
-        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -15.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), i);
+        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -15.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), i);
     }
 
     /* Run physics simulation */
@@ -523,7 +527,7 @@ BOOST_AUTO_TEST_CASE( repulsive_drop_25_fps_test )
     /* Apply forces */
     for (int i = 1; i < 7; ++i)
     {
-        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -15.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), i);
+        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -15.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), i);
     }
 
     /* Run physics simulation */
@@ -558,7 +562,7 @@ BOOST_AUTO_TEST_CASE( repulsive_drop_60_fps_test )
     /* Apply forces */
     for (int i = 1; i < 7; ++i)
     {
-        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -15.0, 0.0), 1000.0, 0.0, numeric_limits<float>::infinity()), i);
+        pe.apply_force(new repel_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -15.0, 0.0), 1000.0, 0.0, std::numeric_limits<float>::infinity()), i);
     }
 
     /* Run physics simulation */
@@ -566,3 +570,5 @@ BOOST_AUTO_TEST_CASE( repulsive_drop_60_fps_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

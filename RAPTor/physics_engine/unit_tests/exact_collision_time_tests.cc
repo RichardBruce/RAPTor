@@ -17,9 +17,10 @@ const raptor_physics::init_logger init_logger;
 #include "physics_common.h"
 
 
-using namespace raptor_physics;
-
-
+namespace raptor_physics
+{
+namespace test
+{
 BOOST_AUTO_TEST_SUITE( exact_collision_time_tests )
 
 const float result_tolerance = 0.0005;
@@ -40,10 +41,10 @@ BOOST_AUTO_TEST_CASE( static_point_away_from_plane_test )
     const fp_t r1 = 1.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, nb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 
     const fp_t s1 = find_exact_none_translating_collision_time(pa, pb, nb, x0, q0, q1, r0, r1);
-    BOOST_CHECK(s1 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s1 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -115,7 +116,7 @@ BOOST_AUTO_TEST_CASE( point_translating_not_through_plane_test )
     const fp_t r1 = 1.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, nb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -173,10 +174,10 @@ BOOST_AUTO_TEST_CASE( point_rotating_in_plane_test )
     const fp_t r1 =  0.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, nb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 
     const fp_t s1 = find_exact_none_translating_collision_time(pa, pb, nb, x0, q0, q1, r0, r1);
-    BOOST_CHECK(s1 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s1 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -307,7 +308,7 @@ BOOST_AUTO_TEST_CASE( point_plane_quadratic_no_root_found_test )
     const fp_t r1 =  0.688;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, nb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -327,10 +328,10 @@ BOOST_AUTO_TEST_CASE( static_edge_away_from_edge_test )
     const fp_t r1 = 1.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, ea, eb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 
     const fp_t s1 = find_exact_none_translating_collision_time(pa, pb, ea, eb, x0, q0, q1, r0, r1);
-    BOOST_CHECK(s1 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s1 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -369,10 +370,10 @@ BOOST_AUTO_TEST_CASE( static_parallel_edge_touching_edge_test )
     const fp_t r1 = 1.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, ea, eb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 
     const fp_t s1 = find_exact_none_translating_collision_time(pa, pb, ea, eb, x0, q0, q1, r0, r1);
-    BOOST_CHECK(s1 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s1 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -390,10 +391,10 @@ BOOST_AUTO_TEST_CASE( static_parallel_edge_away_from_edge_test )
     const fp_t r1 = 1.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, ea, eb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 
     const fp_t s1 = find_exact_none_translating_collision_time(pa, pb, ea, eb, x0, q0, q1, r0, r1);
-    BOOST_CHECK(s1 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s1 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -448,7 +449,7 @@ BOOST_AUTO_TEST_CASE( edge_translating_away_from_edge_test )
     const fp_t r1 = 1.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, ea, eb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -466,7 +467,7 @@ BOOST_AUTO_TEST_CASE( parallel_edge_translating_to_edge_0_test )
     const fp_t r1 = 1.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, ea, eb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -484,7 +485,7 @@ BOOST_AUTO_TEST_CASE( parallel_edge_translating_to_edge_0_5_test )
     const fp_t r1 = 1.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, ea, eb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -545,10 +546,10 @@ BOOST_AUTO_TEST_CASE( edge_rotating_in_plane_test )
     const fp_t r1 =  0.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, ea, eb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 
     const fp_t s1 = find_exact_none_translating_collision_time(pa, pb, ea, eb, x0, q0, q1, r0, r1);
-    BOOST_CHECK(s1 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s1 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -566,10 +567,10 @@ BOOST_AUTO_TEST_CASE( parallel_edge_rotating_in_plane_test )
     const fp_t r1 =  0.0;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, ea, eb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 
     const fp_t s1 = find_exact_none_translating_collision_time(pa, pb, ea, eb, x0, q0, q1, r0, r1);
-    BOOST_CHECK(s1 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s1 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -612,10 +613,10 @@ BOOST_AUTO_TEST_CASE( edge_rotating_not_through_edge_xy_test )
     const fp_t r1 = 0.6427876097;
 
     const fp_t s0 = find_exact_collision_time(pa, pb, ea, eb, x0, x1, q0, q1, r0, r1);
-    BOOST_CHECK(s0 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s0 == std::numeric_limits<float>::infinity());
 
     const fp_t s1 = find_exact_none_translating_collision_time(pa, pb, ea, eb, x0, q0, q1, r0, r1);
-    BOOST_CHECK(s1 == numeric_limits<fp_t>::infinity());
+    BOOST_CHECK(s1 == std::numeric_limits<float>::infinity());
 }
 
 
@@ -698,3 +699,5 @@ BOOST_AUTO_TEST_CASE( edge_rotating_in_plane_with_translation_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

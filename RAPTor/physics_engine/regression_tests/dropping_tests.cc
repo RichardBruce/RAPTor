@@ -12,6 +12,10 @@ const raptor_physics::init_logger init_logger;
 #include "regression_fixture.h"
 
 
+namespace raptor_physics
+{
+namespace test
+{
 BOOST_FIXTURE_TEST_SUITE( dropping_tests, regression_fixture );
 
 
@@ -37,7 +41,7 @@ BOOST_AUTO_TEST_CASE( no_force_drop_10_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t( 5.0, -8.5, 0.0), 10.0, 3));
 
     /* Add static objects */
-    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
     run(&checker, 150);
@@ -66,7 +70,7 @@ BOOST_AUTO_TEST_CASE( no_force_drop_25_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t( 5.0, -8.5, 0.0), 10.0, 3));
 
     /* Add static objects */
-    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
     run(&checker, 300);
@@ -95,7 +99,7 @@ BOOST_AUTO_TEST_CASE( no_force_drop_60_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t( 5.0, -8.5, 0.0), 10.0, 3));
 
     /* Add static objects */
-    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
     run(&checker, 600);
@@ -124,7 +128,7 @@ BOOST_AUTO_TEST_CASE( up_force_drop_10_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t( 5.0, -8.5, 0.0), 10.0, 3));
 
     /* Add static objects */
-    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
     
     /* Apply forces */
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 200.0, 0.0), 0.5), 0);
@@ -158,7 +162,7 @@ BOOST_AUTO_TEST_CASE( up_force_drop_25_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t( 5.0, -8.5, 0.0), 10.0, 3));
 
     /* Add static objects */
-    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
     
     /* Apply forces */
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 200.0, 0.0), 0.5), 0);
@@ -192,7 +196,7 @@ BOOST_AUTO_TEST_CASE( up_force_drop_60_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t( 5.0, -8.5, 0.0), 10.0, 3));
 
     /* Add static objects */
-    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
     
     /* Apply forces */
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, 200.0, 0.0), 0.5), 0);
@@ -226,7 +230,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_10_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t( 5.0, -8.5, 0.0), 10.0, 3));
 
     /* Add static objects */
-    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
     
     /* Apply forces */
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -200.0, 0.0), 0.5), 0);
@@ -260,7 +264,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_25_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t( 5.0, -8.5, 0.0), 10.0, 3));
 
     /* Add static objects */
-    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
     
     /* Apply forces */
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -200.0, 0.0), 0.5), 0);
@@ -294,7 +298,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t( 5.0, -8.5, 0.0), 10.0, 3));
 
     /* Add static objects */
-    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
     
     /* Apply forces */
     pe.apply_force(new const_force(point_t(0.0, 0.0, 0.0), point_t(0.0, -200.0, 0.0), 0.5), 0);
@@ -323,7 +327,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 5.0, 0.0), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 5.0), 10.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
     // run(&checker, 200);
@@ -348,7 +352,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(20.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0));
 
 // //     /* Add static objects */
-// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
     // run(&checker, 50);
@@ -373,7 +377,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(20.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0));
 
 // //     /* Add static objects */
-// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
 // //     /* Check starting state */
@@ -402,7 +406,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(20.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0));
 
 // //     /* Add static objects */
-// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
 // //     /* Check starting state */
@@ -431,7 +435,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(20.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0));
 
 // //     /* Add static objects */
-// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
     // run(&checker, 100);
@@ -456,7 +460,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(20.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0));
 
 // //     /* Add static objects */
-// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
     // run(&checker, 100);
@@ -481,7 +485,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(20.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0));
 
 // //     /* Add static objects */
-// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
     // run(&checker, 100);
@@ -506,7 +510,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(20.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0));
 
 // //     /* Add static objects */
-// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
     // run(&checker, 200);
@@ -531,7 +535,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(20.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0));
 
 // //     /* Add static objects */
-// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
     // run(&checker, 200);
@@ -556,7 +560,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(-10.0, 5.0, 0.0), point_t(20.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0));
 
 // //     /* Add static objects */
-// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
     // run(&checker, 200);
@@ -581,7 +585,7 @@ BOOST_AUTO_TEST_CASE( down_force_drop_60_fps_test )
 // //     se.add_moving_object(make_cube(m, quaternion_t(0.9238795325, 0.0, 0.0, 0.3826834324), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 5.0, 0.0), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 20.0), 10.0));
 
 // //     /* Add static objects */
-// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+// //     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 // //     /* Run physics simulation */
     // run(&checker, 200);
@@ -647,7 +651,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //     se.add_moving_object(make_cube(m, point_t(0.0, -5.0, -0.5), point_t(1.0, -4.0, 0.5), 10.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Apply forces */
 //     pe.apply_force(point_t(50.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 100.0, 0);
@@ -671,7 +675,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //     pe.add_object(phy_obj);
 //     phy_obj->set_angular_velocity(point_t(0.0,0.0, PI * -3.0));
 
-//     phy_obj = make_plane(m.get(), point_t(-10.0, -7.0, -10.0), point_t(10.0, -7.0, -10.0), point_t(-10.0, -7.0, 10.0), point_t(10.0, -7.0, 10.0), numeric_limits<float>::infinity());
+//     phy_obj = make_plane(m.get(), point_t(-10.0, -7.0, -10.0), point_t(10.0, -7.0, -10.0), point_t(-10.0, -7.0, 10.0), point_t(10.0, -7.0, 10.0), std::numeric_limits<float>::infinity());
 //     pe.add_object(phy_obj);
 // #endif
 
@@ -686,7 +690,7 @@ BOOST_AUTO_TEST_SUITE_END()
 // //    at.z += 0.5;
 //     pe.apply_force(point_t(10.0, 0.0, 0.0), at, 0.5, 0);
 
-//     phy_obj = make_plane(m.get(), point_t(-10.0, -10.0, -10.0), point_t(10.0, -10.0, -10.0), point_t(-10.0, -10.0, 10.0), point_t(10.0, -10.0, 10.0), numeric_limits<float>::infinity());
+//     phy_obj = make_plane(m.get(), point_t(-10.0, -10.0, -10.0), point_t(10.0, -10.0, -10.0), point_t(-10.0, -10.0, 10.0), point_t(10.0, -10.0, 10.0), std::numeric_limits<float>::infinity());
 //     pe.add_object(phy_obj);
 // #endif
 
@@ -700,7 +704,8 @@ BOOST_AUTO_TEST_SUITE_END()
 // //    at.z += 0.5;
 //     pe.apply_force(point_t(10.0, 0.0, 0.0), at, 0.5, 0);
 
-//     phy_obj = make_plane(m.get(), point_t(-10.0, -10.0, -10.0), point_t(10.0, -10.0, -10.0), point_t(-10.0, -10.0, 10.0), point_t(10.0, -10.0, 10.0), numeric_limits<float>::infinity());
+//     phy_obj = make_plane(m.get(), point_t(-10.0, -10.0, -10.0), point_t(10.0, -10.0, -10.0), point_t(-10.0, -10.0, 10.0), point_t(10.0, -10.0, 10.0), std::numeric_limits<float>::infinity());
 //     pe.add_object(phy_obj);
 // #endif
-
+}; /* namespace test */
+}; /* namespace raptor_physics */

@@ -18,9 +18,10 @@ const raptor_physics::init_logger init_logger;
 #include "physics_options.h"
 
 
-using namespace raptor_physics;
-
-
+namespace raptor_physics
+{
+namespace test
+{
 BOOST_AUTO_TEST_SUITE( physics_options_tests )
 
 const float result_tolerance = 0.0001;
@@ -225,3 +226,5 @@ BOOST_AUTO_TEST_CASE( frame_done_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

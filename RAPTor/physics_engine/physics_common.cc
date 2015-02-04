@@ -259,7 +259,7 @@ int find_first_positive_real_root(fp_t *const roots, const fp_t a_coeff, const f
             const fp_t root = -third_b + s_cbrt + t_cbrt;
 
             nr_roots = 1;
-            roots[0] = (root >= 0.0) ? root : numeric_limits<fp_t>::infinity();
+            roots[0] = (root >= 0.0) ? root : std::numeric_limits<float>::infinity();
         }        
         /* All real roots, at least 2 are equal */
         else if (disc == 0.0)
@@ -269,8 +269,8 @@ int find_first_positive_real_root(fp_t *const roots, const fp_t a_coeff, const f
             const fp_t root1 = -q_cbrt - third_b;
             
             nr_roots = 2;
-            roots[0] = (root0 >= 0.0) ? root0 : numeric_limits<fp_t>::infinity();
-            roots[1] = (root1 >= 0.0) ? root1 : numeric_limits<fp_t>::infinity();
+            roots[0] = (root0 >= 0.0) ? root0 : std::numeric_limits<float>::infinity();
+            roots[1] = (root1 >= 0.0) ? root1 : std::numeric_limits<float>::infinity();
         }
         /* Three real roots */
         else
@@ -284,9 +284,9 @@ int find_first_positive_real_root(fp_t *const roots, const fp_t a_coeff, const f
             const fp_t root2 = -third_b + v * cos((u + 4.0 * PI) * (1.0 / 3.0));
 
             nr_roots = 3;
-            roots[0] = (root0 >= 0.0) ? root0 : numeric_limits<fp_t>::infinity();
-            roots[1] = (root1 >= 0.0) ? root1 : numeric_limits<fp_t>::infinity();
-            roots[2] = (root2 >= 0.0) ? root2 : numeric_limits<fp_t>::infinity();
+            roots[0] = (root0 >= 0.0) ? root0 : std::numeric_limits<float>::infinity();
+            roots[1] = (root1 >= 0.0) ? root1 : std::numeric_limits<float>::infinity();
+            roots[2] = (root2 >= 0.0) ? root2 : std::numeric_limits<float>::infinity();
         }
     }
     else if (fabs(b_coeff) > 0.0)
@@ -297,7 +297,7 @@ int find_first_positive_real_root(fp_t *const roots, const fp_t a_coeff, const f
         if (d < 0.0)
         {
             BOOST_LOG_TRIVIAL(trace) << "No roots found";
-            roots[0] = numeric_limits<fp_t>::infinity();
+            roots[0] = std::numeric_limits<float>::infinity();
             return 0;
         }
 
@@ -308,8 +308,8 @@ int find_first_positive_real_root(fp_t *const roots, const fp_t a_coeff, const f
         const fp_t root1 = (-c_coeff + sqrt_d) / b_dot_2;
 
         nr_roots = 2;
-        roots[0] = (root0 >= 0.0) ? root0 : numeric_limits<fp_t>::infinity();
-        roots[1] = (root1 >= 0.0) ? root1 : numeric_limits<fp_t>::infinity();
+        roots[0] = (root0 >= 0.0) ? root0 : std::numeric_limits<float>::infinity();
+        roots[1] = (root1 >= 0.0) ? root1 : std::numeric_limits<float>::infinity();
     }
     else if (fabs(c_coeff) > 0.0)
     {
@@ -317,14 +317,14 @@ int find_first_positive_real_root(fp_t *const roots, const fp_t a_coeff, const f
         const fp_t root = -d_coeff / c_coeff;
 
         nr_roots = 1;
-        roots[0] = (root >= 0.0) ? root : numeric_limits<fp_t>::infinity();
+        roots[0] = (root >= 0.0) ? root : std::numeric_limits<float>::infinity();
     }
     else
     {
         BOOST_LOG_TRIVIAL(trace) << "Returning constant";
 
         nr_roots = 1;
-        roots[0] = (fabs(d_coeff) < raptor_physics::EPSILON) ? 0.0 : numeric_limits<fp_t>::infinity();
+        roots[0] = (fabs(d_coeff) < raptor_physics::EPSILON) ? 0.0 : std::numeric_limits<float>::infinity();
     }
 
     std::sort(&roots[0], &roots[nr_roots]);
@@ -529,7 +529,7 @@ fp_t find_exact_collision_time(const point_t &pa, const point_t &pb, const point
         {
             return roots[i];
         }
-        else if (roots[i] == numeric_limits<fp_t>::infinity())
+        else if (roots[i] == std::numeric_limits<float>::infinity())
         {
             return roots[i];
         }
@@ -537,7 +537,7 @@ fp_t find_exact_collision_time(const point_t &pa, const point_t &pb, const point
     }
 
     /* All the roots are parallel */
-    return numeric_limits<fp_t>::infinity();
+    return std::numeric_limits<float>::infinity();
 }
 
 
@@ -621,7 +621,7 @@ fp_t find_exact_none_translating_collision_time(const point_t &pa, const point_t
         {
             return roots[i];
         }
-        else if (roots[i] == numeric_limits<fp_t>::infinity())
+        else if (roots[i] == std::numeric_limits<float>::infinity())
         {
             return roots[i];
         }
@@ -629,6 +629,6 @@ fp_t find_exact_none_translating_collision_time(const point_t &pa, const point_t
     }
 
     /* All the roots are parallel */
-    return numeric_limits<fp_t>::infinity();
+    return std::numeric_limits<float>::infinity();
 }
 } /* namespace raptor_physics */

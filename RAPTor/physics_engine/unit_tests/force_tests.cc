@@ -17,8 +17,10 @@ const raptor_physics::init_logger init_logger;
 #include "force.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 struct force_fixture
 {
@@ -662,3 +664,5 @@ BOOST_AUTO_TEST_CASE( aggregate_force_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

@@ -28,9 +28,11 @@
 #include "collision_info.h"
 #include "physics_engine.h"
 
-using namespace raptor_physics;
-
-const float result_tolerance = 0.0005;
+namespace raptor_physics
+{
+namespace test
+{
+const float result_tolerance = 0.0005f;
 const std::string test_data_location = "test_data/";
 
 #define CREATE_REGRESSION_CHECKER(NAME)  regression_checker NAME( \
@@ -327,13 +329,15 @@ class regression_checker : private boost::noncopyable
         boost::archive::xml_iarchive *  _expected_archive;
         boost::archive::xml_oarchive *  _actual_archive;
 };
+}; /* namespace test */
+}; /* namespace raptor_physics */
 
 BOOST_CLASS_IMPLEMENTATION(point_t, object_serializable);
 BOOST_CLASS_IMPLEMENTATION(quaternion_t, object_serializable);
-BOOST_CLASS_IMPLEMENTATION(object_data, object_serializable);
-BOOST_CLASS_IMPLEMENTATION(collision_data, object_serializable);
-BOOST_CLASS_IMPLEMENTATION(frame_data, object_serializable);
-BOOST_CLASS_IMPLEMENTATION(std::vector<object_data>, object_serializable);
-BOOST_CLASS_IMPLEMENTATION(std::vector<collision_data>, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(raptor_physics::test::object_data, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(raptor_physics::test::collision_data, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(raptor_physics::test::frame_data, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(std::vector<raptor_physics::test::object_data>, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(std::vector<raptor_physics::test::collision_data>, object_serializable);
 
 #endif /* #ifndef __REGRESSION_CHECKER_H__ */
