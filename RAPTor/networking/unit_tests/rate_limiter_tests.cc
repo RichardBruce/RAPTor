@@ -33,7 +33,7 @@ struct rate_limiter_fixture : public stack_component_fixture<uut>
 
     const message_generator ax1024;
     const message_generator ab_mg;
-    const fp_t              bytes_per_milli;
+    const float             bytes_per_milli;
 };
 
 
