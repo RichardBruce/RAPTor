@@ -136,7 +136,7 @@ class quaternion_t
             return *this;
         }
 
-        point_t rotate(const point_t p) const
+        point_t rotate(const point_t &p) const
         {
             return p + (2.0f * cross_product(*this, cross_product(*this, p))) + (2.0f * w * cross_product(*this, p));
         }
