@@ -56,37 +56,37 @@ static const int perm_mod12[512] = {
      4, 0,  0,  8,  7,  1,  2,  9,  7,  4,  6,  2,  6,  8,  1, 9, 6,  6,  7,  5,  0,  0,  3,  9, 8,  3,  6,  6, 11,  1,  0,  0
 };
 
-inline fp_t dot(const int *const g, const fp_t x, const fp_t y)
+inline float dot(const int *const g, const float x, const float y)
 {
     return (g[0] * x) + (g[1] * y);
 }
 
 
-fp_t simplex_noise_2d::interpolated_noise(const fp_t x, const fp_t y) const
+float simplex_noise_2d::interpolated_noise(const float x, const float y) const
 {
     /* Skew from square to simplex space */
-    fp_t s = (x + y) * (0.5 * (sqrtf(3.0) - 1.0));
-    int i = floor(x + s);
-    int j = floor(y + s);
+    const float s = (x + y) * (0.5f * (sqrtf(3.0f) - 1.0f));
+    const int i = floor(x + s);
+    const int j = floor(y + s);
 
     /* Unskew back to square space */
-    fp_t g2 = (3.0 - sqrtf(3.0)) / 6.0;
-    fp_t t = (i + j) * g2;
-    fp_t X0 = i - t;
-    fp_t Y0 = j - t;
+    const float g2 = (3.0f - sqrtf(3.0f)) / 6.0f;
+    const float t = (i + j) * g2;
+    const float X0 = i - t;
+    const float Y0 = j - t;
     
     /* Distances from cell origin */
-    fp_t x0 = x - X0;
-    fp_t y0 = y - Y0;
+    const float x0 = x - X0;
+    const float y0 = y - Y0;
 
     /* Check if we are in the upper or lower triangle */
     int i1 = 0;
     int j1 = 1;
-    if(x0 > y0)
+    if (x0 > y0)
     {
         /* We are in the lower triangle, (0,0)->(1,0)->(1,1) */
-        i1=1;
-        j1=0;
+        i1 = 1;
+        j1 = 0;
     }
     /* We are in the upper triangle, (0,0)->(0,1)->(1,1) */
 
@@ -94,45 +94,45 @@ fp_t simplex_noise_2d::interpolated_noise(const fp_t x, const fp_t y) const
     /* A step of (1,0) in skew space is a step of (1 - c, -c) in square space */
     /* A step of (0,1) in skew space is a step of (-c, 1 - c) in square space */
     /* Distance from middle corner */
-    fp_t x1 = x0 - i1 + g2;
-    fp_t y1 = y0 - j1 + g2;
+    const float x1 = x0 - i1 + g2;
+    const float y1 = y0 - j1 + g2;
 
     /* Distance from last corner */
-    fp_t x2 = x0 - 1.0 + 2.0 * g2;
-    fp_t y2 = y0 - 1.0 + 2.0 * g2;
+    const float x2 = x0 - 1.0f + 2.0f * g2;
+    const float y2 = y0 - 1.0f + 2.0f * g2;
 
     /* Look up the gradients for each corner */
-    int ii = i & 0xff;
-    int jj = j & 0xff;
-    int gi0 = perm_mod12[ii + perm[jj]];
-    int gi1 = perm_mod12[ii + i1 +perm[jj + j1]];
-    int gi2 = perm_mod12[ii + 1 + perm[jj + 1]];
+    const int ii = i & 0xff;
+    const int jj = j & 0xff;
+    const int gi0 = perm_mod12[ii + perm[jj]];
+    const int gi1 = perm_mod12[ii + i1 +perm[jj + j1]];
+    const int gi2 = perm_mod12[ii + 1 + perm[jj + 1]];
 
     /* Contribution from the three simplex corners */
-    fp_t n0 = 0.0;
-    fp_t t0 = 0.5 - x0 * x0 - y0 * y0;
+    float n0 = 0.0f;
+    float t0 = 0.5f - x0 * x0 - y0 * y0;
     if (t0 >= 0)
     {
         t0 *= t0;
         n0 = t0 * t0 * dot(grads[gi0], x0, y0);
     }
 
-    fp_t n1 = 0.0;
-    fp_t t1 = 0.5 - x1 * x1 - y1 * y1;
-    if(t1 >= 0)
+    float n1 = 0.0f;
+    float t1 = 0.5f - x1 * x1 - y1 * y1;
+    if (t1 >= 0.0f)
     {
         t1 *= t1;
         n1 = t1 * t1 * dot(grads[gi1], x1, y1);
     }
 
-    fp_t n2 = 0.0;
-    fp_t t2 = 0.5 - x2 * x2 - y2 * y2;
-    if(t2 >= 0)
+    float n2 = 0.0f;
+    float t2 = 0.5f - x2 * x2 - y2 * y2;
+    if (t2 >= 0.0f)
     {
         t2 *= t2;
         n2 = t2 * t2 * dot(grads[gi2], x2, y2);
     }
 
     /* Combine the corners */
-    return 70.0 * (n0 + n1 + n2);
+    return 70.0f * (n0 + n1 + n2);
 }
