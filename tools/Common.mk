@@ -2,7 +2,7 @@ CPP = g++
 CC = gcc
 
 # Compile and linker options 
-COMMON_OPT  = -fPIC -Wno-unused-local-typedefs -Wall -pipe
+COMMON_OPT  = -fPIC -Wno-unused-local-typedefs -Wall -pipe # -Wold-style-cast -Wdouble-promotion
 DEBUG_OPT   = $(COMMON_OPT) -g3 -O0 --coverage
 RELEASE_OPT = $(COMMON_OPT) -O3 -g -mfpmath=sse -msse4a -mpopcnt -fexpensive-optimizations # -funroll-loops -march=native
 ifeq ($(BUILD), DEBUG)
