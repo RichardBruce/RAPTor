@@ -35,7 +35,7 @@ int simulation_environment::run()
 
         /* Update time */
         const clock_t time_now = clock();
-        fp_t time_step = std::max(_po->min_timestep(), (time_now - _sim_time) * clocks_per_sec_inv);
+        float time_step = std::max(_po->min_timestep(), (time_now - _sim_time) * clocks_per_sec_inv);
         if (_po->max_timestep() > 0.0f)
         {
             time_step = std::min(_po->max_timestep(), time_step);

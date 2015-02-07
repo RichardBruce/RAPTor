@@ -100,7 +100,7 @@ class physics_engine : private boost::noncopyable
             return *this;
         }
 
-        physics_engine& advance_time(const fp_t t);
+        physics_engine& advance_time(const float t);
         
         raptor_raytracer::primitive_list* scene_to_triangles() const
         {
@@ -283,7 +283,7 @@ class physics_engine : private boost::noncopyable
     private :
         /* typedef for convinence */
         friend physics_object;
-        typedef std::pair<physics_object *, fp_t> bound_point;
+        typedef std::pair<physics_object *, float> bound_point;
         typedef std::unordered_map<int, physics_object*>::iterator obj_iter;
         typedef std::unordered_map<int, physics_object*>::const_iterator const_obj_iter;
         
@@ -307,7 +307,7 @@ class physics_engine : private boost::noncopyable
 
         /* Update tracking info after a test */
         physics_engine& update_tracking_info(physics_object *vg_a, physics_object *vg_b, simplex *s, const simplex &other_s,
-            const fp_t t, const collision_t type)
+            const float t, const collision_t type)
         {
             auto coll_iter = _collision_cache->find(vg_a);
             if (coll_iter != _collision_cache->end())
@@ -336,9 +336,9 @@ class physics_engine : private boost::noncopyable
         }
 
         /* Collision detection */
-        bool            collide_and_cache(physics_object *const vg_a, physics_object *const vg_b, const fp_t t);
-        bool            retest_and_cache(physics_object *const vg_a, physics_object *const vg_b, const fp_t t);
-        physics_engine& collision_detect_versus(const const_obj_iter &v, fp_t t, const bool all);
+        bool            collide_and_cache(physics_object *const vg_a, physics_object *const vg_b, const float t);
+        bool            retest_and_cache(physics_object *const vg_a, physics_object *const vg_b, const float t);
+        physics_engine& collision_detect_versus(const const_obj_iter &v, float t, const bool all);
 
         std::unordered_map<int, physics_object*>   *                        _objects;
         std::unordered_map<int, physics_object*>   *                        _moving_objects;
@@ -349,7 +349,7 @@ class physics_engine : private boost::noncopyable
         std::vector<bound_point*>           *                               _yb;
         std::vector<bound_point*>           *                               _zb;
         int                                                                 _entry;
-        const fp_t                                                          _max_d = 1.0;
+        const float                                                         _max_d = 1.0f;
         const bool                                                          _clean_objects;
 };
 }; /* namespace raptor_physics */

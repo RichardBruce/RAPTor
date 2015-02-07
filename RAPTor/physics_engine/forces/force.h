@@ -15,7 +15,7 @@ class force
 {
     public :
         /* CTOR */
-        force(const point_t &at, const fp_t t) : _at(at), _t(t) {  };
+        force(const point_t &at, const float t) : _at(at), _t(t) {  };
 
         /* Virtual DTOR for inheritance */
         virtual ~force() {  };
@@ -23,35 +23,35 @@ class force
         /* Allow default copy and assign */
 
         /* Virtual functions for applying a force */
-        virtual point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const = 0;
-        virtual point_t get_torque(const inertia_tensor &i, const point_t &x, const point_t &w, const fp_t dt) const
+        virtual point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const = 0;
+        virtual point_t get_torque(const inertia_tensor &i, const point_t &x, const point_t &w, const float dt) const
         {
             return cross_product(_at, get_force(i, x, w, dt));
         }
 
         /* Commit a time increment */
-        bool commit(const fp_t dt)
+        bool commit(const float dt)
         {
             _t -= dt;
-            return _t <= 0.0;
+            return _t <= 0.0f;
         }
 
     protected :
         /* Get the remaining time the force should be applied for */
-        fp_t time_remaining() const { return _t; }
+        float time_remaining() const { return _t; }
 
     private :
         const point_t   _at;
-        fp_t            _t;
+        float           _t;
 };
 
 
 class const_force : public force
 {
     public :
-        const_force(const point_t &at, const point_t &f, const fp_t t) : force(at, t), _f(f) {  };
+        const_force(const point_t &at, const point_t &f, const float t) : force(at, t), _f(f) {  };
 
-        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const 
+        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const 
         {
             return _f;
         };
@@ -64,36 +64,36 @@ class const_force : public force
 class linear_force : public force
 {
     public :
-        linear_force(const point_t &at, const point_t &m, const point_t &c, const fp_t t) : force(at, t), _m(m), _c(c), _t_tot(t) {  };
+        linear_force(const point_t &at, const point_t &m, const point_t &c, const float t) : force(at, t), _m(m), _c(c), _t_tot(t) {  };
 
-        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const 
+        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const 
         {
-            const fp_t t = dt + (_t_tot - time_remaining());
+            const float t = dt + (_t_tot - time_remaining());
             return (_m * t) + _c;
         };
         
     private :
         const point_t   _m;
         const point_t   _c;
-        const fp_t      _t_tot;
+        const float     _t_tot;
 };
 
 
 class squared_force : public force
 {
     public :
-        squared_force(const point_t &at, const point_t &m, const point_t &c, const fp_t t) : force(at, t), _m(m), _c(c), _t_tot(t) {  };
+        squared_force(const point_t &at, const point_t &m, const point_t &c, const float t) : force(at, t), _m(m), _c(c), _t_tot(t) {  };
 
-        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const 
+        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const 
         {
-            const fp_t t = dt + (_t_tot - time_remaining());
+            const float t = dt + (_t_tot - time_remaining());
             return (_m * t * t) + _c;
         };
         
     private :
         const point_t   _m;
         const point_t   _c;
-        const fp_t      _t_tot;
+        const float     _t_tot;
 };
 
 
@@ -102,20 +102,20 @@ class squared_force : public force
 class attract_force : public force
 {
     public :
-        attract_force(const point_t &at, const point_t &to, const fp_t f, const fp_t c, const fp_t t) 
+        attract_force(const point_t &at, const point_t &to, const float f, const float c, const float t) 
         : force(at, t), _to(to), _f(f), _c(c) {  };
 
-        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const 
+        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const 
         {
             const point_t dir = _to - x;
-            const fp_t magn = magnitude(dir);
+            const float magn = magnitude(dir);
             return ((_f / magn) + _c) * (dir / magn);
         };
         
     private :
         const point_t   _to;
-        const fp_t      _f;
-        const fp_t      _c;
+        const float     _f;
+        const float     _c;
 };
 
 
@@ -123,20 +123,20 @@ class attract_force : public force
 class repel_force : public force
 {
     public :
-        repel_force(const point_t &at, const point_t &to, const fp_t f, const fp_t c, const fp_t t) 
+        repel_force(const point_t &at, const point_t &to, const float f, const float c, const float t) 
         : force(at, t), _to(to), _f(f), _c(c) {  };
 
-        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const 
+        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const 
         {
             const point_t dir = x - _to;
-            const fp_t magn = magnitude(dir);
+            const float magn = magnitude(dir);
             return ((_f / magn) + _c) * (dir / magn);
         };
         
     private :
         const point_t   _to;
-        const fp_t      _f;
-        const fp_t      _c;
+        const float     _f;
+        const float     _c;
 };
 
 
@@ -144,42 +144,42 @@ class repel_force : public force
 class sin_force : public force
 {
     public :
-        sin_force(const point_t &at, const point_t &f, const point_t &c, const fp_t freq, const fp_t k, const fp_t t)
-            : force(at, t), _f(f), _c(c), _freq(freq * 2.0 * PI), _k(k), _t_tot(t) {  };
+        sin_force(const point_t &at, const point_t &f, const point_t &c, const float freq, const float k, const float t)
+            : force(at, t), _f(f), _c(c), _freq(freq * 2.0f * PI), _k(k), _t_tot(t) {  };
 
-        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const 
+        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const 
         {
-            const fp_t t = dt + (_t_tot - time_remaining());
+            const float t = dt + (_t_tot - time_remaining());
             return (_f * sin((t * _freq) + _k)) + _c;
         };
         
     private :
         const point_t   _f;
         const point_t   _c;
-        const fp_t      _freq;
-        const fp_t      _k;
-        const fp_t      _t_tot;
+        const float     _freq;
+        const float     _k;
+        const float     _t_tot;
 };
 
 
 class cos_force : public force
 {
     public :
-        cos_force(const point_t &at, const point_t &f, const point_t &c, const fp_t freq, const fp_t k, const fp_t t)
+        cos_force(const point_t &at, const point_t &f, const point_t &c, const float freq, const float k, const float t)
             : force(at, t), _f(f), _c(c), _freq(freq * 2.0 * PI), _k(k), _t_tot(t) {  };
 
-        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const 
+        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const 
         {
-            const fp_t t = dt + (_t_tot - time_remaining());
+            const float t = dt + (_t_tot - time_remaining());
             return (_f * cos((t * _freq) + _k)) + _c;
         };
         
     private :
         const point_t   _f;
         const point_t   _c;
-        const fp_t      _freq;
-        const fp_t      _k;
-        const fp_t      _t_tot;
+        const float     _freq;
+        const float     _k;
+        const float     _t_tot;
 };
 
 
@@ -187,15 +187,15 @@ class cos_force : public force
 class viscous_force : public force
 {
     public :
-        viscous_force(const point_t &at, const fp_t f, const fp_t t) : force(at, t), _f(-f) {  };
+        viscous_force(const point_t &at, const float f, const float t) : force(at, t), _f(-f) {  };
 
-        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const 
+        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const 
         {
             return _f * v;
         };
         
     private :
-        const fp_t _f;
+        const float _f;
 };
 
 
@@ -205,9 +205,9 @@ class aggregate_force
     public :
         aggregate_force(const std::vector<force *> &f) : _f(f) { }
 
-        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const
+        point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const
         {
-            point_t agg(0.0, 0.0, 0.0);
+            point_t agg(0.0f, 0.0f, 0.0f);
             for (auto *f : _f)
             {
                 agg += f->get_force(i, x, v, dt);
@@ -215,9 +215,9 @@ class aggregate_force
             return agg;
         }
 
-        point_t get_torque(const inertia_tensor &i, const point_t &x, const point_t &w, const fp_t dt) const
+        point_t get_torque(const inertia_tensor &i, const point_t &x, const point_t &w, const float dt) const
         {
-            point_t agg(0.0, 0.0, 0.0);
+            point_t agg(0.0f, 0.0f, 0.0f);
             for (auto *f : _f)
             {
                 agg += f->get_torque(i, x, w, dt);

@@ -545,7 +545,7 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
     BOOST_CHECK(c1_2_0->get_type() == SLIDING_COLLISION);
 
     const collision_info *const c2_1_0 = uut.get_collision(2, 1);
-    BOOST_CHECK(c2_1_0->get_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(c2_1_0->get_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(c2_1_0->get_type() == NO_COLLISION);
     
     const collision_info *const c2_3_0 = uut.get_collision(2, 3);
@@ -571,11 +571,11 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
     BOOST_CHECK(c1_2_1->get_type() == SLIDING_COLLISION);
 
     const collision_info *const c2_1_1 = uut.get_collision(2, 1);
-    BOOST_CHECK(c2_1_1->get_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(c2_1_1->get_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(c2_1_1->get_type() == NO_COLLISION);
     
     const collision_info *const c2_3_1 = uut.get_collision(2, 3);
-    BOOST_CHECK(c2_3_1->get_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(c2_3_1->get_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(c2_3_1->get_type() == NO_COLLISION);
 
     const collision_info *const c3_2_1 = uut.get_collision(3, 2);
@@ -589,19 +589,19 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
     BOOST_CHECK(uut.number_of_collisions() == 3);
 
     const collision_info *const c1_2_2 = uut.get_collision(1, 2);
-    BOOST_CHECK(c1_2_2->get_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(c1_2_2->get_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(c1_2_2->get_type() == NO_COLLISION);
 
     const collision_info *const c2_1_2 = uut.get_collision(2, 1);
-    BOOST_CHECK(c2_1_2->get_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(c2_1_2->get_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(c2_1_2->get_type() == NO_COLLISION);
     
     const collision_info *const c2_3_2 = uut.get_collision(2, 3);
-    BOOST_CHECK(c2_3_2->get_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(c2_3_2->get_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(c2_3_2->get_type() == NO_COLLISION);
 
     const collision_info *const c3_2_2 = uut.get_collision(3, 2);
-    BOOST_CHECK(c3_2_2->get_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(c3_2_2->get_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(c3_2_2->get_type() == NO_COLLISION);
 }
 

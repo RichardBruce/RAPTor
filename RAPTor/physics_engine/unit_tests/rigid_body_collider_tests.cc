@@ -39,11 +39,11 @@ const float result_tolerance = 0.001;
 /* Test instantaneous frictionless collide with no rotation */
 BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotationless_collide_test )
 {
-    const fp_t cor = 1.0;
+    const float cor = 1.0;
     const point_t poc(0.0, 0.0, 0.0);
     const point_t noc(1.0, 0.0, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, 0.0), 1.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, 0.0), 1.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_frictionless_collide(&po_a, &po_b, poc, noc, cor);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -58,12 +58,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotationless_collide_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotationless_collide_infinite_mass_a_test )
 {
-    const fp_t cor = 0.5;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float cor = 0.5;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(0.0, 0.0, 0.0);
     const point_t noc(1.0, 0.0, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, 0.0), inf), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, 0.0), inf), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_frictionless_collide(&po_a, &po_b, poc, noc, cor);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -78,12 +78,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotationless_collide_infinite_m
 
 BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotationless_collide_infinite_mass_b_test )
 {
-    const fp_t cor = 0.75;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float cor = 0.75;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(0.0, 0.0, 0.0);
     const point_t noc(0.0, 1.0, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t(0.0,  1.0, 0.0), 1.0), point_t(0.0, -5.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t(0.0, -4.3, 0.0), inf), point_t(0.0, 7.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t(0.0,  1.0, 0.0), 1.0), point_t(0.0, -5.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t(0.0, -4.3, 0.0), inf), point_t(0.0, 7.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_frictionless_collide(&po_a, &po_b, poc, noc, cor);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -99,11 +99,11 @@ BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotationless_collide_infinite_m
 /* Test instantaneous frictionless collide with off center impact (i.e. imparting some rotation) */
 BOOST_AUTO_TEST_CASE( instantaneous_frictionless_off_center_collide_test )
 {
-    const fp_t cor = 0.81;
+    const float cor = 0.81;
     const point_t poc(-1.0, 3.6, 0.0);
     const point_t noc( 0.7071067812, 0.7071067812, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, 0.0,  0.0, 0.0 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, 0.0,  0.0, 0.0 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_frictionless_collide(&po_a, &po_b, poc, noc, cor);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -118,12 +118,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_frictionless_off_center_collide_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_frictionless_off_center_collide_infinite_mass_a_test )
 {
-    const fp_t cor = 0.57;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float cor = 0.57;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, 0.0);
     const point_t noc(0.0, -0.7071067812, -0.7071067812);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 0.0, 0.0));
     instantaneous_frictionless_collide(&po_a, &po_b, poc, noc, cor);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -138,12 +138,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_frictionless_off_center_collide_infinite_mas
 
 BOOST_AUTO_TEST_CASE( instantaneous_frictionless_off_center_collide_infinite_mass_b_test )
 {
-    const fp_t cor = 0.35;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float cor = 0.35;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, -1.2);
     const point_t noc(-0.4082482905, -0.8164965809, 0.4082482905);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_frictionless_collide(&po_a, &po_b, poc, noc, cor);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -159,11 +159,11 @@ BOOST_AUTO_TEST_CASE( instantaneous_frictionless_off_center_collide_infinite_mas
 /* Test instantaneous frictionless collide with rotation */
 BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotating_collide_test )
 {
-    const fp_t cor = 0.1;
+    const float cor = 0.1;
     const point_t poc(-1.0, 3.6, 0.0);
     const point_t noc( 0.7071067812, 0.7071067812, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t( 0.0, 3.3, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(-1.5, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t( 0.0, 3.3, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(-1.5, 0.0, 0.0));
     instantaneous_frictionless_collide(&po_a, &po_b, poc, noc, cor);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -178,12 +178,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotating_collide_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotating_collide_infinite_mass_a_test )
 {
-    const fp_t cor = 0.46;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float cor = 0.46;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, 0.0);
     const point_t noc(0.0, -0.7071067812, -0.7071067812);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(-7.9, 0.0, 4.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 10.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(-7.9, 0.0, 4.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 10.0, 0.0));
     instantaneous_frictionless_collide(&po_a, &po_b, poc, noc, cor);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -198,12 +198,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotating_collide_infinite_mass_
 
 BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotating_collide_infinite_mass_b_test )
 {
-    const fp_t cor = 0.85;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float cor = 0.85;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, -1.2);
     const point_t noc(0.4082482905, 0.8164965809, -0.4082482905);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(-15.0, 10.7, 1.3), point_t(-7.9, 11.0, 4.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(-5.6, -4.5, -22.3), point_t(-1.9, 10.0, 14.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(-15.0, 10.7, 1.3), point_t(-7.9, 11.0, 4.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(-5.6, -4.5, -22.3), point_t(-1.9, 10.0, 14.0));
     instantaneous_frictionless_collide(&po_a, &po_b, poc, noc, cor);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -220,12 +220,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_frictionless_rotating_collide_infinite_mass_
 /* Test instantaneous collide with no rotation */
 BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotationless_collide_test )
 {
-    const fp_t mu = 0.0;
-    const fp_t cor = 1.0;
+    const float mu = 0.0;
+    const float cor = 1.0;
     const point_t poc(0.0, 0.0, 0.0);
     const point_t noc(1.0, 0.0, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, 0.0), 1.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, 0.0), 1.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -248,13 +248,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotationless_collide_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotationless_collide_infinite_mass_a_test )
 {
-    const fp_t mu = 0.0;
-    const fp_t cor = 0.5;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.0;
+    const float cor = 0.5;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(0.0, 0.0, 0.0);
     const point_t noc(1.0, 0.0, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, 0.0), inf), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, 0.0), inf), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -277,13 +277,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotationless_collide_infinite_mass_a_te
 
 BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotationless_collide_infinite_mass_b_test )
 {
-    const fp_t mu = 0.0;
-    const fp_t cor = 0.75;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.0;
+    const float cor = 0.75;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(0.0, 0.0, 0.0);
     const point_t noc(0.0, 1.0, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t(0.0,  1.0, 0.0), 1.0), point_t(0.0, -5.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t(0.0, -4.3, 0.0), inf), point_t(0.0, 7.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t(0.0,  1.0, 0.0), 1.0), point_t(0.0, -5.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t(0.0, -4.3, 0.0), inf), point_t(0.0, 7.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -307,12 +307,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotationless_collide_infinite_mass_b_te
 /* Test instantaneous collide with off center impact (i.e. imparting some rotation) */
 BOOST_AUTO_TEST_CASE( instantaneous_0_mu_off_center_collide_test )
 {
-    const fp_t mu = 0.0;
-    const fp_t cor = 0.81;
+    const float mu = 0.0;
+    const float cor = 0.81;
     const point_t poc(-1.0, 3.6, 0.0);
     const point_t noc( 0.7071067812, 0.7071067812, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, 0.0,  0.0, 0.0 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, 0.0,  0.0, 0.0 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -335,13 +335,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_0_mu_off_center_collide_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_0_mu_off_center_collide_infinite_mass_a_test )
 {
-    const fp_t mu = 0.0;
-    const fp_t cor = 0.57;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.0;
+    const float cor = 0.57;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, 0.0);
     const point_t noc(0.0, -0.7071067812, -0.7071067812);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -364,13 +364,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_0_mu_off_center_collide_infinite_mass_a_test
 
 BOOST_AUTO_TEST_CASE( instantaneous_0_mu_off_center_collide_infinite_mass_b_test )
 {
-    const fp_t mu = 0.0;
-    const fp_t cor = 0.35;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.0;
+    const float cor = 0.35;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, -1.2);
     const point_t noc(-0.4082482905, -0.8164965809, 0.4082482905);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -394,12 +394,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_0_mu_off_center_collide_infinite_mass_b_test
 /* Test instantaneous collide with rotation */
 BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotating_collide_test )
 {
-    const fp_t mu = 0.0;
-    const fp_t cor = 0.1;
+    const float mu = 0.0;
+    const float cor = 0.1;
     const point_t poc(-1.0, 3.6, 0.0);
     const point_t noc( 0.7071067812, 0.7071067812, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t( 0.0, 3.3, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(-1.5, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t( 0.0, 3.3, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(-1.5, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -422,13 +422,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotating_collide_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotating_collide_infinite_mass_a_test )
 {
-    const fp_t mu = 0.0;
-    const fp_t cor = 0.46;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.0;
+    const float cor = 0.46;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, 0.0);
     const point_t noc(0.0, -0.7071067812, -0.7071067812);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(-7.9, 0.0, 4.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 10.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(-7.9, 0.0, 4.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 10.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -451,13 +451,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotating_collide_infinite_mass_a_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotating_collide_infinite_mass_b_test )
 {
-    const fp_t mu = 0.0;
-    const fp_t cor = 0.85;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.0;
+    const float cor = 0.85;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, -1.2);
     const point_t noc(0.4082482905, 0.8164965809, -0.4082482905);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(-15.0, 10.7, 1.3), point_t(-7.9, 11.0, 4.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(-5.6, -4.5, -22.3), point_t(-1.9, 10.0, 14.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(-15.0, 10.7, 1.3), point_t(-7.9, 11.0, 4.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(-5.6, -4.5, -22.3), point_t(-1.9, 10.0, 14.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -480,12 +480,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_0_mu_rotating_collide_infinite_mass_b_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_rotationless_collide_test )
 {
-    const fp_t mu = 0.75;
-    const fp_t cor = 1.0;
+    const float mu = 0.75;
+    const float cor = 1.0;
     const point_t poc(0.0, 0.0, 0.0);
     const point_t noc(1.0, 0.0, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, 0.0), 1.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, 0.0), 1.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -508,13 +508,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_rotationless_collide_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_rotationless_collide_infinite_mass_a_test )
 {
-    const fp_t mu = 0.5;
-    const fp_t cor = 0.5;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.5;
+    const float cor = 0.5;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(0.0, 0.0, 0.0);
     const point_t noc(1.0, 0.0, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, 0.0), inf), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, 0.0), inf), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.9, 2.8, 2.7, 0.0, 0.0, 0.0 }, point_t(-4.3, 0.0, 0.0), 2.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -537,13 +537,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_rotationless_collide_infinite_mass_a_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_rotationless_collide_infinite_mass_b_test )
 {
-    const fp_t mu = 0.333;
-    const fp_t cor = 0.75;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.333;
+    const float cor = 0.75;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(0.0, 0.0, 0.0);
     const point_t noc(0.0, 1.0, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t(0.0,  1.0, 0.0), 1.0), point_t(0.0, -5.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t(0.0, -4.3, 0.0), inf), point_t(0.0, 7.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t(0.0,  1.0, 0.0), 1.0), point_t(0.0, -5.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t(0.0, -4.3, 0.0), inf), point_t(0.0, 7.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -567,12 +567,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_rotationless_collide_infinite_mass_b_test )
 /* Test instantaneous collide with off center impact (i.e. imparting some rotation) */
 BOOST_AUTO_TEST_CASE( instantaneous_off_center_collide_test )
 {
-    const fp_t mu = 0.75;
-    const fp_t cor = 0.81;
+    const float mu = 0.75;
+    const float cor = 0.81;
     const point_t poc(-1.0, 3.6, 0.0);
     const point_t noc( 0.7071067812, 0.7071067812, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, 0.0,  0.0, 0.0 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, 0.0,  0.0, 0.0 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -595,13 +595,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_off_center_collide_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_off_center_collide_infinite_mass_a_test )
 {
-    const fp_t mu = 0.5;
-    const fp_t cor = 0.57;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.5;
+    const float cor = 0.57;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, 0.0);
     const point_t noc(0.0, -0.7071067812, -0.7071067812);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -624,13 +624,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_off_center_collide_infinite_mass_a_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_off_center_collide_infinite_mass_b_test )
 {
-    const fp_t mu = 0.333;
-    const fp_t cor = 0.35;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.333;
+    const float cor = 0.35;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, -1.2);
     const point_t noc(-0.4082482905, -0.8164965809, 0.4082482905);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(0.0, 10.7, 1.3), point_t(0.0, 0.0, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -654,12 +654,12 @@ BOOST_AUTO_TEST_CASE( instantaneous_off_center_collide_infinite_mass_b_test )
 /* Test instantaneous collide with rotation */
 BOOST_AUTO_TEST_CASE( instantaneous_rotating_collide_test )
 {
-    const fp_t mu = 0.75;
-    const fp_t cor = 0.1;
+    const float mu = 0.75;
+    const float cor = 0.1;
     const point_t poc(-1.0, 3.6, 0.0);
     const point_t noc( 0.7071067812, 0.7071067812, 0.0);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t( 0.0, 3.3, 0.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(-1.5, 0.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 9.0, 4.6, 5.6, 4.1, -0.5, 4.6 }, point_t( 1.0, 0.0, -2.3), 9.0), point_t(-5.0, 0.0, 0.0), point_t( 0.0, 3.3, 0.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t( 7.0, 0.0, 0.0), point_t(-1.5, 0.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -682,13 +682,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_rotating_collide_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_rotating_collide_infinite_mass_a_test )
 {
-    const fp_t mu = 0.5;
-    const fp_t cor = 0.46;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.5;
+    const float cor = 0.46;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, 0.0);
     const point_t noc(0.0, -0.7071067812, -0.7071067812);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(-7.9, 0.0, 4.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 10.0, 0.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t( 1.0, 0.0, -2.3), inf), point_t(0.0, 10.7, 1.3), point_t(-7.9, 0.0, 4.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ 2.0, 1.2, 8.2, -0.2, 0.7, -3.5 }, point_t(-4.3, 5.7,  0.0), 5.5), point_t(0.0, -4.5, -22.3), point_t(0.0, 10.0, 0.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);
@@ -711,13 +711,13 @@ BOOST_AUTO_TEST_CASE( instantaneous_rotating_collide_infinite_mass_a_test )
 
 BOOST_AUTO_TEST_CASE( instantaneous_rotating_collide_infinite_mass_b_test )
 {
-    const fp_t mu = 0.333;
-    const fp_t cor = 0.85;
-    const fp_t inf = std::numeric_limits<float>::infinity();
+    const float mu = 0.333;
+    const float cor = 0.85;
+    const float inf = std::numeric_limits<float>::infinity();
     const point_t poc(-2.0, 0.0, -1.2);
     const point_t noc(0.4082482905, 0.8164965809, -0.4082482905);
-    mock_physics_object po_a(new inertia_tensor(new fp_t[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(-15.0, 10.7, 1.3), point_t(-7.9, 11.0, 4.0));
-    mock_physics_object po_b(new inertia_tensor(new fp_t[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(-5.6, -4.5, -22.3), point_t(-1.9, 10.0, 14.0));
+    mock_physics_object po_a(new inertia_tensor(new float[6]{ 1.0, 1.1, 1.2, 0.0, 0.0, 0.0 }, point_t( 1.0, 0.0, -2.3), 1.9), point_t(-15.0, 10.7, 1.3), point_t(-7.9, 11.0, 4.0));
+    mock_physics_object po_b(new inertia_tensor(new float[6]{ inf, inf, inf, inf, inf, inf }, point_t(-4.3, 5.7,  0.0), inf), point_t(-5.6, -4.5, -22.3), point_t(-1.9, 10.0, 14.0));
     instantaneous_collide(&po_a, &po_b, poc, noc, cor, mu);
 
     BOOST_CHECK(po_a.get_collision_normal() == noc);

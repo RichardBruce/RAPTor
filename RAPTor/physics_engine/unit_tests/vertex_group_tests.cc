@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE( find_support_vertex_with_optional_displacement_test )
 BOOST_AUTO_TEST_CASE( find_support_penalised_vertex_test )
 {
     /* This just forwards to physic common which is tested else where */
-    fp_t v;
+    float v;
     BOOST_CHECK(cube_vg0->find_support_vertex(point_t(0.0, 1.0, 0.0), point_t(0.0, 0.0, 0.0), point_t(10.0, 0.0, 0.0), point_t(1.0, 0.0, 0.0), &v) == 0);
     BOOST_CHECK(fabs(v - 11.2071) < result_tolerance);
 }

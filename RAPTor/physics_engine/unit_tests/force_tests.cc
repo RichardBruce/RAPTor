@@ -25,12 +25,12 @@ namespace test
 struct force_fixture
 {
     force_fixture()
-    : i0(new fp_t[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(0.0, 0.0,    0.0 ), 0.0),
-      i1(new fp_t[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(3.0, 1.5,   -7.5 ), 0.0),
-      i2(new fp_t[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(6.0, 3.0,  -15.0 ), 0.0),
-      i3(new fp_t[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(8.0, 4.0,  -20.0 ), 0.0),
-      i4(new fp_t[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(9.0, 4.5,  -22.5 ), 0.0),
-      i5(new fp_t[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(9.5, 4.75, -23.75), 0.0)
+    : i0(new float[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(0.0, 0.0,    0.0 ), 0.0),
+      i1(new float[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(3.0, 1.5,   -7.5 ), 0.0),
+      i2(new float[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(6.0, 3.0,  -15.0 ), 0.0),
+      i3(new float[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(8.0, 4.0,  -20.0 ), 0.0),
+      i4(new float[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(9.0, 4.5,  -22.5 ), 0.0),
+      i5(new float[6]{ 0.0, 0.0, 0.0, 0.0,  0.0, 0.0 }, point_t(9.5, 4.75, -23.75), 0.0)
     {  };
 
     inertia_tensor      i0;
@@ -561,7 +561,7 @@ BOOST_AUTO_TEST_CASE( viscous_force_test )
 /* Indefinate force tests */
 BOOST_AUTO_TEST_CASE( indefinite_force_test )
 {
-    const_force uut(point_t(1.5, 0.0, 0.0), point_t(1.2, -7.8, 4.8), std::numeric_limits<fp_t>::infinity());
+    const_force uut(point_t(1.5, 0.0, 0.0), point_t(1.2, -7.8, 4.8), std::numeric_limits<float>::infinity());
     BOOST_CHECK(fabs(magnitude(uut.get_force(i0, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0) - point_t(1.2, -7.8, 4.8))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(uut.get_torque(i0, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0) - point_t(0.0, -7.2, -11.7))) < result_tolerance);
 

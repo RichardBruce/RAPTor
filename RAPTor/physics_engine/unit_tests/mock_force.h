@@ -11,15 +11,15 @@
 class mock_force : public raptor_physics::force
 {
     public :
-        mock_force(const point_t &f, const point_t &t, const fp_t dt) : force(point_t(0.0, 0.0, 0.0), dt), _f(f), _t(t) {  };
+        mock_force(const point_t &f, const point_t &t, const float dt) : force(point_t(0.0f, 0.0f, 0.0f), dt), _f(f), _t(t) {  };
 
         /* Force implementation */
-        point_t get_force(const raptor_physics::inertia_tensor &i, const point_t &x, const point_t &v, const fp_t dt) const 
+        point_t get_force(const raptor_physics::inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const 
         {
             return _f;
         };
 
-        point_t get_torque(const raptor_physics::inertia_tensor &i, const point_t &x, const point_t &w, const fp_t dt) const
+        point_t get_torque(const raptor_physics::inertia_tensor &i, const point_t &x, const point_t &w, const float dt) const
         {
             return _t;
         }
