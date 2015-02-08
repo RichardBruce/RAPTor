@@ -39,7 +39,7 @@ struct regression_fixture : private boost::noncopyable
 {
     public :
         regression_fixture()
-          : po(0.04f, 0.04f, -1, false, true),
+          : po(0.04f, 0.04f, -1, false, false),
             pe(new raptor_physics::rigid_body_collider(0.5f, 0.75f), false),
             se(&pe, &po),
             m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), 1.0f)),
