@@ -36,7 +36,7 @@ namespace raptor_raytracer
 {
 namespace test
 {
-#ifndef VALGRIND_TESTS
+#if !defined(VALGRIND_TESTS) && !defined(DEBUG_TESTS)
 const int test_iterations = 5;
 #else 
 const int test_iterations = 1;

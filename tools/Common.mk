@@ -9,6 +9,7 @@ ifeq ($(BUILD), DEBUG)
 	LD_OPT = --coverage
 	CC_OPT = $(DEBUG_OPT) --std=c11
 	CPP_OPT = $(DEBUG_OPT) --std=c++1y
+	DEFINES += DEBUG_TESTS
 else ifeq ($(BUILD), VALGRIND)
 	LD_OPT = --coverage
 	CC_OPT = $(DEBUG_OPT) --std=c11
