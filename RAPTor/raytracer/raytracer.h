@@ -32,14 +32,14 @@ class ray_trace_engine
         :   _ssd(sub_division), c(c), lights(l) 
             {
                 this->pending_shadows      = static_cast<ray *>(scalable_malloc(  this->lights.size() * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(ray))));
-                this->nr_pending_shadows   = static_cast<fp_t *>(scalable_malloc( this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(fp_t))));
+                this->nr_pending_shadows   = static_cast<float *>(scalable_malloc( this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(float))));
             }
 
         ray_trace_engine(const ray_trace_engine &r)
         :   _ssd(r._ssd), c(r.c), lights(r.lights) 
             {
                 this->pending_shadows       = static_cast<ray *>(scalable_malloc( this->lights.size() * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(ray))));
-                this->nr_pending_shadows    = static_cast<fp_t *>(scalable_malloc(this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(fp_t))));
+                this->nr_pending_shadows    = static_cast<float *>(scalable_malloc(this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(float))));
             }
 
         ~ray_trace_engine() 
@@ -96,7 +96,7 @@ class ray_trace_engine
         const light_list    &lights;
         
         mutable ray         *pending_shadows;
-        mutable fp_t        *nr_pending_shadows;
+        mutable float       *nr_pending_shadows;
         mutable int         shader_nr;
 };
 

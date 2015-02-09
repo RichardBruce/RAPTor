@@ -93,7 +93,7 @@ class triangle : private boost::noncopyable
             point_t text(MAX_DIST);
             if ((this->vnt != nullptr) && (this->vnt[3] != MAX_DIST))
             {
-                text = (h.u * this->vnt[5]) + (h.v * this->vnt[4]) + (((fp_t)1.0 - (h.u + h.v)) * this->vnt[3]);
+                text = (h.u * this->vnt[5]) + (h.v * this->vnt[4]) + ((1.0f - (h.u + h.v)) * this->vnt[3]);
             }
 
             /* Call the material shader */
@@ -538,18 +538,16 @@ inline void triangle::is_intersecting(const frustrum &f, const packet_ray *const
 inline line triangle::normal_at_point(ray *const r, hit_description *const h) const
 {
     const float denom  = dot_product(this->n, r->get_dir());
-#ifdef SINGLE_PRECISION
     /* Re-calculate the intesection of the ray with the plane of the triangle */
     /* This gives a more accurate hit point to adjust the ray to */
     const float num    = dot_product(this->n, (this->vertex_c - r->get_dst()));
     r->change_length(num/denom);
-#endif /* #ifdef SINGLE_PRECISION */
 
     /* Interpolate the vertex normals */
     point_t normal;
     if ((this->vnt != nullptr) && (this->vnt[0] != MAX_DIST))
     {
-        normal = (h->u * this->vnt[2]) + (h->v * this->vnt[1]) + (((fp_t)1.0 - (h->u + h->v)) * this->vnt[0]);
+        normal = (h->u * this->vnt[2]) + (h->v * this->vnt[1]) + ((1.0f - (h->u + h->v)) * this->vnt[0]);
     }
     else
     {

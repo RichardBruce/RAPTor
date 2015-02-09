@@ -42,7 +42,7 @@ class kd_tree : public ssd
 
         /* kdt traversal */
         triangle*   find_nearest_object(const ray *const r, hit_description *const h) const override;
-        bool        found_nearer_object(const ray *const r, const fp_t t) const override;
+        bool        found_nearer_object(const ray *const r, const float t) const override;
 
     private :
         /* Stack element for tracing through the kd tree */

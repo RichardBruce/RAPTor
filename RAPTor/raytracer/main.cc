@@ -113,9 +113,9 @@ int main (int argc, char **argv)
     point_t  x_vec( 1.0f, 0.0f, 0.0f);      /* Horizontal vector                */
     point_t  y_vec( 0.0f, 1.0f, 0.0f);      /* Virtical vector                  */
     point_t  z_vec( 0.0f, 0.0f, 1.0f);      /* Forward vector                   */
-    fp_t     rx = 0.0f;                     /* Rotation about horizontal vector */
-    fp_t     ry = 0.0f;                     /* Rotation about virtical vector   */
-    fp_t     rz = 0.0f;                     /* Rotation about forward vector    */
+    float    rx = 0.0f;                     /* Rotation about horizontal vector */
+    float    ry = 0.0f;                     /* Rotation about virtical vector   */
+    float    rz = 0.0f;                     /* Rotation about forward vector    */
     unsigned xr = 640;                      /* X resolution                     */
     unsigned yr = 480;                      /* Y resolution                     */
     unsigned xa = 1;                        /* X anti-aliasing factor           */
@@ -451,8 +451,8 @@ int main (int argc, char **argv)
                 }
                 ext_colour_t    rgb;
                 point_t         c;
-                fp_t            r;
-                fp_t            d;
+                float           r;
+                float           d;
                 
                 c.x   = atof(argv[++i]);
                 c.y   = atof(argv[++i]);
@@ -518,10 +518,10 @@ int main (int argc, char **argv)
                 point_t         c;
                 point_t         a;
                 point_t         n;
-                fp_t            r;
-                fp_t            d;
-                fp_t            s_a;
-                fp_t            s_b;
+                float           r;
+                float           d;
+                float           s_a;
+                float           s_b;
                 
                 c.x     = atof(argv[++i]);
                 c.y     = atof(argv[++i]);
@@ -534,8 +534,8 @@ int main (int argc, char **argv)
                 a.x     = atof(argv[++i]);
                 a.y     = atof(argv[++i]);
                 a.z     = atof(argv[++i]);
-                s_a     = atof(argv[++i]) * (PI / 180.0);
-                s_b     = atof(argv[++i]) * (PI / 180.0);
+                s_a     = atof(argv[++i]) * (PI / 180.0f);
+                s_b     = atof(argv[++i]) * (PI / 180.0f);
                 
                 n = c - a;
                 normalise(&n);
@@ -555,7 +555,7 @@ int main (int argc, char **argv)
                 point_t         c;
                 point_t         a;
                 point_t         n;
-                fp_t            d;
+                float           d;
                 
                 c.x     = atof(argv[++i]);
                 c.y     = atof(argv[++i]);
@@ -655,9 +655,8 @@ int main (int argc, char **argv)
 
         case model_format_t::vrml :
             /* Deafult camera set up for vrml -- NOTE negative z axis */
-            cam = new raptor_raytracer::camera(cam_p, point_t((fp_t)1.0, (fp_t)0.0, (fp_t) 0.0), 
-                                    point_t((fp_t)0.0, (fp_t)1.0, (fp_t) 0.0), 
-                                    point_t((fp_t)0.0, (fp_t)0.0, (fp_t)-1.0), bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            cam = new raptor_raytracer::camera(cam_p, point_t(1.0f, 0.0f,  0.0f), point_t(0.0f, 1.0f,  0.0f), 
+                                    point_t(0.0f, 0.0f, -1.0f), bg, screen_width, screen_height, 20, xr, yr, xa, ya);
 
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());

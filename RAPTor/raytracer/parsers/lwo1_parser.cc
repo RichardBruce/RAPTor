@@ -344,9 +344,9 @@ inline static void parse_surf(material **m, const std::string &p, const char **p
         /* Texture colour */
         else if (strncmp((*ptr), "TCLR", 4) == 0)
         {
-            current_info.trgb.r = (fp_t)(*ptr)[6];
-            current_info.trgb.g = (fp_t)(*ptr)[7];
-            current_info.trgb.b = (fp_t)(*ptr)[8];
+            current_info.trgb.r = static_cast<float>((*ptr)[6]);
+            current_info.trgb.g = static_cast<float>((*ptr)[7]);
+            current_info.trgb.b = static_cast<float>((*ptr)[8]);
             BOOST_LOG_TRIVIAL(trace) << "TCLR: " << current_info.trgb.r << ", " << current_info.trgb.g << ", " << current_info.trgb.b;
         }
         /* Integer texture parameter 0 */

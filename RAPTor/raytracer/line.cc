@@ -6,14 +6,14 @@
 
 namespace raptor_raytracer
 {
-void line::rotate(const vector_t &r, const point_t &c, const fp_t theta)
+void line::rotate(const vector_t &r, const point_t &c, const float theta)
 {
     /* Rotate the origin into the new coordinate system */
     point_t p = this->ogn;
-    point_t q(0.0,0.0,0.0);
+    point_t q(0.0f, 0.0f, 0.0f);
    
-    fp_t costheta = cos(theta);
-    fp_t sintheta = sin(theta);
+    float costheta = cos(theta);
+    float sintheta = sin(theta);
     
     /* Transform r into the origin */
     p.x -= c.x;
@@ -21,35 +21,35 @@ void line::rotate(const vector_t &r, const point_t &c, const fp_t theta)
     p.z -= c.z;
 
     /* Rotate about r */
-    q.x += (costheta + (1 - costheta) * r.x * r.x) * p.x;
-    q.x += ((1 - costheta) * r.x * r.y - r.z * sintheta) * p.y;
-    q.x += ((1 - costheta) * r.x * r.z + r.y * sintheta) * p.z;
+    q.x += (costheta + (1.0f - costheta) * r.x * r.x) * p.x;
+    q.x += ((1.0f - costheta) * r.x * r.y - r.z * sintheta) * p.y;
+    q.x += ((1.0f - costheta) * r.x * r.z + r.y * sintheta) * p.z;
 
-    q.y += ((1 - costheta) * r.x * r.y + r.z * sintheta) * p.x;
-    q.y += (costheta + (1 - costheta) * r.y * r.y) * p.y;
-    q.y += ((1 - costheta) * r.y * r.z - r.x * sintheta) * p.z;
+    q.y += ((1.0f - costheta) * r.x * r.y + r.z * sintheta) * p.x;
+    q.y += (costheta + (1.0f - costheta) * r.y * r.y) * p.y;
+    q.y += ((1.0f - costheta) * r.y * r.z - r.x * sintheta) * p.z;
 
-    q.z += ((1 - costheta) * r.x * r.z - r.y * sintheta) * p.x;
-    q.z += ((1 - costheta) * r.y * r.z + r.x * sintheta) * p.y;
-    q.z += (costheta + (1 - costheta) * r.z * r.z) * p.z;
+    q.z += ((1.0f - costheta) * r.x * r.z - r.y * sintheta) * p.x;
+    q.z += ((1.0f - costheta) * r.y * r.z + r.x * sintheta) * p.y;
+    q.z += (costheta + (1.0f - costheta) * r.z * r.z) * p.z;
     
     
     /* Move the point up a unit distance */
-    point_t q2(0.0,0.0,0.0);
+    point_t q2(0.0f, 0.0f, 0.0f);
     p += this->dir;
     
     /* Rotate about r */
-    q2.x += (costheta + (1 - costheta) * r.x * r.x) * p.x;
-    q2.x += ((1 - costheta) * r.x * r.y - r.z * sintheta) * p.y;
-    q2.x += ((1 - costheta) * r.x * r.z + r.y * sintheta) * p.z;
+    q2.x += (costheta + (1.0f - costheta) * r.x * r.x) * p.x;
+    q2.x += ((1.0f - costheta) * r.x * r.y - r.z * sintheta) * p.y;
+    q2.x += ((1.0f - costheta) * r.x * r.z + r.y * sintheta) * p.z;
 
-    q2.y += ((1 - costheta) * r.x * r.y + r.z * sintheta) * p.x;
-    q2.y += (costheta + (1 - costheta) * r.y * r.y) * p.y;
-    q2.y += ((1 - costheta) * r.y * r.z - r.x * sintheta) * p.z;
+    q2.y += ((1.0f - costheta) * r.x * r.y + r.z * sintheta) * p.x;
+    q2.y += (costheta + (1.0f - costheta) * r.y * r.y) * p.y;
+    q2.y += ((1.0f - costheta) * r.y * r.z - r.x * sintheta) * p.z;
 
-    q2.z += ((1 - costheta) * r.x * r.z - r.y * sintheta) * p.x;
-    q2.z += ((1 - costheta) * r.y * r.z + r.x * sintheta) * p.y;
-    q2.z += (costheta + (1 - costheta) * r.z * r.z) * p.z;
+    q2.z += ((1.0f - costheta) * r.x * r.z - r.y * sintheta) * p.x;
+    q2.z += ((1.0f - costheta) * r.y * r.z + r.x * sintheta) * p.y;
+    q2.z += (costheta + (1.0f - costheta) * r.z * r.z) * p.z;
     
     /* Convert back to gradiant */
     q2.x -= q.x;
