@@ -69,12 +69,21 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     // BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
 }
 
+inline float next_power_of_two(int x)
+{
+    x |= (x >> 1);
+    x |= (x >> 2);
+    x |= (x >> 4);
+    x |= (x >> 8);
+    x |= (x >> 16);
+    return x + 1;
+}
+
 void bih_builder::bucket_build()
 {
     /* Calculate Morton codes and build MSB histogram */
     const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
-    const float widest = std::max(std::max(scene_width.x, scene_width.y), scene_width.z) / 1023.0f;
-    _widths = point_t(widest, widest, widest);    /* TODO - Possibly divide down by average primitive width to reduce the number of occupied bins */
+    _width = std::max(std::max(scene_width.x, scene_width.y), scene_width.z) * (1.00001f / 1024.0f);
 
     unsigned int hist[histogram_size + 1];
     memset(hist, 0, histogram_size * sizeof(float));
@@ -82,10 +91,10 @@ void bih_builder::bucket_build()
     _prim_buffer.reset(new triangle *[_primitives->size()]);
     _morton_codes.reset(new int [_primitives->size()]);
 
-    const point_t widths_inv(1.0f / _widths.x, 1.0f / _widths.y, 1.0f / _widths.z);
-    const vfp_t x_mul(widths_inv.x);
-    const vfp_t y_mul(widths_inv.y);
-    const vfp_t z_mul(widths_inv.z);
+    const float width_inv = 1.0f / _width;
+    const vfp_t x_mul(width_inv);
+    const vfp_t y_mul(width_inv);
+    const vfp_t z_mul(width_inv);
     const vfp_t scene_lo_x(triangle::get_scene_lower_bounds().x);
     const vfp_t scene_lo_y(triangle::get_scene_lower_bounds().y);
     const vfp_t scene_lo_z(triangle::get_scene_lower_bounds().z);
@@ -95,17 +104,6 @@ void bih_builder::bucket_build()
     std::fill_n(tr, histogram_size, point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST));
     for (int i = 0; i <= (static_cast<int>(_primitives->size()) - SIMD_WIDTH); i += SIMD_WIDTH)
     {
-        /* Cache primitive bounds */
-        // _min_bounds[i    ] = (*_primitives)[i    ]->lowest_point();
-        // _min_bounds[i + 1] = (*_primitives)[i + 1]->lowest_point();
-        // _min_bounds[i + 2] = (*_primitives)[i + 2]->lowest_point();
-        // _min_bounds[i + 3] = (*_primitives)[i + 3]->lowest_point();
-
-        // _max_bounds[i    ] = (*_primitives)[i    ]->highest_point();
-        // _max_bounds[i + 1] = (*_primitives)[i + 1]->highest_point();
-        // _max_bounds[i + 2] = (*_primitives)[i + 2]->highest_point();
-        // _max_bounds[i + 3] = (*_primitives)[i + 3]->highest_point();
-
         /* Calculate morton code*/
         const vfp_t lo_x((*_primitives)[i]->lowest_x(), (*_primitives)[i + 1]->lowest_x(), (*_primitives)[i + 2]->lowest_x(), (*_primitives)[i + 3]->lowest_x());
         const vfp_t lo_y((*_primitives)[i]->lowest_y(), (*_primitives)[i + 1]->lowest_y(), (*_primitives)[i + 2]->lowest_y(), (*_primitives)[i + 3]->lowest_y());
@@ -144,13 +142,9 @@ void bih_builder::bucket_build()
 
     for (int i = (static_cast<int>(_primitives->size()) & ~(SIMD_WIDTH - 1)); i < static_cast<int>(_primitives->size()); ++i)
     {
-        /* Cache primitive bounds */
-        // _min_bounds[i] = (*_primitives)[i]->lowest_point();
-        // _max_bounds[i] = (*_primitives)[i]->highest_point();
-
         /* Calculate morton code*/
         const point_t t((((*_primitives)[i]->highest_point() + (*_primitives)[i]->lowest_point()) * 0.5f) - triangle::get_scene_lower_bounds());
-        _morton_codes[i] = morton_code(t.x, t.y, t.z, widths_inv.x, widths_inv.y, widths_inv.z);
+        _morton_codes[i] = morton_code(t.x, t.y, t.z, width_inv, width_inv, width_inv);
 
         /* Build histogram of morton codes */
         const unsigned int pos = _morton_codes[i] >> 20;
@@ -178,8 +172,6 @@ void bih_builder::bucket_build()
 
         /* Move primitive */
         _prim_buffer[hist[pos]] = (*_primitives)[i];
-        // _min_bounds[hist[pos] + _primitives->size()] = _min_bounds[i];
-        // _max_bounds[hist[pos] + _primitives->size()] = _max_bounds[i];
     }
 
     /* Un-increment the histogram */
@@ -190,17 +182,17 @@ void bih_builder::bucket_build()
     hist[0] = 0;
 
     /* Kick of the block builder, breadth first within blocks, depth first outside blocks */
-    divide_bih_block(bl, tr, hist, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, histogram_size);
+    divide_bih_block(bl, tr, hist, triangle::get_scene_lower_bounds(), triangle::get_scene_lower_bounds() + (_width * 1024.0f), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, histogram_size);
 }
 
 void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e)
 {
     /* Build histogram */
-    const int mc_check = _code_buffer[b] >> 22;
+    const int mc_check = _code_buffer[b] >> 23;
     for (int i = b; i < e; ++i)
     {
         ++hist[(_code_buffer[i] >> 10) & 0x3ff];
-        assert((_code_buffer[i] >> 22) == mc_check);
+        assert((_code_buffer[i] >> 23) == mc_check);
     }
     
     /* Sum the histogram */
@@ -226,8 +218,6 @@ void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigne
         /* Move and track primitive bounds */
         bl[pos] = min(bl[pos], _prim_buffer[i]->lowest_point());
         tr[pos] = max(tr[pos], _prim_buffer[i]->highest_point());
-        // _min_bounds[hist[pos]] = _min_bounds[i + _primitives->size()];
-        // _max_bounds[hist[pos]] = _max_bounds[i + _primitives->size()];
     }
 
     /* Un-increment the histogram */
@@ -242,11 +232,11 @@ void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigne
 void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e)
 {
     /* Build histogram */
-    const int mc_check = _morton_codes[b] >> 11;
+    const int mc_check = _morton_codes[b] >> 13;
     for (int i = b; i < e; ++i)
     {
         ++hist[_morton_codes[i] & 0x3ff];
-        assert((_morton_codes[i] >> 11) == mc_check);
+        assert((_morton_codes[i] >> 13) == mc_check);
     }
     
     /* Sum the histogram */
@@ -272,8 +262,6 @@ void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigne
         /* Move and track primitive bounds */
         bl[pos] = min(bl[pos], (*_primitives)[i]->lowest_point());
         tr[pos] = max(tr[pos], (*_primitives)[i]->highest_point());
-        // _min_bounds[hist[pos] + _primitives->size()] = _min_bounds[i];
-        // _max_bounds[hist[pos] + _primitives->size()] = _max_bounds[i];
     }
 
     /* Un-increment the histogram */
@@ -302,26 +290,15 @@ int morton_decode(int morton)
     return morton;
 }
 
-point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **const active_prims, const int b, const int e)
+void bih_builder::convert_to_primitve_builder(const int b, const int e)
 {
-    /* Calculate grid cell size */
-    const int mc = _code_buffer[b];
-    const point_t mul(morton_decode(mc), morton_decode(mc >> 1), morton_decode(mc >> 2));
-    const point_t grid_bound((mul * _widths) + triangle::get_scene_lower_bounds());
-
     /* Get primitives in the right list for the non-binned node builder */
     for (int i = b; i < e; ++i)
     {
         (*_primitives)[i] = _prim_buffer[i];
-        // _min_bounds[i] = _min_bounds[i + _primitives->size()];
-        // _max_bounds[i] = _max_bounds[i + _primitives->size()];
         _min_bounds[i] = _prim_buffer[i]->lowest_point();
         _max_bounds[i] = _prim_buffer[i]->highest_point();
     }
-
-    /* Set up state and call the partial block builder */
-    *bl = grid_bound;
-    return grid_bound + _widths;
 }
 
 point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **const active_prims, const int b, const int e, const int begin_mc, const int end_mc, const int level)
@@ -351,17 +328,17 @@ point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **c
     const int y_mc = morton_decode(lower_mc >> 1);
     const int z_mc = morton_decode(lower_mc >> 2);
     const point_t lower_mul(x_mc, y_mc, z_mc);
-    const point_t lower_grid((lower_mul * _widths) + triangle::get_scene_lower_bounds());
+    const point_t lower_grid((lower_mul * _width) + triangle::get_scene_lower_bounds());
 
     /* Work out how far to the top of the cell */
-    point_t grid_width(_widths);
+    point_t grid_width(_width, _width, _width);
     const int upper_mc = mc_upper_bits | ((end_mc << (level * 10)) - 1);
 
     const int x_end_mc = morton_decode(upper_mc);
     const int y_end_mc = morton_decode(upper_mc >> 1);
     const int z_end_mc = morton_decode(upper_mc >> 2);
     const point_t end_mul(x_end_mc - x_mc, y_end_mc - y_mc, z_end_mc - z_mc);
-    grid_width += end_mul * _widths;
+    grid_width += end_mul * _width;
 
     /* Set up state and call the partial block builder */
     *bl = lower_grid;
@@ -377,6 +354,7 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
 
     /* If not many primitives left call the primitive builder */
     // if ((level != 0) && ((bins[e] - bins[b]) < 50000))
+    // if (level == 2)
     // {
     //     const int prim_begin = bins[b];
     //     const int prim_end = bins[e];
@@ -387,11 +365,11 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
     //     split_data->begin[data_idx] = prim_begin;
     //     split_data->level[data_idx] = -1;
 
-    //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder level: " << level << ", bins: " << b << " - " << e << ", size: " << (bins[e] - bins[b]);
-    //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder grid bounds: " << split_data->bl[data_idx] << " - " << split_data->tr[data_idx];
-    //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder node bounds: " << split_data->node_bl[data_idx] << " - " << split_data->node_tr[data_idx];
+    // //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder level: " << level << ", bins: " << b << " - " << e << ", size: " << (bins[e] - bins[b]);
+    // //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder grid bounds: " << split_data->bl[data_idx] << " - " << split_data->tr[data_idx];
+    // //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder node bounds: " << split_data->node_bl[data_idx] << " - " << split_data->node_tr[data_idx];
     //     divide_bih_block(split_data, block_idx, node_idx);
-    //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder done";
+    // //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder done";
     //     return;
     // }
     
@@ -400,7 +378,7 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
         /* Level 0 complete, call standard divider */
         case 0 :
             /* Set up state and call the partial block builder */
-            split_data->tr[data_idx]    = convert_to_primitve_builder(&split_data->bl[data_idx], _primitives->data(), bins[b], bins[e]);
+            convert_to_primitve_builder(bins[b], bins[e]);
             split_data->end[data_idx]   = bins[e] - 1;
             split_data->begin[data_idx] = bins[b];
             split_data->level[data_idx] = -1;
@@ -458,18 +436,20 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
 }
 
 /* Divide within a block, breadth first, with outside the block depth first */
-void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const tr, const unsigned int *const bins, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level, const int depth)
+void bih_builder::divide_bih_block(const point_t *const hist_bl, const point_t *const hist_tr, const unsigned int *const bins, const point_t &bl, const point_t &tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level, const int depth)
 {
     block_splitting_data split_data;
-    split_data.hist_bl[0]       = bl;
-    split_data.hist_tr[0]       = tr;
-    split_data.end[0]           = e;
-    split_data.begin[0]         = b;
-    split_data.depth[0]         = depth;
-    split_data.bins[0]          = bins;
-    split_data.level[0]         = level;
-    split_data.node_tr[0]       = node_tr;
-    split_data.node_bl[0]       = node_bl;
+    split_data.hist_bl[0]   = hist_bl;
+    split_data.hist_tr[0]   = hist_tr;
+    split_data.bl[0]        = bl;
+    split_data.tr[0]        = tr;
+    split_data.end[0]       = e;
+    split_data.begin[0]     = b;
+    split_data.depth[0]     = depth;
+    split_data.bins[0]      = bins;
+    split_data.level[0]     = level;
+    split_data.node_tr[0]   = node_tr;
+    split_data.node_bl[0]   = node_bl;
     
     /* Split block root */
     if (divide_bih_node_binned(&split_data, 0, 2, block_idx, 0))
@@ -551,11 +531,11 @@ void bih_builder::divide_bih_block(const point_t *const bl, const point_t *const
             const int right_idx = left_idx + 1;
             
             /* Recurse left */
-            divide_bih_block(split_data.hist_bl[left_idx], split_data.hist_tr[left_idx], split_data.bins[left_idx], split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, split_data.begin[left_idx], split_data.end[left_idx], split_data.level[left_idx], split_data.depth[left_idx]);
+            divide_bih_block(split_data.hist_bl[left_idx], split_data.hist_tr[left_idx], split_data.bins[left_idx], split_data.bl[left_idx], split_data.tr[left_idx], split_data.node_bl[left_idx], split_data.node_tr[left_idx], child_idx, split_data.begin[left_idx], split_data.end[left_idx], split_data.level[left_idx], split_data.depth[left_idx]);
             ++child_idx;
             
             /* Recurse right */
-            divide_bih_block(split_data.hist_bl[right_idx], split_data.hist_tr[right_idx], split_data.bins[right_idx], split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, split_data.begin[right_idx], split_data.end[right_idx], split_data.level[right_idx], split_data.depth[right_idx]);
+            divide_bih_block(split_data.hist_bl[right_idx], split_data.hist_tr[right_idx], split_data.bins[right_idx], split_data.bl[right_idx], split_data.tr[right_idx], split_data.node_bl[right_idx], split_data.node_tr[right_idx], child_idx, split_data.begin[right_idx], split_data.end[right_idx], split_data.level[right_idx], split_data.depth[right_idx]);
             ++child_idx;
         }
     }
@@ -649,11 +629,11 @@ void bih_builder::divide_bih_block(block_splitting_data *const split_data, const
             else
             {
                 /* Recurse left */
-                divide_bih_block(split_data->hist_bl[left_idx], split_data->hist_tr[left_idx], split_data->bins[left_idx], split_data->node_bl[left_idx], split_data->node_tr[left_idx], child_idx, split_data->begin[left_idx], split_data->end[left_idx], split_data->level[left_idx], split_data->depth[left_idx]);
+                divide_bih_block(split_data->hist_bl[left_idx], split_data->hist_tr[left_idx], split_data->bins[left_idx], split_data->bl[left_idx], split_data->tr[left_idx], split_data->node_bl[left_idx], split_data->node_tr[left_idx], child_idx, split_data->begin[left_idx], split_data->end[left_idx], split_data->level[left_idx], split_data->depth[left_idx]);
                 ++child_idx;
                 
                 /* Recurse right */
-                divide_bih_block(split_data->hist_bl[right_idx], split_data->hist_tr[right_idx], split_data->bins[right_idx], split_data->node_bl[right_idx], split_data->node_tr[right_idx], child_idx, split_data->begin[right_idx], split_data->end[right_idx], split_data->level[right_idx], split_data->depth[right_idx]);
+                divide_bih_block(split_data->hist_bl[right_idx], split_data->hist_tr[right_idx], split_data->bins[right_idx], split_data->bl[right_idx], split_data->tr[right_idx], split_data->node_bl[right_idx], split_data->node_tr[right_idx], child_idx, split_data->begin[right_idx], split_data->end[right_idx], split_data->level[right_idx], split_data->depth[right_idx]);
                 ++child_idx;
             }
         }
@@ -666,26 +646,20 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
 {
     int e = split_data->end[in_idx];
     int b = split_data->begin[in_idx];
+    point_t tr(split_data->tr[in_idx]);
+    point_t bl(split_data->bl[in_idx]);
     const int level = split_data->level[in_idx];
     const int depth = split_data->depth[in_idx] + 1;
     const point_t &node_tr = split_data->node_tr[in_idx];
     const point_t &node_bl = split_data->node_bl[in_idx];
-    const point_t *const bl = split_data->hist_bl[in_idx];
-    const point_t *const tr = split_data->hist_tr[in_idx];
+    const point_t *const hist_bl = split_data->hist_bl[in_idx];
+    const point_t *const hist_tr = split_data->hist_tr[in_idx];
     const unsigned int *const bins = split_data->bins[in_idx];
 
     /* Checks */
     assert(depth <= MAX_BIH_STACK_HEIGHT);
     assert(static_cast<unsigned int>(e) <= histogram_size);
-    
-    /* Check if we are down to 1 bin */
-    if (b == e)
-    {
-        split_data->begin[out_idx]  = b;
-        split_data->end[out_idx]    = e;
-        return true;
-    }
-    
+
     /* Create leaf */
     if ((static_cast<int>(bins[e] - bins[b]) <= _max_node_size) || (depth == MAX_BIH_STACK_HEIGHT))
     {
@@ -702,45 +676,130 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
         return false;
     }
 
-    /* Moving towards the left bin look to split the node in 2 */
-    int bin_range = (e - b) >> 1;
-    int next_bin_level = bin_range >> 3;
-    int split_idx = b | bin_range;
+    /* More checks */
+    assert(((node_bl.x <= tr.x) && (node_bl.x >= bl.x)) || ((node_tr.x <= tr.x) && (node_tr.x >= bl.x)) || ((bl.x <= node_tr.x) && (bl.x >= node_bl.x)) || ((tr.x <= node_tr.x) && (tr.x >= node_bl.x)) || !"Error: x bounds no longer overlap");
+    assert(((node_bl.y <= tr.y) && (node_bl.y >= bl.y)) || ((node_tr.y <= tr.y) && (node_tr.y >= bl.y)) || ((bl.y <= node_tr.y) && (bl.y >= node_bl.y)) || ((tr.y <= node_tr.y) && (tr.y >= node_bl.y)) || !"Error: y bounds no longer overlap");
+    assert(((node_bl.z <= tr.z) && (node_bl.z >= bl.z)) || ((node_tr.z <= tr.z) && (node_tr.z >= bl.z)) || ((bl.z <= node_tr.z) && (bl.z >= node_bl.z)) || ((tr.z <= node_tr.z) && (tr.z >= node_bl.z)) || !"Error: z bounds no longer overlap");
 
-    assert((b & std::max(0, bin_range - 1)) == 0);
-    assert(__builtin_popcount(bin_range) <= 1);
-
-    while ((bins[b | next_bin_level] == bins[b | bin_range | next_bin_level]) && (bin_range > 0))
+    /* Pick longest side to divide in with a preference to z for floating point ties */
+    point_t tm;
+    point_t bm(bl);
+    float split_pnt;
+    float dx = tr.x - bl.x;
+    float dy = tr.y - bl.y;
+    float dz = tr.z - bl.z;
+    axis_t split_axis = axis_t::not_set;
+    while (true)
     {
-        if (bins[b] == bins[split_idx])
+        if (dx > (dy + (_width * 0.09f)))
         {
-            b += bin_range;
-        }
-        else if (bins[split_idx] == bins[e])
-        {
-            e -= bin_range;
+            if (dx > (dz + (_width * 0.09f)))
+            {
+                split_pnt  = bl.x + (dx * 0.5f);
+                if ((split_pnt < node_bl.x) && (dx > (_width * 1.09f)))
+                {
+                    bl.x = split_pnt;
+                    dx *= 0.5f;
+                }
+                else if ((split_pnt > node_tr.x) && (dx > (_width * 1.09f)))
+                {
+                    tr.x = split_pnt;
+                    dx *= 0.5f;
+                }
+                else
+                {
+                    split_axis = axis_t::x_axis;
+                    bm         = point_t(split_pnt, bl.y, bl.z);
+                    tm         = point_t(split_pnt, tr.y, tr.z);
+                    break;
+                }
+            }
+            else
+            {
+                split_pnt  = bl.z + (dz * 0.5f);
+                if (split_pnt < node_bl.z)
+                {
+                    bl.z = split_pnt;
+                    dz *= 0.5f;
+                }
+                else if (split_pnt > node_tr.z)
+                {
+                    tr.z = split_pnt;
+                    dz *= 0.5f;
+                }
+                else
+                {
+                    split_axis = axis_t::z_axis;
+                    bm         = point_t(bl.x, bl.y, split_pnt);
+                    tm         = point_t(tr.x, tr.y, split_pnt);
+                    break;
+                }
+            }
         }
         else
         {
-            break;
+            if (dy > (dz + (_width * 0.09f)))
+            {
+                split_pnt  = bl.y + (dy * 0.5f);
+                if (split_pnt < node_bl.y)
+                {
+                    bl.y = split_pnt;
+                    dy *= 0.5f;
+                }
+                else if (split_pnt > node_tr.y)
+                {
+                    tr.y = split_pnt;
+                    dy *= 0.5f;
+                }
+                else
+                {
+                    split_axis = axis_t::y_axis;
+                    bm         = point_t(bl.x, split_pnt, bl.z);
+                    tm         = point_t(tr.x, split_pnt, tr.z);
+                    break;
+                }
+            }
+            else
+            {
+                split_pnt  = bl.z + (dz * 0.5f);
+                if (split_pnt < node_bl.z)
+                {
+                    bl.z = split_pnt;
+                    dz *= 0.5f;
+                }
+                else if (split_pnt > node_tr.z)
+                {
+                    tr.z = split_pnt;
+                    dz *= 0.5f;
+                }
+                else
+                {
+                    split_axis = axis_t::z_axis;
+                    bm         = point_t(bl.x, bl.y, split_pnt);
+                    tm         = point_t(tr.x, tr.y, split_pnt);
+                    break;
+                }
+            }
         }
-
-        bin_range >>= 1;
-        next_bin_level >>= 1;
-        split_idx = b | bin_range;
     }
 
-    if (bin_range == 0)
+    /* Calculate which bins are are looking at */
+    const point_t code_pnt(bm + (_width * 0.09f) - triangle::get_scene_lower_bounds());
+    const int split_mc = morton_code(code_pnt.x, code_pnt.y, code_pnt.z, 1.0f / _width, 1.0f / _width, 1.0f / _width);
+    const int split_idx = (split_mc >> (level * 10)) & 0x3ff;
+
+    /* Check we have enough bins to work on */
+    if ((split_mc & ((0x1 << (level * 10)) - 1)) || (dx < (_width * 1.09f)))
     {
-        split_data->begin[out_idx]  = b;
-        split_data->end[out_idx]    = b + 1;
+        split_data->tr[in_idx]      = tr;
+        split_data->bl[in_idx]      = bl;
+        split_data->begin[in_idx]   = split_idx;
+        split_data->end[in_idx]     = split_idx + 1;
+        assert((static_cast<int>(bins[split_idx + 1] - bins[split_idx]) > _max_node_size) || !"Error: Switching level lost primitives");
         return true;
     }
 
-    /* Calculate split axis */
-    const axis_t split_axis = static_cast<axis_t>(((31 - __builtin_clz(bin_range) + level) % 3) + 1);
-
-    /* Iterate over primitive to left and right to find the node bounds */
+    /* Partition primitives */
     point_t node_tm(node_tr);
     point_t node_bm(node_bl);
     float max_left  = -MAX_DIST;
@@ -749,15 +808,40 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     {
         case axis_t::x_axis :
         {
+            /* Track node bounds */
             int i = b;
             for (; i < split_idx; ++i)
             {
-                max_left = std::max(max_left, tr[i].x);
+                max_left = std::max(max_left, hist_tr[i].x);
             }
 
             for (; i < e; ++i)
             {
-                min_right = std::min(min_right, bl[i].x);
+                min_right = std::min(min_right, hist_bl[i].x);
+            }
+
+            assert(((node_bl.x <= split_pnt) && (node_bl.x >= bl.x     )) || ((max_left  <= split_pnt) && (max_left  >= bl.x     )) || ((bl.x      <= max_left ) && (bl.x      >= node_bl.x)) || ((split_pnt <= max_left ) && (split_pnt >= node_bl.x)) || (max_left  == -MAX_DIST) || !"Error: x bounds no longer overlap");
+            assert(((min_right <= tr.x     ) && (min_right >= split_pnt)) || ((node_tr.x <= tr.x     ) && (node_tr.x >= split_pnt)) || ((split_pnt <= node_tr.x) && (split_pnt >= min_right)) || ((tr.x      <= node_tr.x) && (tr.x      >= min_right)) || (min_right ==  MAX_DIST) || !"Error: x bounds no longer overlap");
+
+            /* Check this node is small than its parents */
+            if ((min_right == MAX_DIST) && (max_left == node_tm.x))
+            {
+                split_data->bl[in_idx] = bl;
+                split_data->tr[in_idx] = tm;
+                split_data->begin[in_idx] = b;
+                split_data->end[in_idx] = split_idx;
+                split_data->depth[in_idx] = depth;
+                return divide_bih_node_binned(split_data, in_idx, out_idx, block_idx, node_idx);
+            }
+
+            if ((max_left == -MAX_DIST) && (min_right == node_bm.x))
+            {
+                split_data->bl[in_idx] = bm;
+                split_data->tr[in_idx] = tr;
+                split_data->begin[in_idx] = split_idx;
+                split_data->end[in_idx] = e;
+                split_data->depth[in_idx] = depth;
+                return divide_bih_node_binned(split_data, in_idx, out_idx, block_idx, node_idx);
             }
 
             node_tm.x = max_left;
@@ -766,15 +850,41 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
         }
         case axis_t::y_axis :
         {
+            /* Track node bounds */
             int i = b;
             for (; i < split_idx; ++i)
             {
-                max_left = std::max(max_left, tr[i].y);
+                max_left = std::max(max_left, hist_tr[i].y);
             }
 
             for (; i < e; ++i)
             {
-                min_right = std::min(min_right, bl[i].y);
+                min_right = std::min(min_right, hist_bl[i].y);
+            }
+
+            assert(((node_bl.y <= split_pnt) && (node_bl.y >= bl.y     )) || ((max_left  <= split_pnt) && (max_left  >= bl.y     )) || ((bl.y      <= max_left ) && (bl.y      >= node_bl.y)) || ((split_pnt <= max_left ) && (split_pnt >= node_bl.y)) || (max_left  == -MAX_DIST) || !"Error: y bounds no longer overlap");
+            assert(((min_right <= tr.y     ) && (min_right >= split_pnt)) || ((node_tr.y <= tr.y     ) && (node_tr.y >= split_pnt)) || ((split_pnt <= node_tr.y) && (split_pnt >= min_right)) || ((tr.y      <= node_tr.y) && (tr.y      >= min_right)) || (min_right ==  MAX_DIST) || !"Error: y bounds no longer overlap");
+
+            /* Check this node is small than its parents */
+            if ((min_right == MAX_DIST) && (max_left == node_tm.y))
+            {
+
+                split_data->bl[in_idx] = bl;
+                split_data->tr[in_idx] = tm;
+                split_data->begin[in_idx] = b;
+                split_data->end[in_idx] = split_idx;
+                split_data->depth[in_idx] = depth;
+                return divide_bih_node_binned(split_data, in_idx, out_idx, block_idx, node_idx);
+            }
+
+            if ((max_left == -MAX_DIST) && (min_right == node_bm.y))
+            {
+                split_data->bl[in_idx] = bm;
+                split_data->tr[in_idx] = tr;
+                split_data->begin[in_idx] = split_idx;
+                split_data->end[in_idx] = e;
+                split_data->depth[in_idx] = depth;
+                return divide_bih_node_binned(split_data, in_idx, out_idx, block_idx, node_idx);
             }
 
             node_tm.y = max_left;
@@ -783,15 +893,40 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
         }
         case axis_t::z_axis :
         {
+            /* Track node bounds */
             int i = b;
             for (; i < split_idx; ++i)
             {
-                max_left = std::max(max_left, tr[i].z);
+                max_left = std::max(max_left, hist_tr[i].z);
             }
 
             for (; i < e; ++i)
             {
-                min_right = std::min(min_right, bl[i].z);
+                min_right = std::min(min_right, hist_bl[i].z);
+            }
+
+            assert(((node_bl.z <= split_pnt) && (node_bl.z >= bl.z     )) || ((max_left  <= split_pnt) && (max_left  >= bl.z     )) || ((bl.z      <= max_left ) && (bl.z      >= node_bl.z)) || ((split_pnt <= max_left ) && (split_pnt >= node_bl.z)) || (max_left  == -MAX_DIST) || !"Error: z bounds no longer overlap");
+            assert(((min_right <= tr.z     ) && (min_right >= split_pnt)) || ((node_tr.z <= tr.z     ) && (node_tr.z >= split_pnt)) || ((split_pnt <= node_tr.z) && (split_pnt >= min_right)) || ((tr.z      <= node_tr.z) && (tr.z      >= min_right)) || (min_right ==  MAX_DIST) || !"Error: z bounds no longer overlap");
+
+            /* Check this node is small than its parents */
+            if ((min_right == MAX_DIST) && (max_left == node_tm.z))
+            {
+                split_data->bl[in_idx] = bl;
+                split_data->tr[in_idx] = tm;
+                split_data->begin[in_idx] = b;
+                split_data->end[in_idx] = split_idx;
+                split_data->depth[in_idx] = depth;
+                return divide_bih_node_binned(split_data, in_idx, out_idx, block_idx, node_idx);
+            }
+
+            if ((max_left == -MAX_DIST) && (min_right == node_bm.z))
+            {
+                split_data->bl[in_idx] = bm;
+                split_data->tr[in_idx] = tr;
+                split_data->begin[in_idx] = split_idx;
+                split_data->end[in_idx] = e;
+                split_data->depth[in_idx] = depth;
+                return divide_bih_node_binned(split_data, in_idx, out_idx, block_idx, node_idx);
             }
 
             node_tm.z = max_left;
@@ -806,8 +941,10 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     (*_blocks)[block_idx].create_generic_node(max_left, min_right, node_idx, split_axis);
 
     /* Left node recursion data */
-    split_data->hist_bl[out_idx]    = bl;
-    split_data->hist_tr[out_idx]    = tr;
+    split_data->hist_bl[out_idx]    = hist_bl;
+    split_data->hist_tr[out_idx]    = hist_tr;
+    split_data->tr[out_idx]         = tm;
+    split_data->bl[out_idx]         = bl;
     split_data->begin[out_idx]      = b;
     split_data->end[out_idx]        = split_idx;
     split_data->depth[out_idx]      = depth;
@@ -818,10 +955,12 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
 
     /* Right node recursion data */
     const int out_idx_p1 = out_idx + 1;
-    split_data->hist_bl[out_idx_p1] = bl;
-    split_data->hist_tr[out_idx_p1] = tr;
+    split_data->hist_bl[out_idx_p1] = hist_bl;
+    split_data->hist_tr[out_idx_p1] = hist_tr;
+    split_data->tr[out_idx_p1]      = tr;
+    split_data->bl[out_idx_p1]      = bm;
     split_data->begin[out_idx_p1]   = split_idx;
-    split_data->end[out_idx_p1]     = split_idx + bin_range;
+    split_data->end[out_idx_p1]     = e;
     split_data->depth[out_idx_p1]   = depth;
     split_data->bins[out_idx_p1]    = bins;
     split_data->level[out_idx_p1]   = level;
@@ -1018,6 +1157,9 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                 }
             }
 
+            assert(((node_bl.x <= split_pnt) && (node_bl.x >= bl.x     )) || ((max_left  <= split_pnt) && (max_left  >= bl.x     )) || ((bl.x      <= max_left ) && (bl.x      >= node_bl.x)) || ((split_pnt <= max_left ) && (split_pnt >= node_bl.x)) || (max_left  == -MAX_DIST) || !"Error: x bounds no longer overlap");
+            assert(((min_right <= tr.x     ) && (min_right >= split_pnt)) || ((node_tr.x <= tr.x     ) && (node_tr.x >= split_pnt)) || ((split_pnt <= node_tr.x) && (split_pnt >= min_right)) || ((tr.x      <= node_tr.x) && (tr.x      >= min_right)) || (min_right ==  MAX_DIST) || !"Error: x bounds no longer overlap");
+
             /* Adjust grid cell bounds */
             float pos = (tm.x - bl.x) * 0.5f;
             while (((bl.x + pos) > max_left) && (max_left > -MAX_DIST))
@@ -1096,6 +1238,9 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                 }
             }
 
+            assert(((node_bl.y <= split_pnt) && (node_bl.y >= bl.y     )) || ((max_left  <= split_pnt) && (max_left  >= bl.y     )) || ((bl.y      <= max_left ) && (bl.y      >= node_bl.y)) || ((split_pnt <= max_left ) && (split_pnt >= node_bl.y)) || (max_left  == -MAX_DIST) || !"Error: y bounds no longer overlap");
+            assert(((min_right <= tr.y     ) && (min_right >= split_pnt)) || ((node_tr.y <= tr.y     ) && (node_tr.y >= split_pnt)) || ((split_pnt <= node_tr.y) && (split_pnt >= min_right)) || ((tr.y      <= node_tr.y) && (tr.y      >= min_right)) || (min_right ==  MAX_DIST) || !"Error: y bounds no longer overlap");
+
             /* Adjust grid cell bounds */
             float pos = (tm.y - bl.y) * 0.5f;
             while (((bl.y + pos) > max_left) && (max_left > -MAX_DIST))
@@ -1173,6 +1318,9 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
                     min_right = std::min(min_right, _min_bounds[top].z);
                 }
             }
+
+            assert(((node_bl.z <= split_pnt) && (node_bl.z >= bl.z     )) || ((max_left  <= split_pnt) && (max_left  >= bl.z     )) || ((bl.z      <= max_left ) && (bl.z      >= node_bl.z)) || ((split_pnt <= max_left ) && (split_pnt >= node_bl.z)) || (max_left  == -MAX_DIST) || !"Error: z bounds no longer overlap");
+            assert(((min_right <= tr.z     ) && (min_right >= split_pnt)) || ((node_tr.z <= tr.z     ) && (node_tr.z >= split_pnt)) || ((split_pnt <= node_tr.z) && (split_pnt >= min_right)) || ((tr.z      <= node_tr.z) && (tr.z      >= min_right)) || (min_right ==  MAX_DIST) || !"Error: z bounds no longer overlap");
 
             /* Adjust grid cell bounds */
             float pos = (tm.z - bl.z) * 0.5f;
