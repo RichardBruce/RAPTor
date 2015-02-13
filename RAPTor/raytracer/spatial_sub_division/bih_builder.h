@@ -18,7 +18,7 @@ class bih_builder
 {
     public :
         bih_builder(const int max_node_size = MAX_BIH_NODE_SIZE) :
-        _primitives(nullptr), _blocks(nullptr), _max_node_size(max_node_size), _next_block(1) {  }
+        _primitives(nullptr), _blocks(nullptr), _width(0.0f), _width_epsilon(0.0f), _width_inv(0.0f), _max_node_size(max_node_size), _next_block(1) {  }
 
         void build(primitive_list *const primitives, std::vector<bih_block> *const blocks);
     
