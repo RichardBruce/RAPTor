@@ -45,7 +45,7 @@ class bih_builder
         void bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
 
         void convert_to_primitve_builder(const int b, const int e);
-        point_t convert_to_primitve_builder(point_t *const bl, triangle **const active_prims, const int b, const int e, const int begin_mc, const int end_mc, const int level);
+        void convert_to_primitve_builder(triangle **const active_prims, const int b, const int e);
         void level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx);
 
         void divide_bih_block(const point_t *const hist_bl, const point_t *const hist_tr, const unsigned int *const bins, const point_t &bl, const point_t &tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level = 2, const int depth = 0);
@@ -63,6 +63,8 @@ class bih_builder
         std::unique_ptr<point_t []>     _max_bounds;
         std::unique_ptr<point_t []>     _min_bounds;
         float                           _width;
+        float                           _width_epsilon;
+        float                           _width_inv;
         const int                       _max_node_size;
         std::atomic<int>                _next_block;
 };

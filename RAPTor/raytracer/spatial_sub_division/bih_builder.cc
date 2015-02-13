@@ -84,6 +84,8 @@ void bih_builder::bucket_build()
     /* Calculate Morton codes and build MSB histogram */
     const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
     _width = std::max(std::max(scene_width.x, scene_width.y), scene_width.z) * (1.00001f / 1024.0f);
+    _width_epsilon = _width * 1.09f;
+    _width_inv = 1.0f / _width;
 
     unsigned int hist[histogram_size + 1];
     memset(hist, 0, histogram_size * sizeof(float));
@@ -91,10 +93,9 @@ void bih_builder::bucket_build()
     _prim_buffer.reset(new triangle *[_primitives->size()]);
     _morton_codes.reset(new int [_primitives->size()]);
 
-    const float width_inv = 1.0f / _width;
-    const vfp_t x_mul(width_inv);
-    const vfp_t y_mul(width_inv);
-    const vfp_t z_mul(width_inv);
+    const vfp_t x_mul(_width_inv);
+    const vfp_t y_mul(_width_inv);
+    const vfp_t z_mul(_width_inv);
     const vfp_t scene_lo_x(triangle::get_scene_lower_bounds().x);
     const vfp_t scene_lo_y(triangle::get_scene_lower_bounds().y);
     const vfp_t scene_lo_z(triangle::get_scene_lower_bounds().z);
@@ -144,7 +145,7 @@ void bih_builder::bucket_build()
     {
         /* Calculate morton code*/
         const point_t t((((*_primitives)[i]->highest_point() + (*_primitives)[i]->lowest_point()) * 0.5f) - triangle::get_scene_lower_bounds());
-        _morton_codes[i] = morton_code(t.x, t.y, t.z, width_inv, width_inv, width_inv);
+        _morton_codes[i] = morton_code(t.x, t.y, t.z, _width_inv, _width_inv, _width_inv);
 
         /* Build histogram of morton codes */
         const unsigned int pos = _morton_codes[i] >> 20;
@@ -301,7 +302,7 @@ void bih_builder::convert_to_primitve_builder(const int b, const int e)
     }
 }
 
-point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **const active_prims, const int b, const int e, const int begin_mc, const int end_mc, const int level)
+void bih_builder::convert_to_primitve_builder(triangle **const active_prims, const int b, const int e)
 {
     /* Get primitives in the right list for the non-binned node builder */
     if (active_prims != _primitives->data())
@@ -318,31 +319,6 @@ point_t bih_builder::convert_to_primitve_builder(point_t *const bl, triangle **c
         _min_bounds[i] = (*_primitives)[i]->lowest_point();
         _max_bounds[i] = (*_primitives)[i]->highest_point();
     }
-
-    const int mc = (active_prims != _primitives->data()) ? _code_buffer[b] : _morton_codes[b];
-    const int mc_upper_bits = mc & ~((0x400 << (level * 10)) - 1);
-    
-    /* Calculate grid cell size, this is a little conservative, bit represents the gird so far */
-    const int lower_mc = mc_upper_bits | (begin_mc << (level * 10));
-    const int x_mc = morton_decode(lower_mc);
-    const int y_mc = morton_decode(lower_mc >> 1);
-    const int z_mc = morton_decode(lower_mc >> 2);
-    const point_t lower_mul(x_mc, y_mc, z_mc);
-    const point_t lower_grid((lower_mul * _width) + triangle::get_scene_lower_bounds());
-
-    /* Work out how far to the top of the cell */
-    point_t grid_width(_width, _width, _width);
-    const int upper_mc = mc_upper_bits | ((end_mc << (level * 10)) - 1);
-
-    const int x_end_mc = morton_decode(upper_mc);
-    const int y_end_mc = morton_decode(upper_mc >> 1);
-    const int z_end_mc = morton_decode(upper_mc >> 2);
-    const point_t end_mul(x_end_mc - x_mc, y_end_mc - y_mc, z_end_mc - z_mc);
-    grid_width += end_mul * _width;
-
-    /* Set up state and call the partial block builder */
-    *bl = lower_grid;
-    return lower_grid + grid_width;
 }
 
 void bih_builder::level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx)
@@ -353,23 +329,18 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
     const unsigned int *const bins  = split_data->bins[data_idx];
 
     /* If not many primitives left call the primitive builder */
-    // if ((level != 0) && ((bins[e] - bins[b]) < 50000))
-    // if (level == 2)
+    // if ((level != 0) && ((bins[e] - bins[b]) < 500))
     // {
     //     const int prim_begin = bins[b];
     //     const int prim_end = bins[e];
     //     triangle **active_prims = (level == 0x1) ? _primitives->data() : _prim_buffer.get();
 
-    //     split_data->tr[data_idx]    = convert_to_primitve_builder(&split_data->bl[data_idx], active_prims, prim_begin, prim_end, b, e, level);
+    //     convert_to_primitve_builder(active_prims, prim_begin, prim_end);
     //     split_data->end[data_idx]   = prim_end - 1;
     //     split_data->begin[data_idx] = prim_begin;
     //     split_data->level[data_idx] = -1;
 
-    // //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder level: " << level << ", bins: " << b << " - " << e << ", size: " << (bins[e] - bins[b]);
-    // //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder grid bounds: " << split_data->bl[data_idx] << " - " << split_data->tr[data_idx];
-    // //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder node bounds: " << split_data->node_bl[data_idx] << " - " << split_data->node_tr[data_idx];
     //     divide_bih_block(split_data, block_idx, node_idx);
-    // //     // BOOST_LOG_TRIVIAL(trace) << "Primitive builder done";
     //     return;
     // }
     
@@ -676,11 +647,6 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
         return false;
     }
 
-    /* More checks */
-    assert(((node_bl.x <= tr.x) && (node_bl.x >= bl.x)) || ((node_tr.x <= tr.x) && (node_tr.x >= bl.x)) || ((bl.x <= node_tr.x) && (bl.x >= node_bl.x)) || ((tr.x <= node_tr.x) && (tr.x >= node_bl.x)) || !"Error: x bounds no longer overlap");
-    assert(((node_bl.y <= tr.y) && (node_bl.y >= bl.y)) || ((node_tr.y <= tr.y) && (node_tr.y >= bl.y)) || ((bl.y <= node_tr.y) && (bl.y >= node_bl.y)) || ((tr.y <= node_tr.y) && (tr.y >= node_bl.y)) || !"Error: y bounds no longer overlap");
-    assert(((node_bl.z <= tr.z) && (node_bl.z >= bl.z)) || ((node_tr.z <= tr.z) && (node_tr.z >= bl.z)) || ((bl.z <= node_tr.z) && (bl.z >= node_bl.z)) || ((tr.z <= node_tr.z) && (tr.z >= node_bl.z)) || !"Error: z bounds no longer overlap");
-
     /* Pick longest side to divide in with a preference to z for floating point ties */
     point_t tm;
     point_t bm(bl);
@@ -696,12 +662,12 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
             if (dx > (dz + (_width * 0.09f)))
             {
                 split_pnt  = bl.x + (dx * 0.5f);
-                if ((split_pnt < node_bl.x) && (dx > (_width * 1.09f)))
+                if ((split_pnt < node_bl.x) && (dx > _width_epsilon))
                 {
                     bl.x = split_pnt;
                     dx *= 0.5f;
                 }
-                else if ((split_pnt > node_tr.x) && (dx > (_width * 1.09f)))
+                else if ((split_pnt > node_tr.x) && (dx > _width_epsilon))
                 {
                     tr.x = split_pnt;
                     dx *= 0.5f;
@@ -785,11 +751,11 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
 
     /* Calculate which bins are are looking at */
     const point_t code_pnt(bm + (_width * 0.09f) - triangle::get_scene_lower_bounds());
-    const int split_mc = morton_code(code_pnt.x, code_pnt.y, code_pnt.z, 1.0f / _width, 1.0f / _width, 1.0f / _width);
+    const int split_mc = morton_code(code_pnt.x, code_pnt.y, code_pnt.z, _width_inv, _width_inv, _width_inv);
     const int split_idx = (split_mc >> (level * 10)) & 0x3ff;
 
     /* Check we have enough bins to work on */
-    if ((split_mc & ((0x1 << (level * 10)) - 1)) || (dx < (_width * 1.09f)))
+    if ((split_mc & ((0x1 << (level * 10)) - 1)) || (dx < _width_epsilon))
     {
         split_data->tr[in_idx]      = tr;
         split_data->bl[in_idx]      = bl;
