@@ -23,8 +23,10 @@ const raptor_physics::init_logger init_logger;
 #include "rigid_body_collider.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 struct simulation_environment_fixture : private boost::noncopyable
 {
@@ -274,3 +276,5 @@ BOOST_AUTO_TEST_CASE (load_screen_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

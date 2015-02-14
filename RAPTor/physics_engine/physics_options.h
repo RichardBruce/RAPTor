@@ -18,11 +18,11 @@ class physics_options
 {
     public :
         /* CTOR */
-        physics_options(const fp_t max_ts = -1.0, const fp_t min_ts = 0.0, const int frames_to_run = -1, const bool pause_on_last = false, const bool render = true)
+        physics_options(const float max_ts = -1.0f, const float min_ts = 0.0f, const int frames_to_run = -1, const bool pause_on_last = false, const bool render = true)
             : _max_ts(max_ts), _min_ts(min_ts), _frames_to_run(frames_to_run), _pause_on_last(pause_on_last), _render(render), _error(false) { };
 
         physics_options(const char *const *const argv, const int argc)
-            : _max_ts(-1.0), _min_ts(0.0), _frames_to_run(-1), _pause_on_last(false), _render(true), _error(false)
+            : _max_ts(-1.0f), _min_ts(0.0f), _frames_to_run(-1), _pause_on_last(false), _render(true), _error(false)
         {
             /* Parse input arguements */
             if (argc > 1)
@@ -46,7 +46,7 @@ class physics_options
                         }
                         else
                         {
-                            _max_ts = 1.0 / boost::lexical_cast<fp_t>(argv[++i]);
+                            _max_ts = 1.0f / boost::lexical_cast<float>(argv[++i]);
                         }
                     }
                     /* Minimum frames per second */
@@ -60,7 +60,7 @@ class physics_options
                         }
                         else
                         {
-                            _min_ts = 1.0 / boost::lexical_cast<fp_t>(argv[++i]);
+                            _min_ts = 1.0f / boost::lexical_cast<float>(argv[++i]);
                         }
                     }
                     /* Number of frame to run */
@@ -104,20 +104,20 @@ class physics_options
         }
 
         /* Access functions */
-        fp_t    max_timestep()  const { return _max_ts;         }
-        fp_t    min_timestep()  const { return _min_ts;         }
+        float   max_timestep()  const { return _max_ts;         }
+        float   min_timestep()  const { return _min_ts;         }
         int     frames_to_run() const { return _frames_to_run;  }
         bool    pause_on_last() const { return _pause_on_last;  }
         bool    render()        const { return _render;         }
         bool    error()         const { return _error;          }
 
-        physics_options& max_timestep(const fp_t s)
+        physics_options& max_timestep(const float s)
         {
             _max_ts = s;
             return *this;
         }
 
-        physics_options& min_timestep(const fp_t s)
+        physics_options& min_timestep(const float s)
         {
             _min_ts = s;
             return *this;
@@ -142,8 +142,8 @@ class physics_options
         
 
     private :
-        fp_t    _max_ts;
-        fp_t    _min_ts;
+        float   _max_ts;
+        float   _min_ts;
         int     _frames_to_run;
         bool    _pause_on_last;
         bool    _render;

@@ -99,7 +99,7 @@ class matrix_3d : private boost::noncopyable
         {
             for (unsigned int i = 0; i < _data.size(); i++)
             {
-                cout << "Point: " << i << " " << _data[i] << endl;
+                std::cout << "Point: " << i << " " << _data[i] << std::endl;
             }
             
             return *this;
@@ -110,7 +110,7 @@ class matrix_3d : private boost::noncopyable
         matrix_3d() : _data() {  };
 
         /* Calculate a 2x2 determinant */
-        inline fp_t determinant_2x2(const fp_t a00, const fp_t a01, const fp_t a10, const fp_t a11) const
+        inline float determinant_2x2(const float a00, const float a01, const float a10, const float a11) const
         {
             return (a00 * a11) - (a01 * a10);
         }

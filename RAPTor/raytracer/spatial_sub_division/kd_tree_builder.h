@@ -29,9 +29,6 @@ class kd_tree_build_task : public task
             /* Check if a leaf node was create */
             if (this->k->get_normal() != not_set)
             {
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-                ++ng;
-#endif
                 /* If no leaf node was created recurse */
                 /* Allocate 2 new children */
                 kd_tree_build_task& left  = *new(allocate_child()) kd_tree_build_task(this->b,       this->k->get_left(),  this->d + 1);
@@ -44,18 +41,8 @@ class kd_tree_build_task : public task
                 spawn(left);
                 spawn_and_wait_for_all(right);
             }
-#ifdef SPATIAL_SUBDIVISION_STATISTICS
-            else
-            {
-                /* Collect stats on the leaf node */
-                ++ne;
-                max_depth    = max(max_depth, d);
-                nee         += this->k->is_empty();
-                ner          = max(ner, (unsigned)this->k->get_size());       
-                ave_ob      += this->k->get_size();
-            }
-#endif
-            return NULL;
+
+            return nullptr;
         }
         
     private :

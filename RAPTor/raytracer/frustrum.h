@@ -1,12 +1,12 @@
 #ifndef __FRUSTRUM_H__
 #define __FRUSTRUM_H__
 
+/* Ray tracer headers */
 #include "simd.h"
 #include "ray.h"
 #include "packet_ray.h"
 
 #ifdef SIMD_PACKET_TRACING
-
 
 namespace raptor_raytracer
 {
@@ -52,49 +52,49 @@ class frustrum
             }
             
             /* Max and min accross vector */
-            this->n_ogn.x = min(min(min_x_ogn[3], min_x_ogn[2]), min(min_x_ogn[1], min_x_ogn[0]));
-            this->n_ogn.y = min(min(min_y_ogn[3], min_y_ogn[2]), min(min_y_ogn[1], min_y_ogn[0]));
-            this->n_ogn.z = min(min(min_z_ogn[3], min_z_ogn[2]), min(min_z_ogn[1], min_z_ogn[0]));
-            this->n_dir.x = (fp_t)1.0/min(min(min_x_dir[3], min_x_dir[2]), min(min_x_dir[1], min_x_dir[0]));
-            this->n_dir.y = (fp_t)1.0/min(min(min_y_dir[3], min_y_dir[2]), min(min_y_dir[1], min_y_dir[0]));
-            this->n_dir.z = (fp_t)1.0/min(min(min_z_dir[3], min_z_dir[2]), min(min_z_dir[1], min_z_dir[0]));
+            _x_data[0] = horizontal_min(min_x_ogn);
+            _y_data[0] = horizontal_min(min_y_ogn);
+            _z_data[0] = horizontal_min(min_z_ogn);
+            _x_data[2] = 1.0f / horizontal_min(min_x_dir);
+            _y_data[2] = 1.0f / horizontal_min(min_y_dir);
+            _z_data[2] = 1.0f / horizontal_min(min_z_dir);
             
-            this->p_ogn.x = max(max(max_x_ogn[3], max_x_ogn[2]), max(max_x_ogn[1], max_x_ogn[0]));
-            this->p_ogn.y = max(max(max_y_ogn[3], max_y_ogn[2]), max(max_y_ogn[1], max_y_ogn[0]));
-            this->p_ogn.z = max(max(max_z_ogn[3], max_z_ogn[2]), max(max_z_ogn[1], max_z_ogn[0]));
-            this->p_dir.x = (fp_t)1.0/max(max(max_x_dir[3], max_x_dir[2]), max(max_x_dir[1], max_x_dir[0]));
-            this->p_dir.y = (fp_t)1.0/max(max(max_y_dir[3], max_y_dir[2]), max(max_y_dir[1], max_y_dir[0]));
-            this->p_dir.z = (fp_t)1.0/max(max(max_z_dir[3], max_z_dir[2]), max(max_z_dir[1], max_z_dir[0]));
+            _x_data[1] = horizontal_max(max_x_ogn);
+            _y_data[1] = horizontal_max(max_y_ogn);
+            _z_data[1] = horizontal_max(max_z_ogn);
+            _x_data[3] = 1.0f / horizontal_max(max_x_dir);
+            _y_data[3] = 1.0f / horizontal_max(max_y_dir);
+            _z_data[3] = 1.0f / horizontal_max(max_z_dir);
             
-            this->mm_ogn[0] = vfp_t(this->n_ogn.x, this->n_ogn.x, this->p_ogn.x, this->p_ogn.x);
-            this->mm_ogn[1] = vfp_t(this->n_ogn.y, this->n_ogn.y, this->p_ogn.y, this->p_ogn.y);
-            this->mm_ogn[2] = vfp_t(this->n_ogn.z, this->n_ogn.z, this->p_ogn.z, this->p_ogn.z);
+            this->mm_ogn[0] = vfp_t(_x_data[0], _x_data[0], _x_data[1], _x_data[1]);
+            this->mm_ogn[1] = vfp_t(_y_data[0], _y_data[0], _y_data[1], _y_data[1]);
+            this->mm_ogn[2] = vfp_t(_z_data[0], _z_data[0], _z_data[1], _z_data[1]);
             
-            this->mm_dir[0] = vfp_t(this->n_dir.x, this->n_dir.x, this->p_dir.x, this->p_dir.x);
-            this->mm_dir[1] = vfp_t(this->n_dir.y, this->n_dir.y, this->p_dir.y, this->p_dir.y);
-            this->mm_dir[2] = vfp_t(this->n_dir.z, this->n_dir.z, this->p_dir.z, this->p_dir.z);
+            this->mm_dir[0] = vfp_t(_x_data[2], _x_data[2], _x_data[3], _x_data[3]);
+            this->mm_dir[1] = vfp_t(_y_data[2], _y_data[2], _y_data[3], _y_data[3]);
+            this->mm_dir[2] = vfp_t(_z_data[2], _z_data[2], _z_data[3], _z_data[3]);
             
-            /* Pick a major axis -- NOTE p_dir is inverse so flip the comparison */
-            if (fabs(this->p_dir.x) < fabs(this->p_dir.y))
+            /* Pick a major axis -- NOTE positive direction, _data[3], is inverse so flip the comparison */
+            if (fabs(_x_data[3]) < fabs(_y_data[3]))
             {
-                if (fabs(this->p_dir.x) < fabs(this->p_dir.z))
+                if (fabs(_x_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 0 + ((int)(this->p_dir.x < (fp_t)0.0) << 2);
+                    this->n = 0 + ((int)(_x_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(this->p_dir.z < (fp_t)0.0) << 2);
+                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
                 }
             }
             else
             {
-                if (fabs(this->p_dir.y) < fabs(this->p_dir.z))
+                if (fabs(_y_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 1 + ((int)(this->p_dir.y < (fp_t)0.0) << 2);
+                    this->n = 1 + ((int)(_y_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(this->p_dir.z < (fp_t)0.0) << 2);
+                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
                 }
             }
 
@@ -123,49 +123,49 @@ class frustrum
             }
             
             /* Max and min accross vector and invert the direction */
-            this->n_ogn.x = o.x;
-            this->n_ogn.y = o.y;
-            this->n_ogn.z = o.z;
-            this->p_dir.x = (fp_t)1.0/-min(min(min_x_dir[3], min_x_dir[2]), min(min_x_dir[1], min_x_dir[0]));
-            this->p_dir.y = (fp_t)1.0/-min(min(min_y_dir[3], min_y_dir[2]), min(min_y_dir[1], min_y_dir[0]));
-            this->p_dir.z = (fp_t)1.0/-min(min(min_z_dir[3], min_z_dir[2]), min(min_z_dir[1], min_z_dir[0]));
+            _x_data[0] = o.x;
+            _y_data[0] = o.y;
+            _z_data[0] = o.z;
+            _x_data[3] = 1.0f / -horizontal_min(min_x_dir);
+            _y_data[3] = 1.0f / -horizontal_min(min_y_dir);
+            _z_data[3] = 1.0f / -horizontal_min(min_z_dir);
             
-            this->p_ogn.x = o.x;
-            this->p_ogn.y = o.y;
-            this->p_ogn.z = o.z;
-            this->n_dir.x = (fp_t)1.0/-max(max(max_x_dir[3], max_x_dir[2]), max(max_x_dir[1], max_x_dir[0]));
-            this->n_dir.y = (fp_t)1.0/-max(max(max_y_dir[3], max_y_dir[2]), max(max_y_dir[1], max_y_dir[0]));
-            this->n_dir.z = (fp_t)1.0/-max(max(max_z_dir[3], max_z_dir[2]), max(max_z_dir[1], max_z_dir[0]));
+            _x_data[1] = o.x;
+            _y_data[1] = o.y;
+            _z_data[1] = o.z;
+            _x_data[2] = 1.0f / -horizontal_max(max_x_dir);
+            _y_data[2] = 1.0f / -horizontal_max(max_y_dir);
+            _z_data[2] = 1.0f / -horizontal_max(max_z_dir);
             
             this->mm_ogn[0] = vfp_t(o.x);
             this->mm_ogn[1] = vfp_t(o.y);
             this->mm_ogn[2] = vfp_t(o.z);
             
-            this->mm_dir[0] = vfp_t(this->n_dir.x, this->n_dir.x, this->p_dir.x, this->p_dir.x);
-            this->mm_dir[1] = vfp_t(this->n_dir.y, this->n_dir.y, this->p_dir.y, this->p_dir.y);
-            this->mm_dir[2] = vfp_t(this->n_dir.z, this->n_dir.z, this->p_dir.z, this->p_dir.z);
+            this->mm_dir[0] = vfp_t(_x_data[2], _x_data[2], _x_data[3], _x_data[3]);
+            this->mm_dir[1] = vfp_t(_y_data[2], _y_data[2], _y_data[3], _y_data[3]);
+            this->mm_dir[2] = vfp_t(_z_data[2], _z_data[2], _z_data[3], _z_data[3]);
             
-            /* Pick a major axis -- NOTE p_dir is inverse so flip the comparison */
-            if (fabs(this->p_dir.x) < fabs(this->p_dir.y))
+            /* Pick a major axis -- NOTE positive direction _data[3] is inverse so flip the comparison */
+            if (fabs(_x_data[3]) < fabs(_y_data[3]))
             {
-                if (fabs(this->p_dir.x) < fabs(this->p_dir.z))
+                if (fabs(_x_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 0 + ((int)(this->p_dir.x < (fp_t)0.0) << 2);
+                    this->n = 0 + ((int)(_x_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(this->p_dir.z < (fp_t)0.0) << 2);
+                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
                 }
             }
             else
             {
-                if (fabs(this->p_dir.y) < fabs(this->p_dir.z))
+                if (fabs(_y_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 1 + ((int)(this->p_dir.y < (fp_t)0.0) << 2);
+                    this->n = 1 + ((int)(_y_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(this->p_dir.z < (fp_t)0.0) << 2);
+                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
                 }
             }
 
@@ -182,8 +182,8 @@ class frustrum
             const int I2 = mod_3_lut[I0 + 2];
 
             /* Width of the leaf node */
-            fp_t bminf;
-            fp_t bmaxf;
+            float bminf;
+            float bmaxf;
             switch (I0)
             {
                 case 0 :
@@ -206,8 +206,8 @@ class frustrum
             /* Avoid flat leaves */
             if (bminf == bmaxf) 
             { 
-                bminf -= (fp_t)0.5;
-                bmaxf += (fp_t)0.5;
+                bminf -= 0.5f;
+                bmaxf += 0.5f;
             } 
 
             const vfp_t bmin = vfp_t(bminf);
@@ -341,26 +341,26 @@ class frustrum
         }
        
         /* Access functions */
-        fp_t get_min_x0()                   const { return this->n_ogn.x;               }
-        fp_t get_min_y0()                   const { return this->n_ogn.y;               }
-        fp_t get_min_z0()                   const { return this->n_ogn.z;               }
-        fp_t get_max_x0()                   const { return this->p_ogn.x;               }
-        fp_t get_max_y0()                   const { return this->p_ogn.y;               }
-        fp_t get_max_z0()                   const { return this->p_ogn.z;               }
+        float get_min_x0()                  const { return _x_data[0];               }
+        float get_min_y0()                  const { return _y_data[0];               }
+        float get_min_z0()                  const { return _z_data[0];               }
+        float get_max_x0()                  const { return _x_data[1];               }
+        float get_max_y0()                  const { return _y_data[1];               }
+        float get_max_z0()                  const { return _z_data[1];               }
        
-        fp_t get_min_x_grad()               const { return (fp_t)1.0/this->n_dir.x;     }
-        fp_t get_min_y_grad()               const { return (fp_t)1.0/this->n_dir.y;     }
-        fp_t get_min_z_grad()               const { return (fp_t)1.0/this->n_dir.z;     }
-        fp_t get_max_x_grad()               const { return (fp_t)1.0/this->p_dir.x;     }
-        fp_t get_max_y_grad()               const { return (fp_t)1.0/this->p_dir.y;     }
-        fp_t get_max_z_grad()               const { return (fp_t)1.0/this->p_dir.z;     }
+        float get_min_x_grad()              const { return 1.0f / _x_data[2];        }
+        float get_min_y_grad()              const { return 1.0f / _y_data[2];        }
+        float get_min_z_grad()              const { return 1.0f / _z_data[2];        }
+        float get_max_x_grad()              const { return 1.0f / _x_data[3];        }
+        float get_max_y_grad()              const { return 1.0f / _y_data[3];        }
+        float get_max_z_grad()              const { return 1.0f / _z_data[3];        }
         
-        fp_t get_min_x_igrad()              const { return this->n_dir.x;               }
-        fp_t get_min_y_igrad()              const { return this->n_dir.y;               }
-        fp_t get_min_z_igrad()              const { return this->n_dir.z;               }
-        fp_t get_max_x_igrad()              const { return this->p_dir.x;               }
-        fp_t get_max_y_igrad()              const { return this->p_dir.y;               }
-        fp_t get_max_z_igrad()              const { return this->p_dir.z;               }
+        float get_min_x_igrad()             const { return _x_data[2];               }
+        float get_min_y_igrad()             const { return _y_data[2];               }
+        float get_min_z_igrad()             const { return _z_data[2];               }
+        float get_max_x_igrad()             const { return _x_data[3];               }
+        float get_max_y_igrad()             const { return _y_data[3];               }
+        float get_max_z_igrad()             const { return _z_data[3];               }
         
         vfp_t get_ogn(unsigned int i)       const { return this->ogn[i];                }
         vfp_t get_dir(unsigned int i)       const { return this->dir[i];                }
@@ -389,10 +389,13 @@ class frustrum
 //        vfp_t       torg1;
         vfp_t       mm_ogn[3];      /* Max and min origin packed together                   */
         vfp_t       mm_dir[3];      /* Max and min direction packed together                */
-        point_t     n_ogn;          /* Most negative origin                                 */
-        point_t     p_ogn;          /* Most positive origin                                 */
-        point_t     n_dir;          /* Most negative direction                              */
-        point_t     p_dir;          /* Most positive direction                              */
+        float       _x_data[4];
+        float       _y_data[4];
+        float       _z_data[4];
+        // point_t     n_ogn;          /* Most negative origin                                 */
+        // point_t     p_ogn;          /* Most positive origin                                 */
+        // point_t     n_dir;          /* Most negative direction                              */
+        // point_t     p_dir;          /* Most positive direction                              */
         int         n;              /* Major direction of the frustrum                      */
 };
 

@@ -18,16 +18,18 @@ const raptor_physics::init_logger init_logger;
 #include "force.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 struct integrator_fixture
 {
     integrator_fixture()
-    : i0(new fp_t[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t(            0.0,  -0.5,            0.0  ), 4.0),
-      i1(new fp_t[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 1.0 / sqrt(2.0),  0.0, 1.0 / sqrt(2.0) ), 2.0),
-      i2(new fp_t[6]{ numeric_limits<fp_t>::infinity(), numeric_limits<fp_t>::infinity(), numeric_limits<fp_t>::infinity(), 0.0,  0.0, 0.0 }, point_t( 0.0, 0.0, 0.0), numeric_limits<fp_t>::infinity()),
-      i3(new fp_t[6]{ 4.0, 4.0, 4.0, 0.0,  0.0, 0.0 }, point_t( -1.0, 1.0, -1.0 ), 6.0),
+    : i0(new float[6]{ 2.66667, 2.66667, 2.66667, 0.0,  0.0, 0.0 }, point_t(            0.0,  -0.5,            0.0  ), 4.0),
+      i1(new float[6]{ 1.33333, 1.33333, 1.33333, 0.0,  0.0, 0.0 }, point_t( 1.0 / sqrt(2.0),  0.0, 1.0 / sqrt(2.0) ), 2.0),
+      i2(new float[6]{ std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), 0.0,  0.0, 0.0 }, point_t( 0.0, 0.0, 0.0), std::numeric_limits<float>::infinity()),
+      i3(new float[6]{ 4.0, 4.0, 4.0, 0.0,  0.0, 0.0 }, point_t( -1.0, 1.0, -1.0 ), 6.0),
       no_force_vec(),
       no_force(no_force_vec)
     {  };
@@ -1041,3 +1043,5 @@ BOOST_AUTO_TEST_CASE( timestep_viscous_torque_rk4_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

@@ -237,9 +237,9 @@ unsigned parse_element_face(const char **c, unsigned *const pre_skip, unsigned *
  v is a list of vertex locations. m is the current 
  material in use. c is the byte stream to be parsed.
 **********************************************************/
-void parse_binary_face(light_list *l, primitive_list *e, vector<point_t> &vn, vector<point_t> &v, map<int, material *> *const shader_map, const char **c, const bool colour)
+void parse_binary_face(light_list *l, primitive_list *e, std::vector<point_t> &vn, std::vector<point_t> &v, std::map<int, material *> *const shader_map, const char **c, const bool colour)
 {
-    static vector<point_t> face;
+    static std::vector<point_t> face;
     
     /* Parse all vextex data for the face */
     unsigned char v_this_f = from_byte_stream<unsigned char>(c);
@@ -322,9 +322,9 @@ void parse_binary_face(light_list *l, primitive_list *e, vector<point_t> &vn, ve
  v is a list of vertex locations. m is the current 
  material in use. c is the byte stream to be parsed.
 **********************************************************/
-void parse_face(light_list *l, primitive_list *e, vector<point_t> &vn, vector<point_t> &v, map<int, material *> *const shader_map, const char **c, const bool colour)
+void parse_face(light_list *l, primitive_list *e, std::vector<point_t> &vn, std::vector<point_t> &v, std::map<int, material *> *const shader_map, const char **c, const bool colour)
 {
-    static vector<point_t> face;
+    static std::vector<point_t> face;
 
     /* Parse all vextex data for the face */
     unsigned v_this_f = atoi(*c);
@@ -402,14 +402,14 @@ void parse_face(light_list *l, primitive_list *e, vector<point_t> &vn, vector<po
  vs is a list of vertices to be appended too and c is a 
  pointer to the byte stream to be parsed.
 **********************************************************/
-void parse_binary_vertex(vector<point_t> *const vs, vector<point_t> *const vn, const char **c, const bool normal, const bool colour)
+void parse_binary_vertex(std::vector<point_t> *const vs, std::vector<point_t> *const vn, const char **c, const bool normal, const bool colour)
 {
     point_t v;
 
     /* Parse the vertex position */
-    v.x = from_byte_stream<fp_t>(c);
-    v.y = from_byte_stream<fp_t>(c);
-    v.z = from_byte_stream<fp_t>(c);
+    v.x = from_byte_stream<float>(c);
+    v.y = from_byte_stream<float>(c);
+    v.z = from_byte_stream<float>(c);
     vs->push_back(v);
 
     /* Ignore the vertex colour */
@@ -421,9 +421,9 @@ void parse_binary_vertex(vector<point_t> *const vs, vector<point_t> *const vn, c
     /* Parse the vertex normal */
     if (normal)
     {
-        v.x = from_byte_stream<fp_t>(c);
-        v.y = from_byte_stream<fp_t>(c);
-        v.z = from_byte_stream<fp_t>(c);
+        v.x = from_byte_stream<float>(c);
+        v.y = from_byte_stream<float>(c);
+        v.z = from_byte_stream<float>(c);
         vn->push_back(v);
     }
 }
@@ -436,7 +436,7 @@ void parse_binary_vertex(vector<point_t> *const vs, vector<point_t> *const vn, c
  vs is a list of vertices to be appended too and c is a 
  pointer to the byte stream to be parsed.
 **********************************************************/
-void parse_vertex(vector<point_t> *const vs, vector<point_t> *const vn, const char **c, const bool normal, const bool colour)
+void parse_vertex(std::vector<point_t> *const vs, std::vector<point_t> *const vn, const char **c, const bool normal, const bool colour)
 {
     point_t v;
 
@@ -467,18 +467,18 @@ void parse_vertex(vector<point_t> *const vs, vector<point_t> *const vn, const ch
  common models, namely vertex and face data.
 **********************************************************/
 void ply_parser(
-    ifstream            &ply_file,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m,
-    camera              **c)
+    std::ifstream           &ply_file,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m,
+    camera                  **c)
 {
     /* Find the size of the file */
-    ply_file.seekg(0, ios::end);
+    ply_file.seekg(0, std::ios::end);
     size_t len = ply_file.tellg();
-    ply_file.seekg(0, ios::beg);
+    ply_file.seekg(0, std::ios::beg);
 
-//    cout << "Parsing PLY length: " << len << endl;
+//    std::cout << "Parsing PLY length: " << len << std::endl;
        
     /* Read the whole file into a buffer */
     char *buffer = new char [len];
@@ -486,12 +486,12 @@ void ply_parser(
     const char *at = &buffer[0];
     
     /* Vectors of vertice data */
-    vector<point_t>         vn;
-    vector<point_t>         v;
+    std::vector<point_t>    vn;
+    std::vector<point_t>    v;
     
     /* Map of shader names to shader */
-    map<int, material *> shader_map;
-    shader_map[0xdefa] = new phong_shader(ext_colour_t(0.0, 0.0, 0.0), ext_colour_t(200.0, 200.0, 200.0), ext_colour_t(0.0, 0.0, 0.0), 0.0);
+    std::map<int, material *> shader_map;
+    shader_map[0xdefa] = new phong_shader(ext_colour_t(0.0f, 0.0f, 0.0f), ext_colour_t(200.0f, 200.0f, 200.0f), ext_colour_t(0.0f, 0.0f, 0.0f), 0.0f);
     
     /* Check this is a PLY file */
     assert(strncmp(at, "ply", 3) == 0);
@@ -567,13 +567,13 @@ void ply_parser(
 
  
     /* Add the materials to the list of materials */
-    for (map<int, material *>::const_iterator i = shader_map.begin(); i != shader_map.end(); ++i)
+    for (auto i = shader_map.begin(); i != shader_map.end(); ++i)
     {
         m.push_back(i->second);
     }
  
     /* Tidy up */
     delete [] buffer;
-//    cout << "Parsing complete" << endl;
+//    std::cout << "Parsing complete" << std::endl;
 }
 }; /* namespace raptor_raytracer */

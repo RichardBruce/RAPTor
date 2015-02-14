@@ -14,24 +14,24 @@ class light
 {
     public :
         /* CTOR for spherical light */
-        light(const ext_colour_t &rgb, const point_t &c, const fp_t d, const fp_t r)                  
-            : t(NULL), rgb(rgb/(fp_t)255.0), c(c), n(2.0), r(r), d(d), s_a(0.0), s_b(0.0), n_dir(x_pos) { };
+        light(const ext_colour_t &rgb, const point_t &c, const float d, const float r)                  
+            : t(nullptr), rgb(rgb / 255.0f), c(c), n(2.0f), r(r), d(d), s_a(0.0f), s_b(0.0f), n_dir(x_pos) { };
 
         /* CTOR for triangle defined light */
-        light(const ext_colour_t &rgb, const point_t &c, const fp_t d, const vector<triangle *> *const t)
-            : t(t), rgb(rgb/(fp_t)255.0), c(c), n(2.0), r(0.0), d(d), s_a(0.0), s_b(0.0), n_dir(x_pos) { };
+        light(const ext_colour_t &rgb, const point_t &c, const float d, const std::vector<triangle *> *const t)
+            : t(t), rgb(rgb / 255.0f), c(c), n(2.0f), r(0.0f), d(d), s_a(0.0f), s_b(0.0f), n_dir(x_pos) { };
 
         /* CTOR for spot light */
-        light(const ext_colour_t &rgb, const point_t &c, const point_t &n, const fp_t d, const fp_t s_a, const fp_t s_b, const fp_t r)
-            : t(NULL), rgb(rgb/(fp_t)255.0), c(c), n(n), r(r), d(d), s_a(s_a), s_b(s_b), n_dir(x_pos) { };
+        light(const ext_colour_t &rgb, const point_t &c, const point_t &n, const float d, const float s_a, const float s_b, const float r)
+            : t(nullptr), rgb(rgb / 255.0f), c(c), n(n), r(r), d(d), s_a(s_a), s_b(s_b), n_dir(x_pos) { };
 
         /* CTOR for triangle defined spot light */
-        light(const ext_colour_t &rgb, const point_t &c, const point_t &n, const fp_t d, const fp_t s_a, const fp_t s_b, const vector<triangle *> *const t)
-            : t(t), rgb(rgb/(fp_t)255.0), c(c), n(n), r(0.0), d(d), s_a(s_a), s_b(s_b), n_dir(x_pos) { };
+        light(const ext_colour_t &rgb, const point_t &c, const point_t &n, const float d, const float s_a, const float s_b, const std::vector<triangle *> *const t)
+            : t(t), rgb(rgb / 255.0f), c(c), n(n), r(0.0f), d(d), s_a(s_a), s_b(s_b), n_dir(x_pos) { };
 
         /* CTOR for directional light */
-        light(const ext_colour_t &rgb, const point_t &n, const fp_t d)
-            : t(NULL), rgb(rgb/(fp_t)255.0), c(), n(n), r(0.0), d(d), s_a(0.0), s_b(0.0), n_dir(find_major_direction()) {  };
+        light(const ext_colour_t &rgb, const point_t &n, const float d)
+            : t(nullptr), rgb(rgb / 255.0f), c(), n(n), r(0.0f), d(d), s_a(0.0f), s_b(0.0f), n_dir(find_major_direction()) {  };
 
         /* Copy CTOR */
         light(const light &l)
@@ -41,15 +41,15 @@ class light
         
         /* Use inverse distance square law for light intensity */
         /* Distance is scaled by this->d */
-        const ext_colour_t   get_light_intensity(const point_t &dir, const fp_t c)  const   
+        const ext_colour_t   get_light_intensity(const point_t &dir, const float c)  const   
         {
-            const fp_t dist     = c * this->d;
-            const fp_t d_scale  = ((dist * dist) + (fp_t)1.0);
-            if (this->s_b != (fp_t)0.0)
+            const float dist    = c * this->d;
+            const float d_scale = ((dist * dist) + 1.0f);
+            if (this->s_b != 0.0f)
             {
-                const fp_t a = acos(dot_product(dir, this->n));
-                const fp_t p = (a - this->s_a) / (this->s_b - this->s_a);
-                const fp_t f = max((fp_t)0.0, min((fp_t)1.0, ((fp_t)1.0 - p)));
+                const float a = acos(dot_product(dir, this->n));
+                const float p = (a - this->s_a) / (this->s_b - this->s_a);
+                const float f = std::max(0.0f, std::min(1.0f, (1.0f - p)));
                 return (this->rgb * (f / d_scale));
             }
             else
@@ -62,11 +62,11 @@ class light
         int find_rays(ray *const r, const point_t &d, const int n) const
         {
             /* Directional light */
-            if ((this->n.x != (fp_t)2.0) && (this->s_b == (fp_t)0.0))
+            if ((this->n.x != 2.0f) && (this->s_b == 0.0f))
             {
                 /* The light should be parallel light and from infinetly far away */
                 /* Place the light outside the scene bounding box and in the direction of this->n */
-                fp_t dist;
+                float dist;
                 switch (this->n_dir)
                 {
                     case x_pos :
@@ -113,27 +113,27 @@ class light
                 return 1;
             }
             /* Generate spherical light */
-            else if (this->t == NULL)
+            else if (this->t == nullptr)
             {
                 /* Pick scales in each co-ordinate */
-                const fp_t a_scale  = 1.0/(fp_t)((n >> 4) + ((n & 0xe) != 0) + 1);
-                const fp_t b_scale  = 1.0/(fp_t)((n >> 4) + ((n & 0xc) != 0) + 1);
-                const fp_t r_scale  = 1.0/(fp_t)((n >> 4) + ((n & 0x8) != 0) + 1);
+                const float a_scale = 1.0f / static_cast<float>((n >> 4) + ((n & 0xe) != 0) + 1);
+                const float b_scale = 1.0f / static_cast<float>((n >> 4) + ((n & 0xc) != 0) + 1);
+                const float r_scale = 1.0f / static_cast<float>((n >> 4) + ((n & 0x8) != 0) + 1);
 
                 /* Create n rays, each with a random offset in a fixed volume */
                 for (int i = 0; i < n; i++)
                 {
                     /* Pick random offsets */
                     const int eigths    = (i >> 2) & ~0x1;
-                    const fp_t a_off    = gen_random_mersenne_twister() * (a_scale * (fp_t)(eigths + (i & 0x1))) * ((fp_t)2.0 * PI);
-                    const fp_t b_off    = gen_random_mersenne_twister() * (b_scale * (fp_t)(eigths + (i & 0x2))) * ((fp_t)2.0 * PI);
-                    const fp_t r_off    = gen_random_mersenne_twister() * (r_scale * (fp_t)(eigths + (i & 0x4))) * this->r;
+                    const float a_off   = gen_random_mersenne_twister() * (a_scale * static_cast<float>(eigths + (i & 0x1))) * (2.0f * PI);
+                    const float b_off   = gen_random_mersenne_twister() * (b_scale * static_cast<float>(eigths + (i & 0x2))) * (2.0f * PI);
+                    const float r_off   = gen_random_mersenne_twister() * (r_scale * static_cast<float>(eigths + (i & 0x4))) * this->r;
 
                     /* Convert to cartesian co-ordinates */
-                    const fp_t sin_a    = cos_lut.get_sin(a_off);
-                    const fp_t cos_a    = cos_lut.get_cos(a_off);
-                    const fp_t sin_b    = cos_lut.get_sin(b_off);
-                    const fp_t cos_b    = cos_lut.get_cos(b_off);
+                    const float sin_a   = cos_lut.get_sin(a_off);
+                    const float cos_a   = cos_lut.get_cos(a_off);
+                    const float sin_b   = cos_lut.get_sin(b_off);
+                    const float cos_b   = cos_lut.get_cos(b_off);
                     point_t offset((r_off * cos_a * sin_b), (r_off * sin_a * sin_b), (r_off * cos_b));
 
                     /* Create a new ray */
@@ -147,10 +147,10 @@ class light
                 const int ppt       = n / this->t->size();
                 
                 /* How often to take an extra point */
-                const fp_t stride   = (fp_t)this->t->size() / (fp_t)max((int)(n - (this->t->size() * ppt)), 1);
+                const float stride  = static_cast<float>(this->t->size()) / static_cast<float>(std::max((int)(n - (this->t->size() * ppt)), 1));
 
                 /* Create n rays */
-                fp_t extra_point    = (fp_t)0.0;
+                float extra_point   = 0.0f;
                 int  ray_nr         = 0;
                 for(int i = 0; i < (int)this->t->size(); i ++)
                 {
@@ -191,7 +191,7 @@ class light
             {
                 if (fabs(n.x) > fabs(n.z))
                 {
-                    if (n.x < (fp_t)0.0)
+                    if (n.x < 0.0f)
                     {
                         return x_neg;
                     }
@@ -202,7 +202,7 @@ class light
                 }
                 else
                 {
-                    if (n.z < (fp_t)0.0)
+                    if (n.z < 0.0f)
                     {
                         return z_neg;
                     }
@@ -216,7 +216,7 @@ class light
             {
                 if (fabs(n.y) > fabs(n.z))
                 {
-                    if (n.y < (fp_t)0.0)
+                    if (n.y < 0.0f)
                     {
                         return y_neg;
                     }
@@ -227,7 +227,7 @@ class light
                 }
                 else
                 {
-                    if (n.z < (fp_t)0.0)
+                    if (n.z < 0.0f)
                     {
                         return z_neg;
                     }
@@ -239,15 +239,15 @@ class light
             }
         }
 
-        const vector<triangle *> *const t;      /* Triangles forming a face                 */
-        const ext_colour_t              rgb;    /* The colour of the light                  */
-        const point_t                   c;      /* Centre of the light                      */
-        const point_t                   n;      /* Direction of the light                   */
-        const fp_t                      r;      /* Radius of the light                      */
-        const fp_t                      d;      /* Drop off with distance                   */
-        const fp_t                      s_a;    /* Angle where spotlight starts to fade     */
-        const fp_t                      s_b;    /* Angle where spotlight finishes fading    */
-        const light_direction_t         n_dir;  /* Major axis and direction of the light    */
+        const std::vector<triangle *> *const    t;      /* Triangles forming a face                 */
+        const ext_colour_t                      rgb;    /* The colour of the light                  */
+        const point_t                           c;      /* Centre of the light                      */
+        const point_t                           n;      /* Direction of the light                   */
+        const float                             r;      /* Radius of the light                      */
+        const float                             d;      /* Drop off with distance                   */
+        const float                             s_a;    /* Angle where spotlight starts to fade     */
+        const float                             s_b;    /* Angle where spotlight finishes fading    */
+        const light_direction_t                 n_dir;  /* Major axis and direction of the light    */
 };
 }; /* namespace raptor_raytracer */
 

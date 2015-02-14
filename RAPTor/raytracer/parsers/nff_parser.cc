@@ -9,16 +9,16 @@
 namespace raptor_raytracer
 {
 void nff_parser(
-    ifstream            &nff_file,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m,
-    camera              **c)
+    std::ifstream           &nff_file,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m,
+    camera                  **c)
 {
     /* Find the size of the file */
-    nff_file.seekg(0, ios::end);
+    nff_file.seekg(0, std::ios::end);
     size_t len = nff_file.tellg();
-    nff_file.seekg(0, ios::beg);
+    nff_file.seekg(0, std::ios::beg);
     
     /* Read the whole file into a buffer */
     char *buffer = new char [len];
@@ -26,17 +26,17 @@ void nff_parser(
     const char *at = &buffer[0];
     
     /* The current material properties to be used */
-    phong_shader *cur_mat = NULL;
+    phong_shader *cur_mat = nullptr;
     
     /* The background colour */
     ext_colour_t bg;
 
     /* Vector for face to triangle conversion */
-    vector<point_t> points;
-    vector<point_t> normals;
+    std::vector<point_t> points;
+    std::vector<point_t> normals;
 
     /* Parse the file */
-    while (at < &buffer[len-1])
+    while (at < &buffer[len - 1])
     {
         /* Parse the background colour */
         if ((*at) == 'b')
@@ -46,7 +46,7 @@ void nff_parser(
             bg.b = get_next_float(&at);
             
             /* Scale the colour to rgb */
-            bg *= (fp_t)255.0;
+            bg *= 255.0f;
         }
         /* Parse viewing vectors and angles */
         else if ((*at) == 'v')
@@ -54,7 +54,7 @@ void nff_parser(
             /* Parse the view position */
             find_next_line(&at);
             
-            fp_t x, y, z, a, h, x_res, y_res;
+            float x, y, z, a, h, x_res, y_res;
             x  = get_next_float(&at);
             y  = get_next_float(&at);
             z  = get_next_float(&at);
@@ -66,36 +66,36 @@ void nff_parser(
             y  = get_next_float(&at);
             z  = get_next_float(&at);
             point_t to(x, y, z);
-            vector_t at_vec = to - from;
+            point_t at_vec = to - from;
             
             /* Parse up direction */        
             find_next_line(&at);
             x  = get_next_float(&at);
             y  = get_next_float(&at);
             z  = get_next_float(&at);
-            vector_t up_vec(x, y, z);
+            point_t up_vec(x, y, z);
             
             /* Parse angle of view */        
             find_next_line(&at);
             a  = get_next_float(&at);
-            fp_t angle = a * (PI/(fp_t)360.0); /* This is half of the angle in rad to make a right angle triangle */
-            fp_t dist_ratio = sin(angle)/cos(angle);
+            float angle = a * (PI / 360.0f); /* This is half of the angle in rad to make a right angle triangle */
+            float dist_ratio = sin(angle)/cos(angle);
             
             /* Parse the heigth of the picture */        
             find_next_line(&at);
             h  = get_next_float(&at);
-            if (h == (fp_t)0.0)
+            if (h == 0.0f)
             {
-                h = (fp_t)1.0;
+                h = 1.0f;
             }
-            fp_t height_width = dist_ratio * h;
+            float height_width = dist_ratio * h;
             
             /* Parse the resolution */        
             find_next_line(&at);
             x_res  = get_next_float(&at);
             y_res  = get_next_float(&at);
 
-            vector_t x_vec(1.0, 0.0, 0.0);
+            point_t x_vec(1.0f, 0.0f, 0.0f);
             cross_product(up_vec, at_vec, &x_vec);
             cross_product(at_vec, x_vec, &up_vec);
             normalise(&x_vec);
@@ -106,10 +106,10 @@ void nff_parser(
         /* Parse a light */
         else if ((*at) == 'l')
         {
-            fp_t x, y, z, r, g, b;
-            r = (fp_t)255.0;
-            g = (fp_t)255.0;
-            b = (fp_t)255.0;
+            float x, y, z, r, g, b;
+            r = 255.0f;
+            g = 255.0f;
+            b = 255.0f;
             
             x  = get_next_float(&at);
             y  = get_next_float(&at);
@@ -125,13 +125,13 @@ void nff_parser(
             
             /* No fall off in intensity with distance is assumed */
             /* A radius of 0.1 is assumed */
-            new_light(&l, ext_colour_t(r, g, b), point_t(x, y, z), 0.0, 0.1);
+            new_light(&l, ext_colour_t(r, g, b), point_t(x, y, z), 0.0f, 0.1f);
         }
         /* Parse material properties */
         else if (((*at) == 'f') && ((*(at+1)) == ' '))
         {
             ext_colour_t rgb;
-            fp_t kd, ks, s, t, ri;
+            float kd, ks, s, t, ri;
             
             rgb.r   = get_next_float(&at);
             rgb.g   = get_next_float(&at);
@@ -143,7 +143,7 @@ void nff_parser(
             ri      = get_next_float(&at);
             
             /* Scale the colour to rgb */
-            rgb *= (fp_t)255.0;
+            rgb *= 255.0f;
         
             cur_mat = new phong_shader(rgb, kd, ks, s, t, ri, ks);
             m.push_back(cur_mat);
@@ -161,7 +161,7 @@ void nff_parser(
                 for (unsigned i=0; i<p; i++)
                 {
                     /* Points */
-                    fp_t x, y, z;
+                    float x, y, z;
                     find_next_line(&at);
                     x = atof(at);
                     y = get_next_float(&at);
@@ -193,7 +193,7 @@ void nff_parser(
                 /* Parse each point */
                 for (unsigned int i = 0; i < p; i++)
                 {
-                    fp_t x, y, z;
+                    float x, y, z;
                     find_next_line(&at);
                     x = atof(at);
                     y = get_next_float(&at);
@@ -212,7 +212,7 @@ void nff_parser(
         /* Parse a sphere */
         else if ((*at) == 's')
         {
-//            fp_t x, y, z, r;
+//            float x, y, z, r;
 //            
 //            x = get_next_float(&at);
 //            y = get_next_float(&at);
@@ -226,7 +226,7 @@ void nff_parser(
         else if ((*at) == 'c')
         {
             point_t t,  b;
-            // fp_t    r0, r1;
+            // float    r0, r1;
             
             t.x = get_next_float(&at);
             t.y = get_next_float(&at);
@@ -237,7 +237,7 @@ void nff_parser(
             b.z = get_next_float(&at);
             // r1  = get_next_float(&at);
             
-            cout << "Warning: Parsed un-used cone" << endl;
+            std::cout << "Warning: Parsed un-used cone" << std::endl;
             /* A cyclinder is a cone with the same radius at each end */
 //             if (r0 == r1)
 //             {
@@ -252,7 +252,7 @@ void nff_parser(
         }
         else
         {
-            cout << "Error: Unknown enitity: " << (*at) << endl;
+            std::cout << "Error: Unknown enitity: " << (*at) << std::endl;
         }
 
         /* Move onto the next line */

@@ -19,9 +19,10 @@ const raptor_physics::init_logger init_logger;
 #include "inertia_tensor.h"
 
 
-using namespace raptor_physics;
-
-
+namespace raptor_physics
+{
+namespace test
+{
 BOOST_AUTO_TEST_SUITE( inertia_tensor_tests )
 
 const float result_tolerance = 0.0005;
@@ -53,7 +54,7 @@ BOOST_AUTO_TEST_CASE( basic_test )
 
 BOOST_AUTO_TEST_CASE( inifinite_mass_basic_test )
 {
-    const float m = numeric_limits<float>::infinity();
+    const float m = std::numeric_limits<float>::infinity();
     const point_t com(30.1, -4.7, 5.3);
     float *const it = new float [6] { m, m, m, m, m, m };
     const float it_inv[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
@@ -259,13 +260,13 @@ BOOST_AUTO_TEST_CASE( infinite_mass_test )
             0, 1, 4, 1, 5, 4  /* Bottom face */
         });
 
-    const float m = numeric_limits<fp_t>::infinity();
+    const float m = std::numeric_limits<float>::infinity();
     const point_t com(0.0, 0.0, 0.0);
-    const float tensor = numeric_limits<fp_t>::infinity();
+    const float tensor = std::numeric_limits<float>::infinity();
     const float it[6] = { tensor, tensor, tensor, tensor, tensor, tensor };
     const float it_inv[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
-    inertia_tensor uut(p, e, numeric_limits<fp_t>::infinity());
+    inertia_tensor uut(p, e, std::numeric_limits<float>::infinity());
     BOOST_CHECK(std::equal(&it[0], &it[6], uut.tensor()));
     BOOST_CHECK(std::equal(&it_inv[0], &it_inv[6], uut.inverse_tensor(), [] (const float exp, const float act)
         {
@@ -833,7 +834,7 @@ BOOST_AUTO_TEST_CASE( rotated_cuboid_with_density_test )
 
 BOOST_AUTO_TEST_CASE( inifinite_mass_view_test )
 {
-    const float m = numeric_limits<float>::infinity();
+    const float m = std::numeric_limits<float>::infinity();
     const point_t com(30.1, -4.7, 5.3);
     float *const it = new float [6] { m, m, m, m, m, m };
     const float it_inv[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
@@ -862,3 +863,5 @@ BOOST_AUTO_TEST_CASE( inifinite_mass_view_test )
 
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

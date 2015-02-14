@@ -39,13 +39,13 @@ void find_vertex(const char **c)
 {
     while (((**c) != ' ') && ((**c) != '\n') && ((**c) != '\r'))
     {
-//        cout << "non space increment" << endl;
+//        std::cout << "non space increment" << std::endl;
         ++(*c);
     }
     
     while ((**c) == ' ')
     {
-//        cout << "space increment" << endl;
+//        std::cout << "space increment" << std::endl;
         ++(*c);
     }
     
@@ -65,12 +65,12 @@ bool is_triplet_delimiter(const char **c)
 }
 
 
-void parse_f_statement(light_list *l, primitive_list *e, vector<point_t> &vt, vector<point_t> &vn, vector<point_t> &v, material *const m, const char **c)
+void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &vt, std::vector<point_t> &vn, std::vector<point_t> &v, material *const m, const char **c)
 {
-//    cout << "face: " << (*c)[0] << endl;
-    static vector<point_t> face;
-    static vector<point_t> face_t;
-    static vector<point_t> face_n;
+//    std::cout << "face: " << (*c)[0] << std::endl;
+    static std::vector<point_t> face;
+    static std::vector<point_t> face_t;
+    static std::vector<point_t> face_n;
 
     /* Parse all vextex data for the face */
     find_vertex(c);
@@ -86,7 +86,7 @@ void parse_f_statement(light_list *l, primitive_list *e, vector<point_t> &vt, ve
         {
             vert_num--;
         }
-//        cout << "vertex: " << vert_num << endl;
+//        std::cout << "vertex: " << vert_num << std::endl;
         assert((unsigned)vert_num < v.size());
         face.push_back(v[vert_num]);
         
@@ -105,7 +105,7 @@ void parse_f_statement(light_list *l, primitive_list *e, vector<point_t> &vt, ve
                 {
                     vert_text--;
                 }
-//                cout << "texture: " << vert_text << endl;
+//                std::cout << "texture: " << vert_text << std::endl;
                 assert((unsigned)vert_text < vt.size());
                 face_t.push_back(vt[vert_text]);
             }
@@ -123,12 +123,12 @@ void parse_f_statement(light_list *l, primitive_list *e, vector<point_t> &vt, ve
                 {
                     vert_norm--;
                 }
-//                cout << "normal: " << vert_norm << endl;
+//                std::cout << "normal: " << vert_norm << std::endl;
                 assert((unsigned)vert_norm < vn.size());
                 face_n.push_back(vn[vert_norm]);
             }
         }
-//        cout << "current: " << (*c)[0] << (*c)[1] << endl;
+//        std::cout << "current: " << (*c)[0] << (*c)[1] << std::endl;
         find_vertex(c);
     }
 
@@ -159,13 +159,13 @@ void parse_f_statement(light_list *l, primitive_list *e, vector<point_t> &vt, ve
                 {
                     if (face_t.empty())
                     {
-                        new_triangle(e, NULL, m, face[0], face[1], face[2], false);
+                        new_triangle(e, nullptr, m, face[0], face[1], face[2], false);
                     }
                     else
                     {
                         assert(face_t.size() == 3);
                         point_t text[3] = { face_t[0], face_t[1], face_t[2] };
-                        new_triangle(e, NULL, m, face[0], face[1], face[2], false, NULL, &text[0]);
+                        new_triangle(e, nullptr, m, face[0], face[1], face[2], false, nullptr, &text[0]);
                     }
                 }
                 else
@@ -174,13 +174,13 @@ void parse_f_statement(light_list *l, primitive_list *e, vector<point_t> &vt, ve
                     point_t normals[3] = { face_n[0], face_n[1], face_n[2] };
                     if (face_t.empty())
                     {
-                        new_triangle(e, NULL, m, face[0], face[1], face[2], false, &normals[0]);
+                        new_triangle(e, nullptr, m, face[0], face[1], face[2], false, &normals[0]);
                     }
                     else
                     {
                         assert(face_t.size() == 3);
                         point_t text[3] = { face_t[0], face_t[1], face_t[2] };
-                        new_triangle(e, NULL, m, face[0], face[1], face[2], false, &normals[0], &text[0]);
+                        new_triangle(e, nullptr, m, face[0], face[1], face[2], false, &normals[0], &text[0]);
                     }
                 }
             }
@@ -200,12 +200,12 @@ void parse_f_statement(light_list *l, primitive_list *e, vector<point_t> &vt, ve
 }
 
 
-material * parse_mtllib(map<string, material *> *const s, ifstream &f, const string &p)
+material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstream &f, const std::string &p)
 {
     /* Find the size of the file */
-    f.seekg(0, ios::end);
+    f.seekg(0, std::ios::end);
     size_t len = f.tellg();
-    f.seekg(0, ios::beg);
+    f.seekg(0, std::ios::beg);
        
     /* Read the whole file into a buffer */
     char *buffer = new char [len];
@@ -213,16 +213,16 @@ material * parse_mtllib(map<string, material *> *const s, ifstream &f, const str
     const char *at = &buffer[0];
     
     /* Colour of current material */
-    string          mn;
-    material       *m       = NULL;
-    texture_mapper *t_ka    = NULL;     /* Ambient colour texture mapper    */
-    texture_mapper *t_kd    = NULL;     /* Diffuse colour texture mapper    */
-    texture_mapper *t_ks    = NULL;     /* Specular colour texture mapper   */
-    texture_mapper *t_ns    = NULL;     /* Specular exponant texture mapper */
+    std::string     mn;
+    material       *m       = nullptr;
+    texture_mapper *t_ka    = nullptr;     /* Ambient colour texture mapper    */
+    texture_mapper *t_kd    = nullptr;     /* Diffuse colour texture mapper    */
+    texture_mapper *t_ks    = nullptr;     /* Specular colour texture mapper   */
+    texture_mapper *t_ns    = nullptr;     /* Specular exponant texture mapper */
     ext_colour_t    ka;                 /* Ambient colour                   */
     ext_colour_t    kd;                 /* Diffuse colour                   */
     ext_colour_t    ks;                 /* Specular colour                  */
-    fp_t            ns      = 0.0;      /* Specular exponant                */
+    float           ns      = 0.0f;      /* Specular exponant                */
     
     /* Parse the file */
     while (at < &buffer[len-1])
@@ -244,10 +244,10 @@ material * parse_mtllib(map<string, material *> *const s, ifstream &f, const str
             mn = get_next_string(&at);
             
             /* Default parameters */
-            t_ka    = NULL;
-            t_kd    = NULL;
-            t_ks    = NULL;
-            t_ns    = NULL;
+            t_ka    = nullptr;
+            t_kd    = nullptr;
+            t_ks    = nullptr;
+            t_ns    = nullptr;
             ka      = ext_colour_t(0.0);
             kd      = ext_colour_t(0.0);
             ks      = ext_colour_t(0.0);
@@ -311,8 +311,8 @@ material * parse_mtllib(map<string, material *> *const s, ifstream &f, const str
         /* Diffuse texture map */
         else if (strncmp(at, "map_Kd", 6) == 0)
         {
-            string map_file = p + get_next_string(&at);
-            fp_t *img;
+            std::string map_file = p + get_next_string(&at);
+            float *img;
             unsigned int img_width;
             unsigned int img_height;
             unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
@@ -320,7 +320,7 @@ material * parse_mtllib(map<string, material *> *const s, ifstream &f, const str
         }
         else
         {
-            cout << "Found unknown: " << at[0] << endl;
+            std::cout << "Found unknown: " << at[0] << std::endl;
             find_next_line(&at);
             assert(false);
         }
@@ -343,18 +343,18 @@ material * parse_mtllib(map<string, material *> *const s, ifstream &f, const str
 }
 
 
-material * parse_mtllib_statement(map<string, material *> *const s, const string &p, const char **c)
+material * parse_mtllib_statement(std::map<std::string, material *> *const s, const std::string &p, const char **c)
 {
     /* Last defined material */
-    material *m = NULL;
+    material *m = nullptr;
     
     /* Parse till the end of the line */
     while (!end_of_line(*c))
     {
         /* Get the material library to open */
-        string mtllib = p + get_next_string(c);
-//        cout << "Opening material file: " << mtllib << endl;
-        ifstream f(mtllib.c_str());
+        std::string mtllib = p + get_next_string(c);
+//        std::cout << "Opening material file: " << mtllib << std::endl;
+        std::ifstream f(mtllib.c_str());
         assert(f.is_open());
 
         /* Parse the file */    
@@ -371,11 +371,11 @@ material * parse_mtllib_statement(map<string, material *> *const s, const string
 }
 
 
-void parse_usemtl_statement(map<string, material *> *const s, material **m, const char **c)
+void parse_usemtl_statement(std::map<std::string, material *> *const s, material **m, const char **c)
 {
     /* Get the name of the material and look it up in the hash */
-    string usemtl = get_next_string(c);
-    map<string, material *>::const_iterator i = s->find(usemtl);
+    std::string usemtl = get_next_string(c);
+    auto i = s->find(usemtl);
     
     /* Check if the material was found */
     if(i != s->end())
@@ -384,7 +384,7 @@ void parse_usemtl_statement(map<string, material *> *const s, material **m, cons
     }
     else
     {
-        *m = new phong_shader(ext_colour_t(0.0, 0.0, 0.0), ext_colour_t(200.0, 200.0, 200.0), ext_colour_t(0.0, 0.0, 0.0), 0.0);
+        *m = new phong_shader(ext_colour_t(0.0f, 0.0f, 0.0f), ext_colour_t(200.0f, 200.0f, 200.0f), ext_colour_t(0.0f, 0.0f, 0.0f), 0.0f);
         (*s)[usemtl] = *m;
     }
         
@@ -392,14 +392,14 @@ void parse_usemtl_statement(map<string, material *> *const s, material **m, cons
 }
 
 
-void parse_v_statement(vector<point_t> *const vs, const char **c)
+void parse_v_statement(std::vector<point_t> *const vs, const char **c)
 {
     point_t v;
 
     v.x = get_next_float(c);
     v.y = get_next_float(c);
     v.z = get_next_float(c);
-//    cout << "Parsed v: " << v.x << ", " << v.y << ", " << v.z << endl;
+//    std::cout << "Parsed v: " << v.x << ", " << v.y << ", " << v.z << std::endl;
 
     find_next_line(c);
 
@@ -407,13 +407,13 @@ void parse_v_statement(vector<point_t> *const vs, const char **c)
 }
 
 
-void parse_vt_statement(vector<point_t> *const vs, const char **c)
+void parse_vt_statement(std::vector<point_t> *const vs, const char **c)
 {
     point_t v;
 
     v.x = get_next_float(c);
     v.y = get_next_float(c);
-//    cout << "Parsed vt: " << v.x << ", " << v.y << ", " << v.z << endl;
+//    std::cout << "Parsed vt: " << v.x << ", " << v.y << ", " << v.z << std::endl;
 
     find_next_line(c);
 
@@ -421,7 +421,7 @@ void parse_vt_statement(vector<point_t> *const vs, const char **c)
 }
 
 
-void parse_vn_statement(vector<point_t> *const vs, const char **c)
+void parse_vn_statement(std::vector<point_t> *const vs, const char **c)
 {
     point_t v;
 
@@ -429,7 +429,7 @@ void parse_vn_statement(vector<point_t> *const vs, const char **c)
     v.y = get_next_float(c);
     v.z = get_next_float(c);
     normalise(&v);
-//    cout << "Parsed vn: " << v.x << ", " << v.y << ", " << v.z << endl;
+//    std::cout << "Parsed vn: " << v.x << ", " << v.y << ", " << v.z << std::endl;
 
     find_next_line(c);
 
@@ -438,19 +438,19 @@ void parse_vn_statement(vector<point_t> *const vs, const char **c)
 
 
 void obj_parser(
-    ifstream            &obj_file,
-    string              p,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m,
-    camera              **c)
+    std::ifstream           &obj_file,
+    std::string             p,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m,
+    camera                  **c)
 {
     /* Find the size of the file */
-    obj_file.seekg(0, ios::end);
+    obj_file.seekg(0, std::ios::end);
     size_t len = obj_file.tellg();
-    obj_file.seekg(0, ios::beg);
+    obj_file.seekg(0, std::ios::beg);
 
-//    cout << "Parsing OBJ length: " << len << endl;
+//    std::cout << "Parsing OBJ length: " << len << std::endl;
        
     /* Read the whole file into a buffer */
     char *buffer = new char [len];
@@ -458,17 +458,17 @@ void obj_parser(
     const char *at = &buffer[0];
     
     /* Vectors of vertice data */
-    vector<point_t>         vt;
-    vector<point_t>         vn;
-    vector<point_t>         v;
+    std::vector<point_t>    vt;
+    std::vector<point_t>    vn;
+    std::vector<point_t>    v;
     
     /* Map of shader names to shader */
-    map<string, material *> shader_map;
-    material *              cur_mat = new phong_shader(ext_colour_t(0.0, 0.0, 0.0), ext_colour_t(200.0, 200.0, 200.0), ext_colour_t(0.0, 0.0, 0.0), 0.0);
+    std::map<std::string, material *> shader_map;
+    material *              cur_mat = new phong_shader(ext_colour_t(0.0f, 0.0f, 0.0f), ext_colour_t(200.0f, 200.0f, 200.0f), ext_colour_t(0.0f, 0.0f, 0.0f), 0.0f);
     m.push_back(cur_mat);
     
     /* Parse the file */
-    while (at < &buffer[len-1])
+    while (at < &buffer[len - 1])
     {
         at = find_next_statement(at);
         
@@ -513,20 +513,20 @@ void obj_parser(
         }
         else
         {
-            cout << "Found unknown statement: " << at[0] << endl;
+            std::cout << "Found unknown statement: " << at[0] <<std:: endl;
             find_next_line(&at);
             assert(false);
         }
     }
     
     /* Add the materials to the list of materials */
-    for (map<string, material *>::iterator i = shader_map.begin(); i != shader_map.end(); ++i)
+    for (auto i = shader_map.begin(); i != shader_map.end(); ++i)
     {
         m.push_back((*i).second);
     }
  
     /* Tidy up */
     delete [] buffer;
-//    cout << "Parsing complete" << endl;
+//    std::cout << "Parsing complete" << std::endl;
 }
 }; /* namespace raptor_raytracer */

@@ -16,21 +16,21 @@
 namespace raptor_raytracer
 {
 void lwo_parser(
-    ifstream            &lwo_file,
-    string              &p,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m,
-    camera              **c)
+    std::ifstream           &lwo_file,
+    std::string             &p,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m,
+    camera                  **c)
 {
     METHOD_LOG;
     
     assert(sizeof(float) == 4);
     
     /* Find the size of the file */
-    lwo_file.seekg(0, ios::end);
+    lwo_file.seekg(0, std::ios::end);
     size_t len = lwo_file.tellg();
-    lwo_file.seekg(0, ios::beg);
+    lwo_file.seekg(0, std::ios::beg);
     
     /* Read the whole file into a buffer */
     BOOST_LOG_TRIVIAL(trace) << "Reading file of size: " << len;

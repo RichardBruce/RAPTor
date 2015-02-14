@@ -15,8 +15,10 @@
 #include "mock_stack_component.h"
 
 
-using namespace raptor_networking;
-
+namespace raptor_networking
+{
+namespace test
+{
 /* Test data */
 typedef ack_retransmission<stack_component, stack_component> uut;
 struct ack_retransmission_fixture : public stack_component_fixture<uut>
@@ -249,3 +251,5 @@ BOOST_AUTO_TEST_CASE( recv_ack_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_networking */

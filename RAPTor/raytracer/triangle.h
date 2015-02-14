@@ -52,22 +52,22 @@ class triangle : private boost::noncopyable
         point_t get_vertex_c()                      const       { return this->vertex_c;                        }
 
         /* KD-tree node classification */
-        fp_t get_x0()                               const       { return this->vertex_c.x;                      }
-        fp_t get_y0()                               const       { return this->vertex_c.y;                      }
-        fp_t get_z0()                               const       { return this->vertex_c.z;                      }
+        float get_x0()                              const       { return this->vertex_c.x;                      }
+        float get_y0()                              const       { return this->vertex_c.y;                      }
+        float get_z0()                              const       { return this->vertex_c.z;                      }
         
         /* Bounding box access functions for spatial subdivision */
-        fp_t    lowest_x()                          const       { return this->b.x;                             }
-        fp_t    lowest_y()                          const       { return this->b.y;                             }
-        fp_t    lowest_z()                          const       { return this->b.z;                             }
+        float   lowest_x()                          const       { return this->b.x;                             }
+        float   lowest_y()                          const       { return this->b.y;                             }
+        float   lowest_z()                          const       { return this->b.z;                             }
         point_t lowest_point()                      const       { return this->b;                               }
-        fp_t    highest_x()                         const       { return this->t.x;                             }
-        fp_t    highest_y()                         const       { return this->t.y;                             }
-        fp_t    highest_z()                         const       { return this->t.z;                             }
+        float   highest_x()                         const       { return this->t.x;                             }
+        float   highest_y()                         const       { return this->t.y;                             }
+        float   highest_z()                         const       { return this->t.z;                             }
         point_t highest_point()                     const       { return this->t;                               }
-        bool    is_intersecting_x(const fp_t s)     const       { return ((this->t.x > s) && (this->b.x < s));  }
-        bool    is_intersecting_y(const fp_t s)     const       { return ((this->t.y > s) && (this->b.y < s));  }
-        bool    is_intersecting_z(const fp_t s)     const       { return ((this->t.z > s) && (this->b.z < s));  }
+        bool    is_intersecting_x(const float s)    const       { return ((this->t.x > s) && (this->b.x < s));  }
+        bool    is_intersecting_y(const float s)    const       { return ((this->t.y > s) && (this->b.y < s));  }
+        bool    is_intersecting_z(const float s)    const       { return ((this->t.z > s) && (this->b.z < s));  }
         
         /* Ray tracing functions */
         inline void is_intersecting(const ray *const r, hit_description *const h) const;
@@ -79,7 +79,7 @@ class triangle : private boost::noncopyable
         inline void find_rays(ray *const r, const point_t &d, const int n) const;
         
         /* Generate secondary rays for packet tracing */
-        inline line generate_rays(const ray_trace_engine &r, ray &i, hit_description *const h, ray *const rl, ray *const rf, fp_t *const n_rl, fp_t *const n_rf) const
+        inline line generate_rays(const ray_trace_engine &r, ray &i, hit_description *const h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const
         {
             line norm = this->normal_at_point(&i, h);
             get_material()->generate_rays(r, i, norm, h->h, rl, rf, n_rl, n_rf);
@@ -93,14 +93,14 @@ class triangle : private boost::noncopyable
             point_t text(MAX_DIST);
             if ((this->vnt != nullptr) && (this->vnt[3] != MAX_DIST))
             {
-                text = (h.u * this->vnt[5]) + (h.v * this->vnt[4]) + (((fp_t)1.0 - (h.u + h.v)) * this->vnt[3]);
+                text = (h.u * this->vnt[5]) + (h.v * this->vnt[4]) + ((1.0f - (h.u + h.v)) * this->vnt[3]);
             }
 
             /* Call the material shader */
             get_material()->shade(r, i, n, h.h, c, text);
         }
         
-        inline void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const fp_t *const n_rl, const fp_t *const n_rf) const
+        inline void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const
         {
             get_material()->combind_secondary_rays(r, c, rl, rf, c_rl, c_rf, n_rl, n_rf);
         }
@@ -537,19 +537,17 @@ inline void triangle::is_intersecting(const frustrum &f, const packet_ray *const
 ************************************************************/
 inline line triangle::normal_at_point(ray *const r, hit_description *const h) const
 {
-    const fp_t denom  = dot_product(this->n, r->get_dir());
-#ifdef SINGLE_PRECISION
+    const float denom  = dot_product(this->n, r->get_dir());
     /* Re-calculate the intesection of the ray with the plane of the triangle */
     /* This gives a more accurate hit point to adjust the ray to */
-    const fp_t num    = dot_product(this->n, (this->vertex_c - r->get_dst()));
+    const float num    = dot_product(this->n, (this->vertex_c - r->get_dst()));
     r->change_length(num/denom);
-#endif /* #ifdef SINGLE_PRECISION */
 
     /* Interpolate the vertex normals */
     point_t normal;
     if ((this->vnt != nullptr) && (this->vnt[0] != MAX_DIST))
     {
-        normal = (h->u * this->vnt[2]) + (h->v * this->vnt[1]) + (((fp_t)1.0 - (h->u + h->v)) * this->vnt[0]);
+        normal = (h->u * this->vnt[2]) + (h->v * this->vnt[1]) + ((1.0f - (h->u + h->v)) * this->vnt[0]);
     }
     else
     {
@@ -581,17 +579,17 @@ inline line triangle::normal_at_point(ray *const r, hit_description *const h) co
 inline void triangle::find_rays(ray *const r, const point_t &d, const int n) const
 {
     /* Scales */
-    const fp_t beta_scale    = (fp_t)1.0/(fp_t)((n >> 4) + ((n & 0xe) != 0) + 1);
-    const fp_t gamma_scale   = (fp_t)1.0/(fp_t)((n >> 4) + ((n & 0xc) != 0) + 1);
+    const float beta_scale    = 1.0f / static_cast<float>((n >> 4) + ((n & 0xe) != 0) + 1);
+    const float gamma_scale   = 1.0f / static_cast<float>((n >> 4) + ((n & 0xc) != 0) + 1);
 
     /* Create n rays, each with a random offset in a fixed volume */
     for (int i = 0; i < n; i++)
     {
         /* Generate a legal barycenrtic co-ordinate */
         const int eigths    = (i >> 2) & ~0x1;
-        const fp_t beta     = gen_random_mersenne_twister() * (beta_scale  * (fp_t)(eigths + (i & 0x1)));
-        const fp_t gamma    = gen_random_mersenne_twister() * (gamma_scale * (fp_t)(eigths + (i & 0x2))) * ((fp_t)1.0 - beta);
-        const fp_t alpha    =(fp_t)1.0 - (beta + gamma);
+        const float beta     = gen_random_mersenne_twister() * (beta_scale  * static_cast<float>(eigths + (i & 0x1)));
+        const float gamma    = gen_random_mersenne_twister() * (gamma_scale * static_cast<float>(eigths + (i & 0x2))) * (1.0f - beta);
+        const float alpha    =1.0f - (beta + gamma);
 
         /* Convert to cartesian co-ordinates */
         point_t p = (this->vertex_a * alpha) + (this->vertex_b * beta) + (this->vertex_c * gamma);

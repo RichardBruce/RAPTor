@@ -28,9 +28,11 @@
 #include "collision_info.h"
 #include "physics_engine.h"
 
-using namespace raptor_physics;
-
-const float result_tolerance = 0.0005;
+namespace raptor_physics
+{
+namespace test
+{
+const float result_tolerance = 0.0005f;
 const std::string test_data_location = "test_data/";
 
 #define CREATE_REGRESSION_CHECKER(NAME)  regression_checker NAME( \
@@ -84,15 +86,15 @@ class object_data
         void save(Archive & ar, const unsigned int version) const
         {
             /* Yukky, but boost serialization cant cope with infinity so convert to an unlikely value */
-            const fp_t mass = (_i->mass() == std::numeric_limits<fp_t>::infinity()) ? std::numeric_limits<fp_t>::max() : _i->mass();
+            const float mass = (_i->mass() == std::numeric_limits<float>::infinity()) ? std::numeric_limits<float>::max() : _i->mass();
             const point_t com(_i->center_of_mass());
-            const fp_t *const tensor = _i->tensor();
+            const float *const tensor = _i->tensor();
 
             ar << BOOST_SERIALIZATION_NVP(mass);
             ar << BOOST_SERIALIZATION_NVP(com);
             for (int i = 0; i < 6; ++i)
             {
-                const fp_t tensor_element = (tensor[i] == std::numeric_limits<fp_t>::infinity()) ? std::numeric_limits<fp_t>::max() : tensor[i];
+                const float tensor_element = (tensor[i] == std::numeric_limits<float>::infinity()) ? std::numeric_limits<float>::max() : tensor[i];
                 ar << BOOST_SERIALIZATION_NVP(tensor_element);
             }
 
@@ -107,19 +109,19 @@ class object_data
         template<class Archive>
         void load(Archive & ar, const unsigned int version)
         {
-            fp_t mass;
+            float mass;
             point_t com;
-            fp_t *tensor = new fp_t[6];
+            float *tensor = new float[6];
 
             /* Yukky, but boost serialization cant cope with infinity so convert from an unlikely value */
             ar >> BOOST_SERIALIZATION_NVP(mass);
-            mass = (mass == std::numeric_limits<fp_t>::max()) ? std::numeric_limits<fp_t>::infinity() : mass;
+            mass = (mass == std::numeric_limits<float>::max()) ? std::numeric_limits<float>::infinity() : mass;
             ar >> BOOST_SERIALIZATION_NVP(com);
             for (int i = 0; i < 6; ++i)
             {
-                fp_t tensor_element;
+                float tensor_element;
                 ar >> BOOST_SERIALIZATION_NVP(tensor_element);
-                tensor[i] = (tensor_element == std::numeric_limits<fp_t>::max()) ? std::numeric_limits<fp_t>::infinity() : tensor_element;
+                tensor[i] = (tensor_element == std::numeric_limits<float>::max()) ? std::numeric_limits<float>::infinity() : tensor_element;
             }
             _i.reset(new inertia_tensor(tensor, com, mass));
 
@@ -188,7 +190,7 @@ class collision_data
 
         point_t         noc;
         point_t         poc;
-        fp_t            t;
+        float           t;
         collision_t     type;
         int             po_i;
         int             po_j;
@@ -327,13 +329,15 @@ class regression_checker : private boost::noncopyable
         boost::archive::xml_iarchive *  _expected_archive;
         boost::archive::xml_oarchive *  _actual_archive;
 };
+}; /* namespace test */
+}; /* namespace raptor_physics */
 
 BOOST_CLASS_IMPLEMENTATION(point_t, object_serializable);
 BOOST_CLASS_IMPLEMENTATION(quaternion_t, object_serializable);
-BOOST_CLASS_IMPLEMENTATION(object_data, object_serializable);
-BOOST_CLASS_IMPLEMENTATION(collision_data, object_serializable);
-BOOST_CLASS_IMPLEMENTATION(frame_data, object_serializable);
-BOOST_CLASS_IMPLEMENTATION(std::vector<object_data>, object_serializable);
-BOOST_CLASS_IMPLEMENTATION(std::vector<collision_data>, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(raptor_physics::test::object_data, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(raptor_physics::test::collision_data, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(raptor_physics::test::frame_data, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(std::vector<raptor_physics::test::object_data>, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(std::vector<raptor_physics::test::collision_data>, object_serializable);
 
 #endif /* #ifndef __REGRESSION_CHECKER_H__ */

@@ -47,7 +47,7 @@ class vertex_group : private boost::noncopyable
             delete [] _edges;
         }
 
-        inertia_tensor *const build_inertia_tensor(const fp_t density) const
+        inertia_tensor *const build_inertia_tensor(const float density) const
         {
             return new inertia_tensor(*_verts, *_tris, density);
         }
@@ -78,8 +78,8 @@ class vertex_group : private boost::noncopyable
             int max_support_vertex = find_support_vertex(d);
             
             /* Adjust its position for the relative displacement */
-            const fp_t disp_gain = dot_product(d, rel_disp);
-            if (disp_gain > 0.0)
+            const float disp_gain = dot_product(d, rel_disp);
+            if (disp_gain > 0.0f)
             {
                 max_support_vertex |= 0x80000000;
             }
@@ -88,18 +88,18 @@ class vertex_group : private boost::noncopyable
         }
 
         /* Find support vertex including movement and rotation and penalising for distance in n */
-        int find_support_vertex(const point_t &w, const point_t &c, const point_t &p, const point_t &n, fp_t *const val) const
+        int find_support_vertex(const point_t &w, const point_t &c, const point_t &p, const point_t &n, float *const val) const
         {
             return raptor_physics::find_support_vertex(*_verts, w, c, p, n, val);
         }
 
-        fp_t find_intersection_time(const vertex_group &vg, const point_t &nb, const point_t &x0, const point_t &x1, const point_t &q0, const point_t &q1, const fp_t r0, const fp_t r1, const fp_t full_t)
+        float find_intersection_time(const vertex_group &vg, const point_t &nb, const point_t &x0, const point_t &x1, const point_t &q0, const point_t &q1, const float r0, const float r1, const float full_t)
         {
             BOOST_LOG_TRIVIAL(trace) << "Verts: " << _verts->size();
             BOOST_LOG_TRIVIAL(trace) << "Tris: " << vg._tris->size();
 
             /* Check each vertex of this object */
-            fp_t frac_t = 1.001;
+            float frac_t = 1.001f;
             for (int i = 0; i < _verts->size(); ++i)
             {
                 /* See when it is inside all face of vg */
@@ -113,7 +113,7 @@ class vertex_group : private boost::noncopyable
                     // const point_t nb(cross_product(pb_1 - pb_0, pb_2 - pb_0));
 
                     /* Find intersection time */
-                    const fp_t inter = find_exact_collision_time(pa, pb_0, nb, x0, x1, q0, q1, r0, r1);
+                    const float inter = find_exact_collision_time(pa, pb_0, nb, x0, x1, q0, q1, r0, r1);
                     frac_t = std::min(frac_t, inter);
                     BOOST_LOG_TRIVIAL(trace) << "Determining exact collision time up to: " << (full_t * frac_t);
                 }

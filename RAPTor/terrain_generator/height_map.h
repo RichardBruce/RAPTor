@@ -11,28 +11,28 @@ template<class NG>
 class height_map
 {
     public :
-        height_map(const NG &noise, const fp_t a, const fp_t z, const fp_t p, const int o, const int x, const int y)
+        height_map(const NG &noise, const float a, const float z, const float p, const int o, const int x, const int y)
         : _noise(noise), _a(a), _z(z), _p(p), _o(o), _x(x), _y(y) {  };
 
-        point_t* generate(const fp_t xs, const fp_t ys) const
+        point_t* generate(const float xs, const float ys) const
         {
             point_t *verts = new point_t [this->_x * this->_y];
             for (int i = 0; i < this->_x; ++i)
             {
                 /* For each cell */
-                const fp_t x = static_cast<fp_t>(i) * this->_z;
+                const float x = static_cast<float>(i) * this->_z;
                 for (int j = 0; j < this->_y; ++j)
                 {
-                    const fp_t y = static_cast<fp_t>(j) * this->_z;
+                    const float y = static_cast<float>(j) * this->_z;
 
                     /* Generate height of different scales */
-                    fp_t frequency  = 1.0;
-                    fp_t amplitude  = this->_a;
-                    fp_t total      = 0.0;
+                    float frequency  = 1.0f;
+                    float amplitude  = this->_a;
+                    float total      = 0.0f;
                     for (int k = 0; k < this->_o; ++k)
                     {
                         total += (this->_noise.interpolated_noise(x * frequency, y * frequency) * amplitude);
-                        frequency *= 2.0;
+                        frequency *= 2.0f;
                         amplitude *= this->_p;
                     }
 
@@ -45,9 +45,9 @@ class height_map
 
     private :
         const NG &  _noise;     /* Noise generator      */
-        const fp_t  _a;         /* Amplitude            */
-        const fp_t  _z;         /* Zoom                 */
-        const fp_t  _p;         /* Persistence          */
+        const float _a;         /* Amplitude            */
+        const float _z;         /* Zoom                 */
+        const float _p;         /* Persistence          */
         const int   _o;         /* Octaves              */
         const int   _x;         /* Number of x cells    */
         const int   _y;         /* Number of y cells    */

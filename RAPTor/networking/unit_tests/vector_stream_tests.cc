@@ -14,8 +14,10 @@
 #include "vector_stream.h"
 
 
-using namespace raptor_networking;
-
+namespace raptor_networking
+{
+namespace test
+{
 /* Test data */
 struct vector_stream_fixture
 {
@@ -344,3 +346,5 @@ BOOST_AUTO_TEST_CASE( ibuf_stream_read_small_last_fragment_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_networking */

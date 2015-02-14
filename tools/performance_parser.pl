@@ -136,7 +136,9 @@ while (my $line = <INDEX_T>)
                 }
             }
 
-            print INDEX_F "            <td><a href=\"./$date\">$date</a></td><td>$git_hash</td><td>" . join(', ', @perf_messages) , "</td>\n";
+            my $comment = join(', ', @perf_messages);
+            $comment =~ s/\n//g;
+            print INDEX_F "            <td><a href=\"./$date\">$date</a></td><td>$git_hash</td><td>$comment</td>\n";
         }
         else
         {

@@ -152,7 +152,7 @@ class grid_cell
 
         /* Check if the grid cells have roughly the same slope (within tolerance min_cos) */
         /* This function assume that it doesnt matter which way up the grid cell is and that the grid cell has an area */
-        bool can_merge(const grid_cell &c, const fp_t min_cos) const
+        bool can_merge(const grid_cell &c, const float min_cos) const
         {
             const point_t n(normalise(cross_product(_verts[_v1]  - _verts[_v0], _verts[_v3] - _verts[_v0])));
             const point_t n_c(normalise(cross_product(c._verts[c._v1]  - c._verts[c._v0], c._verts[c._v3] - c._verts[c._v0])));

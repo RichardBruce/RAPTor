@@ -55,9 +55,9 @@ inline T from_byte_stream(const char **s)
     return t;
 }
 
-/* fp_t specialisation */
+/* float specialisation */
 template <>
-inline fp_t from_byte_stream<fp_t>(const unsigned char **s)
+inline float from_byte_stream<float>(const unsigned char **s)
 {
     /* Union to bit cast char to float */
     union 
@@ -76,11 +76,11 @@ inline fp_t from_byte_stream<fp_t>(const unsigned char **s)
     (*s) += 4;
     
     /* Return the float */
-    return (fp_t)u.f;
+    return u.f;
 }
 
 template <>
-inline fp_t from_byte_stream<fp_t>(const char **s)
+inline float from_byte_stream<float>(const char **s)
 {
     /* Union to bit cast char to float */
     union 
@@ -99,7 +99,7 @@ inline fp_t from_byte_stream<fp_t>(const char **s)
     (*s) += 4;
     
     /* Return the float */
-    return (fp_t)u.f;
+    return u.f;
 }
 
 
@@ -120,9 +120,9 @@ inline T from_big_endian_byte_stream(const unsigned char **s)
     return t;
 }
 
-/* fp_t specialisation */
+/* float specialisation */
 template <>
-inline fp_t from_big_endian_byte_stream<fp_t>(const unsigned char **s)
+inline float from_big_endian_byte_stream<float>(const unsigned char **s)
 {
     /* Union to bit cast char to float */
     union 
@@ -141,7 +141,7 @@ inline fp_t from_big_endian_byte_stream<fp_t>(const unsigned char **s)
     (*s) += 4;
     
     /* Return the float */
-    return (fp_t)u.f;
+    return u.f;
 }
 
 
@@ -158,7 +158,7 @@ inline void skip_white_space(const char **a)
 
 
 /* String to float conversion */
-inline fp_t get_next_float(const string &s, size_t *const fst_space)
+inline float get_next_float(const std::string &s, size_t *const fst_space)
 {
     /* Eat the string until white space is found */
     *fst_space = s.find(' ', *fst_space) + 1;
@@ -168,7 +168,7 @@ inline fp_t get_next_float(const string &s, size_t *const fst_space)
 }
 
 /* Char* to float conversion */
-inline fp_t get_next_float(const char **c)
+inline float get_next_float(const char **c)
 {
     /* Eat the string until white space is found */
     while ((**c) != ' ')
@@ -209,7 +209,7 @@ inline unsigned get_next_unsigned(const char **c)
 
 
 /* Char* to string conversion where string is quoted */
-inline string get_quoted_string(const char **c)
+inline std::string get_quoted_string(const char **c)
 {
     /* Eat to a quote */
     while ((**c) != '"')
@@ -227,12 +227,12 @@ inline string get_quoted_string(const char **c)
         (*c)++;
     }
     
-    return string(start, ((*c) - start));
+    return std::string(start, ((*c) - start));
 }
 
 
 /* Char* to string conversion */
-inline string get_next_string(const char **c)
+inline std::string get_next_string(const char **c)
 {
     /* Eat the string until white space is found */
     while ((**c) != ' ')
@@ -256,11 +256,11 @@ inline string get_next_string(const char **c)
     }
     (*c)--;
     
-    return string(start, (((*c) + 1) - start));
+    return std::string(start, (((*c) + 1) - start));
 }
 
 
-inline string get_this_string(const char **c)
+inline std::string get_this_string(const char **c)
 {
     /* Eat the white space */
     while ((**c) == ' ')
@@ -277,7 +277,7 @@ inline string get_this_string(const char **c)
         (*c)++;
     }
     
-    return string(start, ((*c) - start));
+    return std::string(start, ((*c) - start));
 }
 
 
@@ -334,7 +334,7 @@ inline void find_next_line(const char **c)
 
 
 /* Declare triangle */
-inline void new_triangle(primitive_list *e, vector<triangle *> *t, material *m, const point_t &a, const point_t &b, const point_t &c, const bool li, const point_t *vn=nullptr, const point_t *vt=nullptr)
+inline void new_triangle(primitive_list *e, std::vector<triangle *> *t, material *m, const point_t &a, const point_t &b, const point_t &c, const bool li, const point_t *vn=nullptr, const point_t *vt=nullptr)
 {
     triangle *tr = new triangle(m, a, b, c, li, vn, vt);
     e->push_back(tr);
@@ -346,30 +346,30 @@ inline void new_triangle(primitive_list *e, vector<triangle *> *t, material *m, 
 
 
 /* Declare light */
-inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const fp_t d, const fp_t r)
+inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const float d, const float r)
 {
     l->push_back(light(rgb, c, d, r));
 }
 
 
-inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const fp_t d, const vector<triangle *> *const t)
+inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const float d, const std::vector<triangle *> *const t)
 {
     l->push_back(light(rgb, c, d, t));
 }
 
 
-inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const point_t &n, const fp_t d, const fp_t s_a, const fp_t s_b, const fp_t r)
+inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const point_t &n, const float d, const float s_a, const float s_b, const float r)
 {
     l->push_back(light(rgb, c, n, d, s_a, s_b, r));
 }
 
 
-inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &n, const fp_t d)
+inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &n, const float d)
 {
     l->push_back(light(rgb, n, d));
 }
 
-inline point_t find_centre(const vector<point_t> &p)
+inline point_t find_centre(const std::vector<point_t> &p)
 {
     /* Add all the points together */
     point_t total;
@@ -379,19 +379,19 @@ inline point_t find_centre(const vector<point_t> &p)
     }
 
     /* Average the points and return */
-    return total/(fp_t)p.size();
+    return total / static_cast<float>(p.size());
 }
 
-inline int find_furthest(const vector<point_t> &p, const point_t &c)
+inline int find_furthest(const std::vector<point_t> &p, const point_t &c)
 {
     int max_point = 0;
-    fp_t max_dist = 0.0;
+    float max_dist = 0.0f;
 
     /* Compare the distance of the points from the centre point */
     unsigned s = p.size();
     for (unsigned i = 0; i < s; i++)
     {
-        fp_t dist = magnitude(c - p[i]);
+        float dist = magnitude(c - p[i]);
         if (dist > max_dist)
         {
             max_dist  = dist;
@@ -410,7 +410,7 @@ inline bool is_straight_line(const point_t &a, point_t b, point_t c)
     c -= a;
     point_t n;
     cross_product(b, c, &n);
-    return (n == 0.0);
+    return (n == 0.0f);
 }
 
 
@@ -421,7 +421,7 @@ inline bool same_side(const point_t &p, const point_t &a, const point_t &ab, con
     cross_product((p - a), ab, &cp);
     
     /* Check the normal is in the same direction as the face normal */
-    if (dot_product(cp, fn) > 0.0)
+    if (dot_product(cp, fn) > 0.0f)
     {
         return true;
     }
@@ -432,7 +432,7 @@ inline bool same_side(const point_t &p, const point_t &a, const point_t &ab, con
 }
 
 
-inline bool is_in_triangle(const vector<point_t> &p, const point_t &a, const point_t &b, const point_t &c, const point_t &fn)
+inline bool is_in_triangle(const std::vector<point_t> &p, const point_t &a, const point_t &b, const point_t &c, const point_t &fn)
 {
     /* Pre-calculate some useful vectors */
     const point_t ab(a - b);
@@ -514,7 +514,7 @@ inline void face_to_triangle_edges(std::vector<int> *const tris, std::vector<poi
             normalise(&tri_normal);
 
             /* If any of the remaining points fall in the triangle it is illegal */ 
-            if ((dot_product(tri_normal, face_normal) > 0.0) && !is_in_triangle(p, a, b, c, face_normal))
+            if ((dot_product(tri_normal, face_normal) > 0.0f) && !is_in_triangle(p, a, b, c, face_normal))
             {
                 /* Declare if the triangle is valid */
                 tris->push_back(max_m1);
@@ -561,7 +561,7 @@ inline void face_to_triangle_edges(std::vector<int> *const tris, std::vector<poi
 }
 
 
-inline void face_to_triangles(primitive_list *e, light_list *l, vector<point_t> &p, material *const m, const bool li, vector<point_t> *vn = nullptr, vector<point_t> *vt = nullptr, const fp_t d = 0.0)
+inline void face_to_triangles(primitive_list *e, light_list *l, std::vector<point_t> &p, material *const m, const bool li, std::vector<point_t> *vn = nullptr, std::vector<point_t> *vt = nullptr, const float d = 0.0f)
 {
     /* Progress tracking */
     unsigned size = p.size();
@@ -586,12 +586,12 @@ inline void face_to_triangles(primitive_list *e, light_list *l, vector<point_t> 
     
 
     /* Triangle list for lights */
-    vector<triangle *>  *t  = nullptr;
+    std::vector<triangle *>  *t  = nullptr;
     
     if (li)
     {
         /* To be deleted by the light destructor */
-        t   = new vector<triangle *>;
+        t   = new std::vector<triangle *>;
     }
 
     /* Find the furthest point from the center */
@@ -648,7 +648,7 @@ inline void face_to_triangles(primitive_list *e, light_list *l, vector<point_t> 
             normalise(&tri_normal);
 
             /* If any of the remaining points fall in the triangle it is illegal */ 
-            if ((dot_product(tri_normal, face_normal) > 0.0) && !is_in_triangle(p, a, b, c, face_normal))
+            if ((dot_product(tri_normal, face_normal) > 0.0f) && !is_in_triangle(p, a, b, c, face_normal))
             {
                 /* Declare if the triangle is valid */
                 if ((vn != nullptr) && (!vn->empty()))
@@ -708,7 +708,7 @@ inline void face_to_triangles(primitive_list *e, light_list *l, vector<point_t> 
     /* Add light */
     if (li)
     {
-        new_light(l, ext_colour_t(255.0, 255.0,255.0), com, 0.0, t);
+        new_light(l, ext_colour_t(255.0f, 255.0f, 255.0f), com, 0.0f, t);
     }
 }
 }; /* namespace raptor_raytracer */

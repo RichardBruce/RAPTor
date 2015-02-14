@@ -6,9 +6,13 @@
 //#include "primitive_count.h"
 #endif
 
+/* Common headers */
 #include "common.h"
+
+/* Ray tracer headers */
 #include "simd.h"
 #include "sort.h"
+#include "simd.h"
 #include "triangle.h"
 #include "kdt_node.h"
 
@@ -46,29 +50,29 @@ class voxel
         voxel operator=(const voxel &v);
 
         /* SAH evaluation functions */
-        // fp_t            split_all_axis(fp_t *s, axis_t * normal);
-        // fp_t            approximate_split_all_axis(fp_t *s, axis_t * normal) const;
-        fp_t            approximate_split_one_axis(fp_t *const s, const axis_t normal) const;
+        // float           split_all_axis(float *s, axis_t * normal);
+        // float           approximate_split_all_axis(float *s, axis_t * normal) const;
+        float           approximate_split_one_axis(float *const s, const axis_t normal) const;
 
         /* SIMD only SAH evaluation function */
-        fp_t            brute_force_split_all_axis(fp_t *s, axis_t * normal) const;
+        float           brute_force_split_all_axis(float *s, axis_t * normal) const;
         inline  void    count_primitives(vfp_t *const l, vfp_t *const r, const vfp_t *const s, const axis_t n) const;
         inline  vfp_t   calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp_t &s, const axis_t normal) const;
 
         /* SAH cost equation */
-        // inline fp_t     calculate_sah_cost(const fp_t l, const fp_t r, const fp_t s, const axis_t normal) const;
+        // inline float    calculate_sah_cost(const float l, const float r, const float s, const axis_t normal) const;
 
         /* Primitive counting functions */
-    	inline  fp_t    count_primitives(fp_t *const r, const fp_t s, const axis_t normal) const;
-    	inline  void    count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis_t n) const;
+    	inline  float   count_primitives(float *const r, const float s, const axis_t normal) const;
+    	inline  void    count_primitives(float *const l, float *const r, const float *const s, const int len, const axis_t n) const;
 
 
         primitive_list  *p;
-        fp_t            *low_points;
-        fp_t            *high_points;
+        float           *low_points;
+        float           *high_points;
         point_t          t;
         point_t          b;
-        axis_t             n;
+        axis_t           n;
 };
 }; /* namespace raptor_raytracer */
 

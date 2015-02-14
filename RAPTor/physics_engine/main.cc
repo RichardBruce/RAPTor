@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     se.add_moving_object(new raptor_physics::physics_object(raptor_physics::make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, 9.5, 0.0), 10.0));
 
     /* Add static objects */
-    se.add_object(new raptor_physics::physics_object(raptor_physics::make_plane(m.get(), point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0)), point_t(0.0, -10.0, 0.0), numeric_limits<fp_t>::infinity()));
+    se.add_object(new raptor_physics::physics_object(raptor_physics::make_plane(m.get(), point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0)), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
     /* Apply forces */
     se.engine()->apply_force(new raptor_physics::const_force(point_t(0.0, 0.5, 0.0), point_t(50.0, 0.0, 0.0), 0.5), 0);

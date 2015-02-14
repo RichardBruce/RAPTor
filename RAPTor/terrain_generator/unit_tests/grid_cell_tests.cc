@@ -17,8 +17,10 @@ const raptor_physics::init_logger init_logger;
 #include "grid_cell.h"
 
 
-using namespace raptor_terrain;
-
+namespace raptor_terrain
+{
+namespace test
+{
 /* Test data */
 struct grid_cell_fixture : private boost::noncopyable
 {
@@ -180,3 +182,5 @@ BOOST_AUTO_TEST_CASE( can_merge_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_terrain */

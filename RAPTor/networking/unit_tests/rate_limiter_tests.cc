@@ -15,8 +15,10 @@
 #include "mock_stack_component.h"
 
 
-using namespace raptor_networking;
-
+namespace raptor_networking
+{
+namespace test
+{
 /* Test data */
 typedef rate_limiter<stack_component, stack_component> uut;
 struct rate_limiter_fixture : public stack_component_fixture<uut>
@@ -31,7 +33,7 @@ struct rate_limiter_fixture : public stack_component_fixture<uut>
 
     const message_generator ax1024;
     const message_generator ab_mg;
-    const fp_t              bytes_per_milli;
+    const float             bytes_per_milli;
 };
 
 
@@ -130,3 +132,5 @@ BOOST_AUTO_TEST_CASE( recv_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_networking */

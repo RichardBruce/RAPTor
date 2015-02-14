@@ -28,7 +28,7 @@ bool gjk::find_minimum_distance(point_t *const dist, const point_t &fixed_rel_di
         /* The origin is contained within the simplices */
         if ((min_simplex == 4) || (magnitude(dir) < raptor_physics::EPSILON))
         {
-            (*dist) = point_t(0.0, 0.0, 0.0);
+            (*dist) = point_t(0.0f, 0.0f, 0.0f);
             BOOST_LOG_TRIVIAL(trace) << "Hit";
             return true;
         }
@@ -73,9 +73,9 @@ int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const
     /*            [ Q3 - Q1, Q3 - Q2, 0        Q3 - Q4] */
     /*            [ Q4 - Q1, Q4 - Q2, Q4 - Q3, 0      ] */
     point_t diffs[16];
-    for (unsigned int i = 0; i < size; i++)
+    for (unsigned int i = 0; i < size; ++i)
     {
-        for (unsigned int j = i + 1; j < size; j++)
+        for (unsigned int j = i + 1; j < size; ++j)
         {
             diffs[(i << 2) + j] = c_space[i] - c_space[j];
             diffs[(j << 2) + i] = -diffs[(i << 2) + j];
@@ -87,10 +87,10 @@ int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const
     /*            [ Q2 . (Q2 - Q1), 0             , Q2 . (Q2 - Q3), Q2 . (Q2 - Q4)] */
     /*            [ Q3 . (Q3 - Q1), Q3 . (Q3 - Q2), 0,              Q3 . (Q3 - Q4)] */
     /*            [ Q4 . (Q4 - Q1), Q4 . (Q4 - Q2), Q4 . (Q4 - Q3), 0             ] */
-    fp_t dot_prods[16];
-    for (unsigned int i = 0; i < size; i++)
+    float dot_prods[16];
+    for (unsigned int i = 0; i < size; ++i)
     {
-        for (unsigned int j = 0; j < size; j++)
+        for (unsigned int j = 0; j < size; ++j)
         {
             if (i != j)
             {
@@ -100,12 +100,12 @@ int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const
     }
     
     /* Check vertices */
-    for (unsigned int i = 0; i < size; i++)
+    for (unsigned int i = 0; i < size; ++i)
     {
         bool this_vert = true;
-        for (unsigned int j = 0; j < size; j++)
+        for (unsigned int j = 0; j < size; ++j)
         {
-            this_vert &= ((i == j) || (dot_prods[(i << 2) + j] <= 0.0));
+            this_vert &= ((i == j) || (dot_prods[(i << 2) + j] <= 0.0f));
         }
 
         /* Return this vert as the closest */
@@ -122,10 +122,10 @@ int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const
     {
         verts[0] = 0;
         verts[1] = 1;
-        const fp_t magn_diff = dot_product(diffs[1], diffs[1]);
+        const float magn_diff = dot_product(diffs[1], diffs[1]);
         if (magn_diff > raptor_physics::EPSILON)
         {
-            const fp_t dot_prod = dot_product(c_space[0], diffs[1]);
+            const float dot_prod = dot_product(c_space[0], diffs[1]);
             (*dir) = c_space[0] - ((diffs[1] * dot_prod) / magn_diff);
         }
         else
@@ -195,9 +195,9 @@ int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const
     /* Its not a vertex or an edge and there's only 3 vertices so it must be a face */
     if (size == 3)
     {
-        const fp_t a = dot_product(norms[0], c_space[0]);
+        const float a = dot_product(norms[0], c_space[0]);
         verts[1] = 1;
-        if (a < 0.0)
+        if (a < 0.0f)
         {
             verts[0] = 2;
             verts[2] = 0;
@@ -208,7 +208,7 @@ int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const
             verts[2] = 2;
         }
 
-        const fp_t b = dot_product(norms[0], norms[0]);
+        const float b = dot_product(norms[0], norms[0]);
         (*dir) = norms[0] * (a / b);
         return 3;
     }
@@ -218,7 +218,7 @@ int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const
     /* This is normally covered by the edge checks unless you have co-planar */
     /* or close to co-planar faces */
     /* Return faces in reverse order to reverse the normal and ensure integrity */
-    if ((dot_product(c_space[1], norms[1]) < 0.0) &&
+    if ((dot_product(c_space[1], norms[1]) < 0.0f) &&
         in_triangle(norms[1], diffs[1], diffs[13], c_space[1], dir, verts, 1, 3, 0))
     {
         return 3;
@@ -230,13 +230,13 @@ int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const
         return 3;
     }
 
-    if ((dot_product(c_space[3], norms[3]) < 0.0) &&
+    if ((dot_product(c_space[3], norms[3]) < 0.0f) &&
         in_triangle(norms[3], diffs[7], diffs[11], c_space[3], dir, verts, 2, 3, 1))
     {
         return 3;
     }
 
-    if ((dot_product(c_space[0], norms[0]) < 0.0) &&
+    if ((dot_product(c_space[0], norms[0]) < 0.0f) &&
         in_triangle(norms[0], diffs[4], diffs[8], c_space[0], dir, verts, 2, 1, 0))
     {
         return 3;
@@ -247,7 +247,7 @@ int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const
     verts[1] = 1;
     verts[2] = 2;
     verts[3] = 3;
-    (*dir) = point_t(0.0, 0.0, 0.0);
+    (*dir) = point_t(0.0f, 0.0f, 0.0f);
     return 4;
 }
 
@@ -256,30 +256,30 @@ bool gjk::in_triangle(const point_t &n, const point_t &d0, const point_t &d1, co
     point_t *d, int *verts, const int v0, const int v1, const int v2) const
 {
     /* Get intersecting point of line and triangles plane */
-    const fp_t a = dot_product(n, c);
-    const fp_t b = dot_product(n, n);
+    const float a = dot_product(n, c);
+    const float b = dot_product(n, n);
 
-    const fp_t r = a / b;
+    const float r = a / b;
     const point_t dir(n * r);
     const point_t w(dir - c);
 
     /* Calculate and test barycentric coordinates */
-    const fp_t uu = dot_product(d0, d0);
-    const fp_t uv = dot_product(d0, d1);
-    const fp_t vv = dot_product(d1, d1);
+    const float uu = dot_product(d0, d0);
+    const float uv = dot_product(d0, d1);
+    const float vv = dot_product(d1, d1);
     
-    const fp_t wu = dot_product(w, d0);
-    const fp_t wv = dot_product(w, d1);
-    const fp_t no = uv * uv - uu * vv;
+    const float wu = dot_product(w, d0);
+    const float wv = dot_product(w, d1);
+    const float no = uv * uv - uu * vv;
 
-    const fp_t s = ((uv * wv) - (vv * wu)) / no;
-    if (s < -raptor_physics::EPSILON || s > 1.0)
+    const float s = ((uv * wv) - (vv * wu)) / no;
+    if (s < -raptor_physics::EPSILON || s > 1.0f)
     {
         return false;
     }
 
-    const fp_t t = ((uv * wu) - (uu * wv)) / no;
-    if (t < -raptor_physics::EPSILON || (s + t) > 1.0)
+    const float t = ((uv * wu) - (uu * wv)) / no;
+    if (t < -raptor_physics::EPSILON || (s + t) > 1.0f)
     {
         return false;
     }

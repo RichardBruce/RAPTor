@@ -50,25 +50,25 @@ class gjk : private boost::noncopyable
         /* Tests if an edge is the closest feature to the origin. */
         /* Returns true if this is the closest edge fature. */
         /* Sets the vertices of the edge and the direction to the origin. */
-        bool test_edge(const point_t &norm0, const point_t &norm1, const fp_t dot0, const fp_t dot1,
+        bool test_edge(const point_t &norm0, const point_t &norm1, const float dot0, const float dot1,
             const point_t& diff, const point_t &c_space, const int i, const int j,
             int *const verts, point_t *const dir) const
         {
-            if ((dot0 >= 0.0) && (dot1 >= 0.0))
+            if ((dot0 >= 0.0f) && (dot1 >= 0.0f))
             {
                 /* It is important norm isnt normalised and the equality be in the conditions */
                 /* This covers the case that a face has degraded to a line */
                 const point_t cross0(cross_product(diff, norm0));
                 const point_t cross1(cross_product(norm1, diff));
-                if ((dot_product(c_space, cross0) >= 0.0) && (dot_product(c_space, cross1) >= 0.0))
+                if ((dot_product(c_space, cross0) >= 0.0f) && (dot_product(c_space, cross1) >= 0.0f))
                 {
                     /* Return this edge as the closest */
                     verts[0] = i;
                     verts[1] = j;
-                    const fp_t magn_diff = dot_product(diff, diff);
+                    const float magn_diff = dot_product(diff, diff);
                     if (magn_diff > raptor_physics::EPSILON)
                     {
-                        const fp_t dot_prod = dot_product(c_space, diff);
+                        const float dot_prod = dot_product(c_space, diff);
                         (*dir) = c_space - ((diff * dot_prod) / magn_diff);
                     }
                     else

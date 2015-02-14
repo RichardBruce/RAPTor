@@ -17,9 +17,10 @@ const raptor_physics::init_logger init_logger;
 #include "lcp_solver.h"
 
 
-using namespace raptor_physics;
-
-
+namespace raptor_physics
+{
+namespace test
+{
 BOOST_AUTO_TEST_SUITE( lcp_solver_tests )
 
 const float result_tolerance = 0.0005;
@@ -266,3 +267,5 @@ BOOST_AUTO_TEST_CASE( instant_no_solution_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

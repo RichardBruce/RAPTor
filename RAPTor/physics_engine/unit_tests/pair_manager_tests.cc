@@ -22,8 +22,10 @@ const raptor_physics::init_logger init_logger;
 #include "pair_manager.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Mock hash so I can cause collisions */
 class mock_hash_fn
 {
@@ -442,3 +444,5 @@ BOOST_AUTO_TEST_CASE( iterate_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

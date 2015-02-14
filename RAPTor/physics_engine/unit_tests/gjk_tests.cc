@@ -22,8 +22,10 @@ const raptor_physics::init_logger init_logger;
 #include "gjk_test_access.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 class gjk_fixture
 {
@@ -1478,3 +1480,5 @@ BOOST_AUTO_TEST_CASE( rotated_translating_miss_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

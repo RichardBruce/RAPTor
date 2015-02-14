@@ -35,17 +35,17 @@ const char * cfg_next_statement(const char *c, const char *const end)
 
 
 void cfg_parser(
-    const std::string   &base_path,
-    ifstream            &cfg_file,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m,
-    camera              **c)
+    const std::string       &base_path,
+    std::ifstream           &cfg_file,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m,
+    camera                  **c)
 {
     /* Find the size of the file */
-    cfg_file.seekg(0, ios::end);
+    cfg_file.seekg(0, std::ios::end);
     size_t len = cfg_file.tellg();
-    cfg_file.seekg(0, ios::beg);
+    cfg_file.seekg(0, std::ios::beg);
 
 //    cout << "Parsing CFG length: " << len << endl;
        
@@ -55,7 +55,7 @@ void cfg_parser(
     const char *at = &buffer[0];
     
     /* Statement hash */
-    map<string, model_format_t> format;
+    std::map<std::string, model_format_t> format;
     format["cfg"]   = model_format_t::cfg;
     format["code"]  = model_format_t::code;
     format["mgf"]   = model_format_t::mgf;
@@ -72,20 +72,20 @@ void cfg_parser(
             break;
         }
 
-        const string statement(get_this_string(&at));
+        const std::string statement(get_this_string(&at));
         
-        map<string, model_format_t>::const_iterator i = format.find(statement);
+        auto i = format.find(statement);
 //        cout << "parsing : " << statement << endl;
         if (i == format.end())
         {
-            cout << "Error: Unknown statement: " << statement << endl;
+            std::cout << "Error: Unknown statement: " << statement << std::endl;
             assert(false);
         }
         
-        ifstream    input_stream;
-        string      path;
-        size_t      last_slash;
-        const string input_file(base_path + get_this_string(&at));
+        std::ifstream   input_stream;
+        std::string     path;
+        size_t          last_slash;
+        const std::string input_file(base_path + get_this_string(&at));
 //        cout << "path: " << input_file << endl;
         switch ((*i).second)
         {

@@ -16,8 +16,10 @@
 
 
 using boost::uuids::uuid;
-using namespace raptor_networking;
-
+namespace raptor_networking
+{
+namespace test
+{
 /* Test data */
 typedef batcher<stack_component, stack_component> uut;
 struct batcher_fixture : public stack_component_fixture<uut>
@@ -301,3 +303,5 @@ BOOST_AUTO_TEST_CASE( send_small_timeout_batcher_test )
 
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_networking */
