@@ -49,7 +49,8 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
         _max_bounds.reset(new point_t [_primitives->size()]);
 
         /* For small data sets run the primitive builder */
-        if (_primitives->size() < 750000)
+        /* This needs tuning to each machine. On intel i7 laptop this should be ~750,000, but on amd llano the binned algorithm shouldnt be used */
+        if (_primitives->size() < 28000000)
         {
             /* Cache primitive min and max */
             for (unsigned int i = 0; i < _primitives->size(); ++i)
