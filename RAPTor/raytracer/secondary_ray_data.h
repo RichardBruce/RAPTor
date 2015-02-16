@@ -18,7 +18,7 @@ class secondary_ray_data
 {
     public :
         secondary_ray_data() :
-            _nr(0.0f) {  }
+            _colours(nullptr), _nr(0.0f), _value(0.0f) {  }
 
         /* Access functions */
         /* Getters */

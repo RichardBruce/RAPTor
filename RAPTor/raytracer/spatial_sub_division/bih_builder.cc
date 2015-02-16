@@ -70,16 +70,6 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     // BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
 }
 
-inline float next_power_of_two(int x)
-{
-    x |= (x >> 1);
-    x |= (x >> 2);
-    x |= (x >> 4);
-    x |= (x >> 8);
-    x |= (x >> 16);
-    return x + 1;
-}
-
 void bih_builder::bucket_build()
 {
     /* Calculate Morton codes and build MSB histogram */
@@ -272,24 +262,6 @@ void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigne
         hist[i] = hist[i - 1] + 1;
     }
     hist[0] = b;
-}
-
-int morton_decode(int morton)
-{
-    morton &= 0x09249249;
-    morton |= (morton >> 2);
-
-    morton &= 0x030c30c3;
-    morton |= (morton >> 4);
-
-    morton &= 0x0300f00f;
-    morton |= (morton >> 8);
-
-    morton &= 0x030000ff;
-    morton |= (morton >> 16);
-
-    morton &= 0x000003ff;
-    return morton;
 }
 
 void bih_builder::convert_to_primitve_builder(const int b, const int e)
