@@ -54,7 +54,7 @@ void nff_parser(
             /* Parse the view position */
             find_next_line(&at);
             
-            float x, y, z, a, h, x_res, y_res;
+            float x, y, z, a, h;
             x  = get_next_float(&at);
             y  = get_next_float(&at);
             z  = get_next_float(&at);
@@ -88,12 +88,12 @@ void nff_parser(
             {
                 h = 1.0f;
             }
-            float height_width = dist_ratio * h;
+            const float height_width = dist_ratio * h;
             
             /* Parse the resolution */        
             find_next_line(&at);
-            x_res  = get_next_float(&at);
-            y_res  = get_next_float(&at);
+            const float x_res  = get_next_float(&at);
+            const float y_res  = get_next_float(&at);
 
             point_t x_vec(1.0f, 0.0f, 0.0f);
             cross_product(up_vec, at_vec, &x_vec);
@@ -101,19 +101,19 @@ void nff_parser(
             normalise(&x_vec);
             normalise(&up_vec);
             normalise(&at_vec);
-            *c = new camera(from, x_vec, up_vec, at_vec, bg, height_width, height_width, h, (unsigned)x_res, (unsigned)y_res);
+            *c = new camera(from, x_vec, up_vec, at_vec, bg, height_width, height_width, h, static_cast<unsigned int>(x_res), static_cast<unsigned int>(y_res));
         }
         /* Parse a light */
         else if ((*at) == 'l')
         {
-            float x, y, z, r, g, b;
+            float r, g, b;
             r = 255.0f;
             g = 255.0f;
             b = 255.0f;
             
-            x  = get_next_float(&at);
-            y  = get_next_float(&at);
-            z  = get_next_float(&at);
+            const float x  = get_next_float(&at);
+            const float y  = get_next_float(&at);
+            const float z  = get_next_float(&at);
             
             /* Overload the input light colour with the colour specified in the file */
             if (!end_of_line(at))
@@ -131,16 +131,15 @@ void nff_parser(
         else if (((*at) == 'f') && ((*(at+1)) == ' '))
         {
             ext_colour_t rgb;
-            float kd, ks, s, t, ri;
-            
             rgb.r   = get_next_float(&at);
             rgb.g   = get_next_float(&at);
             rgb.b   = get_next_float(&at);
-            kd      = get_next_float(&at);
-            ks      = get_next_float(&at);
-            s       = get_next_float(&at);
-            t       = get_next_float(&at);
-            ri      = get_next_float(&at);
+
+            const float kd  = get_next_float(&at);
+            const float ks  = get_next_float(&at);
+            const float s   = get_next_float(&at);
+            const float t   = get_next_float(&at);
+            const float ri  = get_next_float(&at);
             
             /* Scale the colour to rgb */
             rgb *= 255.0f;
@@ -155,10 +154,10 @@ void nff_parser(
             if (at[1] == 'p')
             {
                 /* Get the number of points on the face */
-                unsigned p = (unsigned)get_next_float(&at);
+                const unsigned int p = static_cast<unsigned int>(get_next_float(&at));
                 
                 /* Parse each point */
-                for (unsigned i=0; i<p; i++)
+                for (unsigned i = 0; i < p; i++)
                 {
                     /* Points */
                     float x, y, z;
@@ -188,16 +187,15 @@ void nff_parser(
             else
             {
                 /* Get the number of points on the face */
-                unsigned p = (unsigned)get_next_float(&at);
+                const unsigned int p = static_cast<unsigned int>(get_next_float(&at));
                 
                 /* Parse each point */
                 for (unsigned int i = 0; i < p; i++)
                 {
-                    float x, y, z;
                     find_next_line(&at);
-                    x = atof(at);
-                    y = get_next_float(&at);
-                    z = get_next_float(&at);
+                    const float x = atof(at);
+                    const float y = get_next_float(&at);
+                    const float z = get_next_float(&at);
                     
                     points.emplace_back(x, y, z);
                 }
@@ -208,47 +206,6 @@ void nff_parser(
                 
             /* Clean up */
             points.clear();
-        }
-        /* Parse a sphere */
-        else if ((*at) == 's')
-        {
-//            float x, y, z, r;
-//            
-//            x = get_next_float(&at);
-//            y = get_next_float(&at);
-//            z = get_next_float(&at);
-//            r = get_next_float(&at);
-            
-            assert(!"Warning: Parsed un-used sphere");
-//            new_sphere(&e, &l, cur_mat, point_t(x, y, z), r, false);
-        }
-        /* Parse a cone or cyclinder */
-        else if ((*at) == 'c')
-        {
-            point_t t,  b;
-            // float    r0, r1;
-            
-            t.x = get_next_float(&at);
-            t.y = get_next_float(&at);
-            t.z = get_next_float(&at);
-            // r0  = get_next_float(&at);
-            b.x = get_next_float(&at);
-            b.y = get_next_float(&at);
-            b.z = get_next_float(&at);
-            // r1  = get_next_float(&at);
-            
-            std::cout << "Warning: Parsed un-used cone" << std::endl;
-            /* A cyclinder is a cone with the same radius at each end */
-//             if (r0 == r1)
-//             {
-//                 /* Declare the cylinder */
-// //                new_cylinder(&e, &l, cur_mat, t, b, r0, false);
-//             }
-//             else
-//             {
-//                 /* Declare the cone */
-// //                new_cone(&e, &l, cur_mat, t, b, r0, r1, false);
-//             }
         }
         else
         {
