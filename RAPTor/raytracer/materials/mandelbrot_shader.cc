@@ -5,7 +5,7 @@
 
 namespace raptor_raytracer
 {
-void mandelbrot_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const
+void mandelbrot_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
@@ -123,7 +123,7 @@ WHILE :
 }
 
 
-void mandelbrot_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const
+void mandelbrot_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const
 {
     return;
 }

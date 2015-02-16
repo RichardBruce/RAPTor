@@ -11,6 +11,9 @@
 
 namespace raptor_raytracer
 {
+/* Forward delcarations */
+class secondary_ray_data;
+
 /* Child of material used to attach multiple texture mapper */
 /* This class with calculate illumination and pass this value to the texture mapper for shading */
 class coloured_mapper_shader : public material
@@ -32,8 +35,8 @@ class coloured_mapper_shader : public material
                 assert((this->ks.r >= 0.0f) &&  (this->ks.r <= 255.0f));
                 assert((this->ks.g >= 0.0f) &&  (this->ks.g <= 255.0f));
                 assert((this->ks.b >= 0.0f) &&  (this->ks.b <= 255.0f));
-                assert((tran       >= 0.0f) &&  (tran       <=   1.0f));
-                assert((tran       == 0.0f) || ((this->ri   >=   1.0f) && (this->ri <= 5.0f))); /* 2.49 is the highest real refractive index */
+                assert((this->tran >= 0.0f) &&  (this->tran <=   1.0f));
+                assert((this->tran == 0.0f) || ((this->ri   >=   1.0f) && (this->ri <= 5.0f))); /* 2.49 is the highest real refractive index */
                 assert((this->rf   >= 0.0f) &&  (this->rf   <=   1.0f));                             /* This limits the number of iterative refractions (there is no such thing as a perfect mirror) */
             };
             
@@ -66,13 +69,13 @@ class coloured_mapper_shader : public material
         };
 
         /* Function the allow the shader a chance to generate SIMD packets */
-        void generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const;
+        void generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const;
 
         /* Shading function. To allow the shader to shade the current object */
         void shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const;
 
         /* Function to the allow the shader a combined SIMD packets traced secondary rays into the image */
-        void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const;
+        void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const;
 
     private :
         const texture_mapper    *   t_ka;   /* Texture mapper to map Ka     */

@@ -9,6 +9,7 @@
 namespace raptor_raytracer
 {
 /* Forward declarations */
+class secondary_ray_data;
 class ray_trace_engine;
 class ray;
 class line;
@@ -52,13 +53,13 @@ class material
         virtual ~material() { };
 
         /* Pure virtual function to the allow the shader a chance to generate SIMD packets */
-        virtual void generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const = 0;
+        virtual void generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const = 0;
 
         /* Pure virtual shading function. To allow the shader to shade the current object */
         virtual void shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const = 0;
 
         /* Pure virtual function to the allow the shader a combined SIMD packets traced secondary rays into the image */
-        virtual void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const = 0;
+        virtual void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const = 0;
 
         /* Allow read transparency */
         const bool is_transparent() const { return t; }

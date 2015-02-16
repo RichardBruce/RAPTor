@@ -1,6 +1,14 @@
+/* Standard headers */
+
+/* Boost headers */
+
+/* Common headers */
+
 /* Ray tracer headers */
 #include "raytracer.h"
+#include "secondary_ray_data.h"
 #include "ssd.h"
+
 
 namespace raptor_raytracer
 {
@@ -23,15 +31,15 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
     {
         r.calculate_destination(hit_type.d);
         
+        point_t vt;
         this->shader_nr = 0;
-        float           nr_reflections = 0.0f;
-        float           nr_refractions = 0.0f;
-        ray             reflection_rays[REFLECTION_ARRAY_SIZE];
-        ray             refraction_rays[REFLECTION_ARRAY_SIZE];
-        ext_colour_t    reflection_colour[REFLECTION_ARRAY_SIZE];
-        ext_colour_t    refraction_colour[REFLECTION_ARRAY_SIZE];
-
-        const line n = intersecting_object->generate_rays(*this, r, &hit_type, &reflection_rays[0], &refraction_rays[0], &nr_reflections, &nr_refractions);
+        ext_colour_t refl_colour[MAX_SECONDARY_RAYS];
+        ext_colour_t refr_colour[MAX_SECONDARY_RAYS];
+        secondary_ray_data refl;
+        secondary_ray_data refr;
+        refl.colours(&refl_colour[0]);
+        refr.colours(&refr_colour[0]);
+        const line n(intersecting_object->generate_rays(*this, r, &vt, &hit_type, &refl, &refr));
         
         /* Trace shadow rays */
         for (unsigned int i = 0; i < this->lights.size(); ++i)
@@ -57,20 +65,20 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
         }
 
         /* Call the shader */
-        intersecting_object->shade(*this, r, n, hit_type, c);
+        intersecting_object->shade(*this, r, n, vt, hit_type, c);
         
         /* Process secondary rays */
-        for (int i = 0; i < nr_reflections; ++i)
+        for (int i = 0; i < static_cast<int>(refl.number()); ++i)
         {
-            this->ray_trace(reflection_rays[i], &reflection_colour[i]);
+            this->ray_trace(refl.rays()[i], &refl.colours()[i]);
         }
         
-        for (int i = 0; i < nr_refractions; ++i)
+        for (int i = 0; i < static_cast<int>(refr.number()); ++i)
         {
-            this->ray_trace(refraction_rays[i], &refraction_colour[i]);
+            this->ray_trace(refr.rays()[i], &refr.colours()[i]);
         }
 
-        intersecting_object->combind_secondary_rays(*this, (*c), &reflection_rays[0], &refraction_rays[0], &reflection_colour[0], &refraction_colour[0], &nr_reflections, &nr_refractions);
+        intersecting_object->combind_secondary_rays(*this, c, refl, refr);
     }
     /* Otherwise colour with the background colour */
     else
@@ -223,22 +231,17 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
         _ssd->frustrum_find_nearest_object(r, &intersecting_object[0], &h[0], s);
     }
 
-    /* Generate secondary rays, currently limited to shadow rays */
+    /* Generate secondary rays */
     line normals[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
+    point_t vt[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     ray ray_p[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     hit_description hit_p[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
 
-    float           nr_reflections[MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
-    float           nr_refractions[MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
-    ray             reflection_rays[REFLECTION_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
-    ray             refraction_rays[REFLECTION_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
-    ext_colour_t    reflection_colour[REFLECTION_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
-    ext_colour_t    refraction_colour[REFLECTION_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
+    ext_colour_t refl_colour[MAX_SECONDARY_RAYS * MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
+    ext_colour_t refr_colour[MAX_SECONDARY_RAYS * MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
+    secondary_ray_data refl[MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
+    secondary_ray_data refr[MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
     
-    memset(nr_reflections, 0, (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(float)));
-    memset(nr_refractions, 0, (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(float)));
-    
-//    memset(this->nr_pending_shadows, 0, this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(float)));
     int addr = 0;
     for (int i = 0; i < s; ++i)
     {
@@ -251,8 +254,8 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             if (hit_p[addr].d < MAX_DIST)
             {
                 this->shader_nr = addr;
-                int ray_addr = addr * REFLECTION_ARRAY_SIZE;
-                normals[addr] = intersecting_object[addr]->generate_rays(*this, ray_p[addr], &hit_p[addr], &reflection_rays[ray_addr], &refraction_rays[ray_addr], &nr_reflections[addr], &nr_refractions[addr]);
+                int ray_addr = addr * MAX_SECONDARY_RAYS;
+                normals[addr] = intersecting_object[addr]->generate_rays(*this, ray_p[addr], &vt[addr], &hit_p[addr], &refl[ray_addr], &refr[ray_addr]);
             }
             else
             {
@@ -261,8 +264,6 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
                     const unsigned int nr_addr          = (l * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH)) + addr;
                     this->nr_pending_shadows[nr_addr]   = 0.0f;
                 }
-                nr_reflections[addr] = 0.0f;
-                nr_refractions[addr] = 0.0f;
             }
             
             ++addr;
@@ -329,8 +330,6 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             
             if (this->nr_pending_shadows[shader] > 0.0)
             {
-                assert(made_it[k] >= 0);
-                assert(made_it[k] <= 256);
                 this->pending_shadows[addr].set_magnitude(made_it[k] / this->nr_pending_shadows[shader]);
             }
         }
@@ -345,7 +344,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
 
         if (hit_p[i].d < MAX_DIST)
         {
-            intersecting_object[i]->shade(*this, ray_p[i], normals[i], hit_p[i], &c[addr]);
+            intersecting_object[i]->shade(*this, ray_p[i], normals[i], vt[i], hit_p[i], &c[addr]);
         }
         /* Otherwise colour with the background colour */
         else
@@ -360,10 +359,12 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
     int nr_of_packets   = 0;
     for (int i = 0; i < (s << LOG2_SIMD_WIDTH); ++i)
     {
-        int ray_addr = (i * REFLECTION_ARRAY_SIZE);
-        for (int j = 0; j < (int)nr_reflections[i]; ++j)
+        int ray_addr = (i * MAX_SECONDARY_RAYS);
+        refl[i].colours(&refl_colour[ray_addr]);
+
+        for (int j = 0; j < static_cast<int>(refl[i].number()); ++j)
         {
-            rays_this_packet[(nr_of_packets << LOG2_SIMD_WIDTH) + packed] = &reflection_rays[ray_addr];
+            rays_this_packet[(nr_of_packets << LOG2_SIMD_WIDTH) + packed] = &refl[i].rays()[j];
             ray_to_shader[(nr_of_packets << LOG2_SIMD_WIDTH) + packed] = ray_addr;
             ++packed;
             ++ray_addr;
@@ -376,7 +377,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
                 
                 if (nr_of_packets == MAXIMUM_PACKET_SIZE)
                 {
-                    this->ray_trace(&next_packet[0], &reflection_colour[0], &ray_to_shader[0], nr_of_packets);
+                    this->ray_trace(&next_packet[0], &refl_colour[0], &ray_to_shader[0], nr_of_packets);
                     nr_of_packets = 0;
                 }
             }
@@ -385,14 +386,14 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
 
     if (nr_of_packets > 0)
     {
-        this->ray_trace(&next_packet[0], &reflection_colour[0], &ray_to_shader[0], nr_of_packets);
+        this->ray_trace(&next_packet[0], &refl_colour[0], &ray_to_shader[0], nr_of_packets);
     }
     
     /* Shoot rays mod SIMD_WIDTH alone */
     for (int i = 0; i < packed; ++i)
     {
         int addr = (nr_of_packets << LOG2_SIMD_WIDTH) + i;
-        this->ray_trace(*(rays_this_packet[addr]), &reflection_colour[ray_to_shader[addr]]);        
+        this->ray_trace(*(rays_this_packet[addr]), &refl_colour[ray_to_shader[addr]]);        
     }
     
     
@@ -402,10 +403,12 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
     nr_of_packets   = 0;
     for (int i = 0; i < (s << LOG2_SIMD_WIDTH); ++i)
     {
-        int ray_addr = (i * REFLECTION_ARRAY_SIZE);
-        for (int j = 0; j < (int)nr_refractions[i]; ++j)
+        int ray_addr = (i * MAX_SECONDARY_RAYS);
+        refr[i].colours(&refr_colour[ray_addr]);
+
+        for (int j = 0; j < static_cast<int>(refr[i].number()); ++j)
         {
-            rays_this_packet[(nr_of_packets << LOG2_SIMD_WIDTH) + packed] = &refraction_rays[ray_addr];
+            rays_this_packet[(nr_of_packets << LOG2_SIMD_WIDTH) + packed] = &refr[i].rays()[j];
             ray_to_shader[(nr_of_packets << LOG2_SIMD_WIDTH) + packed] = ray_addr;
             ++packed;
             ++ray_addr;
@@ -418,7 +421,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
                 
                 if (nr_of_packets == MAXIMUM_PACKET_SIZE)
                 {
-                    this->ray_trace(&next_packet[0], &reflection_colour[0], &ray_to_shader[0], nr_of_packets);
+                    this->ray_trace(&next_packet[0], &refr_colour[0], &ray_to_shader[0], nr_of_packets);
                     nr_of_packets = 0;
                 }
             }
@@ -427,14 +430,14 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
 
     if (nr_of_packets > 0)
     {
-        this->ray_trace(&next_packet[0], &refraction_colour[0], &ray_to_shader[0], nr_of_packets);
+        this->ray_trace(&next_packet[0], &refr_colour[0], &ray_to_shader[0], nr_of_packets);
     }
     
     /* Shoot rays mod SIMD_WIDTH alone */
     for (int i = 0; i < packed; ++i)
     {
         int addr = (nr_of_packets << LOG2_SIMD_WIDTH) + i;
-        this->ray_trace(*(rays_this_packet[addr]), &refraction_colour[ray_to_shader[addr]]);        
+        this->ray_trace(*(rays_this_packet[addr]), &refr_colour[ray_to_shader[addr]]);        
     }
 
     /* Combine secondary rays in the shaders */
@@ -445,8 +448,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
 
         if (hit_p[i].d < MAX_DIST)
         {
-            int ray_addr = i * REFLECTION_ARRAY_SIZE;
-            intersecting_object[i]->combind_secondary_rays(*this, c[addr], &reflection_rays[ray_addr], &refraction_rays[ray_addr], &reflection_colour[ray_addr], &refraction_colour[ray_addr], &nr_reflections[i], &nr_refractions[i]);
+            intersecting_object[i]->combind_secondary_rays(*this, &c[addr], refl[i], refr[i]);
         }
     }
 

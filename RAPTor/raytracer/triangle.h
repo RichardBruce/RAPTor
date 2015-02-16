@@ -8,6 +8,7 @@
 #include "common.h"
 #include "line.h"
 #include "ray.h"
+#include "secondary_ray_data.h"
 #ifdef SIMD_PACKET_TRACING
 #include "packet_ray.h"
 #include "frustrum.h"
@@ -79,30 +80,34 @@ class triangle : private boost::noncopyable
         inline void find_rays(ray *const r, const point_t &d, const int n) const;
         
         /* Generate secondary rays for packet tracing */
-        inline line generate_rays(const ray_trace_engine &r, ray &i, hit_description *const h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const
+        inline line generate_rays(const ray_trace_engine &r, ray &i, point_t *const text, hit_description *const h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
         {
-            line norm = this->normal_at_point(&i, h);
-            get_material()->generate_rays(r, i, norm, h->h, rl, rf, n_rl, n_rf);
+            /* Calculate the normal */
+            line norm(this->normal_at_point(&i, h));
+
+            /* Interpolate the texture co-ordinate if possible */
+            point_t vt(MAX_DIST);
+            if ((this->vnt != nullptr) && (this->vnt[3] != MAX_DIST))
+            {
+                vt = (h->u * this->vnt[5]) + (h->v * this->vnt[4]) + ((1.0f - (h->u + h->v)) * this->vnt[3]);
+            }
+
+            get_material()->generate_rays(r, i, norm, vt, h->h, rl, rf);
+
+            (*text) = vt;
             return norm;
         }
         
         /* Call the materials shader with the triangles normal */
-        inline void shade(const ray_trace_engine &r, ray &i, const line &n, const hit_description &h, ext_colour_t *const c) const
+        inline void shade(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_description &h, ext_colour_t *const c) const
         {
-            /* Interpolate the texture co-ordinate if possible */
-            point_t text(MAX_DIST);
-            if ((this->vnt != nullptr) && (this->vnt[3] != MAX_DIST))
-            {
-                text = (h.u * this->vnt[5]) + (h.v * this->vnt[4]) + ((1.0f - (h.u + h.v)) * this->vnt[3]);
-            }
-
             /* Call the material shader */
-            get_material()->shade(r, i, n, h.h, c, text);
+            get_material()->shade(r, i, n, h.h, c, vt);
         }
         
-        inline void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const
+        inline void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const
         {
-            get_material()->combind_secondary_rays(r, c, rl, rf, c_rl, c_rf, n_rl, n_rf);
+            get_material()->combind_secondary_rays(r, c, rl, rf);
         }
 
     private : 

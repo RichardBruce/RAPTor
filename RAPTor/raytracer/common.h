@@ -56,9 +56,9 @@ namespace raptor_raytracer
 #endif /* #ifndef MIN_REFLECTIVE_POWER */
 
 #ifdef DIFFUSE_REFLECTIONS
-#define REFLECTION_ARRAY_SIZE (int)DIFFUSE_REFLECTIONS 
+#define MAX_SECONDARY_RAYS (int)DIFFUSE_REFLECTIONS 
 #else
-#define REFLECTION_ARRAY_SIZE 1
+#define MAX_SECONDARY_RAYS 1
 #endif /* #ifdef DIFFUSE_REFLECTIONS */
 
 #ifdef SOFT_SHADOW

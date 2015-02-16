@@ -6,7 +6,7 @@
 
 namespace raptor_raytracer
 {
-void phong_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const
+void phong_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
@@ -67,7 +67,7 @@ void phong_shader::shade(const ray_trace_engine &r, ray &i, const line &n, const
     if (this->rf > 0.0f)
     {
         ext_colour_t    average;
-        ray             rl[REFLECTION_ARRAY_SIZE];
+        ray             rl[MAX_SECONDARY_RAYS];
         
         /* Ray reflection member */
         float nr_rays = i.reflect(rl, n, this->rf, this->rfd);
@@ -87,13 +87,13 @@ void phong_shader::shade(const ray_trace_engine &r, ray &i, const line &n, const
     }
 
     /* Refract */
-    if (tran > 0.0f)
+    if (this->tran > 0.0f)
     {
         ext_colour_t    average;
-        ray             rl[REFLECTION_ARRAY_SIZE];
+        ray             rl[MAX_SECONDARY_RAYS];
         
         /* Ray refraction member */
-        float nr_rays = i.refract(rl, n, tran, this->ri, h, this->td);
+        float nr_rays = i.refract(rl, n, this->tran, this->ri, h, this->td);
         
         for (int i = 0; i< static_cast<int>(nr_rays); ++i)
         {
@@ -105,13 +105,13 @@ void phong_shader::shade(const ray_trace_engine &r, ray &i, const line &n, const
         /* Average the colours */
         if (nr_rays > 0.0f)
         {
-            (*c) += average * (tran / nr_rays);
+            (*c) += average * (this->tran / nr_rays);
         }
     }
 }
 
 
-void phong_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const
+void phong_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const
 {
     return;
 }

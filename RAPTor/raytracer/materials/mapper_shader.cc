@@ -6,13 +6,48 @@
 
 namespace raptor_raytracer
 {
-void mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const
+void mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
     {
         r.generate_rays_to_light(i, n, h, l);
     }
+
+    /* Request reflections */
+    ext_colour_t rgb;
+    float refl  = this->rf;
+    float alpha = 1.0f;
+    for (auto j = this->rtex.begin(); j != this->rtex.end() ; ++j)
+    {
+        alpha *= (*j)->texture_map(&rgb, i.get_dst(), n.get_dir(), vt);
+        refl = rgb.r / 255.0f;
+        
+        if (alpha == 0.0f)
+        {
+            break;
+        }
+    }
+    
+    rl->number(i.reflect(rl->rays(), n, refl, this->rfd));
+    rl->value(refl);
+    
+    /* Request refractions */
+    float trans = this->tran;
+    alpha       = 1.0f;
+    for (auto j = this->ttex.begin(); j != this->ttex.end() ; ++j)
+    {
+        alpha *= (*j)->texture_map(&rgb, i.get_dst(), n.get_dir(), vt);
+        trans = rgb.r / 255.0f;
+        
+        if (alpha == 0.0f)
+        {
+            break;
+        }
+    }
+
+    rf->number(i.refract(rf->rays(), n, trans, this->ri, h, this->td));
+    rf->value(trans);
     
     return;
 }
@@ -87,89 +122,21 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const line &n, cons
         /* Note rgb is stored in light_intensity in the format ( r, g, b ) */
         (*c) += rgb * shade * illum.get_magnitude() * (*iter).get_light_intensity(illum.get_dir(), illum.get_length());
     }
-
-    /* Get the transparency of the material */
-    float refl  = this->rf;
-    alpha       = 1.0f;
-    for (auto j = this->rtex.begin(); j != this->rtex.end() ; ++j)
-    {
-        alpha *= (*j)->texture_map(&rgb, i.get_dst(), n.get_dir(), vt);
-        refl = rgb.r / 255.0f;
-        
-        if (alpha == 0.0f)
-        {
-            break;
-        }
-    }
-    
-    /* Reflect */
-    if (refl > 0.0f)
-    {
-        ext_colour_t    average;
-        ray             rl[REFLECTION_ARRAY_SIZE];
-        
-        /* Ray reflection member */
-        float nr_rays = i.reflect(rl, n, refl, this->rfd);
-        
-        for (int i = 0; i < static_cast<int>(nr_rays); ++i)
-        {
-            ext_colour_t pixel;
-            r.ray_trace(rl[i], &pixel);
-            average += pixel;
-        }
-
-        /* Average the colours */
-        if (nr_rays > 0.0f)
-        {
-            (*c) += average * (refl / nr_rays);
-        }
-    }
-
-    /* Get the transparency of the material */
-    float trans = tran;
-    alpha       = 1.0f;
-    for (auto j = this->ttex.begin(); j != this->ttex.end() ; ++j)
-    {
-        alpha *= (*j)->texture_map(&rgb, i.get_dst(), n.get_dir(), vt);
-        trans = rgb.r / 255.0f;
-        
-        if (alpha == 0.0f)
-        {
-            break;
-        }
-    }
-    if (trans >= 0.9f)
-    {
-        (*c) = ext_colour_t(0.0f, 0.0f, 0.0f);
-    }
-    
-    /* Refract */
-    if (trans > 0.0f)
-    {
-        ext_colour_t    average;
-        ray             rl[REFLECTION_ARRAY_SIZE];
-        
-        /* Ray refraction member */
-        float nr_rays = i.refract(rl, n, trans, this->ri, h, this->td);
-        
-        for (int i = 0; i< static_cast<int>(nr_rays); ++i)
-        {
-            ext_colour_t pixel;
-            r.ray_trace(rl[i], &pixel);
-            average += pixel;
-        }
-
-        /* Average the colours */
-        if (nr_rays > 0.0f)
-        {
-            (*c) += average * (trans / nr_rays);
-        }
-    }
 }
 
 
-void mapper_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const
+void mapper_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const
 {
-    return;
+    /* Process reflection data */
+    if ((rl.value() > 0.0f) && (rl.number() > 0.0f))
+    {
+        (*c) += rl.average_colour() * rl.value();
+    }
+    
+    /* Process refraction data */
+    if ((rf.value() > 0.0f) && (rf.number() > 0.0f))
+    {
+        (*c) += rf.average_colour() * rf.value();
+    }
 }
 }; /* namespace raptor_raytracer */

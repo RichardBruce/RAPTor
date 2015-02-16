@@ -6,7 +6,7 @@
 
 namespace raptor_raytracer
 {
-void cook_torrance_cxy::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const
+void cook_torrance_cxy::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
@@ -15,10 +15,10 @@ void cook_torrance_cxy::generate_rays(const ray_trace_engine &r, ray &i, const l
     }
     
     /* Request reflections */
-    (*n_rl) = i.reflect(rl, n, this->rs, 0.0f);
+    rl->number(i.reflect(rl->rays(), n, this->rs, 0.0f));
     
     /* Request refractions */
-    (*n_rf) = i.refract(rf, n, this->ts, this->ri_r, h, 0.0f);
+    rf->number(i.refract(rf->rays(), n, this->ts, this->ri_r, h, 0.0f));
 
     return;
 }
@@ -72,34 +72,18 @@ void cook_torrance_cxy::shade(const ray_trace_engine &r, ray &i, const line &n, 
 }
 
 
-void cook_torrance_cxy::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const
+void cook_torrance_cxy::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const
 {
     /* Process reflection data */
-    const float l_rl = *n_rl;
-    if ((this->rs > 0.0f) & (l_rl > 0.0f))
+    if ((this->rs > 0.0f) && (rl.number() > 0.0f))
     {
-        ext_colour_t average;
-        for (int i = 0; i < static_cast<int>(l_rl); ++i)
-        {
-            average += c_rl[i];
-        }
-
-        /* Average the colours */
-        c += average * (this->rs / l_rl);
+        (*c) += rl.average_colour() * this->rs;
     }
-
+    
     /* Process refraction data */
-    const float l_rf = *n_rf;
-    if ((this->ts > 0.0f) & (l_rf > 0.0f))
+    if ((this->ts > 0.0f) && (rf.number() > 0.0f))
     {
-        ext_colour_t average;
-        for (int i = 0; i < static_cast<int>(l_rf); ++i)
-        {
-            average += c_rf[i];
-        }
-
-        /* Average the colours */
-        c += average * (this->ts / l_rf);
+        (*c) += rf.average_colour() * this->ts;
     }
 
     return;

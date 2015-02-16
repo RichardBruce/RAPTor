@@ -6,7 +6,7 @@
 
 namespace raptor_raytracer
 {
-void coloured_mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, float *const n_rl, float *const n_rf) const
+void coloured_mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
@@ -15,10 +15,10 @@ void coloured_mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, co
     }
     
     /* Request reflections */
-    (*n_rl) = i.reflect(rl, n, this->rf, this->rfd);
+    rl->number(i.reflect(rl->rays(), n, this->rf, this->rfd));
     
     /* Request refractions */
-    (*n_rf) = i.refract(rf, n, tran, this->ri, h, this->td);
+    rf->number(i.refract(rf->rays(), n, this->tran, this->ri, h, this->td));
 
     return;
 }
@@ -100,32 +100,18 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line
 }
 
 
-void coloured_mapper_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const float *const n_rl, const float *const n_rf) const
+void coloured_mapper_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const
 {
     /* Process reflection data */
-    if ((this->rf > 0.0f) && ((*n_rl) > 0.0))
+    if ((this->rf > 0.0f) && (rl.number() > 0.0f))
     {
-        ext_colour_t average;
-        for (int i = 0; i < static_cast<int>(*n_rl); ++i)
-        {
-            average += c_rl[i];
-        }
-
-        /* Average the colours */
-        c += average * (this->rf / (*n_rl));
+        (*c) += rl.average_colour() * this->rf;
     }
     
     /* Process refraction data */
-    if ((tran > 0.0f) && ((*n_rf) > 0.0))
+    if ((this->tran > 0.0f) && (rf.number() > 0.0f))
     {
-        ext_colour_t average;
-        for (int i = 0; i < static_cast<int>(*n_rf); ++i)
-        {
-            average += c_rf[i];
-        }
-
-        /* Average the colours */
-        c += average * (tran / (*n_rf));
+        (*c) += rf.average_colour() * this->tran;
     }
 
     return;
