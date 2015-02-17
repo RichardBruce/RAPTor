@@ -23,7 +23,7 @@ voxel voxel::divide(kdt_node *const k)
     
 #ifdef SIMD_PACKET_TRACING
     /* If using SIMD allow early exit for nodes under a given size */
-    if (this->p->size() <= MIN_KDT_NODE_SIZE)
+    if (this->p->size() <= MAX_KDT_NODE_SIZE)
     {
         k->set_primitives(this->p);
         return *this;
