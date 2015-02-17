@@ -12,7 +12,7 @@ namespace raptor_raytracer
 class kdt_node
 {
     public :
-        kdt_node(fp_t s = (fp_t)0.0, axis_t n = axis_t::not_set) : c(NULL), split_pos(s), normal(n) { };
+        kdt_node(float s = 0.0f, axis_t n = axis_t::not_set) : c(NULL), split_pos(s), normal(n) { };
         ~kdt_node() 
         {
             /* Clean up dynamic memory usage */
@@ -30,13 +30,13 @@ class kdt_node
         primitive_list& get_primitives()                    { return *this->p;          }
         kdt_node *      get_left()                const     { return &this->c[0];       }
         kdt_node *      get_right()               const     { return &this->c[1];       }
-        fp_t            get_split_position()      const     { return this->split_pos;   }
+        float           get_split_position()      const     { return this->split_pos;   }
         axis_t          get_normal()              const     { return this->normal;      }
         int             get_size()                const     { return this->p->size();   }
         bool            is_empty()                const     { return this->p->empty();  }
         
         void            set_primitives(primitive_list *p)   { this->p = p;              }
-        kdt_node &      split_node(const fp_t s, const axis_t n) 
+        kdt_node &      split_node(const float s, const axis_t n) 
         {
             this->normal    = n;
             this->split_pos = s;
@@ -47,13 +47,14 @@ class kdt_node
         /* test_leaf_node_nearest tests this object if is a leaf node and returns a pointer 
            to the nearest object found. The distance to this object is returned in m. If no 
            object is found NULL is returned */
-        triangle * test_leaf_node_nearest(const ray *const r, hit_description *const h, const fp_t min) const;
+        triangle * test_leaf_node_nearest(const ray *const r, hit_description *const h, const float min) const;
         
         /* test_leaf_node_nearer tests this object if it is a leaf node to find an object
            that intersects with the ray r and is closer than max. If a closer intersecting 
            obeject is found true is return otherwise false is returned */
-        bool    test_leaf_node_nearer(const ray *const r, const fp_t max) const;
+        bool    test_leaf_node_nearer(const ray *const r, const float max) const;
 
+#ifdef SIMD_PACKET_TRACING
         void test_leaf_node_nearest(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const
         {
             for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
@@ -131,7 +132,7 @@ class kdt_node
 
             return;
         }
-
+#endif /* #ifdef SIMD_PACKET_TRACING */
 
     private :
         /* Prevent copying of this class */
@@ -145,7 +146,7 @@ class kdt_node
             primitive_list  *p;
         };
 
-        fp_t    split_pos;
+        float   split_pos;
         axis_t  normal;
 };
 }; /* namespace raptor_raytracer */

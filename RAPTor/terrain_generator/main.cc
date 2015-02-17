@@ -30,7 +30,7 @@ using raptor_terrain::neighbour_t;
 bool try_merge_grid_cell(grid_cell **const proc_grid_cells, grid_cell **const raw_grid_cells, grid_cell **const stack, const int add_idx)
 {
     /* Check for the edge of the map */
-    const fp_t min_cos = 0.9999;
+    const float min_cos = 0.9999f;
     if (add_idx == -1)
     {
         return false;
@@ -104,52 +104,52 @@ int main()
     const int cell_y = y - 1;
     const int nr_grid_cells = cell_x * cell_y;
 
-    const fp_t xs = 25.0;
-    const fp_t ys = 25.0;
+    const float xs = 25.0f;
+    const float ys = 25.0f;
 
     /* Enviroment set up */
-    raptor_physics::physics_options po(0.04, 0.04, -1, false, true);
-    raptor_physics::physics_engine pe(new raptor_physics::rigid_body_collider(0.5, 0.75), false);
-    pe.default_collider(new raptor_physics::rigid_body_collider(0.5, 0.3));
+    raptor_physics::physics_options po(0.04f, 0.04f, -1, false, true);
+    raptor_physics::physics_engine pe(new raptor_physics::rigid_body_collider(0.5f, 0.75f), false);
+    pe.default_collider(new raptor_physics::rigid_body_collider(0.5f, 0.3f));
     raptor_physics::simulation_environment se(&pe, &po);
     se.load_screen("./load_screen.png");
 
     std::unique_ptr<raptor_raytracer::material> m[16];
-    m[ 0].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), 1.0));
-    m[ 1].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0,   0.0,   0.0), 1.0));
-    m[ 2].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0,   0.0,   0.0), 1.0));
-    m[ 3].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0, 128.0,   0.0), 1.0));
-    m[ 4].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0, 255.0,   0.0), 1.0));
-    m[ 5].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0,   0.0, 128.0), 1.0));
-    m[ 6].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0,   0.0, 255.0), 1.0));
-    m[ 7].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0, 128.0,   0.0), 1.0));
-    m[ 8].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0,   0.0), 1.0));
-    m[ 9].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0,   0.0, 128.0), 1.0));
-    m[10].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0,   0.0, 255.0), 1.0));
-    m[11].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0, 128.0, 128.0), 1.0));
-    m[12].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0, 255.0, 255.0), 1.0));
-    m[13].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0, 255.0, 255.0), 1.0));
-    m[14].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 128.0, 255.0), 1.0));
-    m[15].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 128.0), 1.0));
+    m[ 0].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), 1.0f));
+    m[ 1].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0f,   0.0f,   0.0f), 1.0f));
+    m[ 2].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f,   0.0f,   0.0f), 1.0f));
+    m[ 3].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0f, 128.0f,   0.0f), 1.0f));
+    m[ 4].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0f, 255.0f,   0.0f), 1.0f));
+    m[ 5].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0f,   0.0f, 128.0f), 1.0f));
+    m[ 6].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0f,   0.0f, 255.0f), 1.0f));
+    m[ 7].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0f, 128.0f,   0.0f), 1.0f));
+    m[ 8].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f, 255.0f,   0.0f), 1.0f));
+    m[ 9].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0f,   0.0f, 128.0f), 1.0f));
+    m[10].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f,   0.0f, 255.0f), 1.0f));
+    m[11].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0f, 128.0f, 128.0f), 1.0f));
+    m[12].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(  0.0f, 255.0f, 255.0f), 1.0f));
+    m[13].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(128.0f, 255.0f, 255.0f), 1.0f));
+    m[14].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f, 128.0f, 255.0f), 1.0f));
+    m[15].reset(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 128.0f), 1.0f));
 
-    fp_t *img;
+    float *img;
     unsigned int img_width;
     unsigned int img_height;
-    const raptor_raytracer::ext_colour_t black(0.0, 0.0, 0.0);
+    const raptor_raytracer::ext_colour_t black(0.0f, 0.0f, 0.0f);
     unsigned int cpp = raptor_raytracer::read_jpeg(&img, "./grass-texture-2.jpg", &img_height, &img_width);
-    raptor_raytracer::planar_mapper *tm = new raptor_raytracer::planar_mapper(img, point_t(0.0, 0.0, 0.0), point_t(0.0, 1.0, 0.0), point_t(10.0, 0.0, 10.0), cpp, img_width, img_height, raptor_raytracer::tile, raptor_raytracer::tile);
-    std::unique_ptr<raptor_raytracer::material> grass(new raptor_raytracer::coloured_mapper_shader(black, raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), black, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, nullptr, tm, nullptr, nullptr));
+    raptor_raytracer::planar_mapper *tm = new raptor_raytracer::planar_mapper(img, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f), point_t(10.0f, 0.0f, 10.0f), cpp, img_width, img_height, raptor_raytracer::tile, raptor_raytracer::tile);
+    std::unique_ptr<raptor_raytracer::material> grass(new raptor_raytracer::coloured_mapper_shader(black, raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), black, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, nullptr, tm, nullptr, nullptr));
 
     /* Lights */
-    se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t( 200.0,  1500.0,  200.0));
-    // se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t( 200.0, -1500.0,  200.0));
+    se.add_light(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t( 200.0f,  1500.0f,  200.0f));
+    // se.add_light(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t( 200.0f, -1500.0f,  200.0f));
 
 
     /* Generate height map */
     // perlin_noise_2d noise(57);
-    // raptor_terrain::height_map<perlin_noise_2d> hm(noise, 100.0, 0.05, 0.4, 3, x, y);
+    // raptor_terrain::height_map<perlin_noise_2d> hm(noise, 100.0f, 0.05f, 0.4f, 3, x, y);
     simplex_noise_2d noise;
-    raptor_terrain::height_map<simplex_noise_2d> hm(noise, 100.0, 0.01, 0.4, 3, x, y);
+    raptor_terrain::height_map<simplex_noise_2d> hm(noise, 100.0f, 0.01f, 0.4f, 3, x, y);
     std::unique_ptr<point_t []> verts(hm.generate(xs, ys));
 
 
@@ -226,7 +226,7 @@ int main()
 
     //     /* Add static objects */
     //     raptor_physics::vertex_group *const vg = new raptor_physics::vertex_group(patch_verts, tris, m[c & 0xf].get());
-    //     raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0, 0.0, 0.0), numeric_limits<fp_t>::infinity());
+    //     raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0f, 0.0f, 0.0f), std::numeric_limits<float>::infinity());
     //     se.add_object(phy_obj);
     // }
 
@@ -315,10 +315,10 @@ int main()
                 /* If possible turn right, else go straight, else turn left, finally go back */
                 /* Find the next cell tracking an anit clockwise edge */
                 neighbour_t turning;
-                fp_t total_distance = (turn_left(previous_facing) == facing) ? 1.0 : 0.0;
+                float total_distance = (turn_left(previous_facing) == facing) ? 1.0f : 0.0f;
                 do
                 {
-                    total_distance += 1.0;
+                    total_distance += 1.0f;
                     turning = track_anti_clockwise_edge(proc_grid_cells.get(), &cur_cell, facing, true);
 
                     assert(cur_cell != nullptr);
@@ -327,18 +327,18 @@ int main()
                 /* Subtract the edge from the turning cell if turning right */
                 if (turn_right(facing) == turning)
                 {
-                    total_distance -= 1.0;
+                    total_distance -= 1.0f;
                 }
 
                 /* Adjust geometry given that last_cell to cur_cell is "flat" */
-                fp_t distance = (turn_right(previous_facing) == facing) ? 0.0 : 1.0;
+                float distance = (turn_right(previous_facing) == facing) ? 0.0f : 1.0f;
                 const int in_vertex = cur_cell->corner_entering(facing, turning);
-                const fp_t slope = (verts[in_vertex].y - verts[facets.back().back()].y) / total_distance;
+                const float slope = (verts[in_vertex].y - verts[facets.back().back()].y) / total_distance;
                 while (last_cell != cur_cell)
                 {
                     const int adj_idx = last_cell->furthest_index(facing);
                     verts[adj_idx].y = verts[facets.back().back()].y + (slope * distance);
-                    distance += 1.0;
+                    distance += 1.0f;
 
                     /* Move to next cell */
                     last_cell = proc_grid_cells[last_cell->neighbour(facing)];
@@ -407,7 +407,7 @@ int main()
 
         /* Add static objects */
         raptor_physics::vertex_group *const vg = new raptor_physics::vertex_group(facet_verts, tris, m[0].get());
-        raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0, 0.0, 0.0), numeric_limits<fp_t>::infinity());
+        raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0f, 0.0f, 0.0f), std::numeric_limits<float>::infinity());
         se.add_object(phy_obj);
     }
 

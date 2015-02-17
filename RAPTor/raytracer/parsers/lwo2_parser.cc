@@ -43,10 +43,10 @@ struct lwo2_texture_info_t
         twrp_mode_y     = (texture_wrapping_mode_t)2;
     }
     
-    void add_shader_to(list<texture_mapper *>  *const t)
+    void add_shader_to(std::list<texture_mapper *>  *const t)
     {
         texture_mapper  *tm;
-        fp_t *img;
+        float *img;
         std::uint32_t img_width;
         std::uint32_t img_height;
         std::uint32_t cpp;
@@ -145,9 +145,9 @@ struct lwo2_texture_info_t
     point_t                 tctr;
     point_t                 tnorm;
     point_t                 tsiz;
-    fp_t                    tfp[4];
-    fp_t                    valu[3];
-    fp_t                    topc;
+    float                   tfp[4];
+    float                   valu[3];
+    float                   topc;
     mapper_type_t           shader;
     mapper_of_t             map_of;
     std::uint16_t           tip;
@@ -288,18 +288,18 @@ inline void parse_tmap(lwo2_texture_info_t *current_info, const char **ptr, cons
         /* Texture center */
         if (strncmp((*ptr), "CNTR", 4) == 0)
         {
-            current_info->tctr.x = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info->tctr.y = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info->tctr.z = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info->tctr.x = from_byte_stream<float>(&tmp_ptr);
+            current_info->tctr.y = from_byte_stream<float>(&tmp_ptr);
+            current_info->tctr.z = from_byte_stream<float>(&tmp_ptr);
             
             BOOST_LOG_TRIVIAL(trace) << "CNTR:" << current_info->tctr;
         }
         /* Texture size */
         else if (strncmp((*ptr), "SIZE", 4) == 0)
         {
-            current_info->tsiz.x = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info->tsiz.y = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info->tsiz.z = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info->tsiz.x = from_byte_stream<float>(&tmp_ptr);
+            current_info->tsiz.y = from_byte_stream<float>(&tmp_ptr);
+            current_info->tsiz.z = from_byte_stream<float>(&tmp_ptr);
             
             BOOST_LOG_TRIVIAL(trace) << "SIZE: "<< current_info->tsiz;
         }
@@ -420,9 +420,9 @@ inline void parse_blok(lwo2_texture_info_t *current_info, const std::map<std::ui
             
             /* Get the normal */
             const std::uint16_t tflg = from_byte_stream<std::uint16_t>(&tmp_ptr);
-            current_info->tnorm.x = (fp_t)((tflg     ) & 0x1);
-            current_info->tnorm.y = (fp_t)((tflg >> 1) & 0x1);
-            current_info->tnorm.z = (fp_t)((tflg >> 2) & 0x1);
+            current_info->tnorm.x = static_cast<float>((tflg     ) & 0x1);
+            current_info->tnorm.y = static_cast<float>((tflg >> 1) & 0x1);
+            current_info->tnorm.z = static_cast<float>((tflg >> 2) & 0x1);
         }
         /* Texture wrapping options */
         else if (strncmp((*ptr), "WRAP", 4) == 0)
@@ -535,13 +535,13 @@ inline static void parse_surf(material **m, const std::map<std::uint32_t, std::s
 {
     /* Variable to hold all the parameters */
     lwo2_texture_info_t  current_info;
-    ext_colour_t    rgb(255.0, 255.0, 255.0);
-    fp_t            vkd = 0.0;
-    fp_t            vks = 0.0;
-    fp_t            s   = 0.0;
-    fp_t            vt  = 0.0;
-    fp_t            ri  = 1.0;
-    fp_t            vr  = 0.0;
+    ext_colour_t    rgb(255.0f, 255.0f, 255.0f);
+    float           vkd = 0.0f;
+    float           vks = 0.0f;
+    float           s   = 0.0f;
+    float           vt  = 0.0f;
+    float           ri  = 1.0f;
+    float           vr  = 0.0f;
     std::uint32_t   i   = 0;
     
     while (i < surf_len)
@@ -553,44 +553,44 @@ inline static void parse_surf(material **m, const std::map<std::uint32_t, std::s
         /* Base image colour */
         if (strncmp((*ptr), "COLR", 4) == 0)
         {
-            rgb.r = from_byte_stream<fp_t>(&tmp_ptr) * 255.0;
-            rgb.g = from_byte_stream<fp_t>(&tmp_ptr) * 255.0;
-            rgb.b = from_byte_stream<fp_t>(&tmp_ptr) * 255.0;
+            rgb.r = from_byte_stream<float>(&tmp_ptr) * 255.0f;
+            rgb.g = from_byte_stream<float>(&tmp_ptr) * 255.0f;
+            rgb.b = from_byte_stream<float>(&tmp_ptr) * 255.0f;
             BOOST_LOG_TRIVIAL(trace) << "COLR: "<< rgb.r << ", " << rgb.g << ", " << rgb.b;
         }
         /* Floating point percentage diffuse co-efficient */
         else if (strncmp((*ptr), "DIFF", 4) == 0)
         {
-            vkd = from_byte_stream<fp_t>(&tmp_ptr);
+            vkd = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "DIFF: " << vkd;
         }
         /* Floating point percentage specular co-efficient */
         else if (strncmp((*ptr), "SPEC", 4) == 0)
         {
-            vks = from_byte_stream<fp_t>(&tmp_ptr) / 255.0;
+            vks = from_byte_stream<float>(&tmp_ptr) / 255.0f;
             BOOST_LOG_TRIVIAL(trace) << "SPEC: " << vks;
         }
         else if (strncmp((*ptr), "GLOS", 4) == 0)
         {
-            s = from_byte_stream<fp_t>(&tmp_ptr);
+            s = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "GLOS: " << s;
         }
         /* Floating point percentage transmittance co-efficient. */
         else if (strncmp((*ptr), "TRAN", 4) == 0)
         {
-            vt = from_byte_stream<fp_t>(&tmp_ptr);
+            vt = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TRAN: " << vt;
         }
         /* Floating point percentage reflectance co-efficient. */
         else if (strncmp((*ptr), "REFL", 4) == 0)
         {
-            vr = from_byte_stream<fp_t>(&tmp_ptr);
+            vr = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "REFL: " << vr;
         }
         /* Refractive index */
         else if (strncmp((*ptr), "RIND", 4) == 0)
         {
-            ri = from_byte_stream<fp_t>(&tmp_ptr);
+            ri = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "RIND: " << ri;
         }
         /* Floating point percentage luminance co-efficient */
@@ -691,7 +691,7 @@ inline static void parse_surf(material **m, const std::map<std::uint32_t, std::s
 }
 
 
-void parse_surf(list<material *> &m, const std::string &p, const std::map<std::string, std::uint16_t> &tag_map, material **surf_materials, const char *at)
+void parse_surf(std::list<material *> &m, const std::string &p, const std::map<std::string, std::uint16_t> &tag_map, material **surf_materials, const char *at)
 {
     /* Check this is the POLS chunk */
     check_for_chunk(&at, "POLS", 4, __LINE__);
@@ -830,7 +830,7 @@ void parse_pols(light_list &l, primitive_list &e, const std::map<std::string, st
 
     /* Gather all the polygons */
     std::uint32_t pol = 0;
-    vector<point_t> pol_vert;
+    std::vector<point_t> pol_vert;
     std::uint16_t vert_this_pol = 0;
     std::uint32_t num_of_surfs = tag_map.size();
     while ((*at) < ptags_start)
@@ -852,7 +852,7 @@ void parse_pols(light_list &l, primitive_list &e, const std::map<std::string, st
         /* Range check the material */
         if ((std::uint32_t)mat_num > num_of_surfs)
         {
-            BOOST_LOG_TRIVIAL(error) << "Material " << hex << mat_num << " out of range at " << (std::uint32_t)((*at) - buffer) << dec;
+            BOOST_LOG_TRIVIAL(error) << "Material " << std::hex << mat_num << " out of range at " << (std::uint32_t)((*at) - buffer) << std::dec;
             assert(false);
         }
 
@@ -874,13 +874,13 @@ void parse_pols(light_list &l, primitive_list &e, const std::map<std::string, st
 
 
 const char * lwo2_parser(
-    const char *const   begin,
-    const char         *at,
-    string              &p,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m,
-    camera              **c)
+    const char *const       begin,
+    const char              *at,
+    std::string             &p,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m,
+    camera                  **c)
 {
     METHOD_LOG;
     
@@ -919,9 +919,9 @@ const char * lwo2_parser(
     point_t *all_points         = new point_t[nr_of_verts];
     for (std::uint32_t i = 0; i < nr_of_verts; i++)
     {
-        all_points[i].x = from_byte_stream<fp_t>(&at);
-        all_points[i].y = from_byte_stream<fp_t>(&at);
-        all_points[i].z = from_byte_stream<fp_t>(&at);
+        all_points[i].x = from_byte_stream<float>(&at);
+        all_points[i].y = from_byte_stream<float>(&at);
+        all_points[i].z = from_byte_stream<float>(&at);
     }
 
     /* Check for optional BBOX chunk */

@@ -16,23 +16,11 @@
 #include <map>
 #include <sstream>
 
-/* Size of a floating point number */
-#define SINGLE_PRECISION
-#ifdef SINGLE_PRECISION
-typedef float fp_t;
-#else
-typedef double fp_t;
-#endif /* #ifdef SINGLE_PRECISION */
-
 /* Threading headers */
 #ifdef THREADED_RAY_TRACE
 #include "scalable_allocator.h"
-
-using namespace tbb;
 #endif
 
-
-using namespace std;
 
 /* Template for casting bits from one type to another */
 template<class T, class S>
@@ -54,7 +42,7 @@ inline S bit_cast(const T t_in)
     return cast_union.s;
 }
 
-extern const fp_t PI;
+extern const float PI;
 
 namespace raptor_raytracer
 {
@@ -68,9 +56,9 @@ namespace raptor_raytracer
 #endif /* #ifndef MIN_REFLECTIVE_POWER */
 
 #ifdef DIFFUSE_REFLECTIONS
-#define REFLECTION_ARRAY_SIZE (int)DIFFUSE_REFLECTIONS 
+#define MAX_SECONDARY_RAYS (int)DIFFUSE_REFLECTIONS 
 #else
-#define REFLECTION_ARRAY_SIZE 1
+#define MAX_SECONDARY_RAYS 1
 #endif /* #ifdef DIFFUSE_REFLECTIONS */
 
 #ifdef SOFT_SHADOW
@@ -82,7 +70,7 @@ namespace raptor_raytracer
 /* Define the size of the bih trace stack */
 /* A bih may not grow to be bigger than this */
 #ifndef MAX_BIH_STACK_HEIGHT
-#define MAX_BIH_STACK_HEIGHT 100
+#define MAX_BIH_STACK_HEIGHT 30
 #endif
 
 /* Define the maximum size of a BIH node */
@@ -147,6 +135,16 @@ namespace raptor_raytracer
 #endif
 
 /* SIMD numbers */
+/* The number of elements in the SIMD vetor */
+#ifndef SIMD_WIDTH
+#define SIMD_WIDTH              4
+#endif
+
+/* Log base 2 of the SIMD_WIDTH */
+#ifndef LOG2_SIMD_WIDTH
+#define LOG2_SIMD_WIDTH         2
+#endif
+
 #ifdef SIMD_PACKET_TRACING
 /* The maximum allowed number of SIMD vectors in a packet */
 /* Must be a power of 4, including 0 */
@@ -166,17 +164,7 @@ namespace raptor_raytracer
 #define SPLIT_PACKET_DIVISOR    4
 #endif
 
-/* The number of elements in the SIMD vetor */
-#ifndef SIMD_WIDTH
-#define SIMD_WIDTH              4
-#endif
-
 #define PACKET_WIDTH            (unsigned)sqrt(MAXIMUM_PACKET_SIZE * SIMD_WIDTH)
-
-/* Log base 2 of the SIMD_WIDTH */
-#ifndef LOG2_SIMD_WIDTH
-#define LOG2_SIMD_WIDTH         2
-#endif
 
 #else   /* #ifdef SIMD_PACKET_TRACING */
 
@@ -211,24 +199,20 @@ namespace raptor_raytracer
 /* Primitive list to hold primitives */
 class triangle;
 class light;
-#ifdef SPATIAL_SUBDIVISION_BIH
-typedef vector<triangle *>                                  primitive_list;
-#else
 #ifdef THREADED_RAY_TRACE
-typedef vector<triangle *, scalable_allocator<triangle *> > primitive_list;
+typedef std::vector<triangle *, scalable_allocator<triangle *> >    primitive_list;
 #else
-typedef vector<triangle *>                                  primitive_list;
+typedef std::vector<triangle *>                                     primitive_list;
 #endif /* #ifdef THREADED_RAY_TRACE */
-#endif /* #ifdef SPATIAL_SUBDIVISION_BIH */
 
-typedef vector<light>                                       light_list;
+typedef std::vector<light> light_list;
 
 /* Common numbers */
-extern const fp_t       FP_DELTA;
-extern const fp_t       FP_DELTA_SMALL;
-extern const fp_t       MAX_DIST;
-extern const fp_t       EPSILON;
-extern const fp_t       EXP;
+extern const float FP_DELTA;
+extern const float FP_DELTA_SMALL;
+extern const float MAX_DIST;
+extern const float EPSILON;
+extern const float EXP;
 
 /* Modulus 3 look up table for values less than 6 */
 extern const unsigned   mod_3_lut[6];
@@ -243,35 +227,35 @@ template <const unsigned int size> class static_cos
             assert(size == ((~size & (size-1)) + 1));
             for (unsigned i=0; i<size; i++)
             {
-                this->lut[i] = cos(((fp_t)i*2.0*PI)/((fp_t)size));
+                this->lut[i] = cos((static_cast<float>(i) * 2.0f * PI) / (static_cast<float>(size)));
             }
         };
         ~static_cos() {  };
         
         /* Function to access the lut */
-        fp_t get_cos(fp_t a) const
+        float get_cos(float a) const
         {
-            unsigned entry = (unsigned)((1.0/(2.0*PI)) * size * a) & (size-1);
+            unsigned int entry = static_cast<unsigned int>((1.0f / (2.0f * PI)) * size * a) & (size - 1);
             return this->lut[entry];
         };
         
         /* Function to extract sin values from the LUT */
-        fp_t get_sin(fp_t a) const
+        float get_sin(float a) const
         {
-            return this->get_cos(a - (PI/2.0));
+            return this->get_cos(a - (PI / 2.0f));
         };
         
         /* Function to extract sin and cos values from the LUT */
-        fp_t get_cos_and_sin(fp_t *cos, fp_t a) const
+        float get_cos_and_sin(float *cos, float a) const
         {
-            unsigned entry = (unsigned)((1.0/(2.0*PI)) * size * a) & (size-1);
+            unsigned int entry = static_cast<unsigned int>((1.0f / (2.0f * PI)) * size * a) & (size - 1);
             *cos = this->lut[entry];
-            entry = (entry - (size/4)) & (size-1);
+            entry = (entry - (size / 4)) & (size - 1);
             return this->lut[entry];
         };
     
     private :
-        fp_t lut[size];
+        float lut[size];
 };
 
 /* LUT for sine and cosine value look up */
@@ -295,12 +279,12 @@ enum class hit_t : char { miss = 0, out_in = 1, in_out = -1 };
 /* A struct to hold the hit information */
 struct hit_description
 {
-    hit_description(const fp_t d = MAX_DIST, const hit_t h = hit_t::miss, const fp_t u = 0.0, const fp_t v = 0.0) :
+    hit_description(const float d = MAX_DIST, const hit_t h = hit_t::miss, const float u = 0.0f, const float v = 0.0f) :
                     u(u), v(v), d(d), h(h) {  };
 
-    fp_t    u;      /* Barycentric u co-ordinate    */
-    fp_t    v;      /* Barycentric u co-ordinate    */
-    fp_t    d;      /* Distance                     */
+    float   u;      /* Barycentric u co-ordinate    */
+    float   v;      /* Barycentric u co-ordinate    */
+    float   d;      /* Distance                     */
     hit_t   h;      /* Hit direction                */
 };
 
@@ -311,7 +295,7 @@ enum class model_format_t : char { cfg = 0, code = 1, mgf = 2, nff = 3, lwo = 4,
 enum class image_format_t : char { tga = 0, jpg = 1, png = 2 };
 
 /* Function to generate a random number between -1 and 1 */
-fp_t gen_random_mersenne_twister();
+float gen_random_mersenne_twister();
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __COMMON_H__ */

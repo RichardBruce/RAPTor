@@ -26,15 +26,43 @@
 #include "ply_parser.h"
 #include "vrml_parser.h"
 #include "raytracer.h"
+#include "kd_tree.h"
+#include "bih.h"
 
 /* Test headers */
 #include "regression_checker.h"
 
-#ifndef VALGRIND_TESTS
+namespace raptor_raytracer
+{
+namespace test
+{
+#if !defined(VALGRIND_TESTS) && !defined(DEBUG_TESTS)
 const int test_iterations = 5;
-#else
+#else 
 const int test_iterations = 1;
 #endif
+
+/* Log message generating traits classes */
+template <typename T>
+struct log_statement
+{
+    static std::string build_time()     { return "SSD"; }
+    static std::string render_time()    { return "SSD"; }
+};
+
+template <>
+struct log_statement<bih>
+{
+    static std::string build_time()     { return "4 - BIH"; }
+    static std::string render_time()    { return "5 - BIH"; }
+};
+
+template <>
+struct log_statement<kd_tree>
+{
+    static std::string build_time()     { return "6 - KDT"; }
+    static std::string render_time()    { return "7 - KDT"; }
+};
 
 /* Test data */
 struct regression_fixture : private boost::noncopyable
@@ -42,14 +70,17 @@ struct regression_fixture : private boost::noncopyable
     public :
         /* CTOR */
         regression_fixture(const std::string &input_file, const model_format_t input_format, 
-            const point_t &cam_p = point_t(0.0, 0.0, -10), const point_t &x_vec = point_t(1.0, 0.0, 0.0), const point_t &y_vec = point_t(0.0, 1.0, 0.0), const point_t &z_vec = point_t(0.0, 0.0, 1.0),
-            const ext_colour_t &bg = ext_colour_t(0.0, 0.0, 0.0),
-            const fp_t rx = 0.0, const fp_t ry = 0.0, const fp_t rz = 0.0, 
+            const point_t &cam_p = point_t(0.0f, 0.0f, -10.0f), const point_t &x_vec = point_t(1.0f, 0.0f, 0.0f), const point_t &y_vec = point_t(0.0f, 1.0f, 0.0f), const point_t &z_vec = point_t(0.0f, 0.0f, 1.0f),
+            const ext_colour_t &bg = ext_colour_t(0.0f, 0.0f, 0.0f),
+            const float rx = 0.0f, const float ry = 0.0f, const float rz = 0.0f, 
             const unsigned int xr = 640, const unsigned int yr = 480, const unsigned int xa = 1, const unsigned int ya = 1, 
             const std::string &view_point = "")
         {
-            const fp_t screen_width     = 10.0;
-            const fp_t screen_height    = screen_width * ((fp_t)yr / (fp_t)xr);
+            /* Reset scene bounds */
+            triangle::reset_scene_bounding_box();
+
+            const float screen_width    = 10.0f;
+            const float screen_height   = screen_width * (static_cast<float>(yr) / static_cast<float>(xr));
 
             const std::string data_dir(getenv("RAPTOR_DATA"));
             const std::string input_path(data_dir + input_file);
@@ -117,9 +148,9 @@ struct regression_fixture : private boost::noncopyable
 
                 case model_format_t::vrml :
                     /* Deafult camera set up for vrml -- NOTE negative z axis */
-                    _cam = new camera(cam_p, point_t((fp_t)1.0, (fp_t)0.0, (fp_t) 0.0), 
-                                             point_t((fp_t)0.0, (fp_t)1.0, (fp_t) 0.0), 
-                                             point_t((fp_t)0.0, (fp_t)0.0, (fp_t)-1.0), bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                    _cam = new camera(cam_p, point_t(1.0f, 0.0f,  0.0f), 
+                                             point_t(0.0f, 1.0f,  0.0f), 
+                                             point_t(0.0f, 0.0f, -1.0f), bg, screen_width, screen_height, 20, xr, yr, xa, ya);
 
                     input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
@@ -146,14 +177,14 @@ struct regression_fixture : private boost::noncopyable
             scene_clean(&_everything, &_materials, _cam);
         }
 
-        regression_fixture& add_light(const ext_colour_t &rgb, const point_t &c, const fp_t d, const fp_t r)
+        regression_fixture& add_light(const ext_colour_t &rgb, const point_t &c, const float d, const float r)
         {
             new_light(&_lights, rgb, c, d, r);
 
             return *this;
         }
 
-        regression_fixture& add_spotlight(const ext_colour_t &rgb, const point_t &c, const point_t &a, const fp_t r, const fp_t d, const fp_t s_a, const fp_t s_b)
+        regression_fixture& add_spotlight(const ext_colour_t &rgb, const point_t &c, const point_t &a, const float r, const float d, const float s_a, const float s_b)
         {
             const point_t n(normalise(c - a));
             new_light(&_lights, rgb, c, n, d, s_a, s_b, r);
@@ -161,7 +192,7 @@ struct regression_fixture : private boost::noncopyable
             return *this;
         }
 
-        regression_fixture& add_directional_light(const ext_colour_t &rgb, const point_t &c, const point_t &a, const fp_t d)
+        regression_fixture& add_directional_light(const ext_colour_t &rgb, const point_t &c, const point_t &a, const float d)
         {
             const point_t n(normalise(c - a));
             new_light(&_lights, rgb, n, d);
@@ -169,6 +200,7 @@ struct regression_fixture : private boost::noncopyable
             return *this;
         }
 
+        template<class SpatialSubDivision = bih>
         regression_fixture& render()
         {
             /* Assert there must be some lights to light the scene */
@@ -184,28 +216,36 @@ struct regression_fixture : private boost::noncopyable
             BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - # Primitives: " << _everything.size();
             BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - # Lights: " << _lights.size();
 
-            /* Render */
-            int max_runtime = 0;
-            int total_runtime = 0;
+            /* Build ssd */
+            std::unique_ptr<SpatialSubDivision> ssd;
+            int max_ssd_runtime = 0;
+            int total_ssd_runtime = 0;
             for (int i = 0; i < test_iterations; ++i)
             {
-                const auto t0(std::chrono::system_clock::now());
-                ray_tracer(_lights, _everything, *_cam);
-                const auto t1(std::chrono::system_clock::now());
+                const auto ssd_build_t0(std::chrono::system_clock::now());
+                ssd.reset(new SpatialSubDivision(_everything));
+                const auto ssd_build_t1(std::chrono::system_clock::now());
 
-                /* Track run time and outliers */
-                const int runtime = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-                total_runtime += runtime;
-                max_runtime = std::max(max_runtime, runtime);
+                const int runtime = std::chrono::duration_cast<std::chrono::microseconds>(ssd_build_t1 - ssd_build_t0).count();
+                total_ssd_runtime += runtime;
+                max_ssd_runtime = std::max(max_ssd_runtime, runtime);
             }
+            BOOST_LOG_TRIVIAL(fatal) << "PERF " << log_statement<SpatialSubDivision>::build_time() << " Build Time ms: " << average_runtime(total_ssd_runtime, max_ssd_runtime);
 
-            /* Log test duration */
-            if (test_iterations > 1)
+            /* Render */
+            int max_render_runtime = 0;
+            int total_render_runtime = 0;
+            for (int i = 0; i < test_iterations; ++i)
             {
-                total_runtime -= max_runtime;
+                const auto render_t0(std::chrono::system_clock::now());
+                ray_tracer(ssd.get(), _lights, _everything, *_cam);
+                const auto render_t1(std::chrono::system_clock::now());
+
+                const int runtime = std::chrono::duration_cast<std::chrono::microseconds>(render_t1 - render_t0).count();
+                total_render_runtime += runtime;
+                max_render_runtime = std::max(max_render_runtime, runtime);
             }
-            const int avg_runtime = total_runtime / (std::max(1, test_iterations - 1) * 1000);
-            BOOST_LOG_TRIVIAL(fatal) << "PERF 4 - Render Time ms: " << avg_runtime;
+            BOOST_LOG_TRIVIAL(fatal) << "PERF " << log_statement<SpatialSubDivision>::render_time() << " Render Time ms: " << average_runtime(total_render_runtime, max_render_runtime);
 
             return *this;
         }
@@ -216,10 +256,22 @@ struct regression_fixture : private boost::noncopyable
         }
 
     private :
+        int average_runtime(int total_runtime, const int max_runtime)
+        {
+            if (test_iterations > 1)
+            {
+                total_runtime -= max_runtime;
+            }
+
+            return total_runtime / (std::max(1, test_iterations - 1) * 1000);
+        }
+
         camera              *   _cam;
         light_list              _lights;
         primitive_list          _everything;
         std::list<material *>   _materials;
 };
+}; /* namespace raptor_raytracer */
+}; /* namespace test */
 
 #endif /* #ifndef __REGRESSION_FIXTURE_H__ */

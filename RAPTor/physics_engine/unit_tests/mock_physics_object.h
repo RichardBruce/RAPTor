@@ -56,10 +56,10 @@ class mock_physics_object
             return *this;
         }
 
-        mock_physics_object& apply_force(const point_t &at, const point_t &f, const fp_t t)
+        mock_physics_object& apply_force(const point_t &at, const point_t &f, const float t)
         {
             /* No point pushing an infinite mass object */
-            if (get_mass() == numeric_limits<fp_t>::infinity())
+            if (get_mass() == std::numeric_limits<float>::infinity())
             {
                 return *this;
             }
@@ -93,7 +93,7 @@ class mock_physics_object
         point_t                 get_angular_velocity()          const { return _w;                      }
         point_t                 get_center_of_mass()            const { return _i->center_of_mass();    }
         inertia_tensor&         get_inertia_tenor()             const { return *_i;                     }
-        fp_t                    get_mass()                      const { return _i->mass();              }
+        float                   get_mass()                      const { return _i->mass();              }
 
         point_t get_velocity(const point_t &p) const
         {
@@ -103,22 +103,22 @@ class mock_physics_object
         point_t get_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
-            return (_i->mass() == numeric_limits<fp_t>::infinity()) ? 0.0 : ( _i->mass() * _v);
+            return (_i->mass() == std::numeric_limits<float>::infinity()) ? 0.0f : ( _i->mass() * _v);
         }
 
         point_t get_angular_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
-            return (_i->mass() == numeric_limits<fp_t>::infinity()) ? point_t(0.0, 0.0, 0.0) : (get_orientated_tensor() * _w);
+            return (_i->mass() == std::numeric_limits<float>::infinity()) ? point_t(0.0f, 0.0f, 0.0f) : (get_orientated_tensor() * _w);
         }
 
         const inertia_tensor_view get_orientated_tensor() const
         {
-            return inertia_tensor_view(*_i, quaternion_t(1.0, 0.0, 0.0, 0.0));
+            return inertia_tensor_view(*_i, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f));
         }
         
         /* Setters */
-        mock_physics_object& apply_impulse(const point_t &n, const point_t &angular_weight, const fp_t impulse)
+        mock_physics_object& apply_impulse(const point_t &n, const point_t &angular_weight, const float impulse)
         {
             _n.push_back(n);
             _angular_weight.push_back(angular_weight);
@@ -142,9 +142,9 @@ class mock_physics_object
             return tmp;
         }
 
-        fp_t    get_impulse()
+        float   get_impulse()
         {
-            const fp_t tmp = _impulse.front();
+            const float tmp = _impulse.front();
             _impulse.pop_front();
             return tmp;
         }
@@ -154,7 +154,7 @@ class mock_physics_object
         inertia_tensor *const   _i;
         std::deque<point_t>     _n;
         std::deque<point_t>     _angular_weight;
-        std::deque<fp_t>        _impulse;
+        std::deque<float>       _impulse;
         point_t                 _v;
         point_t                 _w;
         point_t                 _f;

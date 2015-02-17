@@ -26,8 +26,10 @@ const raptor_physics::init_logger init_logger;
 #include "spatial_sub_division.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 struct spatial_sub_division_fixture : private boost::noncopyable
 {
@@ -630,3 +632,5 @@ BOOST_AUTO_TEST_CASE( add_object_performance_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

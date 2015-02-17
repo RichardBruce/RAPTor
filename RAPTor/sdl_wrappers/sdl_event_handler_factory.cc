@@ -117,7 +117,7 @@ sdl_event_handler<camera>* get_camera_event_handler(camera *const cam, const std
         { SDLK_f, [&output_file, jpg_quality, image_format](const SDL_Keycode key, camera* c) -> int
             {
                 static unsigned int snapshot_nr = 0;
-                ostringstream file_name(ostringstream::out);
+                std::ostringstream file_name(std::ostringstream::out);
 
                 /* Tone map */
                 c->tone_map(tone_mapping_mode_t::local_human_histogram);

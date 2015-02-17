@@ -16,8 +16,10 @@ const raptor_physics::init_logger init_logger;
 #include "object_bound.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 BOOST_AUTO_TEST_SUITE( object_bound_tests );
 
 
@@ -163,3 +165,5 @@ BOOST_AUTO_TEST_CASE( compare_and_swap_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

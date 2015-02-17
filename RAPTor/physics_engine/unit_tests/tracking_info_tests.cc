@@ -22,8 +22,10 @@ const raptor_physics::init_logger init_logger;
 #include "mock_physics_object.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 struct tracking_info_fixture
 {
@@ -378,3 +380,5 @@ BOOST_AUTO_TEST_CASE( iter_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

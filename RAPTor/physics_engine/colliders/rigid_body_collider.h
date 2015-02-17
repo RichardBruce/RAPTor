@@ -16,7 +16,7 @@ namespace raptor_physics
 /* Function to process an instantaneous, frictionless collision */
 /* The function is templated for testing */
 template<class Object>
-void instantaneous_frictionless_collide(Object *const po_a, Object *const po_b, const point_t &poc, const point_t &noc, const fp_t cor)
+void instantaneous_frictionless_collide(Object *const po_a, Object *const po_b, const point_t &poc, const point_t &noc, const float cor)
 {
     METHOD_LOG;
 
@@ -57,16 +57,16 @@ void instantaneous_frictionless_collide(Object *const po_a, Object *const po_b, 
 
     const point_t a_cross_r(cross_product(ra_cross_n, ra) / inertia_a);
     const point_t b_cross_r(cross_product(rb_cross_n, rb) / inertia_b);
-    const fp_t rot_comp = dot_product((a_cross_r + b_cross_r), noc);
+    const float rot_comp = dot_product((a_cross_r + b_cross_r), noc);
 
     /* Linear component of impulse */
-    const fp_t total_m_inv = (1.0 / po_a->get_mass()) + (1.0 / po_b->get_mass());
-    const fp_t tra_comp = dot_product(noc, noc * total_m_inv);
+    const float total_m_inv = (1.0f / po_a->get_mass()) + (1.0f / po_b->get_mass());
+    const float tra_comp = dot_product(noc, noc * total_m_inv);
 
     /* Impulse */
-    const fp_t denom = rot_comp + tra_comp;
-    const fp_t numer = dot_product(closing_v * (1.0 + cor), noc);
-    const fp_t impul = numer / denom;
+    const float denom = rot_comp + tra_comp;
+    const float numer = dot_product(closing_v * (1.0f + cor), noc);
+    const float impul = numer / denom;
     BOOST_LOG_TRIVIAL(trace) << "Impulse: " << impul;
 
     /* Apply the impulse */
@@ -85,7 +85,7 @@ void instantaneous_frictionless_collide(Object *const po_a, Object *const po_b, 
 /* Function to process an instantaneous collision */
 /* The function is templated for testing */
 template<class Object>
-void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t &poc, const point_t &noc, const fp_t cor, const fp_t mu)
+void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t &poc, const point_t &noc, const float cor, const float mu)
 {
     METHOD_LOG;
 
@@ -117,7 +117,7 @@ void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t
     const point_t proj_v_close(t_b_proj - t_a_proj);
     point_t tanj_v_close(t_b_tanj - t_a_tanj);
     
-    const fp_t tanj_v_magn = magnitude(tanj_v_close);
+    const float tanj_v_magn = magnitude(tanj_v_close);
     if (tanj_v_magn > raptor_physics::EPSILON)
     {
         tanj_v_close /= tanj_v_magn;
@@ -138,19 +138,19 @@ void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t
 
     const point_t a_cross_r(cross_product(ra_cross_n, ra) / inertia_a);
     const point_t b_cross_r(cross_product(rb_cross_n, rb) / inertia_b);
-    const fp_t rot_comp = dot_product((a_cross_r + b_cross_r), noc);
+    const float rot_comp = dot_product((a_cross_r + b_cross_r), noc);
 
     /* Linear component */
-    const fp_t total_m_inv = (1.0 / po_a->get_mass()) + (1.0 / po_b->get_mass());
-    const fp_t tra_comp = dot_product(noc, noc * total_m_inv);
+    const float total_m_inv = (1.0f / po_a->get_mass()) + (1.0f / po_b->get_mass());
+    const float tra_comp = dot_product(noc, noc * total_m_inv);
 
     /* Limit friction to bringing point to a halt */
-    fp_t friction_max = 0.0;
+    float friction_max = 0.0f;
     const point_t a_mult_proj(ra_cross_n / inertia_a);
     const point_t b_mult_proj(rb_cross_n / inertia_b);
     const point_t a_mult_tanj(ra_cross_tanj / inertia_a);
     const point_t b_mult_tanj(rb_cross_tanj / inertia_b);
-    const fp_t tanj_coeff = magnitude(cross_product(a_mult_tanj, ra) + cross_product(b_mult_tanj, rb) + (tanj_v_close / po_a->get_mass()) +  (tanj_v_close / po_b->get_mass()));
+    const float tanj_coeff = magnitude(cross_product(a_mult_tanj, ra) + cross_product(b_mult_tanj, rb) + (tanj_v_close / po_a->get_mass()) +  (tanj_v_close / po_b->get_mass()));
     if (tanj_coeff > raptor_physics::EPSILON)
     {
         friction_max = tanj_v_magn / tanj_coeff;
@@ -158,10 +158,10 @@ void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t
     BOOST_LOG_TRIVIAL(trace) << "Maximum friction impulse: " << friction_max;
 
     /* Impulses */
-    const fp_t denom = rot_comp + tra_comp;
-    const fp_t numer = dot_product(proj_v_close * (1.0 + cor), noc);
-    const fp_t reactive_impulse = numer / denom;
-    const fp_t friction_impulse = std::min(friction_max, -reactive_impulse * mu);
+    const float denom = rot_comp + tra_comp;
+    const float numer = dot_product(proj_v_close * (1.0f + cor), noc);
+    const float reactive_impulse = numer / denom;
+    const float friction_impulse = std::min(friction_max, -reactive_impulse * mu);
     BOOST_LOG_TRIVIAL(trace) << "Reactive impulse: " << reactive_impulse << ", Fricion impulse: " << friction_impulse;
 
     /* Apply the impulses */
@@ -182,7 +182,7 @@ void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t
 class rigid_body_collider : public collider
 {
     public :
-        rigid_body_collider(const fp_t cor, const fp_t mu)
+        rigid_body_collider(const float cor, const float mu)
             : _cor(cor), _mu(mu) {  };
         
         virtual const rigid_body_collider& collide(physics_object *const po_a, physics_object *const po_b, const point_t &poc, const point_t &noc, const collision_t type) const
@@ -199,8 +199,8 @@ class rigid_body_collider : public collider
         }
         
     private :
-        const fp_t _cor;    /* Coefficient of restitution   */
-        const fp_t _mu;     /* Coefficient of friction      */
+        const float _cor;    /* Coefficient of restitution   */
+        const float _mu;     /* Coefficient of friction      */
 };
 }; /* namespace raptor_physics */
 #endif /* #ifndef __RIGID_BODY_COLLIDER_H__ */

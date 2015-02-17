@@ -20,18 +20,18 @@ struct texture_info_t
 {
     void reset(const mapper_of_t m, const mapper_type_t s)
     {
-        trgb            = ext_colour_t(255.0, 255.0, 255.0);
-        topc            = 1.0;
+        trgb            = ext_colour_t(255.0f, 255.0f, 255.0f);
+        topc            = 1.0f;
         shader          = s;
         map_of          = m;
         twrp_mode_x     = (texture_wrapping_mode_t)2;
         twrp_mode_y     = (texture_wrapping_mode_t)2;    
     }
     
-    void add_shader_to(list<texture_mapper *>  *const t)
+    void add_shader_to(std::list<texture_mapper *>  *const t)
     {
         texture_mapper  *tm;
-        fp_t *img;
+        float *img;
         std::uint32_t img_width;
         std::uint32_t img_height;
         std::uint32_t cpp;
@@ -94,23 +94,23 @@ struct texture_info_t
         }
     }
 
-    list<texture_mapper *>  btex;
-    list<texture_mapper *>  ctex;
-    list<texture_mapper *>  dtex;
-    list<texture_mapper *>  ttex;
-    list<texture_mapper *>  rtex;
-    std::string             filename;
-    ext_colour_t            trgb;
-    point_t                 tctr;
-    point_t                 tnorm;
-    point_t                 tsiz;
-    fp_t                    tfp[4];
-    fp_t                    topc;
-    mapper_type_t           shader;
-    mapper_of_t             map_of;
-    std::uint16_t           tip;
-    texture_wrapping_mode_t twrp_mode_x;
-    texture_wrapping_mode_t twrp_mode_y;
+    std::list<texture_mapper *> btex;
+    std::list<texture_mapper *> ctex;
+    std::list<texture_mapper *> dtex;
+    std::list<texture_mapper *> ttex;
+    std::list<texture_mapper *> rtex;
+    std::string                 filename;
+    ext_colour_t                trgb;
+    point_t                     tctr;
+    point_t                     tnorm;
+    point_t                     tsiz;
+    float                       tfp[4];
+    float                       topc;
+    mapper_type_t               shader;
+    mapper_of_t                 map_of;
+    std::uint16_t               tip;
+    texture_wrapping_mode_t     twrp_mode_x;
+    texture_wrapping_mode_t     twrp_mode_y;
 };
 
 
@@ -131,9 +131,9 @@ inline std::uint32_t find_surf_chunk(const char *p, const char **s, std::uint32_
     {
         if ((*p == 0x00) && ((i & 0x1) == 1))
         {
-            num_of_surfs++;
+            ++num_of_surfs;
         }
-        p++;
+        ++p;
     }
     
     /* Check p points where it should */
@@ -176,17 +176,17 @@ inline mapper_type_t pick_shader(const char *const c)
 }
 
 
-inline static void parse_surf(material **m, const string &p, const char **ptr, const std::uint32_t surf_len)
+inline static void parse_surf(material **m, const std::string &p, const char **ptr, const std::uint32_t surf_len)
 {
     /* Variable to hold all the parameters */
     texture_info_t  current_info;
-    ext_colour_t    rgb(255.0, 255.0, 255.0);
-    fp_t            vkd = 0.0;
-    fp_t            vks = 0.0;
-    fp_t            s   = 0.0;
-    fp_t            vt  = 0.0;
-    fp_t            ri  = 0.0;
-    fp_t            vr  = 0.0;
+    ext_colour_t    rgb(255.0f, 255.0f, 255.0f);
+    float           vkd = 0.0f;
+    float           vks = 0.0f;
+    float           s   = 0.0f;
+    float           vt  = 0.0f;
+    float           ri  = 0.0f;
+    float           vr  = 0.0f;
     const char      *tmp_ptr;
     std::uint32_t   i   = 0;
     std::uint16_t   short_tmp;
@@ -207,9 +207,9 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
         /* Base image colour */
         if (strncmp((*ptr), "COLR", 4) == 0)
         {
-            rgb.r = static_cast<fp_t>(static_cast<std::uint8_t>((*ptr)[6]));
-            rgb.g = static_cast<fp_t>(static_cast<std::uint8_t>((*ptr)[7]));
-            rgb.b = static_cast<fp_t>(static_cast<std::uint8_t>((*ptr)[8]));
+            rgb.r = static_cast<float>(static_cast<std::uint8_t>((*ptr)[6]));
+            rgb.g = static_cast<float>(static_cast<std::uint8_t>((*ptr)[7]));
+            rgb.b = static_cast<float>(static_cast<std::uint8_t>((*ptr)[8]));
         }
         else if (strncmp((*ptr), "FLAG", 4) == 0)
         {
@@ -221,7 +221,7 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
             if (vkd == 0.0)
             {
                 tmp_ptr = (*ptr) + 6;
-                vkd = (fp_t)from_byte_stream<std::uint16_t>(&tmp_ptr) / 255.0;
+                vkd = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
             }
             BOOST_LOG_TRIVIAL(trace) << "DIFF: " << vkd;
         }
@@ -230,7 +230,7 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
         else if (strncmp((*ptr), "VDIF", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            vkd = from_byte_stream<fp_t>(&tmp_ptr);
+            vkd = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "VDIF: " << vkd;
         }
         /* Integer percentage specular co-efficient */
@@ -239,7 +239,7 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
             if (vks == 0.0)
             {
                 tmp_ptr = (*ptr) + 6;
-                vks = from_byte_stream<fp_t>(&tmp_ptr) / 255.0;
+                vks = from_byte_stream<float>(&tmp_ptr) / 255.0f;
             }
             BOOST_LOG_TRIVIAL(trace) << "SPEC: " << vks;
         }
@@ -248,13 +248,13 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
         else if (strncmp((*ptr), "VSPC", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            vks = from_byte_stream<fp_t>(&tmp_ptr);
+            vks = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "VSPC: " << vks;
         }
         else if (strncmp((*ptr), "GLOS", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            s = (fp_t)from_byte_stream<std::uint16_t>(&tmp_ptr);
+            s = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr));
             BOOST_LOG_TRIVIAL(trace) << "GLOS: " << s;
         }
         /* Integer percentage transmittance co-efficient */
@@ -263,7 +263,7 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
             if (vt == 0.0)
             {
                 tmp_ptr = (*ptr) + 6;
-                vt = (fp_t)from_byte_stream<std::uint16_t>(&tmp_ptr) / 255.0;
+                vt = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
             }
             BOOST_LOG_TRIVIAL(trace) << "TRAN: " << vt;
         }
@@ -272,7 +272,7 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
         else if (strncmp((*ptr), "VTRN", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            vt = from_byte_stream<fp_t>(&tmp_ptr);
+            vt = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "VTRN: " << vt;
         }
         /* Integer percentage reflectance co-efficient */
@@ -281,7 +281,7 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
             if (vr == 0.0)
             {
                 tmp_ptr = (*ptr) + 6;
-                vr = (fp_t)from_byte_stream<std::uint16_t>(&tmp_ptr) / 255.0;
+                vr = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
             }
             BOOST_LOG_TRIVIAL(trace) << "REFL: " << vr;
         }
@@ -290,7 +290,7 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
         else if (strncmp((*ptr), "VRFL", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            vr = from_byte_stream<fp_t>(&tmp_ptr);
+            vr = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "VRFL: " << vr;
         }
         else if (strncmp((*ptr), "RFLT", 4) == 0)
@@ -301,7 +301,7 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
         else if (strncmp((*ptr), "RIND", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            ri = from_byte_stream<fp_t>(&tmp_ptr);
+            ri = from_byte_stream<float>(&tmp_ptr);
         }
         /* Integer percentage luminance co-efficient */
         else if (strncmp((*ptr), "LUMI", 4) == 0)
@@ -322,17 +322,17 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
             BOOST_LOG_TRIVIAL(trace) << "TFLG (not handled fully): " << short_tmp;
             
             /* Get the normal */
-            current_info.tnorm.x = (fp_t)((short_tmp     ) & 0x1);
-            current_info.tnorm.y = (fp_t)((short_tmp >> 1) & 0x1);
-            current_info.tnorm.z = (fp_t)((short_tmp >> 2) & 0x1);
+            current_info.tnorm.x = static_cast<float>((short_tmp     ) & 0x1);
+            current_info.tnorm.y = static_cast<float>((short_tmp >> 1) & 0x1);
+            current_info.tnorm.z = static_cast<float>((short_tmp >> 2) & 0x1);
         }
         else if (strncmp((*ptr), "TSIZ", 4) == 0)
         {
             /* Texture size */
             tmp_ptr = (*ptr) + 6;
-            current_info.tsiz.x = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info.tsiz.y = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info.tsiz.z = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info.tsiz.x = from_byte_stream<float>(&tmp_ptr);
+            current_info.tsiz.y = from_byte_stream<float>(&tmp_ptr);
+            current_info.tsiz.z = from_byte_stream<float>(&tmp_ptr);
             
             BOOST_LOG_TRIVIAL(trace) << "TSIZ: " << current_info.tsiz;
         }
@@ -344,9 +344,9 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
         /* Texture colour */
         else if (strncmp((*ptr), "TCLR", 4) == 0)
         {
-            current_info.trgb.r = (fp_t)(*ptr)[6];
-            current_info.trgb.g = (fp_t)(*ptr)[7];
-            current_info.trgb.b = (fp_t)(*ptr)[8];
+            current_info.trgb.r = static_cast<float>((*ptr)[6]);
+            current_info.trgb.g = static_cast<float>((*ptr)[7]);
+            current_info.trgb.b = static_cast<float>((*ptr)[8]);
             BOOST_LOG_TRIVIAL(trace) << "TCLR: " << current_info.trgb.r << ", " << current_info.trgb.g << ", " << current_info.trgb.b;
         }
         /* Integer texture parameter 0 */
@@ -360,14 +360,14 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
         else if (strncmp((*ptr), "TFP0", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            current_info.tfp[0] = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info.tfp[0] = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TFP0: " << current_info.tfp[0];
         }
         /* Floating point texture parameter 1 */
         else if (strncmp((*ptr), "TFP1", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            current_info.tfp[1] = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info.tfp[1] = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TFP1: " << current_info.tfp[1];
         }
         /* Texture image name */
@@ -391,9 +391,9 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
         else if (strncmp((*ptr), "TCTR", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            current_info.tctr.x = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info.tctr.y = from_byte_stream<fp_t>(&tmp_ptr);
-            current_info.tctr.z = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info.tctr.x = from_byte_stream<float>(&tmp_ptr);
+            current_info.tctr.y = from_byte_stream<float>(&tmp_ptr);
+            current_info.tctr.z = from_byte_stream<float>(&tmp_ptr);
             
             BOOST_LOG_TRIVIAL(trace) << "TCTR: "<< current_info.tctr;
         }
@@ -401,7 +401,7 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
         {
             /* Texture opaqueness */
             tmp_ptr = (*ptr) + 6;
-            current_info.topc = from_byte_stream<fp_t>(&tmp_ptr);
+            current_info.topc = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TOPC: " << current_info.topc;
         }
         /* Algorithmic texture mappers name */
@@ -471,13 +471,13 @@ inline static void parse_surf(material **m, const string &p, const char **ptr, c
 
 
 const char * lwo1_parser(
-    const char *const   begin,
-    const char         *at,
-    string              &p,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m,
-    camera              **c)
+    const char *const       begin,
+    const char              *at,
+    std::string             &p,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m,
+    camera                  **c)
 {
     METHOD_LOG;
 
@@ -489,9 +489,9 @@ const char * lwo1_parser(
     point_t *all_points         = new point_t[nr_of_verts];
     for (std::uint32_t i = 0; i < nr_of_verts; i++)
     {
-        all_points[i].x = from_byte_stream<fp_t>(&at);
-        all_points[i].y = from_byte_stream<fp_t>(&at);
-        all_points[i].z = from_byte_stream<fp_t>(&at);
+        all_points[i].x = from_byte_stream<float>(&at);
+        all_points[i].y = from_byte_stream<float>(&at);
+        all_points[i].z = from_byte_stream<float>(&at);
     }
     
     /* Check this is the SRFS chunk */
@@ -504,7 +504,7 @@ const char * lwo1_parser(
 
     /* Parse the names of the surfaces (SRFS chunk) */
     std::unique_ptr<const char *[]> srfs(new const char *[num_of_surfs]);
-    for (std::uint32_t i = 0; i < num_of_surfs; i++)
+    for (std::uint32_t i = 0; i < num_of_surfs; ++i)
     {
         srfs[i] = at;
         at += strlen(srfs[i]) + 1;
@@ -516,7 +516,7 @@ const char * lwo1_parser(
     
     /* Parse the materials (SURF chunk) */
     material **surf_materials = new material *[num_of_surfs];
-    for (std::uint32_t i = 0; i < num_of_surfs; i ++)
+    for (std::uint32_t i = 0; i < num_of_surfs; ++i)
     {
         const std::uint32_t surf_len = from_byte_stream<std::uint32_t>(&surfs_start);
         if(strcmp(surfs_start, srfs[i]) != 0)
@@ -541,7 +541,7 @@ const char * lwo1_parser(
     check_for_chunk(&at, "POLS", 4);
     
     /* Gather all the polygons */
-    vector<point_t> pol_vert;
+    std::vector<point_t> pol_vert;
     std::uint16_t vert_this_pol = 0;
     std::uint32_t pols_bytes    = from_byte_stream<std::uint32_t>(&at);
     for (std::uint32_t i = 0; i < pols_bytes; i += (4 + (vert_this_pol << 1)))
@@ -561,7 +561,7 @@ const char * lwo1_parser(
         /* Check for detail polygons, but then parse them as normal polygons */
         if (mat_num < 0)
         {
-            BOOST_LOG_TRIVIAL(trace) << "Found detail polygons at: 0x" << hex << (std::uint32_t)((at) - begin) << dec;
+            BOOST_LOG_TRIVIAL(trace) << "Found detail polygons at: 0x" << std::hex << (std::uint32_t)((at) - begin) << std::dec;
             from_byte_stream<std::int16_t>(&at);
             mat_num = abs(mat_num);
             i += 2;
@@ -570,7 +570,7 @@ const char * lwo1_parser(
         /* Range check the material */
         if ((std::uint32_t)mat_num > num_of_surfs)
         {
-            BOOST_LOG_TRIVIAL(error) << "Material " << hex << mat_num << " out of range at " << (std::uint32_t)((at) - begin) << dec;
+            BOOST_LOG_TRIVIAL(error) << "Material " << std::hex << mat_num << " out of range at " << (std::uint32_t)((at) - begin) << std::dec;
             assert(false);
         }
 
@@ -583,7 +583,7 @@ const char * lwo1_parser(
 
     /* Check for and skip SURF chunk, which has already been parsed */
     /* Yes all this really is necassary, for whatever reason the SURF chunk might be longer than it claims */
-    for (std::uint32_t i = 0; i < num_of_surfs; i ++)
+    for (std::uint32_t i = 0; i < num_of_surfs; ++i)
     {
         check_for_chunk(&at, "SURF", 4);
 

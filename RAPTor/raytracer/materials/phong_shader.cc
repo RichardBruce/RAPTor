@@ -6,7 +6,7 @@
 
 namespace raptor_raytracer
 {
-void phong_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ray *const rl, ray *const rf, fp_t *const n_rl, fp_t *const n_rf) const
+void phong_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
@@ -28,29 +28,29 @@ void phong_shader::shade(const ray_trace_engine &r, ray &i, const line &n, const
         ray illum = r.get_illumination(l++);
 
         /* Cos(angle between normal and the ray) */
-        fp_t shade = dot_product(illum.get_dir(), n.get_dir());
+        float shade = dot_product(illum.get_dir(), n.get_dir());
         
         /* Ignore if the surface is facing away from the ray */
-        if (shade < (fp_t)0.0)
+        if (shade < 0.0f)
         {
             continue;
         }
         
         /* Find the reflection of the light ray */
         point_t ref_dir;
-        fp_t shade_x2 = (fp_t)2.0 * shade;
+        float shade_x2 = 2.0f * shade;
         ref_dir.x = illum.get_x_grad() - n.get_x_grad() * shade_x2;
         ref_dir.y = illum.get_y_grad() - n.get_y_grad() * shade_x2;
         ref_dir.z = illum.get_z_grad() - n.get_z_grad() * shade_x2;
     
         /* Cos(angle between refelction and the ray) */
-        fp_t ray_dot_reflection = dot_product(i.get_dir(), ref_dir);
+        float ray_dot_reflection = dot_product(i.get_dir(), ref_dir);
 
         /* Scale the diffuse componant */
         ext_colour_t shade_colour = shade * this->kd;
 
         /* Calculate and scale the specular componant */
-        if (ray_dot_reflection > (fp_t)0.0)
+        if (ray_dot_reflection > 0.0f)
         {
             shade_colour += pow(ray_dot_reflection, this->s) * this->ks;
         }
@@ -64,15 +64,15 @@ void phong_shader::shade(const ray_trace_engine &r, ray &i, const line &n, const
     (*c) += this->ka;
     
     /* Reflect */
-    if (this->rf > (fp_t)0.0)
+    if (this->rf > 0.0f)
     {
         ext_colour_t    average;
-        ray             rl[REFLECTION_ARRAY_SIZE];
+        ray             rl[MAX_SECONDARY_RAYS];
         
         /* Ray reflection member */
-        fp_t nr_rays = i.reflect(rl, n, this->rf, this->rfd);
+        float nr_rays = i.reflect(rl, n, this->rf, this->rfd);
         
-        for (int i=0; i<(int)nr_rays; ++i)
+        for (int i = 0; i< static_cast<int>(nr_rays); ++i)
         {
             ext_colour_t pixel;
             r.ray_trace(rl[i], &pixel);
@@ -80,22 +80,22 @@ void phong_shader::shade(const ray_trace_engine &r, ray &i, const line &n, const
         }
 
         /* Average the colours */
-        if (nr_rays > (fp_t)0.0)
+        if (nr_rays > 0.0f)
         {
             (*c) += average * (this->rf / nr_rays);
         }
     }
 
     /* Refract */
-    if (tran > (fp_t)0.0)
+    if (this->tran > 0.0f)
     {
         ext_colour_t    average;
-        ray             rl[REFLECTION_ARRAY_SIZE];
+        ray             rl[MAX_SECONDARY_RAYS];
         
         /* Ray refraction member */
-        fp_t nr_rays = i.refract(rl, n, tran, this->ri, h, this->td);
+        float nr_rays = i.refract(rl, n, this->tran, this->ri, h, this->td);
         
-        for (int i=0; i<(int)nr_rays; ++i)
+        for (int i = 0; i< static_cast<int>(nr_rays); ++i)
         {
             ext_colour_t pixel;
             r.ray_trace(rl[i], &pixel);
@@ -103,15 +103,15 @@ void phong_shader::shade(const ray_trace_engine &r, ray &i, const line &n, const
         }
 
         /* Average the colours */
-        if (nr_rays > (fp_t)0.0)
+        if (nr_rays > 0.0f)
         {
-            (*c) += average * (tran / nr_rays);
+            (*c) += average * (this->tran / nr_rays);
         }
     }
 }
 
 
-void phong_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t &c, const ray *const rl, const ray *const rf, const ext_colour_t *const c_rl, const ext_colour_t *const c_rf, const fp_t *const n_rl, const fp_t *const n_rf) const
+void phong_shader::combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const
 {
     return;
 }

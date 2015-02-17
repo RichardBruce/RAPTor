@@ -1,12 +1,12 @@
 #ifndef __PACKET_RAY_H__
 #define __PACKET_RAY_H__
 
+/* Ray tracer headers */
 #include "simd.h"
 #include "ray.h"
 
+
 #ifdef SIMD_PACKET_TRACING
-
-
 namespace raptor_raytracer
 {
 /* Forward declarations */
@@ -16,7 +16,7 @@ class packet_ray
 {
     public :
         /* Constructor if we havent intersected anything yet */
-        packet_ray(const point_t &o, const vfp_t &dx, const vfp_t &dy, const vfp_t &dz, fp_t m=1.0, int c=1) : 
+        packet_ray(const point_t &o, const vfp_t &dx, const vfp_t &dy, const vfp_t &dz, float m = 1.0f, int c = 1) : 
             magn(m), componant(c) 
             { 
                 this->ogn[0] = o.x;
@@ -30,10 +30,10 @@ class packet_ray
         /* Empty constructor */
         packet_ray() {  };
         
-        void set_up(const point_t &o, const vfp_t &dx, const vfp_t &dy, const vfp_t &dz, const fp_t m=1.0, const int c=1)
+        void set_up(const point_t &o, const vfp_t &dx, const vfp_t &dy, const vfp_t &dz, const float m = 1.0f, const int c = 1)
         { 
             magn        = vfp_t(m);
-            componant   = vfp_t((fp_t)c);
+            componant   = vfp_t(static_cast<float>(c));
 
             this->ogn[0] = o.x;
             this->ogn[1] = o.y;
@@ -45,10 +45,10 @@ class packet_ray
             return;
         }
         
-        void set_up(const vfp_t &ox, const vfp_t &oy, const vfp_t &oz, const vfp_t &dx, const vfp_t &dy, const vfp_t &dz, const fp_t m=1.0, const int c=1)
+        void set_up(const vfp_t &ox, const vfp_t &oy, const vfp_t &oz, const vfp_t &dx, const vfp_t &dy, const vfp_t &dz, const float m=1.0, const int c=1)
         { 
             magn        = vfp_t(m);
-            componant   = vfp_t((fp_t)c);
+            componant   = vfp_t(static_cast<float>(c));
 
             this->ogn[0] = ox;
             this->ogn[1] = oy;
@@ -84,7 +84,10 @@ class packet_ray
             this->dst[2]    = vfp_t(r[0]->get_z1(), r[1]->get_z1(), r[2]->get_z1(), r[3]->get_z1());
             
             this->magn      = vfp_t(r[0]->get_magnitude(), r[1]->get_magnitude(), r[2]->get_magnitude(), r[3]->get_magnitude());
-            this->componant = vfp_t((fp_t)r[0]->get_componant(), (fp_t)r[1]->get_componant(), (fp_t)r[2]->get_componant(), (fp_t)r[3]->get_componant());
+            this->componant = vfp_t(static_cast<float>(r[0]->get_componant()), 
+                                    static_cast<float>(r[1]->get_componant()), 
+                                    static_cast<float>(r[2]->get_componant()), 
+                                    static_cast<float>(r[3]->get_componant()));
 
             return vfp_t(r[0]->get_length(), r[1]->get_length(), r[2]->get_length(), r[3]->get_length());
         }
@@ -105,22 +108,22 @@ class packet_ray
         const packet_ray & extract(ray *const r) const
         {
             /* Extract simd data */
-            const fp_t *ogn_x = this->ogn[0];
-            const fp_t *ogn_y = this->ogn[1];
-            const fp_t *ogn_z = this->ogn[2];
+            const float *ogn_x = this->ogn[0];
+            const float *ogn_y = this->ogn[1];
+            const float *ogn_z = this->ogn[2];
 
-            const fp_t *dir_x = this->dir[0];
-            const fp_t *dir_y = this->dir[1];
-            const fp_t *dir_z = this->dir[2];
+            const float *dir_x = this->dir[0];
+            const float *dir_y = this->dir[1];
+            const float *dir_z = this->dir[2];
 
-            const fp_t *dst_x = this->dst[0];
-            const fp_t *dst_y = this->dst[1];
-            const fp_t *dst_z = this->dst[2];
+            const float *dst_x = this->dst[0];
+            const float *dst_y = this->dst[1];
+            const float *dst_z = this->dst[2];
 
-            const fp_t *len   = this->length;
+            const float *len   = this->length;
             
-            const fp_t *magn  = this->magn;
-            const fp_t *comp  = this->componant;
+            const float *magn  = this->magn;
+            const float *comp  = this->componant;
             
             r[0].set_up(point_t(ogn_x[0], ogn_y[0], ogn_z[0]), 
                         point_t(dst_x[0], dst_y[0], dst_z[0]), 
@@ -168,16 +171,16 @@ class packet_ray
 /* A struct to hold the hit information for a packet ray */
 struct packet_hit_description
 {
-    packet_hit_description(const vfp_t &d = MAX_DIST) : u((fp_t)0.0), v((fp_t)0.0), d(d) {  };
+    packet_hit_description(const vfp_t &d = MAX_DIST) : u(0.0f), v(0.0f), d(d) {  };
     
     hit_description operator[](int i)   const   { return hit_description(d[i], hit_t::miss, u[i], v[i]);   };
 
     const packet_hit_description & extract(hit_description *const h) const
     {
         /* Extract simd data */
-        const fp_t *fp_u = this->u;
-        const fp_t *fp_v = this->v;
-        const fp_t *fp_d = this->d;
+        const float *fp_u = this->u;
+        const float *fp_v = this->v;
+        const float *fp_d = this->d;
 
         h[0] = hit_description(fp_d[0], hit_t::miss, fp_u[0], fp_v[0]);
         h[1] = hit_description(fp_d[1], hit_t::miss, fp_u[1], fp_v[1]);
@@ -204,7 +207,7 @@ class packet_ray_to_pixel
     public :
         packet_ray_to_pixel()
         {
-            const unsigned int pkt_width = (unsigned int)std::sqrt((fp_t)(MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH));
+            const unsigned int pkt_width = (unsigned int)std::sqrt(static_cast<float>((MAXIMUM_PACKET_SIZE) << LOG2_SIMD_WIDTH));
 
             /* Foreach ray in the biggest packet */
             for (unsigned int i = 0; i < (unsigned int)(MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH); i++)
@@ -255,7 +258,7 @@ class packet_ray_to_co_ordinate
     public :
         packet_ray_to_co_ordinate()
         {
-            const unsigned int pkt_width = (unsigned int)std::sqrt((fp_t)MAXIMUM_PACKET_SIZE) >> 1;
+            const unsigned int pkt_width = (unsigned int)std::sqrt(static_cast<float>(MAXIMUM_PACKET_SIZE)) >> 1;
 
             /* Foreach the biggest packet size */
             for (unsigned int i = 0; i < MAXIMUM_PACKET_SIZE; i++)

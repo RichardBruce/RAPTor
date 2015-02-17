@@ -9,17 +9,17 @@ namespace raptor_raytracer
 voxel voxel::divide(kdt_node *const k)
 {
     /* Calculate the cost of this node */
-    fp_t nr_of_primitives = this->p->size();
-    fp_t x_dist = this->t.x - this->b.x;
-    fp_t y_dist = this->t.y - this->b.y;
-    fp_t z_dist = this->t.z - this->b.z;
-    fp_t area   = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
-    fp_t lowest_cost = COST_OF_INTERSECTION * nr_of_primitives * area;
-    fp_t cost_before = lowest_cost;
+    float nr_of_primitives = this->p->size();
+    float x_dist = this->t.x - this->b.x;
+    float y_dist = this->t.y - this->b.y;
+    float z_dist = this->t.z - this->b.z;
+    float area   = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+    float lowest_cost = COST_OF_INTERSECTION * nr_of_primitives * area;
+    float cost_before = lowest_cost;
 
 #if 1   /* Approximate builder */
     axis_t normal;
-    fp_t best_split;
+    float best_split;
     
 #ifdef SIMD_PACKET_TRACING
     /* If using SIMD allow early exit for nodes under a given size */
@@ -33,11 +33,7 @@ voxel voxel::divide(kdt_node *const k)
     /* Invoke the exact builder for small node */
     if (this->p->size() <= MIN_APPROX_KDT_BUILDER_NODE_SIZE)
     {
-#ifdef SIMD_PACKET_TRACING
         best_split = this->brute_force_split_all_axis(&lowest_cost, &normal);
-#else
-        best_split = this->split_all_axis(&lowest_cost, &normal);
-#endif
     }
     else
     {
@@ -89,15 +85,15 @@ voxel voxel::divide(kdt_node *const k)
     }
 #else   /* Exact builder */
 #if 0   /* Signal axis aplit */
-    fp_t best_split = this->split_this_axis(&lowest_cost);
+    float best_split = this->split_this_axis(&lowest_cost);
 #else   /* All axis aplit */
     axis_t normal;
-    fp_t best_split = this->split_all_axis(&lowest_cost, &normal);
+    float best_split = this->split_all_axis(&lowest_cost, &normal);
 #endif
 #endif
 
     /* Stop splitting if the cost metric cannot be reduced */
-    assert(lowest_cost >= 0.0);
+    assert(lowest_cost >= 0.0f);
     if (lowest_cost >= cost_before)
     {
         k->set_primitives(this->p);
@@ -138,9 +134,9 @@ voxel voxel::divide(kdt_node *const k)
     }
     
     /* Divide the primitives */
-    fp_t nearest_clip = best_split;
+    float nearest_clip = best_split;
 #if 0   /* Set to enable clip of split plane to nearest primitive */
-    fp_t dist_to_clip = MAX_DIST;
+    float dist_to_clip = MAX_DIST;
 #endif
     primitive_list *child_p = new primitive_list;
     
@@ -263,28 +259,28 @@ voxel voxel::divide(kdt_node *const k)
 /**********************************************************
  
 **********************************************************/
-// fp_t voxel::split_all_axis(fp_t *s, axis_t *normal)
+// float voxel::split_all_axis(float *s, axis_t *normal)
 // {
 //     /* Find the best split position of the primitives */
 //     axis_t   best_axis   = axis_t::not_set;
-//     fp_t     best_split  = axis_t::not_set;
-//     fp_t     lowest_cost = *s;
+//     float     best_split  = axis_t::not_set;
+//     float     lowest_cost = *s;
     
 //      /* Initial primitive split */
 //     unsigned size_of_prim = this->p->size();
-//     fp_t     right = size_of_prim;
-//     fp_t     left  = 0;
-//     fp_t     guess;
-//     fp_t     last_guess = MAX_DIST;
+//     float     right = size_of_prim;
+//     float     left  = 0;
+//     float     guess;
+//     float     last_guess = MAX_DIST;
     
 //     /* Elements for evaluation */
-//     fp_t lo_x, lo_y, lo_z, hi_x, hi_y, hi_z;
+//     float lo_x, lo_y, lo_z, hi_x, hi_y, hi_z;
     
 //     /* Allocated arrays to hold the bounding box points */    
 //     if (low_points == NULL)
 //     {
-//         low_points  = new fp_t [size_of_prim];
-//         high_points = new fp_t [size_of_prim];
+//         low_points  = new float [size_of_prim];
+//         high_points = new float [size_of_prim];
 //     }
     
 //     unsigned index=0;
@@ -352,7 +348,7 @@ voxel voxel::divide(kdt_node *const k)
 //         /* Evaluate unique points */
 //         if (last_guess != guess)
 //         {
-//             fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::x_axis);
+//             float this_cost = calculate_sah_cost(left, right, guess, axis_t::x_axis);
 //             if (this_cost < lowest_cost)
 //             {
 //                 lowest_cost = this_cost;
@@ -442,7 +438,7 @@ voxel voxel::divide(kdt_node *const k)
 //         /* Evaluate unique points */
 //         if (last_guess != guess)
 //         {
-//             fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::y_axis);
+//             float this_cost = calculate_sah_cost(left, right, guess, axis_t::y_axis);
 //             if (this_cost < lowest_cost)
 //             {
 //                 lowest_cost = this_cost;
@@ -532,7 +528,7 @@ voxel voxel::divide(kdt_node *const k)
 //         /* Evaluate unique points */
 //         if (last_guess != guess)
 //         {
-//             fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::z_axis);
+//             float this_cost = calculate_sah_cost(left, right, guess, axis_t::z_axis);
 //             if (this_cost < lowest_cost)
 //             {
 //                 lowest_cost = this_cost;
@@ -560,15 +556,15 @@ voxel voxel::divide(kdt_node *const k)
 // }
 
 
-// fp_t voxel::approximate_split_all_axis(fp_t *s, axis_t * normal) const
+// float voxel::approximate_split_all_axis(float *s, axis_t * normal) const
 // {
 //     axis_t   best_axis      = axis_t::not_set;
-//     fp_t     best_split     = MAX_DIST;
-//     fp_t     cost           = *s;
-//     fp_t     lowest_cost    = *s;
+//     float     best_split     = MAX_DIST;
+//     float     cost           = *s;
+//     float     lowest_cost    = *s;
 
 //     /* Split in x and compare the result */
-//     fp_t split =  approximate_split_one_axis(&cost, axis_t::x_axis);
+//     float split =  approximate_split_one_axis(&cost, axis_t::x_axis);
 //     if (cost < lowest_cost)
 //     {
 //         lowest_cost = cost;
@@ -601,52 +597,52 @@ voxel voxel::divide(kdt_node *const k)
 // }
 
 
-fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
+float voxel::approximate_split_one_axis(float *const s, const axis_t normal) const
 {
     /* Find the best split position of the primitives */
-    fp_t best_split     = MAX_DIST;
-    fp_t lowest_cost    = *s;
+    float best_split     = MAX_DIST;
+    float lowest_cost    = *s;
     
     /* Adaptive sampling bin sizes */
-    const fp_t adapt_bin_size   = this->p->size() * (2.0/9.0);
+    const float adapt_bin_size   = this->p->size() * (2.0/9.0);
     
     /* Voxel dimensions */
-    const fp_t xw       = this->t.x - this->b.x;
-    const fp_t yw       = this->t.y - this->b.y;
-    const fp_t zw       = this->t.z - this->b.z;
-    const fp_t xb_yw    = this->b.x * yw;
-    const fp_t xb_zw    = this->b.x * zw;
-    const fp_t xt_yw    = this->t.x * yw;
-    const fp_t xt_zw    = this->t.x * zw;
-    const fp_t yb_xw    = this->b.y * xw;
-    const fp_t yb_zw    = this->b.y * zw;
-    const fp_t yt_xw    = this->t.y * xw;
-    const fp_t yt_zw    = this->t.y * zw;
-    const fp_t zb_xw    = this->b.z * xw;
-    const fp_t zb_yw    = this->b.z * yw;
-    const fp_t zt_xw    = this->t.z * xw;
-    const fp_t zt_yw    = this->t.z * yw;
-    const fp_t xw_yw    = xw * yw;
-    const fp_t xw_zw    = xw * zw;
-    const fp_t yw_zw    = yw * zw;
-    const fp_t xw_p_yw  = xw + yw;
-    const fp_t xw_p_zw  = xw + zw;
-    const fp_t yw_p_zw  = yw + zw;
-//    const fp_t sa       = 1.0 / (xw_yw + xw_zw + yw_zw);
+    const float xw       = this->t.x - this->b.x;
+    const float yw       = this->t.y - this->b.y;
+    const float zw       = this->t.z - this->b.z;
+    const float xb_yw    = this->b.x * yw;
+    const float xb_zw    = this->b.x * zw;
+    const float xt_yw    = this->t.x * yw;
+    const float xt_zw    = this->t.x * zw;
+    const float yb_xw    = this->b.y * xw;
+    const float yb_zw    = this->b.y * zw;
+    const float yt_xw    = this->t.y * xw;
+    const float yt_zw    = this->t.y * zw;
+    const float zb_xw    = this->b.z * xw;
+    const float zb_yw    = this->b.z * yw;
+    const float zt_xw    = this->t.z * xw;
+    const float zt_yw    = this->t.z * yw;
+    const float xw_yw    = xw * yw;
+    const float xw_zw    = xw * zw;
+    const float yw_zw    = yw * zw;
+    const float xw_p_yw  = xw + yw;
+    const float xw_p_zw  = xw + zw;
+    const float yw_p_zw  = yw + zw;
+//    const float sa       = 1.0 / (xw_yw + xw_zw + yw_zw);
     
     /* Sampling variable */
-    fp_t dw;
-    fp_t evaluate;
-    fp_t sample[8] ALIGN(16);
-    fp_t bins_per_sample[9];
-    fp_t adaptive_width[9];
-    fp_t cl[9];
-    fp_t cr[9];
-    fp_t cla[9];
-    fp_t cra[9];
-    fp_t last_cl;
-    fp_t last_cr;
-    fp_t sp;
+    float dw;
+    float evaluate;
+    float sample[8] ALIGN(16);
+    float bins_per_sample[9];
+    float adaptive_width[9];
+    float cl[9];
+    float cr[9];
+    float cla[9];
+    float cra[9];
+    float last_cl;
+    float last_cr;
+    float sp;
     int  adaptive_offset;
 
     switch (normal)
@@ -663,7 +659,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
             
             for (int i = 0; i < 8; i++)
             {
-                sample[i] = this->b.x + (dw * (fp_t)(i+1));
+                sample[i] = this->b.x + (dw * static_cast<float>(i + 1));
             }
             this->count_primitives(cl, cr, sample, 8, axis_t::x_axis);
             
@@ -695,32 +691,32 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
             last_cl         = 0.0;
             last_cr         = this->p->size();
             sp              = this->b.x;
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 9; ++i)
             {
                 /* Process any adaptive samples in this bin first because they will be encountered first */
                 for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
                 {
                     /* Bin primitive gradients */
-                    const fp_t clg = (cla[j] - last_cl) / adaptive_width[i];
-                    const fp_t crg = (cra[j] - last_cr) / adaptive_width[i];
+                    const float clg = (cla[j] - last_cl) / adaptive_width[i];
+                    const float crg = (cra[j] - last_cr) / adaptive_width[i];
                     
                     /* Sample location */
-                    const fp_t sp_yw    = sp * yw;
-                    const fp_t sp_zw    = sp * zw;
+                    const float sp_yw    = sp * yw;
+                    const float sp_zw    = sp * zw;
                     
                     /* Minima point bound to this bin */
-                    const fp_t a    = 2.0 * ((clg * yw_p_zw) - (crg * yw_p_zw));
-                    const fp_t b    =   ( last_cl * yw_p_zw) - (clg * (xb_yw + xb_zw - yw_zw + sp_yw + sp_zw))
+                    const float a    = 2.0f * ((clg * yw_p_zw) - (crg * yw_p_zw));
+                    const float b    =   ( last_cl * yw_p_zw) - (clg * (xb_yw + xb_zw - yw_zw + sp_yw + sp_zw))
                                       + (-last_cr * yw_p_zw) + (crg * (xt_yw + xt_zw + yw_zw + sp_yw + sp_zw));
                     
-                    const fp_t delta    = adaptive_width[i] * 0.05;
-                    const fp_t xm       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                    const float delta    = adaptive_width[i] * 0.05f;
+                    const float xm       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
         
                     /* Cost at minima */
-                    const fp_t xmb  = xm - this->b.x;
-                    const fp_t xmt  = this->t.x - xm;
+                    const float xmb  = xm - this->b.x;
+                    const float xmt  = this->t.x - xm;
         
-                    const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+                    const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
                                       (((last_cl + (clg * (xm - sp))) * ((xmb * yw) + (xmb * zw) + yw_zw))  + 
                                        ((last_cr + (crg * (xm - sp))) * ((xmt * yw) + (xmt * zw) + yw_zw))));
                     
@@ -734,29 +730,29 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                     last_cr = cra[j];
                     sp     += adaptive_width[i];
                 }
-                adaptive_offset += (int)bins_per_sample[i];
+                adaptive_offset += static_cast<int>(bins_per_sample[i]);
         
                 /* Bin primitive gradients */
-                const fp_t clg = (cl[i] - last_cl) / adaptive_width[i];
-                const fp_t crg = (cr[i] - last_cr) / adaptive_width[i];
+                const float clg = (cl[i] - last_cl) / adaptive_width[i];
+                const float crg = (cr[i] - last_cr) / adaptive_width[i];
               
                 /* Sample location */
-                const fp_t sp_yw    = sp * yw;
-                const fp_t sp_zw    = sp * zw;
+                const float sp_yw    = sp * yw;
+                const float sp_zw    = sp * zw;
               
                 /* Minima point bound to this bin */
-                const fp_t a    = 2.0 * ((clg * yw_p_zw) - (crg * yw_p_zw));
-                const fp_t b    =   ( last_cl * yw_p_zw) - (clg * (xb_yw + xb_zw - yw_zw + sp_yw + sp_zw))
+                const float a    = 2.0f * ((clg * yw_p_zw) - (crg * yw_p_zw));
+                const float b    =   ( last_cl * yw_p_zw) - (clg * (xb_yw + xb_zw - yw_zw + sp_yw + sp_zw))
                                   + (-last_cr * yw_p_zw) + (crg * (xt_yw + xt_zw + yw_zw + sp_yw + sp_zw));
               
-                const fp_t delta    = adaptive_width[i] * 0.05;
-                const fp_t xm       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                const float delta    = adaptive_width[i] * 0.05f;
+                const float xm       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
               
                 /* Cost at minima */
-                const fp_t xmb  = xm - this->b.x;
-                const fp_t xmt  = this->t.x - xm;
+                const float xmb  = xm - this->b.x;
+                const float xmt  = this->t.x - xm;
         
-                const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+                const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
                                   (((last_cl + (clg * (xm - sp))) * ((xmb * yw) + (xmb * zw) + yw_zw))  + 
                                    ((last_cr + (crg * (xm - sp))) * ((xmt * yw) + (xmt * zw) + yw_zw))));
               
@@ -774,17 +770,17 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
             
         case axis_t::y_axis :
             /* Pick fixed points to evaluate */
-            dw          = yw * (1.0 / 9.0);
+            dw          = yw * (1.0f / 9.0f);
             evaluate    = this->t.y;
             
             /* Fixed points samples and adaptive bin boundaries */
             cl[8]               = this->p->size();
-            cr[8]               = 0.0;
-            bins_per_sample[8]  = 8.0;
+            cr[8]               = 0.0f;
+            bins_per_sample[8]  = 8.0f;
         
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; ++i)
             {
-                sample[i] = this->b.y + (dw * (fp_t)(i+1));
+                sample[i] = this->b.y + (dw * static_cast<float>(i + 1));
             }
             this->count_primitives(cl, cr, sample, 8, axis_t::y_axis);
         
@@ -813,35 +809,35 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
             
             /* Evaluate SAH minima for each sample as -b/2a */
             adaptive_offset = 0;
-            last_cl         = 0.0;
+            last_cl         = 0.0f;
             last_cr         = this->p->size();
             sp              = this->b.y;
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 9; ++i)
             {
                 /* Process any adaptive samples in this bin first because they will be encountered first */
                 for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
                 {
                     /* Bin primitive gradients */
-                    const fp_t clg = (cla[j] - last_cl) / adaptive_width[i];
-                    const fp_t crg = (cra[j] - last_cr) / adaptive_width[i];
+                    const float clg = (cla[j] - last_cl) / adaptive_width[i];
+                    const float crg = (cra[j] - last_cr) / adaptive_width[i];
                     
                     /* Sample location */
-                    const fp_t sp_xw    = sp * xw;
-                    const fp_t sp_zw    = sp * zw;
+                    const float sp_xw    = sp * xw;
+                    const float sp_zw    = sp * zw;
                     
                     /* Minima point bound to this bin */
-                    const fp_t a    = 2.0 * ((clg * xw_p_zw) - (crg * xw_p_zw));
-                    const fp_t b    =   ( last_cl * xw_p_zw) - (clg * (yb_xw + yb_zw - xw_zw + sp_xw + sp_zw))
+                    const float a    = 2.0f * ((clg * xw_p_zw) - (crg * xw_p_zw));
+                    const float b    =   ( last_cl * xw_p_zw) - (clg * (yb_xw + yb_zw - xw_zw + sp_xw + sp_zw))
                                       + (-last_cr * xw_p_zw) + (crg * (yt_xw + yt_zw + xw_zw + sp_xw + sp_zw));
                     
-                    const fp_t delta    = adaptive_width[i] * 0.05;
-                    const fp_t ym       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                    const float delta    = adaptive_width[i] * 0.05f;
+                    const float ym       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
                     
                     /* Cost at minima */
-                    const fp_t ymb  = ym - this->b.y;
-                    const fp_t ymt  = this->t.y - ym;
+                    const float ymb  = ym - this->b.y;
+                    const float ymt  = this->t.y - ym;
         
-                    const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+                    const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
                                       (((last_cl + (clg * (ym - sp))) * ((ymb * xw) + (ymb * zw) + xw_zw))  + 
                                        ((last_cr + (crg * (ym - sp))) * ((ymt * xw) + (ymt * zw) + xw_zw))));
                     
@@ -855,29 +851,29 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                     last_cr = cra[j];
                     sp     += adaptive_width[i];
                 }
-                adaptive_offset += (int)bins_per_sample[i];
+                adaptive_offset += static_cast<int>(bins_per_sample[i]);
         
                 /* Bin primitive gradients */
-                const fp_t clg = (cl[i] - last_cl) / adaptive_width[i];
-                const fp_t crg = (cr[i] - last_cr) / adaptive_width[i];
+                const float clg = (cl[i] - last_cl) / adaptive_width[i];
+                const float crg = (cr[i] - last_cr) / adaptive_width[i];
               
                 /* Sample location */
-                const fp_t sp_xw    = sp * xw;
-                const fp_t sp_zw    = sp * zw;
+                const float sp_xw    = sp * xw;
+                const float sp_zw    = sp * zw;
               
                 /* Minima point bound to this bin */
-                const fp_t a    = 2.0 * ((clg * xw_p_zw) - (crg * xw_p_zw));
-                const fp_t b    =   ( last_cl * xw_p_zw) - (clg * (yb_xw + yb_zw - xw_zw + sp_xw + sp_zw))
+                const float a    = 2.0f * ((clg * xw_p_zw) - (crg * xw_p_zw));
+                const float b    =   ( last_cl * xw_p_zw) - (clg * (yb_xw + yb_zw - xw_zw + sp_xw + sp_zw))
                                   + (-last_cr * xw_p_zw) + (crg * (yt_xw + yt_zw + xw_zw + sp_xw + sp_zw));
               
-                const fp_t delta    = adaptive_width[i] * 0.05;
-                const fp_t ym       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                const float delta    = adaptive_width[i] * 0.05f;
+                const float ym       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
               
                 /* Cost at minima */
-                const fp_t ymb  = ym - this->b.y;
-                const fp_t ymt  = this->t.y - ym;
+                const float ymb  = ym - this->b.y;
+                const float ymt  = this->t.y - ym;
         
-                const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+                const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
                                   (((last_cl + (clg * (ym - sp))) * ((ymb * xw) + (ymb * zw) + xw_zw))  + 
                                    ((last_cr + (crg * (ym - sp))) * ((ymt * xw) + (ymt * zw) + xw_zw))));
               
@@ -895,7 +891,7 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
 
         case axis_t::z_axis :
             /* Pick fixed points to evaluate */
-            dw          = zw * (1.0 / 9.0);
+            dw          = zw * (1.0f / 9.0f);
             evaluate    = this->t.z;
             
             /* Fixed points samples and adaptive bin boundaries */
@@ -905,16 +901,16 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
         
             for (int i = 0; i < 8; i++)
             {
-                sample[i] = this->b.z + (dw * (fp_t)(i+1));
+                sample[i] = this->b.z + (dw * static_cast<float>(i + 1));
             }
             this->count_primitives(cl, cr, sample, 8, axis_t::z_axis);
         
             /* Fix adaptive sample width per bin */
-            for (int i = 7; i >= 0; i--)
+            for (int i = 7; i >= 0; --i)
             {
                 bins_per_sample[i] = int((cl[i] - cr[i]) / adapt_bin_size) + 4;
                 bins_per_sample[i+1]   -= bins_per_sample[i];
-                adaptive_width[i+1]     = dw / (bins_per_sample[i+1] + 1.0);
+                adaptive_width[i+1]     = dw / (bins_per_sample[i + 1] + 1.0);
             }
             adaptive_width[0]   = dw / (bins_per_sample[0] + 1.0);
             
@@ -934,35 +930,35 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
             
             /* Evaluate SAH minima for each sample as -b/2a */
             adaptive_offset = 0;
-            last_cl         = 0.0;
+            last_cl         = 0.0f;
             last_cr         = this->p->size();
             sp              = this->b.z;
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 9; ++i)
             {
                 /* Process any adaptive samples in this bin first because they will be encountered first */
                 for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
                 {
                     /* Bin primitive gradients */
-                    const fp_t clg = (cla[j] - last_cl) / adaptive_width[i];
-                    const fp_t crg = (cra[j] - last_cr) / adaptive_width[i];
+                    const float clg = (cla[j] - last_cl) / adaptive_width[i];
+                    const float crg = (cra[j] - last_cr) / adaptive_width[i];
                     
                     /* Sample location */
-                    const fp_t sp_xw    = sp * xw;
-                    const fp_t sp_yw    = sp * yw;
+                    const float sp_xw    = sp * xw;
+                    const float sp_yw    = sp * yw;
                     
                     /* Minima point bound to this bin */
-                    const fp_t a    = 2.0 * ((clg * xw_p_yw) - (crg * xw_p_zw));
-                    const fp_t b    =   ( last_cl * xw_p_yw) - (clg * (zb_xw + zb_yw - xw_yw + sp_xw + sp_yw))
+                    const float a    = 2.0f * ((clg * xw_p_yw) - (crg * xw_p_zw));
+                    const float b    =   ( last_cl * xw_p_yw) - (clg * (zb_xw + zb_yw - xw_yw + sp_xw + sp_yw))
                                       + (-last_cr * xw_p_yw) + (crg * (zt_xw + zt_yw + xw_yw + sp_xw + sp_yw));
                     
-                    const fp_t delta    = adaptive_width[i] * 0.05;
-                    const fp_t zm       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                    const float delta    = adaptive_width[i] * 0.05f;
+                    const float zm       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
                     
                     /* Cost at minima */
-                    const fp_t zmb  = zm - this->b.z;
-                    const fp_t zmt  = this->t.z - zm;
+                    const float zmb  = zm - this->b.z;
+                    const float zmt  = this->t.z - zm;
         
-                    const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+                    const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
                                       (((last_cl + (clg * (zm - sp))) * ((zmb * xw) + (zmb * yw) + xw_yw))  + 
                                        ((last_cr + (crg * (zm - sp))) * ((zmt * xw) + (zmt * yw) + xw_yw))));
                     
@@ -976,29 +972,29 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
                     last_cr = cra[j];
                     sp     += adaptive_width[i];
                 }
-                adaptive_offset += (int)bins_per_sample[i];
+                adaptive_offset += static_cast<int>(bins_per_sample[i]);
         
                 /* Bin primitive gradients */
-                const fp_t clg = (cl[i] - last_cl) / adaptive_width[i];
-                const fp_t crg = (cr[i] - last_cr) / adaptive_width[i];
+                const float clg = (cl[i] - last_cl) / adaptive_width[i];
+                const float crg = (cr[i] - last_cr) / adaptive_width[i];
               
                 /* Sample location */
-                const fp_t sp_xw    = sp * xw;
-                const fp_t sp_yw    = sp * yw;
+                const float sp_xw    = sp * xw;
+                const float sp_yw    = sp * yw;
              
                 /* Minima point bound to this bin */
-                const fp_t a    = 2.0 * ((clg * xw_p_yw) - (crg * xw_p_zw));
-                const fp_t b    =   ( last_cl * xw_p_yw) - (clg * (zb_xw + zb_yw - xw_yw + sp_xw + sp_yw))
+                const float a    = 2.0f * ((clg * xw_p_yw) - (crg * xw_p_zw));
+                const float b    =   ( last_cl * xw_p_yw) - (clg * (zb_xw + zb_yw - xw_yw + sp_xw + sp_yw))
                                   + (-last_cr * xw_p_yw) + (crg * (zt_xw + zt_yw + xw_yw + sp_xw + sp_yw));
               
-                const fp_t delta    = adaptive_width[i] * 0.05;
-                const fp_t zm       = max((sp + delta), min((sp + adaptive_width[i] - delta), (b / a)));
+                const float delta    = adaptive_width[i] * 0.05f;
+                const float zm       = std::max((sp + delta), std::min((sp + adaptive_width[i] - delta), (b / a)));
               
                 /* Cost at minima */
-                const fp_t zmb  = zm - this->b.z;
-                const fp_t zmt  = this->t.z - zm;
+                const float zmb  = zm - this->b.z;
+                const float zmt  = this->t.z - zm;
         
-                const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+                const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
                                   (((last_cl + (clg * (zm - sp))) * ((zmb * xw) + (zmb * yw) + xw_yw))  + 
                                    ((last_cr + (crg * (zm - sp))) * ((zmt * xw) + (zmt * yw) + xw_yw))));
               
@@ -1027,119 +1023,253 @@ fp_t voxel::approximate_split_one_axis(fp_t *const s, const axis_t normal) const
 
 /**********************************************************
  
-**********************************************************/
-inline fp_t voxel::count_primitives(fp_t *const r, const fp_t s, const axis_t normal) const
-{
-    /* Sub divide the objects */
-    fp_t left_objects  = (fp_t)0.0;
-    fp_t right_objects = (fp_t)0.0;
-    switch (normal)
-    {
-        case axis_t::x_axis:
-            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
-            {
-                left_objects  += (int)((*i)->lowest_x()  < s);
-                right_objects += (int)((*i)->highest_x() > s);
-            }
-            break;
-        case axis_t::y_axis:
-            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
-            {
-                left_objects  += (int)((*i)->lowest_y()  < s);
-                right_objects += (int)((*i)->highest_y() > s);
-            }
-            break;
-        case axis_t::z_axis:
-            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
-            {
-                left_objects  += (int)((*i)->lowest_z()  < s);
-                right_objects += (int)((*i)->highest_z() > s);
-            }
-            break;
-        default :
-            assert(false);
-            break;
-    }
+// **********************************************************/
+// inline float voxel::count_primitives(float *const r, const float s, const axis_t normal) const
+// {
+//     /* Sub divide the objects */
+//     float left_objects  = 0.0f;
+//     float right_objects = 0.0f;
+//     switch (normal)
+//     {
+//         case axis_t::x_axis:
+//             for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
+//             {
+//                 left_objects  += (int)((*i)->lowest_x()  < s);
+//                 right_objects += (int)((*i)->highest_x() > s);
+//             }
+//             break;
+//         case axis_t::y_axis:
+//             for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
+//             {
+//                 left_objects  += (int)((*i)->lowest_y()  < s);
+//                 right_objects += (int)((*i)->highest_y() > s);
+//             }
+//             break;
+//         case axis_t::z_axis:
+//             for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
+//             {
+//                 left_objects  += (int)((*i)->lowest_z()  < s);
+//                 right_objects += (int)((*i)->highest_z() > s);
+//             }
+//             break;
+//         default :
+//             assert(false);
+//             break;
+//     }
 
-    *r = right_objects;
-    return left_objects;
-}
+//     *r = right_objects;
+//     return left_objects;
+// }
 
-
-#ifndef SIMD_PACKET_TRACING
 /**********************************************************
  
 **********************************************************/
-inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis_t n) const
+float voxel::brute_force_split_all_axis(float *s, axis_t * normal) const
 {
-//    if (this->p->size() > 1000000)
-//    {
-//        primitive_count pc(this->p, s, n);
-//        parallel_reduce(blocked_range<size_t>(0,this->p->size()), pc, auto_partitioner());
-//    
-//        for (int i = 0; i < 8; i++)
-//        {
-//            l[i] = pc.sum_l[i];
-//            r[i] = pc.sum_r[i];
-//        }
-//    }
-//    else
-//    {
-    /* Clear the counters */
-    for (int i = 0; i < len; i++)
+    /* Find the best split position of the primitives */
+    float sample[9] ALIGN(16);
+    vfp_t valid_mask[2];
+
+    vfp_t l_vec[2], r_vec[2], s_vec[2];
+    vfp_t lc_vec(*s);
+    vfp_t ba_vec(static_cast<float>(axis_t::not_set));
+    vfp_t bs_vec(MAX_DIST);
+
+    /* Evaluate the X axis */
+    int bucketted = 0;
+    for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
     {
-        l[i] = (fp_t)0.0;
-        r[i] = (fp_t)0.0;
+        /* Add samples to their bucket */
+        if (((*i)->lowest_x() > this->b.x) && ((*i)->lowest_x() < this->t.x))
+        {
+            sample[bucketted++] = (*i)->lowest_x();
+        }
+
+        if (((*i)->highest_x() > this->b.x) && ((*i)->highest_x() < this->t.x))
+        {
+            sample[bucketted++] = (*i)->highest_x();
+        }
+        
+        /* Check for bucket full */
+        if (bucketted > 7)
+        {
+            s_vec[0] = &sample[0];
+            s_vec[1] = &sample[SIMD_WIDTH];
+            this->count_primitives(l_vec, r_vec, s_vec, axis_t::x_axis);
+            for (int j = 0; j < 2; j++)
+            {
+                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::x_axis);
+                vfp_t mask = (cost < lc_vec);
+
+                lc_vec = min(lc_vec, cost);
+                bs_vec = mov_p(mask, s_vec[j], bs_vec);
+                ba_vec = mov_p(mask, vfp_t(static_cast<float>(axis_t::x_axis)), ba_vec);
+            }
+            
+            /* Move down any overflow */
+            if (bucketted == 9)
+            {
+                sample[0] = sample[8];
+                bucketted = 1;
+            }
+            else
+            {
+                bucketted = 0;
+            }
+        }
+    }
+    
+    /*  Process left over samples */
+    s_vec[0] = &sample[0];
+    s_vec[1] = &sample[SIMD_WIDTH];
+    valid_mask[0] = (bucketted & SIMD_WIDTH) ? vfp_true : index_to_mask_lut[bucketted];
+    valid_mask[1] = (bucketted & SIMD_WIDTH) ? index_to_mask_lut[bucketted - SIMD_WIDTH] : vfp_zero;
+    
+    this->count_primitives(l_vec, r_vec, s_vec, axis_t::x_axis);
+    for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + (int)(bucketted > 0)); j++)
+    {
+        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::x_axis);
+        vfp_t mask = (cost < lc_vec) & valid_mask[j];
+
+        lc_vec = mov_p(mask, cost,                lc_vec);
+        bs_vec = mov_p(mask, s_vec[j],            bs_vec);
+        ba_vec = mov_p(mask, vfp_t(static_cast<float>(axis_t::x_axis)), ba_vec);
     }
 
-    /* Count in the given axis */
-    switch (n)
+    /* Evaluate the Y axis */
+    bucketted = 0;
+    for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
     {
-        case axis_t::x_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                for (int j = 0; j < len; j++)
-                {
-                    l[j] += (int)((*i)->lowest_x()  < s[j]);
-                    r[j] += (int)((*i)->highest_x() > s[j]);
-                }
-            }
-            break;
+        /* Add samples to their bucket */
+        if (((*i)->lowest_y() > this->b.y) && ((*i)->lowest_y() < this->t.y))
+        {
+            sample[bucketted++] = (*i)->lowest_y();
+        }
 
-        case axis_t::y_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
+        if (((*i)->highest_y() > this->b.y) && ((*i)->highest_y() < this->t.y))
+        {
+            sample[bucketted++] = (*i)->highest_y();
+        }
+        
+        /* Check for bucket full */
+        if (bucketted > 7)
+        {
+            s_vec[0] = &sample[0];
+            s_vec[1] = &sample[SIMD_WIDTH];
+            this->count_primitives(l_vec, r_vec, s_vec, axis_t::y_axis);
+            for (int j = 0; j < 2; j++)
             {
-                for (int j = 0; j < len; j++)
-                {
-                    l[j] += (int)((*i)->lowest_y()  < s[j]);
-                    r[j] += (int)((*i)->highest_y() > s[j]);
-                }
-            }
-            break;
+                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::y_axis);
+                vfp_t mask = (cost < lc_vec);
 
-    case axis_t::z_axis:
-            for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-            {
-                for (int j = 0; j < len; j++)
-                {
-                    l[j] += (int)((*i)->lowest_z()  < s[j]);
-                    r[j] += (int)((*i)->highest_z() > s[j]);
-                }
+                lc_vec = min(lc_vec, cost);
+                bs_vec = mov_p(mask, s_vec[j], bs_vec);
+                ba_vec = mov_p(mask, vfp_t(static_cast<float>(axis_t::y_axis)), ba_vec);
             }
-            break;
-        default :
-            assert(false);
-            break;
+            
+            /* Move down any overflow */
+            if (bucketted == 9)
+            {
+                sample[0] = sample[8];
+                bucketted = 1;
+            }
+            else
+            {
+                bucketted = 0;
+            }
+        }
     }
-//    }
+    
+    /*  Process left over samples */
+    s_vec[0] = &sample[0];
+    s_vec[1] = &sample[SIMD_WIDTH];
+    valid_mask[0] = (bucketted & SIMD_WIDTH) ? vfp_true : index_to_mask_lut[bucketted];
+    valid_mask[1] = (bucketted & SIMD_WIDTH) ? index_to_mask_lut[bucketted - SIMD_WIDTH] : vfp_zero;
+    
+    this->count_primitives(l_vec, r_vec, s_vec, axis_t::y_axis);
+    for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + (int)(bucketted > 0)); j++)
+    {
+        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::y_axis);
+        vfp_t mask = (cost < lc_vec) & valid_mask[j];
+
+        lc_vec = mov_p(mask, cost,                lc_vec);
+        bs_vec = mov_p(mask, s_vec[j],            bs_vec);
+        ba_vec = mov_p(mask, vfp_t(static_cast<float>(axis_t::y_axis)), ba_vec);
+    }
+
+    /* Evaluate the Z axis */
+    bucketted = 0;
+    for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
+    {
+        /* Add samples to their bucket */
+        if (((*i)->lowest_z() > this->b.z) && ((*i)->lowest_z() < this->t.z))
+        {
+            sample[bucketted++] = (*i)->lowest_z();
+        }
+
+        if (((*i)->highest_z() > this->b.z) && ((*i)->highest_z() < this->t.z))
+        {
+            sample[bucketted++] = (*i)->highest_z();
+        }
+        
+        /* Check for bucket full */
+        if (bucketted > 7)
+        {
+            s_vec[0] = &sample[0];
+            s_vec[1] = &sample[SIMD_WIDTH];
+            this->count_primitives(l_vec, r_vec, s_vec, axis_t::z_axis);
+            for (int j = 0; j < 2; j++)
+            {
+                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::z_axis);
+                vfp_t mask = (cost < lc_vec);
+
+                lc_vec = min(lc_vec, cost);
+                bs_vec = mov_p(mask, s_vec[j], bs_vec);
+                ba_vec = mov_p(mask, vfp_t(static_cast<float>(axis_t::z_axis)), ba_vec);
+            }
+            
+            /* Move down any overflow */
+            if (bucketted == 9)
+            {
+                sample[0] = sample[8];
+                bucketted = 1;
+            }
+            else
+            {
+                bucketted = 0;
+            }
+        }
+    }
+    
+    /*  Process left over samples */
+    s_vec[0] = &sample[0];
+    s_vec[1] = &sample[SIMD_WIDTH];
+    valid_mask[0] = (bucketted & SIMD_WIDTH) ? vfp_true : index_to_mask_lut[bucketted];
+    valid_mask[1] = (bucketted & SIMD_WIDTH) ? index_to_mask_lut[bucketted - SIMD_WIDTH] : vfp_zero;
+    
+    this->count_primitives(l_vec, r_vec, s_vec, axis_t::z_axis);
+    for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + static_cast<int>(bucketted > 0)); ++j)
+    {
+        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::z_axis);
+        vfp_t mask = (cost < lc_vec) & valid_mask[j];
+
+        lc_vec = mov_p(mask, cost,                lc_vec);
+        bs_vec = mov_p(mask, s_vec[j],            bs_vec);
+        ba_vec = mov_p(mask, vfp_t(static_cast<float>(axis_t::z_axis)), ba_vec);
+    }
+    
+    /* Collect results */
+    (*s) = std::min(std::min(lc_vec[0], lc_vec[1]), std::min(lc_vec[2], lc_vec[3]));
+
+    const int index = mask_to_index_lut[move_mask(vfp_t(*s) == lc_vec)];
+    (*normal) = static_cast<axis_t>(ba_vec[index]);
+    return bs_vec[index];
 }
 
-
-#else
 /**********************************************************
  
 **********************************************************/
-inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *const s, const int len, const axis_t n) const
+inline void voxel::count_primitives(float *const l, float *const r, const float *const s, const int len, const axis_t n) const
 {
     assert(len == 8);
     vfp_t l_vec[2] = { vfp_zero, vfp_zero };
@@ -1201,229 +1331,6 @@ inline void voxel::count_primitives(fp_t *const l, fp_t *const r, const fp_t *co
             r[(i << LOG2_SIMD_WIDTH) + j] = r_vec[i][j];
         }
     }
-}
-
-//Static properties of the tree :
-//Scene primitves                                             (nsp) : 76152
-//Tree primitves                                              (ntp) : 226924
-//Number of generic nodes                                     (ng ) : 19642
-//Number of elementary nodes                                  (ne ) : 19643
-//Number of empty elementary nodes                            (nee) : 2223
-//Maximum size of an elementary node                          (ner) : 38
-//Average size of an elementary node                          (nea) : 11.5524
-//Maximum depth of the tree                                   (d  ) : 26
-//
-//Dynamic properties of the KD-tree :
-//Number of rays shot                                       (nr   ) : 38077
-//Intersection tests performed                              (nit  ) : 374006
-//Intersection tests performed : to minimum required tests  (ritm ) : 80.9362
-//Average number of nodes accessed per ray                  (nts  ) : 54.3604
-//Average number of elementary nodes accessed per ray       (nets ) : 15.2664
-//Average number of empty elementary nodes accessed per ray (neets) : 1.64764
-
-/**********************************************************
- 
-**********************************************************/
-fp_t voxel::brute_force_split_all_axis(fp_t *s, axis_t * normal) const
-{
-    /* Find the best split position of the primitives */
-    fp_t sample[9] ALIGN(16);
-    vfp_t valid_mask[2];
-
-    vfp_t l_vec[2], r_vec[2], s_vec[2];
-    vfp_t lc_vec(*s);
-    vfp_t ba_vec((fp_t)axis_t::not_set);
-    vfp_t bs_vec(MAX_DIST);
-
-    /* Evaluate the X axis */
-    int bucketted = 0;
-    for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-    {
-        /* Add samples to their bucket */
-        if (((*i)->lowest_x() > this->b.x) && ((*i)->lowest_x() < this->t.x))
-        {
-            sample[bucketted++] = (*i)->lowest_x();
-        }
-
-        if (((*i)->highest_x() > this->b.x) && ((*i)->highest_x() < this->t.x))
-        {
-            sample[bucketted++] = (*i)->highest_x();
-        }
-        
-        /* Check for bucket full */
-        if (bucketted > 7)
-        {
-            s_vec[0] = &sample[0];
-            s_vec[1] = &sample[SIMD_WIDTH];
-            this->count_primitives(l_vec, r_vec, s_vec, axis_t::x_axis);
-            for (int j = 0; j < 2; j++)
-            {
-                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::x_axis);
-                vfp_t mask = (cost < lc_vec);
-
-                lc_vec = min(lc_vec, cost);
-                bs_vec = mov_p(mask, s_vec[j], bs_vec);
-                ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::x_axis), ba_vec);
-            }
-            
-            /* Move down any overflow */
-            if (bucketted == 9)
-            {
-                sample[0] = sample[8];
-                bucketted = 1;
-            }
-            else
-            {
-                bucketted = 0;
-            }
-        }
-    }
-    
-    /*  Process left over samples */
-    s_vec[0] = &sample[0];
-    s_vec[1] = &sample[SIMD_WIDTH];
-    valid_mask[0] = (bucketted & SIMD_WIDTH) ? vfp_true : index_to_mask_lut[bucketted];
-    valid_mask[1] = (bucketted & SIMD_WIDTH) ? index_to_mask_lut[bucketted - SIMD_WIDTH] : vfp_zero;
-    
-    this->count_primitives(l_vec, r_vec, s_vec, axis_t::x_axis);
-    for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + (int)(bucketted > 0)); j++)
-    {
-        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::x_axis);
-        vfp_t mask = (cost < lc_vec) & valid_mask[j];
-
-        lc_vec = mov_p(mask, cost,                lc_vec);
-        bs_vec = mov_p(mask, s_vec[j],            bs_vec);
-        ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::x_axis), ba_vec);
-    }
-
-    /* Evaluate the Y axis */
-    bucketted = 0;
-    for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-    {
-        /* Add samples to their bucket */
-        if (((*i)->lowest_y() > this->b.y) && ((*i)->lowest_y() < this->t.y))
-        {
-            sample[bucketted++] = (*i)->lowest_y();
-        }
-
-        if (((*i)->highest_y() > this->b.y) && ((*i)->highest_y() < this->t.y))
-        {
-            sample[bucketted++] = (*i)->highest_y();
-        }
-        
-        /* Check for bucket full */
-        if (bucketted > 7)
-        {
-            s_vec[0] = &sample[0];
-            s_vec[1] = &sample[SIMD_WIDTH];
-            this->count_primitives(l_vec, r_vec, s_vec, axis_t::y_axis);
-            for (int j = 0; j < 2; j++)
-            {
-                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::y_axis);
-                vfp_t mask = (cost < lc_vec);
-
-                lc_vec = min(lc_vec, cost);
-                bs_vec = mov_p(mask, s_vec[j], bs_vec);
-                ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::y_axis), ba_vec);
-            }
-            
-            /* Move down any overflow */
-            if (bucketted == 9)
-            {
-                sample[0] = sample[8];
-                bucketted = 1;
-            }
-            else
-            {
-                bucketted = 0;
-            }
-        }
-    }
-    
-    /*  Process left over samples */
-    s_vec[0] = &sample[0];
-    s_vec[1] = &sample[SIMD_WIDTH];
-    valid_mask[0] = (bucketted & SIMD_WIDTH) ? vfp_true : index_to_mask_lut[bucketted];
-    valid_mask[1] = (bucketted & SIMD_WIDTH) ? index_to_mask_lut[bucketted - SIMD_WIDTH] : vfp_zero;
-    
-    this->count_primitives(l_vec, r_vec, s_vec, axis_t::y_axis);
-    for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + (int)(bucketted > 0)); j++)
-    {
-        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::y_axis);
-        vfp_t mask = (cost < lc_vec) & valid_mask[j];
-
-        lc_vec = mov_p(mask, cost,                lc_vec);
-        bs_vec = mov_p(mask, s_vec[j],            bs_vec);
-        ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::y_axis), ba_vec);
-    }
-
-    /* Evaluate the Z axis */
-    bucketted = 0;
-    for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-    {
-        /* Add samples to their bucket */
-        if (((*i)->lowest_z() > this->b.z) && ((*i)->lowest_z() < this->t.z))
-        {
-            sample[bucketted++] = (*i)->lowest_z();
-        }
-
-        if (((*i)->highest_z() > this->b.z) && ((*i)->highest_z() < this->t.z))
-        {
-            sample[bucketted++] = (*i)->highest_z();
-        }
-        
-        /* Check for bucket full */
-        if (bucketted > 7)
-        {
-            s_vec[0] = &sample[0];
-            s_vec[1] = &sample[SIMD_WIDTH];
-            this->count_primitives(l_vec, r_vec, s_vec, axis_t::z_axis);
-            for (int j = 0; j < 2; j++)
-            {
-                vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::z_axis);
-                vfp_t mask = (cost < lc_vec);
-
-                lc_vec = min(lc_vec, cost);
-                bs_vec = mov_p(mask, s_vec[j], bs_vec);
-                ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::z_axis), ba_vec);
-            }
-            
-            /* Move down any overflow */
-            if (bucketted == 9)
-            {
-                sample[0] = sample[8];
-                bucketted = 1;
-            }
-            else
-            {
-                bucketted = 0;
-            }
-        }
-    }
-    
-    /*  Process left over samples */
-    s_vec[0] = &sample[0];
-    s_vec[1] = &sample[SIMD_WIDTH];
-    valid_mask[0] = (bucketted & SIMD_WIDTH) ? vfp_true : index_to_mask_lut[bucketted];
-    valid_mask[1] = (bucketted & SIMD_WIDTH) ? index_to_mask_lut[bucketted - SIMD_WIDTH] : vfp_zero;
-    
-    this->count_primitives(l_vec, r_vec, s_vec, axis_t::z_axis);
-    for (int j = 0; j < ((bucketted >> LOG2_SIMD_WIDTH) + (int)(bucketted > 0)); ++j)
-    {
-        vfp_t cost = this->calculate_sah_cost(l_vec[j], r_vec[j], s_vec[j], axis_t::z_axis);
-        vfp_t mask = (cost < lc_vec) & valid_mask[j];
-
-        lc_vec = mov_p(mask, cost,                lc_vec);
-        bs_vec = mov_p(mask, s_vec[j],            bs_vec);
-        ba_vec = mov_p(mask, vfp_t((fp_t)axis_t::z_axis), ba_vec);
-    }
-    
-    /* Collect results */
-    (*s) = min(min(lc_vec[0], lc_vec[1]), min(lc_vec[2], lc_vec[3]));
-
-    const int index = mask_to_index_lut[move_mask(vfp_t(*s) == lc_vec)];
-    (*normal) = static_cast<axis_t>(ba_vec[index]);
-    return bs_vec[index];
 }
 
 
@@ -1493,7 +1400,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
     /* Surface area of sub-divides */
     vfp_t left_area, right_area;
     vfp_t x_dist, y_dist, z_dist;
-//    const fp_t sa   = 1.0 / ((x_dist * y_dist) + (x_dist * z_dist) + (y_dist * z_dist));
+//    const float sa   = 1.0 / ((x_dist * y_dist) + (x_dist * z_dist) + (y_dist * z_dist));
     switch (normal)
     {
         case axis_t::x_axis:
@@ -1541,20 +1448,19 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
     /* cost of traversal + cost of intersection * (left cell count * left area + right cell count * right area) */
     return vfp_t(COST_OF_TRAVERSAL) + (vfp_t(COST_OF_INTERSECTION) * ((l * left_area) + (r * right_area)));
 }
-#endif /* #ifndef SIMD_PACKET_TRACING */
 
 
 /**********************************************************
  
 **********************************************************/
-// inline fp_t voxel::calculate_sah_cost(const fp_t l, const fp_t r, const fp_t s, const axis_t normal) const
+// inline float voxel::calculate_sah_cost(const float l, const float r, const float s, const axis_t normal) const
 // {
 //     /* Surface area of sub-divides */
-//     fp_t left_area, right_area;
-//     fp_t x_dist     = this->t.x - this->b.x;
-//     fp_t y_dist     = this->t.y - this->b.y;
-//     fp_t z_dist     = this->t.z - this->b.z;
-// //    const fp_t sa   = 1.0 / ((x_dist * y_dist) + (x_dist * z_dist) + (y_dist * z_dist));
+//     float left_area, right_area;
+//     float x_dist     = this->t.x - this->b.x;
+//     float y_dist     = this->t.y - this->b.y;
+//     float z_dist     = this->t.z - this->b.z;
+// //    const float sa   = 1.0 / ((x_dist * y_dist) + (x_dist * z_dist) + (y_dist * z_dist));
 //     switch (normal)
 //     {
 //         case axis_t::x_axis:
@@ -1597,13 +1503,13 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 ///**********************************************************
 // 
 //**********************************************************/
-//fp_t voxel::calculate_sah_cost(const fp_t s, const axis_t normal) const
+//float voxel::calculate_sah_cost(const float s, const axis_t normal) const
 //{
 //    /* Surface area of sub-divides */
-//    fp_t left_area, right_area;
-//    fp_t x_dist = this->t.x - this->b.x;
-//    fp_t y_dist = this->t.y - this->b.y;
-//    fp_t z_dist = this->t.z - this->b.z;
+//    float left_area, right_area;
+//    float x_dist = this->t.x - this->b.x;
+//    float y_dist = this->t.y - this->b.y;
+//    float z_dist = this->t.z - this->b.z;
 //    switch (normal)
 //    {
 //        case axis_t::x_axis:
@@ -1636,8 +1542,8 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    }
 //  
 //    /* Sub divide the objects */
-//    fp_t left_objects  = 0.0;
-//    fp_t right_objects = 0.0;
+//    float left_objects  = 0.0;
+//    float right_objects = 0.0;
 //    switch (normal)
 //    {
 //        case axis_t::x_axis:
@@ -1702,7 +1608,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            break;
 //    }
 //
-//    fp_t sah_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left_objects * left_area) + (right_objects * right_area)));
+//    float sah_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left_objects * left_area) + (right_objects * right_area)));
 //
 //    /* Calculate the surface area heuristic metric */
 //    /* cost of traversal + cost of intersection * (left cell count * left area + right cell count * right area) */
@@ -1712,11 +1618,11 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 
 /* Sequential */
 
-//fp_t voxel::approximate_split_all_axis(fp_t *s, axis_t * normal) const
+//float voxel::approximate_split_all_axis(float *s, axis_t * normal) const
 //{
 //    /* Find the best split position of the primitives */
-//    fp_t      best_split = MAX_DIST;
-//    fp_t      lowest_cost = *s;
+//    float      best_split = MAX_DIST;
+//    float      lowest_cost = *s;
 //    axis_t    best_axis = axis_t::not_set;
 //
 //    for (primitive_list::const_iterator i=p.begin(); i!=p.end(); i++)
@@ -1724,7 +1630,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        const triangle *current_p = *i;
 //        if ((current_p->lowest_x() > this->b.x) && (current_p->lowest_x() < this->t.x))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->lowest_x(), axis_t::x_axis);
+//            float this_cost = this->calculate_sah_cost(current_p->lowest_x(), axis_t::x_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -1734,7 +1640,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        }
 //        if ((current_p->highest_x() > this->b.x) && (current_p->highest_x() < this->t.x))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->highest_x(), axis_t::x_axis);
+//            float this_cost = this->calculate_sah_cost(current_p->highest_x(), axis_t::x_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -1749,7 +1655,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        const triangle *current_p = *i;
 //        if ((current_p->lowest_y() > this->b.y) && (current_p->lowest_y() < this->t.y))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->lowest_y(), axis_t::y_axis);
+//            float this_cost = this->calculate_sah_cost(current_p->lowest_y(), axis_t::y_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -1759,7 +1665,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        }
 //        if ((current_p->highest_y() > this->b.y) && (current_p->highest_y() < this->t.y))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->highest_y(), axis_t::y_axis);
+//            float this_cost = this->calculate_sah_cost(current_p->highest_y(), axis_t::y_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -1774,7 +1680,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        const triangle *current_p = *i;
 //        if ((current_p->lowest_z() > this->b.z) && (current_p->lowest_z() < this->t.z))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->lowest_z(), axis_t::z_axis);
+//            float this_cost = this->calculate_sah_cost(current_p->lowest_z(), axis_t::z_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -1784,7 +1690,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        }
 //        if ((current_p->highest_z() > this->b.z) && (current_p->highest_z() < this->t.z))
 //        {
-//            fp_t this_cost = this->calculate_sah_cost(current_p->highest_z(), axis_t::z_axis);
+//            float this_cost = this->calculate_sah_cost(current_p->highest_z(), axis_t::z_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -1803,11 +1709,11 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 
 /* Sequencial */
 
-//fp_t voxel::split_this_axis(fp_t *s) const
+//float voxel::split_this_axis(float *s) const
 //{
 //    /* Find the best split position of the primitives */
-//    fp_t best_split = MAX_DIST;
-//    fp_t lowest_cost = *s;
+//    float best_split = MAX_DIST;
+//    float lowest_cost = *s;
 //    switch (this->n)
 //    {
 //        case axis_t::x_axis:
@@ -1816,7 +1722,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                const triangle *current_p = *i;
 //                if ((current_p->lowest_x() > this->b.x) && (current_p->lowest_x() < this->t.x))
 //                {
-//                    fp_t this_cost = this->calculate_sah_cost(current_p->lowest_x());
+//                    float this_cost = this->calculate_sah_cost(current_p->lowest_x());
 //                    if (this_cost < lowest_cost)
 //                    {
 //                        lowest_cost = this_cost;
@@ -1825,7 +1731,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //                if ((current_p->highest_x() > this->b.x) && (current_p->highest_x() < this->t.x))
 //                {
-//                    fp_t this_cost = this->calculate_sah_cost(current_p->highest_x());
+//                    float this_cost = this->calculate_sah_cost(current_p->highest_x());
 //                    if (this_cost < lowest_cost)
 //                    {
 //                        lowest_cost = this_cost;
@@ -1840,7 +1746,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                const triangle *current_p = *i;
 //                if ((current_p->lowest_y() > this->b.y) && (current_p->lowest_y() < this->t.y))
 //                {
-//                    fp_t this_cost = this->calculate_sah_cost(current_p->lowest_y());
+//                    float this_cost = this->calculate_sah_cost(current_p->lowest_y());
 //                    if (this_cost < lowest_cost)
 //                    {
 //                        lowest_cost = this_cost;
@@ -1849,7 +1755,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //                if ((current_p->highest_y() > this->b.y) && (current_p->highest_y() < this->t.y))
 //                {
-//                    fp_t this_cost = this->calculate_sah_cost(current_p->highest_y());
+//                    float this_cost = this->calculate_sah_cost(current_p->highest_y());
 //                    if (this_cost < lowest_cost)
 //                    {
 //                        lowest_cost = this_cost;
@@ -1864,7 +1770,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                const triangle *current_p = *i;
 //                if ((current_p->lowest_z() > this->b.z) && (current_p->lowest_z() < this->t.z))
 //                {
-//                    fp_t this_cost = this->calculate_sah_cost(current_p->lowest_z());
+//                    float this_cost = this->calculate_sah_cost(current_p->lowest_z());
 //                    if (this_cost < lowest_cost)
 //                    {
 //                        lowest_cost = this_cost;
@@ -1873,7 +1779,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //                }
 //                if ((current_p->highest_z() > this->b.z) && (current_p->highest_z() < this->t.z))
 //                {
-//                    fp_t this_cost = this->calculate_sah_cost(current_p->highest_z());
+//                    float this_cost = this->calculate_sah_cost(current_p->highest_z());
 //                    if (this_cost < lowest_cost)
 //                    {
 //                        lowest_cost = this_cost;
@@ -1896,13 +1802,13 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 ///**********************************************************
 // 
 //**********************************************************/
-//fp_t voxel::calculate_sah_cost(const fp_t s) const
+//float voxel::calculate_sah_cost(const float s) const
 //{
 //    /* Surface area of sub-divides */
-//    fp_t left_area, right_area;
-//    fp_t x_dist = this->t.x - this->b.x;
-//    fp_t y_dist = this->t.y - this->b.y;
-//    fp_t z_dist = this->t.z - this->b.z;
+//    float left_area, right_area;
+//    float x_dist = this->t.x - this->b.x;
+//    float y_dist = this->t.y - this->b.y;
+//    float z_dist = this->t.z - this->b.z;
 //    switch (this->n)
 //    {
 //        case axis_t::x_axis:
@@ -1935,8 +1841,8 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    }
 //  
 //    /* Sub divide the objects */
-//    fp_t left_objects  = 0.0;
-//    fp_t right_objects = 0.0;
+//    float left_objects  = 0.0;
+//    float right_objects = 0.0;
 //    switch (this->n)
 //    {
 //        case axis_t::x_axis:
@@ -2001,7 +1907,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            break;
 //    }
 //
-//    fp_t sah_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left_objects * left_area) + (right_objects * right_area)));
+//    float sah_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left_objects * left_area) + (right_objects * right_area)));
 //
 //    /* Calculate the surface area heuristic metric */
 //    /* cost of traversal + cost of intersection * (left cell count * left area + right cell count * right area) */
@@ -2012,13 +1918,13 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 ///**********************************************************
 // 
 //**********************************************************/
-//fp_t voxel::calculate_sah_cost(const fp_t s, const fp_t l, const fp_t r) const
+//float voxel::calculate_sah_cost(const float s, const float l, const float r) const
 //{
 //    /* Surface area of sub-divides */
-//    fp_t left_area, right_area;
-//    fp_t x_dist = this->t.x - this->b.x;
-//    fp_t y_dist = this->t.y - this->b.y;
-//    fp_t z_dist = this->t.z - this->b.z;
+//    float left_area, right_area;
+//    float x_dist = this->t.x - this->b.x;
+//    float y_dist = this->t.y - this->b.y;
+//    float z_dist = this->t.z - this->b.z;
 //    switch (this->n)
 //    {
 //        case axis_t::x_axis:
@@ -2050,7 +1956,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            break;
 //    }
 //  
-//    fp_t sah_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((l * left_area) + (r * right_area)));
+//    float sah_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((l * left_area) + (r * right_area)));
 //
 //    /* Calculate the surface area heuristic metric */
 //    /* cost of traversal + cost of intersection * (left cell count * left area + right cell count * right area) */
@@ -2063,26 +1969,26 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 ///**********************************************************
 // 
 //**********************************************************/
-//fp_t voxel::split_all_axis(fp_t *s, axis_t *normal)
+//float voxel::split_all_axis(float *s, axis_t *normal)
 //{
 //    /* Find the best split position of the primitives */
 //    axis_t    best_axis   = axis_t::not_set;
-//    fp_t  best_split  = axis_t::not_set;
-//    fp_t  lowest_cost = *s;
+//    float  best_split  = axis_t::not_set;
+//    float  lowest_cost = *s;
 //    
 //     /* Initial primitive split */
 //    unsigned size_of_prim = this->p->size();
-//    fp_t     right = size_of_prim;
-//    fp_t     left  = 0;
-//    fp_t     guess;
-//    fp_t     last_guess = MAX_DIST;
+//    float     right = size_of_prim;
+//    float     left  = 0;
+//    float     guess;
+//    float     last_guess = MAX_DIST;
 //    
-//    fp_t x_dist = this->t.x - this->b.x;
-//    fp_t y_dist = this->t.y - this->b.y;
-//    fp_t z_dist = this->t.z - this->b.z;
+//    float x_dist = this->t.x - this->b.x;
+//    float y_dist = this->t.y - this->b.y;
+//    float z_dist = this->t.z - this->b.z;
 //    
 //    /* Elements for evaluation */
-//    fp_t lo_x, lo_y, lo_z, hi_x, hi_y, hi_z;
+//    float lo_x, lo_y, lo_z, hi_x, hi_y, hi_z;
 //    
 //    bb_point_t *bb_points = new bb_point_t [(size_of_prim << 1)];
 //    
@@ -2139,11 +2045,11 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            assert(guess > this->b.x);
 //            assert(guess < this->t.x);
 //            x_dist = guess - this->b.x;
-//            fp_t left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            x_dist = this->t.x - guess;
-//            fp_t right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //
-//            fp_t this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
+//            float this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -2218,11 +2124,11 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            assert(guess > this->b.y);
 //            assert(guess < this->t.y);
 //            y_dist = guess - this->b.y;
-//            fp_t left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            y_dist = this->t.y - guess;
-//            fp_t right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //
-//            fp_t this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
+//            float this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -2298,11 +2204,11 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            assert(guess > this->b.z);
 //            assert(guess < this->t.z);
 //            z_dist = guess - this->b.z;
-//            fp_t left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            z_dist = this->t.z - guess;
-//            fp_t right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //
-//            fp_t this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
+//            float this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -2332,26 +2238,26 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 /**********************************************************
  
 **********************************************************/
-//fp_t voxel::split_all_axis(fp_t *s, axis_t *normal)
+//float voxel::split_all_axis(float *s, axis_t *normal)
 //{
 //    /* Find the best split position of the primitives */
 //    axis_t    best_axis   = axis_t::not_set;
-//    fp_t      best_split  = axis_t::not_set;
-//    fp_t      lowest_cost = *s;
+//    float      best_split  = axis_t::not_set;
+//    float      lowest_cost = *s;
 //    
 //     /* Initial primitive split */
 //    unsigned size_of_prim = this->p->size();
-//    fp_t     right = size_of_prim;
-//    fp_t     left  = 0;
-//    fp_t     guess;
-//    fp_t     last_guess = MAX_DIST;
+//    float     right = size_of_prim;
+//    float     left  = 0;
+//    float     guess;
+//    float     last_guess = MAX_DIST;
 //    
-//    fp_t x_dist = this->t.x - this->b.x;
-//    fp_t y_dist = this->t.y - this->b.y;
-//    fp_t z_dist = this->t.z - this->b.z;
+//    float x_dist = this->t.x - this->b.x;
+//    float y_dist = this->t.y - this->b.y;
+//    float z_dist = this->t.z - this->b.z;
 //    
 //    /* Elements for evaluation */
-//    fp_t lo_x, lo_y, lo_z, hi_x, hi_y, hi_z;
+//    float lo_x, lo_y, lo_z, hi_x, hi_y, hi_z;
 //    
 //    bb_point_t *low_points, *high_points;
 //    low_points = new bb_point_t [size_of_prim];
@@ -2425,11 +2331,11 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            assert(guess > this->b.x);
 //            assert(guess < this->t.x);
 //            x_dist = guess - this->b.x;
-//            fp_t left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            x_dist = this->t.x - guess;
-//            fp_t right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //
-//            fp_t this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
+//            float this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -2523,11 +2429,11 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            assert(guess > this->b.y);
 //            assert(guess < this->t.y);
 //            y_dist = guess - this->b.y;
-//            fp_t left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            y_dist = this->t.y - guess;
-//            fp_t right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //
-//            fp_t this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
+//            float this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -2621,11 +2527,11 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //            assert(guess > this->b.z);
 //            assert(guess < this->t.z);
 //            z_dist = guess - this->b.z;
-//            fp_t left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float left_area  = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //            z_dist = this->t.z - guess;
-//            fp_t right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
+//            float right_area = (x_dist * y_dist) + (x_dist * z_dist) + (z_dist * y_dist);
 //
-//            fp_t this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
+//            float this_cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * ((left * left_area) + (right * right_area)));
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -2655,56 +2561,56 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //}
 
 
-//fp_t voxel::approximate_split_all_axis(fp_t *s, axis_t * normal) const
+//float voxel::approximate_split_all_axis(float *s, axis_t * normal) const
 //{
 //    /* Find the best split position of the primitives */
-//    fp_t      best_split     = MAX_DIST;
-//    fp_t      lowest_cost    = *s;
+//    float      best_split     = MAX_DIST;
+//    float      lowest_cost    = *s;
 //    axis_t    best_axis      = axis_t::not_set;
 //    
 //    /* Adaptive sampling bin sizes */
-//    const fp_t adapt_bin_size   = this->p->size() * (2.0/9.0);
+//    const float adapt_bin_size   = this->p->size() * (2.0/9.0);
 //    
 //    /* Voxel dimensions */
-//    const fp_t xw       = this->t.x - this->b.x;
-//    const fp_t yw       = this->t.y - this->b.y;
-//    const fp_t zw       = this->t.z - this->b.z;
-//    const fp_t xb_yw    = this->b.x * yw;
-//    const fp_t xb_zw    = this->b.x * zw;
-//    const fp_t xt_yw    = this->t.x * yw;
-//    const fp_t xt_zw    = this->t.x * zw;
-//    const fp_t yb_xw    = this->b.y * xw;
-//    const fp_t yb_zw    = this->b.y * zw;
-//    const fp_t yt_xw    = this->t.y * xw;
-//    const fp_t yt_zw    = this->t.y * zw;
-//    const fp_t zb_xw    = this->b.z * xw;
-//    const fp_t zb_yw    = this->b.z * yw;
-//    const fp_t zt_xw    = this->t.z * xw;
-//    const fp_t zt_yw    = this->t.z * yw;
-//    const fp_t xw_yw    = xw * yw;
-//    const fp_t xw_zw    = xw * zw;
-//    const fp_t yw_zw    = yw * zw;
-//    const fp_t xw_p_yw  = xw + yw;
-//    const fp_t xw_p_zw  = xw + zw;
-//    const fp_t yw_p_zw  = yw + zw;
+//    const float xw       = this->t.x - this->b.x;
+//    const float yw       = this->t.y - this->b.y;
+//    const float zw       = this->t.z - this->b.z;
+//    const float xb_yw    = this->b.x * yw;
+//    const float xb_zw    = this->b.x * zw;
+//    const float xt_yw    = this->t.x * yw;
+//    const float xt_zw    = this->t.x * zw;
+//    const float yb_xw    = this->b.y * xw;
+//    const float yb_zw    = this->b.y * zw;
+//    const float yt_xw    = this->t.y * xw;
+//    const float yt_zw    = this->t.y * zw;
+//    const float zb_xw    = this->b.z * xw;
+//    const float zb_yw    = this->b.z * yw;
+//    const float zt_xw    = this->t.z * xw;
+//    const float zt_yw    = this->t.z * yw;
+//    const float xw_yw    = xw * yw;
+//    const float xw_zw    = xw * zw;
+//    const float yw_zw    = yw * zw;
+//    const float xw_p_yw  = xw + yw;
+//    const float xw_p_zw  = xw + zw;
+//    const float yw_p_zw  = yw + zw;
 //   
 //    /* Pick fixed points to evaluate */
-//    fp_t divide_width   = xw * (1.0 / 9.0);
-//    fp_t evaluate       = this->t.x;
+//    float divide_width   = xw * (1.0 / 9.0);
+//    float evaluate       = this->t.x;
 //    
 //    /* Fixed points samples and adaptive bin boundaries */
-//    fp_t cl_x[9];
-//    fp_t cr_x[9];
-//    fp_t bins_per_sample[9];
-//    fp_t adaptive_width[9];
+//    float cl_x[9];
+//    float cr_x[9];
+//    float bins_per_sample[9];
+//    float adaptive_width[9];
 //    cl_x[8]             = this->p->size();
 //    cr_x[8]             = 0.0;
 //    bins_per_sample[8]  = 8.0;
 //    
-//    fp_t sample[8];
+//    float sample[8];
 //    for (int i = 0; i < 8; i++)
 //    {
-//        sample[i] = this->b.x + (divide_width * (fp_t)(i+1));
+//        sample[i] = this->b.x + (divide_width * static_cast<float>(i + 1));
 //    }
 //    this->count_primitives(cl_x, cr_x, sample, 8, axis_t::x_axis);
 //    
@@ -2723,8 +2629,8 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    adaptive_width[0]   = divide_width / (bins_per_sample[0] + 1.0);
 //    
 //    /* Take adaptive samples */
-//    fp_t cl_ax[9];
-//    fp_t cr_ax[9];
+//    float cl_ax[9];
+//    float cr_ax[9];
 //    int adaptive_offset = 0;
 //    for (int i = 0; i < 9; i++)
 //    {
@@ -2741,34 +2647,34 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    
 //    /* Evaluate SAH minima for each sample as -b/2a */
 //    adaptive_offset = 0;
-//    fp_t last_cl    = 0.0;
-//    fp_t last_cr    = this->p->size();
-//    fp_t xs         = this->b.x;
+//    float last_cl    = 0.0;
+//    float last_cr    = this->p->size();
+//    float xs         = this->b.x;
 //    for (int i = 0; i < 9; i++)
 //    {
 //        /* Process any adaptive samples in this bin first because they will be encountered first */
 //        for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
 //        {
 //            /* Bin primitive gradients */
-//            const fp_t clg = (cl_ax[j] - last_cl) / adaptive_width[i];
-//            const fp_t crg = (cr_ax[j] - last_cr) / adaptive_width[i];
+//            const float clg = (cl_ax[j] - last_cl) / adaptive_width[i];
+//            const float crg = (cr_ax[j] - last_cr) / adaptive_width[i];
 //            
 //            /* Sample location */
-//            const fp_t xs_yw    = xs * yw;
-//            const fp_t xs_zw    = xs * zw;
+//            const float xs_yw    = xs * yw;
+//            const float xs_zw    = xs * zw;
 //            
 //            /* Minima point bound to this bin */
-//            const fp_t a    = 2.0 * ((clg * yw_p_zw) - (crg * yw_p_zw));
-//            const fp_t b    =   ( last_cl * yw_p_zw) - (clg * (xb_yw + xb_zw - yw_zw + xs_yw + xs_zw))
+//            const float a    = 2.0 * ((clg * yw_p_zw) - (crg * yw_p_zw));
+//            const float b    =   ( last_cl * yw_p_zw) - (clg * (xb_yw + xb_zw - yw_zw + xs_yw + xs_zw))
 //                              + (-last_cr * yw_p_zw) + (crg * (xt_yw + xt_zw + yw_zw + xs_yw + xs_zw));
 //            
-//            const fp_t xm   = max(xs, min((xs + adaptive_width[i]), (b / a)));
+//            const float xm   = max(xs, min((xs + adaptive_width[i]), (b / a)));
 //
 //            /* Cost at minima */
-//            const fp_t xmb  = xm - this->b.x;
-//            const fp_t xmt  = this->t.x - xm;
+//            const float xmb  = xm - this->b.x;
+//            const float xmt  = this->t.x - xm;
 //
-//            const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+//            const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
 //                              (((last_cl + (clg * (xm - xs))) * ((xmb * yw) + (xmb * zw) + yw_zw))  + 
 //                               ((last_cr + (crg * (xm - xs))) * ((xmt * yw) + (xmt * zw) + yw_zw))));
 //            
@@ -2786,25 +2692,25 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        adaptive_offset += bins_per_sample[i];
 //
 //        /* Bin primitive gradients */
-//        const fp_t clg = (cl_x[i] - last_cl) / adaptive_width[i];
-//        const fp_t crg = (cr_x[i] - last_cr) / adaptive_width[i];
+//        const float clg = (cl_x[i] - last_cl) / adaptive_width[i];
+//        const float crg = (cr_x[i] - last_cr) / adaptive_width[i];
 //      
 //        /* Sample location */
-//        const fp_t xs_yw    = xs * yw;
-//        const fp_t xs_zw    = xs * zw;
+//        const float xs_yw    = xs * yw;
+//        const float xs_zw    = xs * zw;
 //      
 //        /* Minima point bound to this bin */
-//        const fp_t a    = 2.0 * ((clg * yw_p_zw) - (crg * yw_p_zw));
-//        const fp_t b    =   ( last_cl * yw_p_zw) - (clg * (xb_yw + xb_zw - yw_zw + xs_yw + xs_zw))
+//        const float a    = 2.0 * ((clg * yw_p_zw) - (crg * yw_p_zw));
+//        const float b    =   ( last_cl * yw_p_zw) - (clg * (xb_yw + xb_zw - yw_zw + xs_yw + xs_zw))
 //                          + (-last_cr * yw_p_zw) + (crg * (xt_yw + xt_zw + yw_zw + xs_yw + xs_zw));
 //      
-//        const fp_t xm   = max(xs, min((xs + adaptive_width[i]), (b / a)));
+//        const float xm   = max(xs, min((xs + adaptive_width[i]), (b / a)));
 //      
 //        /* Cost at minima */
-//        const fp_t xmb  = xm - this->b.x;
-//        const fp_t xmt  = this->t.x - xm;
+//        const float xmb  = xm - this->b.x;
+//        const float xmt  = this->t.x - xm;
 //
-//        const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+//        const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
 //                          (((last_cl + (clg * (xm - xs))) * ((xmb * yw) + (xmb * zw) + yw_zw))  + 
 //                           ((last_cr + (crg * (xm - xs))) * ((xmt * yw) + (xmt * zw) + yw_zw))));
 //      
@@ -2825,15 +2731,15 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    evaluate       = this->t.y;
 //    
 //    /* Fixed points samples and adaptive bin boundaries */
-//    fp_t cl_y[9];
-//    fp_t cr_y[9];
+//    float cl_y[9];
+//    float cr_y[9];
 //    cl_y[8]             = this->p->size();
 //    cr_y[8]             = 0.0;
 //    bins_per_sample[8]  = 8.0;
 //
 //    for (int i = 0; i < 8; i++)
 //    {
-//        sample[i] = this->b.y + (divide_width * (fp_t)(i+1));
+//        sample[i] = this->b.y + (divide_width * static_cast<float>(i + 1));
 //    }
 //    this->count_primitives(cl_y, cr_y, sample, 8, axis_t::y_axis);
 //
@@ -2852,8 +2758,8 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    adaptive_width[0]   = divide_width / (bins_per_sample[0] + 1.0);
 //    
 //    /* Take adaptive samples */
-//    fp_t cl_ay[9];
-//    fp_t cr_ay[9];
+//    float cl_ay[9];
+//    float cr_ay[9];
 //    adaptive_offset = 0;
 //    for (int i = 0; i < 9; i++)
 //    {
@@ -2872,32 +2778,32 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    adaptive_offset = 0;
 //         last_cl    = 0.0;
 //         last_cr    = this->p->size();
-//    fp_t ys         = this->b.y;
+//    float ys         = this->b.y;
 //    for (int i = 0; i < 9; i++)
 //    {
 //        /* Process any adaptive samples in this bin first because they will be encountered first */
 //        for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
 //        {
 //            /* Bin primitive gradients */
-//            const fp_t clg = (cl_ay[j] - last_cl) / adaptive_width[i];
-//            const fp_t crg = (cr_ay[j] - last_cr) / adaptive_width[i];
+//            const float clg = (cl_ay[j] - last_cl) / adaptive_width[i];
+//            const float crg = (cr_ay[j] - last_cr) / adaptive_width[i];
 //            
 //            /* Sample location */
-//            const fp_t ys_xw    = ys * xw;
-//            const fp_t ys_zw    = ys * zw;
+//            const float ys_xw    = ys * xw;
+//            const float ys_zw    = ys * zw;
 //            
 //            /* Minima point bound to this bin */
-//            const fp_t a    = 2.0 * ((clg * xw_p_zw) - (crg * xw_p_zw));
-//            const fp_t b    =   ( last_cl * xw_p_zw) - (clg * (yb_xw + yb_zw - xw_zw + ys_xw + ys_zw))
+//            const float a    = 2.0 * ((clg * xw_p_zw) - (crg * xw_p_zw));
+//            const float b    =   ( last_cl * xw_p_zw) - (clg * (yb_xw + yb_zw - xw_zw + ys_xw + ys_zw))
 //                              + (-last_cr * xw_p_zw) + (crg * (yt_xw + yt_zw + xw_zw + ys_xw + ys_zw));
 //            
-//            const fp_t ym   = max(ys, min((ys + adaptive_width[i]), (b / a)));
+//            const float ym   = max(ys, min((ys + adaptive_width[i]), (b / a)));
 //            
 //            /* Cost at minima */
-//            const fp_t ymb  = ym - this->b.y;
-//            const fp_t ymt  = this->t.y - ym;
+//            const float ymb  = ym - this->b.y;
+//            const float ymt  = this->t.y - ym;
 //
-//            const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+//            const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
 //                              (((last_cl + (clg * (ym - ys))) * ((ymb * xw) + (ymb * zw) + xw_zw))  + 
 //                               ((last_cr + (crg * (ym - ys))) * ((ymt * xw) + (ymt * zw) + xw_zw))));
 //            
@@ -2915,25 +2821,25 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        adaptive_offset += bins_per_sample[i];
 //
 //        /* Bin primitive gradients */
-//        const fp_t clg = (cl_y[i] - last_cl) / adaptive_width[i];
-//        const fp_t crg = (cr_y[i] - last_cr) / adaptive_width[i];
+//        const float clg = (cl_y[i] - last_cl) / adaptive_width[i];
+//        const float crg = (cr_y[i] - last_cr) / adaptive_width[i];
 //      
 //        /* Sample location */
-//        const fp_t ys_xw    = ys * xw;
-//        const fp_t ys_zw    = ys * zw;
+//        const float ys_xw    = ys * xw;
+//        const float ys_zw    = ys * zw;
 //      
 //        /* Minima point bound to this bin */
-//        const fp_t a    = 2.0 * ((clg * xw_p_zw) - (crg * xw_p_zw));
-//        const fp_t b    =   ( last_cl * xw_p_zw) - (clg * (yb_xw + yb_zw - xw_zw + ys_xw + ys_zw))
+//        const float a    = 2.0 * ((clg * xw_p_zw) - (crg * xw_p_zw));
+//        const float b    =   ( last_cl * xw_p_zw) - (clg * (yb_xw + yb_zw - xw_zw + ys_xw + ys_zw))
 //                          + (-last_cr * xw_p_zw) + (crg * (yt_xw + yt_zw + xw_zw + ys_xw + ys_zw));
 //      
-//        const fp_t ym   = max(ys, min((ys + adaptive_width[i]), (b / a)));
+//        const float ym   = max(ys, min((ys + adaptive_width[i]), (b / a)));
 //      
 //        /* Cost at minima */
-//        const fp_t ymb  = ym - this->b.y;
-//        const fp_t ymt  = this->t.y - ym;
+//        const float ymb  = ym - this->b.y;
+//        const float ymt  = this->t.y - ym;
 //
-//        const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+//        const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
 //                          (((last_cl + (clg * (ym - ys))) * ((ymb * xw) + (ymb * zw) + xw_zw))  + 
 //                           ((last_cr + (crg * (ym - ys))) * ((ymt * xw) + (ymt * zw) + xw_zw))));
 //      
@@ -2954,15 +2860,15 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    evaluate       = this->t.z;
 //    
 //    /* Fixed points samples and adaptive bin boundaries */
-//    fp_t cl_z[9];
-//    fp_t cr_z[9];
+//    float cl_z[9];
+//    float cr_z[9];
 //    cl_z[8]             = this->p->size();
 //    cr_z[8]             = 0.0;
 //    bins_per_sample[8]  = 8.0;
 //
 //    for (int i = 0; i < 8; i++)
 //    {
-//        sample[i] = this->b.z + (divide_width * (fp_t)(i+1));
+//        sample[i] = this->b.z + (divide_width * static_cast<float>(i + 1));
 //    }
 //    this->count_primitives(cl_z, cr_z, sample, 8, axis_t::z_axis);
 //
@@ -2981,8 +2887,8 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    adaptive_width[0]   = divide_width / (bins_per_sample[0] + 1.0);
 //    
 //    /* Take adaptive samples */
-//    fp_t cl_az[9];
-//    fp_t cr_az[9];
+//    float cl_az[9];
+//    float cr_az[9];
 //    adaptive_offset = 0;
 //    for (int i = 0; i < 9; i++)
 //    {
@@ -3002,32 +2908,32 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    adaptive_offset = 0;
 //         last_cl    = 0.0;
 //         last_cr    = this->p->size();
-//    fp_t zs         = this->b.z;
+//    float zs         = this->b.z;
 //    for (int i = 0; i < 9; i++)
 //    {
 //        /* Process any adaptive samples in this bin first because they will be encountered first */
 //        for (int j = adaptive_offset; j < (bins_per_sample[i] + adaptive_offset); j++)
 //        {
 //            /* Bin primitive gradients */
-//            const fp_t clg = (cl_az[j] - last_cl) / adaptive_width[i];
-//            const fp_t crg = (cr_az[j] - last_cr) / adaptive_width[i];
+//            const float clg = (cl_az[j] - last_cl) / adaptive_width[i];
+//            const float crg = (cr_az[j] - last_cr) / adaptive_width[i];
 //            
 //            /* Sample location */
-//            const fp_t zs_xw    = zs * xw;
-//            const fp_t zs_yw    = zs * yw;
+//            const float zs_xw    = zs * xw;
+//            const float zs_yw    = zs * yw;
 //            
 //            /* Minima point bound to this bin */
-//            const fp_t a    = 2.0 * ((clg * xw_p_yw) - (crg * xw_p_zw));
-//            const fp_t b    =   ( last_cl * xw_p_yw) - (clg * (zb_xw + zb_yw - xw_yw + zs_xw + zs_yw))
+//            const float a    = 2.0 * ((clg * xw_p_yw) - (crg * xw_p_zw));
+//            const float b    =   ( last_cl * xw_p_yw) - (clg * (zb_xw + zb_yw - xw_yw + zs_xw + zs_yw))
 //                              + (-last_cr * xw_p_yw) + (crg * (zt_xw + zt_yw + xw_yw + zs_xw + zs_yw));
 //            
-//            const fp_t zm   = max(zs, min((zs + adaptive_width[i]), (b / a)));
+//            const float zm   = max(zs, min((zs + adaptive_width[i]), (b / a)));
 //            
 //            /* Cost at minima */
-//            const fp_t zmb  = zm - this->b.z;
-//            const fp_t zmt  = this->t.z - zm;
+//            const float zmb  = zm - this->b.z;
+//            const float zmt  = this->t.z - zm;
 //
-//            const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+//            const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
 //                              (((last_cl + (clg * (zm - zs))) * ((zmb * xw) + (zmb * yw) + xw_yw))  + 
 //                               ((last_cr + (crg * (zm - zs))) * ((zmt * xw) + (zmt * yw) + xw_yw))));
 //            
@@ -3045,25 +2951,25 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        adaptive_offset += bins_per_sample[i];
 //
 //        /* Bin primitive gradients */
-//        const fp_t clg = (cl_z[i] - last_cl) / adaptive_width[i];
-//        const fp_t crg = (cr_z[i] - last_cr) / adaptive_width[i];
+//        const float clg = (cl_z[i] - last_cl) / adaptive_width[i];
+//        const float crg = (cr_z[i] - last_cr) / adaptive_width[i];
 //      
 //        /* Sample location */
-//        const fp_t zs_xw    = zs * xw;
-//        const fp_t zs_yw    = zs * yw;
+//        const float zs_xw    = zs * xw;
+//        const float zs_yw    = zs * yw;
 //     
 //        /* Minima point bound to this bin */
-//        const fp_t a    = 2.0 * ((clg * xw_p_zw) - (crg * xw_p_zw));
-//        const fp_t b    =   ( last_cl * xw_p_zw) - (clg * (zb_xw + zb_yw - xw_yw + zs_xw + zs_yw))
+//        const float a    = 2.0 * ((clg * xw_p_zw) - (crg * xw_p_zw));
+//        const float b    =   ( last_cl * xw_p_zw) - (clg * (zb_xw + zb_yw - xw_yw + zs_xw + zs_yw))
 //                          + (-last_cr * xw_p_zw) + (crg * (zt_xw + zt_yw + xw_yw + zs_xw + zs_yw));
 //      
-//        const fp_t zm   = max(zs, min((zs + adaptive_width[i]), (b / a)));
+//        const float zm   = max(zs, min((zs + adaptive_width[i]), (b / a)));
 //      
 //        /* Cost at minima */
-//        const fp_t zmb  = zm - this->b.z;
-//        const fp_t zmt  = this->t.z - zm;
+//        const float zmb  = zm - this->b.z;
+//        const float zmt  = this->t.z - zm;
 //
-//        const fp_t cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
+//        const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
 //                          (((last_cl + (clg * (zm - zs))) * ((zmb * xw) + (zmb * yw) + xw_yw))  + 
 //                           ((last_cr + (crg * (zm - zs))) * ((zmt * xw) + (zmt * yw) + xw_yw))));
 //      
@@ -3088,23 +2994,23 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 
 
 
-//fp_t voxel::stl_split_all_axis(fp_t *s, axis_t *normal)
+//float voxel::stl_split_all_axis(float *s, axis_t *normal)
 //{
 //    axis_t best_axis;
 //    /* Find the best split position of the primitives */
-//    fp_t best_split;
-//    fp_t lowest_cost = *s;
+//    float best_split;
+//    float lowest_cost = *s;
 //    
 //     /* Initial primitive split */
 //    unsigned size_of_prim = this->p->size();
-//    fp_t right = size_of_prim;
-//    fp_t left  = 0;
-//    fp_t guess;
-//    fp_t last_guess = MAX_DIST;
+//    float right = size_of_prim;
+//    float left  = 0;
+//    float guess;
+//    float last_guess = MAX_DIST;
 //    
-//    fp_t x_dist = this->t.x - this->b.x;
-//    fp_t y_dist = this->t.y - this->b.y;
-//    fp_t z_dist = this->t.z - this->b.z;
+//    float x_dist = this->t.x - this->b.x;
+//    float y_dist = this->t.y - this->b.y;
+//    float z_dist = this->t.z - this->b.z;
 //    
 //    primitive_list high = this->p;
 //    primitive_list::iterator l;
@@ -3125,7 +3031,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    h = high.begin();
 //
 //    /* Move past any out of range triangles */
-//    fp_t lo_x = -MAX_DIST;
+//    float lo_x = -MAX_DIST;
 //    while ((lo_x <= this->b.x) && (l != this->p->end()))
 //    {
 //        triangle *cur = *l;
@@ -3136,7 +3042,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    }
 //
 //    /* Evaluate the SAH from left to right */
-//    fp_t hi_x = -MAX_DIST;
+//    float hi_x = -MAX_DIST;
 //    hi_triangle = *h;
 //    lo_triangle = *l;
 //    while (true)
@@ -3180,7 +3086,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        /* Evaluate unique points */
 //        if (last_guess != guess)
 //        {
-//            fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::x_axis);
+//            float this_cost = calculate_sah_cost(left, right, guess, axis_t::x_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -3217,7 +3123,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    h = high.begin();
 //
 //    /* Move past any out of range triangles */
-//    fp_t lo_y = -MAX_DIST;
+//    float lo_y = -MAX_DIST;
 //    while ((lo_y <= this->b.y) && (l != this->p->end()))
 //    {
 //        triangle *cur = *l;
@@ -3228,7 +3134,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    }
 //
 //    /* Evaluate the SAH from left to right */
-//    fp_t hi_y = -MAX_DIST;
+//    float hi_y = -MAX_DIST;
 //    hi_triangle = *h;
 //    lo_triangle = *l;
 //    while (true)
@@ -3272,7 +3178,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        /* Evaluate unique points */
 //        if (last_guess != guess)
 //        {
-//            fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::y_axis);
+//            float this_cost = calculate_sah_cost(left, right, guess, axis_t::y_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;
@@ -3309,7 +3215,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    h = high.begin();
 //
 //    /* Move past any out of range triangles */
-//    fp_t lo_z = -MAX_DIST;
+//    float lo_z = -MAX_DIST;
 //    while ((lo_z <= this->b.z) && (l != this->p->end()))
 //    {
 //        triangle *cur = *l;
@@ -3320,7 +3226,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //    }
 //
 //    /* Evaluate the SAH from left to right */
-//    fp_t hi_z = -MAX_DIST;
+//    float hi_z = -MAX_DIST;
 //    hi_triangle = *h;
 //    lo_triangle = *l;
 //    while (true)
@@ -3364,7 +3270,7 @@ inline vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp
 //        /* Evaluate unique points */
 //        if (last_guess != guess)
 //        {
-//            fp_t this_cost = calculate_sah_cost(left, right, guess, axis_t::z_axis);
+//            float this_cost = calculate_sah_cost(left, right, guess, axis_t::z_axis);
 //            if (this_cost < lowest_cost)
 //            {
 //                lowest_cost = this_cost;

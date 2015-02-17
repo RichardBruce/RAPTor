@@ -10,15 +10,16 @@ namespace raptor_raytracer
   destination of the ray (query point) and returns the colour
   at the location and an alpha value
 ************************************************************/
-fp_t planar_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const
+float planar_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const
 {
-    fp_t u_co, v_co;
+    float u_co;
+    float v_co;
     
     /* Use the interpolated texture address */
     if (vt.x != MAX_DIST)
     {
-        u_co = vt.x * (fp_t)this->w;
-        v_co = vt.y * (fp_t)this->h;
+        u_co = vt.x * static_cast<float>(this->w);
+        v_co = vt.y * static_cast<float>(this->h);
     }
     /* Calculate the texture address */
     else
@@ -40,11 +41,11 @@ fp_t planar_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const
         /* Offset */
         point_t dist = dst - this->c;
     //    cout << "dists: " << dist.x << ", " << dist.y << ", " << dist.z << endl;
-        dist += ((this->s * flip_u) + (this->s * this->v)) * 0.5;
+        dist += ((this->s * flip_u) + (this->s * this->v)) * 0.5f;
         
         /* Scale */
-        u_co = (dot_product(dist, flip_u)) * ((fp_t)this->w / fabs(dot_product(this->s, flip_u)));
-        v_co = (dot_product(dist, this->v)) * ((fp_t)this->h / fabs(dot_product(this->s, this->v)));
+        u_co = (dot_product(dist, flip_u)) * (static_cast<float>(this->w) / fabs(dot_product(this->s, flip_u)));
+        v_co = (dot_product(dist, this->v)) * (static_cast<float>(this->h) / fabs(dot_product(this->s, this->v)));
     }
 
 //    if (!(v_co >= 0.0) || !(u_co >= 0.0))
@@ -62,41 +63,41 @@ fp_t planar_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const
 //    assert(v_co >= 0.0);
     
     /* Addresses and weights */
-    int u0 = (int)u_co + this->u_off;
-    int v0 = (int)v_co + this->v_off;
+    int u0 = static_cast<int>(u_co) + this->u_off;
+    int v0 = static_cast<int>(v_co) + this->v_off;
 
     /* Apply wrapping modes */
     assert(this->u_max == this->w);
     assert(this->v_max == this->h);
     if(!apply_wrapping_mode(&u0, (int)this->u_max, this->uw))
     {
-        (*c) = ext_colour_t(0.0,0.0,0.0);
+        (*c) = ext_colour_t(0.0f, 0.0f, 0.0f);
         return 1.0;
     }
     
     if(!apply_wrapping_mode(&v0, (int)this->v_max, this->vw))
     {
-        (*c) = ext_colour_t(0.0,0.0,0.0);
-        return 1.0;
+        (*c) = ext_colour_t(0.0f, 0.0f, 0.0f);
+        return 1.0f;
     }
 
-    const int u1 = min(u0 + 1, (int)this->w - 1);
-    const int v1 = min(v0 + 1, (int)this->h - 1);
-    assert(u0 <  (int)this->w);
-    assert(v0 <  (int)this->h);
-    assert(u1 <  (int)this->w);
-    assert(v1 <  (int)this->h);
+    const int u1 = std::min(u0 + 1, static_cast<int>(this->w) - 1);
+    const int v1 = std::min(v0 + 1, static_cast<int>(this->h) - 1);
+    assert(u0 <  static_cast<int>(this->w));
+    assert(v0 <  static_cast<int>(this->h));
+    assert(u1 <  static_cast<int>(this->w));
+    assert(v1 <  static_cast<int>(this->h));
     assert(u0 >= 0);
     assert(v0 >= 0);
     assert(u1 >= 0);
     assert(v1 >= 0);
     
-    const fp_t fu = u_co - floor(u_co);
-    const fp_t fv = v_co - floor(v_co);
-    const fp_t w0 = ((fp_t)1.0 - fu) * ((fp_t)1.0 - fv);
-    const fp_t w1 = fu * ((fp_t)1.0 - fv);
-    const fp_t w2 = fv * ((fp_t)1.0 - fu);
-    const fp_t w3 = fu * fv;
+    const float fu = u_co - floor(u_co);
+    const float fv = v_co - floor(v_co);
+    const float w0 = (1.0f - fu) * (1.0f - fv);
+    const float w1 = fu * (1.0f - fv);
+    const float w2 = fv * (1.0f - fu);
+    const float w3 = fu * fv;
     
     /* Texel look up */
     unsigned addr0 = (u0 + (v0 * this->w)) * this->cpp;
@@ -113,6 +114,6 @@ fp_t planar_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const
 
     /* Weight and return */
     (*c) = (c0 * w0) + (c1 * w1) + (c2 * w2) + (c3 * w3);
-    return (fp_t)1.0;
+    return 1.0f;
 }
 }; /* namespace raptor_raytracer */

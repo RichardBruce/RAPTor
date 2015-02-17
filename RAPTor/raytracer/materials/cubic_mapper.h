@@ -38,15 +38,15 @@ class cubic_mapper : public texture_mapper
                 /* Find the V vector */
                 if (n.x)
                 {
-                    this->u = point_t( 0.0, 0.0, -1.0);
+                    this->u = point_t( 0.0f, 0.0f, -1.0f);
                 }
                 else if (n.y)
                 {
-                    this->u = point_t(-1.0, 0.0,  0.0);
+                    this->u = point_t(-1.0f, 0.0f,  0.0f);
                 }
                 else
                 {
-                    this->u = point_t( 1.0, 0.0,  0.0);
+                    this->u = point_t( 1.0f, 0.0f,  0.0f);
                 }
                 
                 cross_product(n, this->u, &this->v);
@@ -59,7 +59,7 @@ class cubic_mapper : public texture_mapper
                 BOOST_LOG_TRIVIAL(trace) << "Width : " << this->w;
             }
 
-        cubic_mapper(fp_t *const im, const point_t &u, const point_t &v, const point_t &c, const point_t &n, const point_t &s, 
+        cubic_mapper(float *const im, const point_t &u, const point_t &v, const point_t &c, const point_t &n, const point_t &s, 
             const unsigned cpp, const unsigned w, const unsigned h, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
             const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1)
             : texture_mapper(), c(c), n(n), u(u), s((u * s.x) + (v * s.y) + (n * s.z)), uw(uw), vw(vw), v(v), img(im), h(h), w(w), cpp(cpp),
@@ -71,8 +71,8 @@ class cubic_mapper : public texture_mapper
         virtual ~cubic_mapper() { };
 
         /* Texture mapping function. Takes the destination and direction 
-           of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        fp_t texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
+           of the incident ray and returns either a float (alpha, kd, ks, t, r....), a colour (rgb) or both */
+        float texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
 
     private :
         friend class boost::serialization::access;
@@ -88,14 +88,14 @@ class cubic_mapper : public texture_mapper
         const texture_wrapping_mode_t   uw;     /* U wrapping mode                      */
         const texture_wrapping_mode_t   vw;     /* V wrapping mode                      */
         point_t                         v;      /* V vector in the plane of the texture */
-        fp_t               *            img;    /* Image data                           */
-        unsigned                        h;      /* Image height                         */
-        unsigned                        w;      /* Image width                          */
-        unsigned                        cpp;    /* Componants per pixel                 */
+        float              *            img;    /* Image data                           */
+        unsigned int                    h;      /* Image height                         */
+        unsigned int                    w;      /* Image width                          */
+        unsigned int                    cpp;    /* Componants per pixel                 */
         const int                       u_off;  /* U offset to be added to every pixel  */
         const int                       v_off;  /* V offset to be added to every pixel  */
-        unsigned                        u_max;  /* Max u value for early wrapping       */
-        unsigned                        v_max;  /* Max v value for early wrapping       */
+        unsigned int                    u_max;  /* Max u value for early wrapping       */
+        unsigned int                    v_max;  /* Max v value for early wrapping       */
 };
 }; /* namespace raptor_raytracer */
 
@@ -127,8 +127,8 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::cubic_mapper *t,
     /* Retreive the fields */
     point_t c, n, u, s, v;
     raptor_raytracer::texture_wrapping_mode_t uw, vw;
-    fp_t *img;
-    unsigned h, w, cpp, u_max, v_max;
+    float *img;
+    unsigned int h, w, cpp, u_max, v_max;
     int u_off, v_off;
     ar >> c;
     ar >> n;

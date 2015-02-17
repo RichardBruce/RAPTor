@@ -22,8 +22,10 @@ const raptor_physics::init_logger init_logger;
 #include "mock_physics_object.h"
 
 
-using namespace raptor_physics;
-
+namespace raptor_physics
+{
+namespace test
+{
 /* Test data */
 struct collision_info_fixture
 {
@@ -108,7 +110,7 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
     BOOST_CHECK(uut.get_simplex().get() == s0);
     BOOST_CHECK(uut.get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut.get_point_of_collision() == point_t(1.5, 1.55, 1.0));
-    BOOST_CHECK(uut.get_time() == std::numeric_limits<fp_t>::max());
+    BOOST_CHECK(uut.get_time() == std::numeric_limits<float>::max());
     BOOST_CHECK(uut.get_type() == NO_COLLISION);
 }
 
@@ -214,3 +216,5 @@ BOOST_AUTO_TEST_CASE( switch_to_sliding )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_physics */

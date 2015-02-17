@@ -13,8 +13,10 @@
 #include "msg_data.h"
 
 
-using namespace raptor_networking;
-
+namespace raptor_networking
+{
+namespace test
+{
 /* Test data */
 struct msg_data_fixture
 {
@@ -147,3 +149,5 @@ BOOST_AUTO_TEST_CASE( self_move_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_networking */

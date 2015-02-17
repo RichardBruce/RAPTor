@@ -24,12 +24,12 @@ inline void check_for_chunk(const char **const a, const char *const e, const int
 
 
 void lwo_parser(
-    ifstream            &lwo_file,
-    string              &p,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m,
-    camera              **c);
+    std::ifstream         &lwo_file,
+    std::string           &p,
+    light_list            &l, 
+    primitive_list        &e,
+    std::list<material *> &m,
+    camera                **c);
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __LWO_PARSER_H__ */

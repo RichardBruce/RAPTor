@@ -43,28 +43,28 @@ enum class tone_mapping_mode_t : char { global_contrast = 1, local_histogram    
                                        global_ferwerda = 9, none = 0 };
 
 /* File output functions */
-void write_png_file(const string &file_name, unsigned char *png_data, const unsigned int x, const unsigned int y);
+void write_png_file(const std::string &file_name, unsigned char *png_data, const unsigned int x, const unsigned int y);
 void read_png_file(const std::string &file_name, unsigned char *png_data, unsigned int *const x, unsigned int *const y);
 
 /* Class representing a camera, shouldn't be copied */
 class camera : private boost::noncopyable
 {
     public :
-        camera(const point_t &c, const vector_t &x, const vector_t    &y, const vector_t    &z, const ext_colour_t     &b, const     fp_t w, 
-               const    fp_t  h, const     fp_t  t, const unsigned x_res, const unsigned y_res, const unsigned x_a_res = 1, const unsigned y_a_res = 1) :
+        camera(const point_t &c, const point_t &x, const point_t    &y, const point_t    &z, const ext_colour_t     &b, const     float w, 
+               const    float  h, const     float  t, const unsigned x_res, const unsigned y_res, const unsigned x_a_res = 1, const unsigned y_a_res = 1) :
                 tm(nullptr), image(new ext_colour_t [ (x_res * x_a_res) * (y_res * y_a_res) ]), scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), temporal_glare_filter(nullptr),
-                u(point_t((fp_t)0.0, (fp_t)0.0, (fp_t)0.0)), l(point_t((fp_t)0.0, (fp_t)0.0, (fp_t)0.0)), c(c), x(x), y(y), z(z), b(b), x_m(-w), y_m(-h), x_inc((w * (fp_t)2.0)/(fp_t)(x_res * x_a_res)), y_inc((h * (fp_t)2.0)/(fp_t)(y_res * y_a_res)), 
+                u(point_t(0.0f, 0.0f, 0.0f)), l(point_t(0.0f, 0.0f, 0.0f)), c(c), x(x), y(y), z(z), b(b), x_m(-w), y_m(-h), x_inc((w * 2.0f)/static_cast<float>(x_res * x_a_res)), y_inc((h * 2.0f)/static_cast<float>(y_res * y_a_res)), 
                 t(t), x_res(x_res * x_a_res), y_res(y_res * y_a_res), out_x_res(x_res), out_y_res(y_res), r_vec(point_t(0.0, 0.0, 0.0)), r_angle(0.0),
                 r_pivot(point_t(0.0, 0.0, 0.0)), speed(1.0), time_step(0.0), adatption_level(0.0)
         { };
 
-        camera(const vector<texture_mapper *>  * const tm, const point_t &u, const point_t &l, const point_t &c, 
-               const vector_t &x, const vector_t    &y, const vector_t    &z, const ext_colour_t     &b, const     fp_t w, 
-               const fp_t  h, const     fp_t  t, const unsigned x_res, const unsigned y_res, 
-               const point_t &r_vec = point_t(0.0, 0.0, 0.0), const fp_t r_angle = 0.0, const point_t &r_pivot = point_t(0.0, 0.0, 0.0),
-               const unsigned  x_a_res = 1, const unsigned y_a_res = 1, const fp_t speed = 1.0, const fp_t time_step = 0.0)
+        camera(const std::vector<texture_mapper *>  * const tm, const point_t &u, const point_t &l, const point_t &c, 
+               const point_t &x, const point_t    &y, const point_t    &z, const ext_colour_t     &b, const     float w, 
+               const float  h, const     float  t, const unsigned x_res, const unsigned y_res, 
+               const point_t &r_vec = point_t(0.0, 0.0, 0.0), const float r_angle = 0.0, const point_t &r_pivot = point_t(0.0, 0.0, 0.0),
+               const unsigned  x_a_res = 1, const unsigned y_a_res = 1, const float speed = 1.0, const float time_step = 0.0)
             : tm(tm), image(new ext_colour_t [ (x_res * x_a_res) * (y_res * y_a_res) ]), scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), temporal_glare_filter(nullptr),
-            u(u), l(l), c(c), x(x), y(y), z(z), b(b), x_m(-w), y_m(-h), x_inc((w * (fp_t)2.0)/(fp_t)(x_res * x_a_res)), y_inc((h * (fp_t)2.0)/(fp_t)(y_res * y_a_res)), 
+            u(u), l(l), c(c), x(x), y(y), z(z), b(b), x_m(-w), y_m(-h), x_inc((w * 2.0f)/static_cast<float>(x_res * x_a_res)), y_inc((h * 2.0f)/static_cast<float>(y_res * y_a_res)), 
             t(t), x_res(x_res * x_a_res), y_res(y_res * y_a_res), out_x_res(x_res), out_y_res(y_res), r_vec(r_vec), r_angle(r_angle),
             r_pivot(r_pivot), speed(speed), time_step(time_step), adatption_level(0.0)
         {  };
@@ -104,7 +104,7 @@ class camera : private boost::noncopyable
         unsigned y_number_of_rays() const   { return this->y_res;       }
         
         /* Time control */
-        camera& advance_time(const fp_t t)
+        camera& advance_time(const float t)
         {
             this->time_step = t;
             return *this;
@@ -113,13 +113,13 @@ class camera : private boost::noncopyable
         /* Speed control */
         camera& speed_up()
         {
-            this->speed *= (fp_t)2.0;
+            this->speed *= 2.0f;
             return *this;
         }
         
         camera& slow_down()
         {
-            this->speed /= (fp_t)2.0;
+            this->speed /= 2.0f;
             return *this;
         }
 
@@ -130,19 +130,19 @@ class camera : private boost::noncopyable
             return *this;
         }
         
-        camera& move_forward(const fp_t d = 1.0)
+        camera& move_forward(const float d = 1.0f)
         {
             this->c += this->z * speed * d;
             return *this;
         }
         
-        camera& move_up(const fp_t d = 1.0)
+        camera& move_up(const float d = 1.0f)
         {
             this->c += this->y * speed * d;
             return *this;
         }
         
-        camera& move_right(const fp_t d = 1.0)
+        camera& move_right(const float d = 1.0f)
         {
             this->c += this->x * speed * d;
             return *this;
@@ -158,7 +158,7 @@ class camera : private boost::noncopyable
         }
         
         /* Rotate about y */
-        camera& pan(const fp_t a)
+        camera& pan(const float a)
         {
             rotate_about_origin(&this->x, &this->y, speed * a);
             rotate_about_origin(&this->z, &this->y, speed * a);
@@ -166,7 +166,7 @@ class camera : private boost::noncopyable
         }
     
         /* Rotate about x */
-        camera& tilt(const fp_t a)
+        camera& tilt(const float a)
         {
             rotate_about_origin(&this->y, &this->x, speed * a);
             rotate_about_origin(&this->z, &this->x, speed * a);
@@ -174,7 +174,7 @@ class camera : private boost::noncopyable
         }
 
         /* Rotate about z */
-        camera& roll(const fp_t a)
+        camera& roll(const float a)
         {
             rotate_about_origin(&this->x, &this->z, speed * a);
             rotate_about_origin(&this->y, &this->z, speed * a);
@@ -182,7 +182,7 @@ class camera : private boost::noncopyable
         }
         
         /* Rotate about an arbitary axis */
-        camera& rotate_about(const point_t &v, const fp_t a)
+        camera& rotate_about(const point_t &v, const float a)
         {
             rotate_about_origin(&this->x, &v, a);
             rotate_about_origin(&this->y, &v, a);
@@ -195,21 +195,21 @@ class camera : private boost::noncopyable
         {
             /* The camera can be anywhere so these co-ordinates are relative to it */
             /* Calaculate the direction that would pass through x,y */
-            const fp_t x_t = ((fp_t)x * x_inc) + x_m;
-            const fp_t y_t = ((fp_t)y * y_inc) + y_m;
+            const float x_t = (static_cast<float>(x) * x_inc) + x_m;
+            const float y_t = (static_cast<float>(y) * y_inc) + y_m;
             
             return (this->x * x_t) + (this->y * y_t) + (this->z * this->t);
         }
 
         /* Convert a line from the origin into a pixel address */
-        inline bool direction_to_pixel(const point_t &d, fp_t *xy) const
+        inline bool direction_to_pixel(const point_t &d, float *xy) const
         {
             /* Find the intersection the the line from the origin and the image plane */
-            const fp_t n_dot_d      = dot_product(this->z, d);
-            //const fp_t n_dot_dist   = dot_product(this->z, (this->z * this->t));
+            const float n_dot_d      = dot_product(this->z, d);
+            //const float n_dot_dist   = dot_product(this->z, (this->z * this->t));
             
             /* Direction perphendicular to the image plane */
-            if (n_dot_d == (fp_t)0.0)
+            if (n_dot_d == 0.0f)
             {
                 return false;
             }
@@ -223,15 +223,15 @@ class camera : private boost::noncopyable
             xy[0] = (dot_product(this->x, diff) - this->x_m) / this->x_inc;
             xy[1] = (dot_product(this->y, diff) - this->y_m) / this->y_inc;
             
-            return ((xy[0] <= this->x_res) && (xy[0] >= (fp_t)0.0) && 
-                    (xy[1] <= this->y_res) && (xy[1] >= (fp_t)0.0));
+            return ((xy[0] <= this->x_res) && (xy[0] >= 0.0f) && 
+                    (xy[1] <= this->y_res) && (xy[1] >= 0.0f));
         }
         
 #ifdef SIMD_PACKET_TRACING
         void pixel_to_co_ordinate(packet_ray *const r, const int x, const int y) const
         {
             /* Assert packet is square */
-            assert(fmod(sqrt((fp_t)MAXIMUM_PACKET_SIZE), (fp_t)1.0) == (fp_t)0.0);
+            assert(fmod(sqrt(static_cast<float>(MAXIMUM_PACKET_SIZE)), 1.0f) == 0.0f);
 
             /* Assert the packet is MAXIMUM_PACKET_SIZE aligned */
             assert((x & (((unsigned int)sqrt(MAXIMUM_PACKET_SIZE) << 1) - 1)) == 0);
@@ -324,11 +324,11 @@ class camera : private boost::noncopyable
         /* Dump function */
         void print_position_data() const
         {
-            cout << "--cam " << this->c.x   << " "  << this->c.y << " " << this->c.z << endl;
-            cout << "--dx  " << this->x.x   << " "  << this->x.y << " " << this->x.z << endl;
-            cout << "--dy  " << this->y.x   << " "  << this->y.y << " " << this->y.z << endl;
-            cout << "--dz  " << this->z.x   << " "  << this->z.y << " " << this->z.z << endl;
-            cout << "speed " << this->speed                                          << endl;
+            std::cout << "--cam " << this->c.x   << " "  << this->c.y << " " << this->c.z << std::endl;
+            std::cout << "--dx  " << this->x.x   << " "  << this->x.y << " " << this->x.z << std::endl;
+            std::cout << "--dy  " << this->y.x   << " "  << this->y.y << " " << this->y.z << std::endl;
+            std::cout << "--dz  " << this->z.x   << " "  << this->z.y << " " << this->z.z << std::endl;
+            std::cout << "speed " << this->speed                                          << std::endl;
         }
         
         /* Setting pixel colour */
@@ -350,7 +350,7 @@ class camera : private boost::noncopyable
             {
                 for (int y = 0; y < (int)this->out_y_res; y++)
                 {
-                    ext_colour_t a((fp_t)0.0, (fp_t)0.0, (fp_t)0.0);
+                    ext_colour_t a(0.0f, 0.0f, 0.0f);
                     const int pixel_addr = (x * x_pixel_samples) + (y * y_pixel_samples * this->x_res);
                     for (int a_x = 0; a_x < x_pixel_samples; a_x++)
                     {
@@ -363,9 +363,9 @@ class camera : private boost::noncopyable
                     }
 
                     const int image_addr = (x + (y * this->out_x_res)) * 3;
-                    c[image_addr    ] = (unsigned char)min((fp_t)255.0, max((fp_t)0.0, (a.r / pixel_samples)));
-                    c[image_addr + 1] = (unsigned char)min((fp_t)255.0, max((fp_t)0.0, (a.g / pixel_samples)));
-                    c[image_addr + 2] = (unsigned char)min((fp_t)255.0, max((fp_t)0.0, (a.b / pixel_samples)));
+                    c[image_addr    ] = (unsigned char)std::min(255.0f, std::max(0.0f, (a.r / pixel_samples)));
+                    c[image_addr + 1] = (unsigned char)std::min(255.0f, std::max(0.0f, (a.g / pixel_samples)));
+                    c[image_addr + 2] = (unsigned char)std::min(255.0f, std::max(0.0f, (a.b / pixel_samples)));
                 }
             }
 
@@ -378,12 +378,12 @@ class camera : private boost::noncopyable
             /* Clip each pixel */
             const int x_pixel_samples = (int)(this->x_res / this->out_x_res);
             const int y_pixel_samples = (int)(this->y_res / this->out_y_res);
-            const fp_t pixel_samples_inv = 1.0 / (x_pixel_samples * y_pixel_samples);
+            const float pixel_samples_inv = 1.0f / (x_pixel_samples * y_pixel_samples);
             for (int x = 0; x < (int)this->out_x_res; x++)
             {
                 for (int y = 0; y < (int)this->out_y_res; y++)
                 {
-                    ext_colour_t a((fp_t)0.0, (fp_t)0.0, (fp_t)0.0);
+                    ext_colour_t a(0.0f, 0.0f, 0.0f);
                     const int pixel_addr = (x * x_pixel_samples) + (y * y_pixel_samples * this->x_res);
                     for (int a_x = 0; a_x < x_pixel_samples; a_x++)
                     {
@@ -396,9 +396,9 @@ class camera : private boost::noncopyable
                     }
 
                     const int image_addr = (x + (y * this->out_x_res)) * 3;
-                    c[image_addr    ] = (unsigned char)min((fp_t)255.0, max((fp_t)0.0, (a.b * pixel_samples_inv)));
-                    c[image_addr + 1] = (unsigned char)min((fp_t)255.0, max((fp_t)0.0, (a.g * pixel_samples_inv)));
-                    c[image_addr + 2] = (unsigned char)min((fp_t)255.0, max((fp_t)0.0, (a.r * pixel_samples_inv)));
+                    c[image_addr    ] = (unsigned char)std::min(255.0f, std::max(0.0f, (a.b * pixel_samples_inv)));
+                    c[image_addr + 1] = (unsigned char)std::min(255.0f, std::max(0.0f, (a.g * pixel_samples_inv)));
+                    c[image_addr + 2] = (unsigned char)std::min(255.0f, std::max(0.0f, (a.r * pixel_samples_inv)));
                 }
             }
 
@@ -406,18 +406,18 @@ class camera : private boost::noncopyable
         }
         
         /* Write to tga file */
-        const camera & write_tga_file(const string &file_name, unsigned char *o = nullptr) const;
+        const camera & write_tga_file(const std::string &file_name, unsigned char *o = nullptr) const;
 
         /* Write to png file */
-        const camera & write_png_file(const string &file_name) const;
+        const camera & write_png_file(const std::string &file_name) const;
 
         /* Write to jpeg file */
-        const camera & write_jpeg_file(const string &file_name, const int q, unsigned char *o = nullptr) const;
+        const camera & write_jpeg_file(const std::string &file_name, const int q, unsigned char *o = nullptr) const;
 
 
         /* Image colour correction */
         /* Exposure compensation of the image */
-        camera & exposure_compensate(const fp_t e)
+        camera & exposure_compensate(const float e)
         {
             /* Multiply each pixel by exposure */
             for (int i = 0; i < (int)(this->x_res * this->y_res); i++)
@@ -429,10 +429,10 @@ class camera : private boost::noncopyable
         }
         
         /* Tone mapping of the image */
-        camera & tone_map(const tone_mapping_mode_t tone_map, const fp_t key = 0.18, const fp_t xw = (1.0/3.0), const fp_t yw = (1.0/3.0), const bool gf = false, const bool ta = false, const bool ds = false, const bool sc = false);
+        camera & tone_map(const tone_mapping_mode_t tone_map, const float key = 0.18f, const float xw = (1.0f / 3.0f), const float yw = (1.0f / 3.0f), const bool gf = false, const bool ta = false, const bool ds = false, const bool sc = false);
         
         /* Gamma correction of the image */
-        camera & gamma_correct(const fp_t gamma);
+        camera & gamma_correct(const float gamma);
 
     private :
         friend class boost::serialization::access;
@@ -459,10 +459,10 @@ class camera : private boost::noncopyable
             ar & adatption_level;
         }
 
-        camera(const vector<texture_mapper *>  *const tm, const point_t &u, const point_t &l, const ext_colour_t &b,
-            const fp_t x_m, const fp_t y_m, const fp_t x_inc, const fp_t y_inc, const fp_t t, 
+        camera(const std::vector<texture_mapper *>  *const tm, const point_t &u, const point_t &l, const ext_colour_t &b,
+            const float x_m, const float y_m, const float x_inc, const float y_inc, const float t, 
             const unsigned x_res, const unsigned y_res, const unsigned out_x_res, const unsigned out_y_res, 
-            const point_t &r_vec, const fp_t r_angle, const point_t &r_pivot)
+            const point_t &r_vec, const float r_angle, const point_t &r_pivot)
             : tm(tm), image(new ext_colour_t[x_res * y_res]), 
             scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), 
             temporal_glare_filter(nullptr), u(u), l(l), b(b), x_m(x_m), y_m(y_m), x_inc(x_inc), y_inc(y_inc), 
@@ -482,48 +482,48 @@ class camera : private boost::noncopyable
             const point_t ogn = rot_r.get_ogn();
             const point_t dir = rot_r.get_dir();
 
-            fp_t x_dist = MAX_DIST;
-            fp_t y_dist = MAX_DIST;
-            fp_t z_dist = MAX_DIST;
+            float x_dist = MAX_DIST;
+            float y_dist = MAX_DIST;
+            float z_dist = MAX_DIST;
             unsigned int hit_plane_x = 0;
             unsigned int hit_plane_y = 0;
             unsigned int hit_plane_z = 0;
             
             /* Calculate distances to all planes, a hit is garenteed */
             /* Only intersect with the plane in the rays forward direction */
-            if (dir.x < 0.0)
+            if (dir.x < 0.0f)
             {
                 hit_plane_x = 3;
                 x_dist = (this->l.x - ogn.x) / dir.x;
             }
-            else if (dir.x > 0.0)
+            else if (dir.x > 0.0f)
             {
                 x_dist = (this->u.x - ogn.x) / dir.x;
             }
 
-            if (dir.y < 0.0)
+            if (dir.y < 0.0f)
             {
                 hit_plane_y = 3;
                 y_dist = (this->l.y - ogn.y) / dir.y;
             }
-            else if (dir.y > 0.0)
+            else if (dir.y > 0.0f)
             {
                 y_dist = (this->u.y - ogn.y) / dir.y;
             }
 
-            if (dir.z < 0.0)
+            if (dir.z < 0.0f)
             {
                 hit_plane_z = 3;
                 z_dist = (this->l.z - ogn.z) / dir.z;
             }
-            else if (dir.z > 0.0)
+            else if (dir.z > 0.0f)
             {
                 z_dist = (this->u.z - ogn.z) / dir.z;
             }
 
-            assert(x_dist > (fp_t)0.0);
-            assert(y_dist > (fp_t)0.0);
-            assert(z_dist > (fp_t)0.0);
+            assert(x_dist > 0.0f);
+            assert(y_dist > 0.0f);
+            assert(z_dist > 0.0f);
             
             /* Find the closest intersection */
             unsigned int hit_plane;
@@ -559,54 +559,54 @@ class camera : private boost::noncopyable
         
         /* Glare filtering  */
         void generate_glare_filter(ext_colour_t **gf, const light_level_t ll);
-        fp_t generate_flare_lines(ext_colour_t *const f);
+        float generate_flare_lines(ext_colour_t *const f);
         
-        void draw_circle(fp_t *o, const int x, const int y, const fp_t s, const fp_t v);
-        void generate_temporal_psf(const fp_t y);
+        void draw_circle(float *o, const int x, const int y, const float s, const float v);
+        void generate_temporal_psf(const float y);
 
         template<typename T>
         void apply_point_spreading_function(T p, ext_colour_t *const f);
-        void perform_glare_filter(const fp_t Yi, const fp_t Yw);
+        void perform_glare_filter(const float Yi, const float Yw);
 
         /* Bi-lateral filtering based tone mapping */
-        void bilateral_filter_tone_map(const fp_t r_s, const fp_t s_s, const fp_t r_sa, const fp_t s_sa);
+        void bilateral_filter_tone_map(const float r_s, const float s_s, const float r_sa, const float s_sa);
        
         /* Ward's histogram based tone mapping function */
-        fp_t just_noticable_difference(const fp_t La) const;
+        float just_noticable_difference(const float La) const;
         void histogram_tone_map(const bool human);
         
         /* Colour space conversion */
         void convert_Yxy_to_rgb();
         void convert_xyz_to_rgb(ext_colour_t *const p, const int x, const int y) const;
 
-        const vector<texture_mapper *>  * const     tm;                         /* Texture mapper for each face of the sky box                      */
-        ext_colour_t                    *           image;                      /* The rendered image                                               */
-        ext_colour_t                    *           scotopic_glare_filter;      /* Array of colours for glare filter images in scotopic lighting    */
-        ext_colour_t                    *           mesopic_glare_filter;       /* Array of colours for glare filter images in mesopic lighting     */
-        ext_colour_t                    *           photopic_glare_filter;      /* Array of colours for glare filter images in photopic lighting    */
-        ext_colour_t                    *           temporal_glare_filter;      /* Array of colours for temporal glare filter images                */
-        const point_t                               u;                          /* Upper bounds of the sky box                                      */
-        const point_t                               l;                          /* Lower bounds of the sky box                                      */
-        point_t                                     c;                          /* Camera position                                                  */
-        vector_t                                    x;                          /* Horizontal axis                                                  */
-        vector_t                                    y;                          /* Vertical axis                                                    */
-        vector_t                                    z;                          /* Forward axis                                                     */
-        const ext_colour_t                          b;                          /* Background colour                                                */
-        const fp_t                                  x_m;                        /* Minimum X co-ordinate                                            */
-        const fp_t                                  y_m;                        /* Minimum y co-ordinate                                            */
-        const fp_t                                  x_inc;                      /* X increment per pixel                                            */
-        const fp_t                                  y_inc;                      /* Y increment per pixel                                            */
-        const fp_t                                  t;                          /* Distance to the image plane                                      */
-        const unsigned                              x_res;                      /* Internal X resolution                                            */
-        const unsigned                              y_res;                      /* Internal Y resolution                                            */
-        const unsigned                              out_x_res;                  /* Output X resolution                                              */
-        const unsigned                              out_y_res;                  /* Output Y resolution                                              */
-        const point_t                               r_vec;                      /* Sky box rotation axis                                            */
-        const fp_t                                  r_angle;                    /* Sky box rotation                                                 */
-        const point_t                               r_pivot;                    /* Sky box pivot point                                              */
-        fp_t                                        speed;                      /* Speed of movement                                                */
-        fp_t                                        time_step;                  /* Time step between last and current frame in seconds              */
-        fp_t                                        adatption_level;            /* Current light level that has been adapted to                     */
+        const std::vector<texture_mapper *>  * const    tm;                         /* Texture mapper for each face of the sky box                      */
+        ext_colour_t                    *               image;                      /* The rendered image                                               */
+        ext_colour_t                    *               scotopic_glare_filter;      /* Array of colours for glare filter images in scotopic lighting    */
+        ext_colour_t                    *               mesopic_glare_filter;       /* Array of colours for glare filter images in mesopic lighting     */
+        ext_colour_t                    *               photopic_glare_filter;      /* Array of colours for glare filter images in photopic lighting    */
+        ext_colour_t                    *               temporal_glare_filter;      /* Array of colours for temporal glare filter images                */
+        const point_t                                   u;                          /* Upper bounds of the sky box                                      */
+        const point_t                                   l;                          /* Lower bounds of the sky box                                      */
+        point_t                                         c;                          /* Camera position                                                  */
+        point_t                                         x;                          /* Horizontal axis                                                  */
+        point_t                                         y;                          /* Vertical axis                                                    */
+        point_t                                         z;                          /* Forward axis                                                     */
+        const ext_colour_t                              b;                          /* Background colour                                                */
+        const float                                     x_m;                        /* Minimum X co-ordinate                                            */
+        const float                                     y_m;                        /* Minimum y co-ordinate                                            */
+        const float                                     x_inc;                      /* X increment per pixel                                            */
+        const float                                     y_inc;                      /* Y increment per pixel                                            */
+        const float                                     t;                          /* Distance to the image plane                                      */
+        const unsigned                                  x_res;                      /* Internal X resolution                                            */
+        const unsigned                                  y_res;                      /* Internal Y resolution                                            */
+        const unsigned                                  out_x_res;                  /* Output X resolution                                              */
+        const unsigned                                  out_y_res;                  /* Output Y resolution                                              */
+        const point_t                                   r_vec;                      /* Sky box rotation axis                                            */
+        const float                                     r_angle;                    /* Sky box rotation                                                 */
+        const point_t                                   r_pivot;                    /* Sky box pivot point                                              */
+        float                                           speed;                      /* Speed of movement                                                */
+        float                                           time_step;                  /* Time step between last and current frame in seconds              */
+        float                                           adatption_level;            /* Current light level that has been adapted to                     */
 };
 }; /* namespace raptor_raytracer */
 
@@ -637,10 +637,10 @@ template<class Archive>
 inline void load_construct_data(Archive & ar, raptor_raytracer::camera *cam, const unsigned int file_version)
 {
     /* Retreive the fields */
-    vector<raptor_raytracer::texture_mapper *>  *tm;
+    std::vector<raptor_raytracer::texture_mapper *>  *tm;
     point_t u, l, r_vec, r_pivot;
     raptor_raytracer::ext_colour_t b;
-    fp_t x_m, y_m, x_inc, y_inc, t, r_angle;
+    float x_m, y_m, x_inc, y_inc, t, r_angle;
     unsigned int x_res, y_res, out_x_res, out_y_res;
 
     ar >> tm;

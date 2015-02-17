@@ -91,7 +91,7 @@ class contact_graph : private boost::noncopyable
         const adj_list &    adjacent(const int v)   const { return _adj_map[v].second;  }
 
         /* Resolve forces to enforce non-penetration */
-        contact_graph<PO>& resolve_forces(const fp_t t_step)
+        contact_graph<PO>& resolve_forces(const float t_step)
         {
             METHOD_LOG;
 
@@ -104,7 +104,7 @@ class contact_graph : private boost::noncopyable
             compute_relative_velocity(sol_f.initialise_q());
 
             /* Minimise impulses */
-            std::unique_ptr<fp_t []> resting_impulses(new fp_t [_edges * 3]);
+            std::unique_ptr<float []> resting_impulses(new float [_edges * 3]);
             if (minimise(sol_f.initialise_m(), sol_f.initialise_q(), resting_impulses.get()))
             {
                 /* Apply impluses */
@@ -140,7 +140,7 @@ class contact_graph : private boost::noncopyable
             compute_relative_accelation(sol_f.initialise_q());
 
             /* Solve */
-            std::unique_ptr<fp_t []> resting_forces(new fp_t [_edges]);
+            std::unique_ptr<float []> resting_forces(new float [_edges]);
             if (sol_f.solve(resting_forces.get()))
             {
                 /* Apply forces */
@@ -253,10 +253,10 @@ class contact_graph : private boost::noncopyable
             }
         }
 
-        const contact_graph<PO>& compute_contact_matrix(fp_t *const c) const
+        const contact_graph<PO>& compute_contact_matrix(float *const c) const
         {
             /* Clear the matrix */
-            memset(&c[0], 0, _edges * _edges * sizeof(fp_t));
+            memset(&c[0], 0, _edges * _edges * sizeof(float));
 
             /* For each vertex */
             int from_idx = 0;
@@ -287,8 +287,8 @@ class contact_graph : private boost::noncopyable
                         
                         const point_t ra_n_j(cross_product(poc_j - a_i->get_center_of_mass(), noc_j));
 
-                        const fp_t lin = dot_product(noc_i, noc_j) / a_i->get_mass();
-                        const fp_t rot = dot_product(ra_n_i, ra_n_j / a_i->get_orientated_tensor());
+                        const float lin = dot_product(noc_i, noc_j) / a_i->get_mass();
+                        const float rot = dot_product(ra_n_i, ra_n_j / a_i->get_orientated_tensor());
                         c[(e_i.edge_id() * _edges) + e_j.edge_id()] += (lin + rot);
                     }
 
@@ -300,8 +300,8 @@ class contact_graph : private boost::noncopyable
                         
                         const point_t rb_n_j(cross_product(poc_j - b_i->get_center_of_mass(), noc_j));
 
-                        const fp_t lin = dot_product(noc_i, noc_j) / b_i->get_mass();
-                        const fp_t rot = dot_product(rb_n_i, rb_n_j / b_i->get_orientated_tensor());
+                        const float lin = dot_product(noc_i, noc_j) / b_i->get_mass();
+                        const float rot = dot_product(rb_n_i, rb_n_j / b_i->get_orientated_tensor());
                         c[(e_i.edge_id() * _edges) + e_j.edge_id()] -= (lin + rot);
                     }
                 }
@@ -313,7 +313,7 @@ class contact_graph : private boost::noncopyable
         }
 
 
-        const contact_graph<PO>& compute_relative_velocity(fp_t *const v_vec)
+        const contact_graph<PO>& compute_relative_velocity(float *const v_vec)
         {
             /* For each vertex */
             int idx = 0;
@@ -348,7 +348,7 @@ class contact_graph : private boost::noncopyable
         }
 
 
-        const contact_graph<PO>& compute_relative_accelation(fp_t *const b_vec)
+        const contact_graph<PO>& compute_relative_accelation(float *const b_vec)
         {
             /* For each vertex */
             int idx = 0;
@@ -406,27 +406,27 @@ class contact_graph : private boost::noncopyable
             return *this;
         }
         
-        bool minimise(const fp_t *const contact, const fp_t *const rel_vel, fp_t *const ri) const
+        bool minimise(const float *const contact, const float *const rel_vel, float *const ri) const
         {
             /* Instantiate solver */
             const int m_size = _edges << 1;
             lcp_solver sol_v(m_size, m_size + 1);
 
             /* Fill in a */
-            fp_t *const m = sol_v.initialise_m();
-            memset(m, 0, m_size * m_size * sizeof(fp_t));
+            float *const m = sol_v.initialise_m();
+            memset(m, 0, m_size * m_size * sizeof(float));
             for (int i = 0; i < _edges; ++i)
             {
                 for (int j = 0; j < _edges; ++j)
                 {
-                    const fp_t a_val = contact[(i * _edges) + j];
+                    const float a_val = contact[(i * _edges) + j];
                     m[(m_size * j) + _edges + i] = a_val;
                     m[((_edges + i) * m_size) + j] = -a_val;
                 }
             }
 
             /* Fill in q */
-            fp_t *const q = sol_v.initialise_q();
+            float *const q = sol_v.initialise_q();
             for (int i = 0; i < _edges; ++i)
             {
                 q[i] = -rel_vel[i];

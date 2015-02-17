@@ -1,8 +1,6 @@
 #ifndef __SIMD_H__
 #define __SIMD_H__
 
-#ifdef SIMD_PACKET_TRACING
-
 #include <immintrin.h>
 #include <iostream>
 #include <cmath>
@@ -481,7 +479,7 @@ class vint_t
         /* Constructors */
         vint_t() = default;
         vint_t(const vint_t &rhs)                                   : m(rhs.m)                                                  { }
-        vint_t(const vfp_t &rhs)                                    : m(_mm_cvtps_epi32(rhs.m))                                 { }
+        vint_t(const vfp_t &rhs)                                    : m(_mm_cvttps_epi32(rhs.m))                                { }
         vint_t(const int a, const int b, const int c, const int d)  : m(_mm_set_epi32 (d, c, b, a))                             { }
         vint_t(const int *a)                                        : m(_mm_load_si128(reinterpret_cast<const __m128i *>(a)))   { }
         vint_t(const int a, const int b, const int c)               : vint_t(a, b, c, c)                                        { }
@@ -735,6 +733,35 @@ inline void transpose(vint_t &a, vint_t &b, vint_t &c, vint_t &d)
 }
 
 /* 3D Morton code */
+inline void split_by_three(int &a)
+{
+    a |= (a << 16);
+    a &= 0x030000FF;
+
+    a |= (a <<  8);
+    a &= 0x0300F00F;
+
+    a |= (a <<  4);
+    a &= 0x030C30C3;
+
+    a |= (a <<  2);
+    a &= 0x09249249;
+}
+
+inline int morton_code(const float x, const float y, const float z, const float x_mul, const float y_mul, const float z_mul)
+{
+    /* Bin to nearest grid cell */
+    int x_int = x * x_mul;
+    int y_int = y * y_mul;
+    int z_int = z * z_mul;
+
+    /* Split by three and or together */
+    split_by_three(x_int);
+    split_by_three(y_int);
+    split_by_three(z_int);
+    return x_int | (y_int << 1) | (z_int << 2);
+}
+
 inline void split_by_three(vint_t &a)
 {
     a |= (a << 16);
@@ -750,12 +777,12 @@ inline void split_by_three(vint_t &a)
     a &= 0x09249249;
 }
 
-inline vint_t morton_code(const vfp_t &x, const vfp_t &y, const vfp_t &z, const vfp_t &x_div, const vfp_t &y_div, const vfp_t &z_div)
+inline vint_t morton_code(const vfp_t &x, const vfp_t &y, const vfp_t &z, const vfp_t &x_mul, const vfp_t &y_mul, const vfp_t &z_mul)
 {
     /* Bin to nearest grid cell */
-    vint_t x_int(x / x_div);
-    vint_t y_int(y / y_div);
-    vint_t z_int(z / z_div);
+    vint_t x_int(x * x_mul);
+    vint_t y_int(y * y_mul);
+    vint_t z_int(z * z_mul);
 
     /* Split by three and or together */
     split_by_three(x_int);
@@ -763,7 +790,4 @@ inline vint_t morton_code(const vfp_t &x, const vfp_t &y, const vfp_t &z, const 
     split_by_three(z_int);
     return x_int | (y_int << 1) | (z_int << 2);
 }
-
-
-#endif /* #ifdef SIMD_PACKET_TRACING */
 #endif /* #ifndef __SIMD_H__ */

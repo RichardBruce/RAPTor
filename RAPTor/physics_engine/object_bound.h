@@ -20,13 +20,13 @@ enum axis_t { X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2 };
 class object_bound : private boost::noncopyable
 {
     public :
-        object_bound(const physics_object *const object, const fp_t bound, const bool min)
+        object_bound(const physics_object *const object, const float bound, const bool min)
         :  _object(object), _bound(bound), _index(-1), _min(min) { }
 
         /* Allow default DTOR */
 
         /* Access functions */
-        object_bound& bound(const fp_t bound)
+        object_bound& bound(const float bound)
         {
             _bound = bound;
             return *this;
@@ -39,7 +39,7 @@ class object_bound : private boost::noncopyable
         }
 
         const physics_object *  object()    const { return _object; }
-        fp_t                    bound()     const { return _bound;  }
+        float                   bound()     const { return _bound;  }
         int                     index()     const { return _index;  }
         bool                    min()       const { return _min;    }
 
@@ -59,7 +59,7 @@ class object_bound : private boost::noncopyable
 
     private :
         const physics_object *const _object;
-        fp_t                        _bound;
+        float                       _bound;
         int                         _index;
         const bool                  _min;
 };

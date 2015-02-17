@@ -3,7 +3,7 @@ SOURCE  = $(MAIN) $(TEXTURE) $(SSD) $(PARSER) $(MGF) #$(SHAPE)
 MAIN    = main.cc raytracer.cc common.cc ray.cc triangle.cc scene.cc sort.cc line.cc simd.cc packet_ray.cc camera.cc \
 	sdl_wrapper.cc sdl_event_handler_factory.cc
 #SHAPE   = shape.cc line.cc sphere.cc cylinder.cc cone.cc triangle.cc torus.cc ring.cc
-SSD	 = kdt_node.cc kd_tree_builder.cc voxel.cc bih_builder.cc
+SSD	 = kd_tree.cc kdt_node.cc kd_tree_builder.cc voxel.cc bih.cc bih_builder.cc
 TEXTURE = phong_shader.cc cook_torrance_cxy.cc mandelbrot_shader.cc \
 	mapper_shader.cc checker_board_mapper.cc perlin_noise_2d_mapper.cc perlin_noise_3d_mapper.cc planar_mapper.cc \
 	cylindrical_mapper.cc cubic_mapper.cc coloured_mapper_shader.cc perlin_noise_3d.cc perlin_noise_2d.cc
@@ -32,5 +32,5 @@ SO_LIBS = SDL2 SDL2_ttf tbb tbbmalloc jpeg png pthread boost_system boost_log bo
 LIBRARY = $(SO_LIBS) fftw3f
 
 # Defines
-DEFINES = SIMD_PACKET_TRACING FRUSTRUM_CULLING SPATIAL_SUBDIVISION_BIH BOOST_LOG_DYN_LINK BOOST_LOG_LEVEL=boost::log::trivial::trace # THREADED_RAY_TRACE SPATIAL_SUBDIVISION_STATISTICS LOG_DEPTH SIMD_PACKET_TRACING FRUSTRUM_CULLING SHOW_KD_TREE DIFFUSE_REFLECTIONS=128.0 SOFT_SHADOW=256.0 
+DEFINES = SIMD_PACKET_TRACING FRUSTRUM_CULLING BOOST_LOG_DYN_LINK BOOST_LOG_LEVEL=boost::log::trivial::trace # THREADED_RAY_TRACE LOG_DEPTH SIMD_PACKET_TRACING FRUSTRUM_CULLING SHOW_KD_TREE DIFFUSE_REFLECTIONS=128.0 SOFT_SHADOW=256.0 
 LINTER_DEFINES = DIFFUSE_REFLECTIONS=128.0 SOFT_SHADOW=256.0 

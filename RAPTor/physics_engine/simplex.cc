@@ -82,7 +82,7 @@ point_t simplex::normal_of_impact(const simplex &s) const
             const point_t s_dir(normalise(s_points[1] - s_points[0]));
 
             /* If there is only a point or the lines are parallel */
-            if ((std::min(a_size, b_size) == 1) || (fabs(dot_product(l_dir, s_dir)) > (1.0 - raptor_physics::EPSILON)))
+            if ((std::min(a_size, b_size) == 1) || (fabs(dot_product(l_dir, s_dir)) > (1.0f - raptor_physics::EPSILON)))
             {
                 BOOST_LOG_TRIVIAL(trace) << "Finding normal for point and line";
                 BOOST_LOG_TRIVIAL(trace) << "L points: " << l_points[0] << " and " << l_points[1];
@@ -92,7 +92,7 @@ point_t simplex::normal_of_impact(const simplex &s) const
                 const point_t perp((l_points[0] - (l_dir * dot_product(l_dir, l_points[0] - s_points[0]))) - s_points[0]);
 
                 /* Check if the nearest point to s is s */
-                const fp_t perp_dist = magnitude(perp);
+                const float perp_dist = magnitude(perp);
                 assert((fabs(perp_dist) > raptor_physics::EPSILON) || !"Error: Distance between objects is 0");
                 norm = perp / perp_dist;
             }
@@ -100,7 +100,7 @@ point_t simplex::normal_of_impact(const simplex &s) const
             else
             {
                 norm = cross_product(l_dir, s_dir);
-                if (dot_product(norm, l_points[0] - s_points[0]) < 0.0)
+                if (dot_product(norm, l_points[0] - s_points[0]) < 0.0f)
                 {
                     norm = -norm;
                 }
@@ -130,7 +130,7 @@ point_t simplex::normal_of_impact(const simplex &s) const
             }
             BOOST_LOG_TRIVIAL(trace) << "Oritentated to: " << norm;
 
-            if (dot_product(norm, l_points[0] - s_points[0]) < 0.0)
+            if (dot_product(norm, l_points[0] - s_points[0]) < 0.0f)
             {
                 BOOST_LOG_TRIVIAL(trace) << "Flipped based on :" << (l_points[0] - s_points[0]) << ", dot is: " << dot_product(norm, l_points[0] - s_points[0]);
                 norm = -norm;
@@ -177,7 +177,7 @@ point_t simplex::center_of_impact(const simplex &s, const point_t &noc) const
     _po.get_orientation().rotate(&verts_a->front());
     point_t hull_a_max(verts_a->front());
     point_t hull_a_min(verts_a->front());
-    for (unsigned int i = 1; i < verts_a->size(); i++)
+    for (unsigned int i = 1; i < verts_a->size(); ++i)
     {
         _po.get_orientation().rotate(&verts_a->at(i));
         hull_a_max = max(hull_a_max, verts_a->at(i));
@@ -187,7 +187,7 @@ point_t simplex::center_of_impact(const simplex &s, const point_t &noc) const
     s._po.get_orientation().rotate(&verts_b->front());
     point_t hull_b_max(verts_b->front());
     point_t hull_b_min(verts_b->front());
-    for (unsigned int i = 1; i < verts_b->size(); i++)
+    for (unsigned int i = 1; i < verts_b->size(); ++i)
     {
         s._po.get_orientation().rotate(&verts_b->at(i));
         hull_b_max = max(hull_b_max, verts_b->at(i));
@@ -205,8 +205,8 @@ point_t simplex::center_of_impact(const simplex &s, const point_t &noc) const
     const point_t hull_min(max(hull_a_min, hull_b_min));
 
     /* Average accross verts */
-    BOOST_LOG_TRIVIAL(trace) << "Point off collision: " << ((hull_min + hull_max) * 0.5);
-    return ((hull_min + hull_max) * 0.5);
+    BOOST_LOG_TRIVIAL(trace) << "Point off collision: " << ((hull_min + hull_max) * 0.5f);
+    return ((hull_min + hull_max) * 0.5f);
 }
 
 
@@ -215,11 +215,11 @@ int simplex::get_unique_points(point_t *const points) const
     /* The are only 4 verts (and the last should alway be a duplicate) */
     /* So accept O(n^2) complexity */
     int size = 0;
-    for (unsigned int i = _size - 1; i < _size; i--)
+    for (unsigned int i = _size - 1; i < _size; --i)
     {
         /* Check if the vert is unique */
         bool unique = true;
-        for (unsigned int j = i - 1; j < _size; j--)
+        for (unsigned int j = i - 1; j < _size; --j)
         {
             unique &= ((_verts_rd[i] & 0x7fffffff) != (_verts_rd[j] & 0x7fffffff));
         }
@@ -249,7 +249,7 @@ std::vector<point_t>* simplex::get_points_in_contact_plane(const point_t &noc) c
         /* Check for vert is a */
         const point_t vert  = _po.get_vertex_group()->get_vertex(i);
         const point_t diff  = vert - a;
-        if (fabs(dot_product(diff, noc_l)) < (5.0 * raptor_physics::EPSILON))/* This test needs a little extra head room after moving the vert to global co-ordinates */
+        if (fabs(dot_product(diff, noc_l)) < (5.0f * raptor_physics::EPSILON))/* This test needs a little extra head room after moving the vert to global co-ordinates */
         {
             verts->push_back(vert);
         }

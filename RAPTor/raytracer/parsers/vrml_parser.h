@@ -6,12 +6,12 @@ namespace raptor_raytracer
 class camera;
 
 void vrml_parser(
-    ifstream            &vrml_file,
-    light_list          &l, 
-    primitive_list      &e,
-    list<material *>    &m,
-    camera              *c,
-    const string        &v);
+    std::ifstream           &vrml_file,
+    light_list              &l, 
+    primitive_list          &e,
+    std::list<material *>   &m,
+    camera                  *c,
+    const std::string       &v);
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __VRML_PARSER_H__ */

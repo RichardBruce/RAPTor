@@ -26,9 +26,10 @@
 
 
 using boost::uuids::uuid;
-using namespace raptor_networking;
-
-
+namespace raptor_networking
+{
+namespace test
+{
 /* Test data */
 struct stack_controller_fixture : public stack_component_fixture<mock_stack_component>
 {
@@ -261,3 +262,5 @@ BOOST_AUTO_TEST_CASE( stack_controller_post_test )
 
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_networking */

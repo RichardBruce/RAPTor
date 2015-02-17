@@ -19,8 +19,10 @@
 #include "mock_stack_component.h"
 
 
-using namespace raptor_networking;
-
+namespace raptor_networking
+{
+namespace test
+{
 const std::string local_host("0.0.0.0");
 const std::string multi_cast("239.255.0.1");
 
@@ -622,3 +624,5 @@ BOOST_FIXTURE_TEST_CASE( send_multi_cast_physical_header_test, udp_multi_cast_fi
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_networking */

@@ -15,8 +15,10 @@ const raptor_physics::init_logger init_logger;
 #include "boost/test/unit_test.hpp"
 
 
-using namespace raptor_raytracer;
-
+namespace raptor_raytracer
+{
+namespace test
+{
 const float result_tolerance = 0.00001;
 
 BOOST_AUTO_TEST_SUITE( simd_tests );
@@ -1093,3 +1095,5 @@ BOOST_AUTO_TEST_CASE( transpose_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_raytracer */

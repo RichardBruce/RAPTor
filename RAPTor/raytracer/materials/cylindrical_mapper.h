@@ -19,7 +19,7 @@ namespace raptor_raytracer
 class cylindrical_mapper : public texture_mapper
 {
     public :
-        cylindrical_mapper(const char *const filename, const point_t &c, const point_t &n, const point_t &s, const fp_t r) 
+        cylindrical_mapper(const char *const filename, const point_t &c, const point_t &n, const point_t &s, const float r) 
             : texture_mapper(), c(c), u(point_t(n.y, n.z, n.x)), v(n), s(s), r(r)
             {
                 METHOD_LOG;
@@ -38,7 +38,7 @@ class cylindrical_mapper : public texture_mapper
             };
 
         cylindrical_mapper(const point_t &c, const point_t &u, const point_t &v, const point_t &s,
-            const fp_t r, fp_t *const img, const unsigned h, const unsigned w, const unsigned cpp)
+            const float r, float *const img, const unsigned h, const unsigned w, const unsigned cpp)
             : texture_mapper(), c(c), u(u), v(v), s(s), r(r), img(img), h(h), w(w), cpp(cpp) { }
 
         virtual ~cylindrical_mapper() 
@@ -47,8 +47,8 @@ class cylindrical_mapper : public texture_mapper
         };
 
         /* Texture mapping function. Takes the destination and direction 
-           of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        fp_t texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
+           of the incident ray and returns either a float (alpha, kd, ks, t, r....), a colour (rgb) or both */
+        float texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
 
     private :
         friend class boost::serialization::access;
@@ -61,11 +61,11 @@ class cylindrical_mapper : public texture_mapper
         const point_t       u;      /* U vector in the plane of the texture */
         const point_t       v;      /* V vector in the plane of the texture */
         const point_t       s;      /* Size of the texture                  */
-        const fp_t          r;      /* Radius of the cylinder               */
-        fp_t               *img;    /* Image data                           */
-        unsigned            h;      /* Image height                         */
-        unsigned            w;      /* Image width                          */
-        unsigned            cpp;    /* Componants per pixel                 */
+        const float         r;      /* Radius of the cylinder               */
+        float              *img;    /* Image data                           */
+        unsigned int        h;      /* Image height                         */
+        unsigned int        w;      /* Image width                          */
+        unsigned int        cpp;    /* Componants per pixel                 */
 };
 }; /* namespace raptor_raytracer */
 
@@ -90,9 +90,9 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::cylindrical_mapp
 {
     /* Retreive the fields */
     point_t c, u, v, s;
-    fp_t r;
-    fp_t *img;
-    unsigned h, w, cpp;
+    float r;
+    float *img;
+    unsigned int h, w, cpp;
     ar >> c;
     ar >> u;
     ar >> v;

@@ -19,8 +19,10 @@
 
 using boost::uuids::uuid;
 using boost::asio::ip::address;
-using namespace raptor_networking;
-
+namespace raptor_networking
+{
+namespace test
+{
 /* Test data */
 struct msg_header_fixture
 {
@@ -417,3 +419,5 @@ BOOST_AUTO_TEST_CASE( comparison_test )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+}; /* namespace test */
+}; /* namespace raptor_networking */

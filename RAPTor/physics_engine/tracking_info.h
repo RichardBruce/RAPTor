@@ -24,7 +24,7 @@ class tracking_info : private boost::noncopyable
         typedef typename std::map<PO*, collision_info*>::const_iterator collision_info_const_iter;
 
         /* CTOR */
-        tracking_info(PO *vg, simplex *s, const simplex &other_s, const fp_t t, const collision_t type) 
+        tracking_info(PO *vg, simplex *s, const simplex &other_s, const float t, const collision_t type) 
             : _collisions(new std::map<PO*, collision_info*>({ {vg, new collision_info(s, other_s, t, type)} })),
               _collide(vg),
               _time(t),
@@ -41,7 +41,7 @@ class tracking_info : private boost::noncopyable
         }
 
         /* Update the collision info with another object */
-        tracking_info& update(PO *vg, simplex *s, const simplex &other_s, const fp_t t, const collision_t type)
+        tracking_info& update(PO *vg, simplex *s, const simplex &other_s, const float t, const collision_t type)
         {
             /* Insert or update the collision cache */
             auto collision = _collisions->find(vg);
@@ -106,7 +106,7 @@ class tracking_info : private boost::noncopyable
 
         /* Access functions */
         collision_t get_first_collision_type()  const { return _type;       }
-        fp_t        get_first_collision_time()  const { return _time;       }
+        float       get_first_collision_time()  const { return _time;       }
         PO*         get_first_collision()       const { return _collide;    }
 
         /* Get the collision information with vg */
@@ -130,11 +130,11 @@ class tracking_info : private boost::noncopyable
         const tracking_info& find_first_collision()
         {
             _collide = nullptr;
-            _time = std::numeric_limits<fp_t>::max();
+            _time = std::numeric_limits<float>::max();
             _type = NO_COLLISION;
             for (auto& c : (*_collisions))
             {
-                fp_t obj_time = c.second->get_time();
+                float obj_time = c.second->get_time();
                 if (obj_time < _time)
                 {
                     _collide = c.first;
@@ -148,7 +148,7 @@ class tracking_info : private boost::noncopyable
 
         std::map<PO*, collision_info*> *    _collisions;    /* A cache of all collision with this object    */
         PO                             *    _collide;       /* The first thing to be hit                    */
-        fp_t                                _time;          /* The time of the first collision              */
+        float                               _time;          /* The time of the first collision              */
         collision_t                         _type;          /* The type of collision                        */
 };
 }; /* namespace raptor_physics */

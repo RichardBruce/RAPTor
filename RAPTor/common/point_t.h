@@ -13,12 +13,14 @@
 class point_t
 {
     public :
-        fp_t x,y,z;
-        point_t(const fp_t x = 0.0, const fp_t y = 0.0, const fp_t z = 0.0) : x(x), y(y), z(z) { };
+        float x;
+        float y;
+        float z;
+        point_t(const float x = 0.0, const float y = 0.0, const float z = 0.0) : x(x), y(y), z(z) { };
         
         /* Element access */
-        inline       fp_t &     operator[](const int i)                 {       fp_t* a[3] = { &this->x, &this->y, &this->z }; return *(a[i]);      }
-        inline const fp_t &     operator[](const int i) const           { const fp_t* a[3] = { &this->x, &this->y, &this->z }; return *(a[i]);      }
+        inline       float &     operator[](const int i)                 {       float* a = &this->x; return a[i];                                  }
+        inline const float &     operator[](const int i) const           { const float* a = &this->x; return a[i];                                  }
 
         /* Unary operators */
         inline const point_t    operator-()   const                     { return point_t(-this->x, -this->y, -this->z);                             }
@@ -34,14 +36,14 @@ class point_t
         inline const point_t&   operator*=(const point_t &rhs)          { this->x *= rhs.x; this->y *= rhs.y; this->z *= rhs.z; return *this;       }
         inline const point_t&   operator/=(const point_t &rhs)          { this->x /= rhs.x; this->y /= rhs.y; this->z /= rhs.z; return *this;       }
 
-        /* With fp_t */
-        inline const bool       operator==(const fp_t rhs)              { return ((this->x == rhs) && (this->y == rhs) && (this->z == rhs));        }
-        inline const bool       operator!=(const fp_t rhs)              { return ((this->x != rhs) || (this->y != rhs) || (this->z != rhs));        }
+        /* With float */
+        inline const bool       operator==(const float rhs)              { return ((this->x == rhs) && (this->y == rhs) && (this->z == rhs));        }
+        inline const bool       operator!=(const float rhs)              { return ((this->x != rhs) || (this->y != rhs) || (this->z != rhs));        }
 
-        inline const point_t&   operator+=(const fp_t rhs)              { this->x += rhs;   this->y += rhs;   this->z += rhs;   return *this;       }
-        inline const point_t&   operator-=(const fp_t rhs)              { this->x -= rhs;   this->y -= rhs;   this->z -= rhs;   return *this;       }
-        inline const point_t&   operator*=(const fp_t rhs)              { this->x *= rhs;   this->y *= rhs;   this->z *= rhs;   return *this;       }
-        inline const point_t&   operator/=(const fp_t rhs)              { this->x /= rhs;   this->y /= rhs;   this->z /= rhs;   return *this;       }
+        inline const point_t&   operator+=(const float rhs)              { this->x += rhs;   this->y += rhs;   this->z += rhs;   return *this;       }
+        inline const point_t&   operator-=(const float rhs)              { this->x -= rhs;   this->y -= rhs;   this->z -= rhs;   return *this;       }
+        inline const point_t&   operator*=(const float rhs)              { this->x *= rhs;   this->y *= rhs;   this->z *= rhs;   return *this;       }
+        inline const point_t&   operator/=(const float rhs)              { this->x /= rhs;   this->y /= rhs;   this->z /= rhs;   return *this;       }
 
     private :
         friend class boost::serialization::access;
@@ -56,28 +58,28 @@ class point_t
 };
 
 /* Degugging */
-inline ostream& operator<<(ostream &os, const point_t &p)
+inline std::ostream& operator<<(std::ostream &os, const point_t &p)
 {
     return os << p.x << ", " << p.y << ", " << p.z;
 }
 
 /* Binary operators */
-inline const point_t operator+(const point_t &lhs, const fp_t rhs)
+inline const point_t operator+(const point_t &lhs, const float rhs)
 {
    return point_t(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs);
 }
 
-inline const point_t operator-(const point_t &lhs, const fp_t rhs)
+inline const point_t operator-(const point_t &lhs, const float rhs)
 {
    return point_t(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs);
 }
 
-inline const point_t operator*(const point_t &lhs, const fp_t rhs)
+inline const point_t operator*(const point_t &lhs, const float rhs)
 {
    return point_t(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs);
 }
 
-inline const point_t operator/(const point_t &lhs, const fp_t rhs)
+inline const point_t operator/(const point_t &lhs, const float rhs)
 {
    return point_t(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs);
 }
@@ -102,22 +104,22 @@ inline const point_t operator/(const point_t &lhs, const point_t &rhs)
    return point_t(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z);
 }
 
-inline const point_t operator+(const fp_t lhs, const point_t &rhs)
+inline const point_t operator+(const float lhs, const point_t &rhs)
 {
    return point_t(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z);
 }
 
-inline const point_t operator-(const fp_t lhs, const point_t &rhs)
+inline const point_t operator-(const float lhs, const point_t &rhs)
 {
    return point_t(lhs - rhs.x, lhs - rhs.y, lhs - rhs.z);
 }
 
-inline const point_t operator*(const fp_t lhs, const point_t &rhs)
+inline const point_t operator*(const float lhs, const point_t &rhs)
 {
    return point_t(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z);
 }
 
-inline const point_t operator/(const fp_t lhs, const point_t &rhs)
+inline const point_t operator/(const float lhs, const point_t &rhs)
 {
    return point_t(lhs / rhs.x, lhs / rhs.y, lhs / rhs.z);
 }
@@ -130,9 +132,9 @@ typedef point_t vector_t;
 inline point_t max(const point_t& a, const point_t &b)
 {
     point_t ret;
-    ret.x = max(a.x, b.x);
-    ret.y = max(a.y, b.y);
-    ret.z = max(a.z, b.z);
+    ret.x = std::max(a.x, b.x);
+    ret.y = std::max(a.y, b.y);
+    ret.z = std::max(a.z, b.z);
     
     return ret;
 }
@@ -141,31 +143,31 @@ inline point_t max(const point_t& a, const point_t &b)
 inline point_t min(const point_t& a, const point_t &b)
 {
     point_t ret;
-    ret.x = min(a.x, b.x);
-    ret.y = min(a.y, b.y);
-    ret.z = min(a.z, b.z);
+    ret.x = std::min(a.x, b.x);
+    ret.y = std::min(a.y, b.y);
+    ret.z = std::min(a.z, b.z);
     
     return ret;
 }
 
 
-inline point_t max(const point_t& a, const fp_t b)
+inline point_t max(const point_t& a, const float b)
 {
     point_t ret;
-    ret.x = max(a.x, b);
-    ret.y = max(a.y, b);
-    ret.z = max(a.z, b);
+    ret.x = std::max(a.x, b);
+    ret.y = std::max(a.y, b);
+    ret.z = std::max(a.z, b);
     
     return ret;
 }
 
 
-inline point_t min(const point_t& a, const fp_t b)
+inline point_t min(const point_t& a, const float b)
 {
     point_t ret;
-    ret.x = min(a.x, b);
-    ret.y = min(a.y, b);
-    ret.z = min(a.z, b);
+    ret.x = std::min(a.x, b);
+    ret.y = std::min(a.y, b);
+    ret.z = std::min(a.z, b);
     
     return ret;
 }
@@ -215,10 +217,10 @@ inline point_t min_magn(const point_t& a, const point_t &b)
 }
 
 
-inline point_t max_magn(const point_t& a, const fp_t b)
+inline point_t max_magn(const point_t& a, const float b)
 {
     point_t ret(a);
-    const fp_t abs_b = fabs(b);
+    const float abs_b = fabs(b);
     if (abs_b > fabs(a.x))
     {
         ret.x = abs_b;
@@ -238,10 +240,10 @@ inline point_t max_magn(const point_t& a, const fp_t b)
 }
 
 
-inline point_t min_magn(const point_t& a, const fp_t b)
+inline point_t min_magn(const point_t& a, const float b)
 {
     point_t ret(a);
-    const fp_t abs_b = fabs(b);
+    const float abs_b = fabs(b);
     if (abs_b < fabs(a.x))
     {
         ret.x = abs_b;
@@ -267,7 +269,7 @@ inline point_t fabs(const point_t &a)
 }
 
 
-inline point_t floor_to_zero(point_t a, const fp_t f)
+inline point_t floor_to_zero(point_t a, const float f)
 {
     if (fabs(a.x) < f)
     {
@@ -294,7 +296,7 @@ inline point_t floor_to_zero(point_t a, const fp_t f)
  a is the vector to find the magnitude of and its 
  magnitude is returned.
 *****************************************************/
-inline fp_t magnitude(const point_t &a)
+inline float magnitude(const point_t &a)
 {
     return sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
 }
@@ -307,14 +309,14 @@ inline fp_t magnitude(const point_t &a)
  to rotate about. theta is the angle to rotate by.
  The rotated point is returned through a.
 *****************************************************/
-inline void rotate_about_origin(point_t *const a, const point_t *const r, const fp_t theta)
+inline void rotate_about_origin(point_t *const a, const point_t *const r, const float theta)
 {
     /* Rotate the origin into the new coordinate system */
     point_t p = *a;
     point_t q(0.0,0.0,0.0);
    
-    const fp_t costheta = cos(theta);
-    const fp_t sintheta = sin(theta);
+    const float costheta = cos(theta);
+    const float sintheta = sin(theta);
     
     /* Rotate about r */
     q.x += (costheta + (1 - costheta) * r->x * r->x) * p.x;
@@ -340,13 +342,13 @@ inline void rotate_about_origin(point_t *const a, const point_t *const r, const 
  a is the point to be rotated. theta is the angle to 
  rotate by. The rotated point is returned through a.
 *****************************************************/
-inline void rotate_about_x_axis(point_t *const a, const fp_t theta)
+inline void rotate_about_x_axis(point_t *const a, const float theta)
 {
     const point_t p = *a;
     point_t q(p.x,0.0,0.0);
    
-    const fp_t costheta = cos(theta);
-    const fp_t sintheta = sin(theta);
+    const float costheta = cos(theta);
+    const float sintheta = sin(theta);
     
     q.y += costheta * p.y;
     q.y -= sintheta * p.z;
@@ -365,13 +367,13 @@ inline void rotate_about_x_axis(point_t *const a, const fp_t theta)
  a is the point to be rotated. theta is the angle to 
  rotate by. The rotated point is returned through a.
 *****************************************************/
-inline void rotate_about_y_axis(point_t *const a, const fp_t theta)
+inline void rotate_about_y_axis(point_t *const a, const float theta)
 {
     const point_t p = *a;
     point_t q(0.0,p.y,0.0);
    
-    const fp_t costheta = cos(theta);
-    const fp_t sintheta = sin(theta);
+    const float costheta = cos(theta);
+    const float sintheta = sin(theta);
     
     /* Rotate about y */
     q.x += costheta * p.x;
@@ -391,13 +393,13 @@ inline void rotate_about_y_axis(point_t *const a, const fp_t theta)
  a is the point to be rotated. theta is the angle to 
  rotate by. The rotated point is returned through a.
 *****************************************************/
-inline void rotate_about_z_axis(point_t *const a, const fp_t theta)
+inline void rotate_about_z_axis(point_t *const a, const float theta)
 {
     const point_t p = *a;
     point_t q(0.0,0.0,p.z);
    
-    const fp_t costheta = cos(theta);
-    const fp_t sintheta = sin(theta);
+    const float costheta = cos(theta);
+    const float sintheta = sin(theta);
     
     /* Rotate about z */
 
@@ -453,7 +455,7 @@ inline point_t cross_product(const point_t &a, const point_t &b)
  
  return a . b.
 *****************************************************/
-inline fp_t dot_product(const point_t &a, const point_t &b)
+inline float dot_product(const point_t &a, const point_t &b)
 {
     return ((a.x * b.x) + (a.y * b.y)+ (a.z * b.z));
 }
@@ -466,7 +468,7 @@ inline fp_t dot_product(const point_t &a, const point_t &b)
 *****************************************************/
 inline void normalise(point_t *const a)
 {
-    const fp_t dist = sqrt((a->x * a->x) + (a->y * a->y) + (a->z * a->z));
+    const float dist = sqrt((a->x * a->x) + (a->y * a->y) + (a->z * a->z));
     a->x /= dist;
     a->y /= dist;
     a->z /= dist;
@@ -476,7 +478,7 @@ inline void normalise(point_t *const a)
 
 inline point_t normalise(point_t a)
 {
-    const fp_t dist = sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
+    const float dist = sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
     a.x /= dist;
     a.y /= dist;
     a.z /= dist;
