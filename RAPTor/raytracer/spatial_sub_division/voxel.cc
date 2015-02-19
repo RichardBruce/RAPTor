@@ -40,47 +40,32 @@ voxel voxel::divide(kdt_node *const k)
 #if 0   /* Split approximately in all axis */
         best_split = this->approximate_split_all_axis(&lowest_cost, &normal);
 #else   /* Split approximately in the first lower cost axis */
-        normal = this->n;
-        best_split = approximate_split_one_axis(&lowest_cost, normal);
-        if (lowest_cost >= cost_before)
+        const float dx = t.x - b.x;
+        const float dy = t.y - b.y;
+        const float dz = t.z - b.z;
+        if (dx > dy)
         {
-            switch (normal)
+            if (dx > dz)
             {
-                case axis_t::x_axis:
-                    normal  = axis_t::y_axis;
-                    break;
-                case axis_t::y_axis:
-                    normal  = axis_t::z_axis;
-                    break;
-                case axis_t::z_axis:
-                    normal  = axis_t::x_axis;
-                    break;
-                default:
-                    assert(false);
-                    break;
-        }
-        best_split = approximate_split_one_axis(&lowest_cost, this->n);
-            
-            if (lowest_cost >= cost_before)
+                normal = axis_t::x_axis;
+            }
+            else
             {
-                switch (normal)
-                {
-                    case axis_t::x_axis:
-                        normal  = axis_t::y_axis;
-                        break;
-                    case axis_t::y_axis:
-                        normal  = axis_t::z_axis;
-                        break;
-                    case axis_t::z_axis:
-                        normal  = axis_t::x_axis;
-                        break;
-                    default:
-                        assert(false);
-                        break;
-                }
-                best_split = approximate_split_one_axis(&lowest_cost, this->n);
+                normal = axis_t::z_axis;
             }
         }
+        else
+        {
+            if (dy > dz)
+            {
+                normal = axis_t::y_axis;
+            }
+            else
+            {
+                normal = axis_t::z_axis;
+            }
+        }
+        best_split = approximate_split_one_axis(&lowest_cost, normal);
 #endif
     }
 #else   /* Exact builder */
