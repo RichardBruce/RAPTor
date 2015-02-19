@@ -6,6 +6,7 @@
 #include "boost/archive/xml_oarchive.hpp"
 
 /* Common headers */
+#include "simd.h"
 #include "common.h"
 
 
@@ -468,20 +469,20 @@ inline float dot_product(const point_t &a, const point_t &b)
 *****************************************************/
 inline void normalise(point_t *const a)
 {
-    const float dist = sqrt((a->x * a->x) + (a->y * a->y) + (a->z * a->z));
-    a->x /= dist;
-    a->y /= dist;
-    a->z /= dist;
+    const float dist = inverse_sqrt((a->x * a->x) + (a->y * a->y) + (a->z * a->z));
+    a->x *= dist;
+    a->y *= dist;
+    a->z *= dist;
     return;
 }
 
 
 inline point_t normalise(point_t a)
 {
-    const float dist = sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
-    a.x /= dist;
-    a.y /= dist;
-    a.z /= dist;
+    const float dist = inverse_sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
+    a.x *= dist;
+    a.y *= dist;
+    a.z *= dist;
     return a;
 }
 
