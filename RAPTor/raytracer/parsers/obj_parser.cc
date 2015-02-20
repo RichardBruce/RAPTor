@@ -149,11 +149,13 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
             b -= c;
             normalise(&a);
             normalise(&b);
+            cross_product(a, b, &c);
+            // BOOST_LOG_TRIVIAL(trace) << a << " - " << b;
         
-            c  = a - b;
-            a += b;
+            // c  = a - b;
+            // a += b;
     
-            if ((c != 0) && (a != 0))
+            if (dot_product(c, c) > 0.0f)
             {
                 if (face_n.empty())
                 {
