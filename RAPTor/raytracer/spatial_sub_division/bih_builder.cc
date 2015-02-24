@@ -45,8 +45,7 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     else
     {
         _next_block = 1;
-        _min_bounds.reset(new point_t [_primitives->size()]);
-        _max_bounds.reset(new point_t [_primitives->size()]);
+        _bounds.reset(new bih_voxel_data [_primitives->size()]);
 
         /* For small data sets run the primitive builder */
         /* This needs tuning to each machine. On intel i7 laptop this should be ~750,000, but on amd llano the binned algorithm shouldnt be used */
@@ -55,8 +54,8 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
             /* Cache primitive min and max */
             for (unsigned int i = 0; i < _primitives->size(); ++i)
             {
-                _min_bounds[i] = (*_primitives)[i]->lowest_point();
-                _max_bounds[i] = (*_primitives)[i]->highest_point();
+                _bounds[i].low  = (*_primitives)[i]->lowest_point();
+                _bounds[i].high = (*_primitives)[i]->highest_point();
             }
     
             divide_bih_block(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, _primitives->size() - 1);
@@ -270,8 +269,8 @@ void bih_builder::convert_to_primitve_builder(const int b, const int e)
     for (int i = b; i < e; ++i)
     {
         (*_primitives)[i] = _prim_buffer[i];
-        _min_bounds[i] = _prim_buffer[i]->lowest_point();
-        _max_bounds[i] = _prim_buffer[i]->highest_point();
+        _bounds[i].low  = _prim_buffer[i]->lowest_point();
+        _bounds[i].high = _prim_buffer[i]->highest_point();
     }
 }
 
@@ -289,8 +288,8 @@ void bih_builder::convert_to_primitve_builder(triangle **const active_prims, con
     /* Cache bounds */
     for (int i = b; i < e; ++i)
     {
-        _min_bounds[i] = (*_primitives)[i]->lowest_point();
-        _max_bounds[i] = (*_primitives)[i]->highest_point();
+        _bounds[i].low  = (*_primitives)[i]->lowest_point();
+        _bounds[i].high = (*_primitives)[i]->highest_point();
     }
 }
 
@@ -1062,37 +1061,36 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             const float dbl_split = 2.0f * split_pnt;
             while (bottom < top)
             {
-                while (dbl_split < (_max_bounds[top].x + _min_bounds[top].x) && bottom < top)
+                while (dbl_split < (_bounds[top].high.x + _bounds[top].low.x) && bottom < top)
                 {
-                    min_right = std::min(min_right, _min_bounds[top--].x);
+                    min_right = std::min(min_right, _bounds[top--].low.x);
                 }
                 
-                while (dbl_split >= (_max_bounds[bottom].x + _min_bounds[bottom].x) && bottom < top)
+                while (dbl_split >= (_bounds[bottom].high.x + _bounds[bottom].low.x) && bottom < top)
                 {
-                    max_left = std::max(max_left, _max_bounds[bottom++].x);
+                    max_left = std::max(max_left, _bounds[bottom++].high.x);
                 }
 
                 if (bottom < top)
                 {
                     std::swap((*_primitives)[bottom], (*_primitives)[top]);
-                    std::swap(_min_bounds[bottom], _min_bounds[top]);
-                    std::swap(_max_bounds[bottom], _max_bounds[top]);
+                    std::swap(_bounds[bottom], _bounds[top]);
                     
-                    max_left = std::max(max_left, _max_bounds[bottom++].x);
-                    min_right = std::min(min_right, _min_bounds[top--].x);
+                    max_left = std::max(max_left, _bounds[bottom++].high.x);
+                    min_right = std::min(min_right, _bounds[top--].low.x);
                 }
             }
 
             /* Parition the last primitive */
             if (bottom == top)
             {
-                if (dbl_split >= (_max_bounds[bottom].x + _min_bounds[bottom].x))
+                if (dbl_split >= (_bounds[bottom].high.x + _bounds[bottom].low.x))
                 {
-                    max_left = std::max(max_left, _max_bounds[bottom++].x);
+                    max_left = std::max(max_left, _bounds[bottom++].high.x);
                 }
                 else
                 {
-                    min_right = std::min(min_right, _min_bounds[top].x);
+                    min_right = std::min(min_right, _bounds[top].low.x);
                 }
             }
 
@@ -1143,37 +1141,36 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             const float dbl_split = 2.0f * split_pnt;
             while (bottom < top)
             {
-                while (dbl_split < (_max_bounds[top].y + _min_bounds[top].y) && bottom < top)
+                while (dbl_split < (_bounds[top].high.y + _bounds[top].low.y) && bottom < top)
                 {
-                    min_right = std::min(min_right, _min_bounds[top--].y);
+                    min_right = std::min(min_right, _bounds[top--].low.y);
                 }
                 
-                while (dbl_split >= (_max_bounds[bottom].y + _min_bounds[bottom].y) && bottom < top)
+                while (dbl_split >= (_bounds[bottom].high.y + _bounds[bottom].low.y) && bottom < top)
                 {
-                    max_left = std::max(max_left, _max_bounds[bottom++].y);
+                    max_left = std::max(max_left, _bounds[bottom++].high.y);
                 }
 
                 if (bottom < top)
                 {
                     std::swap((*_primitives)[bottom], (*_primitives)[top]);
-                    std::swap(_min_bounds[bottom], _min_bounds[top]);
-                    std::swap(_max_bounds[bottom], _max_bounds[top]);
+                    std::swap(_bounds[bottom], _bounds[top]);
                     
-                    max_left = std::max(max_left, _max_bounds[bottom++].y);
-                    min_right = std::min(min_right, _min_bounds[top--].y);
+                    max_left = std::max(max_left, _bounds[bottom++].high.y);
+                    min_right = std::min(min_right, _bounds[top--].low.y);
                 }
-            }             
+            }
 
             /* Parition the last primitive */
             if (bottom == top)
             {
-                if (dbl_split >= (_max_bounds[bottom].y + _min_bounds[bottom].y))
+                if (dbl_split >= (_bounds[bottom].high.y + _bounds[bottom].low.y))
                 {
-                    max_left = std::max(max_left, _max_bounds[bottom++].y);
+                    max_left = std::max(max_left, _bounds[bottom++].high.y);
                 }
                 else
                 {
-                    min_right = std::min(min_right, _min_bounds[top].y);
+                    min_right = std::min(min_right, _bounds[top].low.y);
                 }
             }
 
@@ -1224,37 +1221,36 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
             const float dbl_split = 2.0f * split_pnt;
             while (bottom < top)
             {
-                while (dbl_split < (_max_bounds[top].z + _min_bounds[top].z) && bottom < top)
+                while (dbl_split < (_bounds[top].high.z + _bounds[top].low.z) && bottom < top)
                 {
-                    min_right = std::min(min_right, _min_bounds[top--].z);
+                    min_right = std::min(min_right, _bounds[top--].low.z);
                 }
                 
-                while (dbl_split >= (_max_bounds[bottom].z + _min_bounds[bottom].z) && bottom < top)
+                while (dbl_split >= (_bounds[bottom].high.z + _bounds[bottom].low.z) && bottom < top)
                 {
-                    max_left = std::max(max_left, _max_bounds[bottom++].z);
+                    max_left = std::max(max_left, _bounds[bottom++].high.z);
                 }
 
                 if (bottom < top)
                 {
                     std::swap((*_primitives)[bottom], (*_primitives)[top]);
-                    std::swap(_min_bounds[bottom], _min_bounds[top]);
-                    std::swap(_max_bounds[bottom], _max_bounds[top]);
+                    std::swap(_bounds[bottom], _bounds[top]);
                     
-                    max_left = std::max(max_left, _max_bounds[bottom++].z);
-                    min_right = std::min(min_right, _min_bounds[top--].z);
+                    max_left = std::max(max_left, _bounds[bottom++].high.z);
+                    min_right = std::min(min_right, _bounds[top--].low.z);
                 }
-            }             
+            }
 
             /* Parition the last primitive */
             if (bottom == top)
             {
-                if (dbl_split >= (_max_bounds[bottom].z + _min_bounds[bottom].z))
+                if (dbl_split >= (_bounds[bottom].high.z + _bounds[bottom].low.z))
                 {
-                    max_left = std::max(max_left, _max_bounds[bottom++].z);
+                    max_left = std::max(max_left, _bounds[bottom++].high.z);
                 }
                 else
                 {
-                    min_right = std::min(min_right, _min_bounds[top].z);
+                    min_right = std::min(min_right, _bounds[top].low.z);
                 }
             }
 

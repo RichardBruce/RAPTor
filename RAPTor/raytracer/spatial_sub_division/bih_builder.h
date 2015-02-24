@@ -14,6 +14,12 @@
 
 namespace raptor_raytracer
 {
+struct bih_voxel_data
+{
+    point_t low;
+    point_t high;
+};
+
 class bih_builder
 {
     public :
@@ -55,18 +61,17 @@ class bih_builder
         void divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int depth = 0, const int node_idx = 0);
         void divide_bih_node(block_splitting_data *const split_data, const int in_idx, const int out_idx, const int block_idx, const int node_idx);
 
-        primitive_list *                _primitives;
-        std::unique_ptr<triangle * []>  _prim_buffer;
-        std::unique_ptr<int []>         _morton_codes;
-        std::unique_ptr<int []>         _code_buffer;
-        std::vector<bih_block> *        _blocks;
-        std::unique_ptr<point_t []>     _max_bounds;
-        std::unique_ptr<point_t []>     _min_bounds;
-        float                           _width;
-        float                           _width_epsilon;
-        float                           _width_inv;
-        const int                       _max_node_size;
-        std::atomic<int>                _next_block;
+        primitive_list *                    _primitives;
+        std::unique_ptr<triangle * []>      _prim_buffer;
+        std::unique_ptr<int []>             _morton_codes;
+        std::unique_ptr<int []>             _code_buffer;
+        std::vector<bih_block> *            _blocks;
+        std::unique_ptr<bih_voxel_data []>  _bounds;
+        float                               _width;
+        float                               _width_epsilon;
+        float                               _width_inv;
+        const int                           _max_node_size;
+        std::atomic<int>                    _next_block;
 };
 }; /* namespace raptor_raytracer */
 
