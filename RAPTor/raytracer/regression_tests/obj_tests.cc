@@ -29,9 +29,8 @@ BOOST_AUTO_TEST_CASE( obj_isd_imperator_0_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(500000.0, 200000.0, -700000.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
-    /* Builder throws assert */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
     fixture.render<bih>();
@@ -48,9 +47,8 @@ BOOST_AUTO_TEST_CASE( obj_isd_imperator_1_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-500000.0, -500000.0, 700000.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
-    /* Builder throws assert */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
     fixture.render<bih>();
@@ -67,9 +65,8 @@ BOOST_AUTO_TEST_CASE( obj_isd_imperator_2_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 400000.0, -1000000.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
-    /* Builder throws assert */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
     
     /* Ray trace the scene using bih */
     fixture.render<bih>();
