@@ -22,7 +22,7 @@ void divide_kdt_node(voxel *const base, kdt_node *const kdt_subdiv)
     assert(depth < MAX_KDT_STACK_HEIGHT);
     
     /* Divide the node */
-    voxel right_divide = base->divide(kdt_subdiv);
+    voxel right_divide = base->divide(kdt_subdiv, depth);
     
     /* Check if a leaf node was create */
     if (kdt_subdiv->get_normal() != axis_t::not_set)

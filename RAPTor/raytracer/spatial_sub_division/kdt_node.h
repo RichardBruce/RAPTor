@@ -12,17 +12,24 @@ namespace raptor_raytracer
 class kdt_node
 {
     public :
-        kdt_node(float s = 0.0f, axis_t n = axis_t::not_set) : c(NULL), split_pos(s), normal(n) { };
+        kdt_node(float s = 0.0f, axis_t n = axis_t::not_set) : c(nullptr), split_pos(s), normal(n) { };
         ~kdt_node() 
         {
             /* Clean up dynamic memory usage */
-            if (this->normal != axis_t::not_set)
-            {
-                delete [] this->c;
-            }
-            else
+            if (this->normal == axis_t::not_set)
             {
                 delete this->p;
+            }
+        }
+
+        kdt_node(kdt_node &&k)
+        : split_pos(k.split_pos), normal(k.normal)
+        {
+            if (this->normal == axis_t::not_set)
+            {
+                p = k.p;
+                k.p = nullptr;
+                k.normal = axis_t::x_axis;
             }
         }
         
@@ -36,17 +43,17 @@ class kdt_node
         bool            is_empty()                const     { return this->p->empty();  }
         
         void            set_primitives(primitive_list *p)   { this->p = p;              }
-        kdt_node &      split_node(const float s, const axis_t n) 
+        kdt_node &      split_node(kdt_node *const k, const float s, const axis_t n) 
         {
             this->normal    = n;
             this->split_pos = s;
-            this->c         = new kdt_node[2];
+            this->c         = k;
             return *this;
         } 
         
         /* test_leaf_node_nearest tests this object if is a leaf node and returns a pointer 
            to the nearest object found. The distance to this object is returned in m. If no 
-           object is found NULL is returned */
+           object is found nullptr is returned */
         triangle * test_leaf_node_nearest(const ray *const r, hit_description *const h, const float min) const;
         
         /* test_leaf_node_nearer tests this object if it is a leaf node to find an object

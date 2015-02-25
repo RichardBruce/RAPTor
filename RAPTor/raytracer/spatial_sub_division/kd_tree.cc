@@ -75,7 +75,7 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
     kdt_stack_element entry_point;
     entry_point.vt_max  = vfp_t(MAX_DIST);
     entry_point.vt_min  = vfp_zero;
-    entry_point.n       = &_kdt_base;
+    entry_point.n       = &(*_kdt_base)[0];
     entry_point.m       = vfp_true;
 
     /* Take the inverse direction of the ray for faster traversal */
@@ -183,7 +183,7 @@ vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t) co
     kdt_stack_element entry_point;
     entry_point.vt_max  = t;
     entry_point.vt_min  = vfp_zero;
-    entry_point.n       = &_kdt_base;
+    entry_point.n       = &(*_kdt_base)[0];
     entry_point.m       = vfp_true;
 
     /* Traverse the whole tree */
@@ -487,7 +487,7 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
     exit_point->t_min   = 0.0f;
 
     kdt_stack_element  entry_point;
-    entry_point.n      = &_kdt_base;
+    entry_point.n      = &(*_kdt_base)[0];
     entry_point.t_max  = MAX_DIST;
     entry_point.t_min  = 0.0f;
     entry_point.s      = nullptr;
@@ -694,7 +694,7 @@ void kd_tree::frustrum_found_nearer_object(const packet_ray *const r, const vfp_
     exit_point->t_min   = 0.0f;
 
     kdt_stack_element entry_point;
-    entry_point.n       = &_kdt_base;
+    entry_point.n       = &(*_kdt_base)[0];
     entry_point.t_max   = max_d;
     entry_point.t_min   = 0.0f;
     entry_point.s       = nullptr;
@@ -1031,7 +1031,7 @@ triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *cons
 //    if (!GetMinMaxT(&bbox, r, &tmin, &tmax))
 //      return nullptr; /* no object can be intersected */
 
-    const kdt_node *current_node = &_kdt_base; /* start from the root node */
+    const kdt_node *current_node = &(*_kdt_base)[0]; /* start from the root node */
 
     /* exit point setting */
     kdt_stack_element *exit_point = &(_kdt_stack[1]);
@@ -1119,7 +1119,7 @@ triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *cons
 bool kd_tree::found_nearer_object(const ray *const r, const float t) const
 {
     /* Signed distances */
-    const kdt_node *current_node = &_kdt_base; /* Start from the root node */
+    const kdt_node *current_node = &(*_kdt_base)[0]; /* Start from the root node */
 
     /* exit point setting */
     kdt_stack_element *exit_point = &(_kdt_stack[1]);

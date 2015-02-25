@@ -86,32 +86,26 @@ namespace raptor_raytracer
 /* Define the size of the kd tree trace stack */
 /* A kd tree may not grow to be bigger than this */
 #ifndef MAX_KDT_STACK_HEIGHT
-#define MAX_KDT_STACK_HEIGHT 100
+#define MAX_KDT_STACK_HEIGHT 25
 #endif
 
 #ifdef SIMD_PACKET_TRACING
 #ifndef MIN_KDT_NODE_SIZE
-#define MIN_KDT_NODE_SIZE 20
+#define MIN_KDT_NODE_SIZE 50
 #endif /* #ifndef MIN_KDT_NODE_SIZE */
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
-#ifdef SIMD_PACKET_TRACING
 #ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE
 #define MIN_APPROX_KDT_BUILDER_NODE_SIZE 36
-#endif /* #ifndef MIN_KDT_NODE_SIZE */
-#else
-#ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE
-#define MIN_APPROX_KDT_BUILDER_NODE_SIZE 256
-#endif /* #ifndef MIN_KDT_NODE_SIZE */
-#endif /* #ifdef SIMD_PACKET_TRACING */
+#endif /* #ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE */
 
 /* Define the kd tree completion criteria */
 #ifndef COST_OF_TRAVERSAL
-#define COST_OF_TRAVERSAL 1.0
+#define COST_OF_TRAVERSAL 50.0
 #endif
 
 #ifndef COST_OF_INTERSECTION
-#define COST_OF_INTERSECTION (80.0*COST_OF_TRAVERSAL)
+#define COST_OF_INTERSECTION 1.0
 #endif
 
 #ifndef SECANT_ITERATIONS
