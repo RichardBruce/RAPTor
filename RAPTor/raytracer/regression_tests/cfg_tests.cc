@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_CASE( cfg_mgftree_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(5.0, -25.0, 5.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
     fixture.render<bih>();
@@ -121,9 +121,8 @@ BOOST_AUTO_TEST_CASE( cfg_unc_powerplant_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100000.0, 500000.0, 500000.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
-    /* TODO -- Turn on, assert fails in contruction, /voxel.cc:112: `best_split < this->t.x' failed. */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
     fixture.render<bih>();
@@ -141,9 +140,8 @@ BOOST_AUTO_TEST_CASE( cfg_unc_powerplant_2_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-100000.0, 50000.0, 500000.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
-    /* TODO -- Turn on, assert fails in contruction, /voxel.cc:112: `best_split < this->t.x' failed. */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
     fixture.render<bih>();
