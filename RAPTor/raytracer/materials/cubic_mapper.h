@@ -1,8 +1,11 @@
 #ifndef __CUBIC_MAPPER_H__
 #define __CUBIC_MAPPER_H__
 
+/* Standard headers */
+
 /* Boost headers */
 #include "boost/serialization/access.hpp"
+#include "boost/shared_array.hpp"
 
 /* Common headers */
 #include "common.h"
@@ -22,15 +25,14 @@ class ext_colour_t;
 class cubic_mapper : public texture_mapper
 {
     public :
-        cubic_mapper(const char *const filename, const point_t &c, const point_t &n, const point_t &s, 
-                      const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
-                      const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1) : 
-            texture_mapper(), c(c), n(n), u(point_t(n.y, n.z, -n.x)), s(s), uw(uw), vw(vw), u_off(u_off), v_off(v_off)
+        cubic_mapper(const boost::shared_array<float> &im, const point_t &c, const point_t &n, const point_t &s, const texture_wrapping_mode_t uw, 
+            const texture_wrapping_mode_t vw, const unsigned int cpp, const unsigned int w, const unsigned int h, const int u_off = 0, 
+            const int v_off = 0, const int u_max = -1, const int v_max = -1) : 
+            texture_mapper(), c(c), n(n), u(point_t(n.y, n.z, -n.x)), s(s), uw(uw), vw(vw), img(im), h(h), w(w), cpp(cpp), u_off(u_off), v_off(v_off)
             {
                 METHOD_LOG;
                 
-                /* Decompress the jpeg */
-                this->cpp = read_jpeg(&this->img, filename, &this->h, &this->w);   
+                /* Checks */
                 assert((this->cpp == 1) || (this->cpp == 3));
                 this->u_max = (u_max < 0) ? w : u_max;
                 this->v_max = (v_max < 0) ? h : v_max;
@@ -59,7 +61,7 @@ class cubic_mapper : public texture_mapper
                 BOOST_LOG_TRIVIAL(trace) << "Width : " << this->w;
             }
 
-        cubic_mapper(float *const im, const point_t &u, const point_t &v, const point_t &c, const point_t &n, const point_t &s, 
+        cubic_mapper(const boost::shared_array<float> &im, const point_t &u, const point_t &v, const point_t &c, const point_t &n, const point_t &s, 
             const unsigned cpp, const unsigned w, const unsigned h, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
             const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1)
             : texture_mapper(), c(c), n(n), u(u), s((u * s.x) + (v * s.y) + (n * s.z)), uw(uw), vw(vw), v(v), img(im), h(h), w(w), cpp(cpp),
@@ -71,8 +73,9 @@ class cubic_mapper : public texture_mapper
         virtual ~cubic_mapper() { };
 
         /* Texture mapping function. Takes the destination and direction 
-           of the incident ray and returns either a float (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        float texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
+           of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
+        float sample_texture(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
+        float sample_texture_monochrome(point_t *const c, const point_t &dst, const point_t &n, const point_t &vt, const int x_off, const int y_off) const;
 
     private :
         friend class boost::serialization::access;
@@ -88,7 +91,7 @@ class cubic_mapper : public texture_mapper
         const texture_wrapping_mode_t   uw;     /* U wrapping mode                      */
         const texture_wrapping_mode_t   vw;     /* V wrapping mode                      */
         point_t                         v;      /* V vector in the plane of the texture */
-        float              *            img;    /* Image data                           */
+        boost::shared_array<float>      img;    /* Image data                           */
         unsigned int                    h;      /* Image height                         */
         unsigned int                    w;      /* Image width                          */
         unsigned int                    cpp;    /* Componants per pixel                 */
@@ -104,6 +107,7 @@ namespace serialization {
 template<class Archive>
 inline void save_construct_data(Archive & ar, const raptor_raytracer::cubic_mapper *t, const unsigned int file_version)
 {
+    ar << t->falloff();
     ar << t->c;
     ar << t->n;
     ar << t->u;
@@ -125,11 +129,13 @@ template<class Archive>
 inline void load_construct_data(Archive & ar, raptor_raytracer::cubic_mapper *t, const unsigned int file_version)
 {
     /* Retreive the fields */
+    raptor_raytracer::mapper_falloff *falloff;
     point_t c, n, u, s, v;
     raptor_raytracer::texture_wrapping_mode_t uw, vw;
     float *img;
     unsigned int h, w, cpp, u_max, v_max;
     int u_off, v_off;
+    ar >> falloff;
     ar >> c;
     ar >> n;
     ar >> u;
@@ -147,7 +153,8 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::cubic_mapper *t,
     ar >> v_max;
     
     /* Use plaement new to create the class */
-    ::new(t)raptor_raytracer::cubic_mapper(img, u, v, c, n, s, cpp, w, h, uw, vw, u_off, v_off, u_max, v_max);
+    ::new(t)raptor_raytracer::cubic_mapper(boost::shared_array<float>(img), u, v, c, n, s, cpp, w, h, uw, vw, u_off, v_off, u_max, v_max);
+    t->falloff(falloff);
 }
 }; /* namespace serialization */
 }; /* namespace boost */

@@ -10,7 +10,7 @@ namespace raptor_raytracer
   destination of the ray (query point) and returns the colour
   at the location and an alpha value
 ************************************************************/
-float cubic_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const
+float cubic_mapper::sample_texture(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const
 {
     float u_co, v_co;
     

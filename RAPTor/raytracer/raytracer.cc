@@ -83,7 +83,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
     /* Otherwise colour with the background colour */
     else
     {
-        *c = this->c.shade(r);
+        *c = this->c.shade(&r);
     }
 }
 
@@ -349,7 +349,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
         /* Otherwise colour with the background colour */
         else
         {
-            c[addr] = this->c.shade(ray_p[i]);
+            c[addr] = this->c.shade(&ray_p[i]);
         }
     }
 

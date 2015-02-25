@@ -22,6 +22,31 @@ inline void check_for_chunk(const char **const a, const char *const e, const int
     (*a) += l;
 }
 
+inline std::uint32_t parse_vx(const char **at)
+{
+    std::uint32_t idx = from_byte_stream<std::uint16_t>(at);
+    if ((idx & 0xff00) == 0xff00)
+    {
+        idx &= 0x00ff;
+        idx <<= 16;
+        idx += from_byte_stream<std::uint16_t>(at);
+    }
+
+    return idx;
+}
+
+inline const char * parse_string(const char **at)
+{
+    /* Remember the string */
+    const char *str = (*at);
+    
+    /* Update the pointer */
+    int offset = strlen(str) + 1;
+    offset += offset & 0x1;
+    (*at) += offset;
+
+    return str;
+}
 
 void lwo_parser(
     std::ifstream         &lwo_file,

@@ -25,8 +25,9 @@ class perlin_noise_3d_mapper : public texture_mapper
 
         /* Texture mapping function. Takes the destination and direction 
            of the incident ray and returns either a float (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        float texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
-
+        float sample_texture(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
+        float sample_texture_monochrome(point_t *const c, const point_t &dst, const point_t &n, const point_t &vt, const int x_off, const int y_off) const;
+        
     private :
         friend class boost::serialization::access;
         
@@ -48,6 +49,7 @@ namespace serialization {
 template<class Archive>
 inline void save_construct_data(Archive & ar, const raptor_raytracer::perlin_noise_3d_mapper *t, const unsigned int file_version)
 {
+    ar << t->falloff();
     ar << t->rgb;
     ar << t->p;
     ar << t->z;
@@ -61,9 +63,11 @@ template<class Archive>
 inline void load_construct_data(Archive & ar, raptor_raytracer::perlin_noise_3d_mapper *t, const unsigned int file_version)
 {
     /* Retreive the fields */
+    raptor_raytracer::mapper_falloff *falloff;
     raptor_raytracer::ext_colour_t rgb;
     float p, z, op;
     int o, s;
+    ar >> falloff;
     ar >> rgb;
     ar >> p;
     ar >> z;
@@ -73,6 +77,7 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::perlin_noise_3d_
     
     /* Use plaement new to create the class */
     ::new(t)raptor_raytracer::perlin_noise_3d_mapper(rgb, p, z, o, s, op);
+    t->falloff(falloff);
 }
 }; /* namespace serialization */
 }; /* namespace boost */

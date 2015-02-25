@@ -28,39 +28,42 @@ struct texture_info_t
         twrp_mode_y     = (texture_wrapping_mode_t)2;    
     }
     
-    void add_shader_to(std::list<texture_mapper *>  *const t)
+    void add_shader_to(std::vector<texture_mapper *>  *const t)
     {
-        texture_mapper  *tm;
         float *img;
         std::uint32_t img_width;
         std::uint32_t img_height;
         std::uint32_t cpp;
+        texture_mapper  *tm = nullptr;
         switch (this->shader)
         {
             case f_noise :
                 tm = new perlin_noise_3d_mapper(this->trgb, this->tfp[1], this->tfp[0], this->tip, 4);
-                t->push_front(tm);
                 break;
                 
             case cylindrical  :
-                tm = new cylindrical_mapper(this->filename.c_str(), this->tctr, this->tnorm, this->tsiz, this->tfp[0]);
-                t->push_front(tm);
+                cpp = read_jpeg(&img, this->filename.c_str(), &img_height, &img_width);
+                tm = new cylindrical_mapper(boost::shared_array<float>(img), this->tctr, this->tnorm, this->tsiz, this->tfp[0], img_height, img_width, cpp);
                 break;
     
             case planar  :
                 cpp = read_jpeg(&img, this->filename.c_str(), &img_height, &img_width);
-                tm  = new planar_mapper(img, this->tctr, this->tnorm, this->tsiz, cpp, img_width, img_height, this->twrp_mode_x, this->twrp_mode_y);
-                t->push_front(tm);
+                tm  = new planar_mapper(boost::shared_array<float>(img), this->tctr, this->tnorm, this->tsiz, cpp, img_width, img_height, this->twrp_mode_x, this->twrp_mode_y);
                 break;
     
             case cubic  :
-                tm  = new cubic_mapper(this->filename.c_str(), this->tctr, this->tnorm, this->tsiz, this->twrp_mode_x, this->twrp_mode_y);
-                t->push_front(tm);
+                cpp = read_jpeg(&img, this->filename.c_str(), &img_height, &img_width);
+                tm  = new cubic_mapper(boost::shared_array<float>(img), this->tctr, this->tnorm, this->tsiz, this->twrp_mode_x, this->twrp_mode_y, cpp, img_width, img_height);
                 break;
     
             default :
                 assert(false);
                 break;
+        }
+
+        if (tm != nullptr)
+        {
+            t->push_back(tm);
         }
     }
     
@@ -69,7 +72,7 @@ struct texture_info_t
         switch (this->map_of)
         {
             case map_btex :
-                this->add_shader_to(&this->btex);
+                // this->add_shader_to(&this->btex);
                 break;
 
             case map_ctex :
@@ -94,23 +97,24 @@ struct texture_info_t
         }
     }
 
-    std::list<texture_mapper *> btex;
-    std::list<texture_mapper *> ctex;
-    std::list<texture_mapper *> dtex;
-    std::list<texture_mapper *> ttex;
-    std::list<texture_mapper *> rtex;
-    std::string                 filename;
-    ext_colour_t                trgb;
-    point_t                     tctr;
-    point_t                     tnorm;
-    point_t                     tsiz;
-    float                       tfp[4];
-    float                       topc;
-    mapper_type_t               shader;
-    mapper_of_t                 map_of;
-    std::uint16_t               tip;
-    texture_wrapping_mode_t     twrp_mode_x;
-    texture_wrapping_mode_t     twrp_mode_y;
+    std::vector<texture_mapper *>   btex;
+    std::vector<texture_mapper *>   ctex;
+    std::vector<texture_mapper *>   dtex;
+    std::vector<texture_mapper *>   stex;
+    std::vector<texture_mapper *>   ttex;
+    std::vector<texture_mapper *>   rtex;
+    std::string                     filename;
+    ext_colour_t                    trgb;
+    point_t                         tctr;
+    point_t                         tnorm;
+    point_t                         tsiz;
+    float                           tfp[4];
+    float                           topc;
+    mapper_type_t                   shader;
+    mapper_of_t                     map_of;
+    std::uint16_t                   tip;
+    texture_wrapping_mode_t         twrp_mode_x;
+    texture_wrapping_mode_t         twrp_mode_y;
 };
 
 
@@ -466,7 +470,7 @@ inline static void parse_surf(material **m, const std::string &p, const char **p
     }
 
     /* Create the new material and return */
-    *m = new mapper_shader(current_info.ctex, current_info.dtex, current_info.rtex, current_info.ttex, rgb, vkd, vks, s, vt, ri, vr);
+    *m = new mapper_shader(current_info.btex, current_info.ctex, current_info.dtex, current_info.stex, current_info.rtex, current_info.ttex, rgb, vkd, vks, s, vt, ri, vr);
 }
 
 

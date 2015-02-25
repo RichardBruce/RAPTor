@@ -276,7 +276,7 @@ class camera : private boost::noncopyable
 #endif /* #ifdef SIMD_PACKET_TRACING */
         
         /* Background shading */
-        ext_colour_t shade(const ray &r) const
+        ext_colour_t shade(ray *const r) const
         {
             if (this->tm == nullptr)
             {
@@ -286,7 +286,8 @@ class camera : private boost::noncopyable
             {
                 /* Find the intersection point with the sky box and which plane was hit */
                 point_t p;
-                const unsigned int tm_nr = this->sky_box_intersection(r, &p);
+                const unsigned int tm_nr = this->sky_box_intersection(*r, &p);
+                r->set_dst(p);
 
                 point_t n;
                 switch(tm_nr)
@@ -316,7 +317,7 @@ class camera : private boost::noncopyable
                 
                 /* Look up the texture and texture map the pixel */
                 ext_colour_t c;
-                (*this->tm)[tm_nr]->texture_map(&c, p, n, point_t(MAX_DIST, MAX_DIST, MAX_DIST));
+                (*this->tm)[tm_nr]->texture_map(*r, &c, n, point_t(MAX_DIST, MAX_DIST, MAX_DIST));
                 return c;
             }
         }

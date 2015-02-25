@@ -31,14 +31,14 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line
     float cur_ns = this->ns;
     if(this->t_ns != nullptr)
     {
-        cur_ns = this->t_ns->texture_map(&cur_ka, i.get_dst(), n.get_dir(), vt);
+        cur_ns = this->t_ns->texture_map(i, &cur_ka, n.get_dir(), vt);
     }
 
     /* Get the materials ka */
     cur_ka = this->ka;
     if(this->t_ka != nullptr)
     {
-        this->t_ka->texture_map(&cur_ka, i.get_dst(), n.get_dir(), vt);
+        this->t_ka->texture_map(i, &cur_ka, n.get_dir(), vt);
         cur_ka *= (this->ka * (1.0f / 255.0f));
     }
 
@@ -46,7 +46,7 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line
     ext_colour_t cur_kd = this->kd;
     if(this->t_kd != nullptr)
     {
-        this->t_kd->texture_map(&cur_kd, i.get_dst(), n.get_dir(), vt);
+        this->t_kd->texture_map(i, &cur_kd, n.get_dir(), vt);
         cur_kd *= (this->kd* (1.0f / 255.0f));
     }
     
@@ -54,7 +54,7 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line
     ext_colour_t cur_ks = this->ks;
     if(this->t_ks != nullptr)
     {
-        this->t_ks->texture_map(&cur_ks, i.get_dst(), n.get_dir(), vt);
+        this->t_ks->texture_map(i, &cur_ks, n.get_dir(), vt);
         cur_ks *= (this->ks * (1.0f / 255.0f));
     }
 

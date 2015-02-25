@@ -8,7 +8,7 @@ namespace raptor_raytracer
   destination of the ray (query point) and returns the colour
   at the location and an alpha value
 ************************************************************/
-float perlin_noise_3d_mapper::texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const
+float perlin_noise_3d_mapper::sample_texture(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const
 {
     const float x_co    = dst.x;
     const float y_co    = dst.y;
@@ -28,7 +28,7 @@ float perlin_noise_3d_mapper::texture_map(ext_colour_t *const c, const point_t &
     /*  Move total into the range [0-2] and scale the colour */
     total++;
     (*c) = ext_colour_t((this->rgb.r * total), (this->rgb.g * total), (this->rgb.b * total));
-    
+
     /* Return if the texture map generated a bright enough colour */
     if (total > 1.0f)
     {
