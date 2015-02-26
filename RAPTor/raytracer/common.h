@@ -82,6 +82,21 @@ namespace raptor_raytracer
 #endif /* #ifdef SIMD_PACKET_TRACING */
 #endif /* #ifndef MAX_BIH_NODE_SIZE */
 
+/* Define the size of the bih trace stack */
+/* A bih may not grow to be bigger than this */
+#ifndef MAX_BVH_STACK_HEIGHT
+#define MAX_BVH_STACK_HEIGHT 30
+#endif
+
+/* Define the maximum size of a BIH node */
+#ifndef MAX_BVH_NODE_SIZE
+#ifdef SIMD_PACKET_TRACING
+#define MAX_BVH_NODE_SIZE 5
+#else
+#define MAX_BVH_NODE_SIZE 5
+#endif /* #ifdef SIMD_PACKET_TRACING */
+#endif /* #ifndef MAX_BVH_NODE_SIZE */
+
 
 /* Define the size of the kd tree trace stack */
 /* A kd tree may not grow to be bigger than this */
