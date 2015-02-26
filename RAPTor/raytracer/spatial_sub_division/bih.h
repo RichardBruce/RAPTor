@@ -40,9 +40,6 @@ class bih : public ssd
         /* Assignment prohibited by base class */
         /* Allow default DTOR */
 
-        /* Diagnostics */
-        void dump(const std::string &output_file) const;
-
         /* Traversal functions */
 #ifdef SIMD_PACKET_TRACING
         /* SIMD BIH traversal */

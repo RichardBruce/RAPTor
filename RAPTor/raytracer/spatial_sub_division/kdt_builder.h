@@ -56,7 +56,7 @@ class kdt_builder
 {
     public :
         kdt_builder() :
-            _depth(0) {  }
+            _depth(0), _primitives(nullptr), _nodes(nullptr) {  }
 
         /* Function to build a kd tree containg the object given in objects and with the first split
            in the axis_t given by normal */
