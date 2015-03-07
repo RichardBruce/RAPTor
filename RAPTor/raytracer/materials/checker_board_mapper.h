@@ -14,18 +14,16 @@
 namespace raptor_raytracer
 {
 /* Pure virtual class for material data and shading */
-class checker_board_mapper : public texture_mapper
+class checker_board_mapper : public procedural_texture_mapper
 {
     public :
-        checker_board_mapper(const ext_colour_t &rgb, const point_t &cnt, const point_t &grid_size, const float op = 1.0f) : 
-            texture_mapper(), rgb(rgb), cnt(cnt), grid_size(grid_size), op(op) {  };
+        checker_board_mapper(const ext_colour_t &rgb, const point_t &cnt, const point_t &grid_size, const float op = 1.0f, const float u_ps = 0.1f, const float v_ps = 0.1f) : 
+            procedural_texture_mapper(u_ps, v_ps), _rgb(rgb), _cnt(cnt), _grid_size(grid_size), _op(op) {  };
 
         virtual ~checker_board_mapper() { };
 
-        /* Texture mapping function. Takes the destination and direction 
-           of the incident ray and returns either a float (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        float sample_texture(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
-        float sample_texture_monochrome(point_t *const c, const point_t &dst, const point_t &n, const point_t &vt, const int x_off, const int y_off) const;
+    protected :
+        float run_procedure(ext_colour_t *const c, const point_t &dst, const point_t &dir, const point_t &n) const override;
 
     private :
         friend class boost::serialization::access;
@@ -34,10 +32,10 @@ class checker_board_mapper : public texture_mapper
         template<class Archive>
         void serialize(Archive &ar, const unsigned int version) { }
 
-        const ext_colour_t  rgb;        /* The colour of the texture    */
-        const point_t       cnt;        /* Center                       */
-        const point_t       grid_size;  /* The size of the squares      */
-        const float         op;         /* Opaqueness of the texture    */
+        const ext_colour_t  _rgb;       /* The colour of the texture    */
+        const point_t       _cnt;       /* Center                       */
+        const point_t       _grid_size; /* The size of the squares      */
+        const float         _op;        /* Opaqueness of the texture    */
 };
 }; /* namespace raptor_raytracer */
 
@@ -47,10 +45,10 @@ template<class Archive>
 inline void save_construct_data(Archive & ar, const raptor_raytracer::checker_board_mapper *t, const unsigned int file_version)
 {
     ar << t->falloff();
-    ar << t->rgb;
-    ar << t->cnt;
-    ar << t->grid_size;
-    ar << t->op;
+    ar << t->_rgb;
+    ar << t->_cnt;
+    ar << t->_grid_size;
+    ar << t->_op;
 }
 
 

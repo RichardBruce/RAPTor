@@ -316,7 +316,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
             unsigned int img_width;
             unsigned int img_height;
             unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
-            t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, mirror, mirror);
+            t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
         }
         else
         {

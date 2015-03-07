@@ -26,30 +26,16 @@ enum class grad_of_t : char { previous_layer = 0, bump = 1, slope = 2, incidence
 class ray;
 
 /* Class to represent textures that graients */
-class gradient_mapper : public texture_mapper
+class gradient_mapper : public procedural_texture_mapper
 {
     public :
-        gradient_mapper(const std::vector<float> &keys, const std::vector<std::pair<ext_colour_t, float>> &value, const std::vector<grad_interpolation_t> &grads, const grad_of_t grad_of) : 
-            texture_mapper(), _keys(keys), _value(value), _grads(grads), _grad_of(grad_of) { }
+        gradient_mapper(const std::vector<float> &keys, const std::vector<std::pair<ext_colour_t, float>> &value, const std::vector<grad_interpolation_t> &grads, const grad_of_t grad_of, const float u_ps = 0.1f, const float v_ps = 0.1f) : 
+            procedural_texture_mapper(u_ps, v_ps), _keys(keys), _value(value), _grads(grads), _grad_of(grad_of) { }
 
         virtual ~gradient_mapper() { };
 
-        float texture_map(const ray &r, ext_colour_t *const c, const point_t &n, const point_t &vt) const override;
-        float texture_map_monochrome(const ray &r, point_t *const p, const point_t &n, const point_t &vt, const int x_off = 0, const int y_off = 0) const override;
-
-        /* Texture mapping function. Takes the destination and direction 
-           of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        float sample_texture(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const
-        {
-            assert(false);
-            return 0.0f;
-        }
-
-        float sample_texture_monochrome(point_t *const c, const point_t &dst, const point_t &n, const point_t &vt, const int x_off, const int y_off) const
-        {
-            assert(false);
-            return 0.0f;
-        }
+    protected :
+        float run_procedure(ext_colour_t *const c, const point_t &dst, const point_t &dir, const point_t &n) const override;
 
     private :
         friend class boost::serialization::access;

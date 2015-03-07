@@ -10,7 +10,7 @@
 
 namespace raptor_raytracer
 {
-float gradient_mapper::texture_map(const ray &r, ext_colour_t *const c, const point_t &n, const point_t &vt) const
+float gradient_mapper::run_procedure(ext_colour_t *const c, const point_t &dst, const point_t &dir, const point_t &n) const
 {
     /* Calculate the key for interpolation */
     float key;
@@ -26,7 +26,7 @@ float gradient_mapper::texture_map(const ray &r, ext_colour_t *const c, const po
             assert(false);
             break;
         case grad_of_t::incidence_angle : 
-            key = acos(fabs(dot_product(n, r.get_dir()))) * (180.0f / PI);
+            key = acos(fabs(dot_product(n, dir))) * (180.0f / PI);
             break;
         case grad_of_t::light_incidence : 
             assert(false);

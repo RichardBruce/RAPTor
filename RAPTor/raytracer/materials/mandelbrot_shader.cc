@@ -5,19 +5,19 @@
 
 namespace raptor_raytracer
 {
-void mandelbrot_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
+void mandelbrot_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t *const n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
     {
-        r.generate_rays_to_light(i, n, h, l);
+        r.generate_rays_to_light(i, h, l);
     }
     
     return;
 }
 
 
-void mandelbrot_shader::shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const
+void mandelbrot_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const
 {
     /* For each light shade the object, but only diffusely */
     float total_shade   = 0.0f;
@@ -28,7 +28,7 @@ void mandelbrot_shader::shade(const ray_trace_engine &r, ray &i, const line &n, 
         ray illum = r.get_illumination(l++);
 
         /* Cos(angle between normal and the ray) */
-        float shade = dot_product(illum.get_dir(), n.get_dir());
+        float shade = dot_product(illum.get_dir(), n);
         
         /* Ignore if the surface is facing away from the ray */
         if (shade < 0.0)
@@ -43,12 +43,12 @@ void mandelbrot_shader::shade(const ray_trace_engine &r, ray &i, const line &n, 
     float x0;
     float y0;
     
-    if ((n.get_x_grad() == 1.0f) || (n.get_x_grad() == -1.0f))
+    if ((n.x == 1.0f) || (n.x == -1.0f))
     {
         x0 = fmod(fabs(i.get_z1()),       2.4f) - 1.5f;
         y0 = fmod(fabs(i.get_y1())- 1.5f, 2.4f) - 1.0f;
     }
-    else if ((n.get_z_grad() == 1.0f) || (n.get_z_grad() == -1.0f))
+    else if ((n.z == 1.0f) || (n.z == -1.0f))
     {
         x0 = fmod(fabs(i.get_x1()),       2.4f) - 1.5f;
         y0 = fmod(fabs(i.get_y1())- 1.5f, 2.4f) - 1.0f;
@@ -83,12 +83,12 @@ WHILE :
     else if (iteration == this->i)
     {
         doomed = true;
-        if ((n.get_x_grad() == 1.0f) || (n.get_x_grad() == -1.0f))
+        if ((n.x == 1.0f) || (n.x == -1.0f))
         {
             x0 = fmod(fabs(i.get_z1())- 1.0f, 2.4f) * 1.5f - 0.4f;
             y0 = fmod(fabs(i.get_y1())- 2.0f, 2.4f) * 1.5f - 0.7f;
         }
-        else if ((n.get_z_grad() == 1.0f) || (n.get_z_grad() == -1.0f))
+        else if ((n.z == 1.0f) || (n.z == -1.0f))
         {
             x0 = fmod(fabs(i.get_x1())- 1.0f, 2.4f) * 1.5f - 0.4f;
             y0 = fmod(fabs(i.get_y1())- 2.0f, 2.4f) * 1.5f - 0.7f;

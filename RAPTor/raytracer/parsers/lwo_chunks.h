@@ -59,6 +59,7 @@ class lwo_chunks
                 else
                 {
                     /* Skip it */
+                    BOOST_LOG_TRIVIAL(trace) << "Skipping: " << std::string(at, 4);
                     at += 4;
                     const std::uint32_t len = from_byte_stream<std::uint32_t>(&at);
                     at += len;
@@ -179,6 +180,20 @@ class lwo_chunks
                     BOOST_LOG_TRIVIAL(info) << "ICON (ignored) " << _icon_len;
                     at += _icon_len;
                 }
+                else if (strncmp(at, "VMPA", 4) == 0)
+                {
+                    at += 4;
+                    _vmpa_len = from_byte_stream<std::uint32_t>(&at);
+                    _vmpa = at;
+
+                    BOOST_LOG_TRIVIAL(info) << "VMPA (ignored) " << _vmpa_len;
+                    at += _vmpa_len;
+                }
+                else
+                {
+                    BOOST_LOG_TRIVIAL(info) << "Unknown top level chunk: " << std::string(at, 4);
+                    assert(false);
+                }
             }
 
             _next_layr = at;
@@ -206,6 +221,7 @@ class lwo_chunks
         const char *    ptag()      const { return _ptag;       }
         const char *    bbox()      const { return _bbox;       }
         const char *    desc()      const { return _desc;       }
+        const char *    vmpa()      const { return _vmpa;       }
         const char *    text()      const { return _text;       }
         const char *    icon()      const { return _icon;       }
         const char *    tags()      const { return _tags;       }
@@ -215,6 +231,7 @@ class lwo_chunks
         std::uint32_t   ptag_len()  const { return _ptag_len;   }
         std::uint32_t   bbox_len()  const { return _bbox_len;   }
         std::uint32_t   desc_len()  const { return _desc_len;   }
+        std::uint32_t   vmpa_len()  const { return _vmpa_len;   }
         std::uint32_t   text_len()  const { return _text_len;   }
         std::uint32_t   icon_len()  const { return _icon_len;   }
         std::uint32_t   tags_len()  const { return _tags_len;   }
@@ -228,6 +245,7 @@ class lwo_chunks
             _ptag = nullptr;
             _bbox = nullptr;
             _desc = nullptr;
+            _vmpa = nullptr;
             _text = nullptr;
             _icon = nullptr;
         }
@@ -244,6 +262,7 @@ class lwo_chunks
         const char *                                _ptag;          /* */
         const char *                                _bbox;          /* Bounding box of this layer, optional                         */
         const char *                                _desc;          /* Short description of this layer, optional                    */
+        const char *                                _vmpa;          /*                     */
         const char *                                _text;          /* Long disciption of this layer, optional                      */
         const char *                                _icon;          /* Icon for the file, optional                                  */
         const char *                                _tags;          /* */
@@ -253,6 +272,7 @@ class lwo_chunks
         std::uint32_t                               _ptag_len;
         std::uint32_t                               _bbox_len;
         std::uint32_t                               _desc_len;
+        std::uint32_t                               _vmpa_len;
         std::uint32_t                               _text_len;
         std::uint32_t                               _icon_len;
         std::uint32_t                               _tags_len;

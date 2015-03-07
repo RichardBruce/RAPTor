@@ -73,7 +73,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         {
             _twrp_mode_x = get_wrapping_mode(from_byte_stream<std::uint16_t>(&tmp_ptr));
             _twrp_mode_y = get_wrapping_mode(from_byte_stream<std::uint16_t>(&tmp_ptr));
-            BOOST_LOG_TRIVIAL(trace) << "WRAP: " << _twrp_mode_x << ", " << _twrp_mode_y;
+            BOOST_LOG_TRIVIAL(trace) << "WRAP: " << static_cast<int>(_twrp_mode_x) << ", " << static_cast<int>(_twrp_mode_y);
         }
         /* Image index */
         else if (strncmp((*ptr), "IMAG", 4) == 0)
@@ -91,7 +91,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         else if (strncmp((*ptr), "WRPW", 4) == 0)
         {
             _wrpw = from_byte_stream<float>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(warning) << "WRPW (not handled): " << _wrpw;
+            BOOST_LOG_TRIVIAL(trace) << "WRPW: " << _wrpw;
         }
         else if (strncmp((*ptr), "WRPH", 4) == 0)
         {
@@ -132,7 +132,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         else if (strncmp((*ptr), "TAMP", 4) == 0)
         {
             _tamp = from_byte_stream<float>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(warning) << "TAMP: " << _tamp;
+            BOOST_LOG_TRIVIAL(trace) << "TAMP: " << _tamp;
         }
         else if (strncmp((*ptr), "VMAP", 4) == 0)
         {
@@ -278,12 +278,32 @@ void lwo_bloks::add_shader()
     switch (_map_of)
     {
         case map_btex :
-            /* Scale image for tamp before adding */
-            brightness_scale(_clip->image().get(), _clip->image_width() * _clip->image_height() * _clip->colour_parts(), _tamp * (1.0f / 255.0f));
+        {
+            /* Scale image or procedural texture colour for tamp before adding */
+            lwo_clip *orig_clip = nullptr;
+            if (_clip != nullptr)
+            {
+                orig_clip = _clip;
+                _clip = orig_clip->scaled_clone(_tamp * (1.0f / 255.0f));
+            }
+            else
+            {
+                _valu[0] *= _tamp * (1.0f / 255.0f);
+                _valu[1] *= _tamp * (1.0f / 255.0f);
+                _valu[2] *= _tamp * (1.0f / 255.0f);
+            }
+
             BOOST_LOG_TRIVIAL(trace) << "Adding shader to map_btex";
             add_shader_to(&_btex);
-            break;
 
+            /* Delete the cloned clip */
+            if (_clip != nullptr)
+            {
+                delete _clip;
+                _clip = orig_clip;
+            }
+            break;
+        }
         case map_ctex :
             BOOST_LOG_TRIVIAL(trace) << "Adding shader to map_ctex";
             add_shader_to(&_ctex);
@@ -480,13 +500,13 @@ inline texture_wrapping_mode_t lwo_bloks::get_wrapping_mode(const std::uint16_t 
     switch (m)
     {
         case 0 : 
-            return blank;
+            return texture_wrapping_mode_t::blank;
         case 1 : 
-            return tile;
+            return texture_wrapping_mode_t::tile;
         case 2 :
-            return mirror;
+            return texture_wrapping_mode_t::mirror;
         case 3 : 
-            return clamp;
+            return texture_wrapping_mode_t::clamp;
         default :
             BOOST_LOG_TRIVIAL(error) << "Unknown wrapping mode: " << m;
             assert(false);

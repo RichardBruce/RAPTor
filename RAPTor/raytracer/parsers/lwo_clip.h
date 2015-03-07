@@ -108,6 +108,25 @@ class lwo_clip
             return true;
         }
 
+        /* Create a clone, but with the image scaled. This is used for bump mapping where each image can represent a different height */
+        lwo_clip* scaled_clone(const float scale) const
+        {
+            /* Copy over most parameters */
+            lwo_clip *const ret = new lwo_clip(_path, _data, _size);
+            ret->_filename      = _filename;
+            ret->_clip_idx      = _clip_idx;
+            ret->_img_width     = _img_width;
+            ret->_img_height    = _img_height;
+            ret->_cpp           = _cpp;
+
+            /* Copy image and scale */
+            ret->_img.reset(new float [_img_width * _img_height * _cpp]);
+            std::copy(&_img[0], &_img[_img_width * _img_height * _cpp], &ret->_img[0]);
+            brightness_scale(ret->_img.get(), _img_width * _img_height * _cpp, scale);
+
+            return ret;
+        }
+
         /* Access functions */
         const boost::shared_array<float> &  image()         const { return _img;        }
         std::string                         filename()      const { return _filename;   }

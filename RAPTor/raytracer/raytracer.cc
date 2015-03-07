@@ -39,7 +39,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
         secondary_ray_data refr;
         refl.colours(&refl_colour[0]);
         refr.colours(&refr_colour[0]);
-        const line n(intersecting_object->generate_rays(*this, r, &vt, &hit_type, &refl, &refr));
+        const point_t vn(intersecting_object->generate_rays(*this, r, &vt, &hit_type, &refl, &refr));
         
         /* Trace shadow rays */
         for (unsigned int i = 0; i < this->lights.size(); ++i)
@@ -65,7 +65,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
         }
 
         /* Call the shader */
-        intersecting_object->shade(*this, r, n, vt, hit_type, c);
+        intersecting_object->shade(*this, r, vn, vt, hit_type, c);
         
         /* Process secondary rays */
         for (int i = 0; i < static_cast<int>(refl.number()); ++i)
@@ -232,7 +232,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
     }
 
     /* Generate secondary rays */
-    line normals[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
+    point_t vn[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     point_t vt[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     ray ray_p[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     hit_description hit_p[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
@@ -255,7 +255,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             {
                 this->shader_nr = addr;
                 int ray_addr = addr * MAX_SECONDARY_RAYS;
-                normals[addr] = intersecting_object[addr]->generate_rays(*this, ray_p[addr], &vt[addr], &hit_p[addr], &refl[ray_addr], &refr[ray_addr]);
+                vn[addr] = intersecting_object[addr]->generate_rays(*this, ray_p[addr], &vt[addr], &hit_p[addr], &refl[ray_addr], &refr[ray_addr]);
             }
             else
             {
@@ -344,7 +344,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
 
         if (hit_p[i].d < MAX_DIST)
         {
-            intersecting_object[i]->shade(*this, ray_p[i], normals[i], vt[i], hit_p[i], &c[addr]);
+            intersecting_object[i]->shade(*this, ray_p[i], vn[i], vt[i], hit_p[i], &c[addr]);
         }
         /* Otherwise colour with the background colour */
         else

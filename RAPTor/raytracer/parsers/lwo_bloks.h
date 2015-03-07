@@ -28,7 +28,7 @@ class lwo_bloks : private boost::noncopyable
 {
     public :
         lwo_bloks() :
-            _trgb(ext_colour_t(255.0f, 255.0f, 255.0f)), _topc(1.0f), _tamp(1.0f), _shader(non), _map_of(map_ctex), 
+            _clip(nullptr), _trgb(ext_colour_t(255.0f, 255.0f, 255.0f)), _topc(1.0f), _tamp(1.0f), _shader(non), _map_of(map_ctex), 
             _twrp_mode_x(static_cast<texture_wrapping_mode_t>(2)), _twrp_mode_y(static_cast<texture_wrapping_mode_t>(2)), _fall_type(falloff_type_t::none)
             { }
 

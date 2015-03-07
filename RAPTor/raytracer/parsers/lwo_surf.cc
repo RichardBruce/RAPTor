@@ -96,6 +96,13 @@ bool lwo_surf::parse(const std::map<std::uint32_t, lwo_clip *> &clips, const cha
             const float lumi = from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "LUMI (not handled): " << lumi;
         }
+        /* Floating point percentage luminance co-efficient */
+        else if (strncmp(tmp_ptr, "FLAG", 4) == 0)
+        {
+            tmp_ptr += 6;
+            const std::uint16_t flag = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            BOOST_LOG_TRIVIAL(warning) << "FLAG (not handled): " << flag;
+        }
         /* Texture mapper or shader block */
         else if (strncmp(tmp_ptr, "BLOK", 4) == 0)
         {
@@ -147,7 +154,7 @@ bool lwo_surf::parse(const std::map<std::uint32_t, lwo_clip *> &clips, const cha
             /* Bump height scaling */
             tmp_ptr += 6;
             bump = from_byte_stream<float>(&tmp_ptr);
-            BOOST_LOG_TRIVIAL(warning) << "BUMP: " << bump;
+            BOOST_LOG_TRIVIAL(trace) << "BUMP: " << bump;
         }
         else if (strncmp(tmp_ptr, "SHRP", 4) == 0)
         {
@@ -228,7 +235,8 @@ bool lwo_surf::parse(const std::map<std::uint32_t, lwo_clip *> &clips, const cha
 
         /* Envelop */
         if ((strncmp(sec_ptr, "SMAN", 4) != 0) && (strncmp(sec_ptr, "RFOP", 4) != 0) && (strncmp(sec_ptr, "TROP", 4) != 0) && (strncmp(sec_ptr, "SIDE", 4) != 0) &&
-            (strncmp(sec_ptr, "BLOK", 4) != 0) && (strncmp(sec_ptr, "RIMG", 4) != 0) && (strncmp(sec_ptr, "TIMG", 4) != 0) && (strncmp(sec_ptr, "ALPH", 4) != 0))
+            (strncmp(sec_ptr, "BLOK", 4) != 0) && (strncmp(sec_ptr, "RIMG", 4) != 0) && (strncmp(sec_ptr, "TIMG", 4) != 0) && (strncmp(sec_ptr, "ALPH", 4) != 0) && 
+            (strncmp(sec_ptr, "FLAG", 4) != 0))
         {
             const std::uint16_t envelop_id = from_byte_stream<std::uint16_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "Envelop (not handled): " << envelop_id;

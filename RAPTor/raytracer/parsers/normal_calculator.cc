@@ -68,9 +68,9 @@ void normal_calculator::add_point_usage(const std::vector<int> &pnts, const floa
     /* Calculate the polygons normal */
     if (pnts.size() > 2)
     {
-        const point_t ab(_pnts[pnts[0]] - _pnts[pnts[1]]);
-        const point_t bc(_pnts[pnts[2]] - _pnts[pnts[1]]);
-        const point_t norm(cross_product(bc, ab));
+        const point_t ab(_pnts[pnts.back()] - _pnts[pnts[0]]);
+        const point_t bc(_pnts[pnts[0]] - _pnts[pnts[1]]);
+        const point_t norm(cross_product(ab, bc));
         info->normal = normalise(norm);
     }
 
@@ -116,12 +116,7 @@ void normal_calculator::calculate()
                 point_t norm_0(info_0->normal);
                 point_t norm_1(info_1->normal);
                 const float cos_angle = dot_product(norm_0, norm_1);
-                if (cos_angle < -info_0->cos_threshold)
-                {
-                    norm_1 = -norm_1;
-                }
-
-                if (fabs(cos_angle) > info_0->cos_threshold)
+                if (cos_angle > info_0->cos_threshold)
                 {
                     /* Neither surface is sharing a normal for this point */
                     shared_normal **pnt_norm_0 = &info_0->pnt_norms[point_index(info_0, pnt)];

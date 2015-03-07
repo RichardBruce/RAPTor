@@ -34,13 +34,13 @@ class cook_torrance_cxy : public material
         virtual ~cook_torrance_cxy() { };
 
         /* Function the allow the shader a chance to generate SIMD packets */
-        void generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const;
+        void generate_rays(const ray_trace_engine &r, ray &i, point_t *const n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const override;
 
         /* Shading function. To allow the shader to shade the current object */
-        void shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const;
+        void shade(const ray_trace_engine &r, ray &i, const point_t &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const override;
 
         /* Function to the allow the shader a combined SIMD packets traced secondary rays into the image */
-        void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const;
+        void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const override;
 
     private :
         const float x;      /* X chroma                                 */

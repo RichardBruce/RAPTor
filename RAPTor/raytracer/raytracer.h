@@ -64,12 +64,12 @@ class ray_trace_engine
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
         /* Secondary ray buffer write access */
-        inline void generate_rays_to_light(const ray &r, const line &n, const hit_t h, const unsigned int l) const
+        inline void generate_rays_to_light(const ray &r, const hit_t h, const unsigned int l) const
         {
             const int addr      = (l * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH)) + (this->shader_nr * SHADOW_ARRAY_SIZE);
             const int nr_addr   = (l * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH)) + this->shader_nr;
 
-            this->nr_pending_shadows[nr_addr]  = r.find_rays(&this->pending_shadows[addr], this->lights[l], n, h);
+            this->nr_pending_shadows[nr_addr]  = r.find_rays(&this->pending_shadows[addr], this->lights[l], h);
             return;
         }
         
