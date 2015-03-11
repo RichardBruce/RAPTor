@@ -418,7 +418,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         }
         else
         {
-            std::cout << "Found unknown: " << std::string(at[0], 5) << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]) << std::endl;
+            std::cout << "Found unknown: " << std::string(&at[0], 5) << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]) << std::endl;
             find_next_line(&at);
             assert(false);
         }
@@ -451,7 +451,7 @@ material * parse_mtllib_statement(std::map<std::string, material *> *const s, co
     {
         /* Get the material library to open */
         std::string mtllib = p + get_next_string(c);
-//        std::cout << "Opening material file: " << mtllib << std::endl;
+        BOOST_LOG_TRIVIAL(trace) << "Opening material file: " << mtllib;
         std::ifstream f(mtllib.c_str());
         assert(f.is_open());
 
