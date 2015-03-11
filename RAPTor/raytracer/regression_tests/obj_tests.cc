@@ -627,6 +627,25 @@ BOOST_AUTO_TEST_SUITE( obj_tests );
 //     checker.check(fixture.get_camera(), "bih");
 // }
 
+// BOOST_AUTO_TEST_CASE( obj_head_test )
+// {
+//     /* Checker */
+//     CREATE_REGRESSION_CHECKER(checker);
+
+//     /* Enviroment set up */
+//     regression_fixture fixture("/obj_scenes/head/head.OBJ", model_format_t::obj, point_t(0.0, -0.0156976, 0.750493), point_t(1.0, 0.0, 0.0), point_t(0.0, 0.996917, -0.0784591), point_t(0.0, -0.0784591, -0.996917), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.5, 0.5, 1.0), 0.0, 0.0001);
+//     // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+//     /* Ray trace the scene using kd tree */
+//     fixture.render<kd_tree>();
+//     checker.check(fixture.get_camera(), "kdt");
+
+//     /* Ray trace the scene using bih */
+//     fixture.render<bih>();
+//     checker.check(fixture.get_camera(), "bih");
+// }
+
 // BOOST_AUTO_TEST_CASE( obj_lost_empire_test )
 // {
 //     /* Checker */
@@ -741,24 +760,43 @@ BOOST_AUTO_TEST_SUITE( obj_tests );
 //     checker.check(fixture.get_camera(), "bih");
 // }
 
-BOOST_AUTO_TEST_CASE( obj_rungholt_test )
-{
-    /* Checker */
-    CREATE_REGRESSION_CHECKER(checker);
+// BOOST_AUTO_TEST_CASE( obj_rungholt_0_test )
+// {
+//     /* Checker */
+//     CREATE_REGRESSION_CHECKER(checker);
 
-    /* Enviroment set up */
-    regression_fixture fixture("/obj_scenes/rungholt/rungholt.obj", model_format_t::obj, point_t(85.0, 40.0, -59.0), point_t(0.587784, 0.0, 0.809015), point_t(-0.201194, 0.968583, 0.146176), point_t(-0.783598, -0.248689, 0.569318), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
-    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(85.0, 40.0, -59.0), 0.0, 0.0001);
-    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+//     /* Enviroment set up */
+//     regression_fixture fixture("/obj_scenes/rungholt/rungholt.obj", model_format_t::obj, point_t(-251.0, 63.0, 81.0), point_t(-0.181559, 0.00417275, -0.983368), point_t(0.294922, 0.954189, -0.0504024), point_t(0.93811, -0.299168, -0.174472), ext_colour_t(0.0, 0.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 300.0, 0.0), 0.0, 0.0001);
+//     // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
 
-    /* Ray trace the scene using kd tree */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+//     /* Ray trace the scene using kd tree */
+//     // fixture.render<kd_tree>();
+//     // checker.check(fixture.get_camera(), "kdt");
 
-    /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
-}
+//     /* Ray trace the scene using bih */
+//     fixture.render<bih>();
+//     checker.check(fixture.get_camera(), "bih");
+// }
+
+// BOOST_AUTO_TEST_CASE( obj_rungholt_1_test )
+// {
+//     /* Checker */
+//     CREATE_REGRESSION_CHECKER(checker);
+
+//     /* Enviroment set up */
+//     regression_fixture fixture("/obj_scenes/rungholt/rungholt.obj", model_format_t::obj, point_t(15.0, 7.0, -71.0), point_t(-0.201094, 0.00221717, 0.979556), point_t(0.09992, 0.994821, 0.0182609), point_t(-0.974444, 0.101549, -0.200271), ext_colour_t(0.0, 0.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 300.0, 0.0), 0.0, 0.0001);
+//     // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+//     /* Ray trace the scene using kd tree */
+//     // fixture.render<kd_tree>();
+//     // checker.check(fixture.get_camera(), "kdt");
+
+//     /* Ray trace the scene using bih */
+//     fixture.render<bih>();
+//     checker.check(fixture.get_camera(), "bih");
+// }
 
 // BOOST_AUTO_TEST_CASE( obj_san_miguel_test )
 // {
@@ -766,9 +804,9 @@ BOOST_AUTO_TEST_CASE( obj_rungholt_test )
 //     CREATE_REGRESSION_CHECKER(checker);
 
 //     /* Enviroment set up */
-//     regression_fixture fixture("/obj_scenes/san_miguel/san-miguel.obj", model_format_t::obj, point_t(-13.7643, -6.92507, 1.32953), point_t(-0.105038, -0.00870562, -0.99443), point_t(-0.238403, 0.971023, 0.0166812), point_t(0.965468, 0.238826, -0.104071), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
-//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-5.0, -5.0, -3.0), 0.0, 0.0001);
-//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+//     regression_fixture fixture("/obj_scenes/san_miguel/san-miguel.obj", model_format_t::obj, point_t(9.0, 1.0, 5.0), point_t(-0.453989, 0.0, -0.891005), point_t(-0.0838509, 0.995562, 0.0427242), point_t(0.88705, 0.0941079, -0.451974), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, 5.0, 3.0), 0.0, 0.0001);
+//     // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
@@ -785,9 +823,9 @@ BOOST_AUTO_TEST_CASE( obj_rungholt_test )
 //     CREATE_REGRESSION_CHECKER(checker);
 
 //     /* Enviroment set up */
-//     regression_fixture fixture("/obj_scenes/sibenik/sibenik.obj", model_format_t::obj, point_t(-13.7643, -6.92507, 1.32953), point_t(-0.105038, -0.00870562, -0.99443), point_t(-0.238403, 0.971023, 0.0166812), point_t(0.965468, 0.238826, -0.104071), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
-//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-5.0, -5.0, -3.0), 0.0, 0.0001);
-//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+//     regression_fixture fixture("/obj_scenes/sibenik/sibenik.obj", model_format_t::obj, point_t(-17.0, -13.0, 1.0), point_t(-0.0941056, 0.0, -0.995544), point_t(0.0, 1.0, 0.0), point_t(0.995544, 0.0, -0.0941056), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+//     fixture.add_light(ext_colour_t(125.0, 125.0, 125.0), point_t(-8.0, -9.0, 0.0), 0.0, 0.0001);
+//     fixture.add_light(ext_colour_t(125.0, 125.0, 125.0), point_t(10.0, -9.0, 0.0), 0.0, 0.0001);
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
@@ -804,9 +842,9 @@ BOOST_AUTO_TEST_CASE( obj_rungholt_test )
 //     CREATE_REGRESSION_CHECKER(checker);
 
 //     /* Enviroment set up */
-//     regression_fixture fixture("/obj_scenes/teapot/teapot.obj", model_format_t::obj, point_t(-13.7643, -6.92507, 1.32953), point_t(-0.105038, -0.00870562, -0.99443), point_t(-0.238403, 0.971023, 0.0166812), point_t(0.965468, 0.238826, -0.104071), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
-//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-5.0, -5.0, -3.0), 0.0, 0.0001);
-//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+//     regression_fixture fixture("/obj_scenes/teapot/teapot.obj", model_format_t::obj, point_t(69.9687, 95.9084, 167.297), point_t(-0.933909, -0.0487743, 0.354163), point_t(-0.159631, 0.943301, -0.29103), point_t(-0.319888, -0.328331, -0.888745), ext_colour_t(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, 1920, 1080);
+//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(70.0, 150.0, 140.0), 0.0, 0.0001);
+//     // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
@@ -817,24 +855,24 @@ BOOST_AUTO_TEST_CASE( obj_rungholt_test )
 //     checker.check(fixture.get_camera(), "bih");
 // }
 
-// BOOST_AUTO_TEST_CASE( obj_lighting_challenge_24_the_cabin_test )
-// {
-//     /* Checker */
-//     CREATE_REGRESSION_CHECKER(checker);
+BOOST_AUTO_TEST_CASE( obj_the_cabin_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
 
-//     /* Enviroment set up */
-//     regression_fixture fixture("/obj_scenes/the_cabin/Lighting_Challenge_24_theCabin.obj", model_format_t::obj, point_t(-13.7643, -6.92507, 1.32953), point_t(-0.105038, -0.00870562, -0.99443), point_t(-0.238403, 0.971023, 0.0166812), point_t(0.965468, 0.238826, -0.104071), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
-//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-5.0, -5.0, -3.0), 0.0, 0.0001);
-//     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/the_cabin/Lighting_Challenge_24_theCabin.obj", model_format_t::obj, point_t(-13.7643, -6.92507, 1.32953), point_t(-0.105038, -0.00870562, -0.99443), point_t(-0.238403, 0.971023, 0.0166812), point_t(0.965468, 0.238826, -0.104071), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-5.0, -5.0, -3.0), 0.0, 0.0001);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
 
-//     /* Ray trace the scene using kd tree */
-//     fixture.render<kd_tree>();
-//     checker.check(fixture.get_camera(), "kdt");
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
 
-//     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
-// }
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
 
 // BOOST_AUTO_TEST_CASE( obj_the_carnival_test )
 // {

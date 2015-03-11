@@ -149,11 +149,8 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
             b -= c;
             normalise(&a);
             normalise(&b);
-        
-            c  = a - b;
-            a += b;
-    
-            if ((c != 0) && (a != 0))
+            cross_product(a, b, &c);
+            if (dot_product(c, c) > 0.0f)
             {
                 if (face_n.empty())
                 {
@@ -353,13 +350,13 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         else if (strncmp(at, "d", 1) == 0)
         {
             const float d = get_next_float(&at);
-            assert(d == 1.0f);
+            // assert(d == 1.0f);
         }
         /* Opaque-ness by another name */
         else if (strncmp(at, "Tr", 2) == 0)
         {
             const float tr = get_next_float(&at);
-            assert(tr == 0.0f);
+            // assert(tr == 0.0f);
         }
         /* Shader mode --ignored, everything is ray traced */
         else if (strncmp(at, "illum", 5) == 0)
@@ -386,6 +383,26 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
             // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
             // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
         }
+        /* Specular texture map */
+        else if (strncmp(at, "map_Ks", 6) == 0)
+        {
+            std::string map_file(p + get_next_string(&at));
+            // float *img;
+            // unsigned int img_width;
+            // unsigned int img_height;
+            // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
+            // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+        }
+        /* Reflection texture map */
+        else if (strncmp(at, "map_refl", 8) == 0)
+        {
+            std::string map_file(p + get_next_string(&at));
+            // float *img;
+            // unsigned int img_width;
+            // unsigned int img_height;
+            // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
+            // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+        }
         /* Bump texture map */
         else if (strncmp(at, "map_bump", 8) == 0)
         {
@@ -396,7 +413,6 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
             // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
             // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
         }
-
         else if (strncmp(at, "bump", 4) == 0)
         {
             std::string map_file(p + get_next_string(&at));
@@ -418,7 +434,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         }
         else
         {
-            std::cout << "Found unknown: " << std::string(&at[0], 5) << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]) << std::endl;
+            std::cout << "Found unknown: " << std::string(&at[0], 6) << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]) << std::endl;
             find_next_line(&at);
             assert(false);
         }
