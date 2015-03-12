@@ -172,16 +172,16 @@ inline float get_next_float(const std::string &s, size_t *const fst_space)
 inline float get_next_float(const char **c)
 {
     /* Eat the string until white space is found */
-    while ((**c) != ' ')
+    while (((**c) != ' ') && ((**c) != '\t'))
     {
-        (*c)++;
+        ++(*c);
     }
 
 
     /* Eat the white space */
-    while ((**c) == ' ')
+    while (((**c) == ' ') || ((**c) == '\t'))
     {
-        (*c)++;
+        ++(*c);
     }
     
     /* Assume the next thing is a float and convert */
