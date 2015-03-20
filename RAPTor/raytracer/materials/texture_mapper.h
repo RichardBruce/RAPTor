@@ -2,6 +2,8 @@
 #define __TEXTURE_MAPPER_H__
 
 /* Boost headers */
+#include "boost/algorithm/string.hpp"
+#include "boost/filesystem.hpp"
 #include "boost/scoped_ptr.hpp"
 
 /* Common headers */
@@ -17,7 +19,9 @@
 extern "C"
 {
 #include <jpeglib.h>
+#include <png.h>
 #include <stdio.h>
+#include "tga.h"
 }
 
 /* Forward declarations */
@@ -113,7 +117,7 @@ class image_texture_mapper : public texture_mapper
                 texture_mapper(), _img(img), _c(c), _s(s), _u(u), _v(v), _u_ps(fabs(dot_product(_s, _u)) * u_ps), _v_ps(fabs(dot_product(_s, _v)) * v_ps), _h(h), _w(w), _cpp(cpp), _u_max(u_max < 0 ? w : u_max), _v_max(v_max < 0 ? h : v_max),
                 _u_off(u_off), _v_off(v_off), _uw(uw), _vw(vw)
             { 
-                assert((_cpp == 1) || (_cpp == 3));
+                assert((_cpp == 1) || (_cpp == 3) || (_cpp == 4));
             }
 
         virtual ~image_texture_mapper() { };
@@ -209,7 +213,7 @@ class image_texture_mapper : public texture_mapper
             /* Average down from rgb image */
             p->x = x_off * _u_ps;
             p->y = y_off * _v_ps;
-            if (_cpp == 3)
+            if (_cpp != 1)
             {
                 p->z = (c.r + c.g + c.b) * (1.0f / 3.0f);
             }
@@ -260,23 +264,23 @@ class image_texture_mapper : public texture_mapper
             const float w3 = fu * fv;
             
             /* Weight and return */
-            if (_cpp == 3)
+            if (_cpp != 1)
             {
-                const unsigned addr0 = (u0 + (v0 * _w)) * 3;
+                const unsigned addr0 = (u0 + (v0 * _w)) * _cpp;
                 const ext_colour_t c0(_img[addr0], _img[addr0 + 1], _img[addr0 + 2]);
                 
-                const unsigned addr1 = (u1 + (v0 * _w)) * 3;
+                const unsigned addr1 = (u1 + (v0 * _w)) * _cpp;
                 const ext_colour_t c1(_img[addr1], _img[addr1 + 1], _img[addr1 + 2]);
                 
-                const unsigned addr2 = (u0 + (v1 * _w)) * 3;
+                const unsigned addr2 = (u0 + (v1 * _w)) * _cpp;
                 const ext_colour_t c2(_img[addr2], _img[addr2 + 1], _img[addr2 + 2]);
 
-                const unsigned addr3 = (u1 + (v1 * _w)) * 3;
+                const unsigned addr3 = (u1 + (v1 * _w)) * _cpp;
                 const ext_colour_t c3(_img[addr3], _img[addr3 + 1], _img[addr3 + 2]);
 
                 (*c) = (c0 * w0) + (c1 * w1) + (c2 * w2) + (c3 * w3);
             }
-            else if (_cpp == 1)
+            else
             {
                 const unsigned addr0 = (u0 + (v0 * _w));
                 const unsigned addr1 = (u1 + (v0 * _w));
@@ -337,14 +341,14 @@ class procedural_texture_mapper : public texture_mapper
 };
 
 
-inline unsigned read_jpeg(float **img, const char *const filename, unsigned *const h, unsigned *const w)
+inline unsigned int read_jpeg(float **img, const char *const filename, unsigned *const h, unsigned *const w)
 {
     /* Open the input file */
     FILE *infile = fopen(filename, "rb");
     if (!infile)
     {
-    	std::cout << "Error opening jpeg file " << filename << " for input"  << std::endl;
-    	assert(!"Cannot open file");
+        std::cout << "Error opening jpeg file " << filename << " for input"  << std::endl;
+        assert(!"Cannot open file");
     }
 
     /* Set up the jpeg decompressor */
@@ -370,14 +374,16 @@ inline unsigned read_jpeg(float **img, const char *const filename, unsigned *con
     row_pointer[0] = (unsigned char *) malloc(cinfo.output_width * cinfo.num_components);
 
     /* read one scan line at a time */
-    unsigned long location = 0;
-    while(cinfo.output_scanline < cinfo.image_height)
+    const unsigned int row_width = (cinfo.image_width * cinfo.num_components);
+    unsigned long location = row_width * (cinfo.image_height - 1);
+    while (cinfo.output_scanline < cinfo.image_height)
     {
-    	jpeg_read_scanlines(&cinfo, row_pointer, 1);
-    	for(unsigned i = 0; i < (cinfo.image_width * cinfo.num_components); i++)
+        jpeg_read_scanlines(&cinfo, row_pointer, 1);
+        for (unsigned i = 0; i < (cinfo.image_width * cinfo.num_components); i++)
         {
-    		(*img)[location++] = row_pointer[0][i];
+           (*img)[location++] = row_pointer[0][i];
         }
+        location -= (row_width << 1);
     }
 
     /* Clean up */
@@ -387,6 +393,179 @@ inline unsigned read_jpeg(float **img, const char *const filename, unsigned *con
     fclose(infile);
     
     return cinfo.num_components;
+}
+
+inline unsigned int read_png(float **img, const char *const filename, unsigned *const h, unsigned *const w)
+{
+    /* open file and test for it being a png */
+    FILE *infile = fopen(filename, "rb");
+    if (!infile)
+    {
+        std::cout << "Error opening jpeg file " << filename << " for input"  << std::endl;
+        assert(!"Cannot open file");
+    }
+
+    png_byte header[8];
+    const int read = fread(header, 1, 8, infile);
+    if ((read == 0) || (png_sig_cmp(header, 0, 8)))
+    {
+        std::cout << "File " << filename << " is not recognized as a PNG file";
+        assert(!"Cannot read header");
+    }
+
+    /* initialize stuff */
+    png_struct *png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+    if (!png_ptr)
+    {
+        std::cout << "png_create_read_struct failed";
+        assert(!"Cannot png_create_read_struct");
+    }
+
+    png_infop info_ptr = png_create_info_struct(png_ptr);
+    if (!info_ptr)
+    {
+        std::cout << "png_create_info_struct failed";
+        assert(!"Cannot png_create_info_struct");
+    }
+
+    if (setjmp(png_jmpbuf(png_ptr)))
+    {
+        std::cout << "Error during init_io";
+        assert(!"Error during init_io");
+    }
+
+    png_init_io(png_ptr, infile);
+    png_set_sig_bytes(png_ptr, 8);
+    png_read_info(png_ptr, info_ptr);
+
+    *w = png_get_image_width(png_ptr, info_ptr);
+    *h = png_get_image_height(png_ptr, info_ptr);
+    png_byte color_type = png_get_color_type(png_ptr, info_ptr);
+    png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+    BOOST_LOG_TRIVIAL(error) << "bit_depth: " << static_cast<int>(bit_depth) << ", color_type: " << static_cast<int>(color_type);
+    assert((color_type == 2) || (color_type == 4) || (color_type == 6)); /* 2 = RGB, 4 = GA, 6 = RGBA */
+    const unsigned int cpp = (color_type == 2) ? 3 : ((color_type == 4) ? 1 : 4); 
+
+    png_read_update_info(png_ptr, info_ptr);
+
+    /* read file */
+    if (setjmp(png_jmpbuf(png_ptr)))
+    {
+        std::cout << "Error during read_image";
+        assert(!"Error during read_image");
+    }
+
+    png_bytepp row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * (*h));
+    for (int y = 0; y < static_cast<int>(*h); ++y)
+    {
+        row_pointers[y] = (png_byte*) malloc(png_get_rowbytes(png_ptr, info_ptr));
+    }
+
+    png_read_image(png_ptr, row_pointers);
+
+    /* read one scan line at a time */
+    unsigned long wr_idx = 0;
+    *img = new float[(*h) * (*w) * cpp];
+    for (int y = (*h) - 1; y >= 0; --y)
+    {
+        unsigned long rd_idx = 0;
+        for (unsigned int x = 0; x < (*w); ++x)
+        {
+            for (unsigned int i = 0; i < cpp; ++i)
+            {
+                (*img)[wr_idx++] = row_pointers[y][rd_idx++];
+            }
+            rd_idx += (color_type == 4);    /* Skipping gray scale alpha */
+        }
+
+        free(row_pointers[y]);
+    }
+
+    free(row_pointers);
+    fclose(infile);
+    BOOST_LOG_TRIVIAL(error) << "png read";
+    return cpp;
+}
+
+inline unsigned int read_tga(float **img, const char *const filename, unsigned *const h, unsigned *const w)
+{
+    /* Open tga file */
+    TGA *tga = TGAOpen(const_cast<char *>(filename), "r");
+    if (!tga || (tga->last != TGA_OK))
+    {
+        std::cout << "Error: TGAOpen failed" << std::endl;
+        assert(!"Error: TGAOpen failed");
+    }
+
+    /* Read the file into internal format */
+    TGAData data = {};
+    data.flags = TGA_IMAGE_DATA | TGA_COLOR_MAP | TGA_IMAGE_ID | TGA_RGB;
+    if (TGAReadImage(tga, &data) != TGA_OK)
+    {
+        std::cout << "Error: TGAReadImage failed" << std::endl;
+        assert(!"Error: TGAReadImage failed");
+    }
+
+    /* Get header information */
+    TGAHeader *header = &tga->hdr;
+    (*w) = header->width;
+    (*h) = header->height;
+    const unsigned int cpp = header->depth >> 3;
+
+    /* Check image */
+    tbyte *tga_img = data.img_data;
+    if (tga_img == nullptr)
+    {
+        std::cout << "Error: No image found" << std::endl;
+        assert(!"Error: No image found");
+    }
+
+    /* Copy data */
+    unsigned long wr_idx = 0;
+    unsigned long rd_idx = 0;
+    *img = new float[header->width * header->height * cpp];
+    for (int i = 0; i < header->height; ++i)
+    {
+        for (int j = 0; j < header->width; ++j)
+        {
+            for (int k = 0; k < static_cast<int>(cpp); ++k)
+            {
+                (*img)[wr_idx++] = (data.cmap != nullptr) ? data.cmap[tga_img[rd_idx++]] : tga_img[rd_idx++];
+            }
+        }
+    }
+
+    /* Clean up */
+    if (data.img_id)
+    {
+        free(data.img_id);
+    }
+
+    if (data.cmap)
+    {
+        free(data.cmap);
+    }
+
+    free(data.img_data);
+    TGAClose(tga);
+    return cpp;
+}
+
+inline unsigned read_image_file(float **img, const std::string &filename, unsigned *const h, unsigned *const w)
+{
+    /* Check for png file */
+    const std::string ext(boost::filesystem::extension(filename));
+    if (boost::iequals(ext, ".png"))
+    {
+        return read_png(img, filename.c_str(), h, w);
+    }
+    else if (boost::iequals(ext, ".tga"))
+    {
+        return read_tga(img, filename.c_str(), h, w);
+    }
+
+    /* Default to trying to read as a jpeg */
+    return read_jpeg(img, filename.c_str(), h, w);
 }
 
 inline bool apply_wrapping_mode(int *const c, const int s, const texture_wrapping_mode_t m)
