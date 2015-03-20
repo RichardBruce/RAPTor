@@ -442,7 +442,6 @@ inline unsigned int read_png(float **img, const char *const filename, unsigned *
     *h = png_get_image_height(png_ptr, info_ptr);
     png_byte color_type = png_get_color_type(png_ptr, info_ptr);
     png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-    BOOST_LOG_TRIVIAL(error) << "bit_depth: " << static_cast<int>(bit_depth) << ", color_type: " << static_cast<int>(color_type);
     assert((color_type == 2) || (color_type == 4) || (color_type == 6)); /* 2 = RGB, 4 = GA, 6 = RGBA */
     const unsigned int cpp = (color_type == 2) ? 3 : ((color_type == 4) ? 1 : 4); 
 
@@ -483,7 +482,6 @@ inline unsigned int read_png(float **img, const char *const filename, unsigned *
 
     free(row_pointers);
     fclose(infile);
-    BOOST_LOG_TRIVIAL(error) << "png read";
     return cpp;
 }
 
