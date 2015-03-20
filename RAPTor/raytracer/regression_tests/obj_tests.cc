@@ -893,6 +893,23 @@ BOOST_AUTO_TEST_CASE( obj_the_carnival_test )
     checker.check(fixture.get_camera(), "bih");
 }
 #endif /* #ifndef VALGRIND_TESTS */
+// obj_scenes/A10/A10.3ds
+// obj_scenes/B-17/.DS_Store
+// obj_scenes/Humvee/Tex_0023_1.png
+// obj_scenes/b2_spirit/455deb7c.png
+// obj_scenes/black_hawk/0783dfef.png
+// obj_scenes/damaged_downtown/Downtown_Damage_0.obj
+// obj_scenes/damaged_downtown/Downtown_Damage_1.obj
+// obj_scenes/damaged_downtown/Downtown_Damage_2.obj
+// obj_scenes/desert_city/desert city.obj
+// obj_scenes/elsa/Elsa2.obj
+// obj_scenes/iron_man/IronMan.obj
+// obj_scenes/mig_21/Mig21.obj
+// obj_scenes/sof/sof.obj
+// obj_scenes/t-90a/t-90a(Elements_of_war).obj
+// obj_scenes/war_machine/iron-man-v1_&_v2_(+war_machine).obj
+// obj_scenes/war_machine/war_machine-v2.obj
+// obj_scenes/white_house/Runtime/libraries/character/WhiteHouse/WhiteHouse.obj
 
 BOOST_AUTO_TEST_SUITE_END()
 }; /* namespace raptor_raytracer */
