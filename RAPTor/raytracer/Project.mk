@@ -30,7 +30,7 @@ LIBPATH = $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib \
 	$(LIBARYS_PATH)/fftw-$(FFTW_VER)/lib \
 	$(LIBARYS_PATH)/libtga-$(LIBTGA_VER)/lib \
 	${BOOST_LIB_PATH}
-SO_LIBS = SDL2 SDL2_ttf tbb tbbmalloc jpeg png tga pthread boost_system boost_log boost_serialization
+SO_LIBS = SDL2 SDL2_ttf tbb tbbmalloc jpeg png tga pthread boost_system boost_filesystem boost_log boost_serialization
 LIBRARY = $(SO_LIBS) fftw3f
 
 # Defines
