@@ -2,12 +2,14 @@
 #include "parser_common.h"
 
 #include "camera.h"
-
 #include "obj_parser.h"
+#include "picture_functions.h"
 
 
 namespace raptor_raytracer
 {
+const float ambiant_light = 0.5f;
+
 const char * find_next_statement(const char *at)
 {
     while (true)
@@ -197,6 +199,41 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
 }
 
 
+struct map_info
+{
+    boost::shared_array<float>  img;
+    unsigned int                img_width;
+    unsigned int                img_height;
+    unsigned int                cpp;
+};
+
+inline texture_mapper * load_image(std::map<std::string, map_info> *const cache, const std::string &name, const bool invert = false)
+{
+    /* Check if loaded */
+    const std::string cache_name(name + (invert ? "_inv" : ""));
+    auto cache_iter = cache->find(cache_name);
+    if (cache_iter == cache->end())
+    {
+        BOOST_LOG_TRIVIAL(error) << "Reading: " << name;
+        /* Load image */
+        float *img;
+        map_info info;
+        info.cpp = read_image_file(&img, name.c_str(), &info.img_height, &info.img_width);
+        info.img.reset(img);
+
+        /* Cache */
+        if (invert)
+        {
+            negative(img, info.cpp * info.img_height * info.img_width);
+        }
+        cache_iter = cache->emplace(cache_name, info).first;
+    }
+
+    const auto &info = cache_iter->second;
+    return new planar_mapper(info.img, point_t(0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(0.0f), info.cpp, info.img_width, info.img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+}
+
+
 material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstream &f, const std::string &p)
 {
     /* Find the size of the file */
@@ -208,6 +245,9 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
     char *buffer = new char [len];
     f.read((char *)buffer, len);
     const char *at = &buffer[0];
+
+    /* Image cache */
+    std::map<std::string, map_info> image_cache;
     
     /* Colour of current material */
     std::string     mn;
@@ -216,13 +256,18 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
     texture_mapper *t_kd    = nullptr;  /* Diffuse colour texture mapper    */
     texture_mapper *t_ks    = nullptr;  /* Specular colour texture mapper   */
     texture_mapper *t_ns    = nullptr;  /* Specular exponant texture mapper */
+    texture_mapper *t_rf    = nullptr;  /* Reflectance texture mapper       */
+    texture_mapper *t_tran  = nullptr;  /* Transmittance texture mapper     */
     ext_colour_t    ka;                 /* Ambient colour                   */
     ext_colour_t    kd;                 /* Diffuse colour                   */
     ext_colour_t    ks;                 /* Specular colour                  */
     ext_colour_t    ke;                 /* Emitted colour                   */
-    ext_colour_t    tf;                 /* Transmittaned colour             */
+    ext_colour_t    tf;                 /* Transmitted colour               */
     float           ns      = 0.0f;     /* Specular exponant                */
     float           ri      = 1.0f;     /* Refractive index                 */
+    float           rf      = 0.0f;     /* Reflectance                      */
+    float           trans   = 0.0f;     /* Transmittance                    */
+    int             illum   = 0;        /* Illumination model               */
     
     /* Parse the file */
     while (at < &buffer[len - 1])
@@ -239,7 +284,86 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
             /* Create the last material parsed */
             if (!mn.empty())
             {
-                m = new coloured_mapper_shader(ka, kd, ks, ns, 0.0, 1.0, 0.0, 0.0, 0.0, t_ka, t_kd, t_ks, t_ns);
+                assert(illum != 6  || !"Error: Illumination model not handled");
+                assert(illum != 8  || !"Error: Illumination model not handled");
+                assert(illum != 9  || !"Error: Illumination model not handled");
+                assert(illum != 10 || !"Error: Illumination model not handled");
+                switch (illum)
+                {
+                    /* colour = Kd */
+                    case 0 :
+                        t_ka    = t_kd;
+                        t_kd    = nullptr;
+                        t_ks    = nullptr;
+                        t_ns    = nullptr;
+                        t_rf    = nullptr;
+                        ka      = kd;
+                        kd      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ks      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ns      = 0.0f;
+                        ri      = 1.0f;
+                        rf      = 0.0f;
+                        break;
+                    /* colour = KaIa + Kd { SUM j=1..ls, (N * Lj)Ij } */
+                    case 1 :
+                        t_ks    = nullptr;
+                        t_ns    = nullptr;
+                        t_rf    = nullptr;
+                        ks      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ns      = 0.0f;
+                        ri      = 1.0f;
+                        rf      = 0.0f;
+                        break;
+                    /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks { SUM j=1..ls, ((H*Hj)^Ns)Ij } */
+                    case 2 :
+                        t_rf    = nullptr;
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ri      = 1.0f;
+                        rf      = 0.0f;
+                        break;
+                    /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij } + Ir) */
+                    /* Ir = (intensity of reflection map) + (ray trace)*/
+                    case 3 :
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ri      = 1.0f;
+                        rf      = 0.75f;
+                        break;
+                    /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij } + Ir) */
+                    /* The maximum of the average intensity of highlights and reflected lights is used to adjust the dissolve factor */
+                    case 4 :
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        rf      = 0.0f;
+                        break;
+                    /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij Fr(Lj*Hj,Ks,Ns)Ij} + Fr(N*V,Ks,Ns)Ir}) */
+                    case 5 :
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ri      = 1.0f;
+                        rf      = 0.75f;
+                        break;
+                    /*color = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij Fr(Lj*Hj,Ks,Ns)Ij} + Fr(N*V,Ks,Ns)Ir}) + (1.0 - Kx)Ft (N*V,(1.0-Ks),Ns)TfIt */
+                    case 7 :
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ri      = 1.0f;
+                        rf      = 0.75f;
+                        break;
+
+                    default :
+                        assert(!"Error: Illumination model not handled");
+                }
+            //     coloured_mapper_shader(const ext_colour_t& ka, const ext_colour_t &kd, const ext_colour_t &ks = 0.0f, const float ns = 0.0f, const float tran = 0.0f, const float ri = 1.0f, 
+            // const float rf = 0.0f, const float td = 0.0f, const float rfd = 0.0f, const texture_mapper * const t_ka = nullptr, const texture_mapper * const t_kd = nullptr, 
+            // const texture_mapper * const t_ks = nullptr, const texture_mapper * const t_ns = nullptr, const texture_mapper * const t_refl = nullptr, const texture_mapper * const t_d = nullptr)
+                ka *= ambiant_light;
+                m = new coloured_mapper_shader(ka, kd, ks, ns, trans, ri, rf, 0.0f, 0.0f, t_ka, t_kd, t_ks, t_ns, t_rf, t_tran);
                 (*s)[mn] = m;
             }
             
@@ -252,10 +376,16 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
             t_kd    = nullptr;
             t_ks    = nullptr;
             t_ns    = nullptr;
-            ka      = ext_colour_t(0.0);
-            kd      = ext_colour_t(0.0);
-            ks      = ext_colour_t(0.0);
-            ns      = 0.0;
+            t_rf    = nullptr;
+            t_tran  = nullptr;
+            ka      = ext_colour_t(0.0f);
+            kd      = ext_colour_t(0.0f);
+            ke      = ext_colour_t(0.0f);
+            ks      = ext_colour_t(0.0f);
+            ns      = 0.0f;
+            ri      = 1.0f;
+            rf      = 0.0f;
+            trans   = 0.0f;
         }
         /* Ambient colour */
         else if (strncmp(at, "Ka", 2) == 0)
@@ -316,6 +446,8 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
                 tf.g = tf.r;
                 tf.b = tf.r;
             }
+
+            BOOST_LOG_TRIVIAL(warning) << "Tf: " << tf << " (not handled)";
         }
         /* Emitted colour */
         else if (strncmp(at, "Ke", 2) == 0)
@@ -332,10 +464,8 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
                 ke.b = ke.r;
             }
 
-            // assert(ke.r == 0.0f);
-            // assert(ke.g == 0.0f);
-            // assert(ke.b == 0.0f);
-        }//  bump
+            BOOST_LOG_TRIVIAL(warning) << "Ke: " << ke << " (not handled)";
+        }
         /* Specular exponant */
         else if (strncmp(at, "Ns", 2) == 0)
         {
@@ -350,87 +480,75 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         else if (strncmp(at, "d", 1) == 0)
         {
             const float d = get_next_float(&at);
-            // assert(d == 1.0f);
+            BOOST_LOG_TRIVIAL(trace) << "d: " << d;
+            trans = 1.0f - d;
         }
         /* Opaque-ness by another name */
         else if (strncmp(at, "Tr", 2) == 0)
         {
-            const float tr = get_next_float(&at);
-            // assert(tr == 0.0f);
+            trans = get_next_float(&at);
+            BOOST_LOG_TRIVIAL(trace) << "Tr: " << trans;
         }
         /* Shader mode --ignored, everything is ray traced */
         else if (strncmp(at, "illum", 5) == 0)
         {
-
+            illum = get_next_unsigned(&at);
+            BOOST_LOG_TRIVIAL(trace) << "illum: " << illum;
         }
         /* Ambiant texture map */
         else if (strncmp(at, "map_Ka", 6) == 0)
         {
-            std::string map_file(p + get_next_string(&at));
-            // float *img;
-            // unsigned int img_width;
-            // unsigned int img_height;
-            // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
-            // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(trace) << "map_Ka: " << map_file;
+
+            t_ka = load_image(&image_cache, map_file);
         }
         /* Diffuse texture map */
         else if (strncmp(at, "map_Kd", 6) == 0)
         {
-            std::string map_file(p + get_next_string(&at));
-            // float *img;
-            // unsigned int img_width;
-            // unsigned int img_height;
-            // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
-            // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(trace) << "map_Kd: " << map_file;
+
+            t_kd = load_image(&image_cache, map_file);
         }
         /* Specular texture map */
         else if (strncmp(at, "map_Ks", 6) == 0)
         {
-            std::string map_file(p + get_next_string(&at));
-            // float *img;
-            // unsigned int img_width;
-            // unsigned int img_height;
-            // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
-            // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(trace) << "map_Ks: " << map_file;
+            
+            t_ks = load_image(&image_cache, map_file);
         }
         /* Reflection texture map */
         else if (strncmp(at, "map_refl", 8) == 0)
         {
-            std::string map_file(p + get_next_string(&at));
-            // float *img;
-            // unsigned int img_width;
-            // unsigned int img_height;
-            // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
-            // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(trace) << "map_refl: " << map_file;
+
+            t_rf = load_image(&image_cache, map_file);
         }
         /* Bump texture map */
         else if (strncmp(at, "map_bump", 8) == 0)
         {
-            std::string map_file(p + get_next_string(&at));
-            // float *img;
-            // unsigned int img_width;
-            // unsigned int img_height;
-            // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
-            // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(warning) << "map_bump: " << map_file << " (not handled)";
+
+            // t_kd = load_image(&image_cache, map_file);
         }
         else if (strncmp(at, "bump", 4) == 0)
         {
-            std::string map_file(p + get_next_string(&at));
-            // float *img;
-            // unsigned int img_width;
-            // unsigned int img_height;
-            // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
-            // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(warning) << "bump: " << map_file << " (not handled)";
+
+            // t_kd = load_image(&image_cache, map_file);
         }
         /* Opaqueness texture map */
         else if (strncmp(at, "map_d", 5) == 0)
         {
-            std::string map_file(p + get_next_string(&at));
-            // float *img;
-            // unsigned int img_width;
-            // unsigned int img_height;
-            // unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
-            // t_kd = new planar_mapper(boost::shared_array<float>(img), point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(trace) << "map_d: " << map_file;
+
+            t_tran = load_image(&image_cache, map_file, true);
         }
         else
         {
@@ -446,7 +564,87 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
     /* Create the last material parsed */
     if (!mn.empty())
     {
-        m = new coloured_mapper_shader(ka, kd, ks, ns, 0.0, ri, 0.0, 0.0, 0.0, t_ka, t_kd, t_ks, t_ns);
+        BOOST_LOG_TRIVIAL(trace) << "Adding material: " << mn;
+        assert(illum != 6  || !"Error: Illumination model not handled");
+        assert(illum != 8  || !"Error: Illumination model not handled");
+        assert(illum != 9  || !"Error: Illumination model not handled");
+        assert(illum != 10 || !"Error: Illumination model not handled");
+        switch (illum)
+        {
+            /* colour = Kd */
+            case 0 :
+                t_ka    = t_kd;
+                t_kd    = nullptr;
+                t_ks    = nullptr;
+                t_ns    = nullptr;
+                t_rf    = nullptr;
+                ka      = kd;
+                kd      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ks      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ns      = 0.0f;
+                ri      = 1.0f;
+                rf      = 0.0f;
+                break;
+            /* colour = KaIa + Kd { SUM j=1..ls, (N * Lj)Ij } */
+            case 1 :
+                t_ks    = nullptr;
+                t_ns    = nullptr;
+                t_rf    = nullptr;
+                ks      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ns      = 0.0f;
+                ri      = 1.0f;
+                rf      = 0.0f;
+                break;
+            /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks { SUM j=1..ls, ((H*Hj)^Ns)Ij } */
+            case 2 :
+                t_rf    = nullptr;
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ri      = 1.0f;
+                rf      = 0.0f;
+                break;
+            /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij } + Ir) */
+            /* Ir = (intensity of reflection map) + (ray trace)*/
+            case 3 :
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ri      = 1.0f;
+                rf      = 0.75f;
+                break;
+            /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij } + Ir) */
+            /* The maximum of the average intensity of highlights and reflected lights is used to adjust the dissolve factor */
+            case 4 :
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                rf      = 0.0f;
+                break;
+            /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij Fr(Lj*Hj,Ks,Ns)Ij} + Fr(N*V,Ks,Ns)Ir}) */
+            case 5 :
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ri      = 1.0f;
+                rf      = 0.75f;
+                break;
+            /*color = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij Fr(Lj*Hj,Ks,Ns)Ij} + Fr(N*V,Ks,Ns)Ir}) + (1.0 - Kx)Ft (N*V,(1.0-Ks),Ns)TfIt */
+            case 7 :
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ri      = 1.0f;
+                rf      = 0.75f;
+                break;
+
+            default :
+                assert(!"Error: Illumination model not handled");
+        }
+    //     coloured_mapper_shader(const ext_colour_t& ka, const ext_colour_t &kd, const ext_colour_t &ks = 0.0f, const float ns = 0.0f, const float tran = 0.0f, const float ri = 1.0f, 
+    // const float rf = 0.0f, const float td = 0.0f, const float rfd = 0.0f, const texture_mapper * const t_ka = nullptr, const texture_mapper * const t_kd = nullptr, 
+    // const texture_mapper * const t_ks = nullptr, const texture_mapper * const t_ns = nullptr, const texture_mapper * const t_refl = nullptr, const texture_mapper * const t_d = nullptr)
+        ka *= ambiant_light;
+        m = new coloured_mapper_shader(ka, kd, ks, ns, trans, ri, rf, 0.0f, 0.0f, t_ka, t_kd, t_ks, t_ns, t_rf, t_tran);
         (*s)[mn] = m;
     }
 
