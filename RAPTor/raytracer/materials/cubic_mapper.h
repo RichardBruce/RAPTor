@@ -27,7 +27,7 @@ class cubic_mapper : public image_texture_mapper
         cubic_mapper(const boost::shared_array<float> &img, const point_t &c, const point_t &n, const point_t &s, const texture_wrapping_mode_t uw, 
             const texture_wrapping_mode_t vw, const unsigned int cpp, const unsigned int w, const unsigned int h, const int u_off = 0, 
             const int v_off = 0, const int u_max = -1, const int v_max = -1) : 
-            image_texture_mapper(img, c, s, point_t(n.y + n.z, 0.0f, n.x), point_t(0.0f, -n.x - n.z, -n.y), 1.0f / static_cast<float>(w), 1.0f / static_cast<float>(h), w, h, cpp, uw, vw, u_off, v_off, u_max, v_max), _n(n)
+            image_texture_mapper(img, c, s, point_t(n.y + n.z, 0.0f, n.x), point_t(0.0f, n.x + n.z, n.y), 1.0f / static_cast<float>(w), 1.0f / static_cast<float>(h), w, h, cpp, uw, vw, u_off, v_off, u_max, v_max), _n(n)
             {
                 BOOST_LOG_TRIVIAL(trace) << "Loaded cubic texture map with parameters: ";
                 BOOST_LOG_TRIVIAL(trace) << "U vec : " << _u;

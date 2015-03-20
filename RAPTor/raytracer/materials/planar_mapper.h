@@ -26,11 +26,11 @@ class planar_mapper : public image_texture_mapper
         planar_mapper(const boost::shared_array<float> &img, const point_t &c, const point_t &n, const point_t &s, 
               const unsigned cpp, const unsigned w, const unsigned h, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
               const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1) : 
-                image_texture_mapper(img, c, s, point_t(n.y + n.z, 0.0f, n.x), point_t(0.0f, -n.x - n.z, -n.y), 1.0f / static_cast<float>(w), 1.0f / static_cast<float>(h), w, h, cpp, uw, vw, u_off, v_off, u_max, v_max), _n(n)
+                image_texture_mapper(img, c, s, point_t(n.y + n.z, 0.0f, n.x), point_t(0.0f, n.x + n.z, n.y), 1.0f / static_cast<float>(w), 1.0f / static_cast<float>(h), w, h, cpp, uw, vw, u_off, v_off, u_max, v_max), _n(n)
             {
-                BOOST_LOG_TRIVIAL(trace) << "n vec: " << _n;
-                BOOST_LOG_TRIVIAL(trace) << "u vec: " << _u;
-                BOOST_LOG_TRIVIAL(trace) << "v vec: " << _v;
+                // BOOST_LOG_TRIVIAL(trace) << "n vec: " << _n;
+                // BOOST_LOG_TRIVIAL(trace) << "u vec: " << _u;
+                // BOOST_LOG_TRIVIAL(trace) << "v vec: " << _v;
             };
 
         planar_mapper(const boost::shared_array<float> &img, const point_t &u, const point_t &v, const point_t &c, const point_t &n, const point_t &s, 
