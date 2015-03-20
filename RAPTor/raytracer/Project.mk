@@ -16,6 +16,7 @@ INCLUDE = $(LOCAL_INCLUDES) \
 	$(LIBARYS_PATH)/SDL2_ttf-$(SDLTTF_VER)/include/SDL2/ \
 	$(LIBARYS_PATH)/tbb$(TBB_VER)/include/tbb/ \
 	$(LIBARYS_PATH)/fftw-$(FFTW_VER)/include \
+	$(LIBARYS_PATH)/libtga-$(LIBTGA_VER)/include \
 	${BOOST_INCLUDE_PATH}
 LOCAL_INCLUDES = . $(RAPTOR_HOME)/raytracer/materials/ $(RAPTOR_HOME)/raytracer/spatial_sub_division/ \
 	$(RAPTOR_HOME)/raytracer/parsers/ $(RAPTOR_HOME)/raytracer/parsers/mgflib $(RAPTOR_HOME)/sdl_wrappers $(RAPTOR_HOME)/common/
@@ -27,8 +28,9 @@ LIBPATH = $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib \
 	$(LIBARYS_PATH)/SDL2_ttf-$(SDLTTF_VER)/lib \
 	$(LIBARYS_PATH)/tbb$(TBB_VER)/build/build_release \
 	$(LIBARYS_PATH)/fftw-$(FFTW_VER)/lib \
+	$(LIBARYS_PATH)/libtga-$(LIBTGA_VER)/lib \
 	${BOOST_LIB_PATH}
-SO_LIBS = SDL2 SDL2_ttf tbb tbbmalloc jpeg png pthread boost_system boost_log boost_serialization
+SO_LIBS = SDL2 SDL2_ttf tbb tbbmalloc jpeg png tga pthread boost_system boost_log boost_serialization
 LIBRARY = $(SO_LIBS) fftw3f
 
 # Defines
