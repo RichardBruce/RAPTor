@@ -441,7 +441,7 @@ inline unsigned int read_png(float **img, const char *const filename, unsigned *
     *w = png_get_image_width(png_ptr, info_ptr);
     *h = png_get_image_height(png_ptr, info_ptr);
     png_byte color_type = png_get_color_type(png_ptr, info_ptr);
-    png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+    // png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
     assert((color_type == 2) || (color_type == 4) || (color_type == 6)); /* 2 = RGB, 4 = GA, 6 = RGBA */
     const unsigned int cpp = (color_type == 2) ? 3 : ((color_type == 4) ? 1 : 4); 
 

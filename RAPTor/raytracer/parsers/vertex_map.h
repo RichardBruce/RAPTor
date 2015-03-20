@@ -88,7 +88,7 @@ class vertex_map : private boost::noncopyable
             return true;
         }
 
-        float * find(const std::string map_name, const int vertex)
+        float * find(const std::string &map_name, const int vertex)
         {
             /* Look up the map */
             auto data_iter = _vertex_maps.find(map_name);
@@ -110,7 +110,7 @@ class vertex_map : private boost::noncopyable
             return &values[vertex_iter->second];
         }
 
-        float * find(const std::string map_name, const int poly, const int vertex)
+        float * find(const std::string &map_name, const int poly, const int vertex)
         {
             /* Look up the map */
             auto data_iter = _vertex_maps.find(map_name);

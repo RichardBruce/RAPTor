@@ -28,8 +28,20 @@ class lwo_bloks : private boost::noncopyable
 {
     public :
         lwo_bloks() :
-            _clip(nullptr), _trgb(ext_colour_t(255.0f, 255.0f, 255.0f)), _topc(1.0f), _tamp(1.0f), _shader(non), _map_of(map_ctex), 
-            _twrp_mode_x(static_cast<texture_wrapping_mode_t>(2)), _twrp_mode_y(static_cast<texture_wrapping_mode_t>(2)), _fall_type(falloff_type_t::none)
+            _clip(nullptr),
+            _trgb(ext_colour_t(255.0f, 255.0f, 255.0f)),
+            _tfp{0.0f, 0.0f, 0.0f, 0.0f },
+            _valu{0.0f, 0.0f, 0.0f },
+            _topc(1.0f),
+            _wrpw(1.0f),
+            _wrph(1.0f),
+            _tamp(1.0f),
+            _shader(non),
+            _map_of(map_ctex), 
+            _twrp_mode_x(static_cast<texture_wrapping_mode_t>(2)),
+            _twrp_mode_y(static_cast<texture_wrapping_mode_t>(2)),
+            _fall_type(falloff_type_t::none),
+            _nega(false)
             { }
 
         std::string parse(const std::map<std::uint32_t, lwo_clip *> &clips, const char **ptr, const std::uint32_t blok_len);
