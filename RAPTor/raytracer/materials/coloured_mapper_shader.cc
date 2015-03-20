@@ -15,10 +15,24 @@ void coloured_mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, po
     }
     
     /* Request reflections */
-    rl->number(i.reflect(rl->rays(), *n, this->rf, this->rfd));
+    float cur_rf = this->rf;
+    if (this->t_refl != nullptr)
+    {
+        ext_colour_t tmp;
+        this->t_refl->texture_map(i, &tmp, *n, vt);
+        cur_rf = tmp.r * (this->rf * (1.0f / 255.0f));
+    }
+    rl->number(i.reflect(rl->rays(), *n, cur_rf, this->rfd));
     
     /* Request refractions */
-    rf->number(i.refract(rf->rays(), *n, this->tran, this->ri, h, this->td));
+    float cur_tran = this->tran;
+    if (this->t_d != nullptr)
+    {
+        ext_colour_t tmp;
+        this->t_d->texture_map(i, &tmp, *n, vt);
+        cur_tran = tmp.r * (this->tran * (1.0f / 255.0f));
+    }
+    rf->number(i.refract(rf->rays(), *n, cur_tran, this->ri, h, this->td));
 
     return;
 }
@@ -32,6 +46,7 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const poin
     if(this->t_ns != nullptr)
     {
         cur_ns = this->t_ns->texture_map(i, &cur_ka, n, vt);
+        cur_ns *= (this->ns * (1.0f / 255.0f));
     }
 
     /* Get the materials ka */
@@ -47,7 +62,7 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const poin
     if(this->t_kd != nullptr)
     {
         this->t_kd->texture_map(i, &cur_kd, n, vt);
-        cur_kd *= (this->kd* (1.0f / 255.0f));
+        cur_kd *= (this->kd * (1.0f / 255.0f));
     }
     
     /* Get the materials ks */

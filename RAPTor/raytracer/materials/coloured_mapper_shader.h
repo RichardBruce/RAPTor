@@ -21,8 +21,8 @@ class coloured_mapper_shader : public material
     public :
         coloured_mapper_shader(const ext_colour_t& ka, const ext_colour_t &kd, const ext_colour_t &ks = 0.0f, const float ns = 0.0f, const float tran = 0.0f, const float ri = 1.0f, 
             const float rf = 0.0f, const float td = 0.0f, const float rfd = 0.0f, const texture_mapper * const t_ka = nullptr, const texture_mapper * const t_kd = nullptr, 
-            const texture_mapper * const t_ks = nullptr, const texture_mapper * const t_ns = nullptr) : 
-            material(tran > 0.0f), t_ka(t_ka), t_kd(t_kd), t_ks(t_ks), t_ns(t_ns), ka(ka), kd(kd), ks(ks), ns(ns), tran(tran), ri(ri), rf(rf), td(td), rfd(rfd) 
+            const texture_mapper * const t_ks = nullptr, const texture_mapper * const t_ns = nullptr, const texture_mapper * const t_refl = nullptr, const texture_mapper * const t_d = nullptr) : 
+            material(tran > 0.0f), t_ka(t_ka), t_kd(t_kd), t_ks(t_ks), t_ns(t_ns), t_refl(t_refl), t_d(t_d), ka(ka), kd(kd), ks(ks), ns(ns), tran(tran), ri(ri), rf(rf), td(td), rfd(rfd)
             {
                 /* A whole bunch of sanity checking asserts */
                 /* Note rgb is stored in light_intensity in the format ( r, g, b ) */
@@ -66,6 +66,18 @@ class coloured_mapper_shader : public material
                 delete this->t_ns;
                 this->t_ns = nullptr;
             }
+            
+            if (this->t_refl != nullptr)
+            {
+                delete this->t_refl;
+                this->t_refl = nullptr;
+            }
+            
+            if (this->t_d != nullptr)
+            {
+                delete this->t_d;
+                this->t_d = nullptr;
+            }
         };
 
         /* Function the allow the shader a chance to generate SIMD packets */
@@ -82,6 +94,8 @@ class coloured_mapper_shader : public material
         const texture_mapper    *   t_kd;   /* Texture mapper to map Kd     */
         const texture_mapper    *   t_ks;   /* Texture mapper to map Ks     */
         const texture_mapper    *   t_ns;   /* Texture mapper to map Ns     */
+        const texture_mapper    *   t_refl; /* Texture mapper to map refl   */
+        const texture_mapper    *   t_d;    /* Texture mapper to map d      */
         const ext_colour_t          ka;     /* Ambient co-efficient         */
         const ext_colour_t          kd;     /* Diffuse co-efficient         */
         const ext_colour_t          ks;     /* Specular co-efficient        */
