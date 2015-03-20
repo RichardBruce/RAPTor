@@ -218,7 +218,7 @@ inline texture_mapper * load_image(std::map<std::string, map_info> *const cache,
         /* Load image */
         float *img;
         map_info info;
-        info.cpp = read_image_file(&img, name.c_str(), &info.img_height, &info.img_width);
+        info.cpp = read_image_file(&img, name, &info.img_height, &info.img_width);
         info.img.reset(img);
 
         /* Cache */
