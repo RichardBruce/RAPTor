@@ -492,7 +492,7 @@ BOOST_FIXTURE_TEST_CASE( edge_merge_normal_calculator_calculate_test, normal_cal
 
     /* Add polygons */
     uut->add_point_usage(std::vector<int>{ 0, 1, 2 }, PI * 0.25f, 0, 0);
-    uut->add_point_usage(std::vector<int>{ 1, 2, 3 }, PI * 0.25f, 0, 1);
+    uut->add_point_usage(std::vector<int>{ 1, 3, 2 }, PI * 0.25f, 0, 1);
 
     /* Calculate */
     uut->calculate();
@@ -509,8 +509,8 @@ BOOST_FIXTURE_TEST_CASE( edge_merge_normal_calculator_calculate_test, normal_cal
     BOOST_REQUIRE(uut->normals(&norms, 1) != nullptr);
     BOOST_CHECK(norms.size() == 3);
     BOOST_CHECK(norms[0] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[1] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.382577f, -0.0f, 0.923924f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(-0.382577f, 0.0f, -0.923924f))) < result_tolerance);
+    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
 }
 
 BOOST_FIXTURE_TEST_CASE( flat_normal_calculator_calculate_test, normal_calculator_fixture )
@@ -558,11 +558,7 @@ BOOST_FIXTURE_TEST_CASE( flat_normal_calculator_calculate_test, normal_calculato
     BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
 
     norms.clear();
-    BOOST_REQUIRE(uut->normals(&norms, 4) != nullptr);
-    BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(norms[0] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[1] == point_t(0.0f, 0.0f,  1.0f));
-    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
+    BOOST_REQUIRE(uut->normals(&norms, 4) == nullptr);
 }
 
 BOOST_FIXTURE_TEST_CASE( normal_calculator_calculate_test, normal_calculator_fixture )
