@@ -892,24 +892,254 @@ BOOST_AUTO_TEST_CASE( obj_the_carnival_test )
     fixture.render<bih>();
     checker.check(fixture.get_camera(), "bih");
 }
+
+BOOST_AUTO_TEST_CASE( obj_A10_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/A10/A10.obj", model_format_t::obj, point_t(7.68375, 3.44892, -15.2514), point_t(-0.917753, 0.0, -0.397147), point_t(-0.0866349, 0.975917, 0.200202), point_t(-0.387582, -0.218142, 0.8956), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, 50.0, -150.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_b_17_silver_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/B-17/B17SILVER.obj", model_format_t::obj, point_t(2.63233, 4.5, 5.5), point_t(0.951056, 0.0, -0.309017), point_t(-0.131573, 0.904826, -0.40494), point_t(-0.279606, -0.425779, -0.860541), ext_colour_t(0.0, 0.0, 200.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, 50.0, 150.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_b2_spirit_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/b2_spirit/B2_Spirit.obj", model_format_t::obj, point_t(22.0, 14.0, -34.0), point_t(0.929776, 0.0, 0.368124), point_t(-0.135515, 0.929776, 0.342273), point_t(-0.342273, -0.368124, 0.864484), ext_colour_t(0.0, 0.0, 200.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, 5.0, -160.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_blackhawk_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/black_hawk/Blackhawk.obj", model_format_t::obj, point_t(8.45907, 1.0, -9.32057), point_t(0.707106, 0.0, 0.707106), point_t(0.0, 1.0, 0.0), point_t(-0.707106, 0.0, 0.707106), ext_colour_t(0.0, 0.0, 200.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(200.0, 200.0, 200.0), point_t(1000.0, 100.0, -900.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_Downtown_Damage_0_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/damaged_downtown/Downtown_Damage_0.obj", model_format_t::obj, point_t(-76.0, 24.5, -127.5), point_t(-0.770505, 0.0, -0.637418), point_t(-0.0, 1.0, 0.0), point_t(0.637418, 0.0, -0.770505), ext_colour_t(0.0, 0.0, 200.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-76.0, 100.0, -127.5), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_Downtown_Damage_1_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/damaged_downtown/Downtown_Damage_1.obj", model_format_t::obj, point_t(-105.0, 25.0, 78.0), point_t(0.968581, 0.0, 0.248689), point_t(0.0, 1.0, 0.0), point_t(-0.248689, 0.0, 0.9685), ext_colour_t(0.0, 0.0, 200.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-75.0, 200.0, 78.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_Downtown_Damage_2_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/damaged_downtown/Downtown_Damage_2.obj", model_format_t::obj, point_t(-1.16788, 25.9646, 69.6975), point_t(0.311482, -0.0302841, -0.949754), point_t(-0.166501, 0.98229, -0.0859272), point_t(0.935535, 0.184899, 0.300923), ext_colour_t(0.0, 0.0, 200.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-72.0, 100.0, -35.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_desert_city_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/desert_city/desert_city.obj", model_format_t::obj, point_t(42.8173, 31.9754, 300.0), point_t(-0.992109, 0.0, 0.125333), point_t(-0.0196063, 0.987688, -0.1552), point_t(-0.12379, -0.156433, -0.979895), ext_colour_t(0.0, 0.0, 200.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(40.0, 300.0, 250.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_elsa_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/elsa/Elsa2.obj", model_format_t::obj, point_t(1.0, 1.75, 3.5), point_t(-0.939191, -0.0351117, 0.341594), point_t(-0.0953847, 0.982287, -0.161287), point_t(-0.329881, -0.184062, -0.925904), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(1.0, 2.5, 5.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_ironman_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/iron_man/IronMan.obj", model_format_t::obj, point_t(326.662, 276.885, 322.31), point_t(-0.70313, -0.0389036, 0.709995), point_t(-0.24362, 0.951249, -0.189142), point_t(-0.668023, -0.305961, -0.67833), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(200.0, 300.0, 300.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_mig21_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/mig_21/Mig21.obj", model_format_t::obj, point_t(2.72193, 1.16851, 10.4699), point_t(-0.940318, 0.0126159, 0.34006), point_t(-0.0396971, 0.988423, -0.146438), point_t(-0.33797, -0.151198, -0.928931), ext_colour_t(0.0, 0.0, 200.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(3.0, 5.0, 10.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_spirit_of_fire_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/sof/sof.obj", model_format_t::obj, point_t(64.9104, 27.3028, -17.1907), point_t(0.23036, -0.285895, 0.930159), point_t(-0.168811, 0.929634, 0.327541), point_t(-0.958351, -0.232474, 0.165888), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0, 0.0), 0.0, 0.0001);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, 0.0, 0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( obj_war_machine_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/obj_scenes/war_machine/iron-man-v1_&_v2_(+war_machine).obj", model_format_t::obj, point_t(63.0277, 84.5532, 120.0), point_t(-0.998022, 0.0, -0.0627896), point_t(0.00590902, 0.995562, -0.0939222), point_t(0.0625109, -0.0941075, -0.993593), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, 100.0, -15.0), 0.0, 0.0001);
+    // fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-6.0, 10.0,  0.0), 0.0, 0.0001);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
 #endif /* #ifndef VALGRIND_TESTS */
-// obj_scenes/A10/A10.3ds
-// obj_scenes/B-17/.DS_Store
-// obj_scenes/Humvee/Tex_0023_1.png
-// obj_scenes/b2_spirit/455deb7c.png
-// obj_scenes/black_hawk/0783dfef.png
-// obj_scenes/damaged_downtown/Downtown_Damage_0.obj
-// obj_scenes/damaged_downtown/Downtown_Damage_1.obj
-// obj_scenes/damaged_downtown/Downtown_Damage_2.obj
-// obj_scenes/desert_city/desert city.obj
-// obj_scenes/elsa/Elsa2.obj
-// obj_scenes/iron_man/IronMan.obj
-// obj_scenes/mig_21/Mig21.obj
-// obj_scenes/sof/sof.obj
-// obj_scenes/t-90a/t-90a(Elements_of_war).obj
-// obj_scenes/war_machine/iron-man-v1_&_v2_(+war_machine).obj
-// obj_scenes/war_machine/war_machine-v2.obj
-// obj_scenes/white_house/Runtime/libraries/character/WhiteHouse/WhiteHouse.obj
 
 BOOST_AUTO_TEST_SUITE_END()
 }; /* namespace raptor_raytracer */

@@ -359,6 +359,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
                     default :
                         assert(!"Error: Illumination model not handled");
                 }
+                trans = std::max(0.0f, std::min(1.0f, trans));
             //     coloured_mapper_shader(const ext_colour_t& ka, const ext_colour_t &kd, const ext_colour_t &ks = 0.0f, const float ns = 0.0f, const float tran = 0.0f, const float ri = 1.0f, 
             // const float rf = 0.0f, const float td = 0.0f, const float rfd = 0.0f, const texture_mapper * const t_ka = nullptr, const texture_mapper * const t_kd = nullptr, 
             // const texture_mapper * const t_ks = nullptr, const texture_mapper * const t_ns = nullptr, const texture_mapper * const t_refl = nullptr, const texture_mapper * const t_d = nullptr)
@@ -640,6 +641,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
             default :
                 assert(!"Error: Illumination model not handled");
         }
+        trans = std::max(0.0f, std::min(1.0f, trans));
     //     coloured_mapper_shader(const ext_colour_t& ka, const ext_colour_t &kd, const ext_colour_t &ks = 0.0f, const float ns = 0.0f, const float tran = 0.0f, const float ri = 1.0f, 
     // const float rf = 0.0f, const float td = 0.0f, const float rfd = 0.0f, const texture_mapper * const t_ka = nullptr, const texture_mapper * const t_kd = nullptr, 
     // const texture_mapper * const t_ks = nullptr, const texture_mapper * const t_ns = nullptr, const texture_mapper * const t_refl = nullptr, const texture_mapper * const t_d = nullptr)
