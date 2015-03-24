@@ -113,7 +113,7 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
             }
         
             /* Parse vertex normal */
-            if(is_triplet_delimiter(c))
+            if (is_triplet_delimiter(c))
             {
                 ++(*c);
                 int vert_norm = atoi(*c);
