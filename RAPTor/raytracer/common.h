@@ -289,7 +289,7 @@ struct hit_description
 };
 
 /* Enumerate the input file formats */
-enum class model_format_t : char { cfg = 0, code = 1, mgf = 2, nff = 3, lwo = 4, obj = 5, ply = 6, vrml = 7 };
+enum class model_format_t : char { cfg = 0, code = 1, mgf = 2, nff = 3, lwo = 4, obj = 5, off = 6, ply = 7, vrml = 8 };
 
 /* Enumerate the output file formats */
 enum class image_format_t : char { tga = 0, jpg = 1, png = 2 };

@@ -8,6 +8,7 @@
 #include "nff_parser.h"
 #include "lwo_parser.h"
 #include "obj_parser.h"
+#include "off_parser.h"
 #include "ply_parser.h"
 #include "vrml_parser.h"
 #include "bih.h"
@@ -256,6 +257,19 @@ int main (int argc, char **argv)
                 }
                 
                 input_format    = model_format_t::obj;
+                input_file      = argv[++i];
+            }
+            /* OFF input */
+            else if (strcmp(argv[i], "-off") == 0)
+            {
+                if ((argc - i) < 2)
+                {
+                    std::cout << "Incorrectly specified off file" << std::endl;
+                    help();
+                    return 1;
+                }
+                
+                input_format    = model_format_t::off;
                 input_file      = argv[++i];
             }
             /* PLY input */
@@ -639,6 +653,15 @@ int main (int argc, char **argv)
             last_slash  = input_file.find_last_of('/');
             path        = input_file.substr(0, last_slash + 1);
             raptor_raytracer::obj_parser(input_stream, path, lights, everything, materials, &cam);
+            
+            /* Camera is not set in the scene so do it here */
+            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            break;
+            
+        case model_format_t::off :
+            input_stream.open(input_file.c_str());
+            assert(input_stream.is_open());
+            raptor_raytracer::off_parser(input_stream, lights, everything, materials, cam);
             
             /* Camera is not set in the scene so do it here */
             cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);

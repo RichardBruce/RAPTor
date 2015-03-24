@@ -188,6 +188,18 @@ inline float get_next_float(const char **c)
     return atof(*c);
 }
 
+inline float get_this_float(const char **c)
+{
+    /* Eat the white space */
+    while (((**c) == ' ') || ((**c) == '\t'))
+    {
+        ++(*c);
+    }
+    
+    /* Assume the next thing is a float and convert */
+    return atof(*c);
+}
+
 
 /* Char* to unsigned conversion */
 inline unsigned get_next_unsigned(const char **c)
@@ -208,6 +220,17 @@ inline unsigned get_next_unsigned(const char **c)
     return (unsigned)atoi(*c);
 }
 
+inline unsigned get_this_unsigned(const char **c)
+{
+    /* Eat the white space */
+    while ((**c) == ' ')
+    {
+        (*c)++;
+    }
+    
+    /* Assume the next thing is an unsigned and convert */
+    return (unsigned)atoi(*c);
+}
 
 /* Char* to string conversion where string is quoted */
 inline std::string get_quoted_string(const char **c)
