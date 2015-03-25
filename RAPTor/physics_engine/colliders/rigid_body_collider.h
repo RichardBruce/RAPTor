@@ -190,7 +190,7 @@ class rigid_body_collider : public collider
             METHOD_LOG;
 
             /* Only process these types of collision */
-            assert(type == COLLISION);
+            assert(type == collision_t::COLLISION);
 
             /* Actual collision processing */
             instantaneous_collide(po_a, po_b, poc, noc, _cor, _mu);

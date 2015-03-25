@@ -58,7 +58,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
     {
         *manifold_a = new simplex(*this);
         *manifold_b = new simplex(*po);
-        return NO_COLLISION;
+        return collision_t::NO_COLLISION;
     }
 
     const float min_t = std::max(_cur_t, po->_cur_t);
@@ -84,7 +84,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
         delete sim_a;
         delete sim_b;
         BOOST_LOG_TRIVIAL(trace) << "Object separate, no collision";
-        return NO_COLLISION;
+        return collision_t::NO_COLLISION;
     }
     /* The objects never get any closer, they are sliding or separating */
     else if ((d_t0 - d_t1) < raptor_physics::EPSILON)
@@ -101,13 +101,13 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
         if ((d_t0 - d_t1) < 0.0)
         {
             BOOST_LOG_TRIVIAL(trace) << "Object separating, no collision";
-            return NO_COLLISION;
+            return collision_t::NO_COLLISION;
         }
         /* The objects are already sliding */
         else
         {
             BOOST_LOG_TRIVIAL(trace) << "Sliding collision";
-            return SLIDING_COLLISION;
+            return collision_t::SLIDING_COLLISION;
         }
     }
     /* If distance at t0 is within the weld distance (and dt1 is closer) it is about to slide */
@@ -148,7 +148,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
 
             *t = t_mid;
             BOOST_LOG_TRIVIAL(trace) << "Sliding collision about to happen at: " << t_mid;
-            return SLIDING_COLLISION;
+            return collision_t::SLIDING_COLLISION;
         }
         else
         {
@@ -157,7 +157,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
             *manifold_a = sim_a;
             *manifold_b = sim_b;
             *t = min_t;
-            return COLLISION;
+            return collision_t::COLLISION;
         }
     }
     delete sim_a;
@@ -217,7 +217,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
     }
     
     *t = adjusted_t;
-    return COLLISION;
+    return collision_t::COLLISION;
 }
 
 
@@ -230,7 +230,7 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
     {
         *manifold_a = new simplex(*this);
         *manifold_b = new simplex(*po);
-        return NO_COLLISION;
+        return collision_t::NO_COLLISION;
     }
 
     const float min_t = std::max(_cur_t, po->_cur_t);
@@ -271,14 +271,14 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
         // {
         //     (*t) = min_t;
         //     BOOST_LOG_TRIVIAL(trace) << "resting collision: " << d_t1;
-        //     return RESTING_COLLISION;
+        //     return collision_t::RESTING_COLLISION;
         // }
         /* Sliding so impact at max_t */
         // else if (d_t1 < raptor_physics::WELD_DISTANCE)
         // {
         //     (*t) = max_t;
         //     BOOST_LOG_TRIVIAL(trace) << "possible sliding: " << d_t1;
-        //     return POSSIBLE_SLIDING_COLLISION;
+        //     return collision_t::POSSIBLE_SLIDING_COLLISION;
         // }
         /* Splitting */
     }
@@ -287,7 +287,7 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
     if (d_t1 > raptor_physics::WELD_DISTANCE)
     {
         BOOST_LOG_TRIVIAL(trace) << "no collision " << d_t1;
-        return NO_COLLISION;
+        return collision_t::NO_COLLISION;
     }
 
     /* Iterate until no contact possible */
@@ -327,7 +327,7 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
 
     (*t) = adjusted_t;
     BOOST_LOG_TRIVIAL(trace) << "possible collision at: " << adjusted_t << " dist: " << d_t1;
-    return POSSIBLE_COLLISION;
+    return collision_t::POSSIBLE_COLLISION;
 }
 
 
@@ -344,7 +344,7 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
     // {
     //     BOOST_LOG_TRIVIAL(trace) << "Objects translating towards each other, instant impact";
     //     *t = 0.0;
-    //     return RESTING_COLLISION;
+    //     return collision_t::RESTING_COLLISION;
     // }
         
     const point_t n((*manifold_a)->normal_of_impact(**manifold_b));
@@ -356,7 +356,7 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
     //     {
     //         BOOST_LOG_TRIVIAL(trace) << "Object a translating towards b, instant impact";
     //         *t = 0.0;
-    //         return RESTING_COLLISION;
+    //         return collision_t::RESTING_COLLISION;
     //     }
 
     //     //if (dot_product(po->_v, n) > 0.0)
@@ -364,7 +364,7 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
     //     {
     //         BOOST_LOG_TRIVIAL(trace) << "Objects b translating towards a, instant impact";
     //         *t = 0.0;
-    //         return RESTING_COLLISION;
+    //         return collision_t::RESTING_COLLISION;
     //     }
     // }
 
@@ -400,18 +400,18 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
     {
         BOOST_LOG_TRIVIAL(trace) << "Resting collision";
         (*t) = 0.0;
-        return SLIDING_COLLISION;
+        return collision_t::SLIDING_COLLISION;
     }
     else if (full_t < *t)
     {
         *t = full_t;
         BOOST_LOG_TRIVIAL(trace) << "No collision in time limit, requesting retest at limit";
-        return POSSIBLE_COLLISION;
+        return collision_t::POSSIBLE_COLLISION;
     }
     else
     {
         BOOST_LOG_TRIVIAL(trace) << "No collision";
-        return NO_COLLISION;
+        return collision_t::NO_COLLISION;
     }
 }
 

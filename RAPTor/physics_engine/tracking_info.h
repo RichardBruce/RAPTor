@@ -131,7 +131,7 @@ class tracking_info : private boost::noncopyable
         {
             _collide = nullptr;
             _time = std::numeric_limits<float>::max();
-            _type = NO_COLLISION;
+            _type = collision_t::NO_COLLISION;
             for (auto& c : (*_collisions))
             {
                 float obj_time = c.second->get_time();

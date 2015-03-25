@@ -753,7 +753,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_test )
     po_a->set_velocity(point_t(-10.0,  10.0, 0.0));
     po_b->set_velocity(point_t( 10.0, -10.0, 0.0));
 
-    uut->collide(po_a.get(), po_b.get(), poc, noc, COLLISION);
+    uut->collide(po_a.get(), po_b.get(), poc, noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(-6.7, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, -9.9))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(-1.75, -1.0, 0.0))) < result_tolerance);
@@ -767,7 +767,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_test )
     po_a->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     po_b->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     
-    uut->collide(po_b.get(), po_a.get(), poc, -noc, COLLISION);
+    uut->collide(po_b.get(), po_a.get(), poc, -noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(-6.7, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, -9.9))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(-1.75, -1.0, 0.0))) < result_tolerance);
@@ -791,7 +791,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_reverse_test )
     po_a->set_velocity(point_t( 10.0,  10.0, 0.0));
     po_b->set_velocity(point_t(-10.0, -10.0, 0.0));
 
-    uut->collide(po_a.get(), po_b.get(), poc, noc, COLLISION);
+    uut->collide(po_a.get(), po_b.get(), poc, noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(6.7, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, 9.9))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(1.75, -1.0, 0.0))) < result_tolerance);
@@ -805,7 +805,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_reverse_test )
     po_a->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     po_b->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     
-    uut->collide(po_b.get(), po_a.get(), poc, -noc, COLLISION);
+    uut->collide(po_b.get(), po_a.get(), poc, -noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(6.7, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, 9.9))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(1.75, -1.0, 0.0))) < result_tolerance);
@@ -829,7 +829,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_more_friction_test )
     po_a->set_velocity(point_t(-10.0,  10.0, 0.0));
     po_b->set_velocity(point_t( 10.0, -10.0, 0.0));
 
-    uut->collide(po_a.get(), po_b.get(), poc, noc, COLLISION);
+    uut->collide(po_a.get(), po_b.get(), poc, noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(-6.15, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, -11.55))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(-0.375, -1.0, 0.0))) < result_tolerance);
@@ -843,7 +843,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_more_friction_test )
     po_a->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     po_b->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     
-    uut->collide(po_b.get(), po_a.get(), poc, -noc, COLLISION);
+    uut->collide(po_b.get(), po_a.get(), poc, -noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(-6.15, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, -11.55))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(-0.375, -1.0, 0.0))) < result_tolerance);
@@ -866,7 +866,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_max_friction_test )
     /* Collide and check */
     po_a->set_velocity(point_t(-10.0,  10.0, 0.0));
     po_b->set_velocity(point_t( 10.0, -10.0, 0.0));
-    uut->collide(po_a.get(), po_b.get(), poc, noc, COLLISION);
+    uut->collide(po_a.get(), po_b.get(), poc, noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(-6.00007, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, -11.9998))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(-0.000175476, -1.0, 0.0))) < result_tolerance);
@@ -880,7 +880,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_max_friction_test )
     po_a->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     po_b->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     
-    uut->collide(po_b.get(), po_a.get(), poc, -noc, COLLISION);
+    uut->collide(po_b.get(), po_a.get(), poc, -noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(-6.00007, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, -11.9998))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(-0.000175476, -1.0, 0.0))) < result_tolerance);
@@ -904,7 +904,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_capped_max_friction_test )
     po_a->set_velocity(point_t(-10.0,  10.0, 0.0));
     po_b->set_velocity(point_t( 10.0, -10.0, 0.0));
 
-    uut->collide(po_a.get(), po_b.get(), poc, noc, COLLISION);
+    uut->collide(po_a.get(), po_b.get(), poc, noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(-6.0, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, -12.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(0.0, -1.0, 0.0))) < result_tolerance);
@@ -918,7 +918,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_capped_max_friction_test )
     po_a->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     po_b->set_angular_velocity(point_t(0.0, 0.0, 0.0));
 
-    uut->collide(po_b.get(), po_a.get(), poc, -noc, COLLISION);
+    uut->collide(po_b.get(), po_a.get(), poc, -noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(-6.0, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, -12.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(0.0, -1.0, 0.0))) < result_tolerance);
@@ -942,7 +942,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_zero_tanjent_velocity_test )
     po_a->set_velocity(point_t(0.0,  10.0, 0.0));
     po_b->set_velocity(point_t(0.0, -10.0, 0.0));
 
-    uut->collide(po_a.get(), po_b.get(), poc, noc, COLLISION);
+    uut->collide(po_a.get(), po_b.get(), poc, noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(0.0, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(0.0, -1.0, 0.0))) < result_tolerance);
@@ -956,7 +956,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_zero_tanjent_velocity_test )
     po_a->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     po_b->set_angular_velocity(point_t(0.0, 0.0, 0.0));
 
-    uut->collide(po_b.get(), po_a.get(), poc, -noc, COLLISION);
+    uut->collide(po_b.get(), po_a.get(), poc, -noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(0.0, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0,  0.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(0.0, -1.0, 0.0))) < result_tolerance);
@@ -980,7 +980,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_zero_mu_test )
     po_a->set_velocity(point_t(-10.0,  10.0, 0.0));
     po_b->set_velocity(point_t( 10.0, -10.0, 0.0));
 
-    uut->collide(po_a.get(), po_b.get(), poc, noc, COLLISION);
+    uut->collide(po_a.get(), po_b.get(), poc, noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(-7.0, 0.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0, 0.0, -9.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(-2.5, 0.0, 0.0))) < result_tolerance);
@@ -994,7 +994,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_zero_mu_test )
     po_a->set_angular_velocity(point_t(0.0, 0.0, 0.0));
     po_b->set_angular_velocity(point_t(0.0, 0.0, 0.0));
 
-    uut->collide(po_b.get(), po_a.get(), poc, -noc, COLLISION);
+    uut->collide(po_b.get(), po_a.get(), poc, -noc, collision_t::COLLISION);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity() - point_t(-7.0, 0.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_angular_velocity() - point_t(0.0, 0.0, -9.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(po_a->get_velocity(poc) - point_t(-2.5, 0.0, 0.0))) < result_tolerance);

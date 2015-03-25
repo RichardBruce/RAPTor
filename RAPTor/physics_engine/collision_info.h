@@ -58,7 +58,7 @@ class collision_info
         collision_info& void_collision()
         {
             _t = std::numeric_limits<float>::max();
-            _type = NO_COLLISION;
+            _type = collision_t::NO_COLLISION;
             return *this;
         }
 
@@ -76,7 +76,7 @@ class collision_info
         {
             if (++_repeat > 1)
             {
-                _type = SLIDING_COLLISION;
+                _type = collision_t::SLIDING_COLLISION;
                 return true;
             }
             else

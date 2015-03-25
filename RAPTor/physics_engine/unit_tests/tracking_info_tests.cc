@@ -66,9 +66,9 @@ BOOST_AUTO_TEST_CASE( ctor_test )
     /* Test certain collision */
     /* This is a bit naughty, but dont actaully need a class here */
     physics_object *vg = reinterpret_cast<physics_object *>(0x5);
-    tracking_info<physics_object> uut(vg, s0, *s1, 0.5, COLLISION);
+    tracking_info<physics_object> uut(vg, s0, *s1, 0.5, collision_t::COLLISION);
 
-    BOOST_CHECK(uut.get_first_collision_type() == COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 0.5);
     BOOST_CHECK(uut.get_first_collision()  == vg);
 
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE( ctor_test )
     BOOST_CHECK(uut[vg]->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut[vg]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(uut[vg]->get_time() == 0.5);
-    BOOST_CHECK(uut[vg]->get_type() == COLLISION);
+    BOOST_CHECK(uut[vg]->get_type() == collision_t::COLLISION);
 }
 
 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE( get_test )
     /* Test certain collision */
     /* This is a bit naughty, but dont actaully need a class here */
     physics_object *vg = reinterpret_cast<physics_object *>(0x5);
-    tracking_info<physics_object> uut(vg, s0, *s1, 0.5, COLLISION);
+    tracking_info<physics_object> uut(vg, s0, *s1, 0.5, collision_t::COLLISION);
 
     /* Check unknown object give nullptrs, otherwise this is well tested by other tests */
     BOOST_CHECK(uut[nullptr] == nullptr);
@@ -109,9 +109,9 @@ BOOST_AUTO_TEST_CASE( update_test )
     /* Construct and test */
     /* This is a bit naughty, but dont actaully need a class here */
     physics_object *vg0 = reinterpret_cast<physics_object *>(0x5);
-    tracking_info<physics_object> uut(vg0, s0, *s1, 0.5, COLLISION);
+    tracking_info<physics_object> uut(vg0, s0, *s1, 0.5, collision_t::COLLISION);
 
-    BOOST_CHECK(uut.get_first_collision_type() == COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 0.5);
     BOOST_CHECK(uut.get_first_collision()  == vg0);
 
@@ -119,12 +119,12 @@ BOOST_AUTO_TEST_CASE( update_test )
     BOOST_CHECK(uut[vg0]->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut[vg0]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(uut[vg0]->get_time() == 0.5);
-    BOOST_CHECK(uut[vg0]->get_type() == COLLISION);
+    BOOST_CHECK(uut[vg0]->get_type() == collision_t::COLLISION);
 
     /* Update existing and check */
-    uut.update(vg0, s1, *s2, 1.5, POSSIBLE_COLLISION);
+    uut.update(vg0, s1, *s2, 1.5, collision_t::POSSIBLE_COLLISION);
 
-    BOOST_CHECK(uut.get_first_collision_type() == POSSIBLE_COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::POSSIBLE_COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 1.5);
     BOOST_CHECK(uut.get_first_collision()  == vg0);
 
@@ -132,13 +132,13 @@ BOOST_AUTO_TEST_CASE( update_test )
     BOOST_CHECK(uut[vg0]->get_normal_of_collision() == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(uut[vg0]->get_point_of_collision()  == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(uut[vg0]->get_time() == 1.5);
-    BOOST_CHECK(uut[vg0]->get_type() == POSSIBLE_COLLISION);
+    BOOST_CHECK(uut[vg0]->get_type() == collision_t::POSSIBLE_COLLISION);
 
     /* Add a new collision and test */
     physics_object *vg1 = reinterpret_cast<physics_object *>(0x10);
-    uut.update(vg1, s2, *s1, 0.7, SLIDING_COLLISION);
+    uut.update(vg1, s2, *s1, 0.7, collision_t::SLIDING_COLLISION);
 
-    BOOST_CHECK(uut.get_first_collision_type() == SLIDING_COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(fabs(uut.get_first_collision_time() - 0.7) < result_tolerance);
     BOOST_CHECK(uut.get_first_collision()  == vg1);
 
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE( update_test )
     BOOST_CHECK(uut[vg1]->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut[vg1]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(fabs(uut[vg1]->get_time() - 0.7) < result_tolerance);
-    BOOST_CHECK(uut[vg1]->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(uut[vg1]->get_type() == collision_t::SLIDING_COLLISION);
 }
 
 
@@ -161,9 +161,9 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
 
     /* Construct and test */
     physics_object *vg0 = reinterpret_cast<physics_object *>(0x5);
-    tracking_info<physics_object> uut(vg0, s0, *s1, 0.5, COLLISION);
+    tracking_info<physics_object> uut(vg0, s0, *s1, 0.5, collision_t::COLLISION);
 
-    BOOST_CHECK(uut.get_first_collision_type() == COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 0.5);
     BOOST_CHECK(uut.get_first_collision()  == vg0);
 
@@ -171,13 +171,13 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
     BOOST_CHECK(uut[vg0]->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut[vg0]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(uut[vg0]->get_time() == 0.5);
-    BOOST_CHECK(uut[vg0]->get_type() == COLLISION);
+    BOOST_CHECK(uut[vg0]->get_type() == collision_t::COLLISION);
 
     /* Add a new collision and test */
     physics_object *vg1 = reinterpret_cast<physics_object *>(0x10);
-    uut.update(vg1, s1, *s2, 0.7, SLIDING_COLLISION);
+    uut.update(vg1, s1, *s2, 0.7, collision_t::SLIDING_COLLISION);
 
-    BOOST_CHECK(uut.get_first_collision_type() == COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 0.5);
     BOOST_CHECK(uut.get_first_collision()  == vg0);
 
@@ -185,12 +185,12 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
     BOOST_CHECK(uut[vg1]->get_normal_of_collision() == point_t(0.0, 1.0, 0.0));
     BOOST_CHECK(uut[vg1]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(fabs(uut[vg1]->get_time() - 0.7) < result_tolerance);
-    BOOST_CHECK(uut[vg1]->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(uut[vg1]->get_type() == collision_t::SLIDING_COLLISION);
 
     /* Remove non-existant and check */
     uut.void_collision(reinterpret_cast<physics_object *>(0x15));
 
-    BOOST_CHECK(uut.get_first_collision_type() == COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 0.5);
     BOOST_CHECK(uut.get_first_collision()  == vg0);
 
@@ -198,18 +198,18 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
     BOOST_CHECK(uut[vg0]->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut[vg0]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(uut[vg0]->get_time() == 0.5);
-    BOOST_CHECK(uut[vg0]->get_type() == COLLISION);
+    BOOST_CHECK(uut[vg0]->get_type() == collision_t::COLLISION);
 
     BOOST_CHECK(uut[vg1]->get_simplex().get() == s1);
     BOOST_CHECK(uut[vg1]->get_normal_of_collision() == point_t(0.0, 1.0, 0.0));
     BOOST_CHECK(uut[vg1]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(fabs(uut[vg1]->get_time() - 0.7) < result_tolerance);
-    BOOST_CHECK(uut[vg1]->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(uut[vg1]->get_type() == collision_t::SLIDING_COLLISION);
 
     /* Remove nearest and check */
     uut.void_collision(vg1);
 
-    BOOST_CHECK(uut.get_first_collision_type() == COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 0.5);
     BOOST_CHECK(uut.get_first_collision()  == vg0);
 
@@ -217,15 +217,15 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
     BOOST_CHECK(uut[vg0]->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut[vg0]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(uut[vg0]->get_time() == 0.5);
-    BOOST_CHECK(uut[vg0]->get_type() == COLLISION);
+    BOOST_CHECK(uut[vg0]->get_type() == collision_t::COLLISION);
 
     /* Add a new collision and test */
-    uut.update(vg1, s2, *s3, 0.6, SLIDING_COLLISION);
+    uut.update(vg1, s2, *s3, 0.6, collision_t::SLIDING_COLLISION);
 
     /* Remove furthest and check */
     uut.void_collision(vg0);
     
-    BOOST_CHECK(uut.get_first_collision_type() == SLIDING_COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(fabs(uut.get_first_collision_time() - 0.6) < result_tolerance);
     BOOST_CHECK(uut.get_first_collision()  == vg1);
 
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
     BOOST_CHECK(uut[vg1]->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut[vg1]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(fabs(uut[vg1]->get_time() - 0.6) < result_tolerance);
-    BOOST_CHECK(uut[vg1]->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(uut[vg1]->get_type() == collision_t::SLIDING_COLLISION);
 }
 
 
@@ -247,8 +247,8 @@ BOOST_AUTO_TEST_CASE( void_all_and_update_test )
 
     /* Construct and test */
     physics_object *vg0 = reinterpret_cast<physics_object *>(0x5);
-    tracking_info<physics_object> uut(vg0, s0, *s1, 0.5, COLLISION);
-    BOOST_CHECK(uut.get_first_collision_type() == COLLISION);
+    tracking_info<physics_object> uut(vg0, s0, *s1, 0.5, collision_t::COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 0.5);
     BOOST_CHECK(uut.get_first_collision()  == vg0);
 
@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE( void_all_and_update_test )
     BOOST_CHECK(uut[vg0]->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut[vg0]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(uut[vg0]->get_time() == 0.5);
-    BOOST_CHECK(uut[vg0]->get_type() == COLLISION);
+    BOOST_CHECK(uut[vg0]->get_type() == collision_t::COLLISION);
 
     /* Void and check */
     uut.void_collision(vg0);
@@ -264,8 +264,8 @@ BOOST_AUTO_TEST_CASE( void_all_and_update_test )
 
     /* Update and check */
     physics_object *vg1 = reinterpret_cast<physics_object *>(0x10);
-    uut.update(vg1, s2, *s1, 0.6, SLIDING_COLLISION);
-    BOOST_CHECK(uut.get_first_collision_type() == SLIDING_COLLISION);
+    uut.update(vg1, s2, *s1, 0.6, collision_t::SLIDING_COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(fabs(uut.get_first_collision_time() - 0.6) < result_tolerance);
     BOOST_CHECK(uut.get_first_collision()  == vg1);
 
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE( void_all_and_update_test )
     BOOST_CHECK(uut[vg1]->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut[vg1]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(fabs(uut[vg1]->get_time() - 0.6) < result_tolerance);
-    BOOST_CHECK(uut[vg1]->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(uut[vg1]->get_type() == collision_t::SLIDING_COLLISION);
 }
 
 
@@ -287,9 +287,9 @@ BOOST_AUTO_TEST_CASE( successful_retest_update_test )
 
     /* Construct and check */
     physics_object *vg = reinterpret_cast<physics_object *>(0x5);
-    tracking_info<physics_object> uut(vg, s0, *s1, 0.5, POSSIBLE_COLLISION);
+    tracking_info<physics_object> uut(vg, s0, *s1, 0.5, collision_t::POSSIBLE_COLLISION);
 
-    BOOST_CHECK(uut.get_first_collision_type() == POSSIBLE_COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::POSSIBLE_COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 0.5);
     BOOST_CHECK(uut.get_first_collision() == vg);
 
@@ -297,11 +297,11 @@ BOOST_AUTO_TEST_CASE( successful_retest_update_test )
     BOOST_CHECK(uut[vg]->get_normal_of_collision() == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(uut[vg]->get_point_of_collision() == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(uut[vg]->get_time() == 0.5);
-    BOOST_CHECK(uut[vg]->get_type() == POSSIBLE_COLLISION);
+    BOOST_CHECK(uut[vg]->get_type() == collision_t::POSSIBLE_COLLISION);
 
     /* Update and test */
     uut.successful_retest_update(vg, s2, *s1);
-    BOOST_CHECK(uut.get_first_collision_type() == COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 0.5);
     BOOST_CHECK(uut.get_first_collision() == vg);
 
@@ -309,7 +309,7 @@ BOOST_AUTO_TEST_CASE( successful_retest_update_test )
     BOOST_CHECK(uut[vg]->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(uut[vg]->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(uut[vg]->get_time() == 0.5);
-    BOOST_CHECK(uut[vg]->get_type() == COLLISION);
+    BOOST_CHECK(uut[vg]->get_type() == collision_t::COLLISION);
 }
 
 
@@ -324,21 +324,21 @@ BOOST_AUTO_TEST_CASE( iter_test )
 
     /* Construct and check a little */
     physics_object *vg0 = reinterpret_cast<physics_object *>(0x5);
-    tracking_info<physics_object> uut(vg0, s0, *s1, 0.5, COLLISION);
-    BOOST_CHECK(uut.get_first_collision_type() == COLLISION);
+    tracking_info<physics_object> uut(vg0, s0, *s1, 0.5, collision_t::COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::COLLISION);
     BOOST_CHECK(uut.get_first_collision_time() == 0.5);
     BOOST_CHECK(uut.get_first_collision()  == vg0);
 
     /* Update a bit and check */
     physics_object *vg1 = reinterpret_cast<physics_object *>(0x15);
-    uut.update(vg1, s2, *s1, 0.6, POSSIBLE_COLLISION);
+    uut.update(vg1, s2, *s1, 0.6, collision_t::POSSIBLE_COLLISION);
 
     physics_object *vg2 = reinterpret_cast<physics_object *>(0x20);
-    uut.update(vg2, s1, *s0, 0.7, SLIDING_COLLISION);
+    uut.update(vg2, s1, *s0, 0.7, collision_t::SLIDING_COLLISION);
 
     physics_object *vg3 = reinterpret_cast<physics_object *>(0x10);
-    uut.update(vg3, s3, *s2, 0.3, POSSIBLE_SLIDING_COLLISION);
-    BOOST_CHECK(uut.get_first_collision_type() == POSSIBLE_SLIDING_COLLISION);
+    uut.update(vg3, s3, *s2, 0.3, collision_t::POSSIBLE_SLIDING_COLLISION);
+    BOOST_CHECK(uut.get_first_collision_type() == collision_t::POSSIBLE_SLIDING_COLLISION);
     BOOST_CHECK(fabs(uut.get_first_collision_time() - 0.3) < result_tolerance);
     BOOST_CHECK(uut.get_first_collision()  == vg3);
 
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE( iter_test )
     BOOST_CHECK(coll_iter->second->get_normal_of_collision() == point_t(0.0, -1.0, 0.0));
     BOOST_CHECK(coll_iter->second->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(coll_iter->second->get_time() == 0.5);
-    BOOST_CHECK(coll_iter->second->get_type() == COLLISION);
+    BOOST_CHECK(coll_iter->second->get_type() == collision_t::COLLISION);
 
     ++coll_iter;
     BOOST_CHECK(coll_iter->first == vg3);
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_CASE( iter_test )
     BOOST_CHECK(coll_iter->second->get_normal_of_collision() == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(coll_iter->second->get_point_of_collision() == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(fabs(coll_iter->second->get_time() - 0.3) < result_tolerance);
-    BOOST_CHECK(coll_iter->second->get_type() == POSSIBLE_SLIDING_COLLISION);
+    BOOST_CHECK(coll_iter->second->get_type() == collision_t::POSSIBLE_SLIDING_COLLISION);
 
     ++coll_iter;
     BOOST_CHECK(coll_iter->first == vg1);
@@ -365,7 +365,7 @@ BOOST_AUTO_TEST_CASE( iter_test )
     BOOST_CHECK(coll_iter->second->get_normal_of_collision() == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(coll_iter->second->get_point_of_collision() == point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(fabs(coll_iter->second->get_time() - 0.6) < result_tolerance);
-    BOOST_CHECK(coll_iter->second->get_type() == POSSIBLE_COLLISION);
+    BOOST_CHECK(coll_iter->second->get_type() == collision_t::POSSIBLE_COLLISION);
 
     ++coll_iter;
     BOOST_CHECK(coll_iter->first == vg2);
@@ -373,7 +373,7 @@ BOOST_AUTO_TEST_CASE( iter_test )
     BOOST_CHECK(coll_iter->second->get_normal_of_collision() == point_t(0.0, 1.0, 0.0));
     BOOST_CHECK(coll_iter->second->get_point_of_collision() == point_t(1.5, 1.55, 1.0));
     BOOST_CHECK(fabs(coll_iter->second->get_time() - 0.7) < result_tolerance);
-    BOOST_CHECK(coll_iter->second->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(coll_iter->second->get_type() == collision_t::SLIDING_COLLISION);
 
     ++coll_iter;
     BOOST_CHECK(coll_iter == uut.end());
