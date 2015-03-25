@@ -7,7 +7,7 @@
 namespace raptor_raytracer
 {
 /* Enumerate the major axis and direction of the lights direction */
-enum light_direction_t { x_pos = 0, y_pos = 1, z_pos = 2, x_neg = 3, y_neg = 4, z_neg = 5 };
+enum class light_direction_t : char { x_pos = 0, y_pos = 1, z_pos = 2, x_neg = 3, y_neg = 4, z_neg = 5 };
 
 /* Class to represent a light */
 class light
@@ -15,19 +15,19 @@ class light
     public :
         /* CTOR for spherical light */
         light(const ext_colour_t &rgb, const point_t &c, const float d, const float r)                  
-            : t(nullptr), rgb(rgb / 255.0f), c(c), n(2.0f), r(r), d(d), s_a(0.0f), s_b(0.0f), n_dir(x_pos) { };
+            : t(nullptr), rgb(rgb / 255.0f), c(c), n(2.0f), r(r), d(d), s_a(0.0f), s_b(0.0f), n_dir(light_direction_t::x_pos) { };
 
         /* CTOR for triangle defined light */
         light(const ext_colour_t &rgb, const point_t &c, const float d, const std::vector<triangle *> *const t)
-            : t(t), rgb(rgb / 255.0f), c(c), n(2.0f), r(0.0f), d(d), s_a(0.0f), s_b(0.0f), n_dir(x_pos) { };
+            : t(t), rgb(rgb / 255.0f), c(c), n(2.0f), r(0.0f), d(d), s_a(0.0f), s_b(0.0f), n_dir(light_direction_t::x_pos) { };
 
         /* CTOR for spot light */
         light(const ext_colour_t &rgb, const point_t &c, const point_t &n, const float d, const float s_a, const float s_b, const float r)
-            : t(nullptr), rgb(rgb / 255.0f), c(c), n(n), r(r), d(d), s_a(s_a), s_b(s_b), n_dir(x_pos) { };
+            : t(nullptr), rgb(rgb / 255.0f), c(c), n(n), r(r), d(d), s_a(s_a), s_b(s_b), n_dir(light_direction_t::x_pos) { };
 
         /* CTOR for triangle defined spot light */
         light(const ext_colour_t &rgb, const point_t &c, const point_t &n, const float d, const float s_a, const float s_b, const std::vector<triangle *> *const t)
-            : t(t), rgb(rgb / 255.0f), c(c), n(n), r(0.0f), d(d), s_a(s_a), s_b(s_b), n_dir(x_pos) { };
+            : t(t), rgb(rgb / 255.0f), c(c), n(n), r(0.0f), d(d), s_a(s_a), s_b(s_b), n_dir(light_direction_t::x_pos) { };
 
         /* CTOR for directional light */
         light(const ext_colour_t &rgb, const point_t &n, const float d)
@@ -69,27 +69,27 @@ class light
                 float dist;
                 switch (this->n_dir)
                 {
-                    case x_pos :
+                    case light_direction_t::x_pos :
                         dist = (triangle::get_scene_upper_bounds().x - d.x) / this->n.x;
                         break;
 
-                    case y_pos :
+                    case light_direction_t::y_pos :
                         dist = (triangle::get_scene_upper_bounds().y - d.y) / this->n.y;
                         break;
 
-                    case z_pos :
+                    case light_direction_t::z_pos :
                         dist = (triangle::get_scene_upper_bounds().z - d.z) / this->n.z;
                         break;
 
-                    case x_neg :
+                    case light_direction_t::x_neg :
                         dist = (triangle::get_scene_lower_bounds().x - d.x) / this->n.x;
                         break;
 
-                    case y_neg :
+                    case light_direction_t::y_neg :
                         dist = (triangle::get_scene_lower_bounds().y - d.y) / this->n.y;
                         break;
 
-                    case z_neg :
+                    case light_direction_t::z_neg :
                         dist = (triangle::get_scene_lower_bounds().z - d.z) / this->n.z;
                         break;
                     
@@ -193,22 +193,22 @@ class light
                 {
                     if (n.x < 0.0f)
                     {
-                        return x_neg;
+                        return light_direction_t::x_neg;
                     }
                     else
                     {
-                        return x_pos;
+                        return light_direction_t::x_pos;
                     }
                 }
                 else
                 {
                     if (n.z < 0.0f)
                     {
-                        return z_neg;
+                        return light_direction_t::z_neg;
                     }
                     else
                     {
-                        return z_pos;
+                        return light_direction_t::z_pos;
                     }
                 }
             }
@@ -218,22 +218,22 @@ class light
                 {
                     if (n.y < 0.0f)
                     {
-                        return y_neg;
+                        return light_direction_t::y_neg;
                     }
                     else
                     {
-                        return y_pos;
+                        return light_direction_t::y_pos;
                     }
                 }
                 else
                 {
                     if (n.z < 0.0f)
                     {
-                        return z_neg;
+                        return light_direction_t::z_neg;
                     }
                     else
                     {
-                        return z_pos;
+                        return light_direction_t::z_pos;
                     }
                 }
             }

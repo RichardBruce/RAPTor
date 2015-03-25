@@ -19,7 +19,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
     std::string vmap;
     bool enabled = false;
     std::uint32_t i = 0;
-    _shader = non;
+    _shader = mapper_type_t::non;
     while (i < blok_len)
     {
         const char *tmp_ptr = (*ptr) + 4;
@@ -42,7 +42,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         else if (strncmp((*ptr), "GRAD", 4) == 0)
         {
             BOOST_LOG_TRIVIAL(trace) << "GRAD";
-            _shader = map_grad;
+            _shader = mapper_type_t::map_grad;
             enabled = parse_header(&tmp_ptr, sec_len - 2);
         }
         /* Texture mapping info */
@@ -220,36 +220,36 @@ void lwo_bloks::add_shader_to(std::vector<texture_mapper *>  *const t)
     texture_mapper *tm = nullptr;
     switch (_shader)
     {
-        case f_noise :
+        case mapper_type_t::f_noise :
             BOOST_LOG_TRIVIAL(trace) << "Type of shader is f_noise";
             tm = new perlin_noise_3d_mapper(ext_colour_t(_valu[0] * 255.0f, _valu[1] * 255.0f, _valu[2] * 255.0f), _tfp[1], _tfp[0], _tip, 4);
             break;
             
-        case cylindrical  :
+        case mapper_type_t::cylindrical  :
             BOOST_LOG_TRIVIAL(trace) << "Type of shader is cylindrical";
             tm = new cylindrical_mapper(_clip->image(), _tctr, _tnorm, _tsiz, 0.3f, _clip->image_height(), _clip->image_width(), _clip->colour_parts(), _wrpw);
             break;
 
-        case planar  :
+        case mapper_type_t::planar  :
             BOOST_LOG_TRIVIAL(trace) << "Type of shader is planar";
             tm = new planar_mapper(_clip->image(), _tctr, _tnorm, _tsiz, _clip->colour_parts(), _clip->image_width(), _clip->image_height(), _twrp_mode_x, _twrp_mode_y);
             break;
 
-        case cubic  :
+        case mapper_type_t::cubic  :
             BOOST_LOG_TRIVIAL(trace) << "Type of shader is cubic";
             tm = new cubic_mapper(_clip->image(), _tctr, _tnorm, _tsiz, _twrp_mode_x, _twrp_mode_y, _clip->colour_parts(), _clip->image_width(), _clip->image_height());
             break;
 
-        case f_checker :
+        case mapper_type_t::f_checker :
             BOOST_LOG_TRIVIAL(trace) << "Type of shader is checker board";
             tm = new checker_board_mapper(ext_colour_t(_valu[0] * 255.0f, _valu[1] * 255.0f, _valu[2] * 255.0f), _tctr, _tsiz);
             break;
 
-        case f_honeycomb :
+        case mapper_type_t::f_honeycomb :
             BOOST_LOG_TRIVIAL(warning) << "Type of shader is honey comb (not handled)";
             break;
 
-        case map_grad :
+        case mapper_type_t::map_grad :
             BOOST_LOG_TRIVIAL(trace) << "Adding shader to map_grad";
             tm = new gradient_mapper(_fkey_key, _fkey_value, _ikey, _grad_of);
             break;
@@ -277,7 +277,7 @@ void lwo_bloks::add_shader()
 {
     switch (_map_of)
     {
-        case map_btex :
+        case mapper_of_t::map_btex :
         {
             /* Scale image or procedural texture colour for tamp before adding */
             lwo_clip *orig_clip = nullptr;
@@ -304,32 +304,32 @@ void lwo_bloks::add_shader()
             }
             break;
         }
-        case map_ctex :
+        case mapper_of_t::map_ctex :
             BOOST_LOG_TRIVIAL(trace) << "Adding shader to map_ctex";
             add_shader_to(&_ctex);
             break;
             
-        case map_dtex :
+        case mapper_of_t::map_dtex :
             BOOST_LOG_TRIVIAL(trace) << "Adding shader to map_dtex";
             add_shader_to(&_dtex);
             break;
             
-        case map_rtex :
+        case mapper_of_t::map_rtex :
             BOOST_LOG_TRIVIAL(trace) << "Adding shader to map_rtex";
             add_shader_to(&_rtex);
             break;
 
-        case map_ttex :
+        case mapper_of_t::map_ttex :
             BOOST_LOG_TRIVIAL(trace) << "Adding shader to map_ttex";
             add_shader_to(&_ttex);
             break;
 
-        case map_stex :
+        case mapper_of_t::map_stex :
             BOOST_LOG_TRIVIAL(trace) << "Adding shader to map_stex";
             add_shader_to(&_stex);
             break;
 
-        case map_ltex :
+        case mapper_of_t::map_ltex :
             BOOST_LOG_TRIVIAL(warning) << "Adding shader to map_ltex (not handled)";
             break;
             
@@ -344,15 +344,15 @@ inline mapper_type_t lwo_bloks::pick_shader(const std::uint16_t m)
     switch (m)
     {
         case 0 : 
-            return planar;
+            return mapper_type_t::planar;
         case 1 : 
-            return cylindrical;
+            return mapper_type_t::cylindrical;
         // case 2 : - Spherical
         case 3 : 
-            return cubic;
+            return mapper_type_t::cubic;
         // case 4 :- Front Projection
         case 5 :
-            return planar;  /* UV, must also remember to use texture UV */
+            return mapper_type_t::planar;  /* UV, must also remember to use texture UV */
         default :
             BOOST_LOG_TRIVIAL(error) << "Unknown texture: " << m;
             assert(false);
@@ -366,7 +366,7 @@ inline void lwo_bloks::pick_procedural_shader(const char *c)
     {
         c += 14;
 
-        _shader = f_noise;
+        _shader = mapper_type_t::f_noise;
         _tip = from_byte_stream<std::uint32_t>(&c);
         _tfp[1] = from_byte_stream<float>(&c);
         _tfp[0] = from_byte_stream<float>(&c);
@@ -376,14 +376,14 @@ inline void lwo_bloks::pick_procedural_shader(const char *c)
     else if (strcmp(c, "Checkerboard") == 0)
     {
         c += 13;
-        _shader = f_checker;
+        _shader = mapper_type_t::f_checker;
         BOOST_LOG_TRIVIAL(trace) << "Checkerboard";
 
     }
     else if (strcmp(c, "Turbulence") == 0)
     {
         c += 12;
-        _shader = f_noise;
+        _shader = mapper_type_t::f_noise;
         _tip = from_byte_stream<std::uint32_t>(&c);
         _tfp[1] = from_byte_stream<float>(&c);
         _tfp[0] = from_byte_stream<float>(&c);
@@ -393,7 +393,7 @@ inline void lwo_bloks::pick_procedural_shader(const char *c)
     else if (strcmp(c, "Honeycomb") == 0)
     {
         c += 10;
-        _shader = f_honeycomb;
+        _shader = mapper_type_t::f_honeycomb;
         BOOST_LOG_TRIVIAL(trace) << "Honeycomb";
     }
     else
@@ -461,31 +461,31 @@ inline mapper_of_t lwo_bloks::pick_channel(const char *const c)
 {
     if (strncmp(c, "COLR", 4) == 0)
     {
-        return map_ctex;
+        return mapper_of_t::map_ctex;
     }
     else if (strncmp(c, "DIFF", 4) == 0)
     {
-        return map_dtex;
+        return mapper_of_t::map_dtex;
     }
     else if (strncmp(c, "LUMI", 4) == 0)
     {
-        return map_ltex;
+        return mapper_of_t::map_ltex;
     }
     else if (strncmp(c, "SPEC", 4) == 0)
     {
-        return map_stex;
+        return mapper_of_t::map_stex;
     }
     else if (strncmp(c, "REFL", 4) == 0)
     {
-        return map_rtex;
+        return mapper_of_t::map_rtex;
     }
     else if (strncmp(c, "TRAN", 4) == 0)
     {
-        return map_ttex;
+        return mapper_of_t::map_ttex;
     }
     else if (strncmp(c, "BUMP", 4) == 0)
     {
-        return map_btex;
+        return mapper_of_t::map_btex;
     }
     else
     {

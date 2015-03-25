@@ -60,7 +60,6 @@ void off_parser(
         vert.x = get_this_float(&at);
         vert.y = get_next_float(&at);
         vert.z = get_next_float(&at);
-        // BOOST_LOG_TRIVIAL(trace) << "vertex: " << vert;
         vertices.push_back(vert);
 
         find_next_line(&at);
@@ -71,15 +70,12 @@ void off_parser(
     for (unsigned int i = 0; i < nr_f; ++i)
     {
         const unsigned int nr_verts = get_this_unsigned(&at);
-        // BOOST_LOG_TRIVIAL(trace) << "Vertices on this face: " << nr_verts;
         for (unsigned int j = 0; j < nr_verts; ++j)
         {
             const unsigned int vert_idx = get_next_unsigned(&at);
-            // BOOST_LOG_TRIVIAL(trace) << "    Using vertex: " << vert_idx;
             face.push_back(vertices[vert_idx]);
         }
         find_next_line(&at);
-        // BOOST_LOG_TRIVIAL(trace) << "Face done";
 
         /* Create the polygon */
         if (face.size() == 3)

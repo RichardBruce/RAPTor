@@ -20,9 +20,6 @@
 
 namespace raptor_raytracer
 {
-enum mapper_type_t { non = 0, f_noise = 1, planar = 2, cubic = 3, spherical = 4, cylindrical = 5, f_checker = 6, f_honeycomb = 7, map_grad = 8 };
-enum mapper_of_t   { map_btex = 0, map_ctex = 1, map_dtex = 2, map_ltex = 3, map_stex = 4, map_rtex = 5, map_ttex = 6 };
-
 /* Class to track chunks in current layer */
 class lwo_bloks : private boost::noncopyable
 {
@@ -36,8 +33,8 @@ class lwo_bloks : private boost::noncopyable
             _wrpw(1.0f),
             _wrph(1.0f),
             _tamp(1.0f),
-            _shader(non),
-            _map_of(map_ctex), 
+            _shader(mapper_type_t::non),
+            _map_of(mapper_of_t::map_ctex), 
             _twrp_mode_x(static_cast<texture_wrapping_mode_t>(2)),
             _twrp_mode_y(static_cast<texture_wrapping_mode_t>(2)),
             _fall_type(falloff_type_t::none),

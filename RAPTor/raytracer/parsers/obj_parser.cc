@@ -41,13 +41,11 @@ void find_vertex(const char **c)
 {
     while (((**c) != ' ') && ((**c) != '\n') && ((**c) != '\r'))
     {
-//        std::cout << "non space increment" << std::endl;
         ++(*c);
     }
     
     while ((**c) == ' ')
     {
-//        std::cout << "space increment" << std::endl;
         ++(*c);
     }
     
@@ -69,7 +67,7 @@ bool is_triplet_delimiter(const char **c)
 
 void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &vt, std::vector<point_t> &vn, std::vector<point_t> &v, material *const m, const char **c)
 {
-//    std::cout << "face: " << (*c)[0] << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "face: " << (*c)[0];
     static std::vector<point_t> face;
     static std::vector<point_t> face_t;
     static std::vector<point_t> face_n;
@@ -88,7 +86,7 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
         {
             --vert_num;
         }
-//        std::cout << "vertex: " << vert_num << std::endl;
+//        BOOST_LOG_TRIVIAL(trace) << "vertex: " << vert_num;
         assert(static_cast<unsigned int>(vert_num) < v.size());
         face.push_back(v[vert_num]);
         
@@ -107,7 +105,7 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
                 {
                     --vert_text;
                 }
-//                std::cout << "texture: " << vert_text << std::endl;
+//                BOOST_LOG_TRIVIAL(trace) << "texture: " << vert_text;
                 assert(static_cast<unsigned int>(vert_text) < vt.size());
                 face_t.push_back(vt[vert_text]);
             }
@@ -125,12 +123,12 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
                 {
                     --vert_norm;
                 }
-//                std::cout << "normal: " << vert_norm << std::endl;
+//                BOOST_LOG_TRIVIAL(trace) << "normal: " << vert_norm;
                 assert(static_cast<unsigned int>(vert_norm) < vn.size());
                 face_n.push_back(vn[vert_norm]);
             }
         }
-//        std::cout << "current: " << (*c)[0] << (*c)[1] << std::endl;
+//        BOOST_LOG_TRIVIAL(trace) << "current: " << (*c)[0] << (*c)[1];
         find_vertex(c);
     }
 
@@ -553,7 +551,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         }
         else
         {
-            std::cout << "Found unknown: " << std::string(&at[0], 6) << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]) << std::endl;
+            BOOST_LOG_TRIVIAL(error) << "Found unknown: " << std::string(&at[0], 6) << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]);
             find_next_line(&at);
             assert(false);
         }
@@ -713,7 +711,7 @@ void parse_v_statement(std::vector<point_t> *const vs, const char **c)
     v.x = get_next_float(c);
     v.y = get_next_float(c);
     v.z = get_next_float(c);
-//    std::cout << "Parsed v: " << v.x << ", " << v.y << ", " << v.z << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "Parsed v: " << v;
 
     find_next_line(c);
 
@@ -727,7 +725,7 @@ void parse_vt_statement(std::vector<point_t> *const vs, const char **c)
 
     v.x = get_next_float(c);
     v.y = get_next_float(c);
-//    std::cout << "Parsed vt: " << v.x << ", " << v.y << ", " << v.z << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "Parsed vt: " << v.x << ", " << v.y;
 
     find_next_line(c);
 
@@ -743,7 +741,7 @@ void parse_vn_statement(std::vector<point_t> *const vs, const char **c)
     v.y = get_next_float(c);
     v.z = get_next_float(c);
     normalise(&v);
-//    std::cout << "Parsed vn: " << v.x << ", " << v.y << ", " << v.z << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "Parsed vn: " << v;
 
     find_next_line(c);
 
@@ -764,7 +762,7 @@ void obj_parser(
     size_t len = obj_file.tellg();
     obj_file.seekg(0, std::ios::beg);
 
-//    std::cout << "Parsing OBJ length: " << len << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "Parsing OBJ length: " << len;
        
     /* Read the whole file into a buffer */
     char *buffer = new char [len];
@@ -778,7 +776,7 @@ void obj_parser(
     
     /* Map of shader names to shader */
     std::map<std::string, material *> shader_map;
-    material *              cur_mat = new phong_shader(ext_colour_t(0.0f, 0.0f, 0.0f), ext_colour_t(200.0f, 200.0f, 200.0f), ext_colour_t(0.0f, 0.0f, 0.0f), 0.0f);
+    material *cur_mat = new phong_shader(ext_colour_t(0.0f, 0.0f, 0.0f), ext_colour_t(200.0f, 200.0f, 200.0f), ext_colour_t(0.0f, 0.0f, 0.0f), 0.0f);
     m.push_back(cur_mat);
     
     /* Parse the file */
@@ -831,7 +829,7 @@ void obj_parser(
         }
         else
         {
-            std::cout << "Found unknown statement: " << at << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]) << std::endl;
+            BOOST_LOG_TRIVIAL(error) << "Found unknown statement: " << at << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]);
             find_next_line(&at);
             assert(false);
         }

@@ -5,6 +5,10 @@ namespace raptor_raytracer
 {
 class camera;
 
+/* Mapper enums */
+enum class mapper_type_t : char { non = 0, f_noise = 1, planar = 2, cubic = 3, spherical = 4, cylindrical = 5, f_checker = 6, f_honeycomb = 7, map_grad = 8 };
+enum class mapper_of_t   : char { map_btex = 0, map_ctex = 1, map_dtex = 2, map_ltex = 3, map_stex = 4, map_rtex = 5, map_ttex = 6 };
+
 /***********************************************************
   check_for_chunk checks that the pointer a points at the 
   same chunk name as the pointer e with length l.

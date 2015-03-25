@@ -15,9 +15,6 @@
 
 namespace raptor_raytracer
 {
-enum mapper_type_t { non = 0, f_noise = 1, planar = 2, cubic = 3, spherical = 4, cylindrical = 5 };
-enum mapper_of_t   { map_btex = 0, map_ctex = 1, map_dtex = 2, map_ltex = 3, map_stex = 4, map_rtex = 5, map_ttex = 6 };
-
 struct texture_info_t
 {
     void reset(const mapper_of_t m, const mapper_type_t s)
@@ -43,11 +40,11 @@ struct texture_info_t
         texture_mapper  *tm = nullptr;
         switch (this->shader)
         {
-            case f_noise :
+            case mapper_type_t::f_noise :
                 tm = new perlin_noise_3d_mapper(this->trgb * scale, this->tfp[1], this->tfp[0], this->tip, 4);
                 break;
                 
-            case cylindrical  :
+            case mapper_type_t::cylindrical  :
                 if (!filename.empty())
                 {
                     cpp = read_jpeg(&img, this->filename.c_str(), &img_height, &img_width);
@@ -56,7 +53,7 @@ struct texture_info_t
                 }
                 break;
     
-            case planar  :
+            case mapper_type_t::planar  :
                 if (!filename.empty())
                 {
                     cpp = read_jpeg(&img, this->filename.c_str(), &img_height, &img_width);
@@ -65,7 +62,7 @@ struct texture_info_t
                 }
                 break;
     
-            case cubic  :
+            case mapper_type_t::cubic  :
                 if (!filename.empty())
                 {
                     cpp = read_jpeg(&img, this->filename.c_str(), &img_height, &img_width);
@@ -90,27 +87,27 @@ struct texture_info_t
     {
         switch (this->map_of)
         {
-            case map_btex :
+            case mapper_of_t::map_btex :
                 this->add_shader_to(&this->btex, tamp);
                 break;
 
-            case map_ctex :
+            case mapper_of_t::map_ctex :
                 this->add_shader_to(&this->ctex, 1.0f);
                 break;
                 
-            case map_dtex :
+            case mapper_of_t::map_dtex :
                 this->add_shader_to(&this->dtex, tval);
                 break;
                 
-            case map_stex :
+            case mapper_of_t::map_stex :
                 this->add_shader_to(&this->stex, tval);
                 break;
                 
-            case map_rtex :
+            case mapper_of_t::map_rtex :
                 this->add_shader_to(&this->rtex, tval);
                 break;
 
-            case map_ttex :
+            case mapper_of_t::map_ttex :
                 this->add_shader_to(&this->ttex, tval);
                 break;
                 
@@ -184,19 +181,19 @@ inline mapper_type_t pick_shader(const char *const c)
 {
     if (strcmp(c, "Fractal Noise") == 0)
     {
-        return f_noise;
+        return mapper_type_t::f_noise;
     }
     else if (strcmp(c, "Planar Image Map") == 0)
     {
-        return planar;
+        return mapper_type_t::planar;
     }
     else if (strcmp(c, "Cubic Image Map") == 0)
     {
-        return cubic;
+        return mapper_type_t::cubic;
     }
     else if (strcmp(c, "Cylindrical Image Map") == 0)
     {
-        return cylindrical;
+        return mapper_type_t::cylindrical;
     }
     else
     {
@@ -222,7 +219,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
     std::uint32_t   i   = 0;
     std::uint16_t   short_tmp;
     
-    current_info.shader = non;
+    current_info.shader = mapper_type_t::non;
 
     while (i < surf_len)
     {
@@ -230,7 +227,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
         BOOST_LOG_TRIVIAL(trace) << "Parsing: " << *ptr << " with length " << sec_len;
         
-        if ((current_info.shader != non) && (strncmp((*ptr + 1), "TEX", 3) == 0))
+        if ((current_info.shader != mapper_type_t::non) && (strncmp((*ptr + 1), "TEX", 3) == 0))
         {
             current_info.add_shader();
         }
@@ -441,31 +438,31 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         else if (strncmp((*ptr), "CTEX", 4) == 0)
         {
             BOOST_LOG_TRIVIAL(trace) << "CTEX: " << (*ptr) + 6;
-            current_info.reset(map_ctex, pick_shader(((*ptr) + 6)));
+            current_info.reset(mapper_of_t::map_ctex, pick_shader(((*ptr) + 6)));
         }
         else if (strncmp((*ptr), "BTEX", 4) == 0)
         {
             /* Bump map */
             BOOST_LOG_TRIVIAL(trace) << "BTEX: " << (*ptr) + 6;
-            current_info.reset(map_btex, pick_shader(((*ptr) + 6)));
+            current_info.reset(mapper_of_t::map_btex, pick_shader(((*ptr) + 6)));
         }
         else if (strncmp((*ptr), "TTEX", 4) == 0)
         {
             /* Transparency texture */
             BOOST_LOG_TRIVIAL(trace) << "TTEX: " << (*ptr) + 6;
-            current_info.reset(map_ttex, pick_shader(((*ptr) + 6)));
+            current_info.reset(mapper_of_t::map_ttex, pick_shader(((*ptr) + 6)));
         }
         else if (strncmp((*ptr), "RTEX", 4) == 0)
         {
             /* Reflection texture */
             BOOST_LOG_TRIVIAL(trace) << "RTEX: " << (*ptr) + 6;
-            current_info.reset(map_rtex, pick_shader(((*ptr) + 6)));
+            current_info.reset(mapper_of_t::map_rtex, pick_shader(((*ptr) + 6)));
         }
         else if (strncmp((*ptr), "DTEX", 4) == 0)
         {
             /* Diffuse texture */
             BOOST_LOG_TRIVIAL(trace) << "DTEX: " << (*ptr) + 6;
-            current_info.reset(map_dtex, pick_shader(((*ptr) + 6)));
+            current_info.reset(mapper_of_t::map_dtex, pick_shader(((*ptr) + 6)));
         }
         else if (strncmp((*ptr), "TAMP", 4) == 0)
         {
@@ -499,7 +496,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         
     }
 
-    if (current_info.shader != non)
+    if (current_info.shader != mapper_type_t::non)
     {
         current_info.add_shader();
     }

@@ -10,8 +10,6 @@
 
 namespace raptor_raytracer
 {
-//enum frustrum_dir_t { forward = 0, backward = 1 };
-
 /* Frustrum class to represent an array of rays by proxy */
 class frustrum
 {
