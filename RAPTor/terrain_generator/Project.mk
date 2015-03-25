@@ -17,6 +17,7 @@ INCLUDE = $(LOCAL_INCLUDES) \
     $(LIBARYS_PATH)/SDL2_ttf-$(SDLTTF_VER)/include/SDL2/ \
     $(LIBARYS_PATH)/SDL2_image-2.0.0/include/SDL2/ \
     $(LIBARYS_PATH)/tbb$(TBB_VER)/include/ \
+    $(LIBARYS_PATH)/libtga-$(LIBTGA_VER)/include \
     $(LIBARYS_PATH)/fftw-$(FFTW_VER)/include 
 LOCAL_INCLUDES  = . $(RAPTOR_HOME)/common/
 vpath %.cc $(INCLUDE)

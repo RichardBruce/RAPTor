@@ -137,7 +137,7 @@ int main()
     unsigned int img_height;
     const raptor_raytracer::ext_colour_t black(0.0f, 0.0f, 0.0f);
     unsigned int cpp = raptor_raytracer::read_jpeg(&img, "./grass-texture-2.jpg", &img_height, &img_width);
-    raptor_raytracer::planar_mapper *tm = new raptor_raytracer::planar_mapper(img, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f), point_t(10.0f, 0.0f, 10.0f), cpp, img_width, img_height, raptor_raytracer::tile, raptor_raytracer::tile);
+    raptor_raytracer::planar_mapper *tm = new raptor_raytracer::planar_mapper(boost::shared_array<float>(img), point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f), point_t(10.0f, 0.0f, 10.0f), cpp, img_width, img_height, raptor_raytracer::texture_wrapping_mode_t::tile, raptor_raytracer::texture_wrapping_mode_t::tile);
     std::unique_ptr<raptor_raytracer::material> grass(new raptor_raytracer::coloured_mapper_shader(black, raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), black, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, nullptr, tm, nullptr, nullptr));
 
     /* Lights */
