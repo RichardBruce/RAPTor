@@ -31,7 +31,7 @@ void mandelbrot_shader::shade(const ray_trace_engine &r, ray &i, const point_t &
         float shade = dot_product(illum.get_dir(), n);
         
         /* Ignore if the surface is facing away from the ray */
-        if (shade < 0.0)
+        if (shade < 0.0f)
         {
             continue;
         }
@@ -45,18 +45,18 @@ void mandelbrot_shader::shade(const ray_trace_engine &r, ray &i, const point_t &
     
     if ((n.x == 1.0f) || (n.x == -1.0f))
     {
-        x0 = fmod(fabs(i.get_z1()),       2.4f) - 1.5f;
-        y0 = fmod(fabs(i.get_y1())- 1.5f, 2.4f) - 1.0f;
+        x0 = std::fmod(std::fabs(i.get_z1()),       2.4f) - 1.5f;
+        y0 = std::fmod(std::fabs(i.get_y1())- 1.5f, 2.4f) - 1.0f;
     }
     else if ((n.z == 1.0f) || (n.z == -1.0f))
     {
-        x0 = fmod(fabs(i.get_x1()),       2.4f) - 1.5f;
-        y0 = fmod(fabs(i.get_y1())- 1.5f, 2.4f) - 1.0f;
+        x0 = std::fmod(std::fabs(i.get_x1()),       2.4f) - 1.5f;
+        y0 = std::fmod(std::fabs(i.get_y1())- 1.5f, 2.4f) - 1.0f;
     }
     else
     {
-        x0 = fmod(fabs(i.get_x1())- 1.5f, 2.4f) - 1.0f;
-        y0 = fmod(fabs(i.get_z1()),       2.4f) - 1.5f;
+        x0 = std::fmod(std::fabs(i.get_x1())- 1.5f, 2.4f) - 1.0f;
+        y0 = std::fmod(std::fabs(i.get_z1()),       2.4f) - 1.5f;
     }
     
     float x = x0;
@@ -85,18 +85,18 @@ WHILE :
         doomed = true;
         if ((n.x == 1.0f) || (n.x == -1.0f))
         {
-            x0 = fmod(fabs(i.get_z1())- 1.0f, 2.4f) * 1.5f - 0.4f;
-            y0 = fmod(fabs(i.get_y1())- 2.0f, 2.4f) * 1.5f - 0.7f;
+            x0 = std::fmod(std::fabs(i.get_z1())- 1.0f, 2.4f) * 1.5f - 0.4f;
+            y0 = std::fmod(std::fabs(i.get_y1())- 2.0f, 2.4f) * 1.5f - 0.7f;
         }
         else if ((n.z == 1.0f) || (n.z == -1.0f))
         {
-            x0 = fmod(fabs(i.get_x1())- 1.0f, 2.4f) * 1.5f - 0.4f;
-            y0 = fmod(fabs(i.get_y1())- 2.0f, 2.4f) * 1.5f - 0.7f;
+            x0 = std::fmod(std::fabs(i.get_x1())- 1.0f, 2.4f) * 1.5f - 0.4f;
+            y0 = std::fmod(std::fabs(i.get_y1())- 2.0f, 2.4f) * 1.5f - 0.7f;
         }
         else
         {
-            x0 = fmod(fabs(i.get_x1())- 2.0f, 2.4f) * 1.5f - 0.7f;
-            y0 = fmod(fabs(i.get_z1())- 1.0f, 2.4f) * 1.5f - 0.4f;
+            x0 = std::fmod(std::fabs(i.get_x1())- 2.0f, 2.4f) * 1.5f - 0.7f;
+            y0 = std::fmod(std::fabs(i.get_z1())- 1.0f, 2.4f) * 1.5f - 0.4f;
         }
         x = x0;
         y = y0;

@@ -414,7 +414,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                rx = atof(argv[++i]) * (PI / 180.0);
+                rx = static_cast<float>(atof(argv[++i])) * (PI / 180.0f);
             }
             /* Y rotation */
             else if (strcmp(argv[i], "-ry") == 0)
@@ -426,7 +426,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                ry = atof(argv[++i]) * (PI / 180.0);
+                ry = static_cast<float>(atof(argv[++i])) * (PI / 180.0f);
             }
             /* Z rotation */
             else if (strcmp(argv[i], "-rz") == 0)
@@ -438,7 +438,7 @@ int main (int argc, char **argv)
                     return 1;
                 }
                 
-                rz = atof(argv[++i]) * (PI / 180.0);
+                rz = static_cast<float>(atof(argv[++i])) * (PI / 180.0f);
             }
             /* Background */
             else if (strcmp(argv[i], "-bg") == 0)
@@ -548,8 +548,8 @@ int main (int argc, char **argv)
                 a.x     = atof(argv[++i]);
                 a.y     = atof(argv[++i]);
                 a.z     = atof(argv[++i]);
-                s_a     = atof(argv[++i]) * (PI / 180.0f);
-                s_b     = atof(argv[++i]) * (PI / 180.0f);
+                s_a     = static_cast<float>(atof(argv[++i])) * (PI / 180.0f);
+                s_b     = static_cast<float>(atof(argv[++i])) * (PI / 180.0f);
                 
                 n = c - a;
                 normalise(&n);

@@ -114,7 +114,7 @@ class image_texture_mapper : public texture_mapper
         image_texture_mapper(const boost::shared_array<float> &img, const point_t &c, const point_t &s, const point_t &u, const point_t &v, const float u_ps, const float v_ps,
             const unsigned int w, const unsigned int h, const unsigned int cpp, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
             const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1) : 
-                texture_mapper(), _img(img), _c(c), _s(s), _u(u), _v(v), _u_ps(fabs(dot_product(_s, _u)) * u_ps), _v_ps(fabs(dot_product(_s, _v)) * v_ps), _h(h), _w(w), _cpp(cpp), _u_max(u_max < 0 ? w : u_max), _v_max(v_max < 0 ? h : v_max),
+                texture_mapper(), _img(img), _c(c), _s(s), _u(u), _v(v), _u_ps(std::fabs(dot_product(_s, _u)) * u_ps), _v_ps(std::fabs(dot_product(_s, _v)) * v_ps), _h(h), _w(w), _cpp(cpp), _u_max(u_max < 0 ? w : u_max), _v_max(v_max < 0 ? h : v_max),
                 _u_off(u_off), _v_off(v_off), _uw(uw), _vw(vw)
             { 
                 assert((_cpp == 1) || (_cpp == 3) || (_cpp == 4));
@@ -256,8 +256,8 @@ class image_texture_mapper : public texture_mapper
             assert(v1 >= 0);
 
             /* Calculate weights */
-            const float fu = u_co - floor(u_co);
-            const float fv = v_co - floor(v_co);
+            const float fu = u_co - std::floor(u_co);
+            const float fv = v_co - std::floor(v_co);
             const float w0 = (1.0f - fu) * (1.0f - fv);
             const float w1 = fu * (1.0f - fv);
             const float w2 = fv * (1.0f - fu);

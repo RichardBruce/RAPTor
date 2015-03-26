@@ -145,7 +145,7 @@ void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *cons
                 for (int k = 0; k < SIMD_WIDTH; ++k)
                 {
                     int addr = (j << LOG2_SIMD_WIDTH) + k;
-                    m[r_to_s[addr]] += (int)(closer[k] == 0.0);
+                    m[r_to_s[addr]] += (int)(closer[k] == 0.0f);
                 }
             }
         }
@@ -328,7 +328,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             const int addr   = (i * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH)) + (k * SHADOW_ARRAY_SIZE);
             const int shader = (i * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH)) + k;
             
-            if (this->nr_pending_shadows[shader] > 0.0)
+            if (this->nr_pending_shadows[shader] > 0.0f)
             {
                 this->pending_shadows[addr].set_magnitude(made_it[k] / this->nr_pending_shadows[shader]);
             }

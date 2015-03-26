@@ -19,7 +19,7 @@ void mapper_falloff::falloff(ext_colour_t *const c, const point_t &dst) const
             {
                 const point_t dist(dst - _cnt);
                 const point_t fall(dist * _grad);
-                const float all_fall = (fabs(fall.x) + fabs(fall.y) + fabs(fall.z)) * 255.0f;
+                const float all_fall = (std::fabs(fall.x) + std::fabs(fall.y) + std::fabs(fall.z)) * 255.0f;
                 (*c).r = std::max(0.0f, (*c).r - all_fall);
                 (*c).g = std::max(0.0f, (*c).g - all_fall);
                 (*c).b = std::max(0.0f, (*c).b - all_fall);

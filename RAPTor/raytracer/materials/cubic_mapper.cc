@@ -15,7 +15,7 @@ void cubic_mapper::texture_coordinates(float *const u_co, float *const v_co, con
     const float dist_v = dot_product(dist, _v);
     
     /* Scale */
-    *u_co = dist_u * (static_cast<float>(_w) / fabs(dot_product(_s, _u)));
-    *v_co = dist_v * (static_cast<float>(_h) / fabs(dot_product(_s, _v)));
+    *u_co = dist_u * (static_cast<float>(_w) / std::fabs(dot_product(_s, _u)));
+    *v_co = dist_v * (static_cast<float>(_h) / std::fabs(dot_product(_s, _v)));
 }
 }; /* namespace raptor_raytracer */

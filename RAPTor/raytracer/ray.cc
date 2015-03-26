@@ -225,7 +225,7 @@ float ray::refract(ray rays[], const point_t &n, const float t, float ri, const 
     }
 
     /* Convert back to gradients */
-	float offset = (ri * ray_dot_normal - sqrt(cosT2));
+	float offset = (ri * ray_dot_normal - std::sqrt(cosT2));
     point_t ref = (ri * this->dir) + offset * n;
 
     /* Move a little way along the ray */

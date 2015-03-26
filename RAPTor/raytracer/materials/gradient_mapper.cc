@@ -26,7 +26,7 @@ float gradient_mapper::run_procedure(ext_colour_t *const c, const point_t &dst, 
             assert(false);
             break;
         case grad_of_t::incidence_angle : 
-            key = acos(fabs(dot_product(n, dir))) * (180.0f / PI);
+            key = std::acos(std::fabs(dot_product(n, dir))) * (180.0f / PI);
             break;
         case grad_of_t::light_incidence : 
             assert(false);

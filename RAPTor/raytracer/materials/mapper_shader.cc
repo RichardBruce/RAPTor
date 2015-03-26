@@ -155,7 +155,7 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, c
         float spec_shade = 0.0f;
         if (ray_dot_reflection > 0.0f)
         {
-            spec_shade = pow(ray_dot_reflection, cur_s) * _ks;
+            spec_shade = std::pow(ray_dot_reflection, cur_s) * _ks;
         }
 
         /* Get the lights colour */

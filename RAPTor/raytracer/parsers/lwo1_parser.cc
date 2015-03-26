@@ -246,7 +246,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         /* Integer percentage diffuse co-efficient */
         else if (strncmp((*ptr), "DIFF", 4) == 0)
         {
-            if (vkd == 0.0)
+            if (vkd == 0.0f)
             {
                 tmp_ptr = (*ptr) + 6;
                 vkd = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
@@ -264,7 +264,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         /* Integer percentage specular co-efficient */
         else if (strncmp((*ptr), "SPEC", 4) == 0)
         {
-            if (vks == 0.0)
+            if (vks == 0.0f)
             {
                 tmp_ptr = (*ptr) + 6;
                 vks = from_byte_stream<float>(&tmp_ptr) / 255.0f;
@@ -288,7 +288,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         /* Integer percentage transmittance co-efficient */
         else if (strncmp((*ptr), "TRAN", 4) == 0)
         {
-            if (vt == 0.0)
+            if (vt == 0.0f)
             {
                 tmp_ptr = (*ptr) + 6;
                 vt = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
@@ -306,7 +306,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         /* Integer percentage reflectance co-efficient */
         else if (strncmp((*ptr), "REFL", 4) == 0)
         {
-            if (vr == 0.0)
+            if (vr == 0.0f)
             {
                 tmp_ptr = (*ptr) + 6;
                 vr = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;

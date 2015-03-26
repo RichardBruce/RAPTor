@@ -11,7 +11,7 @@ void planar_mapper::texture_coordinates(float *const u_co, float *const v_co, co
     const point_t dist((dst - _c) + (((_s * _u) + (_s * _v)) * 0.5f));
     
     /* Scale */
-    *u_co = (dot_product(dist, _u)) * (static_cast<float>(_w) / fabs(dot_product(_s, _u)));
-    *v_co = (dot_product(dist, _v)) * (static_cast<float>(_h) / fabs(dot_product(_s, _v)));
+    *u_co = (dot_product(dist, _u)) * (static_cast<float>(_w) / std::fabs(dot_product(_s, _u)));
+    *v_co = (dot_product(dist, _v)) * (static_cast<float>(_h) / std::fabs(dot_product(_s, _v)));
 }
 }; /* namespace raptor_raytracer */

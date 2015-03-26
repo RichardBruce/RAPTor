@@ -231,11 +231,11 @@ class camera : private boost::noncopyable
         void pixel_to_co_ordinate(packet_ray *const r, const int x, const int y) const
         {
             /* Assert packet is square */
-            assert(fmod(sqrt(static_cast<float>(MAXIMUM_PACKET_SIZE)), 1.0f) == 0.0f);
+            assert(std::fmod(std::sqrt(static_cast<float>(MAXIMUM_PACKET_SIZE)), 1.0f) == 0.0f);
 
             /* Assert the packet is MAXIMUM_PACKET_SIZE aligned */
-            assert((x & (((unsigned int)sqrt(MAXIMUM_PACKET_SIZE) << 1) - 1)) == 0);
-            assert((y & (((unsigned int)sqrt(MAXIMUM_PACKET_SIZE) << 1) - 1)) == 0);
+            assert((x & (((unsigned int)std::sqrt(MAXIMUM_PACKET_SIZE) << 1) - 1)) == 0);
+            assert((y & (((unsigned int)std::sqrt(MAXIMUM_PACKET_SIZE) << 1) - 1)) == 0);
 
             /* Create the packet data */
             for (unsigned int i = 0; i < MAXIMUM_PACKET_SIZE; i++)

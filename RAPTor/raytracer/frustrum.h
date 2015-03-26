@@ -77,22 +77,22 @@ class frustrum
             {
                 if (fabs(_x_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 0 + ((int)(_x_data[3] < 0.0f) << 2);
+                    this->n = 0 + (static_cast<int>(_x_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
+                    this->n = 2 + (static_cast<int>(_z_data[3] < 0.0f) << 2);
                 }
             }
             else
             {
                 if (fabs(_y_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 1 + ((int)(_y_data[3] < 0.0f) << 2);
+                    this->n = 1 + (static_cast<int>(_y_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
+                    this->n = 2 + (static_cast<int>(_z_data[3] < 0.0f) << 2);
                 }
             }
 
@@ -148,22 +148,22 @@ class frustrum
             {
                 if (fabs(_x_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 0 + ((int)(_x_data[3] < 0.0f) << 2);
+                    this->n = 0 + (static_cast<int>(_x_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
+                    this->n = 2 + (static_cast<int>(_z_data[3] < 0.0f) << 2);
                 }
             }
             else
             {
                 if (fabs(_y_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 1 + ((int)(_y_data[3] < 0.0f) << 2);
+                    this->n = 1 + (static_cast<int>(_y_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
+                    this->n = 2 + (static_cast<int>(_z_data[3] < 0.0f) << 2);
                 }
             }
 

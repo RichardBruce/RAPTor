@@ -107,11 +107,11 @@ namespace raptor_raytracer
 
 /* Define the kd tree completion criteria */
 #ifndef COST_OF_TRAVERSAL
-#define COST_OF_TRAVERSAL 1.0
+#define COST_OF_TRAVERSAL 1.0f
 #endif
 
 #ifndef COST_OF_INTERSECTION
-#define COST_OF_INTERSECTION (80.0*COST_OF_TRAVERSAL)
+#define COST_OF_INTERSECTION (80.0f * COST_OF_TRAVERSAL)
 #endif
 
 #ifndef SECANT_ITERATIONS
@@ -119,7 +119,7 @@ namespace raptor_raytracer
 #endif
 
 #ifndef SECANT_ERROR_LIMIT
-#define SECANT_ERROR_LIMIT (1000.0*DOUBLE_ERR)
+#define SECANT_ERROR_LIMIT (1000.0f * DOUBLE_ERR)
 #endif
 
 #ifndef NEWTON_RAPHSON_ITERATIONS
@@ -127,7 +127,7 @@ namespace raptor_raytracer
 #endif
 
 #ifndef NEWTON_RAPHSON_ERROR_LIMIT
-#define NEWTON_RAPHSON_ERROR_LIMIT (250.0*DOUBLE_ERR)
+#define NEWTON_RAPHSON_ERROR_LIMIT (250.0f * DOUBLE_ERR)
 #endif
 
 #ifndef COS_LUT_SIZE

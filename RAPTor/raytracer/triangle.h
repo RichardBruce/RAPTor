@@ -562,7 +562,7 @@ inline point_t triangle::normal_at_point(ray *const r, hit_description *const h)
 
     /* If the line is leaving the volume enclosed by 
        the triangle use the opposite normal */
-    if (denom > 0.0)
+    if (denom > 0.0f)
     {
         shader_norm = -shader_norm;
         r->set_geometry_normal(-this->n);
