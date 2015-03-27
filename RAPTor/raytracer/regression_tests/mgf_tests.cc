@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( mgf_book_test )
     CREATE_REGRESSION_CHECKER(checker);
 
     /* Enviroment set up */
-    regression_fixture fixture("/mgf_scenes/book.mgf", model_format_t::mgf, point_t(39.7714, 28.5208, -7.42805), point_t(0.516746, -0.126593, 0.846728), point_t(0.276531, 0.911316, 0.305013), point_t(0.81025, -0.391761, 0.435912));
+    regression_fixture fixture("/mgf_scenes/book.mgf", model_format_t::mgf, point_t(29.8755, 21.5609, -7.26923), point_t(0.725319, -0.105324, 0.680307), point_t(-0.372095, 0.77145, 0.516149), point_t(-0.579185, -0.627511, 0.520357));
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t( 200.0,  150.0, -500.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE( mgf_chair2_test )
     CREATE_REGRESSION_CHECKER(checker);
 
     /* Enviroment set up */
-    regression_fixture fixture("/mgf_scenes/chair2.mgf", model_format_t::mgf, point_t(26.1625, 5.59313, 45.7324), point_t(-0.0294118, 0.999444, 0.0157273), point_t(0.48177, 0.000388113, 0.876298), point_t(0.875804, 0.0333504, -0.481513));
+    regression_fixture fixture("/mgf_scenes/chair2.mgf", model_format_t::mgf, point_t(-24.9715, -4.0363, 34.4186), point_t(-0.278942, 0.959806, 0.0308408), point_t(0.465211, 0.106966, 0.878702), point_t(0.840094, 0.259458, -0.476356));
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-200.0, 150.0, 500.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
@@ -407,8 +407,8 @@ BOOST_AUTO_TEST_CASE( mgf_mug_test )
     CREATE_REGRESSION_CHECKER(checker);
 
     /* Enviroment set up */
-    regression_fixture fixture("/mgf_scenes/mug.mgf", model_format_t::mgf, point_t(17.7387, 13.4915, -2.61691), point_t(0.156434, 0.0, -0.987688), point_t(0.305212, 0.951057, 0.048340), point_t(0.939347, -0.309017, 0.148778));
-    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-200.0, 150.0, -500.0), 0.0, 10.0);
+    regression_fixture fixture("/mgf_scenes/mug.mgf", model_format_t::mgf, point_t(7.27707, 6.3566, 12.3732), point_t(0.648834, -0.75714, -0.0758137), point_t(-0.43585, -0.451466, 0.778595), point_t(-0.623734, -0.472135, -0.622928));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-200.0, 150.0, 500.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
