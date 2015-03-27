@@ -49,32 +49,32 @@ sdl_event_handler<camera>* get_camera_event_handler(camera *const cam, const std
         /* Rotation */
         { SDLK_UP, [](const SDL_Keycode key, camera* c) -> int
             {
-                c->tilt( 0.01 * PI); return 0;
+                c->tilt( 0.01f * PI); return 0;
             }
         },
         { SDLK_DOWN, [](const SDL_Keycode key, camera* c) -> int
             {
-                c->tilt(-0.01 * PI); return 0;
+                c->tilt(-0.01f * PI); return 0;
             }
         },
         { SDLK_RIGHT, [](const SDL_Keycode key, camera* c) -> int
             {
-                c->pan( 0.01 * PI); return 0;
+                c->pan( 0.01f * PI); return 0;
             }
         },
         { SDLK_LEFT, [](const SDL_Keycode key, camera* c) -> int
             {
-                c->pan(-0.01 * PI); return 0;
+                c->pan(-0.01f * PI); return 0;
             }
         },
         { SDLK_PAGEDOWN, [](const SDL_Keycode key, camera* c) -> int
             {
-                c->roll( 0.01 * PI); return 0;
+                c->roll( 0.01f * PI); return 0;
             }
         },
         { SDLK_PAGEUP, [](const SDL_Keycode key, camera* c) -> int
             {
-                c->roll(-0.01 * PI); return 0;
+                c->roll(-0.01f * PI); return 0;
             }
         },
         /* Movement */

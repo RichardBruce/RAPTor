@@ -168,8 +168,8 @@ struct contact_graph_2_contact_fixture : public contact_graph_base_fixture
 {
     contact_graph_2_contact_fixture()
     {
-        info = {{po0, new tracking_info<mock_physics_object>(po1, new simplex(s0), s1, 0.0, SLIDING_COLLISION)},
-                {po1, new tracking_info<mock_physics_object>(po0, new simplex(s1), s0, 0.0, SLIDING_COLLISION)}};
+        info = {{po0, new tracking_info<mock_physics_object>(po1, new simplex(s0), s1, 0.0, collision_t::SLIDING_COLLISION)},
+                {po1, new tracking_info<mock_physics_object>(po0, new simplex(s1), s0, 0.0, collision_t::SLIDING_COLLISION)}};
 
         uut = new contact_graph<mock_physics_object>(info, po0);
     };
@@ -180,8 +180,8 @@ struct contact_graph_2_offset_contact_fixture : public contact_graph_base_fixtur
 {
     contact_graph_2_offset_contact_fixture()
     {
-        info = {{po10, new tracking_info<mock_physics_object>(po11, new simplex(s12), s13, 0.0, SLIDING_COLLISION)},
-                {po11, new tracking_info<mock_physics_object>(po10, new simplex(s13), s12, 0.0, SLIDING_COLLISION)}};
+        info = {{po10, new tracking_info<mock_physics_object>(po11, new simplex(s12), s13, 0.0, collision_t::SLIDING_COLLISION)},
+                {po11, new tracking_info<mock_physics_object>(po10, new simplex(s13), s12, 0.0, collision_t::SLIDING_COLLISION)}};
 
         uut = new contact_graph<mock_physics_object>(info, po10);
     };
@@ -192,8 +192,8 @@ struct contact_graph_2_infinite_mass_contact_fixture : public contact_graph_base
 {
     contact_graph_2_infinite_mass_contact_fixture()
     {
-        info = {{po12, new tracking_info<mock_physics_object>(po13, new simplex(s14), s15, 0.0, SLIDING_COLLISION)},
-                {po13, new tracking_info<mock_physics_object>(po12, new simplex(s15), s14, 0.0, SLIDING_COLLISION)}};
+        info = {{po12, new tracking_info<mock_physics_object>(po13, new simplex(s14), s15, 0.0, collision_t::SLIDING_COLLISION)},
+                {po13, new tracking_info<mock_physics_object>(po12, new simplex(s15), s14, 0.0, collision_t::SLIDING_COLLISION)}};
 
         uut = new contact_graph<mock_physics_object>(info, po12);
     };
@@ -204,15 +204,15 @@ struct contact_graph_4_circle_fixture : public contact_graph_base_fixture
 {
     contact_graph_4_circle_fixture()
     {
-        info= {{po0, new tracking_info<mock_physics_object>(po1, new simplex( s0),  s1, 0.0, SLIDING_COLLISION)},
-               {po1, new tracking_info<mock_physics_object>(po2, new simplex( s2),  s3, 0.0, SLIDING_COLLISION)},
-               {po2, new tracking_info<mock_physics_object>(po6, new simplex( s8),  s9, 0.0, SLIDING_COLLISION)},
-               {po6, new tracking_info<mock_physics_object>(po0, new simplex(s10), s11, 0.0, SLIDING_COLLISION)}};
+        info= {{po0, new tracking_info<mock_physics_object>(po1, new simplex( s0),  s1, 0.0, collision_t::SLIDING_COLLISION)},
+               {po1, new tracking_info<mock_physics_object>(po2, new simplex( s2),  s3, 0.0, collision_t::SLIDING_COLLISION)},
+               {po2, new tracking_info<mock_physics_object>(po6, new simplex( s8),  s9, 0.0, collision_t::SLIDING_COLLISION)},
+               {po6, new tracking_info<mock_physics_object>(po0, new simplex(s10), s11, 0.0, collision_t::SLIDING_COLLISION)}};
 
-        info[po1]->update(po0, new simplex( s1),  s0, 0.0, SLIDING_COLLISION);
-        info[po2]->update(po1, new simplex( s3),  s2, 0.0, SLIDING_COLLISION);
-        info[po6]->update(po2, new simplex( s9),  s8, 0.0, SLIDING_COLLISION);
-        info[po0]->update(po6, new simplex(s11), s10, 0.0, SLIDING_COLLISION);
+        info[po1]->update(po0, new simplex( s1),  s0, 0.0, collision_t::SLIDING_COLLISION);
+        info[po2]->update(po1, new simplex( s3),  s2, 0.0, collision_t::SLIDING_COLLISION);
+        info[po6]->update(po2, new simplex( s9),  s8, 0.0, collision_t::SLIDING_COLLISION);
+        info[po0]->update(po6, new simplex(s11), s10, 0.0, collision_t::SLIDING_COLLISION);
 
         uut = new contact_graph<mock_physics_object>(info, po0);
     };
@@ -223,17 +223,17 @@ struct contact_graph_5_p_fixture : public contact_graph_base_fixture
 {
     contact_graph_5_p_fixture()
     {
-        info = {{po0, new tracking_info<mock_physics_object>(po1, new simplex( s0),  s1, 0.0, SLIDING_COLLISION)},
-                {po1, new tracking_info<mock_physics_object>(po2, new simplex( s2),  s3, 0.0, SLIDING_COLLISION)},
-                {po2, new tracking_info<mock_physics_object>(po6, new simplex( s8),  s9, 0.0, SLIDING_COLLISION)},
-                {po6, new tracking_info<mock_physics_object>(po0, new simplex(s10), s11, 0.0, SLIDING_COLLISION)},
-                {po4, new tracking_info<mock_physics_object>(po2, new simplex( s5),  s4, 0.0, SLIDING_COLLISION)}};
+        info = {{po0, new tracking_info<mock_physics_object>(po1, new simplex( s0),  s1, 0.0, collision_t::SLIDING_COLLISION)},
+                {po1, new tracking_info<mock_physics_object>(po2, new simplex( s2),  s3, 0.0, collision_t::SLIDING_COLLISION)},
+                {po2, new tracking_info<mock_physics_object>(po6, new simplex( s8),  s9, 0.0, collision_t::SLIDING_COLLISION)},
+                {po6, new tracking_info<mock_physics_object>(po0, new simplex(s10), s11, 0.0, collision_t::SLIDING_COLLISION)},
+                {po4, new tracking_info<mock_physics_object>(po2, new simplex( s5),  s4, 0.0, collision_t::SLIDING_COLLISION)}};
 
-        info[po1]->update(po0, new simplex( s1),  s0, 0.0, SLIDING_COLLISION);
-        info[po2]->update(po1, new simplex( s3),  s2, 0.0, SLIDING_COLLISION);
-        info[po6]->update(po2, new simplex( s9),  s8, 0.0, SLIDING_COLLISION);
-        info[po0]->update(po6, new simplex(s11), s10, 0.0, SLIDING_COLLISION);
-        info[po2]->update(po4, new simplex( s4),  s5, 0.0, SLIDING_COLLISION);
+        info[po1]->update(po0, new simplex( s1),  s0, 0.0, collision_t::SLIDING_COLLISION);
+        info[po2]->update(po1, new simplex( s3),  s2, 0.0, collision_t::SLIDING_COLLISION);
+        info[po6]->update(po2, new simplex( s9),  s8, 0.0, collision_t::SLIDING_COLLISION);
+        info[po0]->update(po6, new simplex(s11), s10, 0.0, collision_t::SLIDING_COLLISION);
+        info[po2]->update(po4, new simplex( s4),  s5, 0.0, collision_t::SLIDING_COLLISION);
         
         uut = new contact_graph<mock_physics_object>(info, po0);
     };
@@ -244,15 +244,15 @@ struct contact_graph_5_stacked_fixture : public contact_graph_base_fixture
 {
     contact_graph_5_stacked_fixture()
     {
-        info = {{po0, new tracking_info<mock_physics_object>(po1, new simplex(s0), s1, 0.0, SLIDING_COLLISION)},
-                {po1, new tracking_info<mock_physics_object>(po2, new simplex(s2), s3, 0.0, SLIDING_COLLISION)},
-                {po2, new tracking_info<mock_physics_object>(po3, new simplex(s4), s5, 0.0, SLIDING_COLLISION)},
-                {po3, new tracking_info<mock_physics_object>(po4, new simplex(s6), s7, 0.0, SLIDING_COLLISION)},
-                {po4, new tracking_info<mock_physics_object>(po3, new simplex(s7), s6, 0.0, SLIDING_COLLISION)}};
+        info = {{po0, new tracking_info<mock_physics_object>(po1, new simplex(s0), s1, 0.0, collision_t::SLIDING_COLLISION)},
+                {po1, new tracking_info<mock_physics_object>(po2, new simplex(s2), s3, 0.0, collision_t::SLIDING_COLLISION)},
+                {po2, new tracking_info<mock_physics_object>(po3, new simplex(s4), s5, 0.0, collision_t::SLIDING_COLLISION)},
+                {po3, new tracking_info<mock_physics_object>(po4, new simplex(s6), s7, 0.0, collision_t::SLIDING_COLLISION)},
+                {po4, new tracking_info<mock_physics_object>(po3, new simplex(s7), s6, 0.0, collision_t::SLIDING_COLLISION)}};
 
-        info[po1]->update(po0, new simplex(s1), s0, 0.0, SLIDING_COLLISION);
-        info[po2]->update(po1, new simplex(s3), s2, 0.0, SLIDING_COLLISION);
-        info[po3]->update(po2, new simplex(s5), s4, 0.0, SLIDING_COLLISION);
+        info[po1]->update(po0, new simplex(s1), s0, 0.0, collision_t::SLIDING_COLLISION);
+        info[po2]->update(po1, new simplex(s3), s2, 0.0, collision_t::SLIDING_COLLISION);
+        info[po3]->update(po2, new simplex(s5), s4, 0.0, collision_t::SLIDING_COLLISION);
         
         uut = new contact_graph<mock_physics_object>(info, po0);
     };
@@ -263,25 +263,25 @@ struct contact_graph_9_disjoint_fixture : public contact_graph_base_fixture
 {
     contact_graph_9_disjoint_fixture()
     {
-        info = {{po0, new tracking_info<mock_physics_object>(po1, new simplex(s0), s1, 0.0, SLIDING_COLLISION)},
-                {po1, new tracking_info<mock_physics_object>(po2, new simplex(s2), s3, 0.0, SLIDING_COLLISION)},
-                {po2, new tracking_info<mock_physics_object>(po3, new simplex(s4), s5, 0.0, SLIDING_COLLISION)},
-                {po3, new tracking_info<mock_physics_object>(po4, new simplex(s6), s7, 0.0, SLIDING_COLLISION)},
-                {po4, new tracking_info<mock_physics_object>(po3, new simplex(s7), s6, 0.0, SLIDING_COLLISION)},
+        info = {{po0, new tracking_info<mock_physics_object>(po1, new simplex(s0), s1, 0.0, collision_t::SLIDING_COLLISION)},
+                {po1, new tracking_info<mock_physics_object>(po2, new simplex(s2), s3, 0.0, collision_t::SLIDING_COLLISION)},
+                {po2, new tracking_info<mock_physics_object>(po3, new simplex(s4), s5, 0.0, collision_t::SLIDING_COLLISION)},
+                {po3, new tracking_info<mock_physics_object>(po4, new simplex(s6), s7, 0.0, collision_t::SLIDING_COLLISION)},
+                {po4, new tracking_info<mock_physics_object>(po3, new simplex(s7), s6, 0.0, collision_t::SLIDING_COLLISION)},
 
-                {po5, new tracking_info<mock_physics_object>(po6, new simplex( s0),  s1, 0.0, SLIDING_COLLISION)},
-                {po6, new tracking_info<mock_physics_object>(po7, new simplex( s2),  s3, 0.0, SLIDING_COLLISION)},
-                {po7, new tracking_info<mock_physics_object>(po8, new simplex( s8),  s9, 0.0, SLIDING_COLLISION)},
-                {po8, new tracking_info<mock_physics_object>(po5, new simplex(s10), s11, 0.0, SLIDING_COLLISION)}};
+                {po5, new tracking_info<mock_physics_object>(po6, new simplex( s0),  s1, 0.0, collision_t::SLIDING_COLLISION)},
+                {po6, new tracking_info<mock_physics_object>(po7, new simplex( s2),  s3, 0.0, collision_t::SLIDING_COLLISION)},
+                {po7, new tracking_info<mock_physics_object>(po8, new simplex( s8),  s9, 0.0, collision_t::SLIDING_COLLISION)},
+                {po8, new tracking_info<mock_physics_object>(po5, new simplex(s10), s11, 0.0, collision_t::SLIDING_COLLISION)}};
 
-        info[po1]->update(po0, new simplex(s1), s0, 0.0, SLIDING_COLLISION);
-        info[po2]->update(po1, new simplex(s3), s2, 0.0, SLIDING_COLLISION);
-        info[po3]->update(po2, new simplex(s5), s4, 0.0, SLIDING_COLLISION);
+        info[po1]->update(po0, new simplex(s1), s0, 0.0, collision_t::SLIDING_COLLISION);
+        info[po2]->update(po1, new simplex(s3), s2, 0.0, collision_t::SLIDING_COLLISION);
+        info[po3]->update(po2, new simplex(s5), s4, 0.0, collision_t::SLIDING_COLLISION);
 
-        info[po6]->update(po5, new simplex( s1),  s0, 0.0, SLIDING_COLLISION);
-        info[po7]->update(po6, new simplex( s3),  s2, 0.0, SLIDING_COLLISION);
-        info[po8]->update(po7, new simplex( s9),  s8, 0.0, SLIDING_COLLISION);
-        info[po5]->update(po8, new simplex(s11), s10, 0.0, SLIDING_COLLISION);
+        info[po6]->update(po5, new simplex( s1),  s0, 0.0, collision_t::SLIDING_COLLISION);
+        info[po7]->update(po6, new simplex( s3),  s2, 0.0, collision_t::SLIDING_COLLISION);
+        info[po8]->update(po7, new simplex( s9),  s8, 0.0, collision_t::SLIDING_COLLISION);
+        info[po5]->update(po8, new simplex(s11), s10, 0.0, collision_t::SLIDING_COLLISION);
         
         uut = new contact_graph<mock_physics_object>(info, po0);
     };
@@ -538,40 +538,40 @@ BOOST_FIXTURE_TEST_CASE ( contact_graph_void_collisions_test, contact_graph_9_di
 
     /* Check the stack is void */
     BOOST_CHECK(info[po0]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po0]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po0]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po0]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po1]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po1]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po1]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po1]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po2]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po2]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po2]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po2]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po3]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po3]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po3]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po3]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po4]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po4]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po4]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po4]->get_first_collision() == nullptr);
 
     /* Check the circle isnt void */
     BOOST_CHECK(info[po5]->get_first_collision_time() == 0.0);
-    BOOST_CHECK(info[po5]->get_first_collision_type() == SLIDING_COLLISION);
+    BOOST_CHECK(info[po5]->get_first_collision_type() == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(info[po5]->get_first_collision() == po6);
 
     BOOST_CHECK(info[po6]->get_first_collision_time() == 0.0);
-    BOOST_CHECK(info[po6]->get_first_collision_type() == SLIDING_COLLISION);
+    BOOST_CHECK(info[po6]->get_first_collision_type() == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(info[po6]->get_first_collision() == po7);
 
     BOOST_CHECK(info[po7]->get_first_collision_time() == 0.0);
-    BOOST_CHECK(info[po7]->get_first_collision_type() == SLIDING_COLLISION);
+    BOOST_CHECK(info[po7]->get_first_collision_type() == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(info[po7]->get_first_collision() == po8);
 
     BOOST_CHECK(info[po8]->get_first_collision_time() == 0.0);
-    BOOST_CHECK(info[po8]->get_first_collision_type() == SLIDING_COLLISION);
+    BOOST_CHECK(info[po8]->get_first_collision_type() == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(info[po8]->get_first_collision() == po5);
 
     /* Rebuild for the circle */
@@ -580,40 +580,40 @@ BOOST_FIXTURE_TEST_CASE ( contact_graph_void_collisions_test, contact_graph_9_di
 
     /* Check the stack is void */
     BOOST_CHECK(info[po0]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po0]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po0]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po0]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po1]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po1]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po1]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po1]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po2]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po2]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po2]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po2]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po3]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po3]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po3]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po3]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po4]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po4]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po4]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po4]->get_first_collision() == nullptr);
 
     /* Check the circle is void */
     BOOST_CHECK(info[po5]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po5]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po5]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po5]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po6]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po6]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po6]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po6]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po7]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po7]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po7]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po7]->get_first_collision() == nullptr);
 
     BOOST_CHECK(info[po8]->get_first_collision_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(info[po8]->get_first_collision_type() == NO_COLLISION);
+    BOOST_CHECK(info[po8]->get_first_collision_type() == collision_t::NO_COLLISION);
     BOOST_CHECK(info[po8]->get_first_collision() == nullptr);
 }
 

@@ -151,8 +151,8 @@ char    **av;
         c_ccolor->cx = atof(av[1]);
         c_ccolor->cy = atof(av[2]);
         c_ccolor->flags = C_CDXY|C_CSXY;
-        if (c_ccolor->cx < 0. || c_ccolor->cy < 0. ||
-                c_ccolor->cx + c_ccolor->cy > 1.)
+        if (c_ccolor->cx < 0.0f || c_ccolor->cy < 0.0f ||
+                c_ccolor->cx + c_ccolor->cy > 1.0f)
             return(MG_EILL);
         c_ccolor->clock++;
         return(MG_OK);
@@ -278,7 +278,7 @@ char    **av;
         if (!isflt(av[1]))
             return(MG_ETYPE);
         c_cmaterial->rd = atof(av[1]);
-        if (c_cmaterial->rd < 0. || c_cmaterial->rd > 1.)
+        if (c_cmaterial->rd < 0.0f || c_cmaterial->rd > 1.0f)
             return(MG_EILL);
         c_cmaterial->rd_c = *c_ccolor;
         c_cmaterial->clock++;
@@ -289,7 +289,7 @@ char    **av;
         if (!isflt(av[1]))
             return(MG_ETYPE);
         c_cmaterial->ed = atof(av[1]);
-        if (c_cmaterial->ed < 0.)
+        if (c_cmaterial->ed < 0.0f)
             return(MG_EILL);
         c_cmaterial->ed_c = *c_ccolor;
         c_cmaterial->clock++;
@@ -300,7 +300,7 @@ char    **av;
         if (!isflt(av[1]))
             return(MG_ETYPE);
         c_cmaterial->td = atof(av[1]);
-        if (c_cmaterial->td < 0. || c_cmaterial->td > 1.)
+        if (c_cmaterial->td < 0.0f || c_cmaterial->td > 1.0f)
             return(MG_EILL);
         c_cmaterial->td_c = *c_ccolor;
         c_cmaterial->clock++;
@@ -312,8 +312,8 @@ char    **av;
             return(MG_ETYPE);
         c_cmaterial->rs = atof(av[1]);
         c_cmaterial->rs_a = atof(av[2]);
-        if (c_cmaterial->rs < 0. || c_cmaterial->rs > 1. ||
-                c_cmaterial->rs_a < 0.)
+        if (c_cmaterial->rs < 0.0f || c_cmaterial->rs > 1.0f ||
+                c_cmaterial->rs_a < 0.0f)
             return(MG_EILL);
         c_cmaterial->rs_c = *c_ccolor;
         c_cmaterial->clock++;
@@ -325,8 +325,8 @@ char    **av;
             return(MG_ETYPE);
         c_cmaterial->ts = atof(av[1]);
         c_cmaterial->ts_a = atof(av[2]);
-        if (c_cmaterial->ts < 0. || c_cmaterial->ts > 1. ||
-                c_cmaterial->ts_a < 0.)
+        if (c_cmaterial->ts < 0.0f || c_cmaterial->ts > 1.0f ||
+                c_cmaterial->ts_a < 0.0f)
             return(MG_EILL);
         c_cmaterial->ts_c = *c_ccolor;
         c_cmaterial->clock++;
@@ -497,7 +497,7 @@ int    fl;
             clr->eff = C_CLPWM * y / clr->ssum;
         } else /* clr->flags & C_CSXY */ {    /* from (x,y) */
             clr->eff = clr->cx*cie_xf.eff + clr->cy*cie_yf.eff +
-                    (1. - clr->cx - clr->cy)*cie_zf.eff;
+                    (1.0f - clr->cx - clr->cy)*cie_zf.eff;
         }
         clr->flags |= C_CSEFF;
     }
@@ -507,17 +507,17 @@ int    fl;
 static int
 setspectrum(clr, wlmin, wlmax, ac, av)    /* convert a spectrum */
 C_COLOR    *clr;
-double    wlmin, wlmax;
+float    wlmin, wlmax;
 int    ac;
 char    **av;
 {
-    double    scale;
+    float    scale;
     float    va[C_CNSS];
     int    i, pos;
     int    imax;
     int    wl;
-    double    wl0, wlstep;
-    double    boxpos, boxstep;
+    float    wl0, wlstep;
+    float    boxpos, boxstep;
                     /* check bounds */
     if (wlmax <= C_CMINWL || wlmax <= wlmin || wlmin >= C_CMAXWL)
         return(MG_EILL);
@@ -534,7 +534,7 @@ char    **av;
     boxpos = 0;
     boxstep = 1;
     if (wlstep < C_CWLI) {
-        imax = (wlmax - wlmin)/C_CWLI + (1-FTINY);
+        imax = (wlmax - wlmin)/C_CWLI + (1.0f-FTINY);
         boxpos = (wlmin - C_CMINWL)/C_CWLI;
         boxstep = wlstep/C_CWLI;
         wlstep = C_CWLI;
@@ -544,15 +544,15 @@ char    **av;
     for (i = 0; i < imax; i++) {
         va[i] = 0.; 
         int n = 0;
-        while (boxpos < i+.5 && pos < ac) {
+        while (boxpos < (float)i+0.5f && pos < ac) {
             if (!isflt(av[pos]))
                 return(MG_ETYPE);
-            va[i] += atof(av[pos++]);
+            va[i] += (float)atof(av[pos++]);
             n++;
             boxpos += boxstep;
         }
         if (n > 1)
-            va[i] /= (double)n;
+            va[i] /= (float)n;
         if (va[i] > scale)
             scale = va[i];
         else if (va[i] < -scale)
@@ -573,9 +573,9 @@ char    **av;
                 pos++;
             }
             if (wl+FTINY >= wl0 && wl-FTINY <= wl0)
-                clr->ssamp[i] = scale*va[pos] + .5;
+                clr->ssamp[i] = scale*va[pos] + 0.5f;
             else        /* interpolate if necessary */
-                clr->ssamp[i] = .5 + scale / wlstep *
+                clr->ssamp[i] = 0.5f + scale / wlstep *
                         ( va[pos]*(wl0+wlstep - wl) +
                             va[pos+1]*(wl - wl0) );
             clr->ssum += clr->ssamp[i];
@@ -589,9 +589,9 @@ char    **av;
 static void
 mixcolors(cres, w1, c1, w2, c2)    /* mix two colors according to weights given */
 C_COLOR    *cres, *c1, *c2;
-double    w1, w2;
+float    w1, w2;
 {
-    double    scale;
+    float    scale;
     float    cmix[C_CNSS];
 
     if ((c1->flags|c2->flags) & C_CDSPEC) {        /* spectral mixing */
@@ -599,7 +599,7 @@ double    w1, w2;
         c_ccvt(c2, C_CSSPEC|C_CSEFF);
         w1 /= c1->eff*c1->ssum;
         w2 /= c2->eff*c2->ssum;
-        scale = 0.;
+        scale = 0.0f;
 
         int i;
         for (i = 0; i < C_CNSS; ++i) {
@@ -610,15 +610,15 @@ double    w1, w2;
         scale = C_CMAXV / scale;
         cres->ssum = 0;
         for (i = 0; i < C_CNSS; ++i)
-            cres->ssum += cres->ssamp[i] = scale*cmix[i] + .5;
+            cres->ssum += cres->ssamp[i] = scale*cmix[i] + 0.5f;
         cres->flags = C_CDSPEC|C_CSSPEC;
     } else {                    /* CIE xy mixing */
         c_ccvt(c1, C_CSXY);
         c_ccvt(c2, C_CSXY);
         scale = w1/c1->cy + w2/c2->cy;
-        if (scale == 0.)
+        if (scale == 0.0f)
             return;
-        scale = 1. / scale;
+        scale = 1.0f / scale;
         cres->cx = (c1->cx*w1/c1->cy + c2->cx*w2/c2->cy) * scale;
         cres->cy = (w1 + w2) * scale;
         cres->flags = C_CDXY|C_CSXY;

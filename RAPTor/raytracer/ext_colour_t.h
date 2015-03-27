@@ -42,6 +42,12 @@ class ext_colour_t
         }
 };
 
+/* Degugging */
+inline std::ostream& operator<<(std::ostream &os, const ext_colour_t &c)
+{
+    return os << c.r << ", " << c.g << ", " << c.b;
+}
+
 inline const ext_colour_t operator+(const ext_colour_t &lhs, const float rhs)
 {
    return ext_colour_t(lhs.r + rhs, lhs.g + rhs, lhs.b + rhs);

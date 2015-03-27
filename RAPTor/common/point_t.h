@@ -177,17 +177,17 @@ inline point_t min(const point_t& a, const float b)
 inline point_t max_magn(const point_t& a, const point_t &b)
 {
     point_t ret(a);
-    if (fabs(b.x) > fabs(a.x))
+    if (std::fabs(b.x) > std::fabs(a.x))
     {
         ret.x = b.x;
     }
     
-    if (fabs(b.y) > fabs(a.y))
+    if (std::fabs(b.y) > std::fabs(a.y))
     {
         ret.y = b.y;
     }
     
-    if (fabs(b.z) > fabs(a.z))
+    if (std::fabs(b.z) > std::fabs(a.z))
     {
         ret.z = b.z;
     }
@@ -199,17 +199,17 @@ inline point_t max_magn(const point_t& a, const point_t &b)
 inline point_t min_magn(const point_t& a, const point_t &b)
 {
     point_t ret(a);
-    if (fabs(b.x) < fabs(a.x))
+    if (std::fabs(b.x) < std::fabs(a.x))
     {
         ret.x = b.x;
     }
     
-    if (fabs(b.y) < fabs(a.y))
+    if (std::fabs(b.y) < std::fabs(a.y))
     {
         ret.y = b.y;
     }
     
-    if (fabs(b.z) < fabs(a.z))
+    if (std::fabs(b.z) < std::fabs(a.z))
     {
         ret.z = b.z;
     }
@@ -221,18 +221,18 @@ inline point_t min_magn(const point_t& a, const point_t &b)
 inline point_t max_magn(const point_t& a, const float b)
 {
     point_t ret(a);
-    const float abs_b = fabs(b);
-    if (abs_b > fabs(a.x))
+    const float abs_b = std::fabs(b);
+    if (abs_b > std::fabs(a.x))
     {
         ret.x = abs_b;
     }
     
-    if (abs_b > fabs(a.y))
+    if (abs_b > std::fabs(a.y))
     {
         ret.y = abs_b;
     }
     
-    if (abs_b > fabs(a.z))
+    if (abs_b > std::fabs(a.z))
     {
         ret.z = abs_b;
     }
@@ -244,18 +244,18 @@ inline point_t max_magn(const point_t& a, const float b)
 inline point_t min_magn(const point_t& a, const float b)
 {
     point_t ret(a);
-    const float abs_b = fabs(b);
-    if (abs_b < fabs(a.x))
+    const float abs_b = std::fabs(b);
+    if (abs_b < std::fabs(a.x))
     {
         ret.x = abs_b;
     }
     
-    if (abs_b < fabs(a.y))
+    if (abs_b <std:: fabs(a.y))
     {
         ret.y = abs_b;
     }
     
-    if (abs_b < fabs(a.z))
+    if (abs_b < std::fabs(a.z))
     {
         ret.z = abs_b;
     }
@@ -266,25 +266,25 @@ inline point_t min_magn(const point_t& a, const float b)
 
 inline point_t fabs(const point_t &a)
 {
-    return point_t(fabs(a.x), fabs(a.y), fabs(a.z));
+    return point_t(std::fabs(a.x), std::fabs(a.y), std::fabs(a.z));
 }
 
 
 inline point_t floor_to_zero(point_t a, const float f)
 {
-    if (fabs(a.x) < f)
+    if (std::fabs(a.x) < f)
     {
-        a.x = 0.0;
+        a.x = 0.0f;
     }
 
-    if (fabs(a.y) < f)
+    if (std::fabs(a.y) < f)
     {
-        a.y = 0.0;
+        a.y = 0.0f;
     }
 
-    if (fabs(a.z) < f)
+    if (std::fabs(a.z) < f)
     {
-        a.z = 0.0;
+        a.z = 0.0f;
     }
 
     return a;
@@ -299,7 +299,7 @@ inline point_t floor_to_zero(point_t a, const float f)
 *****************************************************/
 inline float magnitude(const point_t &a)
 {
-    return sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
+    return std::sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
 }
 
 
@@ -314,10 +314,10 @@ inline void rotate_about_origin(point_t *const a, const point_t *const r, const 
 {
     /* Rotate the origin into the new coordinate system */
     point_t p = *a;
-    point_t q(0.0,0.0,0.0);
+    point_t q(0.0f ,0.0f ,0.0f);
    
-    const float costheta = cos(theta);
-    const float sintheta = sin(theta);
+    const float costheta = std::cos(theta);
+    const float sintheta = std::sin(theta);
     
     /* Rotate about r */
     q.x += (costheta + (1 - costheta) * r->x * r->x) * p.x;

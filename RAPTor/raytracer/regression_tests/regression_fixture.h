@@ -23,6 +23,7 @@
 #include "nff_parser.h"
 #include "lwo_parser.h"
 #include "obj_parser.h"
+#include "off_parser.h"
 #include "ply_parser.h"
 #include "vrml_parser.h"
 #include "raytracer.h"
@@ -37,8 +38,8 @@ namespace raptor_raytracer
 namespace test
 {
 #if !defined(VALGRIND_TESTS) && !defined(DEBUG_TESTS)
-const int test_iterations = 5;
-#else 
+const int test_iterations = 1;
+#else
 const int test_iterations = 1;
 #endif
 
@@ -136,6 +137,15 @@ struct regression_fixture : private boost::noncopyable
                     /* Camera is not set in the scene so do it here */
                     _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
                     break;
+                    
+                case model_format_t::off :
+                    input_stream.open(input_path.c_str());
+                    assert(input_stream.is_open());
+                    off_parser(input_stream, _lights, _everything, _materials, _cam);
+                    
+                    /* Camera is not set in the scene so do it here */
+                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                    break;
 
                 case model_format_t::ply :
                     input_stream.open(input_path.c_str());
@@ -147,14 +157,12 @@ struct regression_fixture : private boost::noncopyable
                     break;
 
                 case model_format_t::vrml :
-                    /* Deafult camera set up for vrml -- NOTE negative z axis */
-                    _cam = new camera(cam_p, point_t(1.0f, 0.0f,  0.0f), 
-                                             point_t(0.0f, 1.0f,  0.0f), 
-                                             point_t(0.0f, 0.0f, -1.0f), bg, screen_width, screen_height, 20, xr, yr, xa, ya);
-
                     input_stream.open(input_path.c_str());
                     assert(input_stream.is_open());
                     vrml_parser(input_stream, _lights, _everything, _materials, _cam, view_point);
+                    
+                    /* Camera is not set in the scene so do it here */
+                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
                     break;
 
                 default :

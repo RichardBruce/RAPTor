@@ -68,26 +68,26 @@ const float result_tolerance = 0.0005;
 /* Neighbour tests */
 BOOST_AUTO_TEST_CASE( turn_left_test )
 {
-    BOOST_CHECK(turn_left(NORTH)    == WEST);
-    BOOST_CHECK(turn_left(SOUTH)    == EAST);
-    BOOST_CHECK(turn_left(EAST)     == NORTH);
-    BOOST_CHECK(turn_left(WEST)     == SOUTH);
+    BOOST_CHECK(turn_left(neighbour_t::NORTH)   == neighbour_t::WEST);
+    BOOST_CHECK(turn_left(neighbour_t::SOUTH)   == neighbour_t::EAST);
+    BOOST_CHECK(turn_left(neighbour_t::EAST)    == neighbour_t::NORTH);
+    BOOST_CHECK(turn_left(neighbour_t::WEST)    == neighbour_t::SOUTH);
 }
 
 BOOST_AUTO_TEST_CASE( turn_right_test )
 {
-    BOOST_CHECK(turn_right(NORTH)   == EAST);
-    BOOST_CHECK(turn_right(SOUTH)   == WEST);
-    BOOST_CHECK(turn_right(EAST)    == SOUTH);
-    BOOST_CHECK(turn_right(WEST)    == NORTH);
+    BOOST_CHECK(turn_right(neighbour_t::NORTH)  == neighbour_t::EAST);
+    BOOST_CHECK(turn_right(neighbour_t::SOUTH)  == neighbour_t::WEST);
+    BOOST_CHECK(turn_right(neighbour_t::EAST)   == neighbour_t::SOUTH);
+    BOOST_CHECK(turn_right(neighbour_t::WEST)   == neighbour_t::NORTH);
 }
 
 BOOST_AUTO_TEST_CASE( turn_around_test )
 {
-    BOOST_CHECK(turn_around(NORTH)  == SOUTH);
-    BOOST_CHECK(turn_around(SOUTH)  == NORTH);
-    BOOST_CHECK(turn_around(EAST)   == WEST);
-    BOOST_CHECK(turn_around(WEST)   == EAST);
+    BOOST_CHECK(turn_around(neighbour_t::NORTH) == neighbour_t::SOUTH);
+    BOOST_CHECK(turn_around(neighbour_t::SOUTH) == neighbour_t::NORTH);
+    BOOST_CHECK(turn_around(neighbour_t::EAST)  == neighbour_t::WEST);
+    BOOST_CHECK(turn_around(neighbour_t::WEST)  == neighbour_t::EAST);
 }
 
 /* Test ctor for shapes with known tensor */
@@ -106,64 +106,64 @@ BOOST_AUTO_TEST_CASE( ctor_test )
 /* Getter tests */
 BOOST_AUTO_TEST_CASE( neighbour_test )
 {
-    BOOST_CHECK(gc->neighbour(NORTH)    == -1);
-    BOOST_CHECK(gc->neighbour(SOUTH)    ==  1);
-    BOOST_CHECK(gc->neighbour(EAST)     ==  2);
-    BOOST_CHECK(gc->neighbour(WEST)     ==  5);
+    BOOST_CHECK(gc->neighbour(neighbour_t::NORTH)   == -1);
+    BOOST_CHECK(gc->neighbour(neighbour_t::SOUTH)   ==  1);
+    BOOST_CHECK(gc->neighbour(neighbour_t::EAST)    ==  2);
+    BOOST_CHECK(gc->neighbour(neighbour_t::WEST)    ==  5);
 }
 
 BOOST_AUTO_TEST_CASE( corner_entering_test )
 {
     /* Test moving north */
-    BOOST_CHECK(gc->corner_entering(NORTH, SOUTH)   ==  67);
-    BOOST_CHECK(gc->corner_entering(NORTH, EAST)    == 107);
-    BOOST_CHECK(gc->corner_entering(NORTH, WEST)    ==  67);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::NORTH, neighbour_t::SOUTH) ==  67);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::NORTH, neighbour_t::EAST)  == 107);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::NORTH, neighbour_t::WEST)  ==  67);
 
     /* Test moving south */
-    BOOST_CHECK(gc->corner_entering(SOUTH, NORTH)   == 102);
-    BOOST_CHECK(gc->corner_entering(SOUTH, EAST)    == 102);
-    BOOST_CHECK(gc->corner_entering(SOUTH, WEST)    == 101);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::SOUTH, neighbour_t::NORTH) == 102);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::SOUTH, neighbour_t::EAST)  == 102);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::SOUTH, neighbour_t::WEST)  == 101);
 
     /* Test moving east */
-    BOOST_CHECK(gc->corner_entering(EAST, NORTH)    == 107);
-    BOOST_CHECK(gc->corner_entering(EAST, SOUTH)    == 102);
-    BOOST_CHECK(gc->corner_entering(EAST, WEST)     == 107);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::EAST, neighbour_t::NORTH)  == 107);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::EAST, neighbour_t::SOUTH)  == 102);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::EAST, neighbour_t::WEST)   == 107);
 
     /* Test moving west */
-    BOOST_CHECK(gc->corner_entering(WEST, NORTH)    ==  67);
-    BOOST_CHECK(gc->corner_entering(WEST, SOUTH)    == 101);
-    BOOST_CHECK(gc->corner_entering(WEST, EAST)     == 101);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::WEST, neighbour_t::NORTH)  ==  67);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::WEST, neighbour_t::SOUTH)  == 101);
+    BOOST_CHECK(gc->corner_entering(neighbour_t::WEST, neighbour_t::EAST)   == 101);
 }
 
 BOOST_AUTO_TEST_CASE( corner_leaving_test )
 {
     /* Test moving north */
-    BOOST_CHECK(gc->corner_leaving(NORTH, SOUTH)    == 101);
-    BOOST_CHECK(gc->corner_leaving(NORTH, EAST)     == 107);
-    BOOST_CHECK(gc->corner_leaving(NORTH, WEST)     ==  67);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::NORTH, neighbour_t::SOUTH)  == 101);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::NORTH, neighbour_t::EAST)   == 107);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::NORTH, neighbour_t::WEST)   ==  67);
 
     /* Test moving south */
-    BOOST_CHECK(gc->corner_leaving(SOUTH, NORTH)    == 107);
-    BOOST_CHECK(gc->corner_leaving(SOUTH, EAST)     == 102);
-    BOOST_CHECK(gc->corner_leaving(SOUTH, WEST)     == 101);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::SOUTH, neighbour_t::NORTH)  == 107);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::SOUTH, neighbour_t::EAST)   == 102);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::SOUTH, neighbour_t::WEST)   == 101);
 
     /* Test moving east */
-    BOOST_CHECK(gc->corner_leaving(EAST, NORTH)     == 107);
-    BOOST_CHECK(gc->corner_leaving(EAST, SOUTH)     == 102);
-    BOOST_CHECK(gc->corner_leaving(EAST, WEST)      ==  67);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::EAST, neighbour_t::NORTH)   == 107);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::EAST, neighbour_t::SOUTH)   == 102);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::EAST, neighbour_t::WEST)    ==  67);
 
     /* Test moving west */
-    BOOST_CHECK(gc->corner_leaving(WEST, NORTH)     ==  67);
-    BOOST_CHECK(gc->corner_leaving(WEST, SOUTH)     == 101);
-    BOOST_CHECK(gc->corner_leaving(WEST, EAST)      == 102);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::WEST, neighbour_t::NORTH)   ==  67);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::WEST, neighbour_t::SOUTH)   == 101);
+    BOOST_CHECK(gc->corner_leaving(neighbour_t::WEST, neighbour_t::EAST)    == 102);
 }
 
 BOOST_AUTO_TEST_CASE( furthest_index_test )
 {
-    BOOST_CHECK(gc->furthest_index(NORTH)   ==  67);
-    BOOST_CHECK(gc->furthest_index(SOUTH)   == 102);
-    BOOST_CHECK(gc->furthest_index(EAST)    == 107);
-    BOOST_CHECK(gc->furthest_index(WEST)    == 101);
+    BOOST_CHECK(gc->furthest_index(neighbour_t::NORTH)  ==  67);
+    BOOST_CHECK(gc->furthest_index(neighbour_t::SOUTH)  == 102);
+    BOOST_CHECK(gc->furthest_index(neighbour_t::EAST)   == 107);
+    BOOST_CHECK(gc->furthest_index(neighbour_t::WEST)   == 101);
 }
 
 

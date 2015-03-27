@@ -17,7 +17,7 @@ extern "C"
 inline float f0(const float t)
 {
     const float tmp = t * (1.0f / 0.02f);
-    return 2.61e6f * exp(-(tmp * tmp));
+    return 2.61e6f * std::exp(-(tmp * tmp));
 }
 
 
@@ -36,14 +36,14 @@ inline float f2(const float t)
 inline float f3(const float t, const float l)
 {
     const float tmp = t - 3.0f * l * (1.0f / 568.0f);
-    return 436.9f * (568.0f / l) * exp(-19.75f * (tmp * tmp));
+    return 436.9f * (568.0f / l) * std::exp(-19.75f * (tmp * tmp));
 }
 
 struct scotopic_corona_t
 {
     inline ext_colour_t operator()(const float x, const float y, const float p) const
     {
-        const float dist = sqrt((x * x) + (y * y));
+        const float dist = std::sqrt((x * x) + (y * y));
         const float deg  = dist * p;
         const float a    = (0.478f * f1(deg)) + (0.207f * f2(deg));
         return ext_colour_t(a, a, a);
@@ -55,7 +55,7 @@ struct scotopic_halo_t
 {
     inline ext_colour_t operator()(const float x, const float y, const float p) const
     {
-        const float dist = sqrt((x * x) + (y * y));
+        const float dist = std::sqrt((x * x) + (y * y));
         const float deg  = dist * p;
         return 0.033f * ext_colour_t(f3(deg, 611.0f), f3(deg, 549.0f), f3(deg, 467.0f));
     }
@@ -66,7 +66,7 @@ struct scotopic_bloom_t
 {
     inline ext_colour_t operator()(const float x, const float y, const float p) const
     {
-        const float dist = sqrt((x * x) + (y * y));
+        const float dist = std::sqrt((x * x) + (y * y));
         const float deg  = dist * p;
         const float a    = 0.282f * f0(deg);
         return ext_colour_t(a,a,a);
@@ -78,7 +78,7 @@ struct mesopic_corona_t
 {
     inline ext_colour_t operator()(const float x, const float y, const float p) const
     {
-        const float dist = sqrt((x * x) + (y * y));
+        const float dist = std::sqrt((x * x) + (y * y));
         const float deg  = dist * p;
         const float a    = (0.478f * f1(deg)) + (0.138f * f2(deg));
         return ext_colour_t(a, a, a);
@@ -90,7 +90,7 @@ struct mesopic_halo_t
 {
     inline ext_colour_t operator()(const float x, const float y, const float p) const
     {
-        const float dist = sqrt((x * x) + (y * y));
+        const float dist = std::sqrt((x * x) + (y * y));
         const float deg  = dist * p;
         return 0.016f * ext_colour_t(f3(deg, 611.0f), f3(deg, 549.0f), f3(deg, 467.0f)); 
     }
@@ -101,7 +101,7 @@ struct mesopic_bloom_t
 {
     inline ext_colour_t operator()(const float x, const float y, const float p) const
     {
-        const float dist = sqrt((x * x) + (y * y));
+        const float dist = std::sqrt((x * x) + (y * y));
         const float deg  = dist * p;
         const float a    = 0.368f * f0(deg);
         return ext_colour_t(a, a, a);
@@ -113,7 +113,7 @@ struct photopic_corona_t
 {
     inline ext_colour_t operator()(const float x, const float y, const float p) const
     {
-        const float dist = sqrt((x * x) + (y * y));
+        const float dist = std::sqrt((x * x) + (y * y));
         const float deg  = dist * p;
         const float a    = (0.478f * f1(deg)) + (0.138f * f2(deg));
         return ext_colour_t(a, a, a);
@@ -134,7 +134,7 @@ struct photopic_bloom_t
 {
     inline ext_colour_t operator()(const float x, const float y, const float p) const
     {
-        const float dist = sqrt((x * x) + (y * y));
+        const float dist = std::sqrt((x * x) + (y * y));
         const float deg  = dist * p;
         const float a    = 0.384f * f0(deg);
         return ext_colour_t(a,a,a);
@@ -163,8 +163,8 @@ float camera::generate_flare_lines(ext_colour_t *const f)
             /* Calculate the x bounds of the line on this row */
             float jminf = (j + 0.0f - this->y_res / 2.0f);
             float jmaxf = (j + 1.0f - this->y_res / 2.0f);
-            float iminf = jminf/tan(theta);
-            float imaxf = jmaxf/tan(theta);
+            float iminf = jminf / std::tan(theta);
+            float imaxf = jmaxf / std::tan(theta);
 
             // swap if iminf>imaxf
             if (iminf > imaxf)
@@ -174,7 +174,7 @@ float camera::generate_flare_lines(ext_colour_t *const f)
                 imaxf = temp;
             }
 
-            float dif = fabs(lineRad/sin(theta));
+            float dif = std::fabs(lineRad / std::sin(theta));
             int imin = (int)(iminf - dif + 0.5f + this->x_res / 2.0f);
             int imax = (int)(imaxf + dif - 0.5f + this->x_res / 2.0f);
 
@@ -192,11 +192,11 @@ float camera::generate_flare_lines(ext_colour_t *const f)
                 if (dp > 0.0f)
                 {
                     float vec[2] = { (p[0] - dp * dir[0]), (p[0] - dp * dir[0]) };
-                    dist = sqrt((vec[0] * vec[0]) + (vec[1] * vec[1]));
+                    dist = std::sqrt((vec[0] * vec[0]) + (vec[1] * vec[1]));
                 }
                 else 
                 {
-                    dist = sqrt((p[0] * p[0]) + (p[1] * p[1]));
+                    dist = std::sqrt((p[0] * p[0]) + (p[1] * p[1]));
                 }
 
                 // tent filter
@@ -204,7 +204,7 @@ float camera::generate_flare_lines(ext_colour_t *const f)
                     continue;
                 float filt = 1.0f / lineRad - 1.0f / (lineRad * lineRad) * dist;
                 
-                float len = sqrt((p[0] * p[0]) + (p[1] * p[1]));
+                float len = std::sqrt((p[0] * p[0]) + (p[1] * p[1]));
                 float flo = std::max((len * 2.0f * PI) / nr_of_lines, 1.0f / nr_of_lines);
                 float val = filt*flo*lineIntens;
                 f[k + (j * this->x_res)] += ext_colour_t(val, val, val);
@@ -224,7 +224,7 @@ float camera::generate_flare_lines(ext_colour_t *const f)
 template<typename T>
 void camera::apply_point_spreading_function(T p, ext_colour_t *const f)
 {
-    const float pixdeg = (atan(-this->x_m / this->t) * 2.0f) / this->x_res;
+    const float pixdeg = (std::atan(-this->x_m / this->t) * 2.0f) / this->x_res;
 
     for (int j = 0; j < static_cast<int>(this->y_res); ++j)
     {
@@ -262,7 +262,7 @@ void camera::apply_point_spreading_function(T p, ext_colour_t *const f)
             // choose number of samples based on ratio of min and max
             int samps = 3;
 //            int samps = (max-min)/min > 2.0 ? 100 : 10;  // FIXME
-            //int samps = (fabs(w/(d*0.5)) < .1 && fabs(y/(d*0.5))<.1) ? 100 : 3;
+            //int samps = (std::fabs(w/(d*0.5)) < .1 && std::fabs(y/(d*0.5))<.1) ? 100 : 3;
             int n = samps-1;
         
             float h = (x - w) / n;
@@ -501,7 +501,7 @@ void camera::generate_glare_filter(ext_colour_t **gf, const light_level_t ll)
 //        if (y_dist_sq < s_sq)
 //        {
 //            const float x_dist_sq    = s_sq - y_dist_sq;
-//            const float x_dist       = sqrt(x_dist_sq);
+//            const float x_dist       = std::sqrt(x_dist_sq);
 //            const int  x_pixel_dist = (int)x_dist;
 //            const float min_x        = max(static_cast<float>(x) - x_dist, 0.0f);
 //            const float max_x        = min(static_cast<float>(x) + x_dist, static_cast<float>(this)->x_res);
@@ -534,7 +534,7 @@ void camera::draw_circle(float *o, const int x, const int y, const float s, cons
         if (y_dist_sq < s_sq)
         {
             const float x_dist_sq    = s_sq - y_dist_sq;
-            const float x_dist       = sqrt(x_dist_sq);
+            const float x_dist       = std::sqrt(x_dist_sq);
             const int  x_pixel_dist = static_cast<int>(x_dist);
             const int  min_x        = std::max(x - x_pixel_dist, 0);
             const int  max_x        = std::min(x + x_pixel_dist, picture_resolution);
@@ -569,7 +569,7 @@ void camera::generate_temporal_psf(const float y)
     float *image_componants = new float [picture_resolution * picture_resolution_y * 6];
     
     /* Calculate the pupil diameter */
-    const float p        = 4.9f - (3.0f * tanh(0.4f * (log(y) + 1.0f)));
+    const float p        = 4.9f - (3.0f * std::tanh(0.4f * (std::log(y) + 1.0f)));
     const float p_max    = 9.0f;
     std::cout << "pupil: " << p << std::endl;
     
@@ -606,7 +606,7 @@ void camera::generate_temporal_psf(const float y)
 
         /* Interpolate */
     	float ft = px * PI;
-    	float f = (1.0f - cos(ft)) * 0.5f;
+    	float f = (1.0f - std::cos(ft)) * 0.5f;
     	float i1 = v1 * (1.0f - f) + v2 * f;
 
     	noise += (i1 * amplitude);
@@ -619,7 +619,7 @@ void camera::generate_temporal_psf(const float y)
     std::cout << "pixel_scale: " << pixel_scale << std::endl;
 
     const float pupil_scale  = 0.5e-3f / pixel_resolution;//(min(-this->x_m, -this->y_m) / p_max) * (picture_resolution_y / (-2.0 * this->y_m));
-    const float p_hippus     = (p + (noise * (p_max / p) * sqrt(1.0f - (p / p_max)))) * pupil_scale;
+    const float p_hippus     = (p + (noise * (p_max / p) * std::sqrt(1.0f - (p / p_max)))) * pupil_scale;
 //    std::cout << "hippus: " << p_hippus << std::endl;
     
     /* Draw the pupil */
@@ -657,7 +657,7 @@ void camera::generate_temporal_psf(const float y)
     for (int l = 0; l < lens_fiber_lines; l++)
     {
         const float theta     = ((static_cast<float>(l) + gen_random_mersenne_twister()) * (2.0f * PI)) * inv_lens_fiber_lines;
-        const float x_y_ratio = sin(theta) / cos(theta);
+        const float x_y_ratio = std::sin(theta) / std::cos(theta);
                 
         const float dj = (theta <= PI) ? 1 : -1;
         for (float j = 0; j < static_cast<float>(picture_resolution_y / 2); j++)
@@ -820,7 +820,7 @@ void camera::generate_temporal_psf(const float y)
 
 
     /* Multiply by the complex exponential e^(i * (PI / (lambda * d)) * (xp^2 + yq^2)) */
-    /*                                    = cos((PI / (lambda * d)) * (x^2 + y^2))) + (i * sin((PI / (lambda * d)) * (xp^2 + yq^2))) */
+    /*                                    = std::cos((PI / (lambda * d)) * (x^2 + y^2))) + (i * std::sin((PI / (lambda * d)) * (xp^2 + yq^2))) */
     fftwf_complex *image_in;
     fftwf_complex *image_out;
     fftwf_plan image_p;
@@ -849,8 +849,8 @@ void camera::generate_temporal_psf(const float y)
             const int yq_addr    = std::max(std::min((int)((yq / (5.0f * pixel_scale)) + (static_cast<float>(downsampled_resolution) * 0.5f)), (int)downsampled_resolution - 1), 0);
             const int pupil_addr = complete_image_offset + xp_addr + (downsampled_resolution * yq_addr);
 
-            image_in[image_addr][0] = cos(exponential) * image_componants[pupil_addr];
-            image_in[image_addr][1] = sin(exponential) * image_componants[pupil_addr];
+            image_in[image_addr][0] = std::cos(exponential) * image_componants[pupil_addr];
+            image_in[image_addr][1] = std::sin(exponential) * image_componants[pupil_addr];
         }
     }
 
@@ -1157,7 +1157,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const float key, c
         {
             numpix++;
             maxY = std::max(maxY, xyz.g);
-            Yi += log10(xyz.g);
+            Yi += std::log10(xyz.g);
         }
 
         /* Convert to CIE Yyz */
@@ -1212,7 +1212,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const float key, c
     if (ta && (this->time_step > 0.0f))
     {
         float k;
-        const float log_la = log(Yi);
+        const float log_la = std::log(Yi);
         if (log_la < -2.0f)
         {
             k = 1.0f;
@@ -1237,14 +1237,14 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const float key, c
 //            const float t_cone   = 0.02f * 8.0f;
 //            const float t_rod    = 0.1f  * 0.015f;
 //            
-//            const float pt_cone  = t_cone * exp(3.0f  * (1.0f - p_cone));
-//            const float pt_rod   = t_rod  * exp(19.0f * (1.0f - p_rod ));
+//            const float pt_cone  = t_cone * std::exp(3.0f  * (1.0f - p_cone));
+//            const float pt_rod   = t_rod  * std::exp(19.0f * (1.0f - p_rod ));
             
             /* Cone adaption level */
-            const float a_cone = Yi + ((this->adatption_level - Yi) * exp(-(this->time_step / 0.2f))); // 0.200s for no bleaching else 120s
+            const float a_cone = Yi + ((this->adatption_level - Yi) * std::exp(-(this->time_step / 0.2f))); // 0.200s for no bleaching else 120s
 
             /* Rod adaption level */
-            const float a_rod  = Yi + ((this->adatption_level - Yi) * exp(-(this->time_step / 6.0f))); // 6s     for no bleaching else 400s
+            const float a_rod  = Yi + ((this->adatption_level - Yi) * std::exp(-(this->time_step / 6.0f))); // 6s     for no bleaching else 400s
             
             this->adatption_level = ((1.0f - k) * a_cone) + (k * a_rod);
         }
@@ -1256,10 +1256,10 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const float key, c
             const float c2   = Yi * (1.0f - std::pow(r, -0.1f));
 
             /* Cone adaption level */
-            const float a_cone = Yi - (c1 * exp(-(this->time_step / 16.0e-3f))) - (c2 * exp(-(this->time_step / 200.0e-3f)));
+            const float a_cone = Yi - (c1 * std::exp(-(this->time_step / 16.0e-3f))) - (c2 * std::exp(-(this->time_step / 200.0e-3f)));
 
             /* Rod adaption level */
-            const float a_rod  = Yi - (c1 * exp(-(this->time_step / 40.0e-3f))) - (c2 * exp(-(this->time_step / 6.0f)));
+            const float a_rod  = Yi - (c1 * std::exp(-(this->time_step / 40.0e-3f))) - (c2 * std::exp(-(this->time_step / 6.0f)));
 
             this->adatption_level = ((1.0f - k) * a_cone) + (k * a_rod);
         }
@@ -1323,7 +1323,7 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const float key, c
             this->image[i].g *= sf;
             if (maxY)
             {
-                this->image[i].g = 1.0f - exp(-this->image[i].g);
+                this->image[i].g = 1.0f - std::exp(-this->image[i].g);
             }
         }
     }
@@ -1359,8 +1359,8 @@ camera & camera::tone_map(const tone_mapping_mode_t tone_map, const float key, c
     else if (tone_map == tone_mapping_mode_t::global_ferwerda)
     {
         const float lda      = 800.0f;
-        const float log_lda  = log(lda * 0.5f);
-        const float log_la   = log(Yi);
+        const float log_lda  = std::log(lda * 0.5f);
+        const float log_la   = std::log(Yi);
 
         /* Cone response */
         float tp;
@@ -1477,14 +1477,14 @@ camera & camera::gamma_correct(const float gamma)
         b = std::min(std::max(b, 0.0f), 1.0f);
 
         /* Gamma correct */
-        if (fabs(gamma - 2.2f) > 0.001)
+        if (std::fabs(gamma - 2.2f) > 0.001f)
         {
             /* regular gamma correction */
             r = std::pow(r, 1.0f / gamma);
             g = std::pow(g, 1.0f / gamma);
             b = std::pow(b, 1.0f / gamma);
         }
-        else if (fabs(gamma - 1.0f) > 0.001)
+        else if (std::fabs(gamma - 1.0f) > 0.001f)
         {
             /* sRGB standard gamma correction (similar to regular w/2.2) */
             r = (r <= 0.0031308f) ? (12.92f * r) : (1.055f * std::pow(r, (1.0f / 2.4f)) - 0.055f);
@@ -1694,7 +1694,7 @@ void camera::bilateral_filter_tone_map(const float r_s, const float s_s, const f
             {
                 const float Z = z - ((z > half_depth) ? small_depth : 0.0f);
                 const float rr = (X * X + Y * Y) / (sigma_s * sigma_s) + Z * Z / (sigma_r * sigma_r);	
-                kernel[x + (small_width * (y + (small_height * z)))] = exp(-rr * 0.5f);
+                kernel[x + (small_width * (y + (small_height * z)))] = std::exp(-rr * 0.5f);
             }
         }
     }
@@ -1786,7 +1786,7 @@ void camera::bilateral_filter_tone_map(const float r_s, const float s_s, const f
 
     /* Scale the image */
     const float contrast = 300.0f;
-    const float gamma = log10(contrast) /  (max_value - min_value);
+    const float gamma = std::log10(contrast) /  (max_value - min_value);
     for(int i = 0; i < (int)(this->x_res * this->y_res); i++)
     {
         const float scaled_value = std::pow(10.0f, (result[i] * gamma + (log_intensity[i] - result[i])));
@@ -1910,18 +1910,18 @@ void camera::histogram_tone_map(const bool h)
     /* Convert to log scale */
     const float min_lum  = 1.0e-4f;
     lw_min              = std::max(lw_min, min_lum);
-    float bw_min         = log(lw_min);
-    float bw_max         = log(lw_max);
+    float bw_min         = std::log(lw_min);
+    float bw_max         = std::log(lw_max);
     if (bw_max == bw_min)
     {
-        bw_max += 0.0001f * fabs(bw_max);
+        bw_max += 0.0001f * std::fabs(bw_max);
     }
 
     /* Check for image within displayable range */
     const float ld_max = 300.0f;
     const float ld_min = 1.0f;
-    const float bd_max = log(ld_max);
-    const float bd_min = log(ld_min);
+    const float bd_max = std::log(ld_max);
+    const float bd_min = std::log(ld_min);
     if ((bd_max - bd_min) > (bw_max - bw_min))
     {
         std::cout << "using linear scale factor" << std::endl;
@@ -1944,9 +1944,9 @@ void camera::histogram_tone_map(const bool h)
     int scaled_pixel_gt0 = 0;
     for (int i = 0; i < (scaled_x_res * scaled_y_res); i++)
     {
-        if (scaled_luminance[i] > 0.0)
+        if (scaled_luminance[i] > 0.0f)
         {
-            int b = static_cast<int>((log(scaled_luminance[i]) - bw_min) / (bw_max - bw_min) * bins) + 1;
+            int b = static_cast<int>((std::log(scaled_luminance[i]) - bw_min) / (bw_max - bw_min) * bins) + 1;
             b = std::min(std::max(b, 0), bins);
             his[b]++;
 
@@ -2004,10 +2004,10 @@ void camera::histogram_tone_map(const bool h)
             {
                 /* Displaybale brightness */
                 const float bde = bd_min + (bd_max - bd_min) * cdf[i];
-                const float ld = exp(bde);
+                const float ld = std::exp(bde);
 
                 const float bw = i * lw_step + bw_min;
-                const float lw = exp(bw);
+                const float lw = std::exp(bw);
                 ceiling *= (this->just_noticable_difference(ld) * lw) / (this->just_noticable_difference(lw) * ld);
             }
 
@@ -2041,7 +2041,7 @@ void camera::histogram_tone_map(const bool h)
     {
         if (this->image[i].g > 0.0f)
         {
-            const float bw = log(this->image[i].g);
+            const float bw = std::log(this->image[i].g);
 
             float bf = (bw - bw_min) / (bw_max - bw_min) * bins;
             bf = std::min(std::max(bf, 0.0f), static_cast<float>(bins));
@@ -2051,7 +2051,7 @@ void camera::histogram_tone_map(const bool h)
             const float pbw = (1 - s) * cdf[b0] + s * cdf[b1];
     
             const float bde = bd_min + (bd_max - bd_min) * pbw;
-            this->image[i].g = exp(bde);
+            this->image[i].g = std::exp(bde);
             this->image[i].g /= ld_max;
         }
     }

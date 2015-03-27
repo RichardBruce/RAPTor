@@ -14,6 +14,7 @@
 #include "mapper_shader.h"
 #include "coloured_mapper_shader.h"
 #include "perlin_noise_3d_mapper.h"
+#include "checker_board_mapper.h"
 #include "cubic_mapper.h"
 #include "cylindrical_mapper.h"
 #include "planar_mapper.h"
@@ -171,16 +172,28 @@ inline float get_next_float(const std::string &s, size_t *const fst_space)
 inline float get_next_float(const char **c)
 {
     /* Eat the string until white space is found */
-    while ((**c) != ' ')
+    while (((**c) != ' ') && ((**c) != '\t'))
     {
-        (*c)++;
+        ++(*c);
     }
 
 
     /* Eat the white space */
-    while ((**c) == ' ')
+    while (((**c) == ' ') || ((**c) == '\t'))
     {
-        (*c)++;
+        ++(*c);
+    }
+    
+    /* Assume the next thing is a float and convert */
+    return atof(*c);
+}
+
+inline float get_this_float(const char **c)
+{
+    /* Eat the white space */
+    while (((**c) == ' ') || ((**c) == '\t'))
+    {
+        ++(*c);
     }
     
     /* Assume the next thing is a float and convert */
@@ -207,6 +220,17 @@ inline unsigned get_next_unsigned(const char **c)
     return (unsigned)atoi(*c);
 }
 
+inline unsigned get_this_unsigned(const char **c)
+{
+    /* Eat the white space */
+    while ((**c) == ' ')
+    {
+        (*c)++;
+    }
+    
+    /* Assume the next thing is an unsigned and convert */
+    return (unsigned)atoi(*c);
+}
 
 /* Char* to string conversion where string is quoted */
 inline std::string get_quoted_string(const char **c)
