@@ -13,16 +13,8 @@ void cylindrical_mapper::texture_coordinates(float *const u_co, float *const v_c
     *v_co = (h_off + (0.5f * v_len)) * (static_cast<float>(_h) / v_len);
 
     const point_t height_align(_c + (_v * h_off));
-    const float theta = acos(dot_product(normalise(dst - height_align), _u));
+    const float theta = acos(std::max(-1.0f, std::min(1.0f, dot_product(normalise(dst - height_align), _u))));
     const float phase = theta * (0.5f / PI);
     *u_co = ((_cycles * phase) * static_cast<float>(_w)) / dot_product(_s, _u);
-
-    // if (_v.y != 1.0f)
-    // {
-        // BOOST_LOG_TRIVIAL(fatal) << theta << " -> " << phase;
-        // BOOST_LOG_TRIVIAL(fatal) << _v << " - " << _s;
-        // assert(false);
-    // }
 }
 }; /* namespace raptor_raytracer */
-// 1, 0, 0 - 0.770607, 2.75666, 2.75666

@@ -43,13 +43,13 @@ void mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t *co
     }
 
     /* Request reflections */
-    ext_colour_t rgb;
+    point_t sample;
     float refl  = _rf;
     float alpha = 1.0f;
     for (auto j : _rtex)
     {
-        alpha *= j->texture_map(i, &rgb, normal, vt);
-        refl = rgb.r * (1.0f / 255.0f);
+        alpha *= j->texture_map_monochrome(i, &sample, normal, vt);
+        refl = sample.z * (1.0f / 255.0f);
         
         if (alpha == 0.0f)
         {
@@ -65,8 +65,8 @@ void mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t *co
     alpha       = 1.0f;
     for (auto j : _ttex)
     {
-        alpha *= j->texture_map(i, &rgb, normal, vt);
-        trans = rgb.r * (1.0f / 255.0f);
+        alpha *= j->texture_map_monochrome(i, &sample, normal, vt);
+        trans = sample.z * (1.0f / 255.0f);
         
         if (alpha == 0.0f)
         {
@@ -98,12 +98,12 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, c
     
     /* Get the materials kd */
     alpha = 1.0f;
-    ext_colour_t param;
+    point_t param;
     float cur_kd = _kd;
     for (auto j : _dtex)
     {
-        alpha *= j->texture_map(i, &param, n, vt);
-        cur_kd = magnitude(param) * (1.0f / 255.0f);
+        alpha *= j->texture_map_monochrome(i, &param, n, vt);
+        cur_kd = param.z * (1.0f / 255.0f);
         
         if (alpha == 0.0f)
         {
@@ -116,8 +116,8 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, c
     float cur_s = _s;
     for (auto j : _stex)
     {
-        alpha *= j->texture_map(i, &param, n, vt);
-        cur_s = magnitude(param) * (1.0f / 255.0f);
+        alpha *= j->texture_map_monochrome(i, &param, n, vt);
+        cur_s = param.z * (1.0f / 255.0f);
         
         if (alpha == 0.0f)
         {

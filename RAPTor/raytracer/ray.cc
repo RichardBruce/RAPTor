@@ -119,9 +119,9 @@ float ray::reflect(ray rays[], const point_t &n, const float r, const float dr) 
 {
     /* Check the ray will be strong enough to continue */
     
-    assert(this->magn <  1.1f);
-    assert(this->magn > -0.1f);
-    float refl_power = this->magn * r;
+    const float refl_power = this->magn * r;
+    assert(refl_power <  1.1f);
+    assert(refl_power > -0.1f);
     if (refl_power <= MIN_REFLECTIVE_POWER)
     {
         return 0.0;
@@ -198,7 +198,9 @@ float ray::reflect(ray rays[], const point_t &n, const float r, const float dr) 
 float ray::refract(ray rays[], const point_t &n, const float t, float ri, const hit_t h, const float dr) const 
 {
     /* Check the ray will be strong enough to continue */
-    float refr_power = this->magn * t;
+    const float refr_power = this->magn * t;
+    assert(refr_power <  1.1f);
+    assert(refr_power > -0.1f);
     if (refr_power <= MIN_REFLECTIVE_POWER)
     {
         return 0.0f;
