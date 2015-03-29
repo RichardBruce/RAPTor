@@ -206,10 +206,10 @@ extern int e_faceh(int, char **);	/* expand face w/ holes as face */
 
 #ifdef  SMLFLT
 #define  FLOAT		float
-#define  FTINY		(1e-3)
+#define  FTINY		(1e-3f)
 #else
 #define  FLOAT		double
-#define  FTINY		(1e-6)
+#define  FTINY		(1e-6f)
 #endif
 #define  FHUGE		(1e10)
 

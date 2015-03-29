@@ -77,8 +77,8 @@ void vect_normalize (Vector v)
 {
     float mag = vect_mag (v);
 
-    if (mag > 0.0)
-        vect_scale (v, v, 1.0/mag);
+    if (mag > 0.0f)
+        vect_scale (v, v, 1.0f / mag);
 }
 
 
@@ -118,20 +118,20 @@ float vect_angle (Vector v1, Vector v2)
     float mag2 = vect_mag(v2);
 
     float angle;
-    if (mag1 * mag2 == 0.0)
+    if (mag1 * mag2 == 0.0f)
     {
-       angle = 0.0;
+       angle = 0.0f;
     }
     else
     {
         float cos_theta = vect_dot(v1,v2) / (mag1 * mag2);
 
-        if (cos_theta <= -1.0)
-            angle = 180.0;
-        else if (cos_theta >= +1.0)
-            angle = 0.0;
+        if (cos_theta <= -1.0f)
+            angle = 180.0f;
+        else if (cos_theta >= +1.0f)
+            angle = 0.0f;
         else
-            angle = (180.0/PI) * acos(cos_theta);
+            angle = (180.0f/PI) * acos(cos_theta);
     }
 
     return angle;
@@ -152,7 +152,7 @@ void vect_print (FILE *f, Vector v, int dec, char sep)
     fstr[4]  = sep;
     fstr[10] = sep;
 
-    fprintf (f, fstr, v[X], v[Y], v[Z]);
+    fprintf (f, fstr, (double)v[X], (double)v[Y], (double)v[Z]);
 }
 
 
@@ -248,7 +248,7 @@ void mat_decode (Matrix mat, Vector scale,  Vector shear, Vector rotate,
     scale[Y] = vect_mag (row[1]);
     vect_normalize (row[1]);
 
-    if (scale[Y] != 0.0)
+    if (scale[Y] != 0.0f)
         shear[X] /= scale[Y];
 
     shear[Y] = vect_dot (row[0], row[2]);
@@ -264,23 +264,23 @@ void mat_decode (Matrix mat, Vector scale,  Vector shear, Vector rotate,
     scale[Z] = vect_mag (row[2]);
     vect_normalize (row[2]);
 
-    if (scale[Z] != 0.0) {
+    if (scale[Z] != 0.0f) {
         shear[Y] /= scale[Z];
         shear[Z] /= scale[Z];
     }
 
     vect_cross (temp, row[1], row[2]);
-    if (vect_dot (row[0], temp) < 0.0) {
+    if (vect_dot (row[0], temp) < 0.0f) {
         for (i = 0; i < 3; i++) {
-            scale[i]  *= -1.0;
-            row[i][X] *= -1.0;
-            row[i][Y] *= -1.0;
-            row[i][Z] *= -1.0;
+            scale[i]  *= -1.0f;
+            row[i][X] *= -1.0f;
+            row[i][Y] *= -1.0f;
+            row[i][Z] *= -1.0f;
         }
     }
 
-    if (row[0][Z] < -1.0) row[0][Z] = -1.0;
-    if (row[0][Z] > +1.0) row[0][Z] = +1.0;
+    if (row[0][Z] < -1.0f) row[0][Z] = -1.0f;
+    if (row[0][Z] > +1.0f) row[0][Z] = +1.0f;
 
     rotate[Y] = asin(-row[0][Z]);
 
@@ -290,13 +290,13 @@ void mat_decode (Matrix mat, Vector scale,  Vector shear, Vector rotate,
     }
     else {
         rotate[X] = atan2 (row[1][X], row[1][Y]);
-        rotate[Z] = 0.0;
+        rotate[Z] = 0.0f;
     }
 
     /* Convert the rotations to degrees */
-    rotate[X] = (180.0/PI)*rotate[X];
-    rotate[Y] = (180.0/PI)*rotate[Y];
-    rotate[Z] = (180.0/PI)*rotate[Z];
+    rotate[X] = (180.0f / PI)*rotate[X];
+    rotate[Y] = (180.0f / PI)*rotate[Y];
+    rotate[Z] = (180.0f / PI)*rotate[Z];
 }
 
 

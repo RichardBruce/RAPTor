@@ -62,7 +62,7 @@ int mgf_face_handler(int ac, char **av)     /* face handling routine */
     xf_rotvect(norm, vp->n);
 
     /* No vertex normals */
-    if ((norm[0] == 0.0f) && (norm[1] == 0.0f) && (norm[2] == 0.0f))
+    if ((norm[0] == 0.0) && (norm[1] == 0.0) && (norm[2] == 0.0))
     {
     	for (i = 1; i < ac; ++i)
         {

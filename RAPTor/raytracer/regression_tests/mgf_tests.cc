@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( mgf_book_test )
     CREATE_REGRESSION_CHECKER(checker);
 
     /* Enviroment set up */
-    regression_fixture fixture("/mgf_scenes/book.mgf", model_format_t::mgf, point_t(39.7714, 28.5208, -7.42805), point_t(0.516746, -0.126593, 0.846728), point_t(0.276531, 0.911316, 0.305013), point_t(0.81025, -0.391761, 0.435912));
+    regression_fixture fixture("/mgf_scenes/book.mgf", model_format_t::mgf, point_t(29.8755, 21.5609, -7.26923), point_t(0.725319, -0.105324, 0.680307), point_t(-0.372095, 0.77145, 0.516149), point_t(-0.579185, -0.627511, 0.520357));
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t( 200.0,  150.0, -500.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE( mgf_chair2_test )
     CREATE_REGRESSION_CHECKER(checker);
 
     /* Enviroment set up */
-    regression_fixture fixture("/mgf_scenes/chair2.mgf", model_format_t::mgf, point_t(26.1625, 5.59313, 45.7324), point_t(-0.0294118, 0.999444, 0.0157273), point_t(0.48177, 0.000388113, 0.876298), point_t(0.875804, 0.0333504, -0.481513));
+    regression_fixture fixture("/mgf_scenes/chair2.mgf", model_format_t::mgf, point_t(-24.9715, -4.0363, 34.4186), point_t(-0.278942, 0.959806, 0.0308408), point_t(0.465211, 0.106966, 0.878702), point_t(0.840094, 0.259458, -0.476356));
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-200.0, 150.0, 500.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
@@ -407,8 +407,8 @@ BOOST_AUTO_TEST_CASE( mgf_mug_test )
     CREATE_REGRESSION_CHECKER(checker);
 
     /* Enviroment set up */
-    regression_fixture fixture("/mgf_scenes/mug.mgf", model_format_t::mgf, point_t(17.7387, 13.4915, -2.61691), point_t(0.156434, 0.0, -0.987688), point_t(0.305212, 0.951057, 0.048340), point_t(0.939347, -0.309017, 0.148778));
-    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-200.0, 150.0, -500.0), 0.0, 10.0);
+    regression_fixture fixture("/mgf_scenes/mug.mgf", model_format_t::mgf, point_t(7.27707, 6.3566, 12.3732), point_t(0.648834, -0.75714, -0.0758137), point_t(-0.43585, -0.451466, 0.778595), point_t(-0.623734, -0.472135, -0.622928));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-200.0, 150.0, 500.0), 0.0, 10.0);
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -672,26 +672,317 @@ BOOST_AUTO_TEST_CASE( mgf_wstbskt_test )
     fixture.render<bih>();
     checker.check(fixture.get_camera(), "bih");
 }
+
+BOOST_AUTO_TEST_CASE( mgf_shipbatl_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/cruiser/shipbatl.mgf", model_format_t::mgf, point_t(11.5974, 6.94461, 1.23065), point_t(0.0167102, 0.999227, 0.0355783), point_t(0.0428478, -0.00725486, 0.999056), point_t(-0.994753, 0.0130228, 0.101481), ext_colour_t(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t( 6.0, 6.94461, 1.23065), 0.0, 10.0);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(12.0, 6.94461, 1.23065), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_shipemer_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/cruiser/shipemer.mgf", model_format_t::mgf, point_t(1.70543, 6.82824, 1.25482), point_t(0.0115531, -0.999512, 0.0290114), point_t(0.0, 0.0, 1.0), point_t(0.99819, 0.0132403, 0.0586675), ext_colour_t(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(3.0, 6.82824, 1.2), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_shipfull_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/cruiser/shipfull.mgf", model_format_t::mgf, point_t(12.6852, 7.17522, 1.27253), point_t(-0.443838, -0.895868, -0.0206808), point_t(0.022483, -0.06655, 0.99753), point_t(0.895941, -0.444082, 0.00899294), ext_colour_t(0.0, 0.0, 0.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(14.0, 7.09337, 1.40625), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+
+BOOST_AUTO_TEST_CASE( mgf_furn_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/furn.mgf", model_format_t::mgf, point_t(11.5296, 6.90595, 2.77921), point_t(0.675349, -0.719947, 0.15993), point_t(-0.456826, -0.238132, 0.857087), point_t(-0.578974, -0.651894, -0.489713), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t( 11.0,  10.0, 15.9031), 0.0, 10.0);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-11.0, -10.0, 15.9031), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_bathroom_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/bathroom.mgf", model_format_t::mgf, point_t(0.690096, 2.25, 1.72998), point_t(0.984685, -0.173215, 0.0196139), point_t(-0.067297, -0.273931, 0.95939), point_t(-0.160808, -0.946019, -0.281393), ext_colour_t(0.0, 0.0, 200.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.690096, 1.5, 1.72998), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_conf_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/conf.mgf", model_format_t::mgf, point_t(8.60142, 0.282943, 2.1778), point_t(-0.73504, -0.6762, 0.049539), point_t(-0.0832963, 0.162574, 0.983173), point_t(-0.672876, 0.718547, -0.175823), ext_colour_t(0.0, 0.0, 200.0), 0.0, 0.0, 0.0, 1920, 1080);
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(5.0, 2.0, 1.5), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene0_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene0.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 2.9, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene1_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene1.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 2.9, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene2_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene2.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 2.9, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene3_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene3.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 1.5, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene4_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene4.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 1.5, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene5_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene5.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 2.0, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene6_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene6.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 2.0, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene7_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene7.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 2.0, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene8_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene8.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 2.9, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene9_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene9.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 2.0, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
+
+BOOST_AUTO_TEST_CASE( mgf_erw5_scene10_test )
+{
+    /* Checker */
+    CREATE_REGRESSION_CHECKER(checker);
+
+    /* Enviroment set up */
+    regression_fixture fixture("/mgf_scenes/ERW5/scene10.mgf", model_format_t::mgf, point_t(2.60096, 2.04336, -2.79948), point_t(0.728969, 0.0, 0.684547), point_t(-0.212815, 0.950448, 0.226625), point_t(-0.650626, -0.310884, 0.692847));
+    fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 2.0, 0.0), 0.0, 10.0);
+
+    /* Ray trace the scene using kd tree */
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
+
+    /* Ray trace the scene using bih */
+    fixture.render<bih>();
+    checker.check(fixture.get_camera(), "bih");
+}
 #endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_SUITE_END()
 }; /* namespace raptor_raytracer */
 }; /* namespace test */
-
-// ./raytracer --mgf scenes/mgf_scenes/cruiser/shipbatl.mgf --cam 11.5974 6.94461 1.23065 --dx 0.0167102 0.999227 0.0355783 --dy 0.0428478 -0.00725486 0.999056 --dz -0.994753 0.0130228 0.101481 --light 6.0 6.94461 1.23065 0.001 255 255 255 0.0 --light 12.0 6.94461 1.23065 0.001 255 255 255 0.0 --res 1920 1080
-// ./raytracer --mgf scenes/mgf_scenes/cruiser/shipemer.mgf --cam 1.70543 6.82824 1.25482 --dx 0.0115531 -0.999512 0.0290114 --dy 0.0 0.0 1.0 --dz 0.99819 0.0132403 0.0586675 --light 3.0 6.82824 1.2 0.00001 255 255 255 0.0 --res 1920 1080
-// ./raytracer --mgf scenes/mgf_scenes/cruiser/shipfull.mgf --cam 12.6852 7.17522 1.27253 --dx -0.443838 -0.895868 -0.0206808 --dy 0.022483 -0.06655 0.99753 --dz 0.895941 -0.444082 0.00899294 --light 14.0 7.09337 1.40625 0.0001 255 255 255 0.0 --res 1920 1080
-// ./raytracer --mgf scenes/mgf_scenes/furn.mgf --cam 11.5296 6.90595 2.77921 --dx 0.675349 -0.719947 0.15993 --dy -0.456826 -0.238132 0.857087 --dz -0.578974 -0.651894 -0.489713 --light 11 10.0 15.9031 10 255 255 255 0.0 --light -11 -10.0 15.9031 10 255 255 255 0.0 --bg 255 255 255
-// ./raytracer --mgf scenes/mgf_scenes/bathroom.mgf --cam 0.690096 2.25 1.72998 --dx 0.984685 -0.173215 0.0196139 --dy -0.067297 -0.273931 0.95939 --dz -0.160808 -0.946019 -0.281393 --light 0.690096 1.5 1.72998 0.0001 255 255 255 0.0 --res 1920 1080
-// ./raytracer --mgf ./scenes/mgf_scenes/conf.mgf --cam 0.755185 1.96957 0.999216 --dx -0.244815 0.969566 -0.000783627 --dy -0.125365 -0.0308523 0.991629 --dz 0.961429 0.242865 0.129102 --light 5.0 2.0 1.5 0.00001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene0.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.9 0 0.001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene1.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.9 0 0.001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene2.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.9 0 0.001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene3.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 1.5 0 0.001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene4.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 1.5 0 0.001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene5.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.0 0 0.001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene6.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.0 0 0.001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene7.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.0 0 0.001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene8.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.9 0 0.001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene9.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.0 0 0.001 255 255 255 0.0
-// ./raytracer --mgf scenes/mgf_scenes/ERW5/scene10.mgf --cam 2.60096 2.04336 -2.79948 --dx 0.728969 0 0.684547 --dy -0.212815 0.950448 0.226625 --dz -0.650626 -0.310884 0.692847 --light 0 2.0 0 0.001 255 255 255 0.0

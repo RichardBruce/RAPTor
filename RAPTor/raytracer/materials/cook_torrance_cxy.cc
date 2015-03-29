@@ -6,28 +6,28 @@
 
 namespace raptor_raytracer
 {
-void cook_torrance_cxy::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
+void cook_torrance_cxy::generate_rays(const ray_trace_engine &r, ray &i, point_t *const n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
     {
-        r.generate_rays_to_light(i, n, h, l);
+        r.generate_rays_to_light(i, h, l);
     }
     
     /* Request reflections */
-    rl->number(i.reflect(rl->rays(), n, this->rs, 0.0f));
+    rl->number(i.reflect(rl->rays(), *n, this->rs, 0.0f));
     
     /* Request refractions */
-    rf->number(i.refract(rf->rays(), n, this->ts, this->ri_r, h, 0.0f));
+    rf->number(i.refract(rf->rays(), *n, this->ts, this->ri_r, h, 0.0f));
 
     return;
 }
 
 
-void cook_torrance_cxy::shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const
+void cook_torrance_cxy::shade(const ray_trace_engine &r, ray &i, const point_t &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const
 {
     /* A common dot product to all light sources */
-    const float nv = dot_product(n.get_dir(), i.get_dir());
+    const float nv = dot_product(n, i.get_dir());
         
     /* For each light shade the object */
     unsigned int l = 0;
@@ -37,7 +37,7 @@ void cook_torrance_cxy::shade(const ray_trace_engine &r, ray &i, const line &n, 
         ray illum = r.get_illumination(l++);
 
         const /* Cos(angle between normal and the ray) */
-        float shade = dot_product(illum.get_dir(), n.get_dir());
+        float shade = dot_product(illum.get_dir(), n);
         
         /* Ignore if the surface is facing away from the ray */
         if (shade < 0.0f)
@@ -52,7 +52,7 @@ void cook_torrance_cxy::shade(const ray_trace_engine &r, ray &i, const line &n, 
         half.z = (illum.get_z_grad() + i.get_z_grad()) * 0.5f;
 
         /* Take some common dot products */
-        const float nh = dot_product(n.get_dir(), half);
+        const float nh = dot_product(n, half);
         const float vh = dot_product(half, i.get_dir());
         const float nl = shade;
 

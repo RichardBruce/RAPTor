@@ -35,25 +35,25 @@ class spatial_sub_division : private boost::noncopyable
             _max_sentinel(new object_bound(nullptr,  std::numeric_limits<float>::max(), false))
         {
             /* Sweep the objects picking points in the selected axis */
-            _bounds[X_AXIS].reserve((objects.size() << 1) + 2);
-            _bounds[Y_AXIS].reserve((objects.size() << 1) + 2);
-            _bounds[Z_AXIS].reserve((objects.size() << 1) + 2);
+            _bounds[static_cast<int>(axis_t::X_AXIS)].reserve((objects.size() << 1) + 2);
+            _bounds[static_cast<int>(axis_t::Y_AXIS)].reserve((objects.size() << 1) + 2);
+            _bounds[static_cast<int>(axis_t::Z_AXIS)].reserve((objects.size() << 1) + 2);
 
-            _bounds[X_AXIS].push_back(_min_sentinel);
-            _bounds[Y_AXIS].push_back(_min_sentinel);
-            _bounds[Z_AXIS].push_back(_min_sentinel);
+            _bounds[static_cast<int>(axis_t::X_AXIS)].push_back(_min_sentinel);
+            _bounds[static_cast<int>(axis_t::Y_AXIS)].push_back(_min_sentinel);
+            _bounds[static_cast<int>(axis_t::Z_AXIS)].push_back(_min_sentinel);
             for (auto o : objects)
             {
-                _bounds[X_AXIS].push_back(o.second->lower_bound(X_AXIS));
-                _bounds[Y_AXIS].push_back(o.second->lower_bound(Y_AXIS));
-                _bounds[Z_AXIS].push_back(o.second->lower_bound(Z_AXIS));
-                _bounds[X_AXIS].push_back(o.second->upper_bound(X_AXIS));
-                _bounds[Y_AXIS].push_back(o.second->upper_bound(Y_AXIS));
-                _bounds[Z_AXIS].push_back(o.second->upper_bound(Z_AXIS));
+                _bounds[static_cast<int>(axis_t::X_AXIS)].push_back(o.second->lower_bound(axis_t::X_AXIS));
+                _bounds[static_cast<int>(axis_t::Y_AXIS)].push_back(o.second->lower_bound(axis_t::Y_AXIS));
+                _bounds[static_cast<int>(axis_t::Z_AXIS)].push_back(o.second->lower_bound(axis_t::Z_AXIS));
+                _bounds[static_cast<int>(axis_t::X_AXIS)].push_back(o.second->upper_bound(axis_t::X_AXIS));
+                _bounds[static_cast<int>(axis_t::Y_AXIS)].push_back(o.second->upper_bound(axis_t::Y_AXIS));
+                _bounds[static_cast<int>(axis_t::Z_AXIS)].push_back(o.second->upper_bound(axis_t::Z_AXIS));
             }
-            _bounds[X_AXIS].push_back(_max_sentinel);
-            _bounds[Y_AXIS].push_back(_max_sentinel);
-            _bounds[Z_AXIS].push_back(_max_sentinel);
+            _bounds[static_cast<int>(axis_t::X_AXIS)].push_back(_max_sentinel);
+            _bounds[static_cast<int>(axis_t::Y_AXIS)].push_back(_max_sentinel);
+            _bounds[static_cast<int>(axis_t::Z_AXIS)].push_back(_max_sentinel);
 
             /* Sort objects */
             for (int i = 0; i < 3; ++i)
@@ -63,12 +63,12 @@ class spatial_sub_division : private boost::noncopyable
                         return (*l) < (*r);
                     });
             }
-            assert(_bounds[X_AXIS].front()->object()    == nullptr);
-            assert(_bounds[Y_AXIS].front()->object()    == nullptr);
-            assert(_bounds[Z_AXIS].front()->object()    == nullptr);
-            assert(_bounds[X_AXIS].back()->object()     == nullptr);
-            assert(_bounds[Y_AXIS].back()->object()     == nullptr);
-            assert(_bounds[Z_AXIS].back()->object()     == nullptr);
+            assert(_bounds[static_cast<int>(axis_t::X_AXIS)].front()->object()    == nullptr);
+            assert(_bounds[static_cast<int>(axis_t::Y_AXIS)].front()->object()    == nullptr);
+            assert(_bounds[static_cast<int>(axis_t::Z_AXIS)].front()->object()    == nullptr);
+            assert(_bounds[static_cast<int>(axis_t::X_AXIS)].back()->object()     == nullptr);
+            assert(_bounds[static_cast<int>(axis_t::Y_AXIS)].back()->object()     == nullptr);
+            assert(_bounds[static_cast<int>(axis_t::Z_AXIS)].back()->object()     == nullptr);
 
             /* Set indices */
             set_indices();
@@ -101,17 +101,17 @@ class spatial_sub_division : private boost::noncopyable
         spatial_sub_division& add_object(const physics_object &po)
         {
             /* Add bounds to the end and swap the sentinel to the end */
-            _bounds[X_AXIS].push_back(po.upper_bound(static_cast<axis_t>(X_AXIS)));
-            _bounds[X_AXIS].push_back(po.lower_bound(static_cast<axis_t>(X_AXIS)));
-            std::swap(_bounds[X_AXIS][_bounds[X_AXIS].size() - 3], _bounds[X_AXIS][_bounds[X_AXIS].size() - 1]);
+            _bounds[static_cast<int>(axis_t::X_AXIS)].push_back(po.upper_bound(static_cast<axis_t>(axis_t::X_AXIS)));
+            _bounds[static_cast<int>(axis_t::X_AXIS)].push_back(po.lower_bound(static_cast<axis_t>(axis_t::X_AXIS)));
+            std::swap(_bounds[static_cast<int>(axis_t::X_AXIS)][_bounds[static_cast<int>(axis_t::X_AXIS)].size() - 3], _bounds[static_cast<int>(axis_t::X_AXIS)][_bounds[static_cast<int>(axis_t::X_AXIS)].size() - 1]);
 
-            _bounds[Y_AXIS].push_back(po.upper_bound(static_cast<axis_t>(Y_AXIS)));
-            _bounds[Y_AXIS].push_back(po.lower_bound(static_cast<axis_t>(Y_AXIS)));
-            std::swap(_bounds[Y_AXIS][_bounds[Y_AXIS].size() - 3], _bounds[Y_AXIS][_bounds[Y_AXIS].size() - 1]);
+            _bounds[static_cast<int>(axis_t::Y_AXIS)].push_back(po.upper_bound(static_cast<axis_t>(axis_t::Y_AXIS)));
+            _bounds[static_cast<int>(axis_t::Y_AXIS)].push_back(po.lower_bound(static_cast<axis_t>(axis_t::Y_AXIS)));
+            std::swap(_bounds[static_cast<int>(axis_t::Y_AXIS)][_bounds[static_cast<int>(axis_t::Y_AXIS)].size() - 3], _bounds[static_cast<int>(axis_t::Y_AXIS)][_bounds[static_cast<int>(axis_t::Y_AXIS)].size() - 1]);
 
-            _bounds[Z_AXIS].push_back(po.upper_bound(static_cast<axis_t>(Z_AXIS)));
-            _bounds[Z_AXIS].push_back(po.lower_bound(static_cast<axis_t>(Z_AXIS)));
-            std::swap(_bounds[Z_AXIS][_bounds[Z_AXIS].size() - 3], _bounds[Z_AXIS][_bounds[Z_AXIS].size() - 1]);
+            _bounds[static_cast<int>(axis_t::Z_AXIS)].push_back(po.upper_bound(static_cast<axis_t>(axis_t::Z_AXIS)));
+            _bounds[static_cast<int>(axis_t::Z_AXIS)].push_back(po.lower_bound(static_cast<axis_t>(axis_t::Z_AXIS)));
+            std::swap(_bounds[static_cast<int>(axis_t::Z_AXIS)][_bounds[static_cast<int>(axis_t::Z_AXIS)].size() - 3], _bounds[static_cast<int>(axis_t::Z_AXIS)][_bounds[static_cast<int>(axis_t::Z_AXIS)].size() - 1]);
 
             /* Set indices */
             set_indices();
@@ -172,9 +172,9 @@ class spatial_sub_division : private boost::noncopyable
 
         spatial_sub_division& update_object(const physics_object &po)
         {
-            update_axis(po, X_AXIS);
-            update_axis(po, Y_AXIS);
-            update_axis(po, Z_AXIS);
+            update_axis(po, axis_t::X_AXIS);
+            update_axis(po, axis_t::Y_AXIS);
+            update_axis(po, axis_t::Z_AXIS);
 
             return *this;            
         }
@@ -194,15 +194,15 @@ class spatial_sub_division : private boost::noncopyable
         /* Set indices on the bounds */
         void set_indices()
         {
-            assert(_bounds[X_AXIS].size() == _bounds[Y_AXIS].size());
-            assert(_bounds[X_AXIS].size() == _bounds[Z_AXIS].size());
+            assert(_bounds[static_cast<int>(axis_t::X_AXIS)].size() == _bounds[static_cast<int>(axis_t::Y_AXIS)].size());
+            assert(_bounds[static_cast<int>(axis_t::X_AXIS)].size() == _bounds[static_cast<int>(axis_t::Z_AXIS)].size());
 
             /* Set indices */
-            for (int i = 0; i < static_cast<int>(_bounds[X_AXIS].size()); ++i)
+            for (int i = 0; i < static_cast<int>(_bounds[static_cast<int>(axis_t::X_AXIS)].size()); ++i)
             {
-                _bounds[X_AXIS][i]->index(i);
-                _bounds[Y_AXIS][i]->index(i);
-                _bounds[Z_AXIS][i]->index(i);
+                _bounds[static_cast<int>(axis_t::X_AXIS)][i]->index(i);
+                _bounds[static_cast<int>(axis_t::Y_AXIS)][i]->index(i);
+                _bounds[static_cast<int>(axis_t::Z_AXIS)][i]->index(i);
             }
         }
 
@@ -210,47 +210,47 @@ class spatial_sub_division : private boost::noncopyable
         {
             /* Clean old state */
             _possibles.clear();
-            _axis_possibles[X_AXIS].clear();
-            _axis_possibles[Y_AXIS].clear();
-            _axis_possibles[Z_AXIS].clear();
+            _axis_possibles[static_cast<int>(axis_t::X_AXIS)].clear();
+            _axis_possibles[static_cast<int>(axis_t::Y_AXIS)].clear();
+            _axis_possibles[static_cast<int>(axis_t::Z_AXIS)].clear();
 
             /* For all bounds */
-            collision_detect_axis(X_AXIS);
-            collision_detect_axis(Y_AXIS);
-            collision_detect_axis(Z_AXIS);
+            collision_detect_axis(axis_t::X_AXIS);
+            collision_detect_axis(axis_t::Y_AXIS);
+            collision_detect_axis(axis_t::Z_AXIS);
 
             /* Update possibles */
-            const int smallest_set = (_axis_possibles[X_AXIS].size() < _axis_possibles[Y_AXIS].size()) ?
-                ((_axis_possibles[X_AXIS].size() < _axis_possibles[Z_AXIS].size()) ? X_AXIS : Z_AXIS) :
-                ((_axis_possibles[Y_AXIS].size() < _axis_possibles[Z_AXIS].size()) ? Y_AXIS : Z_AXIS);
+            const axis_t smallest_set = (_axis_possibles[static_cast<int>(axis_t::X_AXIS)].size() < _axis_possibles[static_cast<int>(axis_t::Y_AXIS)].size()) ?
+                ((_axis_possibles[static_cast<int>(axis_t::X_AXIS)].size() < _axis_possibles[static_cast<int>(axis_t::Z_AXIS)].size()) ? axis_t::X_AXIS : axis_t::Z_AXIS) :
+                ((_axis_possibles[static_cast<int>(axis_t::Y_AXIS)].size() < _axis_possibles[static_cast<int>(axis_t::Z_AXIS)].size()) ? axis_t::Y_AXIS : axis_t::Z_AXIS);
 
             switch (smallest_set)
             {
-                case X_AXIS :
-                    for (auto p : _axis_possibles[X_AXIS])
+                case axis_t::X_AXIS :
+                    for (auto p : _axis_possibles[static_cast<int>(axis_t::X_AXIS)])
                     {
-                        if ((_axis_possibles[Y_AXIS].find(p) != _axis_possibles[Y_AXIS].end()) && 
-                            (_axis_possibles[Z_AXIS].find(p) != _axis_possibles[Z_AXIS].end()))
+                        if ((_axis_possibles[static_cast<int>(axis_t::Y_AXIS)].find(p) != _axis_possibles[static_cast<int>(axis_t::Y_AXIS)].end()) && 
+                            (_axis_possibles[static_cast<int>(axis_t::Z_AXIS)].find(p) != _axis_possibles[static_cast<int>(axis_t::Z_AXIS)].end()))
                         {
                             _possibles.insert(p);
                         }
                     }
                     break;
-                case Y_AXIS :
-                    for (auto p : _axis_possibles[X_AXIS])
+                case axis_t::Y_AXIS :
+                    for (auto p : _axis_possibles[static_cast<int>(axis_t::X_AXIS)])
                     {
-                        if ((_axis_possibles[X_AXIS].find(p) != _axis_possibles[X_AXIS].end()) && 
-                            (_axis_possibles[Z_AXIS].find(p) != _axis_possibles[Z_AXIS].end()))
+                        if ((_axis_possibles[static_cast<int>(axis_t::X_AXIS)].find(p) != _axis_possibles[static_cast<int>(axis_t::X_AXIS)].end()) && 
+                            (_axis_possibles[static_cast<int>(axis_t::Z_AXIS)].find(p) != _axis_possibles[static_cast<int>(axis_t::Z_AXIS)].end()))
                         {
                             _possibles.insert(p);
                         }
                     }
                     break;
-                case Z_AXIS :
-                    for (auto p : _axis_possibles[X_AXIS])
+                case axis_t::Z_AXIS :
+                    for (auto p : _axis_possibles[static_cast<int>(axis_t::X_AXIS)])
                     {
-                        if ((_axis_possibles[X_AXIS].find(p) != _axis_possibles[X_AXIS].end()) && 
-                            (_axis_possibles[Y_AXIS].find(p) != _axis_possibles[Y_AXIS].end()))
+                        if ((_axis_possibles[static_cast<int>(axis_t::X_AXIS)].find(p) != _axis_possibles[static_cast<int>(axis_t::X_AXIS)].end()) && 
+                            (_axis_possibles[static_cast<int>(axis_t::Y_AXIS)].find(p) != _axis_possibles[static_cast<int>(axis_t::Y_AXIS)].end()))
                         {
                             _possibles.insert(p);
                         }
@@ -264,18 +264,19 @@ class spatial_sub_division : private boost::noncopyable
         void collision_detect_axis(const axis_t axis)
         {
             /* For all bounds */
-            for (unsigned int i = 1; i < (_bounds[axis].size() - 1); ++i)
+            const int axis_int = static_cast<int>(axis);
+            for (unsigned int i = 1; i < (_bounds[axis_int].size() - 1); ++i)
             {
-                assert(_bounds[axis][i]->object() != nullptr);
+                assert(_bounds[axis_int][i]->object() != nullptr);
 
                 /* That are minimums */
-                if (_bounds[axis][i]->min())
+                if (_bounds[axis_int][i]->min())
                 {
                     /* There may be collisions between this object and any found before the maximum */
                     int j = i + 1;
-                    while ((_bounds[axis][i]->object() != _bounds[axis][j]->object()) && (j < static_cast<int>(_bounds[axis].size())))
+                    while ((_bounds[axis_int][i]->object() != _bounds[axis_int][j]->object()) && (j < static_cast<int>(_bounds[axis_int].size())))
                     {
-                        _axis_possibles[axis].insert(_bounds[axis][i]->object(), _bounds[axis][j]->object());
+                        _axis_possibles[axis_int].insert(_bounds[axis_int][i]->object(), _bounds[axis_int][j]->object());
                         ++j;
                     }
                 }
@@ -290,59 +291,61 @@ class spatial_sub_division : private boost::noncopyable
 
             /* Adjust bounds tracking changes in collision set */
             /* Moving lower bound down */
-            while (_bounds[axis][lower_bound->index()]->compare_and_swap(_bounds[axis][lower_bound->index() - 1]))
+            const int axis_int = static_cast<int>(axis);
+            while (_bounds[axis_int][lower_bound->index()]->compare_and_swap(_bounds[axis_int][lower_bound->index() - 1]))
             {
-                std::swap(_bounds[axis][lower_bound->index()], _bounds[axis][lower_bound->index() + 1]);
-                update_possibles(_bounds[axis][lower_bound->index()], _bounds[axis][lower_bound->index() + 1], axis);
+                std::swap(_bounds[axis_int][lower_bound->index()], _bounds[axis_int][lower_bound->index() + 1]);
+                update_possibles(_bounds[axis_int][lower_bound->index()], _bounds[axis_int][lower_bound->index() + 1], axis);
             }
 
             /* Moving upper bound down */
-            while (_bounds[axis][upper_bound->index()]->compare_and_swap(_bounds[axis][upper_bound->index() - 1]))
+            while (_bounds[axis_int][upper_bound->index()]->compare_and_swap(_bounds[axis_int][upper_bound->index() - 1]))
             {
-                std::swap(_bounds[axis][upper_bound->index()], _bounds[axis][upper_bound->index() + 1]);
-                update_possibles(_bounds[axis][upper_bound->index()], _bounds[axis][upper_bound->index() + 1], axis);
+                std::swap(_bounds[axis_int][upper_bound->index()], _bounds[axis_int][upper_bound->index() + 1]);
+                update_possibles(_bounds[axis_int][upper_bound->index()], _bounds[axis_int][upper_bound->index() + 1], axis);
             }
 
             /* Moving upper bound up */
-            while (_bounds[axis][upper_bound->index() + 1]->compare_and_swap(_bounds[axis][upper_bound->index()]))
+            while (_bounds[axis_int][upper_bound->index() + 1]->compare_and_swap(_bounds[axis_int][upper_bound->index()]))
             {
-                std::swap(_bounds[axis][upper_bound->index() - 1], _bounds[axis][upper_bound->index()]);
-                update_possibles(_bounds[axis][upper_bound->index() - 1], _bounds[axis][upper_bound->index()], axis);
+                std::swap(_bounds[axis_int][upper_bound->index() - 1], _bounds[axis_int][upper_bound->index()]);
+                update_possibles(_bounds[axis_int][upper_bound->index() - 1], _bounds[axis_int][upper_bound->index()], axis);
             }
 
             /* Moving lower bound up */
-            while (_bounds[axis][lower_bound->index() + 1]->compare_and_swap(_bounds[axis][lower_bound->index()]))
+            while (_bounds[axis_int][lower_bound->index() + 1]->compare_and_swap(_bounds[axis_int][lower_bound->index()]))
             {
-                std::swap(_bounds[axis][lower_bound->index() - 1], _bounds[axis][lower_bound->index()]);
-                update_possibles(_bounds[axis][lower_bound->index() - 1], _bounds[axis][lower_bound->index()], axis);
+                std::swap(_bounds[axis_int][lower_bound->index() - 1], _bounds[axis_int][lower_bound->index()]);
+                update_possibles(_bounds[axis_int][lower_bound->index() - 1], _bounds[axis_int][lower_bound->index()], axis);
             }
         }
 
         void update_possibles(const object_bound *const moving_lo, const object_bound *const moving_hi, const axis_t axis)
         {
+            const int axis_int = static_cast<int>(axis);
             if (moving_lo->min() & (!moving_hi->min()))
             {
-                const std::pair<const physics_object*, const physics_object*> *pair = _axis_possibles[axis].insert(moving_lo->object(), moving_hi->object());
+                const std::pair<const physics_object*, const physics_object*> *pair = _axis_possibles[axis_int].insert(moving_lo->object(), moving_hi->object());
 
                 switch (axis)
                 {
-                    case X_AXIS :
-                        if ((_axis_possibles[Y_AXIS].find(*pair) != _axis_possibles[Y_AXIS].end()) && 
-                            (_axis_possibles[Z_AXIS].find(*pair) != _axis_possibles[Z_AXIS].end()))
+                    case axis_t::X_AXIS :
+                        if ((_axis_possibles[static_cast<int>(axis_t::Y_AXIS)].find(*pair) != _axis_possibles[static_cast<int>(axis_t::Y_AXIS)].end()) && 
+                            (_axis_possibles[static_cast<int>(axis_t::Z_AXIS)].find(*pair) != _axis_possibles[static_cast<int>(axis_t::Z_AXIS)].end()))
                         {
                             _possibles.insert(*pair);
                         }
                         break;
-                    case Y_AXIS :
-                        if ((_axis_possibles[X_AXIS].find(*pair) != _axis_possibles[X_AXIS].end()) && 
-                            (_axis_possibles[Z_AXIS].find(*pair) != _axis_possibles[Z_AXIS].end()))
+                    case axis_t::Y_AXIS :
+                        if ((_axis_possibles[static_cast<int>(axis_t::X_AXIS)].find(*pair) != _axis_possibles[static_cast<int>(axis_t::X_AXIS)].end()) && 
+                            (_axis_possibles[static_cast<int>(axis_t::Z_AXIS)].find(*pair) != _axis_possibles[static_cast<int>(axis_t::Z_AXIS)].end()))
                         {
                             _possibles.insert(*pair);
                         }
                         break;
-                    case Z_AXIS :
-                        if ((_axis_possibles[X_AXIS].find(*pair) != _axis_possibles[X_AXIS].end()) && 
-                            (_axis_possibles[Y_AXIS].find(*pair) != _axis_possibles[Y_AXIS].end()))
+                    case axis_t::Z_AXIS :
+                        if ((_axis_possibles[static_cast<int>(axis_t::X_AXIS)].find(*pair) != _axis_possibles[static_cast<int>(axis_t::X_AXIS)].end()) && 
+                            (_axis_possibles[static_cast<int>(axis_t::Y_AXIS)].find(*pair) != _axis_possibles[static_cast<int>(axis_t::Y_AXIS)].end()))
                         {
                             _possibles.insert(*pair);
                         }
@@ -351,7 +354,7 @@ class spatial_sub_division : private boost::noncopyable
             }
             else if ((!moving_lo->min()) & moving_hi->min())
             {
-                _axis_possibles[axis].erase(moving_lo->object(), moving_hi->object());
+                _axis_possibles[axis_int].erase(moving_lo->object(), moving_hi->object());
                 _possibles.erase(moving_lo->object(), moving_hi->object());
             }
         }

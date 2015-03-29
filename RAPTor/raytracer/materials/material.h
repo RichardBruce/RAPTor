@@ -12,7 +12,6 @@ namespace raptor_raytracer
 class secondary_ray_data;
 class ray_trace_engine;
 class ray;
-class line;
 
 /* Change the following to suit your standard */
 /* These are constants for colour space conversion */
@@ -53,10 +52,10 @@ class material
         virtual ~material() { };
 
         /* Pure virtual function to the allow the shader a chance to generate SIMD packets */
-        virtual void generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const = 0;
+        virtual void generate_rays(const ray_trace_engine &r, ray &i, point_t *const n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const = 0;
 
         /* Pure virtual shading function. To allow the shader to shade the current object */
-        virtual void shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const = 0;
+        virtual void shade(const ray_trace_engine &r, ray &i, const point_t &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const = 0;
 
         /* Pure virtual function to the allow the shader a combined SIMD packets traced secondary rays into the image */
         virtual void combind_secondary_rays(const ray_trace_engine &r, ext_colour_t *const c, const secondary_ray_data &rl, const secondary_ray_data &rf) const = 0;
@@ -94,8 +93,8 @@ inline float direct_fresnell(const float r, const float t, const float k)
     const float im_g_sq = 2.0f * r * k;
     
     /* Take the absolute of g^2; Where g^2 = g_re^2 + i * g_im^2 */
-    const float abs_re_g_sq = fabs(re_g_sq);
-    const float abs_im_g_sq = fabs(im_g_sq);
+    const float abs_re_g_sq = std::fabs(re_g_sq);
+    const float abs_im_g_sq = std::fabs(im_g_sq);
 
     float abs_g_sq;
     if ((re_g_sq == 0.0f) && (im_g_sq == 0.0f))
@@ -105,12 +104,12 @@ inline float direct_fresnell(const float r, const float t, const float k)
     else if (abs_re_g_sq >= abs_im_g_sq)
     {
         float d   = abs_im_g_sq / abs_re_g_sq;
-        abs_g_sq = abs_re_g_sq * sqrt(1.0 + (d * d));
+        abs_g_sq = abs_re_g_sq * std::sqrt(1.0f + (d * d));
     }
     else
     {
         float d   = abs_re_g_sq / abs_im_g_sq;
-        abs_g_sq = abs_im_g_sq * sqrt(1.0 + (d * d));
+        abs_g_sq = abs_im_g_sq * std::sqrt(1.0f + (d * d));
     }
     
     /* s = (1 - t^2) / t */
@@ -118,8 +117,8 @@ inline float direct_fresnell(const float r, const float t, const float k)
 
     /* a = sqrt((abs(g^2) + re(g^2)) / 2) */
     /* b = sqrt((abs(g^2) - re(g^2)) / 2) */
-    const float a     = sqrt((abs_g_sq + re_g_sq) * 0.5f);
-    const float b     = sqrt((abs_g_sq - re_g_sq) * 0.5f);
+    const float a     = std::sqrt((abs_g_sq + re_g_sq) * 0.5f);
+    const float b     = std::sqrt((abs_g_sq - re_g_sq) * 0.5f);
     const float b_sq  = b * b;
     
     /* Some repeatedly used Fresnel terms */
@@ -147,7 +146,7 @@ inline float direct_fresnell(const float r, const float t, const float k)
 **********************************************************/
 inline float schlick_fresnell(const float r, const float t, const float k)
 {
-    return (r + (1.0f - r) * pow(1.0f - t, 5.0f));
+    return (r + (1.0f - r) * std::pow(1.0f - t, 5.0f));
 }
 
 
@@ -170,7 +169,7 @@ inline float rescaled_schlick_fresnell(const float r, const float t, const float
     const float r_p1 = r + 1.0f;
     const float k_sq = k * k;
     
-    return ((r_m1 * r_m1) + (4.0f * r * pow((1.0f - t), 5.0f)) + k_sq) / ((r_p1 * r_p1) + k_sq);
+    return ((r_m1 * r_m1) + (4.0f * r * std::pow((1.0f - t), 5.0f)) + k_sq) / ((r_p1 * r_p1) + k_sq);
 }
 
 
@@ -213,7 +212,7 @@ inline float gaussian_facet_distribution(const float a, const float m, const flo
 {
     /* ce^-((alpha/m)^2) */
     const float a_div_m = a / m;
-    return c * exp(-(a_div_m * a_div_m));
+    return c * std::exp(-(a_div_m * a_div_m));
 }
 
 
@@ -238,7 +237,7 @@ inline float beckmann_facet_distribution(const float a, const float m, const flo
     const float m_sq = m * m;
     
     /* 1/(m^2 * cos^4(alpha)) * e^-(tan^2(alpha)/m^2) */
-    return ((1.0f / (m_sq * cos_4_a)) * exp(-(tan_a_sq / m_sq)));
+    return ((1.0f / (m_sq * cos_4_a)) * std::exp(-(tan_a_sq / m_sq)));
 }
 
 

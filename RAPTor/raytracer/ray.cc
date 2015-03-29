@@ -88,12 +88,12 @@ ray ray::rotate(const vector_t &r, const point_t &c, const float theta) const
  destination and the centre of the object. Multiple rays 
  may be created if soft shadows are enabled.
 **********************************************************/
-float ray::find_rays(ray rays[], const light &l, const line &n, const hit_t h) const
+float ray::find_rays(ray rays[], const light &l, const hit_t h) const
 {
     /* Adjust the start point of the shadow ray a small distance a long the surface normal */
-    point_t start = this->offset_start_point(n, 1);    
+    const point_t start(offset_start_point(1));
 #ifdef SOFT_SHADOW
-    int nr_rays = max(((int)(SOFT_SHADOW/this->componant)), 1);
+    int nr_rays = std::max((static_cast<int>(SOFT_SHADOW / this->componant)), 1);
 #else
     int nr_rays = 1;
 #endif
@@ -115,24 +115,24 @@ float ray::find_rays(ray rays[], const light &l, const line &n, const hit_t h) c
  reflection co-efficient dr is greater than 0. dr gives the 
  spread of the rays.
 **********************************************************/
-float ray::reflect(ray rays[], const line &n, const float r, const float dr) const
+float ray::reflect(ray rays[], const point_t &n, const float r, const float dr) const
 {
     /* Check the ray will be strong enough to continue */
     
-    assert(this->magn <  1.1f);
-    assert(this->magn > -0.1f);
-    float refl_power = this->magn * r;
+    const float refl_power = this->magn * r;
+    assert(refl_power <  1.1f);
+    assert(refl_power > -0.1f);
     if (refl_power <= MIN_REFLECTIVE_POWER)
     {
         return 0.0;
     }
     
     /* Cos(angle between normal and the ray) */
-    float   ray_dot_normal  = 2.0f * dot_product(this->dir, n.get_dir());
-    point_t ref             = this->dir - n.get_dir() * ray_dot_normal;
+    float   ray_dot_normal  = 2.0f * dot_product(this->dir, n);
+    point_t ref             = this->dir - n * ray_dot_normal;
 
     /* Move a little way along the ray */
-    point_t start_point = this->offset_start_point(n, 1);
+    point_t start_point = offset_start_point(1);
 
 #ifdef DIFFUSE_REFLECTIONS
     /* Check to see if the object has a diffuse reflection */
@@ -154,7 +154,7 @@ float ray::reflect(ray rays[], const line &n, const float r, const float dr) con
     
     /* Number of rays to create */
     int nr_rays = max(((int)DIFFUSE_REFLECTIONS/this->componant), 1);
-    for (int i=0; i<nr_rays; i++)
+    for (int i = 0; i < nr_rays; ++i)
     {
         /* Pick random offsets */
         float r_off = gen_random_mersenne_twister() * dr;
@@ -195,17 +195,19 @@ float ray::reflect(ray rays[], const line &n, const float r, const float dr) con
  diffuse refraction co-efficient dr is greater than 0. dr 
  gives the spread of the rays.
 **********************************************************/
-float ray::refract(ray rays[], const line &n, const float t, float ri, const hit_t h, const float dr) const 
+float ray::refract(ray rays[], const point_t &n, const float t, float ri, const hit_t h, const float dr) const 
 {
     /* Check the ray will be strong enough to continue */
-    float refr_power = this->magn * t;
+    const float refr_power = this->magn * t;
+    assert(refr_power <  1.1f);
+    assert(refr_power > -0.1f);
     if (refr_power <= MIN_REFLECTIVE_POWER)
     {
         return 0.0f;
     }
     
     /* Cos(angle between normal and the ray) */
-    float ray_dot_normal = -dot_product(this->dir, n.get_dir());
+    float ray_dot_normal = -dot_product(this->dir, n);
                             
     /* sin^2(x) = 1 - cos^2(x) */
     /* cos(refratced angle) */
@@ -225,11 +227,11 @@ float ray::refract(ray rays[], const line &n, const float t, float ri, const hit
     }
 
     /* Convert back to gradients */
-	float offset = (ri * ray_dot_normal - sqrt(cosT2));
-    point_t ref = (ri * this->dir) + offset * n.get_dir();
+	float offset = (ri * ray_dot_normal - std::sqrt(cosT2));
+    point_t ref = (ri * this->dir) + offset * n;
 
     /* Move a little way along the ray */
-    point_t start_point = this->offset_start_point(n, -1);
+    point_t start_point = offset_start_point(-1);
 
 #ifdef DIFFUSE_REFLECTIONS
     /* Check to see if the object has a diffuse refraction */

@@ -102,9 +102,14 @@ class ray
             this->dst       += this->dir * d;
             this->length    += d;
         }
+
+        void set_geometry_normal(const point_t &n)
+        {
+            this->geo_norm = n;
+        }
         
         /* Get an offset start point for secondary rays */
-        point_t offset_start_point(const line &n, const int d) const
+        point_t offset_start_point(const int d) const
         {
             assert((d == -1) || (d == 1));
         
@@ -117,11 +122,11 @@ class ray
             unsigned x = bit_cast<float, unsigned>(this->dst.x);
             if ((x & 0x7fffffff) < bit_cast<float, unsigned>(FP_DELTA_SMALL))
             {
-                start.x += FP_DELTA_SMALL * n.get_x_grad();
+                start.x += FP_DELTA_SMALL * geo_norm.x;
             }
             else
             {
-                x += int(offset[(x >> 31) & 0x1] * n.get_x_grad() * d);
+                x += int(offset[(x >> 31) & 0x1] * geo_norm.x * d);
                 start.x = bit_cast<unsigned, float>(x);
             }
     
@@ -129,11 +134,11 @@ class ray
             unsigned y = bit_cast<float, unsigned>(this->dst.y);
             if ((y & 0x7fffffff) < bit_cast<float, unsigned>(FP_DELTA_SMALL))
             {
-                start.y += FP_DELTA_SMALL * n.get_y_grad();
+                start.y += FP_DELTA_SMALL * geo_norm.y;
             }
             else
             {
-                y += int(offset[(y >> 31) & 0x1] * n.get_y_grad() * d);
+                y += int(offset[(y >> 31) & 0x1] * geo_norm.y * d);
                 start.y = bit_cast<unsigned, float>(y);
             }
 
@@ -141,11 +146,11 @@ class ray
             unsigned z = bit_cast<float, unsigned>(this->dst.z);
             if ((z & 0x7fffffff) < bit_cast<float, unsigned>(FP_DELTA_SMALL))
             {
-                start.z += FP_DELTA_SMALL * n.get_z_grad();
+                start.z += FP_DELTA_SMALL * geo_norm.z;
             }
             else
             {
-                z += int(offset[(z >> 31) & 0x1] * n.get_z_grad() * d);
+                z += int(offset[(z >> 31) & 0x1] * geo_norm.z * d);
                 start.z = bit_cast<unsigned, float>(z);
             }
             
@@ -155,13 +160,16 @@ class ray
         /* Ray Functions */
         point_t calculate_destination(const float d);
         ray     rotate(const vector_t &r, const point_t &c, const float theta) const;
-        float   find_rays(ray rays[], const light &l, const line &n, const hit_t h) const;
+        float   find_rays(ray rays[], const light &l, const hit_t h) const;
         float   get_magnitude_beer(const float a);
-        float   reflect(ray rays[], const line &n, const float r, const float dr = 0.0f) const;
-        float   refract(ray rays[], const line &n, const float t, float ri, const hit_t h, const float dr = 0.0f) const;
+        float   reflect(ray rays[], const point_t &n, const float r, const float dr = 0.0f) const;
+        float   refract(ray rays[], const point_t &n, const float t, float ri, const hit_t h, const float dr = 0.0f) const;
         
     private : 
-        point_t ogn, dst, dir;
+        point_t ogn;
+        point_t dst;
+        point_t dir;
+        point_t geo_norm;
         float   length, magn;
         int     componant;
 };

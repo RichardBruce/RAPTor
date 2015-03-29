@@ -231,11 +231,11 @@ class camera : private boost::noncopyable
         void pixel_to_co_ordinate(packet_ray *const r, const int x, const int y) const
         {
             /* Assert packet is square */
-            assert(fmod(sqrt(static_cast<float>(MAXIMUM_PACKET_SIZE)), 1.0f) == 0.0f);
+            assert(std::fmod(std::sqrt(static_cast<float>(MAXIMUM_PACKET_SIZE)), 1.0f) == 0.0f);
 
             /* Assert the packet is MAXIMUM_PACKET_SIZE aligned */
-            assert((x & (((unsigned int)sqrt(MAXIMUM_PACKET_SIZE) << 1) - 1)) == 0);
-            assert((y & (((unsigned int)sqrt(MAXIMUM_PACKET_SIZE) << 1) - 1)) == 0);
+            assert((x & (((unsigned int)std::sqrt(MAXIMUM_PACKET_SIZE) << 1) - 1)) == 0);
+            assert((y & (((unsigned int)std::sqrt(MAXIMUM_PACKET_SIZE) << 1) - 1)) == 0);
 
             /* Create the packet data */
             for (unsigned int i = 0; i < MAXIMUM_PACKET_SIZE; i++)
@@ -276,7 +276,7 @@ class camera : private boost::noncopyable
 #endif /* #ifdef SIMD_PACKET_TRACING */
         
         /* Background shading */
-        ext_colour_t shade(const ray &r) const
+        ext_colour_t shade(ray *const r) const
         {
             if (this->tm == nullptr)
             {
@@ -286,7 +286,8 @@ class camera : private boost::noncopyable
             {
                 /* Find the intersection point with the sky box and which plane was hit */
                 point_t p;
-                const unsigned int tm_nr = this->sky_box_intersection(r, &p);
+                const unsigned int tm_nr = this->sky_box_intersection(*r, &p);
+                r->set_dst(p);
 
                 point_t n;
                 switch(tm_nr)
@@ -316,7 +317,7 @@ class camera : private boost::noncopyable
                 
                 /* Look up the texture and texture map the pixel */
                 ext_colour_t c;
-                (*this->tm)[tm_nr]->texture_map(&c, p, n, point_t(MAX_DIST, MAX_DIST, MAX_DIST));
+                (*this->tm)[tm_nr]->texture_map(*r, &c, n, point_t(MAX_DIST, MAX_DIST, MAX_DIST));
                 return c;
             }
         }

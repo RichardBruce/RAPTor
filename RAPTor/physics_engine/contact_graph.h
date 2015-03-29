@@ -210,7 +210,7 @@ class contact_graph : private boost::noncopyable
             const tracking_info<PO> *const t = info[r];
             for (auto &p : (*t))
             {
-                if (p.second->get_type() == SLIDING_COLLISION)
+                if (p.second->get_type() == collision_t::SLIDING_COLLISION)
                 {
                     /* If not previously encountered */
                     /* TODO -- This is a linear search for now */

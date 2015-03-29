@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#define PI		3.14159265358979323846
+#define PI		3.14159265358979323846f
 #define WHTEFFICACY	179.0		/* lumens/watt conversion factor */
 
 #define FEQ(a,b)	((a)-(b) < 1e-4 && (a)-(b) > -1e-4)

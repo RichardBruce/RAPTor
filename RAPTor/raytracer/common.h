@@ -116,11 +116,11 @@ namespace raptor_raytracer
 
 /* Define the kd tree completion criteria */
 #ifndef COST_OF_TRAVERSAL
-#define COST_OF_TRAVERSAL 50.0
+#define COST_OF_TRAVERSAL 50.0f
 #endif
 
 #ifndef COST_OF_INTERSECTION
-#define COST_OF_INTERSECTION 1.0
+#define COST_OF_INTERSECTION 1.0f
 #endif
 
 #ifndef SECANT_ITERATIONS
@@ -128,7 +128,7 @@ namespace raptor_raytracer
 #endif
 
 #ifndef SECANT_ERROR_LIMIT
-#define SECANT_ERROR_LIMIT (1000.0*DOUBLE_ERR)
+#define SECANT_ERROR_LIMIT (1000.0f * DOUBLE_ERR)
 #endif
 
 #ifndef NEWTON_RAPHSON_ITERATIONS
@@ -136,7 +136,7 @@ namespace raptor_raytracer
 #endif
 
 #ifndef NEWTON_RAPHSON_ERROR_LIMIT
-#define NEWTON_RAPHSON_ERROR_LIMIT (250.0*DOUBLE_ERR)
+#define NEWTON_RAPHSON_ERROR_LIMIT (250.0f * DOUBLE_ERR)
 #endif
 
 #ifndef COS_LUT_SIZE
@@ -298,7 +298,7 @@ struct hit_description
 };
 
 /* Enumerate the input file formats */
-enum class model_format_t : char { cfg = 0, code = 1, mgf = 2, nff = 3, lwo = 4, obj = 5, ply = 6, vrml = 7 };
+enum class model_format_t : char { cfg = 0, code = 1, mgf = 2, nff = 3, lwo = 4, obj = 5, off = 6, ply = 7, vrml = 8 };
 
 /* Enumerate the output file formats */
 enum class image_format_t : char { tga = 0, jpg = 1, png = 2 };

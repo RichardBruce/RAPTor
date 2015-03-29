@@ -34,7 +34,7 @@ bool group_done(const char *a)
 
 void parser_bg(const char *a, const char *eob, ext_colour_t *const bg)
 {
-//    std::cout << "finding background" << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "finding background";
     while ((a != eob) && (strncmp(a, "Background {", 12) != 0))
     {
         ++a;
@@ -42,7 +42,7 @@ void parser_bg(const char *a, const char *eob, ext_colour_t *const bg)
 
     if (a != eob)
     {
-//        std::cout << "background found" << std::endl;
+//        BOOST_LOG_TRIVIAL(trace) << "background found";
         find_next_line(&a);
         skip_white_space(&a);
         assert(strncmp(a, "skyColor [", 10) == 0);
@@ -91,7 +91,7 @@ float parse_directional_light(light_list &l, const char *a, const char *eob)
         skip_white_space(&a);
         assert(strncmp(a, "intensity", 9) == 0);
         rgb *= get_next_float(&a) * 255.0f;
-//        std::cout << "rgb: " << rgb.r << ", " << rgb.g << ", " << rgb.b << std::endl;
+        // BOOST_LOG_TRIVIAL(trace) << "Directional light found: " << rgb;
         
         new_light(&l, rgb, c, 0.0f, 0.0f);
     }
@@ -107,7 +107,7 @@ void parse_viewpoint(camera *c, const std::string &v, const char *a, const char 
     point_t p, r;
     while ((a != eob) && (v != desc))
     {
-//        std::cout << "finding viewpoint" << std::endl;
+//        BOOST_LOG_TRIVIAL(trace) << "finding viewpoint";
         while ((a != eob) && (strncmp(a, "Viewpoint {", 11) != 0))
         {
             ++a;
@@ -115,7 +115,7 @@ void parse_viewpoint(camera *c, const std::string &v, const char *a, const char 
     
         if (a != eob)
         {
-//            std::cout << "viewpoint found" << std::endl;
+//            BOOST_LOG_TRIVIAL(trace) << "viewpoint found";
     
             find_next_line(&a);
             skip_white_space(&a);
@@ -137,14 +137,14 @@ void parse_viewpoint(camera *c, const std::string &v, const char *a, const char 
             assert(strncmp(a, "description", 11) == 0);
             desc = get_quoted_string(&a);
 
-//            std::cout << "Viewpoint is: " << desc << std::endl;
+//            BOOST_LOG_TRIVIAL(trace) << "Viewpoint is: " << desc;
         }
     }
 
     /* Warn if default view point is used */
     if (v != desc)
     {
-        std::cout << "Warning: View point '" << v << "' not found, using default" << std::endl;
+        BOOST_LOG_TRIVIAL(warning) << "View point '" << v << "' not found, using default";
     }
     /* Set specified view point */
     else
@@ -159,7 +159,7 @@ void parse_viewpoint(camera *c, const std::string &v, const char *a, const char 
 
 void parse_points(std::vector<point_t> *p, const char *a, const char *eob)
 {
-//    std::cout << "finding points" << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "finding points";
     while ((a != eob) && (strncmp(a, "point [", 7) != 0))
     {
         ++a;
@@ -167,7 +167,7 @@ void parse_points(std::vector<point_t> *p, const char *a, const char *eob)
 
     if (a != eob)
     {
-//        std::cout << "points found" << std::endl;
+//        BOOST_LOG_TRIVIAL(trace) << "points found";
         do 
         {
             point_t tp;
@@ -177,18 +177,18 @@ void parse_points(std::vector<point_t> *p, const char *a, const char *eob)
             tp.z = get_next_float(&a);
             p->push_back(tp);
         
-//            std::cout << tp.x << ", " << tp.y << ", " << tp.z << std::endl;
+//            BOOST_LOG_TRIVIAL(trace) << tp.x << ", " << tp.y << ", " << tp.z;
         } while (!group_done(a));
     }
-//    std::cout << "end of points" << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "end of points";
     return;
 }
 
 
 void parse_triangles(primitive_list &prim, std::list<material *> &m, const std::vector<point_t> &p, const std::vector<ext_colour_t> &c, const float ka, const char *a, const char *eob)
 {
-//    std::cout << "finding coordIndex" << std::endl;
-    std::cout << "ka: " << ka << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "finding coordIndex";
+    // BOOST_LOG_TRIVIAL(trace) << "ka: " << ka;
     while ((a != eob) && (strncmp(a, "coordIndex [", 12) != 0))
     {
         ++a;
@@ -196,7 +196,7 @@ void parse_triangles(primitive_list &prim, std::list<material *> &m, const std::
 
     if (a != eob)
     {
-//        std::cout << "coordIndex found" << std::endl;
+//        BOOST_LOG_TRIVIAL(trace) << "coordIndex found";
         do 
         {
             /* Parse the vertex data */
@@ -215,18 +215,18 @@ void parse_triangles(primitive_list &prim, std::list<material *> &m, const std::
             std::vector<triangle *> *t = nullptr;
             new_triangle(&prim, t, cur_mat, p[va], p[vb], p[vc], false);
         
-//            std::cout << va << ", " << vb << ", " << vc << std::endl;
+//            BOOST_LOG_TRIVIAL(trace) << va << ", " << vb << ", " << vc;
         } while (!group_done(a));
     }
 
-//    std::cout << "end of coordIndex" << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "end of coordIndex";
     return;
 }
 
 
 void parse_colours(std::vector<ext_colour_t> *c, const char *a, const char *eob)
 {
-    std::cout << "finding colours" << std::endl;
+    // BOOST_LOG_TRIVIAL(trace) << "finding colours";
     while ((a != eob) && (strncmp(a, "color [", 7) != 0))
     {
         ++a;
@@ -234,7 +234,7 @@ void parse_colours(std::vector<ext_colour_t> *c, const char *a, const char *eob)
 
     if (a != eob)
     {
-        std::cout << "colours found" << std::endl;
+        // BOOST_LOG_TRIVIAL(trace) << "colours found";
         do 
         {
             find_next_line(&a);
@@ -246,7 +246,7 @@ void parse_colours(std::vector<ext_colour_t> *c, const char *a, const char *eob)
         } while (!group_done(a));
     }
 
-    std::cout << "end of colours" << std::endl;
+    // BOOST_LOG_TRIVIAL(trace) << "end of colours";
     return;
 }
 
