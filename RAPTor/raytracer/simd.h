@@ -223,6 +223,11 @@ class vfp_t
 
 } __attribute__ ((aligned(16)));//ALIGN(16);
 
+/* Degugging */
+inline std::ostream& operator<<(std::ostream &os, const vfp_t &v)
+{
+    return os << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3];
+}
 
 /* Friendly operators */
 /* Binary operators */
@@ -658,6 +663,11 @@ class vint_t
 
 } __attribute__ ((aligned(16)));//ALIGN(16);
 
+/* Degugging */
+inline std::ostream& operator<<(std::ostream &os, const vint_t &v)
+{
+    return os << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3];
+}
 
 /* Friendly operators */
 /* Binary operators */

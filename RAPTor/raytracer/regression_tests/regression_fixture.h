@@ -29,9 +29,11 @@
 #include "raytracer.h"
 #include "kd_tree.h"
 #include "bih.h"
+#include "bvh.h"
 
 /* Test headers */
 #include "regression_checker.h"
+
 
 namespace raptor_raytracer
 {
@@ -56,6 +58,13 @@ struct log_statement<bih>
 {
     static std::string build_time()     { return "4 - BIH"; }
     static std::string render_time()    { return "5 - BIH"; }
+};
+
+template <>
+struct log_statement<bvh>
+{
+    static std::string build_time()     { return "8 - BVH"; }
+    static std::string render_time()    { return "9 - BVH"; }
 };
 
 template <>

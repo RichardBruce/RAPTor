@@ -10,9 +10,9 @@ namespace raptor_raytracer
 {
 const float ambiant_light = 0.5f;
 
-const char * find_next_statement(const char *at)
+const char * find_next_statement(const char *at, const char *const end)
 {
-    while (true)
+    while (at < end)
     {
         /* Skip comments */
         if (*at == '#')
@@ -34,6 +34,8 @@ const char * find_next_statement(const char *at)
             return at;
         }
     }
+
+    return at;
 }
 
 
@@ -270,7 +272,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
     /* Parse the file */
     while (at < &buffer[len - 1])
     {
-        at = find_next_statement(at);
+        at = find_next_statement(at, &buffer[len - 1]);
         if (at >= &buffer[len - 1])
         {
             break;
@@ -782,7 +784,7 @@ void obj_parser(
     /* Parse the file */
     while (at < &buffer[len - 1])
     {
-        at = find_next_statement(at);
+        at = find_next_statement(at, &buffer[len - 1]);
         if (at >= &buffer[len - 1])
         {
             break;

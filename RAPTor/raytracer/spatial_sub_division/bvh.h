@@ -1,5 +1,5 @@
-#ifndef __BIH_H__
-#define __BIH_H__
+#ifndef __BVH_H__
+#define __BVH_H__
 
 /* Standard headers */
 #include <vector>
@@ -31,7 +31,7 @@ class bvh : public ssd
             bvh_node::set_primitives(&everything);
 
             /* Build the heirarchy */
-            _builder.build(&everything, _bvh_base.get());
+            _root_node = _builder.build(&everything, _bvh_base.get());
         }
 
         /* Copy CTOR */
@@ -43,7 +43,6 @@ class bvh : public ssd
         /* Traversal functions */
 #ifdef SIMD_PACKET_TRACING
         /* SIMD BIH traversal */
-
         void        frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const override;
         void        frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, const unsigned int size) const override;
 
@@ -63,29 +62,28 @@ class bvh : public ssd
             vfp_t   vt_max;
             vfp_t   vt_min;
 #endif
-            point_t u;
-            point_t l;
             float   t_max;
             float   t_min;
             int     idx;
         };
 
 #ifdef SIMD_PACKET_TRACING
-        inline int  find_leaf_node(const frustrum &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, unsigned int size) const;
-        inline bool find_leaf_node(const packet_ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const vfp_t *const i_rd) const;
+        inline int  find_leaf_node(const frustrum &r, bvh_stack_element *const entry_point, bvh_stack_element **const out) const;
+        inline bool find_leaf_node(const packet_ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const vfp_t *const i_rd, const vfp_t &t_max) const;
 
         void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h,
                                         bvh_stack_element entry_point, bvh_stack_element *exit_point) const;
         vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t, bvh_stack_element entry_point, bvh_stack_element *exit_point) const;
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
-        inline bool find_leaf_node(const ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const point_t &i_rd) const;
+        inline bool find_leaf_node(const ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const point_t &i_rd, const float t_max) const;
 
         /* The stack is mutable because it will never be known to a user of this class */
         mutable bvh_stack_element               _bvh_stack[MAX_BVH_STACK_HEIGHT];
         bvh_builder                             _builder;
         std::shared_ptr<std::vector<bvh_node>>  _bvh_base;
+        int                                     _root_node;
 };
 }; /* namespace raptor_raytracer */
 
-#endif /* #ifndef __BIH_H__ */
+#endif /* #ifndef __BVH_H__ */

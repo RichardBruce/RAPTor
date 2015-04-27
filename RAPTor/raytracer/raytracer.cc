@@ -465,7 +465,7 @@ void ray_trace_engine::ray_trace_one_packet(const int x, const int y) const
     
     /* Ray trace the packet */
     ext_colour_t pixel_colour[MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
-    this->ray_trace(r, &pixel_colour[0], packet_ray_to_pixel_lut, MAXIMUM_PACKET_SIZE);
+    ray_trace(r, &pixel_colour[0], packet_ray_to_pixel_lut, MAXIMUM_PACKET_SIZE);
     
     /* Saturate the colour and output */
     for (int i = 0; i < (std::sqrt(MAXIMUM_PACKET_SIZE * SIMD_WIDTH)); ++i)
@@ -491,7 +491,7 @@ inline void ray_trace_engine::ray_trace_one_pixel(const int x, const int y) cons
 
     /* Work on the pixel as a float and then saturate back to an unsigned char */
     ext_colour_t pixel_colour;
-    this->ray_trace(ray_0, &pixel_colour);
+    ray_trace(ray_0, &pixel_colour);
 
     /* Saturate colours and save output */
     this->c.set_pixel(pixel_colour, x, y);
