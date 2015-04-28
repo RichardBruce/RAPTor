@@ -36,7 +36,7 @@ class bvh_builder
         void build_layer_primitive(int *const cost_b, int *const cost_e, const int b, const int e, axis_t axis = axis_t::x_axis);
         void combine_nodes(int *const cost_b, int *const cost_e, const int layer_size, const int cost_begin, const int cost_m, int cost_end, const int cost_start_idx);
 
-        void dump_cost() const;
+        // void dump_cost() const;
 
         primitive_list *                _primitives;
         primitive_list                  _prim_buffer;

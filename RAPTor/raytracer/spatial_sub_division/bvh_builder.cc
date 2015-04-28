@@ -565,30 +565,30 @@ void bvh_builder::combine_nodes(int *const cost_b, int *const cost_e, const int 
     *cost_b = cost_begin;
 }
 
-void bvh_builder::dump_cost() const
-{
-    std::cout << "         ";
-    for (int i = 0; i < std::min(_rows, static_cast<int>(_cost_addrs.size())); ++i)
-    {
-        std::cout << std::setprecision(4) << std::setw(9) << _cost_addrs[i] << ", ";
-    }
-    std::cout << std::endl;
+// void bvh_builder::dump_cost() const
+// {
+//     std::cout << "         ";
+//     for (int i = 0; i < std::min(_rows, static_cast<int>(_cost_addrs.size())); ++i)
+//     {
+//         std::cout << std::setprecision(4) << std::setw(9) << _cost_addrs[i] << ", ";
+//     }
+//     std::cout << std::endl;
 
-    int mat_idx = 0;
-    for (int i = 0; i < std::min(_rows, static_cast<int>(_cost_addrs.size())); ++i)
-    {
-        std::cout << "(" << std::setw(6) << mat_idx << ") ";
-        for (int j = 0; j <= i; ++j)
-        {
-            std::cout << "           ";
-        }
+//     int mat_idx = 0;
+//     for (int i = 0; i < std::min(_rows, static_cast<int>(_cost_addrs.size())); ++i)
+//     {
+//         std::cout << "(" << std::setw(6) << mat_idx << ") ";
+//         for (int j = 0; j <= i; ++j)
+//         {
+//             std::cout << "           ";
+//         }
 
-        for (int j = i + 1; j < std::min(_rows, static_cast<int>(_cost_addrs.size())); ++j)
-        {
-            std::cout << std::setprecision(4) << std::setw(9) << _cost_matrix[mat_idx++] << ", ";
-        }
-        std::cout << "(" << (mat_idx - 1) << ")" << std::endl;
-        mat_idx += (_rows - std::min(_rows, static_cast<int>(_cost_addrs.size())));
-    }
-}
+//         for (int j = i + 1; j < std::min(_rows, static_cast<int>(_cost_addrs.size())); ++j)
+//         {
+//             std::cout << std::setprecision(4) << std::setw(9) << _cost_matrix[mat_idx++] << ", ";
+//         }
+//         std::cout << "(" << (mat_idx - 1) << ")" << std::endl;
+//         mat_idx += (_rows - std::min(_rows, static_cast<int>(_cost_addrs.size())));
+//     }
+// }
 }; /* namespace raptor_raytracer */
