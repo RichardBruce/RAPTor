@@ -26,7 +26,7 @@ class bvh : public ssd
         /* CTOR */
         // cppcheck-suppress uninitMemberVar
         bvh(primitive_list &everything, const int max_node_size = MAX_BVH_NODE_SIZE) :
-        _builder(), _bvh_base(new std::vector<bvh_node>())
+        _builder(), _bvh_base(new std::vector<bvh_node>()), _root_node(0)
         {
             bvh_node::set_primitives(&everything);
 
@@ -35,7 +35,7 @@ class bvh : public ssd
         }
 
         /* Copy CTOR */
-        bvh(const bvh&b) : _bvh_base(b._bvh_base) {  }
+        bvh(const bvh&b) : _bvh_base(b._bvh_base), _root_node(0) {  }
 
         /* Assignment prohibited by base class */
         /* Allow default DTOR */
