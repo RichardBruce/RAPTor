@@ -21,7 +21,7 @@ class bvh_builder
     public :
         /* alpha = 0.4, delta = 20 should give a high quality build */
         /* alpha = 0.3, delta = 4 should give a faster, low quality, build */
-        bvh_builder(const float alpha = 0.4f, const float delta = 20.0f, const int max_node_size = MAX_BVH_NODE_SIZE, const int max_down_phase_depth = 30) :
+        bvh_builder(const float alpha = 0.4f, const float delta = 20.0f, const int max_node_size = MAX_BVH_NODE_SIZE, const int max_down_phase_depth = 35) :
         _primitives(nullptr), _nodes(nullptr), _alpha(alpha), _epsilon(1e-8f), _delta(delta), _max_node_size(max_node_size), _max_down_phase_depth(max_down_phase_depth), _depth(0), _rows(0), _next_node(0) {  }
 
         int build(primitive_list *const primitives, std::vector<bvh_node> *const nodes);
@@ -30,6 +30,7 @@ class bvh_builder
         int reduction_function(const int n) const;
         int start_index(const int col) const;
         float cost_function(const bvh_node &l, const bvh_node &r) const;
+        float cost_function(const triangle *const l, const point_t &low, const point_t &high) const;
 
         void build_leaf_node(int *const cost_b, int *const cost_e, const int b, const int e, const int node_size);
         void build_layer(int *const cost_b, int *const cost_e, const int b, const int e);

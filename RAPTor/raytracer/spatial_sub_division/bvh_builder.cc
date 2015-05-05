@@ -12,6 +12,7 @@
 namespace raptor_raytracer
 {
 const int histogram_size = 1024;
+float max_leaf_sa;
 
 /* Build a Bounding Volumne Heirarchy for _primitives into nodes */
 int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *const nodes)
@@ -29,6 +30,7 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     /* Calculate Morton codes and build histograms */
     const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
     const float width_inv = 1.0f / (std::max(std::max(scene_width.x, scene_width.y), scene_width.z) * (1.00001f / 1024.0f));
+    max_leaf_sa = ((scene_width.x * scene_width.y) + (scene_width.x *  scene_width.z) + (scene_width.y * scene_width.z)) * 0.001f;
 
     unsigned int hist0[histogram_size * 3];
     unsigned int *hist1 = hist0 + histogram_size;
@@ -174,6 +176,18 @@ float bvh_builder::cost_function(const bvh_node &l, const bvh_node &r) const
     return l.combined_surface_area(r);
 }
 
+float bvh_builder::cost_function(const triangle *const l, const point_t &low, const point_t &high) const
+{
+    /* Size of combined node */
+    const point_t bl(min(low, l->lowest_point()));
+    const point_t tr(max(high, l->highest_point()));
+
+    /* Edges of new node */
+    const point_t dist(tr - bl);
+
+    return (dist.x * dist.y) + (dist.x * dist.z) + (dist.y * dist.z);
+}
+
 int bvh_builder::start_index(const int col) const
 {
     /* Work out the address to the nearest even row */
@@ -225,38 +239,90 @@ void bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const in
         assert(from_idx < 0);
     }
 
-    if (_depth == _max_down_phase_depth)
-    {
-        /* Bound all primitives */
-        point_t low(  MAX_DIST,  MAX_DIST,  MAX_DIST);
-        point_t high(-MAX_DIST, -MAX_DIST, -MAX_DIST);
-        for (int i = b; i < e; ++i)
-        {
-            low     = min(low, (*_primitives)[i]->lowest_point());
-            high    = max(high, (*_primitives)[i]->highest_point());
-        }
+    // if (_depth == _max_down_phase_depth)
+    // {
+    //     /* Bound all primitives */
+    //     point_t low(  MAX_DIST,  MAX_DIST,  MAX_DIST);
+    //     point_t high(-MAX_DIST, -MAX_DIST, -MAX_DIST);
+    //     for (int i = b; i < e; ++i)
+    //     {
+    //         low     = min(low, (*_primitives)[i]->lowest_point());
+    //         high    = max(high, (*_primitives)[i]->highest_point());
+    //     }
 
-        /* Reserve space in cost address */
-        const int node_idx = _next_node++;
-        *cost_b = _cost_addrs.size();
-        _cost_addrs.push_back(node_idx);
-        *cost_e = _cost_addrs.size();
+    //     /* Reserve space in cost address */
+    //     const int node_idx = _next_node++;
+    //     *cost_b = _cost_addrs.size();
+    //     _cost_addrs.push_back(node_idx);
+    //     *cost_e = _cost_addrs.size();
 
-        (*_nodes)[node_idx].create_leaf_node(high, low, b, e);
-        return;
-    }
+    //     (*_nodes)[node_idx].create_leaf_node(high, low, b, e);
+    //     return;
+    // }
 
     /* Add new nodes */
     const int start_idx = start_index(_cost_addrs.size());
     *cost_b = _cost_addrs.size();
-    for (int i = b; i < e; ++i)
+    // for (int i = b; i < e; ++i)
+    // {
+    //     /* Reserve space in cost address */
+    //     const int node_idx = _next_node++;
+    //     _cost_addrs.push_back(node_idx);
+
+    //      Build node 
+    //     (*_nodes)[node_idx].create_leaf_node((*_primitives)[i]->highest_point(), (*_primitives)[i]->lowest_point(), i, i + 1);
+    // }
+    // for (int i = b; i < e; )
+    // {
+    //     int node_end = i + 1;
+    //     point_t low((*_primitives)[i]->lowest_point());
+    //     point_t high((*_primitives)[i]->highest_point());
+    //     for (; node_end < e; ++node_end)
+    //     {
+    //         if (cost_function((*_primitives)[i], (*_primitives)[node_end]) > max_leaf_sa)
+    //         {
+    //             break;
+    //         }
+    //         else
+    //         {
+    //             low     = min(low, (*_primitives)[node_end]->lowest_point());
+    //             high    = max(high, (*_primitives)[node_end]->highest_point());
+    //         }
+    //     }
+    //     /* Reserve space in cost address */
+    //     const int node_idx = _next_node++;
+    //     _cost_addrs.push_back(node_idx);
+
+    //     /* Build node */
+    //     (*_nodes)[node_idx].create_leaf_node(high, low, i, node_end);
+    //     i = node_end;
+    // }
+    for (int i = b; i < e; )
     {
+        int node_end = i + 1;
+        int layer_top = e;
+        point_t low((*_primitives)[i]->lowest_point());
+        point_t high((*_primitives)[i]->highest_point());
+        while (node_end < layer_top)
+        {
+            if (cost_function((*_primitives)[node_end], low, high) > max_leaf_sa)
+            {
+                std::swap((*_primitives)[node_end], (*_primitives)[--layer_top]);
+            }
+            else
+            {
+                low     = min(low, (*_primitives)[node_end]->lowest_point());
+                high    = max(high, (*_primitives)[node_end]->highest_point());
+                ++node_end;
+            }
+        }
         /* Reserve space in cost address */
         const int node_idx = _next_node++;
         _cost_addrs.push_back(node_idx);
 
         /* Build node */
-        (*_nodes)[node_idx].create_leaf_node((*_primitives)[i]->highest_point(), (*_primitives)[i]->lowest_point(), i, i + 1);
+        (*_nodes)[node_idx].create_leaf_node(high, low, i, node_end);
+        i = node_end;
     }
 
     *cost_e = _cost_addrs.size();
@@ -277,7 +343,7 @@ void bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const in
         assert(row_idx >= 0);
     }
 
-    combine_nodes(cost_b, cost_e, reduction_function(std::max(node_size, static_cast<int>(_delta))), cost_begin, cost_end, cost_end, start_idx);
+    combine_nodes(cost_b, cost_e, reduction_function(std::max(cost_end - cost_begin, static_cast<int>(_delta))), cost_begin, cost_end, cost_end, start_idx);
 }
 
 void bvh_builder::build_layer(int *const cost_b, int *const cost_e, const int b, const int e)
@@ -295,7 +361,7 @@ void bvh_builder::build_layer(int *const cost_b, int *const cost_e, const int b,
     }
     else if (_depth == _max_down_phase_depth)
     {
-        build_leaf_node(cost_b, cost_e, b, e, 1);
+        build_leaf_node(cost_b, cost_e, b, e, node_size);
         --_depth;
         return;
     }
@@ -362,7 +428,7 @@ void bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, co
     }
     else if (_depth == _max_down_phase_depth)
     {
-        build_leaf_node(cost_b, cost_e, b, e, 1);
+        build_leaf_node(cost_b, cost_e, b, e, node_size);
         --_depth;
         return;
     }
