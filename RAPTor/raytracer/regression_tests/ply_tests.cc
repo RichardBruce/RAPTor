@@ -29,6 +29,10 @@ BOOST_AUTO_TEST_CASE( ply_bun_zipper_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
@@ -47,6 +51,10 @@ BOOST_AUTO_TEST_CASE( ply_bun_zipper_res2_test )
     regression_fixture fixture("/ply_scenes/bunny/bun_zipper_res2.ply", model_format_t::ply, point_t(-0.12, 0.29, 0.28), point_t(0.960294, 0.06086, 0.272272), point_t(0.0945048, 0.847262, -0.522701), point_t(  0.262497, -0.527678, -0.807869), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -67,6 +75,10 @@ BOOST_AUTO_TEST_CASE( ply_bun_zipper_res3_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
@@ -85,6 +97,10 @@ BOOST_AUTO_TEST_CASE( ply_bun_zipper_res4_test )
     regression_fixture fixture("/ply_scenes/bunny/bun_zipper_res4.ply", model_format_t::ply, point_t(-0.12, 0.29, 0.28), point_t(0.960294, 0.06086, 0.272272), point_t(0.0945048, 0.847262, -0.522701), point_t(  0.262497, -0.527678, -0.807869), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -105,6 +121,10 @@ BOOST_AUTO_TEST_CASE( ply_dragon_vrip_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
@@ -123,6 +143,10 @@ BOOST_AUTO_TEST_CASE( ply_dragon_vrip_res2_test )
     regression_fixture fixture("/ply_scenes/dragon/dragon_vrip_res2.ply", model_format_t::ply, point_t(-0.12, 0.29, 0.25), point_t(0.960294, 0.06086, 0.272272), point_t(0.0945048, 0.847262, -0.522701), point_t(0.262497, -0.527678, -0.807869), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -143,6 +167,10 @@ BOOST_AUTO_TEST_CASE( ply_dragon_vrip_res3_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
@@ -161,6 +189,10 @@ BOOST_AUTO_TEST_CASE( ply_dragon_vrip_res4_test )
     regression_fixture fixture("/ply_scenes/dragon/dragon_vrip_res4.ply", model_format_t::ply, point_t(-0.12, 0.29, 0.25), point_t(0.960294, 0.06086, 0.272272), point_t(0.0945048, 0.847262, -0.522701), point_t(0.262497, -0.527678, -0.807869), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -181,6 +213,10 @@ BOOST_AUTO_TEST_CASE( ply_happy_vrip_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
@@ -199,6 +235,10 @@ BOOST_AUTO_TEST_CASE( ply_happy_vrip_res2_test )
     regression_fixture fixture("/ply_scenes/happy_budha/happy_vrip_res2.ply", model_format_t::ply, point_t(-0.08, 0.3, 0.2), point_t(0.184456, 0.849229, -0.494759), point_t(0.947139, 0.0191441, -0.320253), point_t(0.262497, -0.527678, -0.807869), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -219,6 +259,10 @@ BOOST_AUTO_TEST_CASE( ply_happy_vrip_res3_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
@@ -237,6 +281,10 @@ BOOST_AUTO_TEST_CASE( ply_happy_vrip_res4_test )
     regression_fixture fixture("/ply_scenes/happy_budha/happy_vrip_res4.ply", model_format_t::ply, point_t(-0.08, 0.3, 0.2), point_t(0.184456, 0.849229, -0.494759), point_t(0.947139, 0.0191441, -0.320253), point_t(0.262497, -0.527678, -0.807869), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -257,6 +305,10 @@ BOOST_AUTO_TEST_CASE( ply_armadillo_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(500.0,   0.0,  -100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(  0.0, 100.0, -5000.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
@@ -275,6 +327,10 @@ BOOST_AUTO_TEST_CASE( ply_drill_shaft_vrip_test )
     regression_fixture fixture("/ply_scenes/drill/drill_shaft_vrip.ply", model_format_t::ply, point_t(-0.06, 0.18, 0.08), point_t(0.754168, -0.00684085, 0.656646), point_t(0.332036, 0.866678, -0.37232), point_t(0.566554, -0.498822, -0.655892), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t( 0.0, 100.0,   1.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -295,6 +351,10 @@ BOOST_AUTO_TEST_CASE( ply_drill_shaft_zip_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t( 0.0, 100.0,   1.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
@@ -313,6 +373,10 @@ BOOST_AUTO_TEST_CASE( ply_xyzrgb_dragon_test )
     regression_fixture fixture("/ply_scenes/xyzrgb_dragon/xyzrgb_dragon.ply", model_format_t::ply, point_t(110.0, -50.0, -175.0), point_t(0.873063, -0.0552301, 0.48447), point_t(0.187223, 0.955376, -0.22848), point_t(-0.450232, 0.290181, 0.844444), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0,   0.0, -1000.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(  0.0, 500.0,   100.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -333,6 +397,10 @@ BOOST_AUTO_TEST_CASE( ply_xyzrgb_manuscript_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0,   0.0, -1000.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(  0.0, 500.0,   100.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
@@ -351,6 +419,10 @@ BOOST_AUTO_TEST_CASE( ply_xyzrgb_statuette_test )
     regression_fixture fixture("/ply_scenes/xyzrgb_statuette/xyzrgb_statuette.ply", model_format_t::ply, point_t(-15.0, 10.0, -500.0), point_t(0.000986636, 0.999507, 0.0313953), point_t(0.999507, 0.0, -0.0314108), point_t(0.0313953, -0.0314108, 0.999013), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0,   0.0, -1000.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(  0.0, 500.0,   100.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -371,6 +443,10 @@ BOOST_AUTO_TEST_CASE( ply_blade_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0,   0.0, -1000.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(  0.0, 500.0,   100.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
@@ -389,6 +465,10 @@ BOOST_AUTO_TEST_CASE( ply_hand_test )
     regression_fixture fixture("/ply_scenes/hand/hand.ply", model_format_t::ply, point_t(4.78399, 2.74896, -10.0388), point_t(0.12625, 0.991625, 0.0272109), point_t(0.987618, 0.12822, -0.0903884), point_t(-0.0931204, -0.0154624, 0.995535), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0,   0.0, -1000.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(  0.0, 500.0,   100.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -409,9 +489,13 @@ BOOST_AUTO_TEST_CASE( ply_lucy_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0,   0.0, -1000.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(  0.0, 500.0,   100.0), 0.0, 10.0);
 
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
+
     /* Ray trace the scene using kd tree */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
     fixture.render<bih>();
@@ -427,6 +511,10 @@ BOOST_AUTO_TEST_CASE( ply_horse_test )
     regression_fixture fixture("/ply_scenes/horse/horse.ply", model_format_t::ply, point_t(-0.252297, 0.074832, 0.11), point_t(0.298892, 0.953555, -0.0373727), point_t(0.364136, -0.0777636, 0.928094), point_t(0.882082, -0.291008, -0.370466), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-100.0, 100.0, 200.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(   0.0, -50.0, 100.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
@@ -447,6 +535,10 @@ BOOST_AUTO_TEST_CASE( ply_happy_vrip_res4_low_res_test )
     regression_fixture fixture("/ply_scenes/happy_budha/happy_vrip_res4.ply", model_format_t::ply, point_t(-0.08, 0.3, 0.2), point_t(0.184456, 0.849229, -0.494759), point_t(0.947139, 0.0191441, -0.320253), point_t(0.262497, -0.527678, -0.807869), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 640, 480);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0,   1.0, 100.0), 0.0, 10.0);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 100.0,   1.0), 0.0, 10.0);
+
+    /* Ray trace the scene using bvh */
+    fixture.render<bvh>();
+    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();

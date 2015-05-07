@@ -6,39 +6,54 @@
 
 namespace raptor_raytracer
 {
-void coloured_mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
+void coloured_mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t *const n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
     {
-        r.generate_rays_to_light(i, n, h, l);
+        r.generate_rays_to_light(i, h, l);
     }
     
     /* Request reflections */
-    rl->number(i.reflect(rl->rays(), n, this->rf, this->rfd));
+    float cur_rf = this->rf;
+    if (this->t_refl != nullptr)
+    {
+        ext_colour_t tmp;
+        this->t_refl->texture_map(i, &tmp, *n, vt);
+        cur_rf = tmp.r * (this->rf * (1.0f / 255.0f));
+    }
+    rl->number(i.reflect(rl->rays(), *n, cur_rf, this->rfd));
     
     /* Request refractions */
-    rf->number(i.refract(rf->rays(), n, this->tran, this->ri, h, this->td));
+    float cur_tran = this->tran;
+    if (this->t_d != nullptr)
+    {
+        ext_colour_t tmp;
+        this->t_d->texture_map(i, &tmp, *n, vt);
+        cur_tran = tmp.r * (this->tran * (1.0f / 255.0f));
+    }
+    rf->number(i.refract(rf->rays(), *n, cur_tran, this->ri, h, this->td));
 
     return;
 }
 
 
-void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const
+void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const
 {
     /* Get the materials ns */
     ext_colour_t cur_ka;
     float cur_ns = this->ns;
     if(this->t_ns != nullptr)
     {
-        cur_ns = this->t_ns->texture_map(&cur_ka, i.get_dst(), n.get_dir(), vt);
+        cur_ns = this->t_ns->texture_map(i, &cur_ka, n, vt);
+        cur_ns *= (this->ns * (1.0f / 255.0f));
     }
 
     /* Get the materials ka */
     cur_ka = this->ka;
     if(this->t_ka != nullptr)
     {
-        this->t_ka->texture_map(&cur_ka, i.get_dst(), n.get_dir(), vt);
+        this->t_ka->texture_map(i, &cur_ka, n, vt);
         cur_ka *= (this->ka * (1.0f / 255.0f));
     }
 
@@ -46,15 +61,15 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line
     ext_colour_t cur_kd = this->kd;
     if(this->t_kd != nullptr)
     {
-        this->t_kd->texture_map(&cur_kd, i.get_dst(), n.get_dir(), vt);
-        cur_kd *= (this->kd* (1.0f / 255.0f));
+        this->t_kd->texture_map(i, &cur_kd, n, vt);
+        cur_kd *= (this->kd * (1.0f / 255.0f));
     }
     
     /* Get the materials ks */
     ext_colour_t cur_ks = this->ks;
     if(this->t_ks != nullptr)
     {
-        this->t_ks->texture_map(&cur_ks, i.get_dst(), n.get_dir(), vt);
+        this->t_ks->texture_map(i, &cur_ks, n, vt);
         cur_ks *= (this->ks * (1.0f / 255.0f));
     }
 
@@ -66,7 +81,7 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line
         ray illum = r.get_illumination(l++);
 
         /* Cos(angle between normal and the ray) */
-        float shade = dot_product(illum.get_dir(), n.get_dir());
+        float shade = dot_product(illum.get_dir(), n);
         
         /* Ignore if the surface is facing away from the ray */
         if (shade < 0.0f)
@@ -75,7 +90,7 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const line
         }
         
         /* Find the reflection of the light ray */
-        point_t ref_dir = illum.get_dir() - n.get_dir() * (2.0f * shade);
+        point_t ref_dir = illum.get_dir() - n * (2.0f * shade);
     
         /* Cos(angle between refelction and the ray) */
         float ray_dot_reflection = dot_product(i.get_dir(), ref_dir);

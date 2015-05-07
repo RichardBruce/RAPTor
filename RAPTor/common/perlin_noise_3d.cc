@@ -43,7 +43,7 @@ float perlin_noise_3d::smooth_noise(const int x, const int y, const int z) const
 float perlin_noise_3d::interpolate(const float a, const float b, const float x) const
 {
     const float ft = x * PI;
-    const float f = (1.0f - cos(ft)) * 0.5f;
+    const float f = (1.0f - std::cos(ft)) * 0.5f;
 
     return  a * (1.0f - f) + b * f;
 }

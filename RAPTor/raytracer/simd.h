@@ -19,6 +19,40 @@ extern const vfp_t  index_to_mask_lut[SIMD_WIDTH];
 extern const int    mask_to_index_lut[1 << SIMD_WIDTH];
 
 
+/* Scalar functions */
+// inline float sqrt(const float rhs)
+// {
+//     return _mm_cvtss_f32(_mm_sqrt_ps(_mm_set_ss(rhs.m)));
+// }
+
+/* Use approximate inversion and added an interation of newton raphson */
+inline float inverse(const float rhs)
+{
+    const float tmp0 = _mm_cvtss_f32(_mm_rcp_ss(_mm_set_ss(rhs)));
+    const float tmp1 = (tmp0 + tmp0) - ((rhs * tmp0) * tmp0);
+    return tmp1;
+}
+
+/* Use approximate inverse square root and added an interation of newton raphson */
+inline float inverse_sqrt(const float rhs)
+{
+    const float tmp0 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(rhs)));
+    const float tmp1 = (0.5f * tmp0) * (3.0f - ((rhs * tmp0) * tmp0));
+    return tmp1;
+}
+
+/* Approximate inversion */
+inline float approx_inverse(const float rhs)
+{
+   return _mm_cvtss_f32(_mm_rcp_ss(_mm_set_ss(rhs)));
+}
+
+/* Approximate square root */
+inline float approx_inverse_sqrt(const float rhs)
+{
+   return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(rhs)));
+}
+
 class vfp_t
 {
     public :
@@ -189,6 +223,11 @@ class vfp_t
 
 } __attribute__ ((aligned(16)));//ALIGN(16);
 
+/* Degugging */
+inline std::ostream& operator<<(std::ostream &os, const vfp_t &v)
+{
+    return os << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3];
+}
 
 /* Friendly operators */
 /* Binary operators */
@@ -624,6 +663,11 @@ class vint_t
 
 } __attribute__ ((aligned(16)));//ALIGN(16);
 
+/* Degugging */
+inline std::ostream& operator<<(std::ostream &os, const vint_t &v)
+{
+    return os << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3];
+}
 
 /* Friendly operators */
 /* Binary operators */

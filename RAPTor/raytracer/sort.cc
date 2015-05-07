@@ -497,8 +497,8 @@ void radix_sort(float *const farray, float *const sorted, const int elements)
     for (int i = 0; i < elements; ++i)
     {
         float_flip_inplace(&array[i]);
-        ++hist0[ array[i]        & 0x7FF];
-        ++hist1[(array[i] >> 11) & 0x7FF];
+        ++hist0[ array[i]        & 0x7ff];
+        ++hist1[(array[i] >> 11) & 0x7ff];
         ++hist2[ array[i] >> 22         ];
     }
     

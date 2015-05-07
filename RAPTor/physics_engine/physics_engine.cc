@@ -62,7 +62,7 @@ physics_engine& physics_engine::advance_time(const float t)
         {
             for (auto& p1 : (*p0.second))
             {
-                if (p1.second->get_type() == POSSIBLE_SLIDING_COLLISION)
+                if (p1.second->get_type() == collision_t::POSSIBLE_SLIDING_COLLISION)
                 {
                     if (retest_and_cache(p0.first, p1.first, t_step))
                     {
@@ -121,7 +121,7 @@ physics_engine& physics_engine::advance_time(const float t)
         while (true) 
         {
             /* If no collisions now, then find the earliest collision and process it */
-            auto fc = std::find_if(_collision_cache->begin(), _collision_cache->end(), is_collision(NO_COLLISION, true));
+            auto fc = std::find_if(_collision_cache->begin(), _collision_cache->end(), is_collision(collision_t::NO_COLLISION, true));
             if (fc == _collision_cache->end())
             {
                 /* No more collisions to process */
@@ -131,7 +131,7 @@ physics_engine& physics_engine::advance_time(const float t)
 
             for (auto p = _collision_cache->begin(); p != _collision_cache->end(); ++p)
             {
-                if (((*p).second->get_first_collision_type() != NO_COLLISION) &&
+                if (((*p).second->get_first_collision_type() != collision_t::NO_COLLISION) &&
                     ((*p).second->get_first_collision_time() < fc->second->get_first_collision_time()))
                 {
                     fc = p;
@@ -142,7 +142,7 @@ physics_engine& physics_engine::advance_time(const float t)
             const float c_time = fc->second->get_first_collision_time();
             BOOST_LOG_TRIVIAL(info) << "Iteration time moved to: " << c_time;
             assert((c_time <= t_step) || !"Error: Stepped out the end of the times slot");
-            if (fc->second->get_first_collision_type() == SLIDING_COLLISION)
+            if (fc->second->get_first_collision_type() == collision_t::SLIDING_COLLISION)
             {
                 BOOST_LOG_TRIVIAL(info) << "Next collision is sliding, moving to next frame for contact resolution";
                 t_step = c_time;
@@ -237,7 +237,7 @@ bool physics_engine::collide_and_cache(physics_object *const vg_a, physics_objec
     simplex *simplex_b;
     float toc = t;
     collision_t collision_type = vg_a->resolve_collisions(vg_b, &simplex_a, &simplex_b, &toc);
-    if (collision_type != NO_COLLISION)
+    if (collision_type != collision_t::NO_COLLISION)
     {
         /* Update all info */
         BOOST_LOG_TRIVIAL(trace) << "Collided at: " << toc;
@@ -260,10 +260,10 @@ bool physics_engine::retest_and_cache(physics_object *const vg_a, physics_object
     simplex *simplex_b;
     float toc = t;
     collision_t collision_type = vg_a->resolve_collisions(vg_b, &simplex_a, &simplex_b, &toc);
-    if (collision_type != NO_COLLISION)
+    if (collision_type != collision_t::NO_COLLISION)
     {
         /* Retest as resting collsion means retest passed. Just update the simplices */
-        if (collision_type != POSSIBLE_COLLISION)
+        if (collision_type != collision_t::POSSIBLE_COLLISION)
         {
             update_tracking_info(vg_a, vg_b, simplex_a, *simplex_b);
             update_tracking_info(vg_b, vg_a, simplex_b, *simplex_a);

@@ -1,13 +1,18 @@
 #ifndef __PLANAR_MAPPER_H__
 #define __PLANAR_MAPPER_H__
 
+/* Standard headers */
+
 /* Boost headers */
 #include "boost/serialization/access.hpp"
+#include "boost/shared_array.hpp"
 
 /* Common headers */
 #include "common.h"
+#include "logging.h"
 #include "point_t.h"
 #include "texture_mapper.h"
+
 
 namespace raptor_raytracer
 {
@@ -15,90 +20,29 @@ namespace raptor_raytracer
 class ext_colour_t;
 
 /* Pure virtual class for material data and shading */
-class planar_mapper : public texture_mapper
+class planar_mapper : public image_texture_mapper
 {
     public :
-        planar_mapper(const float *const im, const point_t &c, const point_t &n, const point_t &s, 
-                      const unsigned cpp, const unsigned w, const unsigned h, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
-                      const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1) : 
-            texture_mapper(), c(c), n(n), u(point_t(n.y, n.z, -n.x)), s(s), uw(uw), vw(vw), img(im), h(h), w(w), cpp(cpp),
-            u_off(u_off), v_off(v_off)
+        planar_mapper(const boost::shared_array<float> &img, const point_t &c, const point_t &n, const point_t &s, 
+              const unsigned cpp, const unsigned w, const unsigned h, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
+              const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1) : 
+                image_texture_mapper(img, c, s, point_t(n.y + n.z, 0.0f, n.x), point_t(0.0f, n.x + n.z, n.y), 1.0f / static_cast<float>(w), 1.0f / static_cast<float>(h), w, h, cpp, uw, vw, u_off, v_off, u_max, v_max), _n(n)
             {
-                assert((this->cpp == 1) || (this->cpp == 3));
-                
-                if (u_max < 0)
-                {
-                    this->u_max = w;
-                }
-                else
-                {
-                    this->u_max = u_max;
-                }
-
-                if (v_max < 0)
-                {
-                    this->v_max = h;
-                }
-                else
-                {
-                    this->v_max = v_max;
-                }
-
-                /* Find the V vector */
-                if (n.x)
-                {
-                    this->u = point_t(0.0,0.0,-1.0);
-                }
-                else if (n.y)
-                {
-                    this->u = point_t(-1.0,0.0,0.0);
-                }
-                else
-                {
-                    this->u = point_t(1.0,0.0,0.0);
-                }
-                
-                cross_product(this->u, n, &this->v);
-                this->u = -this->u;
-//                cout << "u vec: " << this->u.x << ", " << this->u.y << ", " << this->u.z << endl;
-//                cout << "v vec: " << this->v.x << ", " << this->v.y << ", " << this->v.z << endl;
+                // BOOST_LOG_TRIVIAL(trace) << "n vec: " << _n;
+                // BOOST_LOG_TRIVIAL(trace) << "u vec: " << _u;
+                // BOOST_LOG_TRIVIAL(trace) << "v vec: " << _v;
             };
 
-        planar_mapper(const float *const im, const point_t &u, const point_t &v, const point_t &c, const point_t &n, const point_t &s, 
+        planar_mapper(const boost::shared_array<float> &img, const point_t &u, const point_t &v, const point_t &c, const point_t &n, const point_t &s, 
             const unsigned cpp, const unsigned w, const unsigned h, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
-            const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1)
-            : texture_mapper(), c(c), n(n), u(u), s((u * s.x) + (v * s.y) + (n * s.z)), uw(uw), vw(vw), v(v), img(im), h(h), w(w), cpp(cpp),
-              u_off(u_off), v_off(v_off)
-            { 
-                assert((this->cpp == 1) || (this->cpp == 3));
+            const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1) :
+                image_texture_mapper(img, c, point_t((u * s.x) + (v * s.y) + (n * s.z)), u, v, 1.0f / static_cast<float>(w), 1.0f / static_cast<float>(h), w, h, cpp, uw, vw, u_off, v_off, u_max, v_max), _n(n)
+            {  };
 
-                if (u_max < 0)
-                {
-                    this->u_max = w;
-                }
-                else
-                {
-                    this->u_max = u_max;
-                }
-
-                if (v_max < 0)
-                {
-                    this->v_max = h;
-                }
-                else
-                {
-                    this->v_max = v_max;
-                }
-            };
-
-        virtual ~planar_mapper()
-        {
-            delete [] img;
-        };
-
-        /* Texture mapping function. Takes the destination and direction 
-           of the incident ray and returns either a float (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        float texture_map(ext_colour_t *const c, const point_t &dst, const point_t &n, const point_t &vt) const;
+        virtual ~planar_mapper() { };
+    
+    protected :
+        void texture_coordinates(float *const u_co, float *const v_co, const point_t &dst, const point_t &n) const override;
 
     private :
         friend class boost::serialization::access;
@@ -107,21 +51,7 @@ class planar_mapper : public texture_mapper
         template<class Archive>
         void serialize(Archive &ar, const unsigned int version) { }
 
-        const point_t                   c;      /* Center of the texture                */
-        const point_t                   n;      /* Normal of the texture                */
-        point_t                         u;      /* U vector in the plane of the texture */
-        const point_t                   s;      /* Size of the texture                  */
-        const texture_wrapping_mode_t   uw;     /* U wrapping mode                      */
-        const texture_wrapping_mode_t   vw;     /* V wrapping mode                      */
-        point_t                         v;      /* V vector in the plane of the texture */
-        const float               *const img;    /* Image data                           */
-        unsigned                        h;      /* Image height                         */
-        unsigned                        w;      /* Image width                          */
-        unsigned                        cpp;    /* Componants per pixel                 */
-        const int                       u_off;  /* U offset to be added to every pixel  */
-        const int                       v_off;  /* V offset to be added to every pixel  */
-        unsigned                        u_max;  /* Max u value for early wrapping       */
-        unsigned                        v_max;  /* Max v value for early wrapping       */
+        const point_t   _n; /* Normal of the texture    */
 };
 }; /* namespace raptor_raytracer */
 
@@ -130,32 +60,35 @@ namespace serialization {
 template<class Archive>
 inline void save_construct_data(Archive & ar, const raptor_raytracer::planar_mapper *t, const unsigned int file_version)
 {
-    ar << t->c;
-    ar << t->n;
-    ar << t->u;
-    ar << t->s;
-    ar << t->uw;
-    ar << t->vw;
-    ar << t->v;
-    ar << t->img;
-    ar << t->h;
-    ar << t->w;
-    ar << t->cpp;
-    ar << t->u_off;
-    ar << t->v_off;
-    ar << t->u_max;
-    ar << t->v_max;
+    ar << t->falloff();
+    ar << t->_c;
+    ar << t->_n;
+    ar << t->_u;
+    ar << t->_s;
+    ar << t->_uw;
+    ar << t->_vw;
+    ar << t->_v;
+    ar << t->_img;
+    ar << t->_h;
+    ar << t->_w;
+    ar << t->_cpp;
+    ar << t->_u_off;
+    ar << t->_v_off;
+    ar << t->_u_max;
+    ar << t->_v_max;
 }
 
 template<class Archive>
 inline void load_construct_data(Archive & ar, raptor_raytracer::planar_mapper *t, const unsigned int file_version)
 {
     /* Retreive the fields */
+    raptor_raytracer::mapper_falloff *falloff;
     point_t c, n, u, s, v;
     raptor_raytracer::texture_wrapping_mode_t uw, vw;
     float *img;
     unsigned h, w, cpp, u_max, v_max;
     int u_off, v_off;
+    ar >> falloff;
     ar >> c;
     ar >> n;
     ar >> u;
@@ -173,7 +106,8 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::planar_mapper *t
     ar >> v_max;
     
     /* Use plaement new to create the class */
-    ::new(t)raptor_raytracer::planar_mapper(img, u, v, c, n, s, cpp, w, h, uw, vw, u_off, v_off, u_max, v_max);
+    ::new(t)raptor_raytracer::planar_mapper(boost::shared_array<float>(img), u, v, c, n, s, cpp, w, h, uw, vw, u_off, v_off, u_max, v_max);
+    t->falloff(falloff);
 }
 }; /* namespace serialization */
 }; /* namespace boost */

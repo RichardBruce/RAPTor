@@ -10,8 +10,6 @@
 
 namespace raptor_raytracer
 {
-//enum frustrum_dir_t { forward = 0, backward = 1 };
-
 /* Frustrum class to represent an array of rays by proxy */
 class frustrum
 {
@@ -79,22 +77,22 @@ class frustrum
             {
                 if (fabs(_x_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 0 + ((int)(_x_data[3] < 0.0f) << 2);
+                    this->n = 0 + (static_cast<int>(_x_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
+                    this->n = 2 + (static_cast<int>(_z_data[3] < 0.0f) << 2);
                 }
             }
             else
             {
                 if (fabs(_y_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 1 + ((int)(_y_data[3] < 0.0f) << 2);
+                    this->n = 1 + (static_cast<int>(_y_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
+                    this->n = 2 + (static_cast<int>(_z_data[3] < 0.0f) << 2);
                 }
             }
 
@@ -150,22 +148,22 @@ class frustrum
             {
                 if (fabs(_x_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 0 + ((int)(_x_data[3] < 0.0f) << 2);
+                    this->n = 0 + (static_cast<int>(_x_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
+                    this->n = 2 + (static_cast<int>(_z_data[3] < 0.0f) << 2);
                 }
             }
             else
             {
                 if (fabs(_y_data[3]) < fabs(_z_data[3]))
                 {
-                    this->n = 1 + ((int)(_y_data[3] < 0.0f) << 2);
+                    this->n = 1 + (static_cast<int>(_y_data[3] < 0.0f) << 2);
                 }
                 else
                 {
-                    this->n = 2 + ((int)(_z_data[3] < 0.0f) << 2);
+                    this->n = 2 + (static_cast<int>(_z_data[3] < 0.0f) << 2);
                 }
             }
 
@@ -339,32 +337,56 @@ class frustrum
             /* Exclude the triangle if all vertices are on one side of the beam */
             return (move_mask(d0 & d1 & d2) != 0);
         }
+
+        /* Frustrum-aabb culling */
+        bool cull(const point_t &low, const point_t &high) const
+        {
+            /* I0 - prevalent beam axis */
+            const int I0 = this->n & 0x3;
+            const int I1 = mod_3_lut[I0 + 1];
+            const int I2 = mod_3_lut[I0 + 2];
+
+            /* Dot products with node pre-computes */
+            const vfp_t t1 = this->q1; 
+            const vfp_t t2 = this->q2; 
+            const vfp_t d0 = t1 + (vfp_t( low[I0]) * t2) + vfp_t( low[I1],  low[I2],  -low[I1],  -low[I2]);
+            const vfp_t d1 = t1 + (vfp_t(high[I0]) * t2) + vfp_t( low[I1],  low[I2],  -low[I1],  -low[I2]);
+            const vfp_t d2 = t1 + (vfp_t( low[I0]) * t2) + vfp_t(high[I1],  low[I2], -high[I1],  -low[I2]);
+            const vfp_t d3 = t1 + (vfp_t(high[I0]) * t2) + vfp_t(high[I1],  low[I2], -high[I1],  -low[I2]);
+            const vfp_t d4 = t1 + (vfp_t( low[I0]) * t2) + vfp_t( low[I1], high[I2],  -low[I1], -high[I2]);
+            const vfp_t d5 = t1 + (vfp_t(high[I0]) * t2) + vfp_t( low[I1], high[I2],  -low[I1], -high[I2]);
+            const vfp_t d6 = t1 + (vfp_t( low[I0]) * t2) + vfp_t(high[I1], high[I2], -high[I1], -high[I2]);
+            const vfp_t d7 = t1 + (vfp_t(high[I0]) * t2) + vfp_t(high[I1], high[I2], -high[I1], -high[I2]);
+
+            /* Exclude the aabb if all vertices are on one side of the beam */
+            return (move_mask(d0 & d1 & d2 & d3 & d4 & d5 & d6 & d7) != 0);
+        }
        
         /* Access functions */
-        float get_min_x0()                  const { return _x_data[0];               }
-        float get_min_y0()                  const { return _y_data[0];               }
-        float get_min_z0()                  const { return _z_data[0];               }
-        float get_max_x0()                  const { return _x_data[1];               }
-        float get_max_y0()                  const { return _y_data[1];               }
-        float get_max_z0()                  const { return _z_data[1];               }
-       
-        float get_min_x_grad()              const { return 1.0f / _x_data[2];        }
-        float get_min_y_grad()              const { return 1.0f / _y_data[2];        }
-        float get_min_z_grad()              const { return 1.0f / _z_data[2];        }
-        float get_max_x_grad()              const { return 1.0f / _x_data[3];        }
-        float get_max_y_grad()              const { return 1.0f / _y_data[3];        }
-        float get_max_z_grad()              const { return 1.0f / _z_data[3];        }
-        
-        float get_min_x_igrad()             const { return _x_data[2];               }
-        float get_min_y_igrad()             const { return _y_data[2];               }
-        float get_min_z_igrad()             const { return _z_data[2];               }
-        float get_max_x_igrad()             const { return _x_data[3];               }
-        float get_max_y_igrad()             const { return _y_data[3];               }
-        float get_max_z_igrad()             const { return _z_data[3];               }
-        
+        float get_min_x0()                  const { return _x_data[0];                  }
+        float get_min_y0()                  const { return _y_data[0];                  }
+        float get_min_z0()                  const { return _z_data[0];                  }
+        float get_max_x0()                  const { return _x_data[1];                  }
+        float get_max_y0()                  const { return _y_data[1];                  }
+        float get_max_z0()                  const { return _z_data[1];                  }
+
+        float get_min_x_grad()              const { return 1.0f / _x_data[2];           }
+        float get_min_y_grad()              const { return 1.0f / _y_data[2];           }
+        float get_min_z_grad()              const { return 1.0f / _z_data[2];           }
+        float get_max_x_grad()              const { return 1.0f / _x_data[3];           }
+        float get_max_y_grad()              const { return 1.0f / _y_data[3];           }
+        float get_max_z_grad()              const { return 1.0f / _z_data[3];           }
+
+        float get_min_x_igrad()             const { return _x_data[2];                  }
+        float get_min_y_igrad()             const { return _y_data[2];                  }
+        float get_min_z_igrad()             const { return _z_data[2];                  }
+        float get_max_x_igrad()             const { return _x_data[3];                  }
+        float get_max_y_igrad()             const { return _y_data[3];                  }
+        float get_max_z_igrad()             const { return _z_data[3];                  }
+
         vfp_t get_ogn(unsigned int i)       const { return this->ogn[i];                }
         vfp_t get_dir(unsigned int i)       const { return this->dir[i];                }
-      
+
         vfp_t get_mm_ogn(unsigned int i)    const { return this->mm_ogn[i];             }
         vfp_t get_mm_idir(unsigned int i)   const { return this->mm_dir[i];             }
         vfp_t get_mm_dir(unsigned int i)    const { return inverse(this->mm_dir[i]);    }

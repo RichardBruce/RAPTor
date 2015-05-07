@@ -2,15 +2,17 @@
 #include "parser_common.h"
 
 #include "camera.h"
-
 #include "obj_parser.h"
+#include "picture_functions.h"
 
 
 namespace raptor_raytracer
 {
-const char * find_next_statement(const char *at)
+const float ambiant_light = 0.5f;
+
+const char * find_next_statement(const char *at, const char *const end)
 {
-    while (true)
+    while (at < end)
     {
         /* Skip comments */
         if (*at == '#')
@@ -32,6 +34,8 @@ const char * find_next_statement(const char *at)
             return at;
         }
     }
+
+    return at;
 }
 
 
@@ -39,13 +43,11 @@ void find_vertex(const char **c)
 {
     while (((**c) != ' ') && ((**c) != '\n') && ((**c) != '\r'))
     {
-//        std::cout << "non space increment" << std::endl;
         ++(*c);
     }
     
     while ((**c) == ' ')
     {
-//        std::cout << "space increment" << std::endl;
         ++(*c);
     }
     
@@ -67,7 +69,7 @@ bool is_triplet_delimiter(const char **c)
 
 void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &vt, std::vector<point_t> &vn, std::vector<point_t> &v, material *const m, const char **c)
 {
-//    std::cout << "face: " << (*c)[0] << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "face: " << (*c)[0];
     static std::vector<point_t> face;
     static std::vector<point_t> face_t;
     static std::vector<point_t> face_n;
@@ -84,14 +86,14 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
         }
         else
         {
-            vert_num--;
+            --vert_num;
         }
-//        std::cout << "vertex: " << vert_num << std::endl;
-        assert((unsigned)vert_num < v.size());
+//        BOOST_LOG_TRIVIAL(trace) << "vertex: " << vert_num;
+        assert(static_cast<unsigned int>(vert_num) < v.size());
         face.push_back(v[vert_num]);
         
         /* Parse texture vertex */
-        if(is_triplet_delimiter(c))
+        if (is_triplet_delimiter(c))
         {
             if ((*c)[1] != '/')
             {
@@ -103,15 +105,15 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
                 }
                 else
                 {
-                    vert_text--;
+                    --vert_text;
                 }
-//                std::cout << "texture: " << vert_text << std::endl;
-                assert((unsigned)vert_text < vt.size());
+//                BOOST_LOG_TRIVIAL(trace) << "texture: " << vert_text;
+                assert(static_cast<unsigned int>(vert_text) < vt.size());
                 face_t.push_back(vt[vert_text]);
             }
         
             /* Parse vertex normal */
-            if(is_triplet_delimiter(c))
+            if (is_triplet_delimiter(c))
             {
                 ++(*c);
                 int vert_norm = atoi(*c);
@@ -121,14 +123,14 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
                 }
                 else
                 {
-                    vert_norm--;
+                    --vert_norm;
                 }
-//                std::cout << "normal: " << vert_norm << std::endl;
-                assert((unsigned)vert_norm < vn.size());
+//                BOOST_LOG_TRIVIAL(trace) << "normal: " << vert_norm;
+                assert(static_cast<unsigned int>(vert_norm) < vn.size());
                 face_n.push_back(vn[vert_norm]);
             }
         }
-//        std::cout << "current: " << (*c)[0] << (*c)[1] << std::endl;
+//        BOOST_LOG_TRIVIAL(trace) << "current: " << (*c)[0] << (*c)[1];
         find_vertex(c);
     }
 
@@ -149,11 +151,8 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
             b -= c;
             normalise(&a);
             normalise(&b);
-        
-            c  = a - b;
-            a += b;
-    
-            if ((c != 0) && (a != 0))
+            cross_product(a, b, &c);
+            if (dot_product(c, c) > 0.0f)
             {
                 if (face_n.empty())
                 {
@@ -200,6 +199,41 @@ void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &v
 }
 
 
+struct map_info
+{
+    boost::shared_array<float>  img;
+    unsigned int                img_width;
+    unsigned int                img_height;
+    unsigned int                cpp;
+};
+
+inline texture_mapper * load_image(std::map<std::string, map_info> *const cache, const std::string &name, const bool invert = false)
+{
+    /* Check if loaded */
+    const std::string cache_name(name + (invert ? "_inv" : ""));
+    auto cache_iter = cache->find(cache_name);
+    if (cache_iter == cache->end())
+    {
+        BOOST_LOG_TRIVIAL(error) << "Reading: " << name;
+        /* Load image */
+        float *img;
+        map_info info;
+        info.cpp = read_image_file(&img, name, &info.img_height, &info.img_width);
+        info.img.reset(img);
+
+        /* Cache */
+        if (invert)
+        {
+            negative(img, info.cpp * info.img_height * info.img_width);
+        }
+        cache_iter = cache->emplace(cache_name, info).first;
+    }
+
+    const auto &info = cache_iter->second;
+    return new planar_mapper(info.img, point_t(0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(0.0f), info.cpp, info.img_width, info.img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+}
+
+
 material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstream &f, const std::string &p)
 {
     /* Find the size of the file */
@@ -211,23 +245,38 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
     char *buffer = new char [len];
     f.read((char *)buffer, len);
     const char *at = &buffer[0];
+
+    /* Image cache */
+    std::map<std::string, map_info> image_cache;
     
     /* Colour of current material */
     std::string     mn;
     material       *m       = nullptr;
-    texture_mapper *t_ka    = nullptr;     /* Ambient colour texture mapper    */
-    texture_mapper *t_kd    = nullptr;     /* Diffuse colour texture mapper    */
-    texture_mapper *t_ks    = nullptr;     /* Specular colour texture mapper   */
-    texture_mapper *t_ns    = nullptr;     /* Specular exponant texture mapper */
+    texture_mapper *t_ka    = nullptr;  /* Ambient colour texture mapper    */
+    texture_mapper *t_kd    = nullptr;  /* Diffuse colour texture mapper    */
+    texture_mapper *t_ks    = nullptr;  /* Specular colour texture mapper   */
+    texture_mapper *t_ns    = nullptr;  /* Specular exponant texture mapper */
+    texture_mapper *t_rf    = nullptr;  /* Reflectance texture mapper       */
+    texture_mapper *t_tran  = nullptr;  /* Transmittance texture mapper     */
     ext_colour_t    ka;                 /* Ambient colour                   */
     ext_colour_t    kd;                 /* Diffuse colour                   */
     ext_colour_t    ks;                 /* Specular colour                  */
-    float           ns      = 0.0f;      /* Specular exponant                */
+    ext_colour_t    ke;                 /* Emitted colour                   */
+    ext_colour_t    tf;                 /* Transmitted colour               */
+    float           ns      = 0.0f;     /* Specular exponant                */
+    float           ri      = 1.0f;     /* Refractive index                 */
+    float           rf      = 0.0f;     /* Reflectance                      */
+    float           trans   = 0.0f;     /* Transmittance                    */
+    int             illum   = 0;        /* Illumination model               */
     
     /* Parse the file */
-    while (at < &buffer[len-1])
+    while (at < &buffer[len - 1])
     {
-        at = find_next_statement(at);
+        at = find_next_statement(at, &buffer[len - 1]);
+        if (at >= &buffer[len - 1])
+        {
+            break;
+        }
         
         /* New material */
         if (strncmp(at, "newmtl", 6) == 0)
@@ -235,7 +284,87 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
             /* Create the last material parsed */
             if (!mn.empty())
             {
-                m = new coloured_mapper_shader(ka, kd, ks, ns, 0.0, 1.0, 0.0, 0.0, 0.0, t_ka, t_kd, t_ks, t_ns);
+                assert(illum != 6  || !"Error: Illumination model not handled");
+                assert(illum != 8  || !"Error: Illumination model not handled");
+                assert(illum != 9  || !"Error: Illumination model not handled");
+                assert(illum != 10 || !"Error: Illumination model not handled");
+                switch (illum)
+                {
+                    /* colour = Kd */
+                    case 0 :
+                        t_ka    = t_kd;
+                        t_kd    = nullptr;
+                        t_ks    = nullptr;
+                        t_ns    = nullptr;
+                        t_rf    = nullptr;
+                        ka      = kd;
+                        kd      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ks      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ns      = 0.0f;
+                        ri      = 1.0f;
+                        rf      = 0.0f;
+                        break;
+                    /* colour = KaIa + Kd { SUM j=1..ls, (N * Lj)Ij } */
+                    case 1 :
+                        t_ks    = nullptr;
+                        t_ns    = nullptr;
+                        t_rf    = nullptr;
+                        ks      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ns      = 0.0f;
+                        ri      = 1.0f;
+                        rf      = 0.0f;
+                        break;
+                    /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks { SUM j=1..ls, ((H*Hj)^Ns)Ij } */
+                    case 2 :
+                        t_rf    = nullptr;
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ri      = 1.0f;
+                        rf      = 0.0f;
+                        break;
+                    /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij } + Ir) */
+                    /* Ir = (intensity of reflection map) + (ray trace)*/
+                    case 3 :
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ri      = 1.0f;
+                        rf      = 0.75f;
+                        break;
+                    /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij } + Ir) */
+                    /* The maximum of the average intensity of highlights and reflected lights is used to adjust the dissolve factor */
+                    case 4 :
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        rf      = 0.0f;
+                        break;
+                    /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij Fr(Lj*Hj,Ks,Ns)Ij} + Fr(N*V,Ks,Ns)Ir}) */
+                    case 5 :
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ri      = 1.0f;
+                        rf      = 0.75f;
+                        break;
+                    /*color = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij Fr(Lj*Hj,Ks,Ns)Ij} + Fr(N*V,Ks,Ns)Ir}) + (1.0 - Kx)Ft (N*V,(1.0-Ks),Ns)TfIt */
+                    case 7 :
+                        ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                        ri      = 1.0f;
+                        rf      = 0.75f;
+                        break;
+
+                    default :
+                        assert(!"Error: Illumination model not handled");
+                }
+                trans = std::max(0.0f, std::min(1.0f, trans));
+            //     coloured_mapper_shader(const ext_colour_t& ka, const ext_colour_t &kd, const ext_colour_t &ks = 0.0f, const float ns = 0.0f, const float tran = 0.0f, const float ri = 1.0f, 
+            // const float rf = 0.0f, const float td = 0.0f, const float rfd = 0.0f, const texture_mapper * const t_ka = nullptr, const texture_mapper * const t_kd = nullptr, 
+            // const texture_mapper * const t_ks = nullptr, const texture_mapper * const t_ns = nullptr, const texture_mapper * const t_refl = nullptr, const texture_mapper * const t_d = nullptr)
+                ka *= ambiant_light;
+                m = new coloured_mapper_shader(ka, kd, ks, ns, trans, ri, rf, 0.0f, 0.0f, t_ka, t_kd, t_ks, t_ns, t_rf, t_tran);
                 (*s)[mn] = m;
             }
             
@@ -248,19 +377,25 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
             t_kd    = nullptr;
             t_ks    = nullptr;
             t_ns    = nullptr;
-            ka      = ext_colour_t(0.0);
-            kd      = ext_colour_t(0.0);
-            ks      = ext_colour_t(0.0);
-            ns      = 0.0;
+            t_rf    = nullptr;
+            t_tran  = nullptr;
+            ka      = ext_colour_t(0.0f);
+            kd      = ext_colour_t(0.0f);
+            ke      = ext_colour_t(0.0f);
+            ks      = ext_colour_t(0.0f);
+            ns      = 0.0f;
+            ri      = 1.0f;
+            rf      = 0.0f;
+            trans   = 0.0f;
         }
         /* Ambient colour */
         else if (strncmp(at, "Ka", 2) == 0)
         {
-            ka.r = get_next_float(&at) * 255.0;
+            ka.r = get_next_float(&at) * 255.0f;
             if (!end_of_line(at))
             {
-                ka.g = get_next_float(&at) * 255.0;
-                ka.b = get_next_float(&at) * 255.0;
+                ka.g = get_next_float(&at) * 255.0f;
+                ka.b = get_next_float(&at) * 255.0f;
             }
             else
             {
@@ -271,11 +406,11 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Diffuse colour */
         else if (strncmp(at, "Kd", 2) == 0)
         {
-            kd.r = get_next_float(&at) * 255.0;
+            kd.r = get_next_float(&at) * 255.0f;
             if (!end_of_line(at))
             {
-                kd.g = get_next_float(&at) * 255.0;
-                kd.b = get_next_float(&at) * 255.0;
+                kd.g = get_next_float(&at) * 255.0f;
+                kd.b = get_next_float(&at) * 255.0f;
             }
             else
             {
@@ -286,11 +421,11 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Specular colour */
         else if (strncmp(at, "Ks", 2) == 0)
         {
-            ks.r = get_next_float(&at) * 255.0;
+            ks.r = get_next_float(&at) * 255.0f;
             if (!end_of_line(at))
             {
-                ks.g = get_next_float(&at) * 255.0;
-                ks.b = get_next_float(&at) * 255.0;
+                ks.g = get_next_float(&at) * 255.0f;
+                ks.b = get_next_float(&at) * 255.0f;
             }
             else
             {
@@ -298,29 +433,127 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
                 ks.b = ks.r;
             }
         }
+        /* Transmitted colour */
+        else if (strncmp(at, "Tf", 2) == 0)
+        {
+            tf.r = get_next_float(&at) * 255.0f;
+            if (!end_of_line(at))
+            {
+                tf.g = get_next_float(&at) * 255.0f;
+                tf.b = get_next_float(&at) * 255.0f;
+            }
+            else
+            {
+                tf.g = tf.r;
+                tf.b = tf.r;
+            }
+
+            BOOST_LOG_TRIVIAL(warning) << "Tf: " << tf << " (not handled)";
+        }
+        /* Emitted colour */
+        else if (strncmp(at, "Ke", 2) == 0)
+        {
+            ke.r = get_next_float(&at) * 255.0f;
+            if (!end_of_line(at))
+            {
+                ke.g = get_next_float(&at) * 255.0f;
+                ke.b = get_next_float(&at) * 255.0f;
+            }
+            else
+            {
+                ke.g = ke.r;
+                ke.b = ke.r;
+            }
+
+            BOOST_LOG_TRIVIAL(warning) << "Ke: " << ke << " (not handled)";
+        }
         /* Specular exponant */
         else if (strncmp(at, "Ns", 2) == 0)
         {
             ns = get_next_float(&at);
         }
+        /* Refractive index */
+        else if (strncmp(at, "Ni", 2) == 0)
+        {
+            ri = get_next_float(&at);
+        }
+        /* Opaque-ness */
+        else if (strncmp(at, "d", 1) == 0)
+        {
+            const float d = get_next_float(&at);
+            BOOST_LOG_TRIVIAL(trace) << "d: " << d;
+            trans = 1.0f - d;
+        }
+        /* Opaque-ness by another name */
+        else if (strncmp(at, "Tr", 2) == 0)
+        {
+            trans = get_next_float(&at);
+            BOOST_LOG_TRIVIAL(trace) << "Tr: " << trans;
+        }
         /* Shader mode --ignored, everything is ray traced */
         else if (strncmp(at, "illum", 5) == 0)
         {
+            illum = get_next_unsigned(&at);
+            BOOST_LOG_TRIVIAL(trace) << "illum: " << illum;
+        }
+        /* Ambiant texture map */
+        else if (strncmp(at, "map_Ka", 6) == 0)
+        {
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(trace) << "map_Ka: " << map_file;
 
+            t_ka = load_image(&image_cache, map_file);
         }
         /* Diffuse texture map */
         else if (strncmp(at, "map_Kd", 6) == 0)
         {
-            std::string map_file = p + get_next_string(&at);
-            float *img;
-            unsigned int img_width;
-            unsigned int img_height;
-            unsigned int cpp = read_jpeg(&img, map_file.c_str(), &img_height, &img_width);
-            t_kd = new planar_mapper(img, point_t(0.0), point_t(0.0), point_t(0.0), cpp, img_width, img_height, mirror, mirror);
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(trace) << "map_Kd: " << map_file;
+
+            t_kd = load_image(&image_cache, map_file);
+        }
+        /* Specular texture map */
+        else if (strncmp(at, "map_Ks", 6) == 0)
+        {
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(trace) << "map_Ks: " << map_file;
+            
+            t_ks = load_image(&image_cache, map_file);
+        }
+        /* Reflection texture map */
+        else if (strncmp(at, "map_refl", 8) == 0)
+        {
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(trace) << "map_refl: " << map_file;
+
+            t_rf = load_image(&image_cache, map_file);
+        }
+        /* Bump texture map */
+        else if (strncmp(at, "map_bump", 8) == 0)
+        {
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(warning) << "map_bump: " << map_file << " (not handled)";
+
+            // t_kd = load_image(&image_cache, map_file);
+        }
+        else if (strncmp(at, "bump", 4) == 0)
+        {
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(warning) << "bump: " << map_file << " (not handled)";
+
+            // t_kd = load_image(&image_cache, map_file);
+        }
+        /* Opaqueness texture map */
+        else if (strncmp(at, "map_d", 5) == 0)
+        {
+            const std::string map_file(p + get_next_string(&at));
+            BOOST_LOG_TRIVIAL(trace) << "map_d: " << map_file;
+
+            t_tran = load_image(&image_cache, map_file, true);
         }
         else
         {
-            std::cout << "Found unknown: " << at[0] << std::endl;
+            BOOST_LOG_TRIVIAL(error) << "Found unknown: " << std::string(&at[0], 6) << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]);
             find_next_line(&at);
             assert(false);
         }
@@ -332,7 +565,88 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
     /* Create the last material parsed */
     if (!mn.empty())
     {
-        m = new coloured_mapper_shader(ka, kd, ks, ns, 0.0, 1.0, 0.0, 0.0, 0.0, t_ka, t_kd, t_ks, t_ns);
+        BOOST_LOG_TRIVIAL(trace) << "Adding material: " << mn;
+        assert(illum != 6  || !"Error: Illumination model not handled");
+        assert(illum != 8  || !"Error: Illumination model not handled");
+        assert(illum != 9  || !"Error: Illumination model not handled");
+        assert(illum != 10 || !"Error: Illumination model not handled");
+        switch (illum)
+        {
+            /* colour = Kd */
+            case 0 :
+                t_ka    = t_kd;
+                t_kd    = nullptr;
+                t_ks    = nullptr;
+                t_ns    = nullptr;
+                t_rf    = nullptr;
+                ka      = kd;
+                kd      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ks      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ns      = 0.0f;
+                ri      = 1.0f;
+                rf      = 0.0f;
+                break;
+            /* colour = KaIa + Kd { SUM j=1..ls, (N * Lj)Ij } */
+            case 1 :
+                t_ks    = nullptr;
+                t_ns    = nullptr;
+                t_rf    = nullptr;
+                ks      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ns      = 0.0f;
+                ri      = 1.0f;
+                rf      = 0.0f;
+                break;
+            /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks { SUM j=1..ls, ((H*Hj)^Ns)Ij } */
+            case 2 :
+                t_rf    = nullptr;
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ri      = 1.0f;
+                rf      = 0.0f;
+                break;
+            /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij } + Ir) */
+            /* Ir = (intensity of reflection map) + (ray trace)*/
+            case 3 :
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ri      = 1.0f;
+                rf      = 0.75f;
+                break;
+            /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij } + Ir) */
+            /* The maximum of the average intensity of highlights and reflected lights is used to adjust the dissolve factor */
+            case 4 :
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                rf      = 0.0f;
+                break;
+            /* colour = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij Fr(Lj*Hj,Ks,Ns)Ij} + Fr(N*V,Ks,Ns)Ir}) */
+            case 5 :
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ri      = 1.0f;
+                rf      = 0.75f;
+                break;
+            /*color = KaIa + Kd { SUM j=1..ls, (N*Lj)Ij } + Ks ({ SUM j=1..ls, ((H*Hj)^Ns)Ij Fr(Lj*Hj,Ks,Ns)Ij} + Fr(N*V,Ks,Ns)Ir}) + (1.0 - Kx)Ft (N*V,(1.0-Ks),Ns)TfIt */
+            case 7 :
+                ke      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                tf      = ext_colour_t(0.0f, 0.0f, 0.0f);
+                ri      = 1.0f;
+                rf      = 0.75f;
+                break;
+
+            default :
+                assert(!"Error: Illumination model not handled");
+        }
+        trans = std::max(0.0f, std::min(1.0f, trans));
+    //     coloured_mapper_shader(const ext_colour_t& ka, const ext_colour_t &kd, const ext_colour_t &ks = 0.0f, const float ns = 0.0f, const float tran = 0.0f, const float ri = 1.0f, 
+    // const float rf = 0.0f, const float td = 0.0f, const float rfd = 0.0f, const texture_mapper * const t_ka = nullptr, const texture_mapper * const t_kd = nullptr, 
+    // const texture_mapper * const t_ks = nullptr, const texture_mapper * const t_ns = nullptr, const texture_mapper * const t_refl = nullptr, const texture_mapper * const t_d = nullptr)
+        ka *= ambiant_light;
+        m = new coloured_mapper_shader(ka, kd, ks, ns, trans, ri, rf, 0.0f, 0.0f, t_ka, t_kd, t_ks, t_ns, t_rf, t_tran);
         (*s)[mn] = m;
     }
 
@@ -353,7 +667,7 @@ material * parse_mtllib_statement(std::map<std::string, material *> *const s, co
     {
         /* Get the material library to open */
         std::string mtllib = p + get_next_string(c);
-//        std::cout << "Opening material file: " << mtllib << std::endl;
+        BOOST_LOG_TRIVIAL(trace) << "Opening material file: " << mtllib;
         std::ifstream f(mtllib.c_str());
         assert(f.is_open());
 
@@ -399,7 +713,7 @@ void parse_v_statement(std::vector<point_t> *const vs, const char **c)
     v.x = get_next_float(c);
     v.y = get_next_float(c);
     v.z = get_next_float(c);
-//    std::cout << "Parsed v: " << v.x << ", " << v.y << ", " << v.z << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "Parsed v: " << v;
 
     find_next_line(c);
 
@@ -413,7 +727,7 @@ void parse_vt_statement(std::vector<point_t> *const vs, const char **c)
 
     v.x = get_next_float(c);
     v.y = get_next_float(c);
-//    std::cout << "Parsed vt: " << v.x << ", " << v.y << ", " << v.z << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "Parsed vt: " << v.x << ", " << v.y;
 
     find_next_line(c);
 
@@ -429,7 +743,7 @@ void parse_vn_statement(std::vector<point_t> *const vs, const char **c)
     v.y = get_next_float(c);
     v.z = get_next_float(c);
     normalise(&v);
-//    std::cout << "Parsed vn: " << v.x << ", " << v.y << ", " << v.z << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "Parsed vn: " << v;
 
     find_next_line(c);
 
@@ -450,7 +764,7 @@ void obj_parser(
     size_t len = obj_file.tellg();
     obj_file.seekg(0, std::ios::beg);
 
-//    std::cout << "Parsing OBJ length: " << len << std::endl;
+//    BOOST_LOG_TRIVIAL(trace) << "Parsing OBJ length: " << len;
        
     /* Read the whole file into a buffer */
     char *buffer = new char [len];
@@ -464,13 +778,17 @@ void obj_parser(
     
     /* Map of shader names to shader */
     std::map<std::string, material *> shader_map;
-    material *              cur_mat = new phong_shader(ext_colour_t(0.0f, 0.0f, 0.0f), ext_colour_t(200.0f, 200.0f, 200.0f), ext_colour_t(0.0f, 0.0f, 0.0f), 0.0f);
+    material *cur_mat = new phong_shader(ext_colour_t(0.0f, 0.0f, 0.0f), ext_colour_t(200.0f, 200.0f, 200.0f), ext_colour_t(0.0f, 0.0f, 0.0f), 0.0f);
     m.push_back(cur_mat);
     
     /* Parse the file */
     while (at < &buffer[len - 1])
     {
-        at = find_next_statement(at);
+        at = find_next_statement(at, &buffer[len - 1]);
+        if (at >= &buffer[len - 1])
+        {
+            break;
+        }
         
         if (strncmp(at, "mtllib", 6) == 0)
         {
@@ -513,7 +831,7 @@ void obj_parser(
         }
         else
         {
-            std::cout << "Found unknown statement: " << at[0] <<std:: endl;
+            BOOST_LOG_TRIVIAL(error) << "Found unknown statement: " << at << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]);
             find_next_line(&at);
             assert(false);
         }
@@ -527,6 +845,5 @@ void obj_parser(
  
     /* Tidy up */
     delete [] buffer;
-//    std::cout << "Parsing complete" << std::endl;
 }
 }; /* namespace raptor_raytracer */

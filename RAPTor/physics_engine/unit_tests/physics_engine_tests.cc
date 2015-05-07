@@ -469,25 +469,25 @@ BOOST_AUTO_TEST_CASE( get_collision_test )
     BOOST_CHECK(fabs(magnitude(c1_2->get_normal_of_collision() - point_t(0.0, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(c1_2->get_point_of_collision()  - point_t(0.0, -9.0, 0.0))) < result_tolerance);
     BOOST_CHECK(c1_2->get_time() == 0.0);
-    BOOST_CHECK(c1_2->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(c1_2->get_type() == collision_t::SLIDING_COLLISION);
 
     const collision_info *const c2_1 = uut.get_collision(2, 1);
     BOOST_CHECK(fabs(magnitude(c2_1->get_normal_of_collision() - point_t(0.0,  1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(c2_1->get_point_of_collision()  - point_t(0.0, -9.0, 0.0))) < result_tolerance);
     BOOST_CHECK(c2_1->get_time() == 0.0);
-    BOOST_CHECK(c2_1->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(c2_1->get_type() == collision_t::SLIDING_COLLISION);
 
     const collision_info *const c2_3 = uut.get_collision(2, 3);
     BOOST_CHECK(fabs(magnitude(c2_3->get_normal_of_collision() - point_t(0.0, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(c2_3->get_point_of_collision()  - point_t(0.0, -8.0, 0.0))) < result_tolerance);
     BOOST_CHECK(c2_3->get_time() == 0.0);
-    BOOST_CHECK(c2_3->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(c2_3->get_type() == collision_t::SLIDING_COLLISION);
 
     const collision_info *const c3_2 = uut.get_collision(3, 2);
     BOOST_CHECK(fabs(magnitude(c3_2->get_normal_of_collision() - point_t(0.0,  1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(c3_2->get_point_of_collision()  - point_t(0.0, -8.0, 0.0))) < result_tolerance);
     BOOST_CHECK(c3_2->get_time() == 0.0);
-    BOOST_CHECK(c3_2->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(c3_2->get_type() == collision_t::SLIDING_COLLISION);
 
     BOOST_CHECK(uut.get_collision(0, 1) == nullptr);
     BOOST_CHECK(uut.get_collision(0, 2) == nullptr);
@@ -542,23 +542,23 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
     BOOST_CHECK(fabs(magnitude(c1_2_0->get_normal_of_collision() - point_t(0.0, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(c1_2_0->get_point_of_collision()  - point_t(0.0, -9.0, 0.0))) < result_tolerance);
     BOOST_CHECK(c1_2_0->get_time() == 0.0);
-    BOOST_CHECK(c1_2_0->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(c1_2_0->get_type() == collision_t::SLIDING_COLLISION);
 
     const collision_info *const c2_1_0 = uut.get_collision(2, 1);
     BOOST_CHECK(c2_1_0->get_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(c2_1_0->get_type() == NO_COLLISION);
+    BOOST_CHECK(c2_1_0->get_type() == collision_t::NO_COLLISION);
     
     const collision_info *const c2_3_0 = uut.get_collision(2, 3);
     BOOST_CHECK(fabs(magnitude(c2_3_0->get_normal_of_collision() - point_t(0.0, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(c2_3_0->get_point_of_collision()  - point_t(0.0, -8.0, 0.0))) < result_tolerance);
     BOOST_CHECK(c2_3_0->get_time() == 0.0);
-    BOOST_CHECK(c2_3_0->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(c2_3_0->get_type() == collision_t::SLIDING_COLLISION);
 
     const collision_info *const c3_2_0 = uut.get_collision(3, 2);
     BOOST_CHECK(fabs(magnitude(c3_2_0->get_normal_of_collision() - point_t(0.0,  1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(c3_2_0->get_point_of_collision()  - point_t(0.0, -8.0, 0.0))) < result_tolerance);
     BOOST_CHECK(c3_2_0->get_time() == 0.0);
-    BOOST_CHECK(c3_2_0->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(c3_2_0->get_type() == collision_t::SLIDING_COLLISION);
 
     /* Void and check */
     uut.void_all_collisions_with(3);
@@ -568,21 +568,21 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
     BOOST_CHECK(fabs(magnitude(c1_2_1->get_normal_of_collision() - point_t(0.0, -1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(c1_2_1->get_point_of_collision()  - point_t(0.0, -9.0, 0.0))) < result_tolerance);
     BOOST_CHECK(c1_2_1->get_time() == 0.0);
-    BOOST_CHECK(c1_2_1->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(c1_2_1->get_type() == collision_t::SLIDING_COLLISION);
 
     const collision_info *const c2_1_1 = uut.get_collision(2, 1);
     BOOST_CHECK(c2_1_1->get_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(c2_1_1->get_type() == NO_COLLISION);
+    BOOST_CHECK(c2_1_1->get_type() == collision_t::NO_COLLISION);
     
     const collision_info *const c2_3_1 = uut.get_collision(2, 3);
     BOOST_CHECK(c2_3_1->get_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(c2_3_1->get_type() == NO_COLLISION);
+    BOOST_CHECK(c2_3_1->get_type() == collision_t::NO_COLLISION);
 
     const collision_info *const c3_2_1 = uut.get_collision(3, 2);
     BOOST_CHECK(fabs(magnitude(c3_2_1->get_normal_of_collision() - point_t(0.0,  1.0, 0.0))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(c3_2_1->get_point_of_collision()  - point_t(0.0, -8.0, 0.0))) < result_tolerance);
     BOOST_CHECK(c3_2_1->get_time() == 0.0);
-    BOOST_CHECK(c3_2_1->get_type() == SLIDING_COLLISION);
+    BOOST_CHECK(c3_2_1->get_type() == collision_t::SLIDING_COLLISION);
 
     /* Void and check */
     uut.void_all_collisions_with(2);
@@ -590,19 +590,19 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
 
     const collision_info *const c1_2_2 = uut.get_collision(1, 2);
     BOOST_CHECK(c1_2_2->get_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(c1_2_2->get_type() == NO_COLLISION);
+    BOOST_CHECK(c1_2_2->get_type() == collision_t::NO_COLLISION);
 
     const collision_info *const c2_1_2 = uut.get_collision(2, 1);
     BOOST_CHECK(c2_1_2->get_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(c2_1_2->get_type() == NO_COLLISION);
+    BOOST_CHECK(c2_1_2->get_type() == collision_t::NO_COLLISION);
     
     const collision_info *const c2_3_2 = uut.get_collision(2, 3);
     BOOST_CHECK(c2_3_2->get_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(c2_3_2->get_type() == NO_COLLISION);
+    BOOST_CHECK(c2_3_2->get_type() == collision_t::NO_COLLISION);
 
     const collision_info *const c3_2_2 = uut.get_collision(3, 2);
     BOOST_CHECK(c3_2_2->get_time() == std::numeric_limits<float>::max());
-    BOOST_CHECK(c3_2_2->get_type() == NO_COLLISION);
+    BOOST_CHECK(c3_2_2->get_type() == collision_t::NO_COLLISION);
 }
 
 

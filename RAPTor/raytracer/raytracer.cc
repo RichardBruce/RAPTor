@@ -39,7 +39,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
         secondary_ray_data refr;
         refl.colours(&refl_colour[0]);
         refr.colours(&refr_colour[0]);
-        const line n(intersecting_object->generate_rays(*this, r, &vt, &hit_type, &refl, &refr));
+        const point_t vn(intersecting_object->generate_rays(*this, r, &vt, &hit_type, &refl, &refr));
         
         /* Trace shadow rays */
         for (unsigned int i = 0; i < this->lights.size(); ++i)
@@ -65,7 +65,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
         }
 
         /* Call the shader */
-        intersecting_object->shade(*this, r, n, vt, hit_type, c);
+        intersecting_object->shade(*this, r, vn, vt, hit_type, c);
         
         /* Process secondary rays */
         for (int i = 0; i < static_cast<int>(refl.number()); ++i)
@@ -83,7 +83,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
     /* Otherwise colour with the background colour */
     else
     {
-        *c = this->c.shade(r);
+        *c = this->c.shade(&r);
     }
 }
 
@@ -145,7 +145,7 @@ void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *cons
                 for (int k = 0; k < SIMD_WIDTH; ++k)
                 {
                     int addr = (j << LOG2_SIMD_WIDTH) + k;
-                    m[r_to_s[addr]] += (int)(closer[k] == 0.0);
+                    m[r_to_s[addr]] += (int)(closer[k] == 0.0f);
                 }
             }
         }
@@ -232,7 +232,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
     }
 
     /* Generate secondary rays */
-    line normals[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
+    point_t vn[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     point_t vt[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     ray ray_p[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     hit_description hit_p[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
@@ -255,7 +255,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             {
                 this->shader_nr = addr;
                 int ray_addr = addr * MAX_SECONDARY_RAYS;
-                normals[addr] = intersecting_object[addr]->generate_rays(*this, ray_p[addr], &vt[addr], &hit_p[addr], &refl[ray_addr], &refr[ray_addr]);
+                vn[addr] = intersecting_object[addr]->generate_rays(*this, ray_p[addr], &vt[addr], &hit_p[addr], &refl[ray_addr], &refr[ray_addr]);
             }
             else
             {
@@ -328,7 +328,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             const int addr   = (i * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH)) + (k * SHADOW_ARRAY_SIZE);
             const int shader = (i * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH)) + k;
             
-            if (this->nr_pending_shadows[shader] > 0.0)
+            if (this->nr_pending_shadows[shader] > 0.0f)
             {
                 this->pending_shadows[addr].set_magnitude(made_it[k] / this->nr_pending_shadows[shader]);
             }
@@ -344,12 +344,12 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
 
         if (hit_p[i].d < MAX_DIST)
         {
-            intersecting_object[i]->shade(*this, ray_p[i], normals[i], vt[i], hit_p[i], &c[addr]);
+            intersecting_object[i]->shade(*this, ray_p[i], vn[i], vt[i], hit_p[i], &c[addr]);
         }
         /* Otherwise colour with the background colour */
         else
         {
-            c[addr] = this->c.shade(ray_p[i]);
+            c[addr] = this->c.shade(&ray_p[i]);
         }
     }
 
@@ -465,7 +465,7 @@ void ray_trace_engine::ray_trace_one_packet(const int x, const int y) const
     
     /* Ray trace the packet */
     ext_colour_t pixel_colour[MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
-    this->ray_trace(r, &pixel_colour[0], packet_ray_to_pixel_lut, MAXIMUM_PACKET_SIZE);
+    ray_trace(r, &pixel_colour[0], packet_ray_to_pixel_lut, MAXIMUM_PACKET_SIZE);
     
     /* Saturate the colour and output */
     for (int i = 0; i < (std::sqrt(MAXIMUM_PACKET_SIZE * SIMD_WIDTH)); ++i)
@@ -491,7 +491,7 @@ inline void ray_trace_engine::ray_trace_one_pixel(const int x, const int y) cons
 
     /* Work on the pixel as a float and then saturate back to an unsigned char */
     ext_colour_t pixel_colour;
-    this->ray_trace(ray_0, &pixel_colour);
+    ray_trace(ray_0, &pixel_colour);
 
     /* Saturate colours and save output */
     this->c.set_pixel(pixel_colour, x, y);

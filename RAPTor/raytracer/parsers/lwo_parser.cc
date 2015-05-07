@@ -53,18 +53,20 @@ void lwo_parser(
     if (strncmp(at, "LWO2", 4) == 0)
     {
         at += 4;
-        at = lwo2_parser(buffer, at, p, l, e, m, c);
+        BOOST_LOG_TRIVIAL(trace) << "Calling lwo 2 parser";
+        lwo2_parser(buffer, at, p, l, e, m, c, len - 12);
     }
     else
     {
         /* Check the for LWO file */
         check_for_chunk(&at, "LWOB", 4);
+        BOOST_LOG_TRIVIAL(trace) << "Calling lwo 1 parser";
         at = lwo1_parser(buffer, at, p, l, e, m, c);
-    }
 
-    /* Check we read the whole file */
-    BOOST_LOG_TRIVIAL(trace) << "Now at file position: " << (at - buffer);
-    assert((static_cast<size_t>(at - buffer) >= len) || !"Error: The whole file was not parsed");
+        /* Check we read the whole file */
+        BOOST_LOG_TRIVIAL(trace) << "Now at file position: " << (at - buffer);
+        assert((static_cast<size_t>(at - buffer) >= len) || !"Error: The whole file was not parsed");
+    }
 
     /* Clean up */
     delete [] buffer;

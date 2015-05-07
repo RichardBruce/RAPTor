@@ -8,21 +8,21 @@
 
 namespace raptor_terrain
 {
-enum neighbour_t { NORTH = 0, WEST = 1, SOUTH = 2, EAST = 3 };
+enum class neighbour_t : char { NORTH = 0, WEST = 1, SOUTH = 2, EAST = 3 };
 
 neighbour_t turn_left(const neighbour_t n)
 {
-    return (neighbour_t)((n + 1) & 0x3);
+    return static_cast<neighbour_t>((static_cast<int>(n) + 1) & 0x3);
 }
 
 neighbour_t turn_right(const neighbour_t n)
 {
-    return (neighbour_t)((n - 1) & 0x3);
+    return static_cast<neighbour_t>((static_cast<int>(n) - 1) & 0x3);
 }
 
 neighbour_t turn_around(const neighbour_t n)
 {
-    return (neighbour_t)(n ^ 0x2);
+    return static_cast<neighbour_t>(static_cast<int>(n) ^ 0x2);
 }
 
 
@@ -37,10 +37,10 @@ class grid_cell
         {
             switch (n)
             {
-                case NORTH  : return north();
-                case SOUTH  : return south();
-                case EAST   : return east();
-                case WEST   : return west();
+                case neighbour_t::NORTH  : return north();
+                case neighbour_t::SOUTH  : return south();
+                case neighbour_t::EAST   : return east();
+                case neighbour_t::WEST   : return west();
                 default     : assert(false);
             }
         }
@@ -60,39 +60,39 @@ class grid_cell
             assert(moving != turning);
             switch (moving)
             {
-                case NORTH  : 
+                case neighbour_t::NORTH  : 
                     switch(turning)
                     {
-                        case SOUTH : return top_right();
-                        case EAST  : return bottom_right();
-                        case WEST  : return top_right();
-                        case NORTH : assert(false);
+                        case neighbour_t::SOUTH : return top_right();
+                        case neighbour_t::EAST  : return bottom_right();
+                        case neighbour_t::WEST  : return top_right();
+                        case neighbour_t::NORTH : assert(false);
                     }
-                case SOUTH  : 
+                case neighbour_t::SOUTH  : 
                     switch(turning)
                     {
-                        case NORTH : return bottom_left();
-                        case EAST  : return bottom_left();
-                        case WEST  : return top_left();
-                        case SOUTH : assert(false);
+                        case neighbour_t::NORTH : return bottom_left();
+                        case neighbour_t::EAST  : return bottom_left();
+                        case neighbour_t::WEST  : return top_left();
+                        case neighbour_t::SOUTH : assert(false);
                     }
-                case EAST   : 
+                case neighbour_t::EAST   : 
                     switch(turning)
                     {
-                        case NORTH : return bottom_right();
-                        case SOUTH : return bottom_left();
-                        case WEST  : return bottom_right();
-                        case EAST  : assert(false);
+                        case neighbour_t::NORTH : return bottom_right();
+                        case neighbour_t::SOUTH : return bottom_left();
+                        case neighbour_t::WEST  : return bottom_right();
+                        case neighbour_t::EAST  : assert(false);
                     }
-                case WEST   : 
+                case neighbour_t::WEST   : 
                     switch(turning)
                     {
-                        case NORTH : return top_right();
-                        case SOUTH : return top_left();
-                        case EAST  : return top_left();
-                        case WEST  : assert(false);
+                        case neighbour_t::NORTH : return top_right();
+                        case neighbour_t::SOUTH : return top_left();
+                        case neighbour_t::EAST  : return top_left();
+                        case neighbour_t::WEST  : assert(false);
                     }
-                default     : assert(false);
+                default : assert(false);
             }
         }
 
@@ -101,39 +101,39 @@ class grid_cell
             assert(moving != turning);
             switch (moving)
             {
-                case NORTH  : 
+                case neighbour_t::NORTH  : 
                     switch(turning)
                     {
-                        case SOUTH : return top_left();
-                        case EAST  : return bottom_right();
-                        case WEST  : return top_right();
-                        case NORTH : assert(false);
+                        case neighbour_t::SOUTH : return top_left();
+                        case neighbour_t::EAST  : return bottom_right();
+                        case neighbour_t::WEST  : return top_right();
+                        case neighbour_t::NORTH : assert(false);
                     }
-                case SOUTH  : 
+                case neighbour_t::SOUTH  : 
                     switch(turning)
                     {
-                        case NORTH : return bottom_right();
-                        case EAST  : return bottom_left();
-                        case WEST  : return top_left();
-                        case SOUTH : assert(false);
+                        case neighbour_t::NORTH : return bottom_right();
+                        case neighbour_t::EAST  : return bottom_left();
+                        case neighbour_t::WEST  : return top_left();
+                        case neighbour_t::SOUTH : assert(false);
                     }
-                case EAST   : 
+                case neighbour_t::EAST   : 
                     switch(turning)
                     {
-                        case NORTH : return bottom_right();
-                        case SOUTH : return bottom_left();
-                        case WEST  : return top_right();
-                        case EAST  : assert(false);
+                        case neighbour_t::NORTH : return bottom_right();
+                        case neighbour_t::SOUTH : return bottom_left();
+                        case neighbour_t::WEST  : return top_right();
+                        case neighbour_t::EAST  : assert(false);
                     }
-                case WEST   : 
+                case neighbour_t::WEST   : 
                     switch(turning)
                     {
-                        case NORTH : return top_right();
-                        case SOUTH : return top_left();
-                        case EAST  : return bottom_left();
-                        case WEST  : assert(false);
+                        case neighbour_t::NORTH : return top_right();
+                        case neighbour_t::SOUTH : return top_left();
+                        case neighbour_t::EAST  : return bottom_left();
+                        case neighbour_t::WEST  : assert(false);
                     }
-                default     : assert(false);
+                default : assert(false);
             }
         }
 
@@ -141,11 +141,11 @@ class grid_cell
         {
             switch(moving)
             {
-                case NORTH  : return top_right();
-                case SOUTH  : return bottom_left();
-                case EAST   : return bottom_right();
-                case WEST   : return top_left();
-                default     : assert(false);
+                case neighbour_t::NORTH : return top_right();
+                case neighbour_t::SOUTH : return bottom_left();
+                case neighbour_t::EAST  : return bottom_right();
+                case neighbour_t::WEST  : return top_left();
+                default                 : assert(false);
             }
         }
 

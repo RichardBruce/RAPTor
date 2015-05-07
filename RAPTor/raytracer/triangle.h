@@ -15,6 +15,7 @@
 #endif
 #include "material.h"
 
+
 namespace raptor_raytracer
 {
 class triangle : private boost::noncopyable
@@ -76,30 +77,30 @@ class triangle : private boost::noncopyable
         inline void is_intersecting(const packet_ray *const r, packet_hit_description *const h, const triangle **const i_o, const unsigned int size) const;
         inline void is_intersecting(const frustrum &f, const packet_ray *const r, packet_hit_description *const h, const triangle **const i_o, const unsigned *c, const unsigned size) const;
 #endif
-        inline line normal_at_point(ray       *const r, hit_description *const h) const;
+        inline point_t normal_at_point(ray *const r, hit_description *const h) const;
         inline void find_rays(ray *const r, const point_t &d, const int n) const;
         
         /* Generate secondary rays for packet tracing */
-        inline line generate_rays(const ray_trace_engine &r, ray &i, point_t *const text, hit_description *const h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
+        inline point_t generate_rays(const ray_trace_engine &r, ray &i, point_t *const text, hit_description *const h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
         {
             /* Calculate the normal */
-            line norm(this->normal_at_point(&i, h));
+            point_t norm(normal_at_point(&i, h));
 
             /* Interpolate the texture co-ordinate if possible */
             point_t vt(MAX_DIST);
-            if ((this->vnt != nullptr) && (this->vnt[3] != MAX_DIST))
+            if ((this->vnt != nullptr) && (this->vnt[3].x != MAX_DIST))
             {
                 vt = (h->u * this->vnt[5]) + (h->v * this->vnt[4]) + ((1.0f - (h->u + h->v)) * this->vnt[3]);
             }
 
-            get_material()->generate_rays(r, i, norm, vt, h->h, rl, rf);
+            get_material()->generate_rays(r, i, &norm, vt, h->h, rl, rf);
 
             (*text) = vt;
             return norm;
         }
         
         /* Call the materials shader with the triangles normal */
-        inline void shade(const ray_trace_engine &r, ray &i, const line &n, const point_t &vt, const hit_description &h, ext_colour_t *const c) const
+        inline void shade(const ray_trace_engine &r, ray &i, const point_t &n, const point_t &vt, const hit_description &h, ext_colour_t *const c) const
         {
             /* Call the material shader */
             get_material()->shade(r, i, n, h.h, c, vt);
@@ -170,7 +171,7 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
     }
     else if (v_t != nullptr)
     {
-        this->vnt[0] = MAX_DIST;
+        this->vnt[0].x = MAX_DIST;
     }
 
     /* Store texture vertex */
@@ -182,7 +183,7 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
     }
     else if (v_n != nullptr)
     {
-        this->vnt[4] = MAX_DIST;
+        this->vnt[3].x = MAX_DIST;
     }
 
     /* Pick the bounds of the triangle */
@@ -540,41 +541,40 @@ inline void triangle::is_intersecting(const frustrum &f, const packet_ray *const
  if vertex normals are used. Also set weather the ray is
  entering of leaving the triangle.
 ************************************************************/
-inline line triangle::normal_at_point(ray *const r, hit_description *const h) const
+inline point_t triangle::normal_at_point(ray *const r, hit_description *const h) const
 {
     const float denom  = dot_product(this->n, r->get_dir());
     /* Re-calculate the intesection of the ray with the plane of the triangle */
     /* This gives a more accurate hit point to adjust the ray to */
     const float num    = dot_product(this->n, (this->vertex_c - r->get_dst()));
-    r->change_length(num/denom);
+    r->change_length(num / denom);
 
     /* Interpolate the vertex normals */
-    point_t normal;
-    if ((this->vnt != nullptr) && (this->vnt[0] != MAX_DIST))
+    point_t shader_norm;
+    if ((this->vnt != nullptr) && (this->vnt[0].x != MAX_DIST))
     {
-        normal = (h->u * this->vnt[2]) + (h->v * this->vnt[1]) + ((1.0f - (h->u + h->v)) * this->vnt[0]);
+        shader_norm = (h->u * this->vnt[2]) + (h->v * this->vnt[1]) + ((1.0f - (h->u + h->v)) * this->vnt[0]);
     }
     else
     {
-        normal = this->n;
+        shader_norm = this->n;
     }
 
-    /* Construct the normal line */
-    line l(r->get_dst(), normal);
-    
     /* If the line is leaving the volume enclosed by 
        the triangle use the opposite normal */
-    if (denom > 0.0)
+    if (denom > 0.0f)
     {
-        l.opposite_dir();
+        shader_norm = -shader_norm;
+        r->set_geometry_normal(-this->n);
         h->h = hit_t::in_out;
     }
     else
     {
+        r->set_geometry_normal(this->n);
         h->h = hit_t::out_in;
     }
     
-    return l;
+    return shader_norm;
 }
 
 
@@ -592,9 +592,9 @@ inline void triangle::find_rays(ray *const r, const point_t &d, const int n) con
     {
         /* Generate a legal barycenrtic co-ordinate */
         const int eigths    = (i >> 2) & ~0x1;
-        const float beta     = gen_random_mersenne_twister() * (beta_scale  * static_cast<float>(eigths + (i & 0x1)));
-        const float gamma    = gen_random_mersenne_twister() * (gamma_scale * static_cast<float>(eigths + (i & 0x2))) * (1.0f - beta);
-        const float alpha    =1.0f - (beta + gamma);
+        const float beta    = gen_random_mersenne_twister() * (beta_scale  * static_cast<float>(eigths + (i & 0x1)));
+        const float gamma   = gen_random_mersenne_twister() * (gamma_scale * static_cast<float>(eigths + (i & 0x2))) * (1.0f - beta);
+        const float alpha   = 1.0f - (beta + gamma);
 
         /* Convert to cartesian co-ordinates */
         point_t p = (this->vertex_a * alpha) + (this->vertex_b * beta) + (this->vertex_c * gamma);

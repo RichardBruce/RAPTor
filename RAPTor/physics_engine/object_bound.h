@@ -14,7 +14,7 @@ namespace raptor_physics
 class physics_object;
 
 /* Enumerate axes */
-enum axis_t { X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2 };
+enum class axis_t : char { X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2 };
 
 /* Class to represent a bound of an object in an axis */
 class object_bound : private boost::noncopyable

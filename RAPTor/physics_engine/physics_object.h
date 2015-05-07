@@ -27,19 +27,19 @@ class physics_engine;
 
 /* Enum to show the different ways objects can connect */
 /* Possible is used for rotating object were only a conservative result can be given */
-enum collision_t { NO_COLLISION = 0, SLIDING_COLLISION = 1, COLLISION = 2, 
+enum class collision_t : char { NO_COLLISION = 0, SLIDING_COLLISION = 1, COLLISION = 2, 
     POSSIBLE_SLIDING_COLLISION = 5, POSSIBLE_COLLISION = 6 };
 
 /* Check for a POSSIBLY_ prefix */
 inline bool is_uncertain(const collision_t c)
 {
-    return (c & 0x4);
+    return (static_cast<int>(c) & 0x4);
 }
 
 /* Convert to the certain form */
 inline collision_t to_certain(const collision_t c)
 {
-    return static_cast<collision_t>(c & 0x3);
+    return static_cast<collision_t>(static_cast<int>(c) & 0x3);
 }
 
 /* Class to wrap a vertex group with the physics engine specific functionality */
@@ -308,12 +308,12 @@ class physics_object : private boost::noncopyable
         /* Bounds access */
         object_bound *upper_bound(const axis_t axis) const
         {
-            return _upper_bound[axis];
+            return _upper_bound[static_cast<int>(axis)];
         }
 
         object_bound *lower_bound(const axis_t axis) const
         {
-            return _lower_bound[axis];
+            return _lower_bound[static_cast<int>(axis)];
         }
 
     private :
