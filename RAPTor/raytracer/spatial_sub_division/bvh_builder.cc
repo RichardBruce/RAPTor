@@ -12,7 +12,7 @@
 namespace raptor_raytracer
 {
 const int histogram_size = 1024;
-float max_leaf_sa;
+
 
 /* Build a Bounding Volumne Heirarchy for _primitives into nodes */
 int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *const nodes)
@@ -29,8 +29,9 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
 
     /* Calculate Morton codes and build histograms */
     const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
-    const float width_inv = 1.0f / (std::max(std::max(scene_width.x, scene_width.y), scene_width.z) * (1.00001f / 1024.0f));
-    max_leaf_sa = ((scene_width.x * scene_width.y) + (scene_width.x *  scene_width.z) + (scene_width.y * scene_width.z)) * 0.001f;
+    const float width = std::max(std::max(scene_width.x, scene_width.y), scene_width.z) * (1.00001f / 1024.0f);
+    const float width_inv = 1.0f / width;
+    _max_leaf_sah = ((scene_width.x * scene_width.y) + (scene_width.x *  scene_width.z) + (scene_width.y * scene_width.z)) * _max_leaf_sah_factor;
 
     unsigned int hist0[histogram_size * 3];
     unsigned int *hist1 = hist0 + histogram_size;
@@ -151,7 +152,7 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     /* Begin recursion */
     int cost_b = 0x0;
     int cost_e = 0x40000000;
-    build_layer(&cost_b, &cost_e, 0, _primitives->size());
+    build_layer(&cost_b, &cost_e, triangle::get_scene_lower_bounds(), triangle::get_scene_lower_bounds() + (width * 1024.0f), 0, _primitives->size());
 
     /* Combine last layer */
     combine_nodes(&cost_b, &cost_e, 1, cost_b, cost_e, cost_e, 0);
@@ -176,7 +177,7 @@ float bvh_builder::cost_function(const bvh_node &l, const bvh_node &r) const
     return l.combined_surface_area(r);
 }
 
-float bvh_builder::cost_function(const triangle *const l, const point_t &low, const point_t &high) const
+float bvh_builder::cost_function(const triangle *const l, const point_t &low, const point_t &high, const float nodes) const
 {
     /* Size of combined node */
     const point_t bl(min(low, l->lowest_point()));
@@ -185,7 +186,7 @@ float bvh_builder::cost_function(const triangle *const l, const point_t &low, co
     /* Edges of new node */
     const point_t dist(tr - bl);
 
-    return (dist.x * dist.y) + (dist.x * dist.z) + (dist.y * dist.z);
+    return ((dist.x * dist.y) + (dist.x * dist.z) + (dist.y * dist.z)) * nodes;
 }
 
 int bvh_builder::start_index(const int col) const
@@ -206,6 +207,40 @@ int bvh_builder::start_index(const int col) const
     }
 
     return addr;
+}
+
+axis_t bvh_builder::divide_spatial_bounds(point_t *const bm, point_t *const tm, const point_t &bl, const point_t &tr, const axis_t axis) const
+{
+    switch (axis)
+    {
+        case axis_t::x_axis : 
+        {
+            const float split = (tr.x + bl.x) * 0.5f;
+            bm->x = split;
+            tm->x = split;
+            return axis_t::z_axis;
+        }
+
+        case axis_t::y_axis : 
+        {
+            const float split = (tr.y + bl.y) * 0.5f;
+            bm->y = split;
+            tm->y = split;
+            return axis_t::x_axis;
+        }
+
+        case axis_t::z_axis : 
+        {
+            const float split = (tr.z + bl.z) * 0.5f;
+            bm->z = split;
+            tm->z = split;
+            return axis_t::y_axis;
+        }
+
+        default :
+            assert(false);
+            return axis_t::not_set;
+    }
 }
 
 void bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const int b, const int e, const int node_size)
@@ -239,64 +274,10 @@ void bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const in
         assert(from_idx < 0);
     }
 
-    // if (_depth == _max_down_phase_depth)
-    // {
-    //     /* Bound all primitives */
-    //     point_t low(  MAX_DIST,  MAX_DIST,  MAX_DIST);
-    //     point_t high(-MAX_DIST, -MAX_DIST, -MAX_DIST);
-    //     for (int i = b; i < e; ++i)
-    //     {
-    //         low     = min(low, (*_primitives)[i]->lowest_point());
-    //         high    = max(high, (*_primitives)[i]->highest_point());
-    //     }
-
-    //     /* Reserve space in cost address */
-    //     const int node_idx = _next_node++;
-    //     *cost_b = _cost_addrs.size();
-    //     _cost_addrs.push_back(node_idx);
-    //     *cost_e = _cost_addrs.size();
-
-    //     (*_nodes)[node_idx].create_leaf_node(high, low, b, e);
-    //     return;
-    // }
-
     /* Add new nodes */
     const int start_idx = start_index(_cost_addrs.size());
     *cost_b = _cost_addrs.size();
-    // for (int i = b; i < e; ++i)
-    // {
-    //     /* Reserve space in cost address */
-    //     const int node_idx = _next_node++;
-    //     _cost_addrs.push_back(node_idx);
 
-    //      Build node 
-    //     (*_nodes)[node_idx].create_leaf_node((*_primitives)[i]->highest_point(), (*_primitives)[i]->lowest_point(), i, i + 1);
-    // }
-    // for (int i = b; i < e; )
-    // {
-    //     int node_end = i + 1;
-    //     point_t low((*_primitives)[i]->lowest_point());
-    //     point_t high((*_primitives)[i]->highest_point());
-    //     for (; node_end < e; ++node_end)
-    //     {
-    //         if (cost_function((*_primitives)[i], (*_primitives)[node_end]) > max_leaf_sa)
-    //         {
-    //             break;
-    //         }
-    //         else
-    //         {
-    //             low     = min(low, (*_primitives)[node_end]->lowest_point());
-    //             high    = max(high, (*_primitives)[node_end]->highest_point());
-    //         }
-    //     }
-    //     /* Reserve space in cost address */
-    //     const int node_idx = _next_node++;
-    //     _cost_addrs.push_back(node_idx);
-
-    //     /* Build node */
-    //     (*_nodes)[node_idx].create_leaf_node(high, low, i, node_end);
-    //     i = node_end;
-    // }
     for (int i = b; i < e; )
     {
         int node_end = i + 1;
@@ -305,7 +286,7 @@ void bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const in
         point_t high((*_primitives)[i]->highest_point());
         while (node_end < layer_top)
         {
-            if (cost_function((*_primitives)[node_end], low, high) > max_leaf_sa)
+            if (cost_function((*_primitives)[node_end], low, high, node_end - i + 1) > _max_leaf_sah)
             {
                 std::swap((*_primitives)[node_end], (*_primitives)[--layer_top]);
             }
@@ -346,20 +327,14 @@ void bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const in
     combine_nodes(cost_b, cost_e, reduction_function(std::max(cost_end - cost_begin, static_cast<int>(_delta))), cost_begin, cost_end, cost_end, start_idx);
 }
 
-void bvh_builder::build_layer(int *const cost_b, int *const cost_e, const int b, const int e)
+void bvh_builder::build_layer(int *const cost_b, int *const cost_e, const point_t &bl, const point_t &tr, const int b, const int e, axis_t axis)
 {
     assert(_depth < _max_down_phase_depth);
     ++_depth;
 
     /* Check if we want a leaf node */
     const int node_size = e - b;
-    if (node_size < _delta)
-    {
-        build_leaf_node(cost_b, cost_e, b, e, node_size);
-        --_depth;
-        return;
-    }
-    else if (_depth == _max_down_phase_depth)
+    if ((node_size < _delta) || (_depth == _max_down_phase_depth))
     {
         build_leaf_node(cost_b, cost_e, b, e, node_size);
         --_depth;
@@ -368,7 +343,7 @@ void bvh_builder::build_layer(int *const cost_b, int *const cost_e, const int b,
     /* No more morton codes, begin primitive partitioning */
     else if (*cost_b == (*cost_e - 1))
     {
-        build_layer_primitive(cost_b, cost_e, b, e);
+        build_layer_primitive(cost_b, cost_e, bl, tr, b, e, axis);
         --_depth;
         return;
     }
@@ -376,16 +351,20 @@ void bvh_builder::build_layer(int *const cost_b, int *const cost_e, const int b,
     /* Divide the morton codes in 2 again */
     const int morton_middle = *cost_b + ((*cost_e - *cost_b) >> 1);
     const int middle_idx = std::distance(&_code_buffer[0], std::lower_bound(&_code_buffer[b], &_code_buffer[e], morton_middle));
-    // BOOST_LOG_TRIVIAL(trace) << "Middles: " << middle_idx << " points to morton: " << std::hex << _code_buffer[middle_idx] << ", previous: " << _code_buffer[middle_idx - 1] << ", looking for middle: " << morton_middle << std::dec;
     assert((middle_idx == e) || (_code_buffer[middle_idx]     >= morton_middle));
     assert((middle_idx == 0) || (_code_buffer[middle_idx - 1] <  morton_middle));
+
+    /* Shrink node bounds */
+    point_t bm(bl);
+    point_t tm(tr);
+    axis = divide_spatial_bounds(&bm, &tm, bl, tr, axis);
 
     /* If some primitives are in the left node then recurse left */
     int cost_begin = *cost_b;
     int cost_m = morton_middle;
     if (b != middle_idx)
     {
-        build_layer(&cost_begin, &cost_m, b, middle_idx);
+        build_layer(&cost_begin, &cost_m, bl, tm, b, middle_idx, axis);
     }
 
     /* If some primitives are in the right node then recurse right */
@@ -393,7 +372,7 @@ void bvh_builder::build_layer(int *const cost_b, int *const cost_e, const int b,
     int cost_mr = morton_middle;
     if (middle_idx != e)
     {
-        build_layer(&cost_mr, &cost_end, middle_idx, e);
+        build_layer(&cost_mr, &cost_end, bm, tr, middle_idx, e, axis);
     }
     else
     {
@@ -413,20 +392,14 @@ void bvh_builder::build_layer(int *const cost_b, int *const cost_e, const int b,
     --_depth;
 }
 
-void bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, const int b, const int e, axis_t axis)
+void bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, const point_t &bl, const point_t &tr, const int b, const int e, axis_t axis)
 {
     assert(_depth < _max_down_phase_depth);
     ++_depth;
 
     /* Check if we want a leaf node */
     const int node_size = e - b;
-    if (node_size < _delta)
-    {
-        build_leaf_node(cost_b, cost_e, b, e, node_size);
-        --_depth;
-        return;
-    }
-    else if (_depth == _max_down_phase_depth)
+    if ((node_size < _delta) || (_depth == _max_down_phase_depth))
     {
         build_leaf_node(cost_b, cost_e, b, e, node_size);
         --_depth;
@@ -434,73 +407,127 @@ void bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, co
     }
 
     /* Sort primitives about split and track bounds */
-    // int top     = e;
-    // int bottom  = b;
-    // switch (axis)
-    // {
-    //     case axis_t::x_axis : 
-    //     {
-    //         const float dbl_split = (tr.x + bl.x);
-    //         while (bottom < top)
-    //         {
-    //             while (dbl_split < ((*_primitives)[top].highest_point().x + (*_primitives)[top].lowest_point().x) && bottom < top) {  }
-    //             while (dbl_split >= ((*_primitives)[bottom].highest_point().x + (*_primitives)[bottom].lowest_point().x) && bottom < top) {  }
+    int middle_idx;
+    int top     = e - 1;
+    int bottom  = b;
+    switch (axis)
+    {
+        case axis_t::x_axis : 
+        {
+            const float dbl_split = (tr.x + bl.x);
+            while (bottom < top)
+            {
+                /* Skip primitives in the correct place*/
+                while (dbl_split < ((*_primitives)[top]->highest_point().x + (*_primitives)[top]->lowest_point().x) && bottom < top)
+                {
+                    --top;
+                }
 
-    //             if (bottom < top)
-    //             {
-    //                 std::swap((*_primitives)[bottom], (*_primitives)[top]);
-    //             }
-    //         }
+                while (dbl_split >= ((*_primitives)[bottom]->highest_point().x + (*_primitives)[bottom]->lowest_point().x) && bottom < top)
+                {
+                    ++bottom;
+                }
 
-    //         axis = axis_t::y_axis;
-    //         break;
-    //     }
+                /* Swap incorrect primitives */
+                if (bottom < top)
+                {
+                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    --top;
+                    ++bottom;
+                }
+            }
 
-    //     case axis_t::y_axis : 
-    //     {
-    //         const float dbl_split = (tr.y + bl.y);
-    //         while (bottom < top)
-    //         {
-    //             while (dbl_split < ((*_primitives)[top].highest_point().y + (*_primitives)[top].lowest_point().y) && bottom < top) {  }
-    //             while (dbl_split >= ((*_primitives)[bottom].highest_point().y + (*_primitives)[bottom].lowest_point().y) && bottom < top) {  }
+            middle_idx = bottom;
+            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->highest_point().x + (*_primitives)[top]->lowest_point().x)))
+            {
+                ++middle_idx;
+            }
+            break;
+        }
 
-    //             if (bottom < top)
-    //             {
-    //                 std::swap((*_primitives)[bottom], (*_primitives)[top]);
-    //             }
-    //         }
+        case axis_t::y_axis : 
+        {
+            const float dbl_split = (tr.y + bl.y);
+            while (bottom < top)
+            {
+                /* Skip primitives in the correct place*/
+                while (dbl_split < ((*_primitives)[top]->highest_point().y + (*_primitives)[top]->lowest_point().y) && bottom < top)
+                {
+                    --top;
+                }
 
-    //         axis = axis_t::z_axis;
-    //         break;
-    //     }
+                while (dbl_split >= ((*_primitives)[bottom]->highest_point().y + (*_primitives)[bottom]->lowest_point().y) && bottom < top)
+                {
+                    ++bottom;
+                }
 
-    //     case axis_t::z_axis : 
-    //     {
-    //         const float dbl_split = (tr.z + bl.z);
-    //         while (bottom < top)
-    //         {
-    //             while (dbl_split < ((*_primitives)[top].highest_point().z + (*_primitives)[top].lowest_point().z) && bottom < top) {  }
-    //             while (dbl_split >= ((*_primitives)[bottom].highest_point().z + (*_primitives)[bottom].lowest_point().z) && bottom < top) {  }
+                /* Swap incorrect primitives */
+                if (bottom < top)
+                {
+                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    --top;
+                    ++bottom;
+                }
+            }
 
-    //             if (bottom < top)
-    //             {
-    //                 std::swap((*_primitives)[bottom], (*_primitives)[top]);
-    //             }
-    //         }
+            middle_idx = bottom;
+            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->highest_point().y + (*_primitives)[top]->lowest_point().y)))
+            {
+                ++middle_idx;
+            }
+            break;
+        }
 
-    //         axis = axis_t::x_axis;
-    //         break;
-    //     }
-    // }
+        case axis_t::z_axis : 
+        {
+            const float dbl_split = (tr.z + bl.z);
+            while (bottom < top)
+            {
+                /* Skip primitives in the correct place*/
+                while (dbl_split < ((*_primitives)[top]->highest_point().z + (*_primitives)[top]->lowest_point().z) && bottom < top)
+                {
+                    --top;
+                }
 
-    const int middle_idx = (b + e) >> 1;
+                while (dbl_split >= ((*_primitives)[bottom]->highest_point().z + (*_primitives)[bottom]->lowest_point().z) && bottom < top)
+                {
+                    ++bottom;
+                }
+
+                /* Swap incorrect primitives */
+                if (bottom < top)
+                {
+                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    --top;
+                    ++bottom;
+                }
+            }
+
+            middle_idx = bottom;
+            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->highest_point().z + (*_primitives)[top]->lowest_point().z)))
+            {
+                ++middle_idx;
+            }
+            break;
+        }
+
+        default :
+            assert(false);
+    }
+
+    // const int middle_idx = (b + e) >> 1;
+
+    /* Shrink node bounds */
+    point_t bm(bl);
+    point_t tm(tr);
+    axis = divide_spatial_bounds(&bm, &tm, bl, tr, axis);
 
     /* If some primitives are in the left node then recurse left */
     int cost_begin = *cost_b;
     int cost_m = middle_idx;
     if (b != middle_idx)
     {
-        build_layer_primitive(&cost_begin, &cost_m, b, middle_idx);
+        build_layer_primitive(&cost_begin, &cost_m, bl, tm, b, middle_idx, axis);
     }
 
     /* If some primitives are in the right node then recurse right */
@@ -508,7 +535,7 @@ void bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, co
     int cost_mr = middle_idx;
     if (middle_idx != e)
     {
-        build_layer_primitive(&cost_mr, &cost_end, middle_idx, e);
+        build_layer_primitive(&cost_mr, &cost_end, bm, tr, middle_idx, e, axis);
     }
     else
     {
@@ -633,27 +660,20 @@ void bvh_builder::combine_nodes(int *const cost_b, int *const cost_e, const int 
 
 // void bvh_builder::dump_cost() const
 // {
-//     std::cout << "         ";
 //     for (int i = 0; i < std::min(_rows, static_cast<int>(_cost_addrs.size())); ++i)
 //     {
-//         std::cout << std::setprecision(4) << std::setw(9) << _cost_addrs[i] << ", ";
 //     }
-//     std::cout << std::endl;
 
 //     int mat_idx = 0;
 //     for (int i = 0; i < std::min(_rows, static_cast<int>(_cost_addrs.size())); ++i)
 //     {
-//         std::cout << "(" << std::setw(6) << mat_idx << ") ";
 //         for (int j = 0; j <= i; ++j)
 //         {
-//             std::cout << "           ";
 //         }
 
 //         for (int j = i + 1; j < std::min(_rows, static_cast<int>(_cost_addrs.size())); ++j)
 //         {
-//             std::cout << std::setprecision(4) << std::setw(9) << _cost_matrix[mat_idx++] << ", ";
 //         }
-//         std::cout << "(" << (mat_idx - 1) << ")" << std::endl;
 //         mat_idx += (_rows - std::min(_rows, static_cast<int>(_cost_addrs.size())));
 //     }
 // }

@@ -248,8 +248,8 @@ class camera : private boost::noncopyable
                 vfp_t vx(tx, (tx + 1), tx,      (tx + 1));
                 vfp_t vy(ty,  ty,     (ty + 1), (ty + 1));
 
-                vfp_t vx_t = (vx * vfp_t(x_inc)) + vfp_t(this->x_m);
-                vfp_t vy_t = (vy * vfp_t(y_inc)) + vfp_t(this->y_m); 
+                vfp_t vx_t((vx * vfp_t(x_inc)) + vfp_t(this->x_m));
+                vfp_t vy_t((vy * vfp_t(y_inc)) + vfp_t(this->y_m));
 
                 vfp_t vd_x(vfp_t(this->x.x) * vx_t);
                 vfp_t vd_y(vfp_t(this->x.y) * vx_t);
@@ -264,7 +264,7 @@ class camera : private boost::noncopyable
                 vd_z += vfp_t(this->z.z) * vfp_t(this->t);
              
                 /* Normalise */
-                vfp_t vec_len = inverse_sqrt((vd_x * vd_x) + (vd_y * vd_y) + (vd_z * vd_z));
+                vfp_t vec_len(inverse_sqrt((vd_x * vd_x) + (vd_y * vd_y) + (vd_z * vd_z)));
                 vd_x *= vec_len;
                 vd_y *= vec_len;
                 vd_z *= vec_len;
