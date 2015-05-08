@@ -150,7 +150,7 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
     
 #ifdef SIMD_PACKET_TRACING
     /* If using SIMD allow early exit for nodes under a given size */
-    if (this->p->size() <= MAX_KDT_NODE_SIZE)
+    if (_nr_prims <= MAX_KDT_NODE_SIZE)
     {
         auto leaf_prims = new primitive_list(_nr_prims);
         for (int i = 0; i < _nr_prims; ++i)
@@ -174,9 +174,9 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
 #if 0   /* Split approximately in all axis */
         best_split = approximate_split_all_axis(&lowest_cost, &normal);
 #else   /* Split approximately in the first lower cost axis */
-        const float dx = t.x - b.x;
-        const float dy = t.y - b.y;
-        const float dz = t.z - b.z;
+        const float dx = _t.x - _b.x;
+        const float dy = _t.y - _b.y;
+        const float dz = _t.z - _b.z;
         if (dx > dy)
         {
             if (dx > dz)
