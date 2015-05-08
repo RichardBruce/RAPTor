@@ -113,11 +113,6 @@ namespace raptor_raytracer
 #ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE
 #define MIN_APPROX_KDT_BUILDER_NODE_SIZE 36
 #endif /* #ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE */
-#else
-#ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE
-#define MIN_APPROX_KDT_BUILDER_NODE_SIZE 256
-#endif /* #ifndef MIN_KDT_NODE_SIZE */
-#endif /* #ifdef MIN_APPROX_KDT_BUILDER_NODE_SIZE */
 
 /* Define the kd tree completion criteria */
 #ifndef COST_OF_TRAVERSAL
