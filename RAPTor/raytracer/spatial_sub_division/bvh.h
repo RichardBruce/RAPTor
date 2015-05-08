@@ -59,8 +59,10 @@ class bvh : public ssd
         struct bvh_stack_element
         {
 #ifdef SIMD_PACKET_TRACING
-            vfp_t   vt_max;
-            vfp_t   vt_min;
+            bvh_stack_element() : vt_min_ptr(&vt_min[0]) {  }
+
+            vfp_t   vt_min[MAXIMUM_PACKET_SIZE];
+            vfp_t * vt_min_ptr;
 #endif
             float   t_max;
             float   t_min;
@@ -68,7 +70,7 @@ class bvh : public ssd
         };
 
 #ifdef SIMD_PACKET_TRACING
-        inline int  find_leaf_node(const frustrum &r, bvh_stack_element *const entry_point, bvh_stack_element **const out) const;
+        inline int  find_leaf_node(const frustrum &f, const packet_ray *const r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const packet_hit_description *const h, const int size) const;
         inline bool find_leaf_node(const packet_ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const vfp_t *const i_rd, const vfp_t &t_max) const;
 
         void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h,
@@ -82,6 +84,7 @@ class bvh : public ssd
         mutable bvh_stack_element               _bvh_stack[MAX_BVH_STACK_HEIGHT];
         bvh_builder                             _builder;
         std::shared_ptr<std::vector<bvh_node>>  _bvh_base;
+        mutable bvh_stack_element               _entry_point;
         int                                     _root_node;
 };
 }; /* namespace raptor_raytracer */
