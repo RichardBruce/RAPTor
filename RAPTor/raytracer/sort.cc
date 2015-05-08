@@ -525,7 +525,7 @@ void radix_sort(float *const farray, float *const sorted, const int elements)
     for (int i = 0; i < elements; ++i)
     {
         const unsigned int data = array[i];
-        const unsigned int pos = data & 0x7FF;
+        const unsigned int pos = data & 0x7ff;
         sort[++hist0[pos]] = data;
     }
 
@@ -533,7 +533,7 @@ void radix_sort(float *const farray, float *const sorted, const int elements)
     for (int i = 0; i < elements; ++i)
     {
         const unsigned int data = sort[i];
-        const unsigned int pos = (data >> 11) & 0x7FF;
+        const unsigned int pos = (data >> 11) & 0x7ff;
         array[++hist1[pos]] = data;
     }
 
