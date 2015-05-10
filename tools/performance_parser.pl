@@ -64,8 +64,7 @@ else
 }
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
-my $date        =  ($year + 1900) . "-" . ($mon + 1) . "-" . $mday;
-my $today_date  = $parser->parse_datetime($date);
+my $date        =  ($year + 1900) . "-" . ($mon + 1) . "-" . $mday . "T" . $hour . "-" . $min . "-" . $sec;
 my $output_dir  = "$website_dir$project_name/$date";
 `mkdir -p $output_dir`;
 
@@ -97,33 +96,28 @@ while (my $line = <INDEX_T>)
         $line = <INDEX_T>;      # <tr>
         print INDEX_F $line;
 
-        # Check if todays date was already added, if so skip it
+        # Grab the hash off this line
+        my $last_hash = 0;
         $line = <INDEX_T>;
-        if ($line =~ m/$date/)
+        if ($line =~ m/<td>.*<\/td><td>(\w+)<\/td><td>.*<\/td>/)
         {
-            $line = <INDEX_T>;      # </tr>
-            $line = <INDEX_T>;      # <tr>
-            $line = <INDEX_T>;
-        }
-
-        # Parse date
-        my $days_since_run;
-        if ($line =~ m/(\d{4}-\d{1,2}-\d{1,2})/)
-        {
-            my $last_date = $parser->parse_datetime($1);
-            my $dur = $today_date->delta_days($last_date);
-            $days_since_run = $dur->delta_days;
+            $last_hash = $1;
         }
         else
         {
-            die "Error: Cant find date in index: $line\n";
+            die "Error: Cant find last hash in index: $line\n";
         }
 
         # Get git log
-        my @git_log = `git log --since=${days_since_run}.day --pretty=oneline`;
+        my @git_log = `git log --pretty=oneline ${last_hash}..HEAD`;
 
+        # Check there were some commits
+        if ($#git_log == 0)
+        {
+            print INDEX_F "            <td><a href=\"./$date\">$date</a></td><td>$last_hash</td><td></td>\n";
+        }
         # Pull out the latest hash
-        if ($git_log[0] =~ m/(\w+)\s/)
+        elsif ($git_log[0] =~ m/(\w+)\s/)
         {
             # Filter the performance related messages
             my $git_hash = $1;
@@ -143,7 +137,7 @@ while (my $line = <INDEX_T>)
         else
         {
             print "Warning: Cant find hash in git log\n";
-            print INDEX_F "            <td><a href=\"./$date\">$date</a></td><td></td><td></td>\n";
+            print INDEX_F "            <td><a href=\"./$date\">$date</a></td><td>$last_hash</td><td></td>\n";
         }
 
         print INDEX_F "        </tr>\n";
@@ -278,7 +272,7 @@ for (@test_dirs)
     my $plot_file = "$_/summary_plot.sh";
     if (-e $plot_file)
     {
-        `$plot_file $website_dir$project_name/$date/$_.csv $website_dir$project_name/$_.png`;
+        `$plot_file $output_dir/$_.csv $website_dir$project_name/$_.png`;
     }
 }
 
