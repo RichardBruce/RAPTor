@@ -532,30 +532,30 @@ BOOST_FIXTURE_TEST_CASE( flat_normal_calculator_calculate_test, normal_calculato
     std::vector<point_t> norms;
     BOOST_REQUIRE(uut->normals(&norms, 0) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(norms[0] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[1] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 1) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(norms[0] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[1] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 2) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(norms[0] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[1] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 3) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(norms[0] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[1] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 4) == nullptr);
@@ -627,23 +627,24 @@ BOOST_FIXTURE_TEST_CASE( normal_calculator_calculate_mixed_groups_test, normal_c
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 1) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(norms[0] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[1] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
+
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 2) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(norms[0] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[1] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 3) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(norms[0] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[1] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 4) == nullptr);
