@@ -29,8 +29,8 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
 
     /* Calculate Morton codes and build histograms */
     const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
-    const float width = std::max(std::max(scene_width.x, scene_width.y), scene_width.z) * (1.00001f / 1024.0f);
-    const float width_inv = 1.0f / width;
+    const point_t width(scene_width * (1.00001f / 1024.0f));
+    const point_t width_inv(1.0f / width);
     _max_leaf_sah = ((scene_width.x * scene_width.y) + (scene_width.x *  scene_width.z) + (scene_width.y * scene_width.z)) * _max_leaf_sah_factor;
 
     unsigned int hist0[histogram_size * 3];
@@ -38,9 +38,9 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     unsigned int *hist2 = hist1 + histogram_size;
     memset(hist0, 0, histogram_size * 3 * sizeof(float));
 
-    const vfp_t x_mul(width_inv);
-    const vfp_t y_mul(width_inv);
-    const vfp_t z_mul(width_inv);
+    const vfp_t x_mul(width_inv.x);
+    const vfp_t y_mul(width_inv.y);
+    const vfp_t z_mul(width_inv.z);
     const vfp_t scene_lo_x(triangle::get_scene_lower_bounds().x);
     const vfp_t scene_lo_y(triangle::get_scene_lower_bounds().y);
     const vfp_t scene_lo_z(triangle::get_scene_lower_bounds().z);
@@ -83,7 +83,7 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     {
         /* Calculate morton code*/
         const point_t t((((*_primitives)[i]->highest_point() + (*_primitives)[i]->lowest_point()) * 0.5f) - triangle::get_scene_lower_bounds());
-        _morton_codes[i] = morton_code(t.x, t.y, t.z, width_inv, width_inv, width_inv);
+        _morton_codes[i] = morton_code(t.x, t.y, t.z, width_inv.x, width_inv.y, width_inv.z);
 
         /* Build histogram of morton codes */
         ++hist0[ _morton_codes[i]        & 0x3ff];
@@ -152,7 +152,7 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     /* Begin recursion */
     int cost_b = 0x0;
     int cost_e = 0x40000000;
-    build_layer(&cost_b, &cost_e, triangle::get_scene_lower_bounds(), triangle::get_scene_lower_bounds() + (width * 1024.0f), 0, _primitives->size());
+    build_layer(&cost_b, &cost_e, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, _primitives->size());
 
     /* Combine last layer */
     combine_nodes(&cost_b, &cost_e, 1, cost_b, cost_e, cost_e, 0);
