@@ -239,7 +239,7 @@ inline void triangle::is_intersecting(const ray *const r, hit_description *const
 
     /* if determinant is near zero, ray lies in plane of triangle */
     const float det = dot_product(e1, P);
-    if(det > -0.000001f && det < 0.000001f)
+    if (det > -0.000001f && det < 0.000001f)
     {
         h->d = MAX_DIST;
         return;
@@ -307,7 +307,7 @@ inline void triangle::is_intersecting(const packet_ray *const r, packet_hit_desc
 
         /* if determinant is near zero, ray lies in plane of triangle */
         const vfp_t det((e1_x * p_x) + (e1_y * p_y) + (e1_z * p_z));
-        const vfp_t inv_det = inverse(det);
+        const vfp_t inv_det = inverse(det);//1.0f / det;
 
         /* calculate distance from V1 to ray origin */
         const vfp_t t_x(r_x - vertex_a.x);
