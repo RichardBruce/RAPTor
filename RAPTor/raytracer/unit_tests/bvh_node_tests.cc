@@ -33,7 +33,7 @@ namespace raptor_raytracer
 {
 namespace test
 {
-const float result_tolerance = 0.00001f;
+const float result_tolerance = 0.0001f;
 
 struct bvh_node_fixture
 {
