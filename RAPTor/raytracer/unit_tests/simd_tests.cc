@@ -9,6 +9,7 @@ const raptor_physics::init_logger init_logger;
 #endif /* #ifdef STAND_ALONE */
 
 // Standard headers
+#include <chrono>
 
 #include "simd.h"
 
@@ -1093,6 +1094,82 @@ BOOST_AUTO_TEST_CASE( transpose_test )
     BOOST_CHECK_CLOSE(uut3[2],  -10.0, result_tolerance);
     BOOST_CHECK_CLOSE(uut3[3],   10.0, result_tolerance);
 }
+
+BOOST_AUTO_TEST_CASE( min_element_in_vector_test )
+{
+    float min = -1.0f;
+    const float d0[] = { 0.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element(d0, &min, 4) == 0);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d1[] = { 5.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element(d1, &min, 4) == 1);
+    BOOST_CHECK(min == 1.0f);
+
+    min = -1.0f;
+    const float d2[] = { 5.0f, 6.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element(d2, &min, 4) == 2);
+    BOOST_CHECK(min == 2.0f);
+
+    min = -1.0f;
+    const float d3[] = { 5.0f, 6.0f, 7.0f, 3.0f };
+    BOOST_CHECK(min_element(d3, &min, 4) == 3);
+    BOOST_CHECK(min == 3.0f);
+}
+
+BOOST_AUTO_TEST_CASE( min_element_test )
+{
+    float min = -1.0f;
+    const float d0[] = { 7.0f, 8.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 0.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK_MESSAGE(min_element(d0, &min, 12) == 8, min_element(d0, &min, 12));
+    BOOST_CHECK(min == 0.0f);
+}
+
+#ifndef VALGRIND_TESTS
+BOOST_AUTO_TEST_CASE( min_element_performance_test )
+{
+    /* Get an array of the right size */
+    std::vector<float> data(16777216);
+
+    /* Fill it */
+    std::default_random_engine gen;
+    std::uniform_real_distribution<float> dist(-100.0f, 100.0f);
+    std::generate(data.begin(), data.end(), [&dist, &gen]()
+        {
+            return dist(gen);
+        });
+
+    /* Run scalar code */
+    auto s0(std::chrono::system_clock::now());
+    float min_v = std::numeric_limits<float>::infinity();
+    int min_i = -1;
+    for (int i = 0; i < static_cast<int>(data.size()); ++i)
+    {
+        if (data[i] < min_v)
+        {
+            min_v = data[i];
+            min_i = i;
+        }
+    }
+    auto s1(std::chrono::system_clock::now());
+    BOOST_CHECK(min_i > -1);
+    BOOST_CHECK(min_v < std::numeric_limits<float>::infinity());
+
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: min_element_performance_test scalar";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(s1 - s0).count();
+
+    /* Run vector code */
+    float min = std::numeric_limits<float>::infinity();
+    auto v0(std::chrono::system_clock::now());
+    BOOST_CHECK(min_element(data.data(), &min, data.size()) == min_i);
+    auto v1(std::chrono::system_clock::now());
+    BOOST_CHECK(min == min_v);
+
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: min_element_performance_test vector";
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(v1 - v0).count();
+}
+#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_SUITE_END()
 }; /* namespace test */
