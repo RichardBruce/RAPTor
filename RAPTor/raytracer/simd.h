@@ -1,9 +1,10 @@
 #ifndef __SIMD_H__
 #define __SIMD_H__
 
+#include <cmath>
 #include <immintrin.h>
 #include <iostream>
-#include <cmath>
+#include <limits>
 
 #include "common.h"
 
@@ -220,6 +221,8 @@ class vfp_t
         friend void  merge                      (vfp_t &a, vfp_t &b);
         friend void  merge                      (vfp_t &a, vfp_t &b, vfp_t &c, vfp_t &d);
         friend void  merge                      (vfp_t &a0, vfp_t &a1, vfp_t &a2, vfp_t &a3, vfp_t &b0, vfp_t &b1, vfp_t &b3, vfp_t &b4);
+
+        friend int   min_element                (const float *const d, float *const m, const int n);
 
 } __attribute__ ((aligned(16)));//ALIGN(16);
 
@@ -657,9 +660,12 @@ class vint_t
         /* Non standard friendly functions */
         friend int   move_mask          (const vint_t &rhs);
         friend vint_t andnot            (const vint_t &lhs, const vint_t &rhs);
+        friend vint_t mov_p             (const vint_t &p, const vint_t &a, const vint_t &b);
         template<unsigned int m0, unsigned int m1, unsigned int m2, unsigned int m3>
         friend vint_t shuffle           (const vint_t &lhs);
         friend void  transpose          (vint_t &a, vint_t &b, vint_t &c, vint_t &d);
+
+        friend int   min_element        (const float *const d, float *const m, const int n);
 
 } __attribute__ ((aligned(16)));//ALIGN(16);
 
@@ -750,7 +756,8 @@ inline vint_t andnot(const vint_t &lhs, const vint_t &rhs)
 /* Returns a if pred is set else returns b */
 inline vint_t mov_p(const vint_t &p, const vint_t &a, const vint_t &b)
 {
-   return (andnot(p, b) | (p & a));
+    // return _mm_blendv_epi8(b.m, a.m, p.m);
+    return (andnot(p, b) | (p & a));
 }
 
 /* Shuffle */
@@ -833,5 +840,33 @@ inline vint_t morton_code(const vfp_t &x, const vfp_t &y, const vfp_t &z, const 
     split_by_three(y_int);
     split_by_three(z_int);
     return x_int | (y_int << 1) | (z_int << 2);
+}
+
+/* Min index */
+inline int min_element(const float *const d, float *const m, const int n)
+{
+    /* Min within vectors */
+    vint_t min_i(-1);
+    vfp_t min_v(std::numeric_limits<float>::infinity());
+    for (int i = 0; i < n; i += SIMD_WIDTH)
+    {
+        const vfp_t data(&d[i]);
+        const vfp_t pred(data < min_v);
+
+        min_i = mov_p(_mm_castps_si128(pred.m), vint_t(i), min_i);
+        min_v = min(data, min_v);
+    }
+
+    /* Horizontal min */
+    *m = horizontal_min(min_v);
+    for (int i = 0; i < SIMD_WIDTH - 1; ++i)
+    {
+        if ((*m) == min_v[i])
+        {
+            return i + min_i[i];
+        }
+    }
+
+    return min_i[SIMD_WIDTH - 1] + SIMD_WIDTH - 1;
 }
 #endif /* #ifndef __SIMD_H__ */
