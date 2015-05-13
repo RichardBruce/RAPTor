@@ -54,7 +54,7 @@ class bvh_builder
         float                           _max_leaf_sah;
         const int                       _max_down_phase_depth;
         int                             _depth;
-        int                             _rows;
+        long                            _rows;
         std::atomic<int>                _next_node;
 };
 }; /* namespace raptor_raytracer */
