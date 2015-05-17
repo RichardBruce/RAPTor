@@ -106,7 +106,7 @@ namespace raptor_raytracer
 
 #ifdef SIMD_PACKET_TRACING
 #ifndef MAX_KDT_NODE_SIZE
-#define MAX_KDT_NODE_SIZE 20
+#define MAX_KDT_NODE_SIZE 30
 #endif /* #ifndef MAX_KDT_NODE_SIZE */
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
