@@ -31,7 +31,7 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
     const point_t width(scene_width * (1.00001f / 1024.0f));
     const point_t width_inv(1.0f / width);
-    _max_leaf_sah = ((scene_width.x * scene_width.y) + (scene_width.x *  scene_width.z) + (scene_width.y * scene_width.z)) * _max_leaf_sah_factor;
+    _max_leaf_sah = ((scene_width.x * scene_width.y) + (scene_width.x *  scene_width.z) + (scene_width.y * scene_width.z)) * static_cast<float>(_primitives->size()) * _max_leaf_sah_factor;
 
     unsigned int hist0[histogram_size * 3];
     unsigned int *hist1 = hist0 + histogram_size;
