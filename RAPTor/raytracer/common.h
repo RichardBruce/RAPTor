@@ -101,7 +101,7 @@ namespace raptor_raytracer
 /* Define the size of the kd tree trace stack */
 /* A kd tree may not grow to be bigger than this */
 #ifndef MAX_KDT_STACK_HEIGHT
-#define MAX_KDT_STACK_HEIGHT 40
+#define MAX_KDT_STACK_HEIGHT 45
 #endif
 
 #ifdef SIMD_PACKET_TRACING
