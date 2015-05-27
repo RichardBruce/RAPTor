@@ -88,20 +88,11 @@ namespace raptor_raytracer
 #define MAX_BVH_STACK_HEIGHT 100
 #endif
 
-/* Define the maximum size of a BIH node */
-#ifndef MAX_BVH_NODE_SIZE
-#ifdef SIMD_PACKET_TRACING
-#define MAX_BVH_NODE_SIZE 5
-#else
-#define MAX_BVH_NODE_SIZE 5
-#endif /* #ifdef SIMD_PACKET_TRACING */
-#endif /* #ifndef MAX_BVH_NODE_SIZE */
-
 
 /* Define the size of the kd tree trace stack */
 /* A kd tree may not grow to be bigger than this */
 #ifndef MAX_KDT_STACK_HEIGHT
-#define MAX_KDT_STACK_HEIGHT 25
+#define MAX_KDT_STACK_HEIGHT 30
 #endif
 
 #ifdef SIMD_PACKET_TRACING
@@ -111,16 +102,16 @@ namespace raptor_raytracer
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
 #ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE
-#define MIN_APPROX_KDT_BUILDER_NODE_SIZE 36
+#define MIN_APPROX_KDT_BUILDER_NODE_SIZE 150
 #endif /* #ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE */
 
 /* Define the kd tree completion criteria */
 #ifndef COST_OF_TRAVERSAL
-#define COST_OF_TRAVERSAL 200.0f
+#define COST_OF_TRAVERSAL 0.1f
 #endif
 
 #ifndef COST_OF_INTERSECTION
-#define COST_OF_INTERSECTION 3.0f
+#define COST_OF_INTERSECTION 200.0f
 #endif
 
 #ifndef SECANT_ITERATIONS

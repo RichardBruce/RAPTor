@@ -36,12 +36,15 @@ class voxel
 {
     public :
         /* Constructors */
-        voxel(std::vector<voxel_aab_data> *const ping, std::vector<voxel_aab_data> *const pong, const int ping_idx, const int pong_idx, const int nr_prims,
-            const point_t &t, const point_t &b, axis_t n) :
-            _ping(ping), _pong(pong), _t(t), _b(b), _ping_idx(ping_idx), _pong_idx(pong_idx), _nr_prims(nr_prims), _n(n) {  };
+        voxel(std::vector<voxel_aab_data> *const ping, std::vector<voxel_aab_data> *const pong, const int ping_idx, const int pong_idx, const int nr_prims, const point_t &t, const point_t &b, axis_t n) :
+            _ping(ping), _pong(pong), _t(t), _b(b), _sa_inv(0.0f), _ping_idx(ping_idx), _pong_idx(pong_idx), _nr_prims(nr_prims), _n(n)
+        {
+            const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
+            _sa_inv = 1.0f / ((scene_width.x * scene_width.y) + (scene_width.x * scene_width.z) + (scene_width.y * scene_width.z));
+        };
 
         voxel(const voxel &v) :
-            _ping(v._ping), _pong(v._pong), _t(v._t), _b(v._b), _ping_idx(v._ping_idx), _pong_idx(v._pong_idx), _nr_prims(v._nr_prims), _n(v._n) {  };
+            _ping(v._ping), _pong(v._pong), _t(v._t), _b(v._b), _sa_inv(v._sa_inv), _ping_idx(v._ping_idx), _pong_idx(v._pong_idx), _nr_prims(v._nr_prims), _n(v._n) {  };
 
         /* Allow default DTOR */
         
@@ -70,6 +73,7 @@ class voxel
         std::vector<voxel_aab_data> *   _pong;
         point_t                         _t;
         point_t                         _b;
+        float                           _sa_inv;
         int                             _ping_idx;
         int                             _pong_idx;
         int                             _nr_prims;

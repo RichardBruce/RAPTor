@@ -141,7 +141,11 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
     }
 
     /* Calculate the cost of this node */
-    float lowest_cost = COST_OF_INTERSECTION * _nr_prims;
+    const float dx = _t.x - _b.x;
+    const float dy = _t.y - _b.y;
+    const float dz = _t.z - _b.z;
+    float sa = (dx * dy) + (dx * dz) + (dy * dz);
+    float lowest_cost = COST_OF_INTERSECTION * _nr_prims * sa * _sa_inv;
     float cost_before = lowest_cost;
 
 #if 1   /* Approximate builder */
@@ -174,9 +178,6 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
 #if 0   /* Split approximately in all axis */
         best_split = approximate_split_all_axis(&lowest_cost, &normal);
 #else   /* Split approximately in the first lower cost axis */
-        const float dx = _t.x - _b.x;
-        const float dy = _t.y - _b.y;
-        const float dz = _t.z - _b.z;
         if (dx > dy)
         {
             if (dx > dz)
@@ -384,7 +385,6 @@ float voxel::approximate_split_one_axis(float *const s, const axis_t normal) con
     const float xw      = _t.x - _b.x;
     const float yw      = _t.y - _b.y;
     const float zw      = _t.z - _b.z;
-    const float sa_inv  = 1.0f / ((xw * yw) + (xw * zw) + (yw * zw));
     const float xw_yw   = xw * yw;
     const float xw_zw   = xw * zw;
     const float yw_zw   = yw * zw;
@@ -422,15 +422,15 @@ float voxel::approximate_split_one_axis(float *const s, const axis_t normal) con
             count_primitives(cla, cra, sample, 8, axis_t::x_axis);
             
             /* Evaluate SAH minima for each sample */
-            best_split = find_sah_minima([this, xw, yw, zw, yw_zw, sa_inv](const float split, const float cl, const float cr, const float last_cl, const float last_cr, const float sp, const float width)
+            best_split = find_sah_minima([this, xw, yw, zw, yw_zw](const float split, const float cl, const float cr, const float last_cl, const float last_cr, const float sp, const float width)
                 {
                     const float xmb  = split - _b.x;
                     const float xmt  = _t.x - split;
                     const float clg  = (cl - last_cl) / width;
                     const float crg  = (cr - last_cr) / width;
                     const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
-                          (((last_cl + (clg * (split - sp))) * ((xmb * yw) + (xmb * zw) + yw_zw) * sa_inv)  + 
-                           ((last_cr + (crg * (split - sp))) * ((xmt * yw) + (xmt * zw) + yw_zw) * sa_inv)));
+                          (((last_cl + (clg * (split - sp))) * ((xmb * yw) + (xmb * zw) + yw_zw) * _sa_inv)  + 
+                           ((last_cr + (crg * (split - sp))) * ((xmt * yw) + (xmt * zw) + yw_zw) * _sa_inv)));
 
                     return cost;
                 }, s, cl, cr, cla, cra, adaptive_width, bins_per_sample, xw, yw, zw, _b.x, _nr_prims);
@@ -456,15 +456,15 @@ float voxel::approximate_split_one_axis(float *const s, const axis_t normal) con
             count_primitives(cla, cra, sample, 8, axis_t::y_axis);
             
             /* Evaluate SAH minima for each sample */
-            best_split = find_sah_minima([this, xw, yw, zw, xw_zw, sa_inv](const float split, const float cl, const float cr, const float last_cl, const float last_cr, const float sp, const float width)
+            best_split = find_sah_minima([this, xw, yw, zw, xw_zw](const float split, const float cl, const float cr, const float last_cl, const float last_cr, const float sp, const float width)
                 {
                     const float ymb  = split - _b.y;
                     const float ymt  = _t.y - split;
                     const float clg  = (cl - last_cl) / width;
                     const float crg  = (cr - last_cr) / width;
                     const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
-                                      (((last_cl + (clg * (split - sp))) * ((ymb * xw) + (ymb * zw) + xw_zw) * sa_inv)  + 
-                                       ((last_cr + (crg * (split - sp))) * ((ymt * xw) + (ymt * zw) + xw_zw) * sa_inv)));
+                                      (((last_cl + (clg * (split - sp))) * ((ymb * xw) + (ymb * zw) + xw_zw) * _sa_inv)  + 
+                                       ((last_cr + (crg * (split - sp))) * ((ymt * xw) + (ymt * zw) + xw_zw) * _sa_inv)));
 
                     return cost;
                 }, s, cl, cr, cla, cra, adaptive_width, bins_per_sample, yw, xw, zw, _b.y, _nr_prims);
@@ -490,15 +490,15 @@ float voxel::approximate_split_one_axis(float *const s, const axis_t normal) con
             count_primitives(cla, cra, sample, 8, axis_t::z_axis);
             
             /* Evaluate SAH minima for each sample */
-            best_split = find_sah_minima([this, xw, yw, zw, xw_yw, sa_inv](const float split, const float cl, const float cr, const float last_cl, const float last_cr, const float sp, const float width)
+            best_split = find_sah_minima([this, xw, yw, zw, xw_yw](const float split, const float cl, const float cr, const float last_cl, const float last_cr, const float sp, const float width)
                 {
                     const float zmb  = split - _b.z;
                     const float zmt  = _t.z - split;
                     const float clg  = (cl - last_cl) / width;
                     const float crg  = (cr - last_cr) / width;
                     const float cost = COST_OF_TRAVERSAL + (COST_OF_INTERSECTION * 
-                                      (((last_cl + (clg * (split - sp))) * ((zmb * xw) + (zmb * yw) + xw_yw) * sa_inv)  + 
-                                       ((last_cr + (crg * (split - sp))) * ((zmt * xw) + (zmt * yw) + xw_yw) * sa_inv)));
+                                      (((last_cl + (clg * (split - sp))) * ((zmb * xw) + (zmb * yw) + xw_yw) * _sa_inv)  + 
+                                       ((last_cr + (crg * (split - sp))) * ((zmt * xw) + (zmt * yw) + xw_yw) * _sa_inv)));
 
                     return cost;
                 }, s, cl, cr, cla, cra, adaptive_width, bins_per_sample, zw, yw, xw, _b.z, _nr_prims);
@@ -832,7 +832,6 @@ vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp_t &s, 
     const vfp_t x_dist(_t.x - _b.x);
     const vfp_t y_dist(_t.y - _b.y);
     const vfp_t z_dist(_t.z - _b.z);
-    const vfp_t sa((x_dist * y_dist) + (x_dist * z_dist) + (y_dist * z_dist));
     switch (normal)
     {
         case axis_t::x_axis:
@@ -869,7 +868,7 @@ vfp_t voxel::calculate_sah_cost(const vfp_t &l, const vfp_t &r, const vfp_t &s, 
 
     /* Calculate the surface area heuristic metric */
     /* cost of traversal + cost of intersection * (left cell count * left area + right cell count * right area) */
-    return vfp_t(COST_OF_TRAVERSAL) + (vfp_t(COST_OF_INTERSECTION) * (((l * left_area) + (r * right_area)) / sa));
+    return vfp_t(COST_OF_TRAVERSAL) + (vfp_t(COST_OF_INTERSECTION) * (((l * left_area) + (r * right_area)) * _sa_inv));
 }
 }; /* namespace raptor_raytracer */
 
