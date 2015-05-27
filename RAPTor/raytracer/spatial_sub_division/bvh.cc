@@ -104,7 +104,7 @@ inline int bvh::find_leaf_node(const frustrum &f, const packet_ray *const r, bvh
             }
         }
     }
-}// 12.5 8
+}
 
 void bvh::frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const
 {
