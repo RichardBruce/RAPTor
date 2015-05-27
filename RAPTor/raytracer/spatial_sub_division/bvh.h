@@ -59,7 +59,9 @@ class bvh : public ssd
         struct bvh_stack_element
         {
 #ifdef SIMD_PACKET_TRACING
-            bvh_stack_element() : vt_min_ptr(&vt_min[0]) {  }
+            bvh_stack_element() :
+                vt_min_ptr(&vt_min[0]), t_max(0.0f), t_min(0.0f), idx(0)
+            {  }
 
             vfp_t   vt_min[MAXIMUM_PACKET_SIZE];
             vfp_t * vt_min_ptr;
