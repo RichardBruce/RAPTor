@@ -25,7 +25,7 @@ class bvh : public ssd
     public :
         /* CTOR */
         // cppcheck-suppress uninitMemberVar
-        bvh(primitive_list &everything, const int max_node_size = MAX_BVH_NODE_SIZE) :
+        bvh(primitive_list &everything) :
         _builder(), _bvh_base(new std::vector<bvh_node>()), _root_node(0)
         {
             bvh_node::set_primitives(&everything);
