@@ -367,38 +367,20 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
     }
 
     /* Clip packet to the world */
-    const vfp_t x_bounds    = vfp_t(entry_point.u.x, entry_point.l.x, entry_point.u.x, entry_point.l.x);
-    const vfp_t y_bounds    = vfp_t(entry_point.u.y, entry_point.l.y, entry_point.u.y, entry_point.l.y);
-    const vfp_t z_bounds    = vfp_t(entry_point.u.z, entry_point.l.z, entry_point.u.z, entry_point.l.z);
-    const vfp_t x0          = (x_bounds - f.get_mm_ogn(0)) * f.get_mm_idir(0);
-    const vfp_t y0          = (y_bounds - f.get_mm_ogn(1)) * f.get_mm_idir(1);
-    const vfp_t z0          = (z_bounds - f.get_mm_ogn(2)) * f.get_mm_idir(2);
+    const vfp_t low_x((vfp_t(entry_point.l.x) - f.get_mm_ogn(0)) * f.get_mm_idir(0));
+    const vfp_t high_x((vfp_t(entry_point.u.x) - f.get_mm_ogn(0)) * f.get_mm_idir(0));
 
-    const vfp_t x_zip       = shuffle<2, 3, 0, 1>(x0, x0); 
-    const vfp_t y_zip       = shuffle<2, 3, 0, 1>(y0, y0); 
-    const vfp_t z_zip       = shuffle<2, 3, 0, 1>(z0, z0); 
+    const vfp_t low_y((vfp_t(entry_point.l.y) - f.get_mm_ogn(1)) * f.get_mm_idir(1));
+    const vfp_t high_y((vfp_t(entry_point.u.y) - f.get_mm_ogn(1)) * f.get_mm_idir(1));
 
-    const vfp_t x_entry     = min(x0, x_zip);
-    const vfp_t x_exit      = max(x0, x_zip);
-    const vfp_t y_entry     = min(y0, y_zip);
-    const vfp_t y_exit      = max(y0, y_zip);
-    const vfp_t z_entry     = min(z0, z_zip);
-    const vfp_t z_exit      = max(z0, z_zip);
+    const vfp_t low_z((vfp_t(entry_point.l.z) - f.get_mm_ogn(2)) * f.get_mm_idir(2));
+    const vfp_t high_z((vfp_t(entry_point.u.z) - f.get_mm_ogn(2)) * f.get_mm_idir(2));
 
-    const vfp_t mask        = (y_entry > x_exit) | (x_entry > y_exit) | 
-                              (z_entry > x_exit) | (x_entry > z_exit) | 
-                              (z_entry > y_exit) | (y_entry > z_exit);
-
-    const int int_mask = move_mask(mask);
-    if ((int_mask & 0x3) && (int_mask & 0xc))
-    {
-        return;
-    }
-    
-    const float near    = std::min(std::min(x_entry[0], y_entry[0]), z_entry[0]);
-    const float far     = std::max(std::max(x_exit[2],  y_exit[2] ), y_exit[2] );
-    entry_point.t_max   = far;
-    entry_point.t_min   = std::max(0.0f, near);
+    /* Check intersection for the best corner ray */
+    const vfp_t enter_t(max(max(low_x, low_y), max(low_z, vfp_zero)));
+    const vfp_t exit_t(min(min(high_x, high_y), high_z));
+    entry_point.t_min   = horizontal_min(enter_t);
+    entry_point.t_max   = horizontal_max(exit_t);
     if (entry_point.t_min > entry_point.t_max)
     {
         return;
@@ -431,12 +413,12 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
                 const vfp_t z_exit   = (entry_point.u.z - r[i].get_z0()) * i_z_grad;
                 const vfp_t z_entry  = (entry_point.l.z - r[i].get_z0()) * i_z_grad;
             
-                const vfp_t mask = ((y_entry > x_exit) | (x_entry > y_exit)) | 
-                                   ((z_entry > x_exit) | (x_entry > z_exit)) | 
-                                   ((z_entry > y_exit) | (y_entry > z_exit));
+                const vfp_t entry_t = max(max(x_entry, y_entry), max(z_entry, vfp_zero));
+                const vfp_t exit_t = min(x_exit, min(x_exit, z_exit));
+                const vfp_t mask = entry_t < exit_t;
           
                 /* If packet enters leaf then test it */
-                if (move_mask(mask) != 0xf)
+                if (move_mask(mask) != 0)
                 {
 #ifdef FRUSTRUM_CULLING
                     clipped_r[clipped_size++] = i;
@@ -616,12 +598,12 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
                 const vfp_t z_exit   = (entry_point.l.z - r[i].get_z0()) * i_z_grad;
 #endif /* #ifdef SOFT_SHADOW */
 
-                const vfp_t mask = ((y_entry > x_exit) | (x_entry > y_exit)) | 
-                                   ((z_entry > x_exit) | (x_entry > z_exit)) | 
-                                   ((z_entry > y_exit) | (y_entry > z_exit));
+                const vfp_t entry_t = max(max(x_entry, y_entry), max(z_entry, vfp_zero));
+                const vfp_t exit_t = min(x_exit, min(x_exit, z_exit));
+                const vfp_t mask = entry_t < exit_t;
                                    
                 /* If packet enters leaf then test it */
-                if (move_mask(mask) != ((1 << SIMD_WIDTH) - 1))
+                if (move_mask(mask) != 0)
                 {
 #ifdef FRUSTRUM_CULLING
                     clipped_r[clipped_size++] = i;
@@ -1393,17 +1375,11 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
     const float y_exit   = (entry_point.l.y - r->get_y0()) * i_y_grad;
     const float z_entry  = (entry_point.u.z - r->get_z0()) * i_z_grad;
     const float z_exit   = (entry_point.l.z - r->get_z0()) * i_z_grad;
-
-    if ((y_entry > x_exit) || (x_entry > y_exit) || (z_entry > x_exit) || (x_entry > z_exit) || (z_entry > y_exit) || (y_entry > z_exit))
-    {
-        return nullptr;
-    }
     
-    const float near    = std::min(std::min(x_entry, y_entry), z_entry);
-    const float far     = std::max(std::max(x_exit,  y_exit ), z_exit );
+    const float near    = std::max(std::max(x_entry, y_entry), std::max(z_entry, 0.0f));
+    const float far     = std::min(std::min(x_exit,  y_exit ), z_exit );
     entry_point.t_max   = far;
-    entry_point.t_min   = std::max(0.0f, near);
-    
+    entry_point.t_min   = near;
     if (entry_point.t_min > entry_point.t_max)
     {
         return nullptr;
@@ -1472,70 +1448,8 @@ bool bih::found_nearer_object(const ray *const r, const float t) const
     entry_point.idx     = 0;
     entry_point.t_max   = t;
     entry_point.t_min   = 0.0f;
-
-    /* Set the scene bounding box based on ray direction */
-    if (r->get_x_grad() >= 0.0f)
-    {
-        entry_point.u.x    = triangle::get_scene_lower_bounds().x;
-        entry_point.l.x    = triangle::get_scene_upper_bounds().x;
-    }
-    else
-    {
-        entry_point.u.x    = triangle::get_scene_upper_bounds().x;
-        entry_point.l.x    = triangle::get_scene_lower_bounds().x;
-    }
-
-    if (r->get_y_grad() >= 0.0f)
-    {
-        entry_point.u.y    = triangle::get_scene_lower_bounds().y;
-        entry_point.l.y    = triangle::get_scene_upper_bounds().y;
-    }
-    else
-    {
-        entry_point.u.y    = triangle::get_scene_upper_bounds().y;
-        entry_point.l.y    = triangle::get_scene_lower_bounds().y;
-    }
-
-    if (r->get_z_grad() >= 0.0f)
-    {
-        entry_point.u.z    = triangle::get_scene_lower_bounds().z;
-        entry_point.l.z    = triangle::get_scene_upper_bounds().z;
-    }
-    else
-    {
-        entry_point.u.z    = triangle::get_scene_upper_bounds().z;
-        entry_point.l.z    = triangle::get_scene_lower_bounds().z;
-    }
-
-    /* Clip packet to the world */
-    const float i_x_grad = 1.0f / r->get_x_grad();
-    const float i_y_grad = 1.0f / r->get_y_grad();
-    const float i_z_grad = 1.0f / r->get_z_grad();
-    const float x_entry  = (entry_point.u.x - r->get_x0()) * i_x_grad;
-    const float x_exit   = (entry_point.l.x - r->get_x0()) * i_x_grad;
-    const float y_entry  = (entry_point.u.y - r->get_y0()) * i_y_grad;
-    const float y_exit   = (entry_point.l.y - r->get_y0()) * i_y_grad;
-    const float z_entry  = (entry_point.u.z - r->get_z0()) * i_z_grad;
-    const float z_exit   = (entry_point.l.z - r->get_z0()) * i_z_grad;
-
-    if ((y_entry > x_exit) || (x_entry > y_exit) || 
-        (z_entry > x_exit) || (x_entry > z_exit) || 
-        (z_entry > y_exit) || (y_entry > z_exit))
-    {
-        return false;
-    }
     
-    const float near    = std::min(std::min(x_entry, y_entry), z_entry);
-    const float far     = std::max(std::max(x_exit,  y_exit ), z_exit );
-    entry_point.t_max   = far;
-    entry_point.t_min   = std::max(0.0f, near);
-    
-    if (entry_point.t_min > entry_point.t_max)
-    {
-        return false;
-    }
-    
-    point_t i_ray_dir(i_x_grad, i_y_grad, i_z_grad);
+    point_t i_ray_dir(1.0f / r->get_x_grad(), 1.0f / r->get_y_grad(), 1.0f / r->get_z_grad());
 
     /* Traverse the whole tree */
     // BOOST_LOG_TRIVIAL(trace) << "Beginning search for nearer object";
