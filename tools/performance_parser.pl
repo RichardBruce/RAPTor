@@ -109,11 +109,13 @@ while (my $line = <INDEX_T>)
         }
 
         # Get git log
+        print "Last run hash: $last_hash\n";
         my @git_log = `git log --pretty=oneline ${last_hash}..HEAD`;
 
         # Check there were some commits
         if ($#git_log == 0)
         {
+            print "No log entries found\n";
             print INDEX_F "            <td><a href=\"./$date\">$date</a></td><td>$last_hash</td><td></td>\n";
         }
         # Pull out the latest hash
@@ -121,11 +123,14 @@ while (my $line = <INDEX_T>)
         {
             # Filter the performance related messages
             my $git_hash = $1;
+            print "Current hash: $git_hash\n";
             my @perf_messages;
             foreach (@git_log)
             {
+                print "Checking git log: $_\n";
                 if (m/PERF:\s+([\w\s\.]+)$/)
                 {
+                    print "Found peformance log: $1\n";
                     push @perf_messages, $1;
                 }
             }
