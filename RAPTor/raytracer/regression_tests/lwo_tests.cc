@@ -30,16 +30,16 @@ BOOST_AUTO_TEST_CASE( lwo_caterpillar_t530_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, 100.0, -100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_freightliner_aerodyne_test )
@@ -52,16 +52,16 @@ BOOST_AUTO_TEST_CASE( lwo_freightliner_aerodyne_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-100, 100, -100), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_hummer_test )
@@ -75,16 +75,16 @@ BOOST_AUTO_TEST_CASE( lwo_hummer_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0, 100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_scud_launcher_test )
@@ -98,16 +98,16 @@ BOOST_AUTO_TEST_CASE( lwo_scud_launcher_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0, 100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_subaru_impreza_0_test )
@@ -121,16 +121,16 @@ BOOST_AUTO_TEST_CASE( lwo_subaru_impreza_0_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_subaru_impreza_1_test )
@@ -144,16 +144,16 @@ BOOST_AUTO_TEST_CASE( lwo_subaru_impreza_1_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t( 100.0, -100.0, 100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_t_62_test )
@@ -167,16 +167,16 @@ BOOST_AUTO_TEST_CASE( lwo_t_62_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_t_62_spotlit_test )
@@ -189,16 +189,16 @@ BOOST_AUTO_TEST_CASE( lwo_t_62_spotlit_test )
     fixture.add_spotlight(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 15.0, 0.0), point_t(0.0, 0.0, 0.0), 10.0, 0.0, 10.0, 45.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_t_62_directlit_test )
@@ -211,16 +211,16 @@ BOOST_AUTO_TEST_CASE( lwo_t_62_directlit_test )
     fixture.add_directional_light(ext_colour_t(255.0, 255.0, 255.0), point_t(15.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_chemical_tanker_test )
@@ -234,16 +234,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_chemical_tanker_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_container_test )
@@ -257,16 +257,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_container_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_diablo_test )
@@ -280,16 +280,16 @@ BOOST_AUTO_TEST_CASE( lwo_diablo_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_thunderbird_test )
@@ -303,16 +303,16 @@ BOOST_AUTO_TEST_CASE( lwo_thunderbird_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_viper_test )
@@ -326,16 +326,16 @@ BOOST_AUTO_TEST_CASE( lwo_viper_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_dragster_test )
@@ -349,16 +349,16 @@ BOOST_AUTO_TEST_CASE( lwo_dragster_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_panzer2_test )
@@ -372,16 +372,16 @@ BOOST_AUTO_TEST_CASE( lwo_panzer2_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_mack_dumper_test )
@@ -395,16 +395,16 @@ BOOST_AUTO_TEST_CASE( lwo_mack_dumper_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_mack_superliner_test )
@@ -418,16 +418,16 @@ BOOST_AUTO_TEST_CASE( lwo_mack_superliner_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_lowboy_test )
@@ -441,16 +441,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_lowboy_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 
@@ -466,16 +466,16 @@ BOOST_AUTO_TEST_CASE( lwo_mercedes_clk_dtm_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_abrams_test )
@@ -489,16 +489,16 @@ BOOST_AUTO_TEST_CASE( lwo_abrams_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_weisel_2_ozelot_test )
@@ -512,16 +512,16 @@ BOOST_AUTO_TEST_CASE( lwo_weisel_2_ozelot_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(500.0, -500.0,  500.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_peterbilt_379_4axle_test )
@@ -535,16 +535,16 @@ BOOST_AUTO_TEST_CASE( lwo_peterbilt_379_4axle_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_2_axle_jeep_test )
@@ -558,16 +558,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_2_axle_jeep_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_mechanical_detachable_gooseneck_jeep_test )
@@ -581,16 +581,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_mechanical_detachable_gooseneck_jeep_te
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_2_axle_mechanical_detachable_gooseneck_jeep_test )
@@ -604,16 +604,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_2_axle_mechanical_detachable_gooseneck_jeep_te
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_jeep_test )
@@ -627,16 +627,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_jeep_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_lowboy_trailer_with_short_goosneck_test )
@@ -650,16 +650,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_lowboy_trailer_with_short_goosneck_test
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_lowboy_trailer_with_long_goosneck_test )
@@ -673,16 +673,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_lowboy_trailer_with_long_goosneck_test 
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_hitachi_fh200_test )
@@ -696,16 +696,16 @@ BOOST_AUTO_TEST_CASE( lwo_hitachi_fh200_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_doepker_logger_test )
@@ -719,16 +719,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_doepker_logger_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_doepker_test )
@@ -742,16 +742,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_doepker_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
@@ -765,16 +765,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 // BOOST_AUTO_TEST_CASE( lwo_jcb_135b_test )
@@ -788,16 +788,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_art_studio_test )
@@ -811,16 +811,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_bottle_collection_layered_test )
@@ -834,16 +834,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_candles_test )
@@ -857,16 +857,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_christmas_challenge_test )
@@ -880,16 +880,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_film_noir_challenge_test )
@@ -903,16 +903,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_flying_spaghetti_monster_test )
@@ -926,16 +926,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_halloween_test )
@@ -949,16 +949,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_haunted_hallway_test )
@@ -972,16 +972,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_kings_treasure_test )
@@ -995,16 +995,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_lighthouse_test )
@@ -1018,16 +1018,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_mad_science_test )
@@ -1041,16 +1041,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_museum_test )
@@ -1064,16 +1064,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_neon_chrome_test )
@@ -1087,16 +1087,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_science_fiction_challenge_3_test )
@@ -1110,16 +1110,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // BOOST_AUTO_TEST_CASE( lwo_under_the_boardwalk_test )
@@ -1133,16 +1133,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_etnyre_asphalt_test )
 //     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     // /* Ray trace the scene using bvh */
-    // fixture.render<bvh>();
-    // checker.check(fixture.get_camera(), "bvh");
+//    // fixture.render<bvh>();
+//    // checker.check(fixture.get_camera(), "bvh");
 
 //     /* Ray trace the scene using kd tree */
 //     fixture.render<kd_tree>();
 //     checker.check(fixture.get_camera(), "kdt");
 
 //     /* Ray trace the scene using bih */
-//     fixture.render<bih>();
-//     checker.check(fixture.get_camera(), "bih");
+////     fixture.render<bih>();
+////     checker.check(fixture.get_camera(), "bih");
 // }
 
 // ../../../data/lwo_scenes/bedroom/Bedroom.lws
@@ -1161,16 +1161,16 @@ BOOST_AUTO_TEST_CASE( lwo_caterpillar_t530_low_res_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, 100.0, -100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_mechanical_detachable_gooseneck_jeep_low_res_test )
@@ -1184,16 +1184,16 @@ BOOST_AUTO_TEST_CASE( lwo_trailer_3_axle_mechanical_detachable_gooseneck_jeep_lo
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100.0, -100.0,  100.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+//    fixture.render<bvh>();
+//    checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+//    fixture.render<bih>();
+//    checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

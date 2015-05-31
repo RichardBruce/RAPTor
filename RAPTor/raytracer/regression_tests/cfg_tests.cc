@@ -29,16 +29,16 @@ BOOST_AUTO_TEST_CASE( cfg_mgftree_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(5.0, -25.0, 5.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+    // fixture.render<bvh>();
+    // checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+    // fixture.render<bih>();
+    // checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( cfg_design1_test )
@@ -52,16 +52,16 @@ BOOST_AUTO_TEST_CASE( cfg_design1_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(2.5, 6.0, 2.6), 0.0, 0.001);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+    // fixture.render<bvh>();
+    // checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+    // fixture.render<bih>();
+    // checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( cfg_df_dl_ww_test )
@@ -74,16 +74,16 @@ BOOST_AUTO_TEST_CASE( cfg_df_dl_ww_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(1.0, 1.1, 2.0), 0.0, 0.1);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+    // fixture.render<bvh>();
+    // checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+    // fixture.render<bih>();
+    // checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( cfg_if_ww_test )
@@ -96,16 +96,16 @@ BOOST_AUTO_TEST_CASE( cfg_if_ww_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(1.0, 1.1, 2.0), 0.0, 0.1);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+    // fixture.render<bvh>();
+    // checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+    // fixture.render<bih>();
+    // checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( cfg_dif_ww_test )
@@ -118,16 +118,16 @@ BOOST_AUTO_TEST_CASE( cfg_dif_ww_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(1.0, 1.1, 2.0), 0.0, 0.1);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+    // fixture.render<bvh>();
+    // checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+    // fixture.render<bih>();
+    // checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( cfg_unc_powerplant_test )
@@ -141,16 +141,16 @@ BOOST_AUTO_TEST_CASE( cfg_unc_powerplant_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(100000.0, 500000.0, 500000.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+    // fixture.render<bvh>();
+    // checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+    // fixture.render<bih>();
+    // checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_CASE( cfg_unc_powerplant_2_test )
@@ -164,16 +164,16 @@ BOOST_AUTO_TEST_CASE( cfg_unc_powerplant_2_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(-100000.0, 50000.0, 500000.0), 0.0, 10.0);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+    // fixture.render<bvh>();
+    // checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+    // fixture.render<bih>();
+    // checker.check(fixture.get_camera(), "bih");
 }
 #endif /* #ifndef VALGRIND_TESTS */
 
@@ -187,16 +187,16 @@ BOOST_AUTO_TEST_CASE( cfg_dif_ww_low_res_test )
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(1.0, 1.1, 2.0), 0.0, 0.1);
 
     /* Ray trace the scene using bvh */
-    fixture.render<bvh>();
-    checker.check(fixture.get_camera(), "bvh");
+    // fixture.render<bvh>();
+    // checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
     fixture.render<kd_tree>();
     checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
-    fixture.render<bih>();
-    checker.check(fixture.get_camera(), "bih");
+    // fixture.render<bih>();
+    // checker.check(fixture.get_camera(), "bih");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
