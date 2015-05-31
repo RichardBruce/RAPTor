@@ -116,7 +116,7 @@ namespace raptor_raytracer
 
 /* Define the kd tree completion criteria */
 #ifndef COST_OF_TRAVERSAL
-#define COST_OF_TRAVERSAL 30.0f
+#define COST_OF_TRAVERSAL 60.0f
 #endif
 
 #ifndef COST_OF_INTERSECTION
