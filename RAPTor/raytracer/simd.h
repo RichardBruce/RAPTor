@@ -599,14 +599,6 @@ class vint_t
         }
 
         /* Lane access */
-        /* Note -- the c++ compile will prefer the slower non const members */
-        inline int& operator[](int i)
-        {
-            union { __m128i *v; int *f[4]; } a;
-            a.v = &this->m;
-            return (*a.f)[i];
-        }
-
         inline int operator[](int i) const
         {
             int f[4];
@@ -848,7 +840,7 @@ inline int min_element(const float *const d, float *const m, const int n)
     /* Min within vectors */
     vint_t min_i(-1);
     vfp_t min_v(std::numeric_limits<float>::infinity());
-    for (int i = 0; i < n; i += SIMD_WIDTH)
+    for (int i = 0; i <= n - SIMD_WIDTH; i += SIMD_WIDTH)
     {
         const vfp_t data(&d[i]);
         const vfp_t pred(data < min_v);
@@ -857,16 +849,60 @@ inline int min_element(const float *const d, float *const m, const int n)
         min_v = min(data, min_v);
     }
 
-    /* Horizontal min */
-    *m = horizontal_min(min_v);
-    for (int i = 0; i < SIMD_WIDTH - 1; ++i)
+    /* Min within vector */
+    const vfp_t min1 = shuffle<1,0,3,2>(min_v, min_v);
+    const vfp_t min2 = min(min_v, min1);
+    const vfp_t min3 = shuffle<0,1,0,1>(min2, min2);
+    const vfp_t min4 = min(min2, min3);
+    float min_d = _mm_cvtss_f32(min4.m);
+
+    /* Min index */
+    const int min_idx = __builtin_ctz(move_mask(min_v == min4));
+    int ret = min_i[min_idx] + min_idx;
+
+    /* Trailing elements */
+    for (int i = (n & ~(SIMD_WIDTH - 1)); i < n; ++i)
     {
-        if ((*m) == min_v[i])
+        if (d[i] < min_d)
         {
-            return i + min_i[i];
+            min_d   = d[i];
+            ret     = i;
         }
     }
 
-    return min_i[SIMD_WIDTH - 1] + SIMD_WIDTH - 1;
+    *m = min_d;
+    return ret;
+}
+
+inline int min_element_unaligned(const float *const d, float *const m, const int a, const int n)
+{
+    /* Leading elements */
+    int min_i = -1;
+    float min_d = std::numeric_limits<float>::infinity();
+    const int aligned = (a & ~(SIMD_WIDTH - 1)) + ((a & (SIMD_WIDTH - 1)) ? SIMD_WIDTH : 0);
+    for (int i = a; i < aligned; ++i)
+    {
+        if (d[i] < min_d)
+        {
+            min_d = d[i];
+            min_i = i;
+        }
+    }
+
+    /* Middle and trailing elements */
+    float r_m = std::numeric_limits<float>::infinity();
+    const int r_i = min_element(&d[aligned], &r_m, n - aligned);
+
+    /* Pick the lowest */
+    if (r_m < min_d)
+    {
+        *m = r_m;
+        return r_i + aligned;
+    }
+    else
+    {
+        *m = min_d;
+        return min_i;
+    }
 }
 #endif /* #ifndef __SIMD_H__ */

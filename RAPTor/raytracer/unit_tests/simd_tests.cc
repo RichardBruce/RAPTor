@@ -8,12 +8,17 @@
 const raptor_physics::init_logger init_logger;
 #endif /* #ifdef STAND_ALONE */
 
-// Standard headers
+/* Standard headers */
 #include <chrono>
 
-#include "simd.h"
+/* Common headers */
+#include "logging.h"
 
+/* Boost headers */
 #include "boost/test/unit_test.hpp"
+
+/* Raytracer headers */
+#include "simd.h"
 
 
 namespace raptor_raytracer
@@ -1122,7 +1127,158 @@ BOOST_AUTO_TEST_CASE( min_element_test )
 {
     float min = -1.0f;
     const float d0[] = { 7.0f, 8.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 0.0f, 1.0f, 2.0f, 3.0f };
-    BOOST_CHECK_MESSAGE(min_element(d0, &min, 12) == 8, min_element(d0, &min, 12));
+    BOOST_CHECK(min_element(d0, &min, 12) == 8);
+    BOOST_CHECK(min == 0.0f);
+}
+
+BOOST_AUTO_TEST_CASE( min_element_duplicate_test )
+{
+    float min = -1.0f;
+    const float d0[] = { 7.0f, 8.0f, 0.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 0.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element(d0, &min, 12) == 8);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d1[] = { 7.0f, 0.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 3.0f, 1.0f, 0.0f, 3.0f };
+    BOOST_CHECK(min_element(d1, &min, 12) == 1);
+    BOOST_CHECK(min == 0.0f);
+}
+
+BOOST_AUTO_TEST_CASE( min_element_non_vector_width_test )
+{
+    float min = -1.0f;
+    const float d0[] = { 7.0f, 8.0f, 2.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 1.0f, 1.0f, 2.0f, 3.0f, 0.0f };
+    BOOST_CHECK(min_element(d0, &min, 13) == 12);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d1[] = { 7.0f, 5.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 3.0f, 1.0f, 5.0f, 3.0f, 1.0f, 2.0f, 0.0f };
+    BOOST_CHECK(min_element(d1, &min, 15) == 14);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d2[] = { 7.0f, 5.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 3.0f, 1.0f, 5.0f, 3.0f, 1.0f, 0.0f, 2.0f };
+    BOOST_CHECK(min_element(d2, &min, 15) == 13);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d3[] = { 7.0f, 5.0f, 9.0f, 0.0f, 4.0f, 5.0f, 6.0f, 7.0f, 3.0f, 1.0f, 5.0f, 3.0f, 1.0f, 10.0f, 2.0f };
+    BOOST_CHECK(min_element(d3, &min, 15) == 3);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d4[] = { 7.0f, 5.0f, 9.0f, 0.0f, 4.0f, 5.0f, 6.0f, 7.0f, 3.0f, 1.0f, 5.0f, 3.0f, 1.0f, 0.0f, 2.0f };
+    BOOST_CHECK(min_element(d4, &min, 15) == 3);
+    BOOST_CHECK(min == 0.0f);
+}
+
+BOOST_AUTO_TEST_CASE( min_element_unaligned_in_vector_test )
+{
+    float min = -1.0f;
+    const float d0[] = { 0.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d0, &min, 0, 4) == 0);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d1[] = { 5.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d1, &min, 0, 4) == 1);
+    BOOST_CHECK(min == 1.0f);
+
+    min = -1.0f;
+    const float d2[] = { 5.0f, 6.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d2, &min, 0, 4) == 2);
+    BOOST_CHECK(min == 2.0f);
+
+    min = -1.0f;
+    const float d3[] = { 5.0f, 6.0f, 7.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d3, &min, 0, 4) == 3);
+    BOOST_CHECK(min == 3.0f);
+}
+
+BOOST_AUTO_TEST_CASE( min_element_unaligned_in_align_test )
+{
+    float min = -1.0f;
+    const float d0[] = { 0.0f, 2.0f, 1.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d0, &min, 1, 4) == 2);
+    BOOST_CHECK(min == 1.0f);
+
+    min = -1.0f;
+    const float d1[] = { 5.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d1, &min, 2, 4) == 2);
+    BOOST_CHECK(min == 2.0f);
+
+    min = -1.0f;
+    const float d2[] = { 5.0f, 6.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d2, &min, 3, 4) == 3);
+    BOOST_CHECK(min == 3.0f);
+}
+
+BOOST_AUTO_TEST_CASE( min_element_unaligned_test )
+{
+    float min = -1.0f;
+    const float d0[] = { 7.0f, 8.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 0.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d0, &min, 0, 12) == 8);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d1[] = { 7.0f, 8.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 0.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d1, &min, 1, 12) == 8);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d2[] = { 7.0f, 8.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 0.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d2, &min, 2, 12) == 8);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d3[] = { 7.0f, 8.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 0.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d3, &min, 3, 12) == 8);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d4[] = { 7.0f, 8.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 0.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d4, &min, 4, 12) == 8);
+    BOOST_CHECK(min == 0.0f);
+}
+
+BOOST_AUTO_TEST_CASE( min_element_unaligned_duplicate_test )
+{
+    float min = -1.0f;
+    const float d0[] = { 7.0f, 8.0f, 0.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 0.0f, 1.0f, 2.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d0, &min, 2, 12) == 2);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d1[] = { 7.0f, 0.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 3.0f, 1.0f, 0.0f, 3.0f };
+    BOOST_CHECK(min_element_unaligned(d1, &min, 1, 12) == 1);
+    BOOST_CHECK(min == 0.0f);
+}
+
+BOOST_AUTO_TEST_CASE( min_element_unaligned_non_vector_width_test )
+{
+    float min = -1.0f;
+    const float d0[] = { 7.0f, 8.0f, 2.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 1.0f, 1.0f, 2.0f, 3.0f, 0.0f };
+    BOOST_CHECK(min_element_unaligned(d0, &min, 0, 13) == 12);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d1[] = { 7.0f, 5.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 3.0f, 1.0f, 5.0f, 3.0f, 1.0f, 2.0f, 0.0f };
+    BOOST_CHECK(min_element_unaligned(d1, &min, 1, 15) == 14);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d2[] = { 7.0f, 5.0f, 9.0f, 10.0f, 4.0f, 5.0f, 6.0f, 7.0f, 3.0f, 1.0f, 5.0f, 3.0f, 1.0f, 0.0f, 2.0f };
+    BOOST_CHECK(min_element_unaligned(d2, &min, 2, 15) == 13);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d3[] = { 7.0f, 5.0f, 9.0f, 0.0f, 4.0f, 5.0f, 6.0f, 7.0f, 3.0f, 1.0f, 5.0f, 3.0f, 1.0f, 10.0f, 2.0f };
+    BOOST_CHECK(min_element_unaligned(d3, &min, 3, 15) == 3);
+    BOOST_CHECK(min == 0.0f);
+
+    min = -1.0f;
+    const float d4[] = { 7.0f, 5.0f, 9.0f, 0.0f, 4.0f, 5.0f, 6.0f, 7.0f, 3.0f, 1.0f, 5.0f, 3.0f, 1.0f, 0.0f, 2.0f };
+    BOOST_CHECK(min_element_unaligned(d4, &min, 4, 15) == 13);
     BOOST_CHECK(min == 0.0f);
 }
 
