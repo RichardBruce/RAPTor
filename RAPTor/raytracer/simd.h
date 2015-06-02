@@ -874,13 +874,13 @@ inline int min_element(const float *const d, float *const m, const int n)
     return ret;
 }
 
-inline int min_element_unaligned(const float *const d, float *const m, const int a, const int n)
+inline int min_element(const float *const d, float *const m, const int begin, const int end)
 {
     /* Leading elements */
     int min_i = -1;
     float min_d = std::numeric_limits<float>::infinity();
-    const int aligned = (a & ~(SIMD_WIDTH - 1)) + ((a & (SIMD_WIDTH - 1)) ? SIMD_WIDTH : 0);
-    for (int i = a; i < aligned; ++i)
+    const int aligned = (begin & ~(SIMD_WIDTH - 1)) + ((begin & (SIMD_WIDTH - 1)) ? SIMD_WIDTH : 0);
+    for (int i = begin; i < std::min(end, aligned); ++i)
     {
         if (d[i] < min_d)
         {
@@ -891,7 +891,8 @@ inline int min_element_unaligned(const float *const d, float *const m, const int
 
     /* Middle and trailing elements */
     float r_m = std::numeric_limits<float>::infinity();
-    const int r_i = min_element(&d[aligned], &r_m, n - aligned);
+    const int n = end - aligned;
+    const int r_i = (n > 0) ? min_element(&d[aligned], &r_m, n) : 0;
 
     /* Pick the lowest */
     if (r_m < min_d)

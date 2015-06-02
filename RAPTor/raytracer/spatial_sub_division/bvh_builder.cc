@@ -586,24 +586,26 @@ void bvh_builder::combine_nodes(int *const cost_b, int *const cost_e, const int 
         float lowest_cost = std::numeric_limits<float>::max();
         for (int i = cost_begin; i < cost_end - 1; ++i)
         {
-            for (int j = i + 1; j < cost_end; ++j)
+            float cost;
+            const int j = min_element(_cost_matrix.data(), &cost, row_idx, row_idx + (cost_end - i - 1));
+            if (cost < lowest_cost)
             {
-                const float cost = _cost_matrix[row_idx++];
-                if (cost < lowest_cost)
-                {
-                    lowest_i    = i;
-                    lowest_j    = j;
-                    lowest_cost = cost;
-                }
+                lowest_i    = i;
+                lowest_j    = (j - row_idx) + i + 1;
+                lowest_cost = cost;
             }
 
             /* Leave some blank space and move to the next row*/
-            row_idx += (_rows - cost_end);
+            row_idx += (_rows - i - 1);
             assert(row_idx >= 0);
         }
 
         /* Make the lowest cost row and column into a new node */
         const int node_idx = _next_node++;
+        assert(lowest_i >= 0);
+        assert(lowest_j >= 0);
+        assert(lowest_i < cost_end);
+        assert(lowest_j < cost_end);
         (*_nodes)[node_idx].create_generic_node(*_nodes, _cost_addrs[lowest_i], _cost_addrs[lowest_j]);
         // assert(lowest_cost == cost_function((*_nodes)[_cost_addrs[lowest_i]], (*_nodes)[_cost_addrs[lowest_j]]));
         _cost_addrs[lowest_i] = node_idx;
