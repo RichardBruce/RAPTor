@@ -415,7 +415,7 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
             
                 const vfp_t entry_t = max(max(x_entry, y_entry), max(z_entry, vfp_zero));
                 const vfp_t exit_t = min(x_exit, min(x_exit, z_exit));
-                const vfp_t mask = entry_t < exit_t;
+                const vfp_t mask = entry_t <= exit_t;
           
                 /* If packet enters leaf then test it */
                 if (move_mask(mask) != 0)
@@ -600,7 +600,7 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
 
                 const vfp_t entry_t = max(max(x_entry, y_entry), max(z_entry, vfp_zero));
                 const vfp_t exit_t = min(x_exit, min(x_exit, z_exit));
-                const vfp_t mask = entry_t < exit_t;
+                const vfp_t mask = entry_t <= exit_t;
                                    
                 /* If packet enters leaf then test it */
                 if (move_mask(mask) != 0)
