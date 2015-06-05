@@ -111,7 +111,7 @@ namespace raptor_raytracer
 #endif
 
 #ifndef COST_OF_INTERSECTION
-#define COST_OF_INTERSECTION 275.0f
+#define COST_OF_INTERSECTION 150.0f
 #endif
 
 #ifndef SECANT_ITERATIONS
