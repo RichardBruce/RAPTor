@@ -102,7 +102,7 @@ namespace raptor_raytracer
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
 #ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE
-#define MIN_APPROX_KDT_BUILDER_NODE_SIZE 125
+#define MIN_APPROX_KDT_BUILDER_NODE_SIZE 140
 #endif /* #ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE */
 
 /* Define the kd tree completion criteria */
