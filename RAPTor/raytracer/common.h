@@ -92,7 +92,7 @@ namespace raptor_raytracer
 /* Define the size of the kd tree trace stack */
 /* A kd tree may not grow to be bigger than this */
 #ifndef MAX_KDT_STACK_HEIGHT
-#define MAX_KDT_STACK_HEIGHT 20
+#define MAX_KDT_STACK_HEIGHT 30
 #endif
 
 #ifdef SIMD_PACKET_TRACING
@@ -102,7 +102,7 @@ namespace raptor_raytracer
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
 #ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE
-#define MIN_APPROX_KDT_BUILDER_NODE_SIZE 150
+#define MIN_APPROX_KDT_BUILDER_NODE_SIZE 175
 #endif /* #ifndef MIN_APPROX_KDT_BUILDER_NODE_SIZE */
 
 /* Define the kd tree completion criteria */
