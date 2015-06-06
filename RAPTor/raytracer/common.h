@@ -92,7 +92,7 @@ namespace raptor_raytracer
 /* Define the size of the kd tree trace stack */
 /* A kd tree may not grow to be bigger than this */
 #ifndef MAX_KDT_STACK_HEIGHT
-#define MAX_KDT_STACK_HEIGHT 30
+#define MAX_KDT_STACK_HEIGHT 35
 #endif
 
 #ifdef SIMD_PACKET_TRACING
@@ -111,7 +111,7 @@ namespace raptor_raytracer
 #endif
 
 #ifndef COST_OF_INTERSECTION
-#define COST_OF_INTERSECTION 125.0f
+#define COST_OF_INTERSECTION 200.0f
 #endif
 
 #ifndef SECANT_ITERATIONS
