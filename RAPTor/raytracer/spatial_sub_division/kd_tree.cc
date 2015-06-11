@@ -536,38 +536,20 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
     }
 
     /* Clip packet to the world */
-    const vfp_t x_bounds    = vfp_t(entry_point.u.x, entry_point.l.x, entry_point.u.x, entry_point.l.x);
-    const vfp_t y_bounds    = vfp_t(entry_point.u.y, entry_point.l.y, entry_point.u.y, entry_point.l.y);
-    const vfp_t z_bounds    = vfp_t(entry_point.u.z, entry_point.l.z, entry_point.u.z, entry_point.l.z);
-    const vfp_t x0          = (x_bounds - f.get_mm_ogn(0)) * f.get_mm_idir(0);
-    const vfp_t y0          = (y_bounds - f.get_mm_ogn(1)) * f.get_mm_idir(1);
-    const vfp_t z0          = (z_bounds - f.get_mm_ogn(2)) * f.get_mm_idir(2);
+    const vfp_t low_x((vfp_t(entry_point.l.x) - f.get_mm_ogn(0)) * f.get_mm_idir(0));
+    const vfp_t high_x((vfp_t(entry_point.u.x) - f.get_mm_ogn(0)) * f.get_mm_idir(0));
 
-    const vfp_t x_zip       = shuffle<2, 3, 0, 1>(x0, x0); 
-    const vfp_t y_zip       = shuffle<2, 3, 0, 1>(y0, y0); 
-    const vfp_t z_zip       = shuffle<2, 3, 0, 1>(z0, z0); 
+    const vfp_t low_y((vfp_t(entry_point.l.y) - f.get_mm_ogn(1)) * f.get_mm_idir(1));
+    const vfp_t high_y((vfp_t(entry_point.u.y) - f.get_mm_ogn(1)) * f.get_mm_idir(1));
 
-    const vfp_t x_entry     = min(x0, x_zip);
-    const vfp_t x_exit      = max(x0, x_zip);
-    const vfp_t y_entry     = min(y0, y_zip);
-    const vfp_t y_exit      = max(y0, y_zip);
-    const vfp_t z_entry     = min(z0, z_zip);
-    const vfp_t z_exit      = max(z0, z_zip);
+    const vfp_t low_z((vfp_t(entry_point.l.z) - f.get_mm_ogn(2)) * f.get_mm_idir(2));
+    const vfp_t high_z((vfp_t(entry_point.u.z) - f.get_mm_ogn(2)) * f.get_mm_idir(2));
 
-    const vfp_t mask        = (y_entry > x_exit) | (x_entry > y_exit) | 
-                              (z_entry > x_exit) | (x_entry > z_exit) | 
-                              (z_entry > y_exit) | (y_entry > z_exit);
-
-    const int int_mask = move_mask(mask);
-    if ((int_mask & 0x3) && (int_mask & 0xc))
-    {
-        return;
-    }
-    
-    const float near    = std::min(std::min(x_entry[0], y_entry[0]), z_entry[0]);
-    const float far     = std::max(std::max(x_exit[2],  y_exit[2] ), y_exit[2] );
-    entry_point.t_max   = far;
-    entry_point.t_min   = std::max(0.0f, near);
+    /* Check intersection for the best corner ray */
+    const vfp_t enter_t(max(max(low_x, low_y), max(low_z, vfp_zero)));
+    const vfp_t exit_t(min(min(high_x, high_y), high_z));
+    entry_point.t_min   = horizontal_min(enter_t);
+    entry_point.t_max   = horizontal_max(exit_t);
     if (entry_point.t_min > entry_point.t_max)
     {
         return;

@@ -261,8 +261,8 @@ BOOST_AUTO_TEST_CASE( obj_conference_test )
     checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
     fixture.render<bih>();
@@ -905,8 +905,8 @@ BOOST_AUTO_TEST_CASE( obj_rungholt_0_test )
     checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
     fixture.render<bih>();
@@ -928,8 +928,8 @@ BOOST_AUTO_TEST_CASE( obj_rungholt_1_test )
     checker.check(fixture.get_camera(), "bvh");
 
     /* Ray trace the scene using kd tree */
-    // fixture.render<kd_tree>();
-    // checker.check(fixture.get_camera(), "kdt");
+    fixture.render<kd_tree>();
+    checker.check(fixture.get_camera(), "kdt");
 
     /* Ray trace the scene using bih */
     fixture.render<bih>();
