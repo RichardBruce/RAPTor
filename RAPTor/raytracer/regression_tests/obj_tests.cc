@@ -643,7 +643,7 @@ BOOST_AUTO_TEST_CASE( obj_hairball_0_test )
     CREATE_REGRESSION_CHECKER(checker);
 
     /* Enviroment set up */
-    regression_fixture fixture("/obj_scenes/hairball/hairball.obj", model_format_t::obj, point_t(0.0, 0.0, 13.0), point_t(1.0, 0.0, 0.0), point_t(0.0, 1.0, 0.0), point_t(0.0, 0.0, -1.0), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
+    regression_fixture fixture("/obj_scenes/hairball/hairball.obj", model_format_t::obj, point_t(0.0, 0.0, 13.5), point_t(1.0, 0.0, 0.0), point_t(0.0, 1.0, 0.0), point_t(0.0, 0.0, -1.0), ext_colour_t(255.0, 255.0, 255.0), 0.0, 0.0, 0.0, 1920, 1080);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 0.0, 10.0), 0.0, 0.0001);
     fixture.add_light(ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, 0.0, 10.0), 0.0, 0.0001);
 
