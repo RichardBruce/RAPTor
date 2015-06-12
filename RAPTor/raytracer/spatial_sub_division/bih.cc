@@ -377,8 +377,8 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
     const vfp_t high_z((vfp_t(entry_point.u.z) - f.get_mm_ogn(2)) * f.get_mm_idir(2));
 
     /* Check intersection for the best corner ray */
-    const vfp_t enter_t(max(max(low_x, low_y), max(low_z, vfp_zero)));
-    const vfp_t exit_t(min(min(high_x, high_y), high_z));
+    const vfp_t enter_t(max(max(low_x, low_y), max(low_z, vfp_zero)) - vfp_t(20.0f * EPSILON));
+    const vfp_t exit_t(min(min(high_x, high_y), high_z) + vfp_t(20.0f * EPSILON));
     entry_point.t_min   = horizontal_min(enter_t);
     entry_point.t_max   = horizontal_max(exit_t);
     if (entry_point.t_min > entry_point.t_max)
