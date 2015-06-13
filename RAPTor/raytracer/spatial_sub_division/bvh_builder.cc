@@ -17,7 +17,7 @@ const int histogram_size = 1024;
 /* Build a Bounding Volumne Heirarchy for _primitives into nodes */
 int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *const nodes)
 {
-    BOOST_LOG_TRIVIAL(trace) << "BVH construction has begun";
+    // BOOST_LOG_TRIVIAL(trace) << "BVH construction has begun";
 
     /* Maximum theoretical size is everything.size() * 6 node, but this is very unlikely */
     _primitives = primitives;
@@ -29,8 +29,20 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     primitive_list          prim_buffer(_primitives->size());
     std::unique_ptr<int []> morton_codes(new int [_primitives->size()]);
 
+    /* Cache primitive min and max */
+    _b = point_t(MAX_DIST, MAX_DIST, MAX_DIST);
+    _t = point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST);
+    _bounds.reset(new bvh_bound_data [_primitives->size()]);
+    for (unsigned int i = 0; i < _primitives->size(); ++i)
+    {
+        _bounds[i].low  = (*_primitives)[i]->low_bound();
+        _bounds[i].high = (*_primitives)[i]->high_bound();
+        _b              = min(_b, _bounds[i].low);
+        _t              = max(_t, _bounds[i].high);
+    }
+
     /* Calculate Morton codes and build histograms */
-    const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
+    const point_t scene_width(_t - _b);
     const point_t width(scene_width * (1.00001f / 1024.0f));
     const point_t width_inv(1.0f / width);
     _max_leaf_sah = ((scene_width.x * scene_width.y) + (scene_width.x *  scene_width.z) + (scene_width.y * scene_width.z)) * static_cast<float>(_primitives->size()) * _max_leaf_sah_factor;
@@ -43,19 +55,19 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     const vfp_t x_mul(width_inv.x);
     const vfp_t y_mul(width_inv.y);
     const vfp_t z_mul(width_inv.z);
-    const vfp_t scene_lo_x(triangle::get_scene_lower_bounds().x);
-    const vfp_t scene_lo_y(triangle::get_scene_lower_bounds().y);
-    const vfp_t scene_lo_z(triangle::get_scene_lower_bounds().z);
+    const vfp_t scene_lo_x(_b.x);
+    const vfp_t scene_lo_y(_b.y);
+    const vfp_t scene_lo_z(_b.z);
     for (int i = 0; i <= (static_cast<int>(_primitives->size()) - SIMD_WIDTH); i += SIMD_WIDTH)
     {
         /* Calculate morton code*/
-        const vfp_t lo_x((*_primitives)[i]->lowest_x(), (*_primitives)[i + 1]->lowest_x(), (*_primitives)[i + 2]->lowest_x(), (*_primitives)[i + 3]->lowest_x());
-        const vfp_t lo_y((*_primitives)[i]->lowest_y(), (*_primitives)[i + 1]->lowest_y(), (*_primitives)[i + 2]->lowest_y(), (*_primitives)[i + 3]->lowest_y());
-        const vfp_t lo_z((*_primitives)[i]->lowest_z(), (*_primitives)[i + 1]->lowest_z(), (*_primitives)[i + 2]->lowest_z(), (*_primitives)[i + 3]->lowest_z());
+        const vfp_t lo_x(_bounds[i].low.x, _bounds[i + 1].low.x, _bounds[i + 2].low.x, _bounds[i + 3].low.x);
+        const vfp_t lo_y(_bounds[i].low.y, _bounds[i + 1].low.y, _bounds[i + 2].low.y, _bounds[i + 3].low.y);
+        const vfp_t lo_z(_bounds[i].low.z, _bounds[i + 1].low.z, _bounds[i + 2].low.z, _bounds[i + 3].low.z);
 
-        const vfp_t hi_x((*_primitives)[i]->highest_x(), (*_primitives)[i + 1]->highest_x(), (*_primitives)[i + 2]->highest_x(), (*_primitives)[i + 3]->highest_x());
-        const vfp_t hi_y((*_primitives)[i]->highest_y(), (*_primitives)[i + 1]->highest_y(), (*_primitives)[i + 2]->highest_y(), (*_primitives)[i + 3]->highest_y());
-        const vfp_t hi_z((*_primitives)[i]->highest_z(), (*_primitives)[i + 1]->highest_z(), (*_primitives)[i + 2]->highest_z(), (*_primitives)[i + 3]->highest_z());
+        const vfp_t hi_x(_bounds[i].high.x, _bounds[i + 1].high.x, _bounds[i + 2].high.x, _bounds[i + 3].high.x);
+        const vfp_t hi_y(_bounds[i].high.y, _bounds[i + 1].high.y, _bounds[i + 2].high.y, _bounds[i + 3].high.y);
+        const vfp_t hi_z(_bounds[i].high.z, _bounds[i + 1].high.z, _bounds[i + 2].high.z, _bounds[i + 3].high.z);
 
         const vfp_t x(((hi_x + lo_x) * 0.5f) - scene_lo_x);
         const vfp_t y(((hi_y + lo_y) * 0.5f) - scene_lo_y);
@@ -84,7 +96,7 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     for (int i = (static_cast<int>(_primitives->size()) & ~(SIMD_WIDTH - 1)); i < static_cast<int>(_primitives->size()); ++i)
     {
         /* Calculate morton code*/
-        const point_t t((((*_primitives)[i]->highest_point() + (*_primitives)[i]->lowest_point()) * 0.5f) - triangle::get_scene_lower_bounds());
+        const point_t t(((_bounds[i].high + _bounds[i].low) * 0.5f) - _b);
         morton_codes[i] = morton_code(t.x, t.y, t.z, width_inv.x, width_inv.y, width_inv.z);
 
         /* Build histogram of morton codes */
@@ -144,7 +156,7 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
         prim_buffer[hist2[pos]]    = (*_primitives)[i];
     }
     prim_buffer.swap(*_primitives);
-    morton_codes.release();
+    morton_codes.reset(nullptr);
 
     /* Allocate the cost matrix */
     // rows = std::ceil(0.5f * (1.0f + std::pow(n, _epsilon * -0.5f) * std::sqrt(std::pow(n, _epsilon) + 16.0f * std::pow(_delta, 0.5f + _epsilon) * std::pow(n, (1.0f + _epsilon) * 0.5f))));
@@ -155,7 +167,7 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     /* Begin recursion */
     int cost_b = 0x0;
     int cost_e = 0x40000000;
-    build_layer(&cost_b, &cost_e, triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, _primitives->size());
+    build_layer(&cost_b, &cost_e, _b, _t, 0, _primitives->size());
 
     /* Combine last layer */
     combine_nodes(&cost_b, &cost_e, 1, 0, cost_b, cost_e, cost_e);
@@ -183,8 +195,8 @@ float bvh_builder::cost_function(const bvh_node &l, const bvh_node &r) const
 float bvh_builder::cost_function(const triangle *const l, const point_t &low, const point_t &high, const float nodes) const
 {
     /* Size of combined node */
-    const point_t bl(min(low, l->lowest_point()));
-    const point_t tr(max(high, l->highest_point()));
+    const point_t bl(min(low, l->low_bound()));
+    const point_t tr(max(high, l->high_bound()));
 
     /* Edges of new node */
     const point_t dist(tr - bl);
@@ -235,8 +247,8 @@ int bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const int
     {
         int node_end = i + 1;
         int layer_top = e;
-        point_t low((*_primitives)[i]->lowest_point());
-        point_t high((*_primitives)[i]->highest_point());
+        point_t low((*_primitives)[i]->low_bound());
+        point_t high((*_primitives)[i]->high_bound());
         while (node_end < layer_top)
         {
             if (cost_function((*_primitives)[node_end], low, high, node_end - i + 1) > _max_leaf_sah)
@@ -245,8 +257,8 @@ int bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const int
             }
             else
             {
-                low     = min(low, (*_primitives)[node_end]->lowest_point());
-                high    = max(high, (*_primitives)[node_end]->highest_point());
+                low     = min(low, (*_primitives)[node_end]->low_bound());
+                high    = max(high, (*_primitives)[node_end]->high_bound());
                 ++node_end;
             }
         }
@@ -489,12 +501,12 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             while (bottom < top)
             {
                 /* Skip primitives in the correct place*/
-                while (dbl_split < ((*_primitives)[top]->highest_point().x + (*_primitives)[top]->lowest_point().x) && bottom < top)
+                while (dbl_split < ((*_primitives)[top]->high_bound().x + (*_primitives)[top]->low_bound().x) && bottom < top)
                 {
                     --top;
                 }
 
-                while (dbl_split >= ((*_primitives)[bottom]->highest_point().x + (*_primitives)[bottom]->lowest_point().x) && bottom < top)
+                while (dbl_split >= ((*_primitives)[bottom]->high_bound().x + (*_primitives)[bottom]->low_bound().x) && bottom < top)
                 {
                     ++bottom;
                 }
@@ -509,7 +521,7 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             }
 
             middle_idx = bottom;
-            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->highest_point().x + (*_primitives)[top]->lowest_point().x)))
+            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->high_bound().x + (*_primitives)[top]->low_bound().x)))
             {
                 ++middle_idx;
             }
@@ -522,12 +534,12 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             while (bottom < top)
             {
                 /* Skip primitives in the correct place*/
-                while (dbl_split < ((*_primitives)[top]->highest_point().y + (*_primitives)[top]->lowest_point().y) && bottom < top)
+                while (dbl_split < ((*_primitives)[top]->high_bound().y + (*_primitives)[top]->low_bound().y) && bottom < top)
                 {
                     --top;
                 }
 
-                while (dbl_split >= ((*_primitives)[bottom]->highest_point().y + (*_primitives)[bottom]->lowest_point().y) && bottom < top)
+                while (dbl_split >= ((*_primitives)[bottom]->high_bound().y + (*_primitives)[bottom]->low_bound().y) && bottom < top)
                 {
                     ++bottom;
                 }
@@ -542,7 +554,7 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             }
 
             middle_idx = bottom;
-            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->highest_point().y + (*_primitives)[top]->lowest_point().y)))
+            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->high_bound().y + (*_primitives)[top]->low_bound().y)))
             {
                 ++middle_idx;
             }
@@ -555,12 +567,12 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             while (bottom < top)
             {
                 /* Skip primitives in the correct place*/
-                while (dbl_split < ((*_primitives)[top]->highest_point().z + (*_primitives)[top]->lowest_point().z) && bottom < top)
+                while (dbl_split < ((*_primitives)[top]->high_bound().z + (*_primitives)[top]->low_bound().z) && bottom < top)
                 {
                     --top;
                 }
 
-                while (dbl_split >= ((*_primitives)[bottom]->highest_point().z + (*_primitives)[bottom]->lowest_point().z) && bottom < top)
+                while (dbl_split >= ((*_primitives)[bottom]->high_bound().z + (*_primitives)[bottom]->low_bound().z) && bottom < top)
                 {
                     ++bottom;
                 }
@@ -575,7 +587,7 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             }
 
             middle_idx = bottom;
-            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->highest_point().z + (*_primitives)[top]->lowest_point().z)))
+            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->high_bound().z + (*_primitives)[top]->low_bound().z)))
             {
                 ++middle_idx;
             }

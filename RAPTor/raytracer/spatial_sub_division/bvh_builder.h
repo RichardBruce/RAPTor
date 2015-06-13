@@ -25,7 +25,11 @@ class bvh_builder
         _primitives(nullptr), _nodes(nullptr), _alpha(alpha), _epsilon(1e-8f), _delta(delta), _max_leaf_sah_factor(max_leaf_sah_factor), _max_leaf_sah(0.0f), _max_down_phase_depth(max_down_phase_depth), _depth(0), _next_node(0) {  }
 
         int build(primitive_list *const primitives, std::vector<bvh_node> *const nodes);
-    
+
+        /* Access to the trees bounds */
+        const point_t & scene_upper_bound() const { return _t; }
+        const point_t & scene_lower_bound() const { return _b; }
+        
     private :
         int reduction_function(const int n) const;
         float cost_function(const bvh_node &l, const bvh_node &r) const;
@@ -38,20 +42,28 @@ class bvh_builder
         void combine_nodes(int *const cost_b, int *const cost_e, const int layer_size, const int cost_start_idx, const int cost_begin, const int cost_m, int cost_end);
 
         // void dump_cost(const int cost_start_idx, const int base_idx) const;
+        struct bvh_bound_data
+        {
+            point_t low;
+            point_t high;
+        };
 
-        primitive_list *        _primitives;
-        std::unique_ptr<int []> _code_buffer;
-        std::vector<float>      _cost_matrix;
-        std::vector<int>        _cost_addrs;
-        std::vector<bvh_node> * _nodes;
-        const float             _alpha;
-        const float             _epsilon;
-        const float             _delta;
-        const float             _max_leaf_sah_factor;
-        float                   _max_leaf_sah;
-        const int               _max_down_phase_depth;
-        int                     _depth;
-        std::atomic<int>        _next_node;
+        primitive_list *                    _primitives;
+        std::unique_ptr<int []>             _code_buffer;
+        std::vector<float>                  _cost_matrix;
+        std::vector<int>                    _cost_addrs;
+        std::vector<bvh_node> *             _nodes;
+        std::unique_ptr<bvh_bound_data []>  _bounds;
+        point_t                             _t;
+        point_t                             _b;
+        const float                         _alpha;
+        const float                         _epsilon;
+        const float                         _delta;
+        const float                         _max_leaf_sah_factor;
+        float                               _max_leaf_sah;
+        const int                           _max_down_phase_depth;
+        int                                 _depth;
+        std::atomic<int>                    _next_node;
 };
 }; /* namespace raptor_raytracer */
 

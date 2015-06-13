@@ -70,27 +70,15 @@ class light
                 switch (this->n_dir)
                 {
                     case light_direction_t::x_pos :
-                        dist = (triangle::get_scene_upper_bounds().x - d.x) / this->n.x;
-                        break;
-
                     case light_direction_t::y_pos :
-                        dist = (triangle::get_scene_upper_bounds().y - d.y) / this->n.y;
-                        break;
-
                     case light_direction_t::z_pos :
-                        dist = (triangle::get_scene_upper_bounds().z - d.z) / this->n.z;
+                        dist = 1.0e15f;
                         break;
 
                     case light_direction_t::x_neg :
-                        dist = (triangle::get_scene_lower_bounds().x - d.x) / this->n.x;
-                        break;
-
                     case light_direction_t::y_neg :
-                        dist = (triangle::get_scene_lower_bounds().y - d.y) / this->n.y;
-                        break;
-
                     case light_direction_t::z_neg :
-                        dist = (triangle::get_scene_lower_bounds().z - d.z) / this->n.z;
+                        dist = -1.0e15f;
                         break;
                     
                     default :
@@ -98,9 +86,7 @@ class light
                 }
                 
                 /* Create a new ray */
-//                cout << d.x << ", " << d.y << ", " << d.z << ", ";
-                point_t c(d + (this->n * dist));
-//                cout << c.x << ", " << c.y << ", " << c.z << endl;
+                const point_t c(d + (this->n * dist));
                 r[0].set_up(d, c);
                 
                 /* only 1 ray is needed because they will all follow the same path */

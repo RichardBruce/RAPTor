@@ -36,6 +36,18 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     _blocks = blocks;
     _blocks->resize(std::max(1, static_cast<int>(_primitives->size() * 0.2f)));
 
+    /* Cache primitive min and max */
+    _b = point_t(MAX_DIST, MAX_DIST, MAX_DIST);
+    _t = point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST);
+    _bounds.reset(new bih_voxel_data [_primitives->size()]);
+    for (unsigned int i = 0; i < _primitives->size(); ++i)
+    {
+        _bounds[i].low  = (*_primitives)[i]->low_bound();
+        _bounds[i].high = (*_primitives)[i]->high_bound();
+        _b              = min(_b, _bounds[i].low);
+        _t              = max(_t, _bounds[i].high);
+    }
+
     /* Check if we have anything to do */
     if (_primitives->size() <= static_cast<unsigned int>(_max_node_size))
     {
@@ -44,27 +56,18 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     }
     else
     {
-        _next_block = 1;
-        _bounds.reset(new bih_voxel_data [_primitives->size()]);
-
         /* For small data sets run the primitive builder */
         /* This needs tuning to each machine. On intel i7 laptop this should be ~750,000, but on amd llano the binned algorithm shouldnt be used */
-        if (_primitives->size() < 28000000)
+        _next_block = 1;
+        // if (_primitives->size() < 28000000)
         {
-            /* Cache primitive min and max */
-            for (unsigned int i = 0; i < _primitives->size(); ++i)
-            {
-                _bounds[i].low  = (*_primitives)[i]->lowest_point();
-                _bounds[i].high = (*_primitives)[i]->highest_point();
-            }
-    
-            divide_bih_block(triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, _primitives->size() - 1);
+            divide_bih_block(_b, _t, _b, _t, 0, 0, _primitives->size() - 1);
         }
         /* For large data sets run a bucket based builder */
-        else
-        {
-            bucket_build();
-        }
+        // else
+        // {
+        //     bucket_build();
+        // }
     }
     // BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
 }
@@ -72,7 +75,7 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
 void bih_builder::bucket_build()
 {
     /* Calculate Morton codes and build MSB histogram */
-    const point_t scene_width(triangle::get_scene_upper_bounds() - triangle::get_scene_lower_bounds());
+    const point_t scene_width(_t - _b);
     _width = std::max(std::max(scene_width.x, scene_width.y), scene_width.z) * (1.00001f / 1024.0f);
     _width_epsilon = _width * 1.09f;
     _width_inv = 1.0f / _width;
@@ -86,9 +89,9 @@ void bih_builder::bucket_build()
     const vfp_t x_mul(_width_inv);
     const vfp_t y_mul(_width_inv);
     const vfp_t z_mul(_width_inv);
-    const vfp_t scene_lo_x(triangle::get_scene_lower_bounds().x);
-    const vfp_t scene_lo_y(triangle::get_scene_lower_bounds().y);
-    const vfp_t scene_lo_z(triangle::get_scene_lower_bounds().z);
+    const vfp_t scene_lo_x(_b.x);
+    const vfp_t scene_lo_y(_b.y);
+    const vfp_t scene_lo_z(_b.z);
     point_t bl[histogram_size];
     point_t tr[histogram_size];
     std::fill_n(bl, histogram_size, point_t( MAX_DIST,  MAX_DIST,  MAX_DIST));
@@ -96,13 +99,13 @@ void bih_builder::bucket_build()
     for (int i = 0; i <= (static_cast<int>(_primitives->size()) - SIMD_WIDTH); i += SIMD_WIDTH)
     {
         /* Calculate morton code*/
-        const vfp_t lo_x((*_primitives)[i]->lowest_x(), (*_primitives)[i + 1]->lowest_x(), (*_primitives)[i + 2]->lowest_x(), (*_primitives)[i + 3]->lowest_x());
-        const vfp_t lo_y((*_primitives)[i]->lowest_y(), (*_primitives)[i + 1]->lowest_y(), (*_primitives)[i + 2]->lowest_y(), (*_primitives)[i + 3]->lowest_y());
-        const vfp_t lo_z((*_primitives)[i]->lowest_z(), (*_primitives)[i + 1]->lowest_z(), (*_primitives)[i + 2]->lowest_z(), (*_primitives)[i + 3]->lowest_z());
+        const vfp_t lo_x(_bounds[i].low.x, _bounds[i + 1].low.x, _bounds[i + 2].low.x, _bounds[i + 3].low.x);
+        const vfp_t lo_y(_bounds[i].low.y, _bounds[i + 1].low.y, _bounds[i + 2].low.y, _bounds[i + 3].low.y);
+        const vfp_t lo_z(_bounds[i].low.z, _bounds[i + 1].low.z, _bounds[i + 2].low.z, _bounds[i + 3].low.z);
 
-        const vfp_t hi_x((*_primitives)[i]->highest_x(), (*_primitives)[i + 1]->highest_x(), (*_primitives)[i + 2]->highest_x(), (*_primitives)[i + 3]->highest_x());
-        const vfp_t hi_y((*_primitives)[i]->highest_y(), (*_primitives)[i + 1]->highest_y(), (*_primitives)[i + 2]->highest_y(), (*_primitives)[i + 3]->highest_y());
-        const vfp_t hi_z((*_primitives)[i]->highest_z(), (*_primitives)[i + 1]->highest_z(), (*_primitives)[i + 2]->highest_z(), (*_primitives)[i + 3]->highest_z());
+        const vfp_t hi_x(_bounds[i].high.x, _bounds[i + 1].high.x, _bounds[i + 2].high.x, _bounds[i + 3].high.x);
+        const vfp_t hi_y(_bounds[i].high.y, _bounds[i + 1].high.y, _bounds[i + 2].high.y, _bounds[i + 3].high.y);
+        const vfp_t hi_z(_bounds[i].high.z, _bounds[i + 1].high.z, _bounds[i + 2].high.z, _bounds[i + 3].high.z);
 
         const vfp_t x(((hi_x + lo_x) * 0.5f) - scene_lo_x);
         const vfp_t y(((hi_y + lo_y) * 0.5f) - scene_lo_y);
@@ -121,27 +124,27 @@ void bih_builder::bucket_build()
         ++hist[pos_3];
 
         /* Move and track primitive bounds */
-        bl[pos_0] = min(bl[pos_0], (*_primitives)[i    ]->lowest_point());
-        tr[pos_0] = max(tr[pos_0], (*_primitives)[i    ]->highest_point());
-        bl[pos_1] = min(bl[pos_1], (*_primitives)[i + 1]->lowest_point());
-        tr[pos_1] = max(tr[pos_1], (*_primitives)[i + 1]->highest_point());
-        bl[pos_2] = min(bl[pos_2], (*_primitives)[i + 2]->lowest_point());
-        tr[pos_2] = max(tr[pos_2], (*_primitives)[i + 2]->highest_point());
-        bl[pos_3] = min(bl[pos_3], (*_primitives)[i + 3]->lowest_point());
-        tr[pos_3] = max(tr[pos_3], (*_primitives)[i + 3]->highest_point());
+        bl[pos_0] = min(bl[pos_0], _bounds[i    ].low);
+        tr[pos_0] = max(tr[pos_0], _bounds[i    ].high);
+        bl[pos_1] = min(bl[pos_1], _bounds[i + 1].low);
+        tr[pos_1] = max(tr[pos_1], _bounds[i + 1].high);
+        bl[pos_2] = min(bl[pos_2], _bounds[i + 2].low);
+        tr[pos_2] = max(tr[pos_2], _bounds[i + 2].high);
+        bl[pos_3] = min(bl[pos_3], _bounds[i + 3].low);
+        tr[pos_3] = max(tr[pos_3], _bounds[i + 3].high);
     }
 
     for (int i = (static_cast<int>(_primitives->size()) & ~(SIMD_WIDTH - 1)); i < static_cast<int>(_primitives->size()); ++i)
     {
         /* Calculate morton code*/
-        const point_t t((((*_primitives)[i]->highest_point() + (*_primitives)[i]->lowest_point()) * 0.5f) - triangle::get_scene_lower_bounds());
+        const point_t t(((_bounds[i].high + _bounds[i].low) * 0.5f) - _b);
         _morton_codes[i] = morton_code(t.x, t.y, t.z, _width_inv, _width_inv, _width_inv);
 
         /* Build histogram of morton codes */
         const unsigned int pos = _morton_codes[i] >> 20;
         ++hist[pos];
-        bl[pos] = min(bl[pos], (*_primitives)[i]->lowest_point());
-        tr[pos] = max(tr[pos], (*_primitives)[i]->highest_point());
+        bl[pos] = min(bl[pos], _bounds[i].low);
+        tr[pos] = max(tr[pos], _bounds[i].high);
     }
 
     /* Sum the histogram */
@@ -173,7 +176,7 @@ void bih_builder::bucket_build()
     hist[0] = 0;
 
     /* Kick of the block builder, breadth first within blocks, depth first outside blocks */
-    divide_bih_block(bl, tr, hist, triangle::get_scene_lower_bounds(), triangle::get_scene_lower_bounds() + (_width * 1024.0f), triangle::get_scene_lower_bounds(), triangle::get_scene_upper_bounds(), 0, 0, histogram_size);
+    divide_bih_block(bl, tr, hist, _b, _b + (_width * 1024.0f), _b, _t, 0, 0, histogram_size);
 }
 
 void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e)
@@ -207,8 +210,8 @@ void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigne
         (*_primitives)[hist[pos]] = _prim_buffer[i];
 
         /* Move and track primitive bounds */
-        bl[pos] = min(bl[pos], _prim_buffer[i]->lowest_point());
-        tr[pos] = max(tr[pos], _prim_buffer[i]->highest_point());
+        bl[pos] = min(bl[pos], _prim_buffer[i]->low_bound());
+        tr[pos] = max(tr[pos], _prim_buffer[i]->high_bound());
     }
 
     /* Un-increment the histogram */
@@ -251,8 +254,8 @@ void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigne
         _prim_buffer[hist[pos]] = (*_primitives)[i];
 
         /* Move and track primitive bounds */
-        bl[pos] = min(bl[pos], (*_primitives)[i]->lowest_point());
-        tr[pos] = max(tr[pos], (*_primitives)[i]->highest_point());
+        bl[pos] = min(bl[pos], (*_primitives)[i]->low_bound());
+        tr[pos] = max(tr[pos], (*_primitives)[i]->high_bound());
     }
 
     /* Un-increment the histogram */
@@ -269,8 +272,8 @@ void bih_builder::convert_to_primitve_builder(const int b, const int e)
     for (int i = b; i < e; ++i)
     {
         (*_primitives)[i] = _prim_buffer[i];
-        _bounds[i].low  = _prim_buffer[i]->lowest_point();
-        _bounds[i].high = _prim_buffer[i]->highest_point();
+        _bounds[i].low  = _prim_buffer[i]->low_bound();
+        _bounds[i].high = _prim_buffer[i]->high_bound();
     }
 }
 
@@ -288,8 +291,8 @@ void bih_builder::convert_to_primitve_builder(triangle **const active_prims, con
     /* Cache bounds */
     for (int i = b; i < e; ++i)
     {
-        _bounds[i].low  = (*_primitives)[i]->lowest_point();
-        _bounds[i].high = (*_primitives)[i]->highest_point();
+        _bounds[i].low  = (*_primitives)[i]->low_bound();
+        _bounds[i].high = (*_primitives)[i]->high_bound();
     }
 }
 
@@ -722,7 +725,7 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     }
 
     /* Calculate which bins are are looking at */
-    const point_t code_pnt(bm + (_width * 0.09f) - triangle::get_scene_lower_bounds());
+    const point_t code_pnt(bm + (_width * 0.09f) - _b);
     const int split_mc = morton_code(code_pnt.x, code_pnt.y, code_pnt.z, _width_inv, _width_inv, _width_inv);
     const int split_idx = (split_mc >> (level * 10)) & 0x3ff;
 

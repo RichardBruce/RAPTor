@@ -504,35 +504,35 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
     /* Set the scene bounding box based on frustrum direction */
     if (f.get_min_x_grad() < 0)
     {
-        entry_point.u.x    = triangle::get_scene_lower_bounds().x;
-        entry_point.l.x    = triangle::get_scene_upper_bounds().x;
+        entry_point.u.x    = _builder.scene_lower_bound().x;
+        entry_point.l.x    = _builder.scene_upper_bound().x;
     }
     else
     {
-        entry_point.u.x    = triangle::get_scene_upper_bounds().x;
-        entry_point.l.x    = triangle::get_scene_lower_bounds().x;
+        entry_point.u.x    = _builder.scene_upper_bound().x;
+        entry_point.l.x    = _builder.scene_lower_bound().x;
     }
 
     if (f.get_min_y_grad() < 0)
     {
-        entry_point.u.y    = triangle::get_scene_lower_bounds().y;
-        entry_point.l.y    = triangle::get_scene_upper_bounds().y;
+        entry_point.u.y    = _builder.scene_lower_bound().y;
+        entry_point.l.y    = _builder.scene_upper_bound().y;
     }
     else
     {
-        entry_point.u.y    = triangle::get_scene_upper_bounds().y;
-        entry_point.l.y    = triangle::get_scene_lower_bounds().y;
+        entry_point.u.y    = _builder.scene_upper_bound().y;
+        entry_point.l.y    = _builder.scene_lower_bound().y;
     }
 
     if (f.get_min_z_grad() < 0)
     {
-        entry_point.u.z    = triangle::get_scene_lower_bounds().z;
-        entry_point.l.z    = triangle::get_scene_upper_bounds().z;
+        entry_point.u.z    = _builder.scene_lower_bound().z;
+        entry_point.l.z    = _builder.scene_upper_bound().z;
     }
     else
     {
-        entry_point.u.z    = triangle::get_scene_upper_bounds().z;
-        entry_point.l.z    = triangle::get_scene_lower_bounds().z;
+        entry_point.u.z    = _builder.scene_upper_bound().z;
+        entry_point.l.z    = _builder.scene_lower_bound().z;
     }
 
     /* Clip packet to the world */
@@ -698,35 +698,35 @@ void kd_tree::frustrum_found_nearer_object(const packet_ray *const r, const vfp_
     /* Set the scene bounding box based on frustrum direction */
     if (f.get_min_x_grad() < 0)
     {
-        entry_point.u.x    = triangle::get_scene_lower_bounds().x;
-        entry_point.l.x    = triangle::get_scene_upper_bounds().x;
+        entry_point.u.x    = _builder.scene_lower_bound().x;
+        entry_point.l.x    = _builder.scene_upper_bound().x;
     }
     else
     {
-        entry_point.u.x    = triangle::get_scene_upper_bounds().x;
-        entry_point.l.x    = triangle::get_scene_lower_bounds().x;
+        entry_point.u.x    = _builder.scene_upper_bound().x;
+        entry_point.l.x    = _builder.scene_lower_bound().x;
     }
 
     if (f.get_min_y_grad() < 0)
     {
-        entry_point.u.y    = triangle::get_scene_lower_bounds().y;
-        entry_point.l.y    = triangle::get_scene_upper_bounds().y;
+        entry_point.u.y    = _builder.scene_lower_bound().y;
+        entry_point.l.y    = _builder.scene_upper_bound().y;
     }
     else
     {
-        entry_point.u.y    = triangle::get_scene_upper_bounds().y;
-        entry_point.l.y    = triangle::get_scene_lower_bounds().y;
+        entry_point.u.y    = _builder.scene_upper_bound().y;
+        entry_point.l.y    = _builder.scene_lower_bound().y;
     }
 
     if (f.get_min_z_grad() < 0)
     {
-        entry_point.u.z    = triangle::get_scene_lower_bounds().z;
-        entry_point.l.z    = triangle::get_scene_upper_bounds().z;
+        entry_point.u.z    = _builder.scene_lower_bound().z;
+        entry_point.l.z    = _builder.scene_upper_bound().z;
     }
     else
     {
-        entry_point.u.z    = triangle::get_scene_upper_bounds().z;
-        entry_point.l.z    = triangle::get_scene_lower_bounds().z;
+        entry_point.u.z    = _builder.scene_upper_bound().z;
+        entry_point.l.z    = _builder.scene_lower_bound().z;
     }
 
     /* Frustrum direction LUT */

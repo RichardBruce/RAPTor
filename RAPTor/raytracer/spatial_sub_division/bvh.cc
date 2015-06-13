@@ -143,7 +143,7 @@ void bvh::frustrum_find_nearest_object(const packet_ray *const r, const triangle
     /* Build a frustrum to traverse */
     frustrum f(r, size);
     frustrum trav(r, size);
-    trav.adapt_to_leaf(r, triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), clipped_r, size);
+    trav.adapt_to_leaf(r, _builder.scene_upper_bound(), _builder.scene_lower_bound(), clipped_r, size);
     
     /* Traverse the whole tree */
     while (true)
@@ -269,7 +269,7 @@ void bvh::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
     frustrum f(r, point_t(r[0].get_dst(0)[0], r[0].get_dst(1)[0], r[0].get_dst(2)[0]), size);
     frustrum trav(r, point_t(r[0].get_dst(0)[0], r[0].get_dst(1)[0], r[0].get_dst(2)[0]), size);
 #endif
-    trav.adapt_to_leaf(r, triangle::get_scene_upper_bounds(), triangle::get_scene_lower_bounds(), clipped_r, size);
+    trav.adapt_to_leaf(r, _builder.scene_upper_bound(), _builder.scene_lower_bound(), clipped_r, size);
 
     /* Traverse the whole tree */
     while (true)

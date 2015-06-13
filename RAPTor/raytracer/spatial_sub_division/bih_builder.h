@@ -28,6 +28,10 @@ class bih_builder
 
         void build(primitive_list *const primitives, std::vector<bih_block> *const blocks);
     
+        /* Access to the trees bounds */
+        const point_t & scene_upper_bound() const { return _t; }
+        const point_t & scene_lower_bound() const { return _b; }
+        
     private :
         struct block_splitting_data
         {
@@ -67,6 +71,8 @@ class bih_builder
         std::unique_ptr<int []>             _code_buffer;
         std::vector<bih_block> *            _blocks;
         std::unique_ptr<bih_voxel_data []>  _bounds;
+        point_t                             _t;
+        point_t                             _b;
         float                               _width;
         float                               _width_epsilon;
         float                               _width_inv;

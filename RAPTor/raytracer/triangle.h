@@ -31,45 +31,25 @@ class triangle : private boost::noncopyable
             }
         };
         
-        /* Static scene bounding box access */
-        static void reset_scene_bounding_box()                  
-        {
-            triangle::scene_top = point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST);
-            triangle::scene_bot = point_t( MAX_DIST,  MAX_DIST,  MAX_DIST);
-        }
-        
-        static point_t & get_scene_upper_bounds()               { return triangle::scene_top;                   }
-        static point_t & get_scene_lower_bounds()               { return triangle::scene_bot;                   }
-        
         /* Find out if this is a light/transparent object for shadow rays to ignore */
-        bool get_light()                            const       { return this->m & 0x1;                         }
-        bool is_transparent()                       const       { return get_material()->is_transparent();      }
+        bool get_light()            const { return this->m & 0x1;                           }
+        bool is_transparent()       const { return get_material()->is_transparent();        }
 
         /* Shadow ray targetting */
-        const point_t& get_centre()	                const       { return this->vertex_c;                        }
+        const point_t& get_centre() const { return this->vertex_c;                          }
         
         /* Frustrum separation algorithm */
-        point_t get_vertex_a()                      const       { return this->vertex_a;                        }
-        point_t get_vertex_b()                      const       { return this->vertex_b;                        }
-        point_t get_vertex_c()                      const       { return this->vertex_c;                        }
+        point_t get_vertex_a()      const { return this->vertex_a;                          }
+        point_t get_vertex_b()      const { return this->vertex_b;                          }
+        point_t get_vertex_c()      const { return this->vertex_c;                          }
 
         /* KD-tree node classification */
-        float get_x0()                              const       { return this->vertex_c.x;                      }
-        float get_y0()                              const       { return this->vertex_c.y;                      }
-        float get_z0()                              const       { return this->vertex_c.z;                      }
-        
-        /* Bounding box access functions for spatial subdivision */
-        float   lowest_x()                          const       { return this->b.x;                             }
-        float   lowest_y()                          const       { return this->b.y;                             }
-        float   lowest_z()                          const       { return this->b.z;                             }
-        point_t lowest_point()                      const       { return this->b;                               }
-        float   highest_x()                         const       { return this->t.x;                             }
-        float   highest_y()                         const       { return this->t.y;                             }
-        float   highest_z()                         const       { return this->t.z;                             }
-        point_t highest_point()                     const       { return this->t;                               }
-        bool    is_intersecting_x(const float s)    const       { return ((this->t.x > s) && (this->b.x < s));  }
-        bool    is_intersecting_y(const float s)    const       { return ((this->t.y > s) && (this->b.y < s));  }
-        bool    is_intersecting_z(const float s)    const       { return ((this->t.z > s) && (this->b.z < s));  }
+        float get_x0()              const { return this->vertex_c.x;                        }
+        float get_y0()              const { return this->vertex_c.y;                        }
+        float get_z0()              const { return this->vertex_c.z;                        }
+
+        point_t low_bound()         const { return min(vertex_a, min(vertex_b, vertex_c));  }
+        point_t high_bound()        const { return max(vertex_a, max(vertex_b, vertex_c));  }
         
         /* Ray tracing functions */
         inline void is_intersecting(const ray *const r, hit_description *const h) const;
@@ -119,15 +99,11 @@ class triangle : private boost::noncopyable
 
         static_assert(sizeof(std::int64_t) == sizeof(material *), "Error: Material pointers dont fit in std::int64_t");
         std::int64_t    m;          /* Pointer to the triangles shader          */
-        static point_t  scene_top;  /* Scene bounding box upper vertex          */
-        static point_t  scene_bot;  /* Scene bounding box lower vertex          */
         point_t       * vnt;        /* Pointer to vertex normals and textures   */
         point_t         vertex_a;   /* Vertex a of the triangle                 */
         point_t         vertex_b;   /* Vertex b of the triangle                 */
         point_t         vertex_c;   /* Vertex c of the triangle                 */
         point_t         n;          /* Normal of the triangle                   */
-        point_t         t;          /* Triangle bounding box upper vertex       */
-        point_t         b;          /* Triangle bounding box lower vertex       */
 };
 
 
@@ -185,28 +161,6 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
     {
         this->vnt[3].x = MAX_DIST;
     }
-
-    /* Pick the bounds of the triangle */
-    this->t = max(this->vertex_a, max(this->vertex_b, this->vertex_c));
-    this->b = min(this->vertex_a, min(this->vertex_b, this->vertex_c));
-    
-    /* If the triangle falls into a plane add some width to it */
-    if (this->t.x == this->b.x)
-    {
-        this->t.x += EPSILON;
-    }
-    if (this->t.y == this->b.y)
-    {
-        this->t.y += EPSILON;
-    }
-    if (this->t.z == this->b.z)
-    {
-        this->t.z += EPSILON;
-    }
-    
-    /* Update scene bounding box */
-    triangle::scene_top = max(triangle::scene_top, this->t);
-    triangle::scene_bot = min(triangle::scene_bot, this->b);
 
     /* Calculate the normal */
     const point_t dir_b(this->vertex_b - this->vertex_a);
@@ -605,48 +559,6 @@ inline void triangle::find_rays(ray *const r, const point_t &d, const int n) con
     
     return;
 }
-
-/* Useful sort criteria for triangles */
-class sort_triangle_by_lowest_x
-{
-    public :
-        bool operator() (const triangle *const a, const triangle *const b) { return (a->lowest_x() < b->lowest_x()); }
-};
-
-
-class sort_triangle_by_lowest_y
-{
-    public :
-        bool operator() (const triangle *const a, const triangle *const b) { return (a->lowest_y() < b->lowest_y()); }
-};
-
-
-class sort_triangle_by_lowest_z
-{
-    public :
-        bool operator() (const triangle *const a, const triangle *const b) { return (a->lowest_z() < b->lowest_z()); }
-};
-
-
-class sort_triangle_by_highest_x
-{
-     public :
-        bool operator() (const triangle *const a, const triangle *const b) { return (a->highest_x() < b->highest_x()); }
-};
-
-
-class sort_triangle_by_highest_y
-{
-     public :
-        bool operator() (const triangle *const a, const triangle *const b) { return (a->highest_y() < b->highest_y()); }
-};
-
-
-class sort_triangle_by_highest_z
-{
-    public :
-        bool operator() (const triangle *const a, const triangle *const b) { return (a->highest_z() < b->highest_z()); }
-};
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __TRIANGLE_H__ */

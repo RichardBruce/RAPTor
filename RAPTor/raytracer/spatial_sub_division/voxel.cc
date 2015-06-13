@@ -375,7 +375,7 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
     _ping_idx = right_idx;
     std::swap(_ping, _pong);
     std::swap(_ping_idx, _pong_idx);
-    return voxel(_pong, _ping, ping_idx, left_idx, right_idx - ping_idx, upper_limit, lower_limit, nxt_n);
+    return voxel(_pong, _ping, _sa_inv, ping_idx, left_idx, right_idx - ping_idx, upper_limit, lower_limit, nxt_n);
 }
 
 
