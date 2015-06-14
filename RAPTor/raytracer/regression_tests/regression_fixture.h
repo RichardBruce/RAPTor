@@ -49,6 +49,7 @@ const int test_iterations = 1;
 template <typename T>
 struct log_statement
 {
+    static std::string test_type()      { return "ssd"; }
     static std::string build_time()     { return "SSD"; }
     static std::string render_time()    { return "SSD"; }
 };
@@ -56,6 +57,7 @@ struct log_statement
 template <>
 struct log_statement<bih>
 {
+    static std::string test_type()      { return "bih";     }
     static std::string build_time()     { return "4 - BIH"; }
     static std::string render_time()    { return "5 - BIH"; }
 };
@@ -63,6 +65,7 @@ struct log_statement<bih>
 template <>
 struct log_statement<bvh>
 {
+    static std::string test_type()      { return "bvh";     }
     static std::string build_time()     { return "8 - BVH"; }
     static std::string render_time()    { return "9 - BVH"; }
 };
@@ -70,6 +73,7 @@ struct log_statement<bvh>
 template <>
 struct log_statement<kd_tree>
 {
+    static std::string test_type()      { return "kdt";     }
     static std::string build_time()     { return "6 - KDT"; }
     static std::string render_time()    { return "7 - KDT"; }
 };
@@ -79,12 +83,13 @@ struct regression_fixture : private boost::noncopyable
 {
     public :
         /* CTOR */
-        regression_fixture(const std::string &input_file, const model_format_t input_format, 
+        regression_fixture(const std::string &test_name, const std::string &input_file, const model_format_t input_format, 
             const point_t &cam_p = point_t(0.0f, 0.0f, -10.0f), const point_t &x_vec = point_t(1.0f, 0.0f, 0.0f), const point_t &y_vec = point_t(0.0f, 1.0f, 0.0f), const point_t &z_vec = point_t(0.0f, 0.0f, 1.0f),
             const ext_colour_t &bg = ext_colour_t(0.0f, 0.0f, 0.0f),
             const float rx = 0.0f, const float ry = 0.0f, const float rz = 0.0f, 
             const unsigned int xr = 640, const unsigned int yr = 480, const unsigned int xa = 1, const unsigned int ya = 1, 
-            const std::string &view_point = "")
+            const std::string &view_point = "") :
+        _test_name(test_name)
         {
             const float screen_width    = 10.0f;
             const float screen_height   = screen_width * (static_cast<float>(yr) / static_cast<float>(xr));
@@ -227,6 +232,7 @@ struct regression_fixture : private boost::noncopyable
             assert(!_everything.empty());
 
             /* Log scene size */
+            BOOST_TEST_CHECKPOINT(_test_name << "_" << log_statement<SpatialSubDivision>::test_type());
             BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - # Primitives: " << _everything.size();
             BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - # Lights: " << _lights.size();
 
@@ -284,6 +290,7 @@ struct regression_fixture : private boost::noncopyable
         light_list              _lights;
         primitive_list          _everything;
         std::list<material *>   _materials;
+        const std::string       _test_name;
 };
 }; /* namespace raptor_raytracer */
 }; /* namespace test */

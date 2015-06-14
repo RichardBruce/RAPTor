@@ -28,10 +28,9 @@ const int failure_limit                 = 1000;
 const std::string test_data_location    = "test_data/";
 
 
-#define CREATE_REGRESSION_CHECKER(NAME)  regression_checker NAME( \
-    boost::unit_test::framework::get<boost::unit_test::test_suite>(boost::unit_test::framework::current_test_case().p_parent_id).p_name, \
-    boost::unit_test::framework::current_test_case().p_name); \
-    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name;
+#define CREATE_REGRESSION_CHECKER(NAME)   const std::string test_name(boost::unit_test::framework::current_test_case().p_name); \
+    regression_checker NAME(boost::unit_test::framework::get<boost::unit_test::test_suite>(boost::unit_test::framework::current_test_case().p_parent_id).p_name, test_name); \
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << test_name;
 
 
 /* Top level class to check the output of a regression test */
