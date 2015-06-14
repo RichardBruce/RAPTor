@@ -186,6 +186,7 @@ my ( $scene, $primitives, $lights, $parser_time, $render_time );
 for my $input_file (@log_files)
 {
     # 1 Pass of the file to find the headers and track the order they are found
+    %headers = ();
     open (LOGFILE, "<", $input_file) or die "Error: Can't find input file";
     while (<LOGFILE>)
     {
