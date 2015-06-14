@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_std_sort_test )
         std::sort(data.begin(), data.end());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_ready_sorted_std_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_std_sort_test )
         std::sort(data.begin(), data.end());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_inverse_sorted_std_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE( large_random_std_sort_test )
         std::sort(data.begin(), data.end());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_random_std_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_std_stable_sort_test )
         std::stable_sort(data.begin(), data.end());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_ready_sorted_std_stable_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_std_stable_sort_test )
         std::stable_sort(data.begin(), data.end());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_inverse_sorted_std_stable_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE( large_random_std_stable_sort_test )
         std::stable_sort(data.begin(), data.end());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_random_std_stable_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -553,7 +553,7 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_vector_merge_sort_test )
         const bool check = vmerge_sort(data.data(), output.data(), data.size());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_ready_sorted_vector_merge_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -579,7 +579,7 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_vector_merge_sort_test )
         const bool check = vmerge_sort(data.data(), output.data(), data.size());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_inverse_sorted_vector_merge_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -605,7 +605,7 @@ BOOST_AUTO_TEST_CASE( large_random_vector_merge_sort_test )
         const bool check = vmerge_sort(data.data(), output.data(), data.size());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_random_vector_merge_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -698,7 +698,7 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_merge_sort_test )
         const bool check = merge_sort(data.data(), output.data(), data.size());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_ready_sorted_merge_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -724,7 +724,7 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_merge_sort_test )
         const bool check = merge_sort(data.data(), output.data(), data.size());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_inverse_sorted_merge_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -750,7 +750,7 @@ BOOST_AUTO_TEST_CASE( large_random_merge_sort_test )
         const bool check = merge_sort(data.data(), output.data(), data.size());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_random_merge_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -843,7 +843,7 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_radix_sort_test )
         radix_sort(data.data(), output.data(), data.size());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_ready_sorted_radix_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -868,7 +868,7 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_radix_sort_test )
         radix_sort(data.data(), output.data(), data.size());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_inverse_sorted_radix_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -893,7 +893,7 @@ BOOST_AUTO_TEST_CASE( large_random_radix_sort_test )
         radix_sort(data.data(), output.data(), data.size());
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_random_radix_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -1010,7 +1010,7 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_insertion_sort_test )
         insertion_sort(data.data(), data.size() - 1);
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_ready_sorted_insertion_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -1034,7 +1034,7 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_insertion_sort_test )
         insertion_sort(data.data(), data.size() - 1);
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_inverse_sorted_insertion_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -1058,7 +1058,7 @@ BOOST_AUTO_TEST_CASE( large_random_insertion_sort_test )
         insertion_sort(data.data(), data.size() - 1);
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_random_insertion_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -1144,7 +1144,7 @@ BOOST_AUTO_TEST_CASE( large_ready_sorted_quick_sort_test )
         quick_sort(data.data(), 0, data.size() - 1);
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_ready_sorted_quick_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -1168,7 +1168,7 @@ BOOST_AUTO_TEST_CASE( large_inverse_sorted_quick_sort_test )
         quick_sort(data.data(), 0, data.size() - 1);
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_inverse_sorted_quick_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
@@ -1192,7 +1192,7 @@ BOOST_AUTO_TEST_CASE( large_random_quick_sort_test )
         quick_sort(data.data(), 0, data.size() - 1);
         auto t1(std::chrono::system_clock::now());
         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: large_random_quick_sort_test " << data.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
         /* Checks */
         bool passed = true;
