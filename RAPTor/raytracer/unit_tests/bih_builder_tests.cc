@@ -35,8 +35,6 @@ struct bih_builder_fixture
         {
             delete p;
         }
-
-        triangle::reset_scene_bounding_box();
     }
 
     void x_axis_primitives(const int size)
