@@ -27,7 +27,7 @@ const int histogram_size = 1024;
     }
 
 /* Build a Bounding Interval Heirarchy for _primitives into blocks */
-void bih_builder::build(primitive_list *const primitives, std::vector<bih_block> *const blocks)
+void bih_builder::build(primitive_store *const primitives, std::vector<bih_block> *const blocks)
 {
     // BOOST_LOG_TRIVIAL(trace) << "BIH construction has begun";
 
@@ -40,16 +40,16 @@ void bih_builder::build(primitive_list *const primitives, std::vector<bih_block>
     _b = point_t(MAX_DIST, MAX_DIST, MAX_DIST);
     _t = point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST);
     _bounds.reset(new bih_voxel_data [_primitives->size()]);
-    for (unsigned int i = 0; i < _primitives->size(); ++i)
+    for (int i = 0; i < _primitives->size(); ++i)
     {
-        _bounds[i].low  = (*_primitives)[i]->low_bound();
-        _bounds[i].high = (*_primitives)[i]->high_bound();
+        _bounds[i].low  = _primitives->primitive(i)->low_bound();
+        _bounds[i].high = _primitives->primitive(i)->high_bound();
         _b              = min(_b, _bounds[i].low);
         _t              = max(_t, _bounds[i].high);
     }
 
     /* Check if we have anything to do */
-    if (_primitives->size() <= static_cast<unsigned int>(_max_node_size))
+    if (_primitives->size() <= _max_node_size)
     {
         /* Create one leaf node that hold the whole scene */
         (*_blocks)[0].create_leaf_node(0, _primitives->size() - 1, 0);
@@ -83,7 +83,7 @@ void bih_builder::bucket_build()
     unsigned int hist[histogram_size + 1];
     memset(hist, 0, histogram_size * sizeof(float));
     _code_buffer.reset(new int [_primitives->size()]);
-    _prim_buffer.reset(new triangle *[_primitives->size()]);
+    _prim_buffer.reset(new int [_primitives->size()]);
     _morton_codes.reset(new int [_primitives->size()]);
 
     const vfp_t x_mul(_width_inv);
@@ -165,7 +165,7 @@ void bih_builder::bucket_build()
         _code_buffer[++hist[pos]] = data;
 
         /* Move primitive */
-        _prim_buffer[hist[pos]] = (*_primitives)[i];
+        _prim_buffer[hist[pos]] = i;
     }
 
     /* Un-increment the histogram */
@@ -207,11 +207,11 @@ void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigne
         _morton_codes[++hist[pos]] = data;
 
         /* Move primitive */
-        (*_primitives)[hist[pos]] = _prim_buffer[i];
+        _primitives->indirection(hist[pos]) = _prim_buffer[i];
 
         /* Move and track primitive bounds */
-        bl[pos] = min(bl[pos], _prim_buffer[i]->low_bound());
-        tr[pos] = max(tr[pos], _prim_buffer[i]->high_bound());
+        bl[pos] = min(bl[pos], _primitives->primitive(_prim_buffer[i])->low_bound());
+        tr[pos] = max(tr[pos], _primitives->primitive(_prim_buffer[i])->high_bound());
     }
 
     /* Un-increment the histogram */
@@ -251,11 +251,11 @@ void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigne
         _code_buffer[++hist[pos]] = data;
 
         /* Move primitive */
-        _prim_buffer[hist[pos]] = (*_primitives)[i];
+        _prim_buffer[hist[pos]] = _primitives->indirection(i);
 
         /* Move and track primitive bounds */
-        bl[pos] = min(bl[pos], (*_primitives)[i]->low_bound());
-        tr[pos] = max(tr[pos], (*_primitives)[i]->high_bound());
+        bl[pos] = min(bl[pos], _primitives->primitive(i)->low_bound());
+        tr[pos] = max(tr[pos], _primitives->primitive(i)->high_bound());
     }
 
     /* Un-increment the histogram */
@@ -271,30 +271,30 @@ void bih_builder::convert_to_primitve_builder(const int b, const int e)
     /* Get primitives in the right list for the non-binned node builder */
     for (int i = b; i < e; ++i)
     {
-        (*_primitives)[i] = _prim_buffer[i];
-        _bounds[i].low  = _prim_buffer[i]->low_bound();
-        _bounds[i].high = _prim_buffer[i]->high_bound();
+        _primitives->indirection(i) = _prim_buffer[i];
+        _bounds[i].low  = _primitives->primitive(_prim_buffer[i])->low_bound();
+        _bounds[i].high = _primitives->primitive(_prim_buffer[i])->high_bound();
     }
 }
 
-void bih_builder::convert_to_primitve_builder(triangle **const active_prims, const int b, const int e)
-{
-    /* Get primitives in the right list for the non-binned node builder */
-    if (active_prims != _primitives->data())
-    {
-        for (int i = b; i < e; ++i)
-        {
-            (*_primitives)[i] = _prim_buffer[i];
-        }
-    }
+// void bih_builder::convert_to_primitve_builder(triangle **const active_prims, const int b, const int e)
+// {
+//     /* Get primitives in the right list for the non-binned node builder */
+//     if (active_prims != _primitives->data())
+//     {
+//         for (int i = b; i < e; ++i)
+//         {
+//             _primitives->indirection(i) = _prim_buffer[i];
+//         }
+//     }
 
-    /* Cache bounds */
-    for (int i = b; i < e; ++i)
-    {
-        _bounds[i].low  = (*_primitives)[i]->low_bound();
-        _bounds[i].high = (*_primitives)[i]->high_bound();
-    }
-}
+//     /* Cache bounds */
+//     for (int i = b; i < e; ++i)
+//     {
+//         _bounds[i].low  = _primitives->primitive(i)->low_bound();
+//         _bounds[i].high = _primitives->primitive(i)->high_bound();
+//     }
+// }
 
 void bih_builder::level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx)
 {
@@ -614,7 +614,7 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
         {
             for (unsigned int i = bins[b]; i < bins[e]; ++i)
             {
-                (*_primitives)[i] = _prim_buffer[i];
+                _primitives->indirection(i) = _prim_buffer[i];
             }
         }
 
@@ -994,8 +994,8 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
 
     /* Checks */
     assert(depth <= MAX_BIH_STACK_HEIGHT);
-    assert(static_cast<unsigned int>(e) < _primitives->size());
-    assert((static_cast<unsigned int>(b) < _primitives->size()) || (b > e));
+    assert(e < _primitives->size());
+    assert((b < _primitives->size()) || (b > e));
 
     /* Create leaf */
     if (((e - b) <= _max_node_size) || (depth == MAX_BIH_STACK_HEIGHT))
@@ -1076,7 +1076,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
 
                 if (bottom < top)
                 {
-                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    std::swap(_primitives->indirection(bottom), _primitives->indirection(top));
                     std::swap(_bounds[bottom], _bounds[top]);
                     
                     max_left = std::max(max_left, _bounds[bottom++].high.x);
@@ -1156,7 +1156,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
 
                 if (bottom < top)
                 {
-                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    std::swap(_primitives->indirection(bottom), _primitives->indirection(top));
                     std::swap(_bounds[bottom], _bounds[top]);
                     
                     max_left = std::max(max_left, _bounds[bottom++].high.y);
@@ -1236,7 +1236,7 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
 
                 if (bottom < top)
                 {
-                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    std::swap(_primitives->indirection(bottom), _primitives->indirection(top));
                     std::swap(_bounds[bottom], _bounds[top]);
                     
                     max_left = std::max(max_left, _bounds[bottom++].high.z);

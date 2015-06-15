@@ -29,7 +29,7 @@ struct voxel_aab_data
 {
     point_t     low;
     point_t     high;
-    triangle *  prim;
+    int         prim;
 } ALIGN(32);
 
 class voxel

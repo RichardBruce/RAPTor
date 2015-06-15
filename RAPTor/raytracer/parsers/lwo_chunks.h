@@ -1,5 +1,4 @@
-#ifndef __LWO_CHUNKS_H__
-#define __LWO_CHUNKS_H__
+#pragma once
 
 /* Boost headers */
 
@@ -278,5 +277,3 @@ class lwo_chunks
         std::uint32_t                               _tags_len;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __LWO_CHUNKS_H__ */

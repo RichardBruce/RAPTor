@@ -19,7 +19,7 @@ void lwo_parser(
     std::ifstream           &lwo_file,
     std::string             &p,
     light_list              &l, 
-    primitive_list          &e,
+    primitive_store         &e,
     std::list<material *>   &m,
     camera                  **c)
 {

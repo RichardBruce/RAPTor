@@ -185,7 +185,7 @@ void parse_points(std::vector<point_t> *p, const char *a, const char *eob)
 }
 
 
-void parse_triangles(primitive_list &prim, std::list<material *> &m, const std::vector<point_t> &p, const std::vector<ext_colour_t> &c, const float ka, const char *a, const char *eob)
+void parse_triangles(primitive_store &prim, std::list<material *> &m, const std::vector<point_t> &p, const std::vector<ext_colour_t> &c, const float ka, const char *a, const char *eob)
 {
 //    BOOST_LOG_TRIVIAL(trace) << "finding coordIndex";
     // BOOST_LOG_TRIVIAL(trace) << "ka: " << ka;
@@ -212,8 +212,7 @@ void parse_triangles(primitive_list &prim, std::list<material *> &m, const std::
             m.push_back(cur_mat);
 
             /* Create the triangle */
-            std::vector<triangle *> *t = nullptr;
-            new_triangle(&prim, t, cur_mat, p[va], p[vb], p[vc], false);
+            new_triangle(&prim, nullptr, cur_mat, p[va], p[vb], p[vc], false);
         
 //            BOOST_LOG_TRIVIAL(trace) << va << ", " << vb << ", " << vc;
         } while (!group_done(a));
@@ -254,7 +253,7 @@ void parse_colours(std::vector<ext_colour_t> *c, const char *a, const char *eob)
 void vrml_parser(
     std::ifstream           &vrml_file,
     light_list              &l, 
-    primitive_list          &e,
+    primitive_store         &e,
     std::list<material *>   &m,
     camera                  *c,
     const std::string       &v)

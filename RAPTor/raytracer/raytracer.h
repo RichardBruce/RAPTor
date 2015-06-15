@@ -7,6 +7,7 @@
 /* Ray tracer headers */
 #include "camera.h"
 #include "light.h"
+#include "primitive_store.h"
 
 #include "scalable_allocator.h"
 
@@ -101,7 +102,7 @@ class ray_trace_engine
 };
 
 /* Main ray tracer function */
-void ray_tracer(const ssd *const sub_division, const light_list &lights, const primitive_list &everything, camera &c);
+void ray_tracer(const ssd *const sub_division, const light_list &lights, const primitive_store &everything, camera &c);
 }; /* namespace raptor_raytracer */
 
 #endif /* #ifndef __RAYTRACER_H__ */

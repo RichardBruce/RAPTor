@@ -93,7 +93,7 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
         /* If the leaf contains objects find the closest intersecting object */
         if (!entry_point.n->is_empty())
         {
-            entry_point.n->test_leaf_node_nearest(r, i_o, h);
+            entry_point.n->test_leaf_node_nearest(_prims, r, i_o, h);
         } 
   
         /* Work back up the tree by poping form the stack */
@@ -142,7 +142,7 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
         /* If the leaf contains objects find the closest intersecting object */
         if (!entry_point.n->is_empty())
         {
-            entry_point.n->test_leaf_node_nearest(r, i_o, h);
+            entry_point.n->test_leaf_node_nearest(_prims, r, i_o, h);
         } 
   
         /* Work back up the tree by poping form the stack */
@@ -204,7 +204,7 @@ vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t) co
         /* If the leaf contains objects find the closest intersecting object */
         if (!entry_point.n->is_empty())
         {
-            entry_point.n->test_leaf_node_nearer(r, &closer, t, &h);
+            entry_point.n->test_leaf_node_nearer(_prims, r, &closer, t, &h);
 
             /* If an intersecting object is found it is the closest so return */
             if (move_mask(closer) == ((1 << SIMD_WIDTH) - 1))
@@ -262,7 +262,7 @@ vfp_t kd_tree::found_nearer_object(const packet_ray *const r, const vfp_t &t, kd
         /* If the leaf contains objects find the closest intersecting object */
         if (!entry_point.n->is_empty())
         {
-            entry_point.n->test_leaf_node_nearer(r, &closer, t, &h);
+            entry_point.n->test_leaf_node_nearer(_prims, r, &closer, t, &h);
 
             /* If an intersecting object is found it is the closest so return */
             if (move_mask(closer) == ((1 << SIMD_WIDTH) - 1))
@@ -594,7 +594,7 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
 #ifdef FRUSTRUM_CULLING
                     clipped_r[clipped_size++] = i;
 #else
-                    entry_point.n->test_leaf_node_nearest(&r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i]);
+                    entry_point.n->test_leaf_node_nearest(_prims, &r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i]);
 #endif
                 }
             }
@@ -602,13 +602,13 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
             if (clipped_size > 0)
             {
                 f.adapt_to_leaf(r, entry_point.u, entry_point.l, clipped_r, clipped_size);
-                entry_point.n->test_leaf_node_nearest(f, r, i_o, h, clipped_r, clipped_size);
+                entry_point.n->test_leaf_node_nearest(_prims, f, r, i_o, h, clipped_r, clipped_size);
             }
 //            else
 //            {
 //                for (int i = 0; i < clipped_size; ++i)
 //                {
-//                    entry_point.n->test_leaf_node_nearest(&r[clipped_r[i]], &i_o[clipped_r[i] << LOG2_SIMD_WIDTH], &h[clipped_r[i]]);
+//                    entry_point.n->test_leaf_node_nearest(_prims, &r[clipped_r[i]], &i_o[clipped_r[i] << LOG2_SIMD_WIDTH], &h[clipped_r[i]]);
 //                }
 //            }
 #endif
@@ -782,7 +782,7 @@ void kd_tree::frustrum_found_nearer_object(const packet_ray *const r, const vfp_
 #ifdef FRUSTRUM_CULLING
                     clipped_r[clipped_size++] = i;
 #else
-                    entry_point.n->test_leaf_node_nearer(&r[i], &closer[i], t[i], &h[i]);
+                    entry_point.n->test_leaf_node_nearer(_prims, &r[i], &closer[i], t[i], &h[i]);
 #endif
                 }
             }
@@ -790,13 +790,13 @@ void kd_tree::frustrum_found_nearer_object(const packet_ray *const r, const vfp_
             if (clipped_size > 0)
             {
                 f.adapt_to_leaf(r, entry_point.u, entry_point.l, clipped_r, clipped_size);
-                entry_point.n->test_leaf_node_nearer(f, r, closer, t, h, clipped_r, clipped_size);
+                entry_point.n->test_leaf_node_nearer(_prims, f, r, closer, t, h, clipped_r, clipped_size);
             }
 //            else
 //            {
 //                for (int i = 0; i < clipped_size; ++i)
 //                {
-//                    entry_point.n->test_leaf_node_nearer(&r[clipped_r[i]], &closer[clipped_r[i]], t[clipped_r[i]], &h[clipped_r[i]]);
+//                    entry_point.n->test_leaf_node_nearer(_prims, &r[clipped_r[i]], &closer[clipped_r[i]], t[clipped_r[i]], &h[clipped_r[i]]);
 //                }
 //            }
 #endif
@@ -1070,7 +1070,7 @@ triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *cons
             triangle *intersecting_object;
             nearest_hit.d = exit_point->d;
             
-            intersecting_object = current_node->test_leaf_node_nearest(r, &nearest_hit, entry_point->d);
+            intersecting_object = current_node->test_leaf_node_nearest(_prims, r, &nearest_hit, entry_point->d);
             /* If an intersecting object is found it is the closest so return */
             if (intersecting_object != nullptr) 
             {
@@ -1128,7 +1128,7 @@ bool kd_tree::found_nearer_object(const ray *const r, const float t) const
         /* If the leaf contains objects find the closest intersecting object */
         if (!current_node->is_empty())
         {
-            bool closer = current_node->test_leaf_node_nearer(r, t);
+            bool closer = current_node->test_leaf_node_nearer(_prims, r, t);
             /* If an intersecting object is found it is the closest so return */
             if (closer) 
             {

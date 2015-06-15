@@ -1,5 +1,4 @@
-#ifndef __LWO_SURF_H__
-#define __LWO_SURF_H__
+#pragma once
 
 /* Standard headers */
 #include <string>
@@ -33,5 +32,3 @@ class lwo_surf : private boost::noncopyable
         float               _smoothing_threshold;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __LWO_SURF_H__ */

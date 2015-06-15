@@ -131,7 +131,7 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
     assert(depth < MAX_KDT_STACK_HEIGHT);
     if ((depth + 1) == MAX_KDT_STACK_HEIGHT)
     {
-        auto leaf_prims = new primitive_list(_nr_prims);
+        auto leaf_prims = new std::vector<int>(_nr_prims);
         for (int i = 0; i < _nr_prims; ++i)
         {
             (*leaf_prims)[i] = (*_ping)[_ping_idx + i].prim;
@@ -156,7 +156,7 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
     /* If using SIMD allow early exit for nodes under a given size */
     if (_nr_prims <= MIN_KDT_NODE_SIZE)
     {
-        auto leaf_prims = new primitive_list(_nr_prims);
+        auto leaf_prims = new std::vector<int>(_nr_prims);
         for (int i = 0; i < _nr_prims; ++i)
         {
             (*leaf_prims)[i] = (*_ping)[_ping_idx + i].prim;
@@ -216,7 +216,7 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
     assert(lowest_cost >= 0.0f);
     if (lowest_cost >= cost_before)
     {
-        auto leaf_prims = new primitive_list(_nr_prims);
+        auto leaf_prims = new std::vector<int>(_nr_prims);
         for (int i = 0; i < _nr_prims; ++i)
         {
             (*leaf_prims)[i] = (*_ping)[_ping_idx + i].prim;

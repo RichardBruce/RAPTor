@@ -237,7 +237,7 @@ unsigned parse_element_face(const char **c, unsigned *const pre_skip, unsigned *
  v is a list of vertex locations. m is the current 
  material in use. c is the byte stream to be parsed.
 **********************************************************/
-void parse_binary_face(light_list *l, primitive_list *e, std::vector<point_t> &vn, std::vector<point_t> &v, std::map<int, material *> *const shader_map, const char **c, const bool colour)
+void parse_binary_face(light_list *l, primitive_store *e, std::vector<point_t> &vn, std::vector<point_t> &v, std::map<int, material *> *const shader_map, const char **c, const bool colour)
 {
     static std::vector<point_t> face;
     
@@ -322,7 +322,7 @@ void parse_binary_face(light_list *l, primitive_list *e, std::vector<point_t> &v
  v is a list of vertex locations. m is the current 
  material in use. c is the byte stream to be parsed.
 **********************************************************/
-void parse_face(light_list *l, primitive_list *e, std::vector<point_t> &vn, std::vector<point_t> &v, std::map<int, material *> *const shader_map, const char **c, const bool colour)
+void parse_face(light_list *l, primitive_store *e, std::vector<point_t> &vn, std::vector<point_t> &v, std::map<int, material *> *const shader_map, const char **c, const bool colour)
 {
     static std::vector<point_t> face;
 
@@ -469,7 +469,7 @@ void parse_vertex(std::vector<point_t> *const vs, std::vector<point_t> *const vn
 void ply_parser(
     std::ifstream           &ply_file,
     light_list              &l, 
-    primitive_list          &e,
+    primitive_store         &e,
     std::list<material *>   &m,
     camera                  **c)
 {

@@ -12,8 +12,6 @@
 
 namespace raptor_raytracer
 {
-std::vector<triangle *> *   bih_node::o     = nullptr;
-
 #ifdef SIMD_PACKET_TRACING
 /* Find the next leaf node intersected by the frustrum */
 inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry_point, bih_stack_element **const out, unsigned int size) const
@@ -423,7 +421,7 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
 #ifdef FRUSTRUM_CULLING
                     clipped_r[clipped_size++] = i;
 #else
-                    leaf_node->test_leaf_node_nearest(&r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i], 1);
+                    leaf_node->test_leaf_node_nearest(_prims, &r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i], 1);
 #endif
                 }
             }
@@ -431,7 +429,7 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
             if (clipped_size > 0)
             {
                 f.adapt_to_leaf(r, entry_point.u, entry_point.l, clipped_r, clipped_size);
-                leaf_node->test_leaf_node_nearest(f, r, i_o, h, clipped_r, clipped_size);
+                leaf_node->test_leaf_node_nearest(_prims, f, r, i_o, h, clipped_r, clipped_size);
             }
 #endif
             /* Update furthest intersection */
@@ -608,7 +606,7 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
 #ifdef FRUSTRUM_CULLING
                     clipped_r[clipped_size++] = i;
 #else
-                    leaf_node->test_leaf_node_nearer(&r[i], &closer[i], t[i], &h[i]);
+                    leaf_node->test_leaf_node_nearer(_prims, &r[i], &closer[i], t[i], &h[i]);
 #endif
                 }
             }
@@ -616,7 +614,7 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
             if (clipped_size > 0)
             {
                 f.adapt_to_leaf(r, entry_point.u, entry_point.l, clipped_r, clipped_size);
-                leaf_node->test_leaf_node_nearer(f, r, closer, t, h, clipped_r, clipped_size);
+                leaf_node->test_leaf_node_nearer(_prims, f, r, closer, t, h, clipped_r, clipped_size);
             }
 #endif
 
@@ -912,7 +910,7 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
         {
-            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(r, i_o, h, 1);
+            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(_prims, r, i_o, h, 1);
         }
 
         /* Unwind the stack */
@@ -958,7 +956,7 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
         {
-            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(r, i_o, h, 1);
+            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(_prims, r, i_o, h, 1);
         }
 
         /* Unwind the stack */
@@ -1004,7 +1002,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t, bih_st
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
         {
-            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearer(r, &closer, t, &h);
+            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearer(_prims, r, &closer, t, &h);
             
             /* If all rays have been occluded, return */
             if (move_mask(closer) == ((1 << SIMD_WIDTH) - 1))
@@ -1062,7 +1060,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
         /* If the leaf contains objects find the closest intersecting object */
         if (cmd)
         {
-            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearer(r, &closer, t, &h);
+            (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearer(_prims, r, &closer, t, &h);
             
             /* If all rays have been occluded, return */
             if (move_mask(closer) == ((1 << SIMD_WIDTH) - 1))
@@ -1400,7 +1398,7 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
         if (leaf)
         {
             // BOOST_LOG_TRIVIAL(trace) << "Found leaf node";
-            triangle *intersecting_object = (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(r, &nearest_hit);
+            triangle *intersecting_object = (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(_prims, r, &nearest_hit);
 
             /* If an intersecting object is found it is the closest so return */
             if (intersecting_object != nullptr)
@@ -1462,7 +1460,7 @@ bool bih::found_nearer_object(const ray *const r, const float t) const
         if (leaf)
         {
             // BOOST_LOG_TRIVIAL(trace) << "Testing leaf node: " << entry_point.idx << ", " << t;
-            const bool closer = (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearer(r, t);
+            const bool closer = (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearer(_prims, r, t);
 
             /* If an intersecting object is found it is the closest so return */
             if (closer) 

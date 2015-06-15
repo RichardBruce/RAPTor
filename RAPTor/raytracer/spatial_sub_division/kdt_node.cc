@@ -14,23 +14,7 @@ namespace raptor_raytracer
   important. If it is not met there may be a closer 
   intersecting object in another leaf node.
 **********************************************************/
-triangle* kdt_node::test_leaf_node_nearest(const ray *const r, hit_description *const h, const float min) const
-{
-    triangle *intersecting_object = nullptr;
 
-    for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-    {
-        hit_description hit_type;
-        (*i)->is_intersecting(r, &hit_type);
-        if ((hit_type.d < ((h->d) + (1.0f * EPSILON))) && (hit_type.d > (min - (1.0f * EPSILON))))
-        {
-            *h = hit_type;
-            intersecting_object = *i;
-        }
-    }
-    
-    return intersecting_object;
-}
 
 
 /**********************************************************
@@ -44,23 +28,5 @@ triangle* kdt_node::test_leaf_node_nearest(const ray *const r, hit_description *
   intersection closer than 'max' is found then true may be
   returned immediately.
 **********************************************************/
-bool kdt_node::test_leaf_node_nearer(const ray *const r, const float max) const
-{
-    for (primitive_list::const_iterator i = this->p->begin(); i != this->p->end(); ++i)
-    {
-        if ((*i)->get_light() || (*i)->is_transparent())
-        {
-            continue;
-        }
-        
-		hit_description hit_type;
-        (*i)->is_intersecting(r, &hit_type);
-        if ((hit_type.d < max) && (hit_type.d > (1.0f * EPSILON)))
-        {
-            return true;
-        }
-    }
-    
-    return false;
-}
+
 }; /* namespace raptor_raytracer */

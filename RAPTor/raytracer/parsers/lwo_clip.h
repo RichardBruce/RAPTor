@@ -1,5 +1,4 @@
-#ifndef __LWO_CLIP_H__
-#define __LWO_CLIP_H__
+#pragma once
 
 /* Standard headers */
 
@@ -147,5 +146,3 @@ class lwo_clip
         const int                   _size;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __LWO_CLIP_H__ */

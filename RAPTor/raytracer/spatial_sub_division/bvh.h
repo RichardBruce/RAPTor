@@ -1,5 +1,4 @@
-#ifndef __BVH_H__
-#define __BVH_H__
+#pragma once
 
 /* Standard headers */
 #include <vector>
@@ -25,17 +24,15 @@ class bvh : public ssd
     public :
         /* CTOR */
         // cppcheck-suppress uninitMemberVar
-        bvh(primitive_list &everything) :
-        _builder(), _bvh_base(new std::vector<bvh_node>()), _root_node(0)
+        bvh(primitive_store &everything) :
+        _prims(everything), _builder(), _bvh_base(new std::vector<bvh_node>()), _root_node(0)
         {
-            bvh_node::set_primitives(&everything);
-
             /* Build the heirarchy */
             _root_node = _builder.build(&everything, _bvh_base.get());
         }
 
         /* Copy CTOR */
-        bvh(const bvh&b) : _bvh_base(b._bvh_base), _root_node(0) {  }
+        bvh(const bvh &b) : _prims(b._prims), _bvh_base(b._bvh_base), _root_node(0) {  }
 
         /* Assignment prohibited by base class */
         /* Allow default DTOR */
@@ -83,6 +80,7 @@ class bvh : public ssd
         inline bool find_leaf_node(const ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const point_t &i_rd, const float t_max) const;
 
         /* The stack is mutable because it will never be known to a user of this class */
+        const primitive_store &                 _prims;
         mutable bvh_stack_element               _bvh_stack[MAX_BVH_STACK_HEIGHT];
         bvh_builder                             _builder;
         std::shared_ptr<std::vector<bvh_node>>  _bvh_base;
@@ -90,5 +88,3 @@ class bvh : public ssd
         int                                     _root_node;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __BVH_H__ */

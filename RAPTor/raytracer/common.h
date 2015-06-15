@@ -197,14 +197,7 @@ namespace raptor_raytracer
 #endif  /* #ifdef SIMD_PACKET_TRACING */
 
 /* Primitive list to hold primitives */
-class triangle;
 class light;
-#ifdef THREADED_RAY_TRACE
-typedef std::vector<triangle *, scalable_allocator<triangle *> >    primitive_list;
-#else
-typedef std::vector<triangle *>                                     primitive_list;
-#endif /* #ifdef THREADED_RAY_TRACE */
-
 typedef std::vector<light> light_list;
 
 /* Common numbers */

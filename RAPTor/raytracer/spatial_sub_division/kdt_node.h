@@ -1,5 +1,4 @@
-#ifndef __KDT_NODE_H__
-#define __KDT_NODE_H__
+#pragma once
 
 #include "common.h"
 #include "triangle.h"
@@ -34,15 +33,15 @@ class kdt_node
         }
         
         /* Access functions */
-        primitive_list& get_primitives()                    { return *this->p;          }
-        kdt_node *      get_left()                const     { return &this->c[0];       }
-        kdt_node *      get_right()               const     { return &this->c[1];       }
-        float           get_split_position()      const     { return this->split_pos;   }
-        axis_t          get_normal()              const     { return this->normal;      }
-        int             get_size()                const     { return this->p->size();   }
-        bool            is_empty()                const     { return this->p->empty();  }
+        std::vector<int>&   get_primitives()              { return *this->p;            }
+        kdt_node *          get_left()              const { return &this->c[0];         }
+        kdt_node *          get_right()             const { return &this->c[1];         }
+        float               get_split_position()    const { return this->split_pos;     }
+        axis_t              get_normal()            const { return this->normal;        }
+        int                 get_size()              const { return this->p->size();     }
+        bool                is_empty()              const { return this->p->empty();    }
         
-        void            set_primitives(primitive_list *p)   { this->p = p;              }
+        void            set_primitives(std::vector<int> *p)  { this->p = p;             }
         kdt_node &      split_node(kdt_node *const k, const float s, const axis_t n) 
         {
             this->normal    = n;
@@ -54,50 +53,89 @@ class kdt_node
         /* test_leaf_node_nearest tests this object if is a leaf node and returns a pointer 
            to the nearest object found. The distance to this object is returned in m. If no 
            object is found nullptr is returned */
-        triangle * test_leaf_node_nearest(const ray *const r, hit_description *const h, const float min) const;
+        triangle * test_leaf_node_nearest(const primitive_store &e, const ray *const r, hit_description *const h, const float min) const
+        {
+            triangle *intersecting_object = nullptr;
+
+            for (int i : (*this->p))
+            {
+                auto *const tri = const_cast<triangle *>(e.primitive(i));
+
+                hit_description hit_type;
+                tri->is_intersecting(r, &hit_type);
+                if ((hit_type.d < ((h->d) + (1.0f * EPSILON))) && (hit_type.d > (min - (1.0f * EPSILON))))
+                {
+                    *h = hit_type;
+                    intersecting_object = tri;
+                }
+            }
+            
+            return intersecting_object;
+        }
         
         /* test_leaf_node_nearer tests this object if it is a leaf node to find an object
            that intersects with the ray r and is closer than max. If a closer intersecting 
            obeject is found true is return otherwise false is returned */
-        bool    test_leaf_node_nearer(const ray *const r, const float max) const;
+        bool test_leaf_node_nearer(const primitive_store &e, const ray *const r, const float max) const
+        {
+            for (int i : (*this->p))
+            {
+                const auto *const tri = e.primitive(i);
+                if (tri->get_light() || tri->is_transparent())
+                {
+                    continue;
+                }
+                
+                hit_description hit_type;
+                tri->is_intersecting(r, &hit_type);
+                if ((hit_type.d < max) && (hit_type.d > (1.0f * EPSILON)))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
 
 #ifdef SIMD_PACKET_TRACING
-        void test_leaf_node_nearest(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const
+        void test_leaf_node_nearest(const primitive_store &e, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const
         {
-            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
+            for (int i : (*this->p))
             {
-                (*i)->is_intersecting(r, h, i_o, 1);
+                e.primitive(i)->is_intersecting(r, h, i_o, 1);
             }
             
             return;
         }
 
-        void test_leaf_node_nearest(frustrum &f, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
+        void test_leaf_node_nearest(const primitive_store &e, frustrum &f, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
         {
-            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
+            for (int i : (*this->p))
             {
-                bool outside = f.cull((*i)->get_vertex_a(), (*i)->get_vertex_b(), (*i)->get_vertex_c());
+                const auto *const tri = e.primitive(i);
+                bool outside = f.cull(tri->get_vertex_a(), tri->get_vertex_b(), tri->get_vertex_c());
                 if (!outside)
                 {
-                    (*i)->is_intersecting(f, r, h, i_o, c, size);
+                    tri->is_intersecting(f, r, h, i_o, c, size);
                 }
             }
 
             return;
         }
 
-        void test_leaf_node_nearer(const packet_ray *const r, vfp_t *const c, const vfp_t &t, packet_hit_description *const h) const
+        void test_leaf_node_nearer(const primitive_store &e, const packet_ray *const r, vfp_t *const c, const vfp_t &t, packet_hit_description *const h) const
         {
             const triangle * i_o[SIMD_WIDTH];
 
-            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
+            for (int i : (*this->p))
             {
-                if ((*i)->get_light() || (*i)->is_transparent())
+                const auto *const tri = e.primitive(i);
+                if (tri->get_light() || tri->is_transparent())
                 {
                     continue;
                 }
         
-                (*i)->is_intersecting(r, h, &i_o[0], 1);
+                tri->is_intersecting(r, h, &i_o[0], 1);
                 (*c) |= (h->d < t);
                 if (move_mask(*c) == ((1 << SIMD_WIDTH) - 1))
                 {
@@ -108,21 +146,22 @@ class kdt_node
             return;
         }
         
-        void test_leaf_node_nearer(frustrum &f, const packet_ray *const r, vfp_t *const closer, const vfp_t *const t, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
+        void test_leaf_node_nearer(const primitive_store &e, frustrum &f, const packet_ray *const r, vfp_t *const closer, const vfp_t *const t, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
         {
             const triangle * i_o[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
             
-            for (primitive_list::const_iterator i=this->p->begin(); i!=this->p->end(); ++i)
+            for (int i : (*this->p))
             {
-                if ((*i)->get_light() || (*i)->is_transparent())
+                const auto *const tri = e.primitive(i);
+                if (tri->get_light() || tri->is_transparent())
                 {
                     continue;
                 }
 
-                bool outside = f.cull((*i)->get_vertex_a(), (*i)->get_vertex_b(), (*i)->get_vertex_c());
+                bool outside = f.cull(tri->get_vertex_a(), tri->get_vertex_b(), tri->get_vertex_c());
                 if (!outside)
                 {
-                    (*i)->is_intersecting(f, r, h, i_o, c, size);
+                    tri->is_intersecting(f, r, h, i_o, c, size);
                     vfp_t done = vfp_true;
                     for (unsigned int j = 0; j < size; ++j)
                     {
@@ -149,13 +188,11 @@ class kdt_node
         /* The node may point to a child node or primitives */
         union 
         {
-            kdt_node        *c;
-            primitive_list  *p;
+            kdt_node            *c;
+            std::vector<int>    *p;
         };
 
         float   split_pos;
         axis_t  normal;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __KDT_NODE_H__ */

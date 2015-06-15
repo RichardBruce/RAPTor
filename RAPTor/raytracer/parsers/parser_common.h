@@ -1,7 +1,7 @@
-#ifndef __PARSER_COMMON_H__
-#define __PARSER_COMMON_H__
+#pragma once
 
 #include "common.h"
+#include "primitive_store.h"
 
 #include "light.h"
 
@@ -358,13 +358,12 @@ inline void find_next_line(const char **c)
 
 
 /* Declare triangle */
-inline void new_triangle(primitive_list *e, std::vector<triangle *> *t, material *m, const point_t &a, const point_t &b, const point_t &c, const bool li, const point_t *vn=nullptr, const point_t *vt=nullptr)
+inline void new_triangle(primitive_store *e, std::vector<int> *t, material *m, const point_t &a, const point_t &b, const point_t &c, const bool li, const point_t *vn=nullptr, const point_t *vt=nullptr)
 {
-    triangle *tr = new triangle(m, a, b, c, li, vn, vt);
-    e->push_back(tr);
+    const int idx = e->emplace_back(m, a, b, c, li, vn, vt);
     if (li)
     {
-        t->push_back(tr);
+        t->push_back(idx);
     }
 }
 
@@ -376,9 +375,9 @@ inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_
 }
 
 
-inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const float d, const std::vector<triangle *> *const t)
+inline void new_light(light_list *const l, const primitive_store *const e, const ext_colour_t &rgb, const point_t &c, const float d, const std::vector<int> *const t)
 {
-    l->push_back(light(rgb, c, d, t));
+    l->push_back(light(e, rgb, c, d, t));
 }
 
 
@@ -585,7 +584,7 @@ inline void face_to_triangle_edges(std::vector<int> *const tris, std::vector<poi
 }
 
 
-inline void face_to_triangles(primitive_list *e, light_list *l, std::vector<point_t> &p, material *const m, const bool li, std::vector<point_t> *vn = nullptr, std::vector<point_t> *vt = nullptr, const float d = 0.0f)
+inline void face_to_triangles(primitive_store *e, light_list *l, std::vector<point_t> &p, material *const m, const bool li, std::vector<point_t> *vn = nullptr, std::vector<point_t> *vt = nullptr, const float d = 0.0f)
 {
     /* Progress tracking */
     unsigned size = p.size();
@@ -610,12 +609,12 @@ inline void face_to_triangles(primitive_list *e, light_list *l, std::vector<poin
     
 
     /* Triangle list for lights */
-    std::vector<triangle *>  *t  = nullptr;
+    std::vector<int>  *t  = nullptr;
     
     if (li)
     {
         /* To be deleted by the light destructor */
-        t   = new std::vector<triangle *>;
+        t   = new std::vector<int>;
     }
 
     /* Find the furthest point from the center */
@@ -732,9 +731,7 @@ inline void face_to_triangles(primitive_list *e, light_list *l, std::vector<poin
     /* Add light */
     if (li)
     {
-        new_light(l, ext_colour_t(255.0f, 255.0f, 255.0f), com, 0.0f, t);
+        new_light(l, e, ext_colour_t(255.0f, 255.0f, 255.0f), com, 0.0f, t);
     }
 }
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __PARSER_COMMON_H__ */

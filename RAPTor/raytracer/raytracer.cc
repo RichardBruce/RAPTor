@@ -524,7 +524,7 @@ void ray_trace_engine::operator() (const tbb::blocked_range2d<unsigned>& r) cons
 #endif /* #ifdef THREADED_RAY_TRACE */
 
 /* Ray tracer main function */
-void ray_tracer(const ssd *const sub_division, const light_list &lights, const primitive_list &everything, camera &c)
+void ray_tracer(const ssd *const sub_division, const light_list &lights, const primitive_store &everything, camera &c)
 {
     /* Make the screen 20 wide and 20 high ie/ -10 to 10 */
 #ifdef THREADED_RAY_TRACE

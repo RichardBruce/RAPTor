@@ -15,7 +15,7 @@ const int histogram_size = 1024;
 
 
 /* Build a Bounding Volumne Heirarchy for _primitives into nodes */
-int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *const nodes)
+int bvh_builder::build(primitive_store *const primitives, std::vector<bvh_node> *const nodes)
 {
     // BOOST_LOG_TRIVIAL(trace) << "BVH construction has begun";
 
@@ -26,17 +26,17 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     _code_buffer.reset(new int [_primitives->size()]);
 
     /* Temporary data for matrix sort */
-    primitive_list          prim_buffer(_primitives->size());
+    std::vector<int>        prim_buffer(_primitives->size());
     std::unique_ptr<int []> morton_codes(new int [_primitives->size()]);
 
     /* Cache primitive min and max */
     _b = point_t(MAX_DIST, MAX_DIST, MAX_DIST);
     _t = point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST);
     _bounds.reset(new bvh_bound_data [_primitives->size()]);
-    for (unsigned int i = 0; i < _primitives->size(); ++i)
+    for (int i = 0; i < _primitives->size(); ++i)
     {
-        _bounds[i].low  = (*_primitives)[i]->low_bound();
-        _bounds[i].high = (*_primitives)[i]->high_bound();
+        _bounds[i].low  = _primitives->primitive(i)->low_bound();
+        _bounds[i].high = _primitives->primitive(i)->high_bound();
         _b              = min(_b, _bounds[i].low);
         _t              = max(_t, _bounds[i].high);
     }
@@ -58,7 +58,7 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
     const vfp_t scene_lo_x(_b.x);
     const vfp_t scene_lo_y(_b.y);
     const vfp_t scene_lo_z(_b.z);
-    for (int i = 0; i <= (static_cast<int>(_primitives->size()) - SIMD_WIDTH); i += SIMD_WIDTH)
+    for (int i = 0; i <= (_primitives->size() - SIMD_WIDTH); i += SIMD_WIDTH)
     {
         /* Calculate morton code*/
         const vfp_t lo_x(_bounds[i].low.x, _bounds[i + 1].low.x, _bounds[i + 2].low.x, _bounds[i + 3].low.x);
@@ -133,7 +133,7 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
         const unsigned int data = morton_codes[i];
         const unsigned int pos = data & 0x3ff;
         _code_buffer[++hist0[pos]]  = data;
-        prim_buffer[hist0[pos]]    = (*_primitives)[i];
+        prim_buffer[hist0[pos]]    = i;
     }
 
     /* Move based on histogram 1 */
@@ -142,8 +142,8 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
         /* Calculate destination and move morton code */
         const unsigned int data = _code_buffer[i];
         const unsigned int pos = (data >> 10) & 0x3ff;
-        morton_codes[++hist1[pos]] = data;
-        (*_primitives)[hist1[pos]]  = prim_buffer[i];
+        morton_codes[++hist1[pos]]              = data;
+        _primitives->indirection(hist1[pos])    = prim_buffer[i];
     }
 
     /* Move based on histogram 2 */
@@ -153,9 +153,9 @@ int bvh_builder::build(primitive_list *const primitives, std::vector<bvh_node> *
         const unsigned int data = morton_codes[i];
         const unsigned int pos = data >> 20;
         _code_buffer[++hist2[pos]]  = data;
-        prim_buffer[hist2[pos]]    = (*_primitives)[i];
+        prim_buffer[hist2[pos]]    = _primitives->indirection(i);
     }
-    prim_buffer.swap(*_primitives);
+    _primitives->swap(prim_buffer);
     morton_codes.reset(nullptr);
 
     /* Allocate the cost matrix */
@@ -247,18 +247,18 @@ int bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const int
     {
         int node_end = i + 1;
         int layer_top = e;
-        point_t low((*_primitives)[i]->low_bound());
-        point_t high((*_primitives)[i]->high_bound());
+        point_t low(_primitives->indirect_primitive(i)->low_bound());
+        point_t high(_primitives->indirect_primitive(i)->high_bound());
         while (node_end < layer_top)
         {
-            if (cost_function((*_primitives)[node_end], low, high, node_end - i + 1) > _max_leaf_sah)
+            if (cost_function(_primitives->indirect_primitive(node_end), low, high, node_end - i + 1) > _max_leaf_sah)
             {
-                std::swap((*_primitives)[node_end], (*_primitives)[--layer_top]);
+                std::swap(_primitives->indirection(node_end), _primitives->indirection(--layer_top));
             }
             else
             {
-                low     = min(low, (*_primitives)[node_end]->low_bound());
-                high    = max(high, (*_primitives)[node_end]->high_bound());
+                low     = min(low, _primitives->indirect_primitive(node_end)->low_bound());
+                high    = max(high, _primitives->indirect_primitive(node_end)->high_bound());
                 ++node_end;
             }
         }
@@ -501,12 +501,12 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             while (bottom < top)
             {
                 /* Skip primitives in the correct place*/
-                while (dbl_split < ((*_primitives)[top]->high_bound().x + (*_primitives)[top]->low_bound().x) && bottom < top)
+                while (dbl_split < (_primitives->indirect_primitive(top)->high_bound().x + _primitives->indirect_primitive(top)->low_bound().x) && bottom < top)
                 {
                     --top;
                 }
 
-                while (dbl_split >= ((*_primitives)[bottom]->high_bound().x + (*_primitives)[bottom]->low_bound().x) && bottom < top)
+                while (dbl_split >= (_primitives->indirect_primitive(bottom)->high_bound().x + _primitives->indirect_primitive(bottom)->low_bound().x) && bottom < top)
                 {
                     ++bottom;
                 }
@@ -514,14 +514,14 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
                 /* Swap incorrect primitives */
                 if (bottom < top)
                 {
-                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    std::swap(_primitives->indirection(bottom), _primitives->indirection(top));
                     --top;
                     ++bottom;
                 }
             }
 
             middle_idx = bottom;
-            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->high_bound().x + (*_primitives)[top]->low_bound().x)))
+            if ((top == bottom) && (dbl_split >= (_primitives->indirect_primitive(top)->high_bound().x + _primitives->indirect_primitive(top)->low_bound().x)))
             {
                 ++middle_idx;
             }
@@ -534,12 +534,12 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             while (bottom < top)
             {
                 /* Skip primitives in the correct place*/
-                while (dbl_split < ((*_primitives)[top]->high_bound().y + (*_primitives)[top]->low_bound().y) && bottom < top)
+                while (dbl_split < (_primitives->indirect_primitive(top)->high_bound().y + _primitives->indirect_primitive(top)->low_bound().y) && bottom < top)
                 {
                     --top;
                 }
 
-                while (dbl_split >= ((*_primitives)[bottom]->high_bound().y + (*_primitives)[bottom]->low_bound().y) && bottom < top)
+                while (dbl_split >= (_primitives->indirect_primitive(bottom)->high_bound().y + _primitives->indirect_primitive(bottom)->low_bound().y) && bottom < top)
                 {
                     ++bottom;
                 }
@@ -547,14 +547,14 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
                 /* Swap incorrect primitives */
                 if (bottom < top)
                 {
-                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    std::swap(_primitives->indirection(bottom), _primitives->indirection(top));
                     --top;
                     ++bottom;
                 }
             }
 
             middle_idx = bottom;
-            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->high_bound().y + (*_primitives)[top]->low_bound().y)))
+            if ((top == bottom) && (dbl_split >= (_primitives->indirect_primitive(top)->high_bound().y + _primitives->indirect_primitive(top)->low_bound().y)))
             {
                 ++middle_idx;
             }
@@ -567,12 +567,12 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             while (bottom < top)
             {
                 /* Skip primitives in the correct place*/
-                while (dbl_split < ((*_primitives)[top]->high_bound().z + (*_primitives)[top]->low_bound().z) && bottom < top)
+                while (dbl_split < (_primitives->indirect_primitive(top)->high_bound().z + _primitives->indirect_primitive(top)->low_bound().z) && bottom < top)
                 {
                     --top;
                 }
 
-                while (dbl_split >= ((*_primitives)[bottom]->high_bound().z + (*_primitives)[bottom]->low_bound().z) && bottom < top)
+                while (dbl_split >= (_primitives->indirect_primitive(bottom)->high_bound().z + _primitives->indirect_primitive(bottom)->low_bound().z) && bottom < top)
                 {
                     ++bottom;
                 }
@@ -580,14 +580,14 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
                 /* Swap incorrect primitives */
                 if (bottom < top)
                 {
-                    std::swap((*_primitives)[bottom], (*_primitives)[top]);
+                    std::swap(_primitives->indirection(bottom), _primitives->indirection(top));
                     --top;
                     ++bottom;
                 }
             }
 
             middle_idx = bottom;
-            if ((top == bottom) && (dbl_split >= ((*_primitives)[top]->high_bound().z + (*_primitives)[top]->low_bound().z)))
+            if ((top == bottom) && (dbl_split >= (_primitives->indirect_primitive(top)->high_bound().z + _primitives->indirect_primitive(top)->low_bound().z)))
             {
                 ++middle_idx;
             }

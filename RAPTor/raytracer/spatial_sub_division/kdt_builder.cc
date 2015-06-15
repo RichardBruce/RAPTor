@@ -8,7 +8,7 @@
 
 namespace raptor_raytracer
 {
-void kdt_builder::build(const primitive_list *const objects, std::vector<kdt_node> *const nodes, axis_t normal)
+void kdt_builder::build(const primitive_store *const objects, std::vector<kdt_node> *const nodes, axis_t normal)
 {
     /* Create a voxel to hold everything */
     const int nr_primitives = objects->size();
@@ -20,9 +20,9 @@ void kdt_builder::build(const primitive_list *const objects, std::vector<kdt_nod
     std::vector<voxel_aab_data> pong(nr_primitives << 1);
     for (int i = 0; i < nr_primitives; ++i)
     {
-        ping[i].prim = (*objects)[i];
-        ping[i].low  = (*objects)[i]->low_bound();
-        ping[i].high = (*objects)[i]->high_bound();
+        ping[i].prim = i;
+        ping[i].low  = (*objects).primitive(i)->low_bound();
+        ping[i].high = (*objects).primitive(i)->high_bound();
         _b           = min(_b, ping[i].low);
         _t           = max(_t, ping[i].high);
     }

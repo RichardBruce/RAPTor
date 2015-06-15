@@ -10,12 +10,6 @@
 
 /* Initialise logger */
 const raptor_physics::init_logger init_logger;
-
-namespace raptor_raytracer
-{
-/* Primitives array so we dont need to include more source */
-std::vector<triangle *> *   bvh_node::o     = nullptr;
-}
 #endif /* #ifdef STAND_ALONE */
 
 /* Standard headers */

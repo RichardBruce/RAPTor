@@ -23,8 +23,8 @@ class kd_tree : public ssd
     public :
         /* CTOR, build the tree */
         // cppcheck-suppress uninitMemberVar
-        kd_tree(const primitive_list &everything) :
-        _builder(), _kdt_base(new std::vector<kdt_node>())
+        kd_tree(const primitive_store &everything) :
+        _prims(everything), _builder(), _kdt_base(new std::vector<kdt_node>())
         {
             /* Build the heirarchy */
             _builder.build(&everything, _kdt_base.get(), axis_t::x_axis);
@@ -74,6 +74,7 @@ class kd_tree : public ssd
         inline void find_leaf_node(const ray *const r, const kdt_node **const n, kdt_stack_element **const out, const kdt_stack_element *const entry_point) const;
 
         /* The stack is mutable because it will never be known to a user of this class */
+        const primitive_store &                 _prims;
         mutable kdt_stack_element               _kdt_stack[MAX_KDT_STACK_HEIGHT];
         kdt_builder                             _builder;
         std::shared_ptr<std::vector<kdt_node>>  _kdt_base;

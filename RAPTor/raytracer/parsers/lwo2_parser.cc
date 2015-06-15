@@ -74,7 +74,7 @@ void parse_surf(const lwo_chunks &chunks, std::list<material *> &m, const std::s
     }
 }
 
-void parse_pols(const lwo_chunks &chunks, light_list &l, primitive_list &e, const std::map<std::string, std::uint16_t> &tag_map, const std::vector<std::unique_ptr<lwo_surf>> &surfs, const std::vector<point_t> &all_points, const char *const buffer)
+void parse_pols(const lwo_chunks &chunks, light_list &l, primitive_store &e, const std::map<std::string, std::uint16_t> &tag_map, const std::vector<std::unique_ptr<lwo_surf>> &surfs, const std::vector<point_t> &all_points, const char *const buffer)
 {
     /* Check this is the POLS chunk */
     const char *at = chunks.pols();
@@ -202,7 +202,7 @@ void lwo2_parser(
     const char              *at,
     std::string             &p,
     light_list              &l, 
-    primitive_list          &e,
+    primitive_store         &e,
     std::list<material *>   &m,
     camera                  **c,
     const int               len)

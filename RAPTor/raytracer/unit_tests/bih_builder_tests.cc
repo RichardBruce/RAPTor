@@ -29,25 +29,17 @@ struct bih_builder_fixture
     uut(1), half_epsilon(0.5f * EPSILON)
     {  }
 
-    ~bih_builder_fixture()
-    {
-        for (auto *p : primitives)
-        {
-            delete p;
-        }
-    }
-
     void x_axis_primitives(const int size)
     {
         float x = 0.0f;
         for (int i = 0; i < size; ++i)
         {
-            primitives.push_back(new triangle(nullptr, point_t(x, 0.0f, 0.0f), point_t(x, 0.0f, 1.0f), point_t(x, 1.0f, 1.0f)));
+            primitives.emplace_back(nullptr, point_t(x, 0.0f, 0.0f), point_t(x, 0.0f, 1.0f), point_t(x, 1.0f, 1.0f));
             x += 5.0f;
         }
     }
 
-    primitive_list          primitives;
+    primitive_store         primitives;
     std::vector<bih_block>  bih;
     bih_builder             uut;
     const float             half_epsilon;
@@ -68,7 +60,7 @@ BOOST_AUTO_TEST_CASE( empty_build_test )
 
 BOOST_AUTO_TEST_CASE( one_triangle_build_test )
 {
-    primitives.push_back(new triangle(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 1.0f, 1.0f)));
+    primitives.emplace_back(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 1.0f, 1.0f));
 
     uut.build(&primitives, &bih);
     
@@ -143,7 +135,7 @@ BOOST_AUTO_TEST_CASE( one_triangle_build_test )
 // BOOST_AUTO_TEST_CASE( dislocated_primitive_build_test )
 // {
 //     x_axis_primitives(4);
-//     primitives.push_back(new triangle(nullptr, point_t(5.0f, 20.0f, 0.0f), point_t(5.0f, 20.0f, 1.0f), point_t(5.0f, 21.0f, 1.0f)));
+//     primitives.emplace_back(nullptr, point_t(5.0f, 20.0f, 0.0f), point_t(5.0f, 20.0f, 1.0f), point_t(5.0f, 21.0f, 1.0f));
 
 //     uut.build(&primitives, &bih);
     
@@ -205,10 +197,10 @@ BOOST_AUTO_TEST_CASE( one_triangle_build_test )
 
 // BOOST_AUTO_TEST_CASE( xyz_tree_build_test )
 // {
-//     primitives.push_back(new triangle(nullptr, point_t( 0.0f,  0.0f,  0.0f), point_t( 0.0f,  0.0f,  1.0f), point_t( 0.0f,  1.0f,  1.0f)));
-//     primitives.push_back(new triangle(nullptr, point_t(10.0f,  0.0f,  0.0f), point_t(10.0f,  0.0f,  1.0f), point_t(10.0f,  1.0f,  1.0f)));
-//     primitives.push_back(new triangle(nullptr, point_t( 0.0f, 15.0f,  0.0f), point_t( 0.0f, 15.0f,  1.0f), point_t( 0.0f, 16.0f,  1.0f)));
-//     primitives.push_back(new triangle(nullptr, point_t( 0.0f,  0.0f, 20.0f), point_t( 0.0f,  0.0f, 21.0f), point_t( 0.0f,  1.0f, 21.0f)));
+//     primitives.emplace_back(nullptr, point_t( 0.0f,  0.0f,  0.0f), point_t( 0.0f,  0.0f,  1.0f), point_t( 0.0f,  1.0f,  1.0f));
+//     primitives.emplace_back(nullptr, point_t(10.0f,  0.0f,  0.0f), point_t(10.0f,  0.0f,  1.0f), point_t(10.0f,  1.0f,  1.0f));
+//     primitives.emplace_back(nullptr, point_t( 0.0f, 15.0f,  0.0f), point_t( 0.0f, 15.0f,  1.0f), point_t( 0.0f, 16.0f,  1.0f));
+//     primitives.emplace_back(nullptr, point_t( 0.0f,  0.0f, 20.0f), point_t( 0.0f,  0.0f, 21.0f), point_t( 0.0f,  1.0f, 21.0f));
 //     uut.build(&primitives, &bih);
     
 //     /* Checks - Root internal node */
@@ -262,8 +254,8 @@ BOOST_AUTO_TEST_CASE( one_triangle_build_test )
 
 // BOOST_AUTO_TEST_CASE( xz_diagonal_tree_build_test )
 // {
-//     primitives.push_back(new triangle(nullptr, point_t(-10.0f, 0.0f, -20.0f), point_t(-10.0f, 0.0f, -19.0f), point_t(-20.0f, 1.0f, -19.0f)));
-//     primitives.push_back(new triangle(nullptr, point_t( 10.0f, 0.0f,  20.0f), point_t( 10.0f, 0.0f,  21.0f), point_t( 20.0f, 1.0f,  21.0f)));
+//     primitives.emplace_back(nullptr, point_t(-10.0f, 0.0f, -20.0f), point_t(-10.0f, 0.0f, -19.0f), point_t(-20.0f, 1.0f, -19.0f));
+//     primitives.emplace_back(nullptr, point_t( 10.0f, 0.0f,  20.0f), point_t( 10.0f, 0.0f,  21.0f), point_t( 20.0f, 1.0f,  21.0f));
 //     uut.build(&primitives, &bih);
     
 //     /* Checks - Root internal node */
@@ -286,12 +278,12 @@ BOOST_AUTO_TEST_CASE( one_triangle_build_test )
 
 // BOOST_AUTO_TEST_CASE( leaf_at_root_of_new_block_tree_build_test )
 // {
-//     primitives.push_back(new triangle(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 9.0f, 0.0f), point_t(0.0f, 9.0f, 9.0f), true));
-//     primitives.push_back(new triangle(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 9.0f, 9.0f), point_t(0.0f, 0.0f, 9.0f), true));       
-//     primitives.push_back(new triangle(nullptr, point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 2.0f, 0.0f), point_t(1.0f, 2.0f, 2.0f), true));
-//     primitives.push_back(new triangle(nullptr, point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 2.0f, 2.0f), point_t(1.0f, 0.0f, 2.0f), true));
-//     primitives.push_back(new triangle(nullptr, point_t(3.0f, 0.0f, 0.0f), point_t(3.0f, 2.0f, 0.0f), point_t(3.0f, 2.0f, 2.0f), true));
-//     primitives.push_back(new triangle(nullptr, point_t(3.0f, 0.0f, 0.0f), point_t(3.0f, 2.0f, 2.0f), point_t(3.0f, 0.0f, 2.0f), true));
+//     primitives.emplace_back(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 9.0f, 0.0f), point_t(0.0f, 9.0f, 9.0f), true);
+//     primitives.emplace_back(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 9.0f, 9.0f), point_t(0.0f, 0.0f, 9.0f), true));      
+//     primitives.emplace_back(nullptr, point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 2.0f, 0.0f), point_t(1.0f, 2.0f, 2.0f), true);
+//     primitives.emplace_back(nullptr, point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 2.0f, 2.0f), point_t(1.0f, 0.0f, 2.0f), true);
+//     primitives.emplace_back(nullptr, point_t(3.0f, 0.0f, 0.0f), point_t(3.0f, 2.0f, 0.0f), point_t(3.0f, 2.0f, 2.0f), true);
+//     primitives.emplace_back(nullptr, point_t(3.0f, 0.0f, 0.0f), point_t(3.0f, 2.0f, 2.0f), point_t(3.0f, 0.0f, 2.0f), true);
  
 //     bih_builder uut;
 //     uut.build(&primitives, &bih);

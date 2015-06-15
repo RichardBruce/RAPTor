@@ -18,7 +18,7 @@
 
 namespace raptor_raytracer
 {
-class triangle : private boost::noncopyable
+class triangle : boost::noncopyable
 {
     public :
         triangle(material *const m, const point_t &a, const point_t &b, const point_t &c, bool l = false, const point_t *v_n = nullptr, const point_t *v_t = nullptr);
@@ -30,6 +30,12 @@ class triangle : private boost::noncopyable
                 delete [] this->vnt;
             }
         };
+
+        triangle(triangle &&r) :
+            m(r.m), vnt(r.vnt), vertex_a(r.vertex_a), vertex_b(r.vertex_b), vertex_c(r.vertex_c), n(r.n)
+        {
+            r.vnt = nullptr;
+        }
         
         /* Find out if this is a light/transparent object for shadow rays to ignore */
         bool get_light()            const { return this->m & 0x1;                           }

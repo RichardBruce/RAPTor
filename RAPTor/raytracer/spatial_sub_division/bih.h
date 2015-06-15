@@ -1,5 +1,4 @@
-#ifndef __BIH_H__
-#define __BIH_H__
+#pragma once
 
 /* Standard headers */
 #include <vector>
@@ -25,17 +24,15 @@ class bih : public ssd
     public :
         /* CTOR */
         // cppcheck-suppress uninitMemberVar
-        bih(primitive_list &everything, const int max_node_size = MAX_BIH_NODE_SIZE) :
-        _builder(), _bih_base(new std::vector<bih_block>())
+        bih(primitive_store &everything, const int max_node_size = MAX_BIH_NODE_SIZE) :
+        _prims(everything), _builder(), _bih_base(new std::vector<bih_block>())
         {
-            bih_node::set_primitives(&everything);
-
             /* Build the heirarchy */
             _builder.build(&everything, _bih_base.get());
         }
 
         /* Copy CTOR */
-        bih(const bih&b) : _bih_base(b._bih_base) {  }
+        bih(const bih&b) : _prims(b._prims), _bih_base(b._bih_base) {  }
 
         /* Assignment prohibited by base class */
         /* Allow default DTOR */
@@ -83,10 +80,9 @@ class bih : public ssd
         inline bool find_leaf_node(const ray &r, bih_stack_element *const entry_point, bih_stack_element **const out, const point_t &i_rd) const;
 
         /* The stack is mutable because it will never be known to a user of this class */
+        const primitive_store &                 _prims;
         mutable bih_stack_element               _bih_stack[MAX_BIH_STACK_HEIGHT];
         bih_builder                             _builder;
         std::shared_ptr<std::vector<bih_block>> _bih_base;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __BIH_H__ */

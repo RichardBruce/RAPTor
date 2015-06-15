@@ -1,7 +1,7 @@
-#ifndef __LIGHT_H__
-#define __LIGHT_H__
+#pragma once
 
 #include "triangle.h"
+#include "primitive_store.h"
 
 
 namespace raptor_raytracer
@@ -15,27 +15,27 @@ class light
     public :
         /* CTOR for spherical light */
         light(const ext_colour_t &rgb, const point_t &c, const float d, const float r)                  
-            : t(nullptr), rgb(rgb / 255.0f), c(c), n(2.0f), r(r), d(d), s_a(0.0f), s_b(0.0f), n_dir(light_direction_t::x_pos) { };
+            : e(nullptr), t(nullptr), rgb(rgb / 255.0f), c(c), n(2.0f), r(r), d(d), s_a(0.0f), s_b(0.0f), n_dir(light_direction_t::x_pos) { };
 
         /* CTOR for triangle defined light */
-        light(const ext_colour_t &rgb, const point_t &c, const float d, const std::vector<triangle *> *const t)
-            : t(t), rgb(rgb / 255.0f), c(c), n(2.0f), r(0.0f), d(d), s_a(0.0f), s_b(0.0f), n_dir(light_direction_t::x_pos) { };
+        light(const primitive_store *const e, const ext_colour_t &rgb, const point_t &c, const float d, const std::vector<int> *const t)
+            : e(e), t(t), rgb(rgb / 255.0f), c(c), n(2.0f), r(0.0f), d(d), s_a(0.0f), s_b(0.0f), n_dir(light_direction_t::x_pos) { };
 
         /* CTOR for spot light */
         light(const ext_colour_t &rgb, const point_t &c, const point_t &n, const float d, const float s_a, const float s_b, const float r)
-            : t(nullptr), rgb(rgb / 255.0f), c(c), n(n), r(r), d(d), s_a(s_a), s_b(s_b), n_dir(light_direction_t::x_pos) { };
+            : e(nullptr), t(nullptr), rgb(rgb / 255.0f), c(c), n(n), r(r), d(d), s_a(s_a), s_b(s_b), n_dir(light_direction_t::x_pos) { };
 
         /* CTOR for triangle defined spot light */
-        light(const ext_colour_t &rgb, const point_t &c, const point_t &n, const float d, const float s_a, const float s_b, const std::vector<triangle *> *const t)
-            : t(t), rgb(rgb / 255.0f), c(c), n(n), r(0.0f), d(d), s_a(s_a), s_b(s_b), n_dir(light_direction_t::x_pos) { };
+        light(const primitive_store *const e, const ext_colour_t &rgb, const point_t &c, const point_t &n, const float d, const float s_a, const float s_b, const std::vector<int> *const t)
+            : e(e), t(t), rgb(rgb / 255.0f), c(c), n(n), r(0.0f), d(d), s_a(s_a), s_b(s_b), n_dir(light_direction_t::x_pos) { };
 
         /* CTOR for directional light */
         light(const ext_colour_t &rgb, const point_t &n, const float d)
-            : t(nullptr), rgb(rgb / 255.0f), c(), n(n), r(0.0f), d(d), s_a(0.0f), s_b(0.0f), n_dir(find_major_direction()) {  };
+            : e(nullptr), t(nullptr), rgb(rgb / 255.0f), c(), n(n), r(0.0f), d(d), s_a(0.0f), s_b(0.0f), n_dir(find_major_direction()) {  };
 
         /* Copy CTOR */
         light(const light &l)
-            : t(l.t), rgb(l.rgb), c(l.c), n(l.n), r(l.r), d(l.d), s_a(l.s_a), s_b(l.s_b), n_dir(l.n_dir) { };
+            : e(l.e), t(l.t), rgb(l.rgb), c(l.c), n(l.n), r(l.r), d(l.d), s_a(l.s_a), s_b(l.s_b), n_dir(l.n_dir) { };
         
         const point_t      & get_centre()                       const   { return this->c;               }
         
@@ -138,19 +138,19 @@ class light
                 /* Create n rays */
                 float extra_point   = 0.0f;
                 int  ray_nr         = 0;
-                for(int i = 0; i < (int)this->t->size(); i ++)
+                for (int i = 0; i < static_cast<int>(this->t->size()); ++i)
                 {
                     /* Create ppt + 1 new ray to the light */
                     if (i == (int)extra_point)
                     {
-                        (*this->t)[i]->find_rays(&r[ray_nr], d, ppt + 1);
+                        e->primitive((*this->t)[i])->find_rays(&r[ray_nr], d, ppt + 1);
                         ray_nr      += (ppt + 1);
                         extra_point += stride;
                     }
                     /* Create ppt new rays to the light */
                     else
                     {
-                        (*this->t)[i]->find_rays(&r[ray_nr], d, ppt);
+                        e->primitive((*this->t)[i])->find_rays(&r[ray_nr], d, ppt);
                         ray_nr      += ppt;
                     }
                 }
@@ -225,16 +225,15 @@ class light
             }
         }
 
-        const std::vector<triangle *> *const    t;      /* Triangles forming a face                 */
-        const ext_colour_t                      rgb;    /* The colour of the light                  */
-        const point_t                           c;      /* Centre of the light                      */
-        const point_t                           n;      /* Direction of the light                   */
-        const float                             r;      /* Radius of the light                      */
-        const float                             d;      /* Drop off with distance                   */
-        const float                             s_a;    /* Angle where spotlight starts to fade     */
-        const float                             s_b;    /* Angle where spotlight finishes fading    */
-        const light_direction_t                 n_dir;  /* Major axis and direction of the light    */
+        const primitive_store *const    e;      /* All the scene primitives                 */
+        const std::vector<int> *const   t;      /* Triangles forming a face                 */
+        const ext_colour_t              rgb;    /* The colour of the light                  */
+        const point_t                   c;      /* Centre of the light                      */
+        const point_t                   n;      /* Direction of the light                   */
+        const float                     r;      /* Radius of the light                      */
+        const float                     d;      /* Drop off with distance                   */
+        const float                     s_a;    /* Angle where spotlight starts to fade     */
+        const float                     s_b;    /* Angle where spotlight finishes fading    */
+        const light_direction_t         n_dir;  /* Major axis and direction of the light    */
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __LIGHT_H__ */

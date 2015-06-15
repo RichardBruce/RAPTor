@@ -1,5 +1,4 @@
-#ifndef __BIH_BUILDER_H__
-#define __BIH_BUILDER_H__
+#pragma once
 
 /* Standard headers */
 #include <atomic>
@@ -26,7 +25,7 @@ class bih_builder
         bih_builder(const int max_node_size = MAX_BIH_NODE_SIZE) :
         _primitives(nullptr), _blocks(nullptr), _width(0.0f), _width_epsilon(0.0f), _width_inv(0.0f), _max_node_size(max_node_size), _next_block(1) {  }
 
-        void build(primitive_list *const primitives, std::vector<bih_block> *const blocks);
+        void build(primitive_store *const primitives, std::vector<bih_block> *const blocks);
     
         /* Access to the trees bounds */
         const point_t & scene_upper_bound() const { return _t; }
@@ -55,7 +54,7 @@ class bih_builder
         void bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
 
         void convert_to_primitve_builder(const int b, const int e);
-        void convert_to_primitve_builder(triangle **const active_prims, const int b, const int e);
+        // void convert_to_primitve_builder(triangle **const active_prims, const int b, const int e);
         void level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx);
 
         void divide_bih_block(const point_t *const hist_bl, const point_t *const hist_tr, const unsigned int *const bins, const point_t &bl, const point_t &tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level = 2, const int depth = 0);
@@ -65,8 +64,8 @@ class bih_builder
         void divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int depth = 0, const int node_idx = 0);
         void divide_bih_node(block_splitting_data *const split_data, const int in_idx, const int out_idx, const int block_idx, const int node_idx);
 
-        primitive_list *                    _primitives;
-        std::unique_ptr<triangle * []>      _prim_buffer;
+        primitive_store *                   _primitives;
+        std::unique_ptr<int []>             _prim_buffer;
         std::unique_ptr<int []>             _morton_codes;
         std::unique_ptr<int []>             _code_buffer;
         std::vector<bih_block> *            _blocks;
@@ -80,5 +79,3 @@ class bih_builder
         std::atomic<int>                    _next_block;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* __BIH_BUILDER_H__ */

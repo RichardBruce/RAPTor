@@ -1,5 +1,4 @@
-#ifndef __CFG_PARSER_H__
-#define __CFG_PARSER_H__
+#pragma once
 
 namespace raptor_raytracer
 {
@@ -9,9 +8,7 @@ void cfg_parser(
     const std::string       &base_path,
     std::ifstream           &cfg_file,
     light_list              &l, 
-    primitive_list          &e,
+    primitive_store         &e,
     std::list<material *>   &m,
     camera                  **c);
 }; /* namespace raptor_raytracer */
-
-#endif	/* #ifndef __CFG_PARSER_H__ */

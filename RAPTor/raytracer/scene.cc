@@ -5,7 +5,7 @@
 namespace raptor_raytracer
 {
 /* Auto generated init function do not edit directly */
-void scene_init(light_list &lights, primitive_list &everything, std::list<material *> &materials, camera **c)
+void scene_init(light_list &lights, primitive_store &everything, std::list<material *> &materials, camera **c)
 {
     /* Set up the camera */
     *c = new camera(point_t(0.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f), point_t(0.0f, 0.0f, 1.0f), ext_colour_t(0.0f ,0.0f ,255.0f), 7.5f, 10.0f, 10.0f, 640, 480);
@@ -13,11 +13,8 @@ void scene_init(light_list &lights, primitive_list &everything, std::list<materi
     phong_shader *frame_mat = new phong_shader(ext_colour_t(125.0f, 125.0f, 125.0f), 0.3330f, 0.3330f, 0.0300f);
     materials.push_back(frame_mat);
 
-    triangle *tr0 = new triangle(frame_mat, point_t(-10.0f, -10.0f, 100.0f), point_t(-10.0f, 10.0f, 100.0f), point_t(10.0f, 10.0f, 100.0f));
-    everything.push_back(tr0);
-    
-    triangle *tr1 = new triangle(frame_mat, point_t(10.0f, 10.0f, 100.0f), point_t(10.0f, -10.0f, 100.0f), point_t(-10.0f, -10.0f, 100.0f));
-    everything.push_back(tr1);
+    everything.emplace_back(frame_mat, point_t(-10.0f, -10.0f, 100.0f), point_t(-10.0f, 10.0f, 100.0f), point_t(10.0f, 10.0f, 100.0f));
+    everything.emplace_back(frame_mat, point_t(10.0f, 10.0f, 100.0f), point_t(10.0f, -10.0f, 100.0f), point_t(-10.0f, -10.0f, 100.0f));
 
     new_light(&lights, ext_colour_t(255.0f ,255.0f ,255.0f), point_t(2.5f, -2.5f, 50.0f), 0.0f, 0.0f);
 

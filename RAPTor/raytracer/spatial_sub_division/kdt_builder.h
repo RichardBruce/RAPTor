@@ -1,5 +1,4 @@
-#ifndef __KD_TREE_BUILDER__
-#define __KD_TREE_BUILDER__
+#pragma once
 
 #include "ray.h"
 #include "voxel.h"
@@ -60,7 +59,7 @@ class kdt_builder
 
         /* Function to build a kd tree containg the object given in objects and with the first split
            in the axis_t given by normal */
-        void build(const primitive_list *const objects, std::vector<kdt_node> *const nodes, axis_t normal);
+        void build(const primitive_store *const objects, std::vector<kdt_node> *const nodes, axis_t normal);
 
         /* Access to the trees bounds */
         const point_t & scene_upper_bound() const { return _t; }
@@ -69,12 +68,10 @@ class kdt_builder
     private :
         void divide_kdt_node(voxel *const base, int *const child_idx, const int node_idx);
   
-        primitive_list *        _primitives;
+        primitive_store *       _primitives;
         std::vector<kdt_node> * _nodes;
         point_t                 _t;
         point_t                 _b;
         int                     _depth;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __KD_TREE_BUILDER__ */

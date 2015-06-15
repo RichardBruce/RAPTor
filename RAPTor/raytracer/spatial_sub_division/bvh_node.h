@@ -58,9 +58,6 @@ class bvh_node
             return (dist.x * dist.y) + (dist.x * dist.z) + (dist.y * dist.z);
         }
         
-        /* Set statics */
-        static void set_primitives(std::vector<triangle *> *const p) { bvh_node::o = p; }
-
         /* Tree traversal */        
         float intersection_distance(const ray &r, const point_t &i_rd) const
         {
@@ -153,7 +150,7 @@ class bvh_node
             return _e - _b;
         }
 
-        triangle * test_leaf_node_nearest(const ray *const r, hit_description *const h) const
+        triangle * test_leaf_node_nearest(const primitive_store &e, const ray *const r, hit_description *const h) const
         {
             triangle *intersecting_object = nullptr;
     
@@ -161,29 +158,31 @@ class bvh_node
             for (int i = _b; i < end; ++i)
             {
                 hit_description hit_type(h->d);
-                (*bvh_node::o)[i]->is_intersecting(r, &hit_type);
+                auto *tri = const_cast<triangle *>(e.indirect_primitive(i));
+                tri->is_intersecting(r, &hit_type);
                 if (hit_type.d < h->d)
                 {
                     *h = hit_type;
-                    intersecting_object = (*bvh_node::o)[i];
+                    intersecting_object = tri;
                 }
             }
     
             return intersecting_object;
         }
 
-        bool test_leaf_node_nearer(const ray *const r, const float max) const
+        bool test_leaf_node_nearer(const primitive_store &e, const ray *const r, const float max) const
         {
             const int end = _e;
             for (int i = _b; i < end; ++i)
             {
-                if ((*bvh_node::o)[i]->get_light() || (*bvh_node::o)[i]->is_transparent())
+                const auto *tri = e.indirect_primitive(i);
+                if (tri->get_light() || tri->is_transparent())
                 {
                     continue;
                 }
         
                 hit_description hit_type(max);
-                (*bvh_node::o)[i]->is_intersecting(r, &hit_type);
+                tri->is_intersecting(r, &hit_type);
                 if (hit_type.d < max)
                 {
                     return true;
@@ -194,12 +193,12 @@ class bvh_node
         }
 
 #ifdef SIMD_PACKET_TRACING
-        void test_leaf_node_nearest(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned int size) const
+        void test_leaf_node_nearest(const primitive_store &e, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned int size) const
         {
             const int end = _e;
             for (int i = _b; i < end; ++i)
             {
-                (*bvh_node::o)[i]->is_intersecting(r, h, i_o, size);
+                e.indirect_primitive(i)->is_intersecting(r, h, i_o, size);
             }
 
             // for (int i = 0; i < size; ++i)
@@ -222,34 +221,36 @@ class bvh_node
             return;
         }
 
-        void test_leaf_node_nearest(frustrum &f, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
+        void test_leaf_node_nearest(const primitive_store &e, frustrum &f, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
         {
             const int end = _e;
             for (int i = _b; i < end; ++i)
             {
-                const bool outside = f.cull((*bvh_node::o)[i]->get_vertex_a(), (*bvh_node::o)[i]->get_vertex_b(), (*bvh_node::o)[i]->get_vertex_c());
+                const auto *tri = e.indirect_primitive(i);
+                const bool outside = f.cull(tri->get_vertex_a(), tri->get_vertex_b(), tri->get_vertex_c());
                 if (!outside)
                 {
-                    (*bvh_node::o)[i]->is_intersecting(f, r, h, i_o, c, size);
+                    tri->is_intersecting(f, r, h, i_o, c, size);
                 }
             }
 
             return;
         }
 
-        void test_leaf_node_nearer(const packet_ray *const r, vfp_t *const c, const vfp_t &t, packet_hit_description *const h) const
+        void test_leaf_node_nearer(const primitive_store &e, const packet_ray *const r, vfp_t *const c, const vfp_t &t, packet_hit_description *const h) const
         {
             const triangle * i_o[SIMD_WIDTH];
 
             const int end = _e;
             for (int i = _b; i < end; ++i)
             {
-                if ((*bvh_node::o)[i]->get_light() || (*bvh_node::o)[i]->is_transparent())
+                const auto *tri = e.indirect_primitive(i);
+                if (tri->get_light() || tri->is_transparent())
                 {
                     continue;
                 }
         
-                (*bvh_node::o)[i]->is_intersecting(r, h, &i_o[0], 1);
+                tri->is_intersecting(r, h, &i_o[0], 1);
                 (*c) |= (h->d < t);
                 if (move_mask(*c) == ((1 << SIMD_WIDTH) - 1))
                 {
@@ -260,22 +261,23 @@ class bvh_node
             return;
         }
         
-        void test_leaf_node_nearer(frustrum &f, const packet_ray *const r, vfp_t *const closer, const vfp_t *const t, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
+        void test_leaf_node_nearer(const primitive_store &e, frustrum &f, const packet_ray *const r, vfp_t *const closer, const vfp_t *const t, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
         {
             const triangle * i_o[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
             
             const int end = _e;
             for (int i = _b; i < end; ++i)
             {
-                if ((*bvh_node::o)[i]->get_light() || (*bvh_node::o)[i]->is_transparent())
+                const auto *tri = e.indirect_primitive(i);
+                if (tri->get_light() || tri->is_transparent())
                 {
                     continue;
                 }
 
-                const bool outside = f.cull((*bvh_node::o)[i]->get_vertex_a(), (*bvh_node::o)[i]->get_vertex_b(), (*bvh_node::o)[i]->get_vertex_c());
+                const bool outside = f.cull(tri->get_vertex_a(), tri->get_vertex_b(), tri->get_vertex_c());
                 if (!outside)
                 {
-                    (*bvh_node::o)[i]->is_intersecting(f, r, h, i_o, c, size);
+                    tri->is_intersecting(f, r, h, i_o, c, size);
                     vfp_t done = vfp_true;
                     for (unsigned int j = 0; j < size; ++j)
                     {
@@ -311,8 +313,6 @@ class bvh_node
         point_t _low;       /* Position of the bottom left corner   */
         point_t _high;      /* Position of the top right corner     */
         bool    _leaf;      /* Weather this is a leaf node          */
-
-        static std::vector<triangle *> *    o;  /* Vector of primitives */
 };
 }; /* namespace raptor_raytracer */
 

@@ -1,5 +1,4 @@
-#ifndef __BVH_BUILDER_H__
-#define __BVH_BUILDER_H__
+#pragma once
 
 /* Standard headers */
 #include <atomic>
@@ -24,7 +23,7 @@ class bvh_builder
         bvh_builder(const float alpha = 0.4f, const float delta = 20.0f, const float max_leaf_sah_factor = 0.00000000009f, const int max_down_phase_depth = 35) :
         _primitives(nullptr), _nodes(nullptr), _alpha(alpha), _epsilon(1e-8f), _delta(delta), _max_leaf_sah_factor(max_leaf_sah_factor), _max_leaf_sah(0.0f), _max_down_phase_depth(max_down_phase_depth), _depth(0), _next_node(0) {  }
 
-        int build(primitive_list *const primitives, std::vector<bvh_node> *const nodes);
+        int build(primitive_store *const primitives, std::vector<bvh_node> *const nodes);
 
         /* Access to the trees bounds */
         const point_t & scene_upper_bound() const { return _t; }
@@ -48,7 +47,7 @@ class bvh_builder
             point_t high;
         };
 
-        primitive_list *                    _primitives;
+        primitive_store *                   _primitives;
         std::unique_ptr<int []>             _code_buffer;
         std::vector<float>                  _cost_matrix;
         std::vector<int>                    _cost_addrs;
@@ -66,5 +65,3 @@ class bvh_builder
         std::atomic<int>                    _next_node;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* __BVH_BUILDER_H__ */

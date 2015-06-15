@@ -1,5 +1,4 @@
-#ifndef __REGRESSION_FIXTURE_H__
-#define __REGRESSION_FIXTURE_H__
+#pragma once
 
 /* Standard headers */
 #include <cstdlib>
@@ -40,7 +39,7 @@ namespace raptor_raytracer
 namespace test
 {
 #if !defined(VALGRIND_TESTS) && !defined(DEBUG_TESTS)
-const int test_iterations = 5;
+const int test_iterations = 1;
 #else
 const int test_iterations = 1;
 #endif
@@ -193,7 +192,7 @@ struct regression_fixture : private boost::noncopyable
         /* DTOR */
         ~regression_fixture()
         {
-            scene_clean(&_everything, &_materials, _cam);
+            scene_clean(&_materials, _cam);
         }
 
         regression_fixture& add_light(const ext_colour_t &rgb, const point_t &c, const float d, const float r)
@@ -230,6 +229,9 @@ struct regression_fixture : private boost::noncopyable
 
             /* Assert there is an imagine to trace */
             assert(!_everything.empty());
+
+            /* Reset indirections */
+            _everything.reset_indirection();
 
             /* Log scene size */
             BOOST_TEST_CHECKPOINT(_test_name << "_" << log_statement<SpatialSubDivision>::test_type());
@@ -288,11 +290,9 @@ struct regression_fixture : private boost::noncopyable
 
         camera              *   _cam;
         light_list              _lights;
-        primitive_list          _everything;
+        primitive_store         _everything;
         std::list<material *>   _materials;
         const std::string       _test_name;
 };
 }; /* namespace raptor_raytracer */
 }; /* namespace test */
-
-#endif /* #ifndef __REGRESSION_FIXTURE_H__ */

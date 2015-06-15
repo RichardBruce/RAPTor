@@ -12,7 +12,7 @@ namespace raptor_raytracer
 {
 bool                    cur_light   = false;
 light_list              *global_l   = nullptr;
-primitive_list          *global_e   = nullptr;
+primitive_store         *global_e   = nullptr;
 std::list<material *>   *global_m   = nullptr;
 material                *cur_mat    = nullptr;
 
@@ -125,7 +125,7 @@ int mgf_face_handler(int ac, char **av)     /* face handling routine */
 void mgf_parser(
     const char              *mgf_file,
     light_list              &l, 
-    primitive_list          &e,
+    primitive_store         &e,
     std::list<material *>   &m)
 {
     global_l = &l;

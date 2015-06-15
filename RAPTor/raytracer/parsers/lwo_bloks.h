@@ -1,5 +1,4 @@
-#ifndef __LWO_BLOKS_H__
-#define __LWO_BLOKS_H__
+#pragma once
 
 /* Standard headers */
 #include <list>
@@ -94,4 +93,3 @@ class lwo_bloks : private boost::noncopyable
         bool                                        _nega;
 };
 }; /* namespace raptor_raytracer */
-#endif /* #ifndef __LWO_BLOKS_H__ */

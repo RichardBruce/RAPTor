@@ -67,7 +67,7 @@ bool is_triplet_delimiter(const char **c)
 }
 
 
-void parse_f_statement(light_list *l, primitive_list *e, std::vector<point_t> &vt, std::vector<point_t> &vn, std::vector<point_t> &v, material *const m, const char **c)
+void parse_f_statement(light_list *l, primitive_store *e, std::vector<point_t> &vt, std::vector<point_t> &vn, std::vector<point_t> &v, material *const m, const char **c)
 {
 //    BOOST_LOG_TRIVIAL(trace) << "face: " << (*c)[0];
     static std::vector<point_t> face;
@@ -755,7 +755,7 @@ void obj_parser(
     std::ifstream           &obj_file,
     std::string             p,
     light_list              &l, 
-    primitive_list          &e,
+    primitive_store         &e,
     std::list<material *>   &m,
     camera                  **c)
 {

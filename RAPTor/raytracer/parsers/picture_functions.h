@@ -1,5 +1,4 @@
-#ifndef __PICTURE_FUNCTIONS__
-#define __PICTURE_FUNCTIONS__
+#pragma once
 
 namespace raptor_raytracer
 {
@@ -10,5 +9,3 @@ void saturation_adjust(float *const data, const int size, const int satr);
 void gamma_adjust(float *const data, const int size, const int gamm);
 void negative(float *const data, const int size);
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __PICTURE_FUNCTIONS__ */

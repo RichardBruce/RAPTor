@@ -11,7 +11,7 @@ namespace raptor_raytracer
 void off_parser(
     std::ifstream           &off_file,
     light_list              &l, 
-    primitive_list          &e,
+    primitive_store         &e,
     std::list<material *>   &m,
     camera                  *c)
 {
