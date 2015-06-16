@@ -124,7 +124,7 @@ int main (int argc, char **argv)
 
     /* Scene data */
     raptor_raytracer::light_list            lights;
-    raptor_raytracer::primitive_list        everything;
+    raptor_raytracer::primitive_store       everything;
     std::list<raptor_raytracer::material *> materials;
 
     /* Parse input arguements */
@@ -781,6 +781,6 @@ int main (int argc, char **argv)
     }
 
     /* Clean up dynamic memory usage */
-    raptor_raytracer::scene_clean(&everything, &materials, cam);
+    raptor_raytracer::scene_clean(&materials, cam);
     return 0;
 }
