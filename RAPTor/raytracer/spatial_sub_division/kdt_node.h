@@ -53,20 +53,17 @@ class kdt_node
         /* test_leaf_node_nearest tests this object if is a leaf node and returns a pointer 
            to the nearest object found. The distance to this object is returned in m. If no 
            object is found nullptr is returned */
-        triangle * test_leaf_node_nearest(const primitive_store &e, const ray *const r, hit_description *const h, const float min) const
+        int test_leaf_node_nearest(const primitive_store &e, const ray *const r, hit_description *const h, const float min) const
         {
-            triangle *intersecting_object = nullptr;
-
+            int intersecting_object = -1;
             for (int i : (*this->p))
             {
-                auto *const tri = const_cast<triangle *>(e.primitive(i));
-
                 hit_description hit_type;
-                tri->is_intersecting(r, &hit_type);
+                e.primitive(i)->is_intersecting(r, &hit_type);
                 if ((hit_type.d < ((h->d) + (1.0f * EPSILON))) && (hit_type.d > (min - (1.0f * EPSILON))))
                 {
                     *h = hit_type;
-                    intersecting_object = tri;
+                    intersecting_object = i;
                 }
             }
             
@@ -98,17 +95,17 @@ class kdt_node
         }
 
 #ifdef SIMD_PACKET_TRACING
-        void test_leaf_node_nearest(const primitive_store &e, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const
+        void test_leaf_node_nearest(const primitive_store &e, const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h) const
         {
             for (int i : (*this->p))
             {
-                e.primitive(i)->is_intersecting(r, h, i_o, 1);
+                e.primitive(i)->is_intersecting(r, h, i_o, 1, i);
             }
             
             return;
         }
 
-        void test_leaf_node_nearest(const primitive_store &e, frustrum &f, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
+        void test_leaf_node_nearest(const primitive_store &e, frustrum &f, const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
         {
             for (int i : (*this->p))
             {
@@ -116,7 +113,7 @@ class kdt_node
                 bool outside = f.cull(tri->get_vertex_a(), tri->get_vertex_b(), tri->get_vertex_c());
                 if (!outside)
                 {
-                    tri->is_intersecting(f, r, h, i_o, c, size);
+                    tri->is_intersecting(f, r, h, i_o, c, size, i);
                 }
             }
 
@@ -125,8 +122,7 @@ class kdt_node
 
         void test_leaf_node_nearer(const primitive_store &e, const packet_ray *const r, vfp_t *const c, const vfp_t &t, packet_hit_description *const h) const
         {
-            const triangle * i_o[SIMD_WIDTH];
-
+            vint_t i_o;
             for (int i : (*this->p))
             {
                 const auto *const tri = e.primitive(i);
@@ -135,7 +131,7 @@ class kdt_node
                     continue;
                 }
         
-                tri->is_intersecting(r, h, &i_o[0], 1);
+                tri->is_intersecting(r, h, &i_o, 1, i);
                 (*c) |= (h->d < t);
                 if (move_mask(*c) == ((1 << SIMD_WIDTH) - 1))
                 {
@@ -148,8 +144,7 @@ class kdt_node
         
         void test_leaf_node_nearer(const primitive_store &e, frustrum &f, const packet_ray *const r, vfp_t *const closer, const vfp_t *const t, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
         {
-            const triangle * i_o[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
-            
+            vint_t i_o[MAXIMUM_PACKET_SIZE];
             for (int i : (*this->p))
             {
                 const auto *const tri = e.primitive(i);
@@ -161,7 +156,7 @@ class kdt_node
                 bool outside = f.cull(tri->get_vertex_a(), tri->get_vertex_b(), tri->get_vertex_c());
                 if (!outside)
                 {
-                    tri->is_intersecting(f, r, h, i_o, c, size);
+                    tri->is_intersecting(f, r, h, i_o, c, size, i);
                     vfp_t done = vfp_true;
                     for (unsigned int j = 0; j < size; ++j)
                     {

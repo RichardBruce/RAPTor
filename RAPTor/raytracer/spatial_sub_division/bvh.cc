@@ -104,13 +104,13 @@ inline int bvh::find_leaf_node(const frustrum &f, const packet_ray *const r, bvh
     }
 }
 
-void bvh::frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const
+void bvh::frustrum_find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h, int size) const
 {
 #if 1
 // #ifndef FRUSTRUM_CULLING
     for (int i = 0; i < size; ++i)
     {
-        find_nearest_object(&r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i]);
+        find_nearest_object(&r[i], &i_o[i], &h[i]);
     }
 
     return;
@@ -177,7 +177,7 @@ void bvh::frustrum_find_nearest_object(const packet_ray *const r, const triangle
             // {
             //     for (int i = 0; i < static_cast<int>(clipped_size); ++i)
             //     {
-            //         leaf.test_leaf_node_nearest(_prims, &r[clipped_r[i]], &i_o[clipped_r[i] << LOG2_SIMD_WIDTH], &h[clipped_r[i]], 1);
+            //         leaf.test_leaf_node_nearest(_prims, &r[clipped_r[i]], &i_o[clipped_r[i]], &h[clipped_r[i]], 1);
             //     }
             // }
         }
@@ -403,7 +403,7 @@ inline bool bvh::find_leaf_node(const packet_ray &r, bvh_stack_element *const en
     return false;
 }
 
-void bvh::find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const
+void bvh::find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h) const
 {
     /* State of stack */
     bvh_stack_element *exit_point = &(_bvh_stack[0]);
@@ -499,7 +499,7 @@ vfp_t bvh::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
     return vfp_zero;
 }
 
-void bvh::find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, bvh_stack_element entry_point, bvh_stack_element *exit_point) const
+void bvh::find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h, bvh_stack_element entry_point, bvh_stack_element *exit_point) const
 {
     const bvh_stack_element *const top_of_stack = exit_point;
     entry_point.vt_min[0]   = vfp_t(entry_point.t_min);
@@ -646,13 +646,13 @@ inline bool bvh::find_leaf_node(const ray &r, bvh_stack_element *const entry_poi
     return false;
 }
 
-triangle* bvh::find_nearest_object(const ray *const r, hit_description *const h) const
+int bvh::find_nearest_object(const ray *const r, hit_description *const h) const
 {
     /* Check we hit the scene at all */
     const point_t ray_dir_inv(1.0f / r->get_dir());
     if ((*_bvh_base)[_root_node].intersection_distance(*r, ray_dir_inv) == MAX_DIST)
     {
-        return nullptr;
+        return -1;
     }
     
     /* State of stack */
@@ -666,7 +666,7 @@ triangle* bvh::find_nearest_object(const ray *const r, hit_description *const h)
 
     /* Traverse the whole tree */
     hit_description nearest_hit;
-    triangle *hit_object = nullptr;
+    int             hit_object = -1;
     // BOOST_LOG_TRIVIAL(trace) << "Beginning search for nearest object";
     while (true)
     {
@@ -677,10 +677,10 @@ triangle* bvh::find_nearest_object(const ray *const r, hit_description *const h)
         if (leaf)
         {
             // BOOST_LOG_TRIVIAL(trace) << "Found leaf node";
-            triangle *intersecting_object = (*_bvh_base)[entry_point.idx].test_leaf_node_nearest(_prims, r, &nearest_hit);
+            const int intersecting_object = (*_bvh_base)[entry_point.idx].test_leaf_node_nearest(_prims, r, &nearest_hit);
 
             /* If an intersecting object is found it is the closest so return */
-            if (intersecting_object != nullptr)
+            if (intersecting_object != -1)
             {
                 hit_object = intersecting_object;
                 // BOOST_LOG_TRIVIAL(trace) << "Found intersecting object";
@@ -705,7 +705,7 @@ triangle* bvh::find_nearest_object(const ray *const r, hit_description *const h)
         } while (entry_point.t_min > (nearest_hit.d + (100.0f * EPSILON)));
     }
 
-    return nullptr;
+    return -1;
 }
 
 bool bvh::found_nearer_object(const ray *const r, const float t) const

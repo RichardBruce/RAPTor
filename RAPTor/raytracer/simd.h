@@ -215,6 +215,7 @@ class vfp_t
         /* Non standard friendly functions */
         friend int   move_mask                  (const vfp_t &rhs);
         friend vfp_t andnot                     (const vfp_t &lhs, const vfp_t &rhs);
+        friend vint_t mov_p                     (const vfp_t &p, const vint_t &a, const vint_t &b);
         template<unsigned int m0, unsigned int m1, unsigned int m2, unsigned int m3>
         friend vfp_t shuffle                    (const vfp_t &lhs, const vfp_t &rhs);
         friend void  transpose                  (vfp_t &a, vfp_t &b, vfp_t &c, vfp_t &d);
@@ -653,6 +654,7 @@ class vint_t
         friend int   move_mask          (const vint_t &rhs);
         friend vint_t andnot            (const vint_t &lhs, const vint_t &rhs);
         friend vint_t mov_p             (const vint_t &p, const vint_t &a, const vint_t &b);
+        friend vint_t mov_p             (const vfp_t &p, const vint_t &a, const vint_t &b);
         template<unsigned int m0, unsigned int m1, unsigned int m2, unsigned int m3>
         friend vint_t shuffle           (const vint_t &lhs);
         friend void  transpose          (vint_t &a, vint_t &b, vint_t &c, vint_t &d);
@@ -752,6 +754,11 @@ inline vint_t mov_p(const vint_t &p, const vint_t &a, const vint_t &b)
     return (andnot(p, b) | (p & a));
 }
 
+inline vint_t mov_p(const vfp_t &p, const vint_t &a, const vint_t &b)
+{
+    return mov_p(_mm_castps_si128(p.m), a, b);
+}
+
 /* Shuffle */
 template<unsigned int m0, unsigned int m1, unsigned int m2, unsigned int m3>
 inline vint_t shuffle(const vint_t &lhs)
@@ -845,7 +852,7 @@ inline int min_element(const float *const d, float *const m, const int n)
         const vfp_t data(&d[i]);
         const vfp_t pred(data < min_v);
 
-        min_i = mov_p(_mm_castps_si128(pred.m), vint_t(i), min_i);
+        min_i = mov_p(pred, vint_t(i), min_i);
         min_v = min(data, min_v);
     }
 

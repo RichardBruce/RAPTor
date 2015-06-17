@@ -304,7 +304,7 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
 /**********************************************************
  
 **********************************************************/
-void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const
+void bih::frustrum_find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h, int size) const
 {
     _mm_prefetch((char *)&(*_bih_base)[0], _MM_HINT_T0);
     for (int i = size; i < MAXIMUM_PACKET_SIZE; ++i)
@@ -421,7 +421,7 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
 #ifdef FRUSTRUM_CULLING
                     clipped_r[clipped_size++] = i;
 #else
-                    leaf_node->test_leaf_node_nearest(_prims, &r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i], 1);
+                    leaf_node->test_leaf_node_nearest(_prims, &r[i], &i_o[i], &h[i], 1);
 #endif
                 }
             }
@@ -443,11 +443,11 @@ void bih::frustrum_find_nearest_object(const packet_ray *const r, const triangle
         {
 //            for (unsigned i = 0; i < size; i += (size/SPLIT_PACKET_DIVISOR))
 //            {
-//                this->bih_frustrum_find_nearest_object(&r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i], entry_point, exit_point, size/SPLIT_PACKET_DIVISOR);
+//                this->bih_frustrum_find_nearest_object(&r[i], &i_o[i], &h[i], entry_point, exit_point, size/SPLIT_PACKET_DIVISOR);
 //            }
             for (int i = 0; i < size; ++i)
             {
-                this->find_nearest_object(&r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i], entry_point, exit_point);
+                this->find_nearest_object(&r[i], &i_o[i], &h[i], entry_point, exit_point);
             }
         }
 
@@ -888,7 +888,7 @@ inline bool bih::find_leaf_node(const packet_ray &r, bih_stack_element *const en
 /**********************************************************
  
 **********************************************************/
-void bih::find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const
+void bih::find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h) const
 {
     /* state of stack */
     bih_stack_element *exit_point = &(_bih_stack[0]);
@@ -937,7 +937,7 @@ void bih::find_nearest_object(const packet_ray *const r, const triangle **const 
 /**********************************************************
  
 **********************************************************/
-void bih::find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h,
+void bih::find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h,
                                                 bih_stack_element entry_point, bih_stack_element *exit_point) const
 {
     const bih_stack_element *const top_of_stack = exit_point;
@@ -1316,7 +1316,7 @@ inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_poi
 /**********************************************************
  
 **********************************************************/
-triangle* bih::find_nearest_object(const ray *const r, hit_description *const h) const
+int bih::find_nearest_object(const ray *const r, hit_description *const h) const
 {
     /* state of stack */
     bih_stack_element *exit_point = &(_bih_stack[0]);
@@ -1380,13 +1380,13 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
     entry_point.t_min   = near;
     if (entry_point.t_min > entry_point.t_max)
     {
-        return nullptr;
+        return -1;
     }
     
     point_t i_ray_dir(i_x_grad, i_y_grad, i_z_grad);
 
     /* Traverse the whole tree */
-    triangle        *hit_object  = nullptr;
+    int             hit_object = -1;
     hit_description nearest_hit;
     // BOOST_LOG_TRIVIAL(trace) << "Beginning search for nearest object";
     while (true)
@@ -1398,10 +1398,10 @@ triangle* bih::find_nearest_object(const ray *const r, hit_description *const h)
         if (leaf)
         {
             // BOOST_LOG_TRIVIAL(trace) << "Found leaf node";
-            triangle *intersecting_object = (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(_prims, r, &nearest_hit);
+            const int intersecting_object = (*_bih_base)[block_index(entry_point.idx)].get_node(node_index(entry_point.idx))->test_leaf_node_nearest(_prims, r, &nearest_hit);
 
             /* If an intersecting object is found it is the closest so return */
-            if (intersecting_object != nullptr)
+            if (intersecting_object != -1)
             {
                 hit_object = intersecting_object;
                 // BOOST_LOG_TRIVIAL(trace) << "Found intersecting object";

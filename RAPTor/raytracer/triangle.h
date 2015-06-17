@@ -60,8 +60,8 @@ class triangle : boost::noncopyable
         /* Ray tracing functions */
         inline void is_intersecting(const ray *const r, hit_description *const h) const;
 #ifdef SIMD_PACKET_TRACING
-        inline void is_intersecting(const packet_ray *const r, packet_hit_description *const h, const triangle **const i_o, const unsigned int size) const;
-        inline void is_intersecting(const frustrum &f, const packet_ray *const r, packet_hit_description *const h, const triangle **const i_o, const unsigned *c, const unsigned size) const;
+        inline void is_intersecting(const packet_ray *const r, packet_hit_description *const h, vint_t *const i_o, const unsigned int size, const int tri_idx) const;
+        inline void is_intersecting(const frustrum &f, const packet_ray *const r, packet_hit_description *const h, vint_t *const i_o, const unsigned *c, const unsigned size, const int tri_idx) const;
 #endif
         inline point_t normal_at_point(ray *const r, hit_description *const h) const;
         inline void find_rays(ray *const r, const point_t &d, const int n) const;
@@ -172,7 +172,7 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
     const point_t dir_b(this->vertex_b - this->vertex_a);
     const point_t dir_c(this->vertex_c - this->vertex_a);
     cross_product(dir_b, dir_c, &this->n);
-    assert(this->n != 0.0);
+    assert(this->n != 0.0f);
     normalise(&this->n);
 }
 
@@ -240,7 +240,7 @@ inline void triangle::is_intersecting(const ray *const r, hit_description *const
 /***********************************************************
  
 ************************************************************/
-inline void triangle::is_intersecting(const packet_ray *const r, packet_hit_description *const h, const triangle **const i_o, const unsigned int size) const 
+inline void triangle::is_intersecting(const packet_ray *const r, packet_hit_description *const h, vint_t *const i_o, const unsigned int size, const int tri_idx) const 
 {
     /* Find vectors for two edges sharing V1 */
     const vfp_t e1_x(vertex_c.x - vertex_a.x);
@@ -250,6 +250,7 @@ inline void triangle::is_intersecting(const packet_ray *const r, packet_hit_desc
     const vfp_t e2_y(vertex_b.y - vertex_a.y);
     const vfp_t e2_z(vertex_b.z - vertex_a.z);
 
+    const vint_t vtri_idx(tri_idx);
     for (unsigned int i = 0; i < size; ++i)
     {
         /* Pick componants based on the major axis of the triangle */
@@ -291,33 +292,13 @@ inline void triangle::is_intersecting(const packet_ray *const r, packet_hit_desc
         mask    &= (v >= vfp_zero);
         mask    &= ((u + v) <= vfp_one);
 
-        int int_mask = move_mask(mask);
-        if (int_mask > 0)
+        if (move_mask(mask) > 0)
         {
             /* Record the hit and return */
             h[i].d  = mov_p(mask, dist,  h[i].d);
             h[i].u  = mov_p(mask, u,  h[i].u);
             h[i].v  = mov_p(mask, v, h[i].v);
-            
-            if ((int_mask & 0x1) > 0)
-            {
-                i_o[(i << LOG2_SIMD_WIDTH)    ] = this;
-            }
-
-            if ((int_mask & 0x2) > 0)
-            {
-                i_o[(i << LOG2_SIMD_WIDTH) + 1] = this;
-            }
-
-            if ((int_mask & 0x4) > 0)
-            {
-                i_o[(i << LOG2_SIMD_WIDTH) + 2] = this;
-            }
-
-            if ((int_mask & 0x8) > 0)
-            {
-                i_o[(i << LOG2_SIMD_WIDTH) + 3] = this;
-            }
+            i_o[i]  = mov_p(mask, vtri_idx, i_o[i]);
         }
     }
     
@@ -328,7 +309,7 @@ inline void triangle::is_intersecting(const packet_ray *const r, packet_hit_desc
 /***********************************************************
  
 ************************************************************/
-inline void triangle::is_intersecting(const frustrum &f, const packet_ray *const r, packet_hit_description *const h, const triangle **const i_o, const unsigned *c, const unsigned size) const 
+inline void triangle::is_intersecting(const frustrum &f, const packet_ray *const r, packet_hit_description *const h, vint_t *const i_o, const unsigned *c, const unsigned size, const int tri_idx) const 
 {
     /* Edge culling */
     /* Frustrum dot triangle */
@@ -457,33 +438,13 @@ inline void triangle::is_intersecting(const frustrum &f, const packet_ray *const
         mask    &= (v >= vfp_zero);
         mask    &= ((u + v) <= vfp_one);
 
-        int int_mask = move_mask(mask);
-        if (int_mask > 0)
+        if (move_mask(mask) > 0)
         {
             /* Record the hit and return */
             h[pkt_addr].d  = mov_p(mask, dist,  h[pkt_addr].d);
             h[pkt_addr].u  = mov_p(mask, u, h[pkt_addr].u);
             h[pkt_addr].v  = mov_p(mask, v, h[pkt_addr].v);
-            
-            if ((int_mask & 0x1) > 0)
-            {
-                i_o[(pkt_addr << LOG2_SIMD_WIDTH)    ] = this;
-            }
-
-            if ((int_mask & 0x2) > 0)
-            {
-                i_o[(pkt_addr << LOG2_SIMD_WIDTH) + 1] = this;
-            }
-
-            if ((int_mask & 0x4) > 0)
-            {
-                i_o[(pkt_addr << LOG2_SIMD_WIDTH) + 2] = this;
-            }
-
-            if ((int_mask & 0x8) > 0)
-            {
-                i_o[(pkt_addr << LOG2_SIMD_WIDTH) + 3] = this;
-            }
+            i_o[pkt_addr]  = mov_p(mask, vint_t(tri_idx), i_o[pkt_addr]);
         }
     }
 

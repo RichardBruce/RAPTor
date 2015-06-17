@@ -32,16 +32,16 @@ class kd_tree : public ssd
 
 #ifdef SIMD_PACKET_TRACING
         /* SIMD KD-tree traversal */
-        void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const override;
-        vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t) const override;
+        void    find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h) const override;
+        vfp_t   found_nearer_object(const packet_ray *const r, const vfp_t &t) const override;
 
-        void        frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, unsigned size) const override;
-        void        frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const override;
+        void    frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, unsigned size) const override;
+        void    frustrum_find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h, int size) const override;
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
         /* kdt traversal */
-        triangle*   find_nearest_object(const ray *const r, hit_description *const h) const override;
-        bool        found_nearer_object(const ray *const r, const float t) const override;
+        int     find_nearest_object(const ray *const r, hit_description *const h) const override;
+        bool    found_nearer_object(const ray *const r, const float t) const override;
 
     private :
         /* Stack element for tracing through the kd tree */
@@ -66,7 +66,7 @@ class kd_tree : public ssd
         inline void find_leaf_node(const packet_ray *const r, kdt_stack_element **const out, kdt_stack_element *const entry_point, const vfp_t *const i_rd, const int *const near_offset) const;
         inline bool find_leaf_node(const frustrum &r, kdt_stack_element *const entry_point, kdt_stack_element **const out, const int *const near_offset, unsigned size) const;
 
-        void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h,
+        void        find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h,
                                                 kdt_stack_element entry_point, kdt_stack_element *exit_point) const;
         vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t, kdt_stack_element entry_point, kdt_stack_element *exit_point) const;
 #endif

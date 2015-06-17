@@ -32,7 +32,7 @@ class bvh_builder
     private :
         int reduction_function(const int n) const;
         float cost_function(const bvh_node &l, const bvh_node &r) const;
-        float cost_function(const triangle *const l, const point_t &low, const point_t &high, const float nodes) const;
+        float cost_function(const point_t &low, const point_t &high, const float nodes, const int tri_idx) const;
         axis_t divide_spatial_bounds(point_t *const bm, point_t *const tm, const point_t &bl, const point_t &tr, const axis_t axis) const;
 
         int build_leaf_node(int *const cost_b, int *const cost_e, const int b, const int e, const int node_size);

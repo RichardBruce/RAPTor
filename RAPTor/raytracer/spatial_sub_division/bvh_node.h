@@ -150,20 +150,18 @@ class bvh_node
             return _e - _b;
         }
 
-        triangle * test_leaf_node_nearest(const primitive_store &e, const ray *const r, hit_description *const h) const
+        int test_leaf_node_nearest(const primitive_store &e, const ray *const r, hit_description *const h) const
         {
-            triangle *intersecting_object = nullptr;
-    
             const int end = _e;
+            int intersecting_object = -1;
             for (int i = _b; i < end; ++i)
             {
                 hit_description hit_type(h->d);
-                auto *tri = const_cast<triangle *>(e.indirect_primitive(i));
-                tri->is_intersecting(r, &hit_type);
+                e.indirect_primitive(i)->is_intersecting(r, &hit_type);
                 if (hit_type.d < h->d)
                 {
                     *h = hit_type;
-                    intersecting_object = tri;
+                    intersecting_object = e.indirection(i);
                 }
             }
     
@@ -193,12 +191,12 @@ class bvh_node
         }
 
 #ifdef SIMD_PACKET_TRACING
-        void test_leaf_node_nearest(const primitive_store &e, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned int size) const
+        void test_leaf_node_nearest(const primitive_store &e, const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h, const unsigned int size) const
         {
             const int end = _e;
             for (int i = _b; i < end; ++i)
             {
-                e.indirect_primitive(i)->is_intersecting(r, h, i_o, size);
+                e.indirect_primitive(i)->is_intersecting(r, h, i_o, size, e.indirection(i));
             }
 
             // for (int i = 0; i < size; ++i)
@@ -221,7 +219,7 @@ class bvh_node
             return;
         }
 
-        void test_leaf_node_nearest(const primitive_store &e, frustrum &f, const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
+        void test_leaf_node_nearest(const primitive_store &e, frustrum &f, const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
         {
             const int end = _e;
             for (int i = _b; i < end; ++i)
@@ -230,7 +228,7 @@ class bvh_node
                 const bool outside = f.cull(tri->get_vertex_a(), tri->get_vertex_b(), tri->get_vertex_c());
                 if (!outside)
                 {
-                    tri->is_intersecting(f, r, h, i_o, c, size);
+                    tri->is_intersecting(f, r, h, i_o, c, size, e.indirection(i));
                 }
             }
 
@@ -239,9 +237,8 @@ class bvh_node
 
         void test_leaf_node_nearer(const primitive_store &e, const packet_ray *const r, vfp_t *const c, const vfp_t &t, packet_hit_description *const h) const
         {
-            const triangle * i_o[SIMD_WIDTH];
-
             const int end = _e;
+            vint_t i_o;
             for (int i = _b; i < end; ++i)
             {
                 const auto *tri = e.indirect_primitive(i);
@@ -250,7 +247,7 @@ class bvh_node
                     continue;
                 }
         
-                tri->is_intersecting(r, h, &i_o[0], 1);
+                tri->is_intersecting(r, h, &i_o, 1, e.indirection(i));
                 (*c) |= (h->d < t);
                 if (move_mask(*c) == ((1 << SIMD_WIDTH) - 1))
                 {
@@ -263,9 +260,8 @@ class bvh_node
         
         void test_leaf_node_nearer(const primitive_store &e, frustrum &f, const packet_ray *const r, vfp_t *const closer, const vfp_t *const t, packet_hit_description *const h, const unsigned *c, const unsigned int size) const
         {
-            const triangle * i_o[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
-            
             const int end = _e;
+            vint_t i_o[MAXIMUM_PACKET_SIZE];
             for (int i = _b; i < end; ++i)
             {
                 const auto *tri = e.indirect_primitive(i);
@@ -277,7 +273,7 @@ class bvh_node
                 const bool outside = f.cull(tri->get_vertex_a(), tri->get_vertex_b(), tri->get_vertex_c());
                 if (!outside)
                 {
-                    tri->is_intersecting(f, r, h, i_o, c, size);
+                    tri->is_intersecting(f, r, h, i_o, c, size, e.indirection(i));
                     vfp_t done = vfp_true;
                     for (unsigned int j = 0; j < size; ++j)
                     {

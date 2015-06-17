@@ -40,16 +40,16 @@ class bvh : public ssd
         /* Traversal functions */
 #ifdef SIMD_PACKET_TRACING
         /* SIMD BIH traversal */
-        void        frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const override;
-        void        frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, const unsigned int size) const override;
+        void    frustrum_find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h, int size) const override;
+        void    frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t, vfp_t *closer, const unsigned int size) const override;
 
-        void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const override;
-        vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t) const override;
+        void    find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h) const override;
+        vfp_t   found_nearer_object(const packet_ray *const r, const vfp_t &t) const override;
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
         /* bvh traversal */
-        triangle*   find_nearest_object(const ray *const r, hit_description *const h) const override;
-        bool        found_nearer_object(const ray *const r, const float t) const override;
+        int     find_nearest_object(const ray *const r, hit_description *const h) const override;
+        bool    found_nearer_object(const ray *const r, const float t) const override;
 
     private :
         /* Stack element for tracing through the bvh */
@@ -72,7 +72,7 @@ class bvh : public ssd
         inline int  find_leaf_node(const frustrum &f, const packet_ray *const r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const packet_hit_description *const h, const int size) const;
         inline bool find_leaf_node(const packet_ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const vfp_t *const i_rd, const vfp_t &t_max) const;
 
-        void        find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h,
+        void        find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h,
                                         bvh_stack_element entry_point, bvh_stack_element *exit_point) const;
         vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t, bvh_stack_element entry_point, bvh_stack_element *exit_point) const;
 #endif /* #ifdef SIMD_PACKET_TRACING */

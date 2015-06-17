@@ -210,8 +210,8 @@ void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigne
         _primitives->indirection(hist[pos]) = _prim_buffer[i];
 
         /* Move and track primitive bounds */
-        bl[pos] = min(bl[pos], _primitives->primitive(_prim_buffer[i])->low_bound());
-        tr[pos] = max(tr[pos], _primitives->primitive(_prim_buffer[i])->high_bound());
+        bl[pos] = min(bl[pos], _bounds[_prim_buffer[i]].low);
+        tr[pos] = max(tr[pos], _bounds[_prim_buffer[i]].high);
     }
 
     /* Un-increment the histogram */
@@ -254,8 +254,8 @@ void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigne
         _prim_buffer[hist[pos]] = _primitives->indirection(i);
 
         /* Move and track primitive bounds */
-        bl[pos] = min(bl[pos], _primitives->primitive(i)->low_bound());
-        tr[pos] = max(tr[pos], _primitives->primitive(i)->high_bound());
+        bl[pos] = min(bl[pos], _bounds[_primitives->indirection(i)].low);
+        tr[pos] = max(tr[pos], _bounds[_primitives->indirection(i)].high);
     }
 
     /* Un-increment the histogram */
@@ -272,8 +272,8 @@ void bih_builder::convert_to_primitve_builder(const int b, const int e)
     for (int i = b; i < e; ++i)
     {
         _primitives->indirection(i) = _prim_buffer[i];
-        _bounds[i].low  = _primitives->primitive(_prim_buffer[i])->low_bound();
-        _bounds[i].high = _primitives->primitive(_prim_buffer[i])->high_bound();
+        _bounds[i].low  = _bounds[_prim_buffer[i]].low;
+        _bounds[i].high = _bounds[_prim_buffer[i]].high;
     }
 }
 
@@ -291,8 +291,8 @@ void bih_builder::convert_to_primitve_builder(const int b, const int e)
 //     /* Cache bounds */
 //     for (int i = b; i < e; ++i)
 //     {
-//         _bounds[i].low  = _primitives->primitive(i)->low_bound();
-//         _bounds[i].high = _primitives->primitive(i)->high_bound();
+//         _bounds[i].low  = _bounds[_primitives->indirection(i)].low;
+//         _bounds[i].high = _bounds[_primitives->indirection(i)].high;
 //     }
 // }
 

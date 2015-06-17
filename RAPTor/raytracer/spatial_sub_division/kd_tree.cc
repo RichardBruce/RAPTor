@@ -62,7 +62,7 @@ inline void kd_tree::find_leaf_node(const packet_ray *const r, kdt_stack_element
 /**********************************************************
  
 **********************************************************/
-void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h) const
+void kd_tree::find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h) const
 {
     /* exit point setting */
     kdt_stack_element *exit_point = &(_kdt_stack[0]);
@@ -121,7 +121,7 @@ void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **co
 /**********************************************************
  
 **********************************************************/
-void kd_tree::find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h,
+void kd_tree::find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h,
                                                 kdt_stack_element entry_point, kdt_stack_element *exit_point) const
 {
     kdt_stack_element *const top_of_stack = exit_point;
@@ -478,7 +478,7 @@ inline bool kd_tree::find_leaf_node(const frustrum &r, kdt_stack_element *const 
 /**********************************************************
  
 **********************************************************/
-void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const triangle **const i_o, packet_hit_description *const h, int size) const
+void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, vint_t *const i_o, packet_hit_description *const h, int size) const
 {
     /* state of stack */
     kdt_stack_element *exit_point = &(_kdt_stack[0]);
@@ -594,7 +594,7 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
 #ifdef FRUSTRUM_CULLING
                     clipped_r[clipped_size++] = i;
 #else
-                    entry_point.n->test_leaf_node_nearest(_prims, &r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i]);
+                    entry_point.n->test_leaf_node_nearest(_prims, &r[i], &i_o[i], &h[i]);
 #endif
                 }
             }
@@ -626,7 +626,7 @@ void kd_tree::frustrum_find_nearest_object(const packet_ray *const r, const tria
         {
             for (int i = 0; i < size; ++i)
             {
-                this->find_nearest_object(&r[i], &i_o[i << LOG2_SIMD_WIDTH], &h[i], entry_point, exit_point);
+                this->find_nearest_object(&r[i], &i_o[i], &h[i], entry_point, exit_point);
             }
         }
 
@@ -1005,7 +1005,7 @@ inline void kd_tree::find_leaf_node(const ray *const r, const kdt_node **const n
 /**********************************************************
  
 **********************************************************/
-triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *const h) const
+int kd_tree::find_nearest_object(const ray *const r, hit_description *const h) const
 {
     hit_description nearest_hit;
   
@@ -1067,12 +1067,11 @@ triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *cons
         /* If the leaf contains objects find the closest intersecting object */
         if (!current_node->is_empty())
         {
-            triangle *intersecting_object;
             nearest_hit.d = exit_point->d;
             
-            intersecting_object = current_node->test_leaf_node_nearest(_prims, r, &nearest_hit, entry_point->d);
+            const int intersecting_object = current_node->test_leaf_node_nearest(_prims, r, &nearest_hit, entry_point->d);
             /* If an intersecting object is found it is the closest so return */
-            if (intersecting_object != nullptr) 
+            if (intersecting_object != -1) 
             {
                 *h = nearest_hit;
                 return intersecting_object;
@@ -1087,7 +1086,7 @@ triangle* kd_tree::find_nearest_object(const ray *const r, hit_description *cons
            return a nullptr */
         if (current_node == nullptr)
         {
-            return nullptr;
+            return -1;
         }
   
         exit_point = exit_point->s;

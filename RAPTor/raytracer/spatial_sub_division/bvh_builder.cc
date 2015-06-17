@@ -192,11 +192,11 @@ float bvh_builder::cost_function(const bvh_node &l, const bvh_node &r) const
     return l.combined_surface_area(r);
 }
 
-float bvh_builder::cost_function(const triangle *const l, const point_t &low, const point_t &high, const float nodes) const
+float bvh_builder::cost_function(const point_t &low, const point_t &high, const float nodes, const int tri_idx) const
 {
     /* Size of combined node */
-    const point_t bl(min(low, l->low_bound()));
-    const point_t tr(max(high, l->high_bound()));
+    const point_t bl(min(low, _bounds[_primitives->indirection(tri_idx)].low));
+    const point_t tr(max(high, _bounds[_primitives->indirection(tri_idx)].high));
 
     /* Edges of new node */
     const point_t dist(tr - bl);
@@ -247,18 +247,18 @@ int bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const int
     {
         int node_end = i + 1;
         int layer_top = e;
-        point_t low(_primitives->indirect_primitive(i)->low_bound());
-        point_t high(_primitives->indirect_primitive(i)->high_bound());
+        point_t low(_bounds[_primitives->indirection(i)].low);
+        point_t high(_bounds[_primitives->indirection(i)].high);
         while (node_end < layer_top)
         {
-            if (cost_function(_primitives->indirect_primitive(node_end), low, high, node_end - i + 1) > _max_leaf_sah)
+            if (cost_function(low, high, node_end - i + 1, node_end) > _max_leaf_sah)
             {
                 std::swap(_primitives->indirection(node_end), _primitives->indirection(--layer_top));
             }
             else
             {
-                low     = min(low, _primitives->indirect_primitive(node_end)->low_bound());
-                high    = max(high, _primitives->indirect_primitive(node_end)->high_bound());
+                low     = min(low, _bounds[_primitives->indirection(node_end)].low);
+                high    = max(high, _bounds[_primitives->indirection(node_end)].high);
                 ++node_end;
             }
         }
@@ -501,12 +501,12 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             while (bottom < top)
             {
                 /* Skip primitives in the correct place*/
-                while (dbl_split < (_primitives->indirect_primitive(top)->high_bound().x + _primitives->indirect_primitive(top)->low_bound().x) && bottom < top)
+                while (dbl_split < (_bounds[_primitives->indirection(top)].high.x + _bounds[_primitives->indirection(top)].low.x) && bottom < top)
                 {
                     --top;
                 }
 
-                while (dbl_split >= (_primitives->indirect_primitive(bottom)->high_bound().x + _primitives->indirect_primitive(bottom)->low_bound().x) && bottom < top)
+                while (dbl_split >= (_bounds[_primitives->indirection(bottom)].high.x + _bounds[_primitives->indirection(bottom)].low.x) && bottom < top)
                 {
                     ++bottom;
                 }
@@ -521,7 +521,7 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             }
 
             middle_idx = bottom;
-            if ((top == bottom) && (dbl_split >= (_primitives->indirect_primitive(top)->high_bound().x + _primitives->indirect_primitive(top)->low_bound().x)))
+            if ((top == bottom) && (dbl_split >= (_bounds[_primitives->indirection(top)].high.x + _bounds[_primitives->indirection(top)].low.x)))
             {
                 ++middle_idx;
             }
@@ -534,12 +534,12 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             while (bottom < top)
             {
                 /* Skip primitives in the correct place*/
-                while (dbl_split < (_primitives->indirect_primitive(top)->high_bound().y + _primitives->indirect_primitive(top)->low_bound().y) && bottom < top)
+                while (dbl_split < (_bounds[_primitives->indirection(top)].high.y + _bounds[_primitives->indirection(top)].low.y) && bottom < top)
                 {
                     --top;
                 }
 
-                while (dbl_split >= (_primitives->indirect_primitive(bottom)->high_bound().y + _primitives->indirect_primitive(bottom)->low_bound().y) && bottom < top)
+                while (dbl_split >= (_bounds[_primitives->indirection(bottom)].high.y + _bounds[_primitives->indirection(bottom)].low.y) && bottom < top)
                 {
                     ++bottom;
                 }
@@ -554,7 +554,7 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             }
 
             middle_idx = bottom;
-            if ((top == bottom) && (dbl_split >= (_primitives->indirect_primitive(top)->high_bound().y + _primitives->indirect_primitive(top)->low_bound().y)))
+            if ((top == bottom) && (dbl_split >= (_bounds[_primitives->indirection(top)].high.y + _bounds[_primitives->indirection(top)].low.y)))
             {
                 ++middle_idx;
             }
@@ -567,12 +567,12 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             while (bottom < top)
             {
                 /* Skip primitives in the correct place*/
-                while (dbl_split < (_primitives->indirect_primitive(top)->high_bound().z + _primitives->indirect_primitive(top)->low_bound().z) && bottom < top)
+                while (dbl_split < (_bounds[_primitives->indirection(top)].high.z + _bounds[_primitives->indirection(top)].low.z) && bottom < top)
                 {
                     --top;
                 }
 
-                while (dbl_split >= (_primitives->indirect_primitive(bottom)->high_bound().z + _primitives->indirect_primitive(bottom)->low_bound().z) && bottom < top)
+                while (dbl_split >= (_bounds[_primitives->indirection(bottom)].high.z + _bounds[_primitives->indirection(bottom)].low.z) && bottom < top)
                 {
                     ++bottom;
                 }
@@ -587,7 +587,7 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
             }
 
             middle_idx = bottom;
-            if ((top == bottom) && (dbl_split >= (_primitives->indirect_primitive(top)->high_bound().z + _primitives->indirect_primitive(top)->low_bound().z)))
+            if ((top == bottom) && (dbl_split >= (_bounds[_primitives->indirection(top)].high.z + _bounds[_primitives->indirection(top)].low.z)))
             {
                 ++middle_idx;
             }

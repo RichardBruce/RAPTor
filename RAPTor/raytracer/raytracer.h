@@ -29,19 +29,19 @@ class ray_trace_engine
         using light_iterator        = light_list::iterator;
         using const_light_iterator  = light_list::const_iterator;
 
-        ray_trace_engine(const light_list &l, camera &c, const ssd *const sub_division)
-        :   _ssd(sub_division), c(c), lights(l) 
-            {
-                this->pending_shadows      = static_cast<ray *>(scalable_malloc(  this->lights.size() * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(ray))));
-                this->nr_pending_shadows   = static_cast<float *>(scalable_malloc( this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(float))));
-            }
+        ray_trace_engine(const primitive_store &prims, const light_list &l, camera &c, const ssd *const sub_division) :
+            _prims(prims), _ssd(sub_division), c(c), lights(l) 
+        {
+            this->pending_shadows      = static_cast<ray *>(scalable_malloc(  this->lights.size() * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(ray))));
+            this->nr_pending_shadows   = static_cast<float *>(scalable_malloc( this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(float))));
+        }
 
-        ray_trace_engine(const ray_trace_engine &r)
-        :   _ssd(r._ssd), c(r.c), lights(r.lights) 
-            {
-                this->pending_shadows       = static_cast<ray *>(scalable_malloc( this->lights.size() * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(ray))));
-                this->nr_pending_shadows    = static_cast<float *>(scalable_malloc(this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(float))));
-            }
+        ray_trace_engine(const ray_trace_engine &r) :
+            _prims(r._prims), _ssd(r._ssd), c(r.c), lights(r.lights) 
+        {
+            this->pending_shadows       = static_cast<ray *>(scalable_malloc( this->lights.size() * (SHADOW_ARRAY_SIZE * MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(ray))));
+            this->nr_pending_shadows    = static_cast<float *>(scalable_malloc(this->lights.size() * (MAXIMUM_PACKET_SIZE * SIMD_WIDTH * sizeof(float))));
+        }
 
         ~ray_trace_engine() 
         {
@@ -91,14 +91,15 @@ class ray_trace_engine
 #ifdef SIMD_PACKET_TRACING
         inline void shoot_shadow_packet(packet_ray *const r, ray *const *const sr, vfp_t *const t, unsigned int *r_to_s, int *m, const int s, const int l) const;
 #endif
+
+        const primitive_store & _prims;
+        const ssd *const        _ssd;
+        camera &                c;    
+        const light_list &      lights;
         
-        const ssd *const    _ssd;
-        camera              &c;    
-        const light_list    &lights;
-        
-        mutable ray         *pending_shadows;
-        mutable float       *nr_pending_shadows;
-        mutable int         shader_nr;
+        mutable ray *           pending_shadows;
+        mutable float *         nr_pending_shadows;
+        mutable int             shader_nr;
 };
 
 /* Main ray tracer function */

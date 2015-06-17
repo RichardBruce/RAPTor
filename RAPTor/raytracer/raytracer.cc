@@ -21,14 +21,13 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
 {
     /* Does the ray intersect any objects */
     /* If the ray intersects multiple objects find the closest */
-    const triangle *intersecting_object;
-    hit_description hit_type;
-    
-    intersecting_object = _ssd->find_nearest_object(&r, &hit_type);
+    hit_description hit_type;    
+    const int tri_idx = _ssd->find_nearest_object(&r, &hit_type);
 
     /* If there was an intersection set the rays endpoint and call that objects shader */
     if (hit_type.d < MAX_DIST)
     {
+        const auto  *const tri = _prims.primitive(tri_idx);
         r.calculate_destination(hit_type.d);
         
         point_t vt;
@@ -39,7 +38,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
         secondary_ray_data refr;
         refl.colours(&refl_colour[0]);
         refr.colours(&refr_colour[0]);
-        const point_t vn(intersecting_object->generate_rays(*this, r, &vt, &hit_type, &refl, &refr));
+        const point_t vn(tri->generate_rays(*this, r, &vt, &hit_type, &refl, &refr));
         
         /* Trace shadow rays */
         for (unsigned int i = 0; i < this->lights.size(); ++i)
@@ -65,7 +64,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
         }
 
         /* Call the shader */
-        intersecting_object->shade(*this, r, vn, vt, hit_type, c);
+        tri->shade(*this, r, vn, vt, hit_type, c);
         
         /* Process secondary rays */
         for (int i = 0; i < static_cast<int>(refl.number()); ++i)
@@ -78,7 +77,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
             this->ray_trace(refr.rays()[i], &refr.colours()[i]);
         }
 
-        intersecting_object->combind_secondary_rays(*this, c, refl, refr);
+        tri->combind_secondary_rays(*this, c, refl, refr);
     }
     /* Otherwise colour with the background colour */
     else
@@ -168,7 +167,8 @@ void ray_trace_engine::shoot_shadow_packet(packet_ray *const r, ray *const *cons
 
 void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, const unsigned int *const ray_to_colour_lut, const int s) const
 {
-    const triangle *intersecting_object[MAXIMUM_PACKET_SIZE * SIMD_WIDTH];
+    int tri_idx[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
+    std::fill_n(&tri_idx[0], MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH, -1);
     packet_hit_description h[MAXIMUM_PACKET_SIZE];
 
     /* Check co-herency */
@@ -214,7 +214,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
                 {
                     ray             ray_0 = r[i].extract(j);
                     hit_description hit_0 = h[i][j];
-                    intersecting_object[(i * SIMD_WIDTH) + j]  = _ssd->find_nearest_object(&ray_0, &hit_0);
+                    tri_idx[(i * SIMD_WIDTH) + j]  = _ssd->find_nearest_object(&ray_0, &hit_0);
                     h[i].d[j] = hit_0.d;
                     h[i].u[j] = hit_0.u;
                     h[i].v[j] = hit_0.v;
@@ -222,16 +222,17 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             }
             else
             {
-                _ssd->find_nearest_object(&r[i], &intersecting_object[i << LOG2_SIMD_WIDTH], &h[i]);
+                _ssd->find_nearest_object(&r[i], reinterpret_cast<vint_t *>(&tri_idx[i << LOG2_SIMD_WIDTH]), &h[i]);
             }
         }
     }
     else
     {
-        _ssd->frustrum_find_nearest_object(r, &intersecting_object[0], &h[0], s);
+        _ssd->frustrum_find_nearest_object(r, reinterpret_cast<vint_t *>(&tri_idx[0]), &h[0], s);
     }
 
     /* Generate secondary rays */
+    const triangle * tri[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     point_t vn[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     point_t vt[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     ray ray_p[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
@@ -255,7 +256,10 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
             {
                 this->shader_nr = addr;
                 int ray_addr = addr * MAX_SECONDARY_RAYS;
-                vn[addr] = intersecting_object[addr]->generate_rays(*this, ray_p[addr], &vt[addr], &hit_p[addr], &refl[ray_addr], &refr[ray_addr]);
+                assert(tri_idx[addr] >= 0);
+                assert(tri_idx[addr] < _prims.size());
+                tri[addr] = _prims.primitive(tri_idx[addr]);
+                vn[addr] = tri[addr]->generate_rays(*this, ray_p[addr], &vt[addr], &hit_p[addr], &refl[ray_addr], &refr[ray_addr]);
             }
             else
             {
@@ -344,7 +348,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
 
         if (hit_p[i].d < MAX_DIST)
         {
-            intersecting_object[i]->shade(*this, ray_p[i], vn[i], vt[i], hit_p[i], &c[addr]);
+            tri[i]->shade(*this, ray_p[i], vn[i], vt[i], hit_p[i], &c[addr]);
         }
         /* Otherwise colour with the background colour */
         else
@@ -448,7 +452,7 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
 
         if (hit_p[i].d < MAX_DIST)
         {
-            intersecting_object[i]->combind_secondary_rays(*this, &c[addr], refl[i], refr[i]);
+            tri[i]->combind_secondary_rays(*this, &c[addr], refl[i], refr[i]);
         }
     }
 
@@ -529,16 +533,16 @@ void ray_tracer(const ssd *const sub_division, const light_list &lights, const p
     /* Make the screen 20 wide and 20 high ie/ -10 to 10 */
 #ifdef THREADED_RAY_TRACE
 #ifdef SIMD_PACKET_TRACING
-    tbb::parallel_for(tbb:blocked_range2d<unsigned>(0, (unsigned)c.y_number_of_rays()/PACKET_WIDTH, 4, 0, (unsigned)c.x_number_of_rays()/PACKET_WIDTH, 4), ray_trace_engine(lights, c, sub_division));
+    tbb::parallel_for(tbb:blocked_range2d<unsigned>(0, (unsigned)c.y_number_of_rays()/PACKET_WIDTH, 4, 0, (unsigned)c.x_number_of_rays()/PACKET_WIDTH, 4), ray_trace_engine(everything, lights, c, sub_division));
 
 #else
     /* Thread using blocked_range2d to specify the size and triangle of block to trace */
-    tbb::parallel_for(tbb:blocked_range2d<unsigned>(0, c.y_number_of_rays(), 32, 0, c.x_number_of_rays(), 32), ray_trace_engine(lights, c, sub_division));
+    tbb::parallel_for(tbb:blocked_range2d<unsigned>(0, c.y_number_of_rays(), 32, 0, c.x_number_of_rays(), 32), ray_trace_engine(everything, lights, c, sub_division));
 
 #endif /* #ifdef SIMD_PACKET_TRACING */
 #else
     /* Instantiate the ray trace engine */
-    ray_trace_engine engine(lights, c, sub_division);
+    ray_trace_engine engine(everything, lights, c, sub_division);
     
     /* Trace a ray through each pixel of the screen working bottom left to top right */
 #ifdef SIMD_PACKET_TRACING
