@@ -82,8 +82,27 @@ class primitive_store
         }
 
         /* Size */
-        bool    empty() const { return _prims.empty();  }
-        int     size()  const { return _prims.size();   }
+        bool    empty()     const { return _prims.empty();      }
+        int     size()      const { return _prims.size();       }
+        int     capacity()  const { return _prims.capacity();   }
+
+        /* Special */
+        primitive_store& move_to_indirect()
+        {
+            /* Move primitives and reset indices */
+            std::vector<triangle> moved;
+            moved.reserve(_prims.size());
+            for (unsigned int i = 0; i < _indirect.size(); ++i)
+            {
+                moved.push_back(std::move(_prims[_indirect[i]]));
+                _indirect[i] = i;
+            }
+
+            /* Swap in new order */
+            _prims.swap(moved);
+
+            return *this;
+        }
 
 
     private :
