@@ -36,13 +36,23 @@ class mapper_shader : public material
             
         /* Tidy up */
         virtual ~mapper_shader() 
-        { 
+        {
+            for (auto m : _btex)
+            {
+                delete m;
+            }
+
             for (auto m : _ctex)
             {
                 delete m;
             }
             
             for (auto m : _dtex)
+            {
+                delete m;
+            }
+            
+            for (auto m : _stex)
             {
                 delete m;
             }
