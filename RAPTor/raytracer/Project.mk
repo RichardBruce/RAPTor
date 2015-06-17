@@ -1,9 +1,9 @@
 # Source
 SOURCE  = $(MAIN) $(TEXTURE) $(SSD) $(PARSER) $(MGF) #$(SHAPE)
-MAIN    = main.cc raytracer.cc common.cc ray.cc triangle.cc scene.cc sort.cc line.cc simd.cc packet_ray.cc camera.cc \
+MAIN    = main.cc raytracer.cc common.cc ray.cc scene.cc sort.cc line.cc simd.cc packet_ray.cc camera.cc \
 	sdl_wrapper.cc sdl_event_handler_factory.cc
-#SHAPE   = shape.cc line.cc sphere.cc cylinder.cc cone.cc triangle.cc torus.cc ring.cc
-SSD	 = kd_tree.cc kdt_node.cc kdt_builder.cc voxel.cc bih.cc bih_builder.cc bvh.cc bvh_builder.cc
+#SHAPE   = shape.cc line.cc sphere.cc cylinder.cc cone.cc torus.cc ring.cc
+SSD	 = kd_tree.cc kdt_builder.cc voxel.cc bih.cc bih_builder.cc bvh.cc bvh_builder.cc
 TEXTURE = picture_functions.cc phong_shader.cc cook_torrance_cxy.cc mandelbrot_shader.cc \
 	mapper_shader.cc mapper_falloff.cc gradient_mapper.cc checker_board_mapper.cc perlin_noise_2d_mapper.cc perlin_noise_3d_mapper.cc planar_mapper.cc \
 	cylindrical_mapper.cc cubic_mapper.cc coloured_mapper_shader.cc perlin_noise_3d.cc perlin_noise_2d.cc
