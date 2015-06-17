@@ -217,7 +217,7 @@ class physics_object : private boost::noncopyable
             return *this;
         }
 
-        const physics_object& triangles(raptor_raytracer::primitive_list *p) const
+        const physics_object& triangles(raptor_raytracer::primitive_store *p) const
         {
             _vg->triangles(p, _o, _i->center_of_mass());
             return *this;

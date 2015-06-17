@@ -53,15 +53,11 @@ int simulation_environment::run()
         /* render */
         if (_po->render())
         {
-            raptor_raytracer::primitive_list *tris = _pe->scene_to_triangles();
+            auto *tris = _pe->scene_to_triangles();
             std::unique_ptr<raptor_raytracer::bih> ssd(new raptor_raytracer::bih(*tris));
             raptor_raytracer::ray_tracer(ssd.get(), _lights, *tris, _cam);
 
             /* Clean up triangles */        
-            for (auto t : (*tris))
-            {
-                delete t;
-            }
             delete tris;
 
             _damped_fps = (0.5f * _damped_fps) + (0.5f / time_step);

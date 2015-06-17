@@ -1,5 +1,4 @@
-#ifndef __PHYSICS_ENGINE_H__
-#define __PHYSICS_ENGINE_H__
+#pragma once
 
 /* Standard headers */
 #include <algorithm>
@@ -102,9 +101,9 @@ class physics_engine : private boost::noncopyable
 
         physics_engine& advance_time(const float t);
         
-        raptor_raytracer::primitive_list* scene_to_triangles() const
+        raptor_raytracer::primitive_store* scene_to_triangles() const
         {
-            raptor_raytracer::primitive_list *ret = new raptor_raytracer::primitive_list();
+            auto *ret = new raptor_raytracer::primitive_store();
             for (auto& p : (*_objects))
             {
                 p.second->triangles(ret);
@@ -353,5 +352,3 @@ class physics_engine : private boost::noncopyable
         const bool                                                          _clean_objects;
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __PHYSICS_ENGINE_H__ */

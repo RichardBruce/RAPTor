@@ -1,5 +1,4 @@
-#ifndef __VERTEX_GROUP_H__
-#define __VERTEX_GROUP_H__
+#pragma once
 
 /* Standard headers */
 #include <vector>
@@ -15,6 +14,7 @@
 #include "quaternion_t.h"
 
 /* Ray tracer headers */
+#include "primitive_store.h"
 #include "triangle.h"
 
 /* Physics headers */
@@ -123,7 +123,7 @@ class vertex_group : private boost::noncopyable
         }
 
         /* Build triangles for rendering */
-        const vertex_group& triangles(raptor_raytracer::primitive_list *p, const quaternion_t &r, const point_t &t) const
+        const vertex_group& triangles(raptor_raytracer::primitive_store *p, const quaternion_t &r, const point_t &t) const
         {
             /* Position vertices */
             std::vector<point_t> pos_verts;
@@ -137,10 +137,7 @@ class vertex_group : private boost::noncopyable
             /* For each triple of edges build a triangle */
             for (unsigned int i = 0; i < _tris->size(); i += 3)
             {
-                p->push_back(new raptor_raytracer::triangle(_mat, 
-                    pos_verts[_tris->at(i    )], 
-                    pos_verts[_tris->at(i + 1)], 
-                    pos_verts[_tris->at(i + 2)]));
+                p->emplace_back(_mat, pos_verts[_tris->at(i)], pos_verts[_tris->at(i + 1)], pos_verts[_tris->at(i + 2)]);
             }
             return *this;
         }
@@ -228,5 +225,3 @@ inline vertex_group* make_cube(raptor_raytracer::material *m, const point_t &bl,
     return new vertex_group(verts, tris, m);
 }
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __VERTEX_GROUP_H__ */

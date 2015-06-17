@@ -656,80 +656,70 @@ BOOST_FIXTURE_TEST_CASE( apply_impulse_with_pre_computes_test, physics_object_fi
 BOOST_FIXTURE_TEST_CASE( build_triangles_test, physics_object_fixture )
 {
     /* Test plane */
-    raptor_raytracer::primitive_list p0;
+    raptor_raytracer::primitive_store p0;
     plane_po->triangles(&p0);
     BOOST_CHECK(p0.size() == 2);
 
-    BOOST_CHECK(p0[0]->get_vertex_a() == point_t(-10.0, -10.0, -10.0));
-    BOOST_CHECK(p0[0]->get_vertex_b() == point_t( 10.0, -10.0,  10.0));
-    BOOST_CHECK(p0[0]->get_vertex_c() == point_t(-10.0, -10.0,  10.0));
+    BOOST_CHECK(p0.primitive(0)->get_vertex_a() == point_t(-10.0, -10.0, -10.0));
+    BOOST_CHECK(p0.primitive(0)->get_vertex_b() == point_t( 10.0, -10.0,  10.0));
+    BOOST_CHECK(p0.primitive(0)->get_vertex_c() == point_t(-10.0, -10.0,  10.0));
 
-    BOOST_CHECK(p0[1]->get_vertex_a() == point_t(-10.0, -10.0, -10.0));
-    BOOST_CHECK(p0[1]->get_vertex_b() == point_t( 10.0, -10.0, -10.0));
-    BOOST_CHECK(p0[1]->get_vertex_c() == point_t( 10.0, -10.0,  10.0));
-
-    for (auto *tri : p0)
-    {
-        delete tri;
-    }
+    BOOST_CHECK(p0.primitive(1)->get_vertex_a() == point_t(-10.0, -10.0, -10.0));
+    BOOST_CHECK(p0.primitive(1)->get_vertex_b() == point_t( 10.0, -10.0, -10.0));
+    BOOST_CHECK(p0.primitive(1)->get_vertex_c() == point_t( 10.0, -10.0,  10.0));
 
     /* Test cube */
-    raptor_raytracer::primitive_list p1;
+    raptor_raytracer::primitive_store p1;
     cube_po0->triangles(&p1);
     BOOST_CHECK(p1.size() == 12);
 
-    BOOST_CHECK(p1[0]->get_vertex_a() == point_t( 0.0, -10.0, -0.5));
-    BOOST_CHECK(p1[0]->get_vertex_b() == point_t( 1.0,  -9.0, -0.5));
-    BOOST_CHECK(p1[0]->get_vertex_c() == point_t( 1.0, -10.0, -0.5));
+    BOOST_CHECK(p1.primitive(0)->get_vertex_a() == point_t( 0.0, -10.0, -0.5));
+    BOOST_CHECK(p1.primitive(0)->get_vertex_b() == point_t( 1.0,  -9.0, -0.5));
+    BOOST_CHECK(p1.primitive(0)->get_vertex_c() == point_t( 1.0, -10.0, -0.5));
 
-    BOOST_CHECK(p1[1]->get_vertex_a() == point_t( 0.0, -10.0, -0.5));
-    BOOST_CHECK(p1[1]->get_vertex_b() == point_t( 0.0,  -9.0, -0.5));
-    BOOST_CHECK(p1[1]->get_vertex_c() == point_t( 1.0,  -9.0, -0.5));
+    BOOST_CHECK(p1.primitive(1)->get_vertex_a() == point_t( 0.0, -10.0, -0.5));
+    BOOST_CHECK(p1.primitive(1)->get_vertex_b() == point_t( 0.0,  -9.0, -0.5));
+    BOOST_CHECK(p1.primitive(1)->get_vertex_c() == point_t( 1.0,  -9.0, -0.5));
 
-    BOOST_CHECK(p1[2]->get_vertex_a() == point_t( 0.0, -10.0,  0.5));
-    BOOST_CHECK(p1[2]->get_vertex_b() == point_t( 1.0, -10.0,  0.5));
-    BOOST_CHECK(p1[2]->get_vertex_c() == point_t( 1.0,  -9.0,  0.5));
+    BOOST_CHECK(p1.primitive(2)->get_vertex_a() == point_t( 0.0, -10.0,  0.5));
+    BOOST_CHECK(p1.primitive(2)->get_vertex_b() == point_t( 1.0, -10.0,  0.5));
+    BOOST_CHECK(p1.primitive(2)->get_vertex_c() == point_t( 1.0,  -9.0,  0.5));
 
-    BOOST_CHECK(p1[3]->get_vertex_a() == point_t( 0.0, -10.0,  0.5));
-    BOOST_CHECK(p1[3]->get_vertex_b() == point_t( 1.0,  -9.0,  0.5));
-    BOOST_CHECK(p1[3]->get_vertex_c() == point_t( 0.0,  -9.0,  0.5));
+    BOOST_CHECK(p1.primitive(3)->get_vertex_a() == point_t( 0.0, -10.0,  0.5));
+    BOOST_CHECK(p1.primitive(3)->get_vertex_b() == point_t( 1.0,  -9.0,  0.5));
+    BOOST_CHECK(p1.primitive(3)->get_vertex_c() == point_t( 0.0,  -9.0,  0.5));
 
-    BOOST_CHECK(p1[4]->get_vertex_a() == point_t( 0.0, -10.0,  0.5));
-    BOOST_CHECK(p1[4]->get_vertex_b() == point_t( 0.0,  -9.0,  0.5));
-    BOOST_CHECK(p1[4]->get_vertex_c() == point_t( 0.0, -10.0, -0.5));
+    BOOST_CHECK(p1.primitive(4)->get_vertex_a() == point_t( 0.0, -10.0,  0.5));
+    BOOST_CHECK(p1.primitive(4)->get_vertex_b() == point_t( 0.0,  -9.0,  0.5));
+    BOOST_CHECK(p1.primitive(4)->get_vertex_c() == point_t( 0.0, -10.0, -0.5));
 
-    BOOST_CHECK(p1[5]->get_vertex_a() == point_t( 0.0,  -9.0,  0.5));
-    BOOST_CHECK(p1[5]->get_vertex_b() == point_t( 0.0,  -9.0, -0.5));
-    BOOST_CHECK(p1[5]->get_vertex_c() == point_t( 0.0, -10.0, -0.5));
+    BOOST_CHECK(p1.primitive(5)->get_vertex_a() == point_t( 0.0,  -9.0,  0.5));
+    BOOST_CHECK(p1.primitive(5)->get_vertex_b() == point_t( 0.0,  -9.0, -0.5));
+    BOOST_CHECK(p1.primitive(5)->get_vertex_c() == point_t( 0.0, -10.0, -0.5));
 
-    BOOST_CHECK(p1[6]->get_vertex_a() == point_t( 1.0, -10.0, -0.5));
-    BOOST_CHECK(p1[6]->get_vertex_b() == point_t( 1.0,  -9.0, -0.5));
-    BOOST_CHECK(p1[6]->get_vertex_c() == point_t( 1.0,  -9.0,  0.5));
+    BOOST_CHECK(p1.primitive(6)->get_vertex_a() == point_t( 1.0, -10.0, -0.5));
+    BOOST_CHECK(p1.primitive(6)->get_vertex_b() == point_t( 1.0,  -9.0, -0.5));
+    BOOST_CHECK(p1.primitive(6)->get_vertex_c() == point_t( 1.0,  -9.0,  0.5));
 
-    BOOST_CHECK(p1[7]->get_vertex_a() == point_t( 1.0, -10.0, -0.5));
-    BOOST_CHECK(p1[7]->get_vertex_b() == point_t( 1.0,  -9.0,  0.5));
-    BOOST_CHECK(p1[7]->get_vertex_c() == point_t( 1.0, -10.0,  0.5));
+    BOOST_CHECK(p1.primitive(7)->get_vertex_a() == point_t( 1.0, -10.0, -0.5));
+    BOOST_CHECK(p1.primitive(7)->get_vertex_b() == point_t( 1.0,  -9.0,  0.5));
+    BOOST_CHECK(p1.primitive(7)->get_vertex_c() == point_t( 1.0, -10.0,  0.5));
 
-    BOOST_CHECK(p1[8]->get_vertex_a() == point_t( 0.0,  -9.0, -0.5));
-    BOOST_CHECK(p1[8]->get_vertex_b() == point_t( 0.0,  -9.0,  0.5));
-    BOOST_CHECK(p1[8]->get_vertex_c() == point_t( 1.0,  -9.0,  0.5));
+    BOOST_CHECK(p1.primitive(8)->get_vertex_a() == point_t( 0.0,  -9.0, -0.5));
+    BOOST_CHECK(p1.primitive(8)->get_vertex_b() == point_t( 0.0,  -9.0,  0.5));
+    BOOST_CHECK(p1.primitive(8)->get_vertex_c() == point_t( 1.0,  -9.0,  0.5));
 
-    BOOST_CHECK(p1[9]->get_vertex_a() == point_t( 0.0,  -9.0, -0.5));
-    BOOST_CHECK(p1[9]->get_vertex_b() == point_t( 1.0,  -9.0,  0.5));
-    BOOST_CHECK(p1[9]->get_vertex_c() == point_t( 1.0,  -9.0, -0.5));
+    BOOST_CHECK(p1.primitive(9)->get_vertex_a() == point_t( 0.0,  -9.0, -0.5));
+    BOOST_CHECK(p1.primitive(9)->get_vertex_b() == point_t( 1.0,  -9.0,  0.5));
+    BOOST_CHECK(p1.primitive(9)->get_vertex_c() == point_t( 1.0,  -9.0, -0.5));
 
-    BOOST_CHECK(p1[10]->get_vertex_a() == point_t( 0.0, -10.0, -0.5));
-    BOOST_CHECK(p1[10]->get_vertex_b() == point_t( 1.0, -10.0, -0.5));
-    BOOST_CHECK(p1[10]->get_vertex_c() == point_t( 0.0, -10.0,  0.5));
+    BOOST_CHECK(p1.primitive(10)->get_vertex_a() == point_t( 0.0, -10.0, -0.5));
+    BOOST_CHECK(p1.primitive(10)->get_vertex_b() == point_t( 1.0, -10.0, -0.5));
+    BOOST_CHECK(p1.primitive(10)->get_vertex_c() == point_t( 0.0, -10.0,  0.5));
 
-    BOOST_CHECK(p1[11]->get_vertex_a() == point_t( 1.0, -10.0, -0.5));
-    BOOST_CHECK(p1[11]->get_vertex_b() == point_t( 1.0, -10.0,  0.5));
-    BOOST_CHECK(p1[11]->get_vertex_c() == point_t( 0.0, -10.0,  0.5));
-
-    for (auto *tri : p1)
-    {
-        delete tri;
-    }
+    BOOST_CHECK(p1.primitive(11)->get_vertex_a() == point_t( 1.0, -10.0, -0.5));
+    BOOST_CHECK(p1.primitive(11)->get_vertex_b() == point_t( 1.0, -10.0,  0.5));
+    BOOST_CHECK(p1.primitive(11)->get_vertex_c() == point_t( 0.0, -10.0,  0.5));
 }
 
 

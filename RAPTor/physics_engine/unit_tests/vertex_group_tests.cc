@@ -161,241 +161,210 @@ BOOST_AUTO_TEST_CASE( find_intersection_time_test )
 BOOST_AUTO_TEST_CASE( static_build_triangles_test )
 {
     /* Test plane */
-    raptor_raytracer::primitive_list p0;
+    raptor_raytracer::primitive_store p0;
     plane_vg->triangles(&p0, quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(p0.size() == 2);
 
-    BOOST_CHECK(p0[0]->get_vertex_a() == point_t(-10.0, 0.0, -10.0));
-    BOOST_CHECK(p0[0]->get_vertex_b() == point_t( 10.0, 0.0,  10.0));
-    BOOST_CHECK(p0[0]->get_vertex_c() == point_t(-10.0, 0.0,  10.0));
+    BOOST_CHECK(p0.primitive(0)->get_vertex_a() == point_t(-10.0, 0.0, -10.0));
+    BOOST_CHECK(p0.primitive(0)->get_vertex_b() == point_t( 10.0, 0.0,  10.0));
+    BOOST_CHECK(p0.primitive(0)->get_vertex_c() == point_t(-10.0, 0.0,  10.0));
 
-    BOOST_CHECK(p0[1]->get_vertex_a() == point_t(-10.0, 0.0, -10.0));
-    BOOST_CHECK(p0[1]->get_vertex_b() == point_t( 10.0, 0.0, -10.0));
-    BOOST_CHECK(p0[1]->get_vertex_c() == point_t( 10.0, 0.0,  10.0));
-
-    for (auto *tri : p0)
-    {
-        delete tri;
-    }
+    BOOST_CHECK(p0.primitive(1)->get_vertex_a() == point_t(-10.0, 0.0, -10.0));
+    BOOST_CHECK(p0.primitive(1)->get_vertex_b() == point_t( 10.0, 0.0, -10.0));
+    BOOST_CHECK(p0.primitive(1)->get_vertex_c() == point_t( 10.0, 0.0,  10.0));
 
     /* Test cube */
-    raptor_raytracer::primitive_list p1;
+    raptor_raytracer::primitive_store p1;
     cube_vg0->triangles(&p1, quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0));
     BOOST_CHECK(p1.size() == 12);
 
-    BOOST_CHECK(p1[0]->get_vertex_a() == point_t(-0.5, -0.5, -0.5));
-    BOOST_CHECK(p1[0]->get_vertex_b() == point_t( 0.5,  0.5, -0.5));
-    BOOST_CHECK(p1[0]->get_vertex_c() == point_t( 0.5, -0.5, -0.5));
+    BOOST_CHECK(p1.primitive(0)->get_vertex_a()    == point_t(-0.5, -0.5, -0.5));
+    BOOST_CHECK(p1.primitive(0)->get_vertex_b()    == point_t( 0.5,  0.5, -0.5));
+    BOOST_CHECK(p1.primitive(0)->get_vertex_c()    == point_t( 0.5, -0.5, -0.5));
 
-    BOOST_CHECK(p1[1]->get_vertex_a() == point_t(-0.5, -0.5, -0.5));
-    BOOST_CHECK(p1[1]->get_vertex_b() == point_t(-0.5,  0.5, -0.5));
-    BOOST_CHECK(p1[1]->get_vertex_c() == point_t( 0.5,  0.5, -0.5));
+    BOOST_CHECK(p1.primitive(1)->get_vertex_a()    == point_t(-0.5, -0.5, -0.5));
+    BOOST_CHECK(p1.primitive(1)->get_vertex_b()    == point_t(-0.5,  0.5, -0.5));
+    BOOST_CHECK(p1.primitive(1)->get_vertex_c()    == point_t( 0.5,  0.5, -0.5));
 
-    BOOST_CHECK(p1[2]->get_vertex_a() == point_t(-0.5, -0.5,  0.5));
-    BOOST_CHECK(p1[2]->get_vertex_b() == point_t( 0.5, -0.5,  0.5));
-    BOOST_CHECK(p1[2]->get_vertex_c() == point_t( 0.5,  0.5,  0.5));
+    BOOST_CHECK(p1.primitive(2)->get_vertex_a()    == point_t(-0.5, -0.5,  0.5));
+    BOOST_CHECK(p1.primitive(2)->get_vertex_b()    == point_t( 0.5, -0.5,  0.5));
+    BOOST_CHECK(p1.primitive(2)->get_vertex_c()    == point_t( 0.5,  0.5,  0.5));
 
-    BOOST_CHECK(p1[3]->get_vertex_a() == point_t(-0.5, -0.5,  0.5));
-    BOOST_CHECK(p1[3]->get_vertex_b() == point_t( 0.5,  0.5,  0.5));
-    BOOST_CHECK(p1[3]->get_vertex_c() == point_t(-0.5,  0.5,  0.5));
+    BOOST_CHECK(p1.primitive(3)->get_vertex_a()    == point_t(-0.5, -0.5,  0.5));
+    BOOST_CHECK(p1.primitive(3)->get_vertex_b()    == point_t( 0.5,  0.5,  0.5));
+    BOOST_CHECK(p1.primitive(3)->get_vertex_c()    == point_t(-0.5,  0.5,  0.5));
 
-    BOOST_CHECK(p1[4]->get_vertex_a() == point_t(-0.5, -0.5,  0.5));
-    BOOST_CHECK(p1[4]->get_vertex_b() == point_t(-0.5,  0.5,  0.5));
-    BOOST_CHECK(p1[4]->get_vertex_c() == point_t(-0.5, -0.5, -0.5));
+    BOOST_CHECK(p1.primitive(4)->get_vertex_a()    == point_t(-0.5, -0.5,  0.5));
+    BOOST_CHECK(p1.primitive(4)->get_vertex_b()    == point_t(-0.5,  0.5,  0.5));
+    BOOST_CHECK(p1.primitive(4)->get_vertex_c()    == point_t(-0.5, -0.5, -0.5));
 
-    BOOST_CHECK(p1[5]->get_vertex_a() == point_t(-0.5,  0.5,  0.5));
-    BOOST_CHECK(p1[5]->get_vertex_b() == point_t(-0.5,  0.5, -0.5));
-    BOOST_CHECK(p1[5]->get_vertex_c() == point_t(-0.5, -0.5, -0.5));
+    BOOST_CHECK(p1.primitive(5)->get_vertex_a()    == point_t(-0.5,  0.5,  0.5));
+    BOOST_CHECK(p1.primitive(5)->get_vertex_b()    == point_t(-0.5,  0.5, -0.5));
+    BOOST_CHECK(p1.primitive(5)->get_vertex_c()    == point_t(-0.5, -0.5, -0.5));
 
-    BOOST_CHECK(p1[6]->get_vertex_a() == point_t( 0.5, -0.5, -0.5));
-    BOOST_CHECK(p1[6]->get_vertex_b() == point_t( 0.5,  0.5, -0.5));
-    BOOST_CHECK(p1[6]->get_vertex_c() == point_t( 0.5,  0.5,  0.5));
+    BOOST_CHECK(p1.primitive(6)->get_vertex_a()    == point_t( 0.5, -0.5, -0.5));
+    BOOST_CHECK(p1.primitive(6)->get_vertex_b()    == point_t( 0.5,  0.5, -0.5));
+    BOOST_CHECK(p1.primitive(6)->get_vertex_c()    == point_t( 0.5,  0.5,  0.5));
 
-    BOOST_CHECK(p1[7]->get_vertex_a() == point_t( 0.5, -0.5, -0.5));
-    BOOST_CHECK(p1[7]->get_vertex_b() == point_t( 0.5,  0.5,  0.5));
-    BOOST_CHECK(p1[7]->get_vertex_c() == point_t( 0.5, -0.5,  0.5));
+    BOOST_CHECK(p1.primitive(7)->get_vertex_a()    == point_t( 0.5, -0.5, -0.5));
+    BOOST_CHECK(p1.primitive(7)->get_vertex_b()    == point_t( 0.5,  0.5,  0.5));
+    BOOST_CHECK(p1.primitive(7)->get_vertex_c()    == point_t( 0.5, -0.5,  0.5));
 
-    BOOST_CHECK(p1[8]->get_vertex_a() == point_t(-0.5,  0.5, -0.5));
-    BOOST_CHECK(p1[8]->get_vertex_b() == point_t(-0.5,  0.5,  0.5));
-    BOOST_CHECK(p1[8]->get_vertex_c() == point_t( 0.5,  0.5,  0.5));
+    BOOST_CHECK(p1.primitive(8)->get_vertex_a()    == point_t(-0.5,  0.5, -0.5));
+    BOOST_CHECK(p1.primitive(8)->get_vertex_b()    == point_t(-0.5,  0.5,  0.5));
+    BOOST_CHECK(p1.primitive(8)->get_vertex_c()    == point_t( 0.5,  0.5,  0.5));
 
-    BOOST_CHECK(p1[9]->get_vertex_a() == point_t(-0.5,  0.5, -0.5));
-    BOOST_CHECK(p1[9]->get_vertex_b() == point_t( 0.5,  0.5,  0.5));
-    BOOST_CHECK(p1[9]->get_vertex_c() == point_t( 0.5,  0.5, -0.5));
+    BOOST_CHECK(p1.primitive(9)->get_vertex_a()    == point_t(-0.5,  0.5, -0.5));
+    BOOST_CHECK(p1.primitive(9)->get_vertex_b()    == point_t( 0.5,  0.5,  0.5));
+    BOOST_CHECK(p1.primitive(9)->get_vertex_c()    == point_t( 0.5,  0.5, -0.5));
 
-    BOOST_CHECK(p1[10]->get_vertex_a() == point_t(-0.5, -0.5, -0.5));
-    BOOST_CHECK(p1[10]->get_vertex_b() == point_t( 0.5, -0.5, -0.5));
-    BOOST_CHECK(p1[10]->get_vertex_c() == point_t(-0.5, -0.5,  0.5));
+    BOOST_CHECK(p1.primitive(10)->get_vertex_a()   == point_t(-0.5, -0.5, -0.5));
+    BOOST_CHECK(p1.primitive(10)->get_vertex_b()   == point_t( 0.5, -0.5, -0.5));
+    BOOST_CHECK(p1.primitive(10)->get_vertex_c()   == point_t(-0.5, -0.5,  0.5));
 
-    BOOST_CHECK(p1[11]->get_vertex_a() == point_t( 0.5, -0.5, -0.5));
-    BOOST_CHECK(p1[11]->get_vertex_b() == point_t( 0.5, -0.5,  0.5));
-    BOOST_CHECK(p1[11]->get_vertex_c() == point_t(-0.5, -0.5,  0.5));
-
-    for (auto *tri : p1)
-    {
-        delete tri;
-    }
+    BOOST_CHECK(p1.primitive(11)->get_vertex_a()   == point_t( 0.5, -0.5, -0.5));
+    BOOST_CHECK(p1.primitive(11)->get_vertex_b()   == point_t( 0.5, -0.5,  0.5));
+    BOOST_CHECK(p1.primitive(11)->get_vertex_c()   == point_t(-0.5, -0.5,  0.5));
 }
 
 
 BOOST_AUTO_TEST_CASE( translated_build_triangles_test )
 {
     /* Test plane */
-    raptor_raytracer::primitive_list p0;
+    raptor_raytracer::primitive_store p0;
     plane_vg->triangles(&p0, quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(-3.0, 1.0, -2.0));
     BOOST_CHECK(p0.size() == 2);
 
-    BOOST_CHECK(p0[0]->get_vertex_a() == point_t(-13.0, 1.0, -12.0));
-    BOOST_CHECK(p0[0]->get_vertex_b() == point_t(  7.0, 1.0,   8.0));
-    BOOST_CHECK(p0[0]->get_vertex_c() == point_t(-13.0, 1.0,   8.0));
+    BOOST_CHECK(p0.primitive(0)->get_vertex_a() == point_t(-13.0, 1.0, -12.0));
+    BOOST_CHECK(p0.primitive(0)->get_vertex_b() == point_t(  7.0, 1.0,   8.0));
+    BOOST_CHECK(p0.primitive(0)->get_vertex_c() == point_t(-13.0, 1.0,   8.0));
 
-    BOOST_CHECK(p0[1]->get_vertex_a() == point_t(-13.0, 1.0, -12.0));
-    BOOST_CHECK(p0[1]->get_vertex_b() == point_t(  7.0, 1.0, -12.0));
-    BOOST_CHECK(p0[1]->get_vertex_c() == point_t(  7.0, 1.0,   8.0));
-
-    for (auto *tri : p0)
-    {
-        delete tri;
-    }
+    BOOST_CHECK(p0.primitive(1)->get_vertex_a() == point_t(-13.0, 1.0, -12.0));
+    BOOST_CHECK(p0.primitive(1)->get_vertex_b() == point_t(  7.0, 1.0, -12.0));
+    BOOST_CHECK(p0.primitive(1)->get_vertex_c() == point_t(  7.0, 1.0,   8.0));
 
     /* Test cube */
-    raptor_raytracer::primitive_list p1;
+    raptor_raytracer::primitive_store p1;
     cube_vg0->triangles(&p1, quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(-2.3, -1.2, 1.5));
     BOOST_CHECK(p1.size() == 12);
 
-    BOOST_CHECK(fabs(magnitude(p1[0]->get_vertex_a() - point_t(-2.8, -1.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[0]->get_vertex_b() - point_t(-1.8, -0.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[0]->get_vertex_c() - point_t(-1.8, -1.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(0)->get_vertex_a() - point_t(-2.8, -1.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(0)->get_vertex_b() - point_t(-1.8, -0.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(0)->get_vertex_c() - point_t(-1.8, -1.7, 1.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[1]->get_vertex_a() - point_t(-2.8, -1.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[1]->get_vertex_b() - point_t(-2.8, -0.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[1]->get_vertex_c() - point_t(-1.8, -0.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(1)->get_vertex_a() - point_t(-2.8, -1.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(1)->get_vertex_b() - point_t(-2.8, -0.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(1)->get_vertex_c() - point_t(-1.8, -0.7, 1.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[2]->get_vertex_a() - point_t(-2.8, -1.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[2]->get_vertex_b() - point_t(-1.8, -1.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[2]->get_vertex_c() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(2)->get_vertex_a() - point_t(-2.8, -1.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(2)->get_vertex_b() - point_t(-1.8, -1.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(2)->get_vertex_c() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[3]->get_vertex_a() - point_t(-2.8, -1.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[3]->get_vertex_b() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[3]->get_vertex_c() - point_t(-2.8, -0.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(3)->get_vertex_a() - point_t(-2.8, -1.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(3)->get_vertex_b() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(3)->get_vertex_c() - point_t(-2.8, -0.7, 2.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[4]->get_vertex_a() - point_t(-2.8, -1.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[4]->get_vertex_b() - point_t(-2.8, -0.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[4]->get_vertex_c() - point_t(-2.8, -1.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(4)->get_vertex_a() - point_t(-2.8, -1.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(4)->get_vertex_b() - point_t(-2.8, -0.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(4)->get_vertex_c() - point_t(-2.8, -1.7, 1.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[5]->get_vertex_a() - point_t(-2.8, -0.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[5]->get_vertex_b() - point_t(-2.8, -0.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[5]->get_vertex_c() - point_t(-2.8, -1.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(5)->get_vertex_a() - point_t(-2.8, -0.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(5)->get_vertex_b() - point_t(-2.8, -0.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(5)->get_vertex_c() - point_t(-2.8, -1.7, 1.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[6]->get_vertex_a() - point_t(-1.8, -1.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[6]->get_vertex_b() - point_t(-1.8, -0.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[6]->get_vertex_c() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(6)->get_vertex_a() - point_t(-1.8, -1.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(6)->get_vertex_b() - point_t(-1.8, -0.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(6)->get_vertex_c() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[7]->get_vertex_a() - point_t(-1.8, -1.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[7]->get_vertex_b() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[7]->get_vertex_c() - point_t(-1.8, -1.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(7)->get_vertex_a() - point_t(-1.8, -1.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(7)->get_vertex_b() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(7)->get_vertex_c() - point_t(-1.8, -1.7, 2.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[8]->get_vertex_a() - point_t(-2.8, -0.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[8]->get_vertex_b() - point_t(-2.8, -0.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[8]->get_vertex_c() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(8)->get_vertex_a() - point_t(-2.8, -0.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(8)->get_vertex_b() - point_t(-2.8, -0.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(8)->get_vertex_c() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[9]->get_vertex_a() - point_t(-2.8, -0.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[9]->get_vertex_b() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[9]->get_vertex_c() - point_t(-1.8, -0.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(9)->get_vertex_a() - point_t(-2.8, -0.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(9)->get_vertex_b() - point_t(-1.8, -0.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(9)->get_vertex_c() - point_t(-1.8, -0.7, 1.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[10]->get_vertex_a() - point_t(-2.8, -1.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[10]->get_vertex_b() - point_t(-1.8, -1.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[10]->get_vertex_c() - point_t(-2.8, -1.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(10)->get_vertex_a() - point_t(-2.8, -1.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(10)->get_vertex_b() - point_t(-1.8, -1.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(10)->get_vertex_c() - point_t(-2.8, -1.7, 2.0))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[11]->get_vertex_a() - point_t(-1.8, -1.7, 1.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[11]->get_vertex_b() - point_t(-1.8, -1.7, 2.0))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[11]->get_vertex_c() - point_t(-2.8, -1.7, 2.0))) < result_tolerance);
-
-    for (auto *tri : p1)
-    {
-        delete tri;
-    }
+    BOOST_CHECK(fabs(magnitude(p1.primitive(11)->get_vertex_a() - point_t(-1.8, -1.7, 1.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(11)->get_vertex_b() - point_t(-1.8, -1.7, 2.0))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(11)->get_vertex_c() - point_t(-2.8, -1.7, 2.0))) < result_tolerance);
 }
 
 
 BOOST_AUTO_TEST_CASE( translated_rotated_build_triangles_test )
 {
     /* Test plane */
-    raptor_raytracer::primitive_list p0;
+    raptor_raytracer::primitive_store p0;
     plane_vg->triangles(&p0, quaternion_t(0.931655, 0.0186331, -0.316763, -0.177014), point_t(2.04, -9.1, -1.44));
     BOOST_CHECK(p0.size() == 2);
 
-    BOOST_CHECK(fabs(magnitude(p0[0]->get_vertex_a() - point_t( 0.641683,  -6.45787, -15.2626  ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p0[0]->get_vertex_b() - point_t( 3.43832,  -11.7421,   12.3826  ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p0[0]->get_vertex_c() - point_t(-11.2948,   -4.90939,   0.709988))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p0.primitive(0)->get_vertex_a() - point_t( 0.641683,  -6.45787, -15.2626  ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p0.primitive(0)->get_vertex_b() - point_t( 3.43832,  -11.7421,   12.3826  ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p0.primitive(0)->get_vertex_c() - point_t(-11.2948,   -4.90939,   0.709988))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p0[1]->get_vertex_a() - point_t( 0.641683,  -6.45787, -15.2626 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p0[1]->get_vertex_b() - point_t(15.3748,   -13.2906,   -3.58999))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p0[1]->get_vertex_c() - point_t( 3.43832,  -11.7421,   12.3826 ))) < result_tolerance);
-
-    for (auto *tri : p0)
-    {
-        delete tri;
-    }
+    BOOST_CHECK(fabs(magnitude(p0.primitive(1)->get_vertex_a() - point_t( 0.641683,  -6.45787, -15.2626 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p0.primitive(1)->get_vertex_b() - point_t(15.3748,   -13.2906,   -3.58999))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p0.primitive(1)->get_vertex_c() - point_t( 3.43832,  -11.7421,   12.3826 ))) < result_tolerance);
 
     /* Test cube */
-    raptor_raytracer::primitive_list p1;
+    raptor_raytracer::primitive_store p1;
     cube_vg0->triangles(&p1, quaternion_t(0.0647662, 0.450449, -0.867219, 0.20207), point_t(-1.71, -6.51, 1.43));
     BOOST_CHECK(p1.size() == 12);
 
-    BOOST_CHECK(fabs(magnitude(p1[0]->get_vertex_a() - point_t(-1.04823, -6.1843,    1.88385))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[0]->get_vertex_b() - point_t(-2.44148, -6.42687,   1.8861 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[0]->get_vertex_c() - point_t(-1.63403, -6.9394,    2.17823))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(0)->get_vertex_a() - point_t(-1.04823, -6.1843,    1.88385))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(0)->get_vertex_b() - point_t(-2.44148, -6.42687,   1.8861 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(0)->get_vertex_c() - point_t(-1.63403, -6.9394,    2.17823))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[1]->get_vertex_a() - point_t(-1.04823, -6.1843,    1.88385))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[1]->get_vertex_b() - point_t(-1.85568, -5.67177,   1.59172))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[1]->get_vertex_c() - point_t(-2.44148, -6.42687,   1.8861 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(1)->get_vertex_a() - point_t(-1.04823, -6.1843,    1.88385))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(1)->get_vertex_b() - point_t(-1.85568, -5.67177,   1.59172))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(1)->get_vertex_c() - point_t(-2.44148, -6.42687,   1.8861 ))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[2]->get_vertex_a() - point_t(-0.978518, -6.59313,  0.973904))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[2]->get_vertex_b() - point_t(-1.56432,  -7.34823,  1.26828 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[2]->get_vertex_c() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(2)->get_vertex_a() - point_t(-0.978518, -6.59313,  0.973904))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(2)->get_vertex_b() - point_t(-1.56432,  -7.34823,  1.26828 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(2)->get_vertex_c() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[3]->get_vertex_a() - point_t(-0.978518, -6.59313,  0.973904))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[3]->get_vertex_b() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[3]->get_vertex_c() - point_t(-1.78597,  -6.0806,   0.681773))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(3)->get_vertex_a() - point_t(-0.978518, -6.59313,  0.973904))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(3)->get_vertex_b() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(3)->get_vertex_c() - point_t(-1.78597,  -6.0806,   0.681773))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[4]->get_vertex_a() - point_t(-0.978518, -6.59313,  0.973904))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[4]->get_vertex_b() - point_t(-1.78597,  -6.0806,   0.681773))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[4]->get_vertex_c() - point_t(-1.04823,  -6.1843,   1.88385 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(4)->get_vertex_a() - point_t(-0.978518, -6.59313,  0.973904))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(4)->get_vertex_b() - point_t(-1.78597,  -6.0806,   0.681773))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(4)->get_vertex_c() - point_t(-1.04823,  -6.1843,   1.88385 ))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[5]->get_vertex_a() - point_t(-1.78597,  -6.0806,   0.681773))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[5]->get_vertex_b() - point_t(-1.85568,  -5.67177,  1.59172 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[5]->get_vertex_c() - point_t(-1.04823,  -6.1843,   1.88385 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(5)->get_vertex_a() - point_t(-1.78597,  -6.0806,   0.681773))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(5)->get_vertex_b() - point_t(-1.85568,  -5.67177,  1.59172 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(5)->get_vertex_c() - point_t(-1.04823,  -6.1843,   1.88385 ))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[6]->get_vertex_a() - point_t(-1.63403,  -6.9394,   2.17823 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[6]->get_vertex_b() - point_t(-2.44148,  -6.42687,  1.8861  ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[6]->get_vertex_c() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(6)->get_vertex_a() - point_t(-1.63403,  -6.9394,   2.17823 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(6)->get_vertex_b() - point_t(-2.44148,  -6.42687,  1.8861  ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(6)->get_vertex_c() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[7]->get_vertex_a() - point_t(-1.63403,  -6.9394,   2.17823 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[7]->get_vertex_b() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[7]->get_vertex_c() - point_t(-1.56432,  -7.34823,  1.26828 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(7)->get_vertex_a() - point_t(-1.63403,  -6.9394,   2.17823 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(7)->get_vertex_b() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(7)->get_vertex_c() - point_t(-1.56432,  -7.34823,  1.26828 ))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[8]->get_vertex_a() - point_t(-1.85568,  -5.67177,  1.59172 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[8]->get_vertex_b() - point_t(-1.78597,  -6.0806,   0.681773))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[8]->get_vertex_c() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(8)->get_vertex_a() - point_t(-1.85568,  -5.67177,  1.59172 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(8)->get_vertex_b() - point_t(-1.78597,  -6.0806,   0.681773))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(8)->get_vertex_c() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[9]->get_vertex_a() - point_t(-1.85568,  -5.67177,  1.59172 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[9]->get_vertex_b() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[9]->get_vertex_c() - point_t(-2.44148,  -6.42687,  1.8861  ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(9)->get_vertex_a() - point_t(-1.85568,  -5.67177,  1.59172 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(9)->get_vertex_b() - point_t(-2.37177,  -6.8357,   0.97615 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(9)->get_vertex_c() - point_t(-2.44148,  -6.42687,  1.8861  ))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[10]->get_vertex_a() - point_t(-1.04823,  -6.1843,  1.88385 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[10]->get_vertex_b() - point_t(-1.63403,  -6.9394,  2.17823 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[10]->get_vertex_c() - point_t(-0.978518, -6.59313, 0.973904))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(10)->get_vertex_a() - point_t(-1.04823,  -6.1843,  1.88385 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(10)->get_vertex_b() - point_t(-1.63403,  -6.9394,  2.17823 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(10)->get_vertex_c() - point_t(-0.978518, -6.59313, 0.973904))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(p1[11]->get_vertex_a() - point_t(-1.63403,  -6.9394,  2.17823 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[11]->get_vertex_b() - point_t(-1.56432,  -7.34823, 1.26828 ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(p1[11]->get_vertex_c() - point_t(-0.978518, -6.59313, 0.973904))) < result_tolerance);
-
-    /* Clean up */
-    for (auto *tri : p1)
-    {
-        delete tri;
-    }
+    BOOST_CHECK(fabs(magnitude(p1.primitive(11)->get_vertex_a() - point_t(-1.63403,  -6.9394,  2.17823 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(11)->get_vertex_b() - point_t(-1.56432,  -7.34823, 1.26828 ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(p1.primitive(11)->get_vertex_c() - point_t(-0.978518, -6.59313, 0.973904))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
