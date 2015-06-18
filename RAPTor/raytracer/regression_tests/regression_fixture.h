@@ -234,7 +234,7 @@ struct regression_fixture : private boost::noncopyable
             _everything.reset_indirection();
 
             /* Log scene size */
-            BOOST_TEST_CHECKPOINT(_test_name << "_" << log_statement<SpatialSubDivision>::test_type());
+            // BOOST_TEST_CHECKPOINT(_test_name << "_" << log_statement<SpatialSubDivision>::test_type());
             BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - # Primitives: " << _everything.size();
             BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - # Lights: " << _lights.size();
 
