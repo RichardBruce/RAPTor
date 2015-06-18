@@ -1,5 +1,4 @@
-#ifndef __REGRESSION_CHECKER_H__
-#define __REGRESSION_CHECKER_H__
+#pragma once
 
 /* Standard headers */
 #include <fstream>
@@ -174,5 +173,3 @@ class regression_checker : private boost::noncopyable
 };
 }; /* namespace test */
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __REGRESSION_CHECKER_H__ */
