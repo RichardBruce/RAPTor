@@ -59,15 +59,15 @@ void bih_builder::build(primitive_store *const primitives, std::vector<bih_block
         /* For small data sets run the primitive builder */
         /* This needs tuning to each machine. On intel i7 laptop this should be ~750,000, but on amd llano the binned algorithm shouldnt be used */
         _next_block = 1;
-        // if (_primitives->size() < 28000000)
+        if (_primitives->size() < 30000000)
         {
             divide_bih_block(_b, _t, _b, _t, 0, 0, _primitives->size() - 1);
         }
         /* For large data sets run a bucket based builder */
-        // else
-        // {
-        //     bucket_build();
-        // }
+        else
+        {
+            bucket_build();
+        }
     }
     // BOOST_LOG_TRIVIAL(trace) << "BIH construction used: " << _next_block << " blocks";
 }
@@ -210,8 +210,8 @@ void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigne
         _primitives->indirection(hist[pos]) = _prim_buffer[i];
 
         /* Move and track primitive bounds */
-        bl[pos] = min(bl[pos], _bounds[_prim_buffer[i]].low);
-        tr[pos] = max(tr[pos], _bounds[_prim_buffer[i]].high);
+        bl[pos] = min(bl[pos], _primitives->indirect_primitive(hist[pos])->low_bound());
+        tr[pos] = max(tr[pos], _primitives->indirect_primitive(hist[pos])->high_bound());
     }
 
     /* Un-increment the histogram */
@@ -254,8 +254,8 @@ void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigne
         _prim_buffer[hist[pos]] = _primitives->indirection(i);
 
         /* Move and track primitive bounds */
-        bl[pos] = min(bl[pos], _bounds[_primitives->indirection(i)].low);
-        tr[pos] = max(tr[pos], _bounds[_primitives->indirection(i)].high);
+        bl[pos] = min(bl[pos], _primitives->indirect_primitive(i)->low_bound());
+        tr[pos] = max(tr[pos], _primitives->indirect_primitive(i)->high_bound());
     }
 
     /* Un-increment the histogram */
@@ -272,8 +272,8 @@ void bih_builder::convert_to_primitve_builder(const int b, const int e)
     for (int i = b; i < e; ++i)
     {
         _primitives->indirection(i) = _prim_buffer[i];
-        _bounds[i].low  = _bounds[_prim_buffer[i]].low;
-        _bounds[i].high = _bounds[_prim_buffer[i]].high;
+        _bounds[i].low  = _primitives->indirect_primitive(i)->low_bound();
+        _bounds[i].high = _primitives->indirect_primitive(i)->high_bound();
     }
 }
 
