@@ -230,7 +230,7 @@ struct regression_fixture : private boost::noncopyable
             /* Assert there is an imagine to trace */
             assert(!_everything.empty());
 
-            /* Reset indirections */
+            /* Reset indirections, technically this is only needed for the BIH which works from the start on the indirection array */
             _everything.reset_indirection();
 
             /* Log scene size */
