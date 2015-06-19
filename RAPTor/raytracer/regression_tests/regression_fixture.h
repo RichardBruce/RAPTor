@@ -230,9 +230,6 @@ struct regression_fixture : private boost::noncopyable
             /* Assert there is an imagine to trace */
             assert(!_everything.empty());
 
-            /* Reset indirections, technically this is only needed for the BIH which works from the start on the indirection array */
-            _everything.reset_indirection();
-
             /* Log scene size */
             // BOOST_TEST_CHECKPOINT(_test_name << "_" << log_statement<SpatialSubDivision>::test_type());
             BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - # Primitives: " << _everything.size();
@@ -244,6 +241,9 @@ struct regression_fixture : private boost::noncopyable
             int total_ssd_runtime = 0;
             for (int i = 0; i < test_iterations; ++i)
             {
+                /* Reset indirections, technically this is only needed for the BIH which works from the start on the indirection array */
+                _everything.reset_indirection();
+
                 const auto ssd_build_t0(std::chrono::system_clock::now());
                 ssd.reset(new SpatialSubDivision(_everything));
                 const auto ssd_build_t1(std::chrono::system_clock::now());
