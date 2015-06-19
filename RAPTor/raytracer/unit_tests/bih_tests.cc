@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE( x_ray_miss_world_test )
     /* Completely miss the world */
     hit_description h;
     ray r(point_t(15.0f, 9.1f, 0.0f), -1.0f, 0.0f, 0.0f);
-    BOOST_CHECK( uut.find_nearest_object(&r, &h) == nullptr);
+    BOOST_CHECK( uut.find_nearest_object(&r, &h) == -1);
     BOOST_CHECK(!uut.found_nearer_object(&r, 1.0f));
 }
 
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE( x_ray_away_from_world_test )
     /* Completely miss the world */
     hit_description h;
     ray r(point_t(20.0f, 5.0f, 0.0f), 1.0f, 0.0f, 0.0f);
-    BOOST_CHECK( uut.find_nearest_object(&r, &h) == nullptr);
+    BOOST_CHECK( uut.find_nearest_object(&r, &h) == -1);
     BOOST_CHECK(!uut.found_nearer_object(&r, 1.0f));
 }
 
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE( x_ray_pass_between_test )
     /* Check we dont hit anything in the middle of the partition */
     hit_description h;
     ray r(point_t(5.0f, 5.0f, -10.0f), 0.0f, 0.0f, 1.0f);
-    BOOST_CHECK( uut.find_nearest_object(&r, &h) == nullptr);
+    BOOST_CHECK( uut.find_nearest_object(&r, &h) == -1);
     BOOST_CHECK(!uut.found_nearer_object(&r, 100.0f));
 }
 
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE( x_ray_hit_in_near_test )
     /* Check we hit the small near triangle */
     hit_description h;
     ray r(point_t(15.0f, 4.0f, 0.1f), -1.0f, 0.0f, 0.0f);
-    BOOST_CHECK(uut.find_nearest_object(&r, &h) == x_tris.primitive(4));
+    BOOST_CHECK(uut.find_nearest_object(&r, &h) == 4);
     BOOST_CHECK_CLOSE(h.d, 5.0f, result_tolerance);
 
     /* Check we hit this for found neearer as well */
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE( x_ray_hit_in_near_reverse_test )
     /* Check we hit the small near triangle */
     hit_description h;
     ray r(point_t(-15.0f, 4.0f, 0.1f), 1.0f, 0.0f, 0.0f);
-    BOOST_CHECK(uut.find_nearest_object(&r, &h) == x_tris.primitive(0));
+    BOOST_CHECK(uut.find_nearest_object(&r, &h) == 0);
     BOOST_CHECK_CLOSE(h.d, 15.0f, result_tolerance);
 
     /* Check we hit this for found neearer as well */
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE( x_ray_hit_in_far_test )
     /* Check we hit the far large triangle  */
     hit_description h;
     ray r(point_t(15.0f, 8.0f, 0.1f), -1.0f, 0.0f, 0.0f);
-    BOOST_CHECK(uut.find_nearest_object(&r, &h) == x_tris.primitive(0));
+    BOOST_CHECK(uut.find_nearest_object(&r, &h) == 0);
     BOOST_CHECK_CLOSE(h.d, 15.0f, result_tolerance);
 
     /* Check we hit this for found neearer as well */
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE( y_ray_miss_world_test )
     /* Completely miss the world */
     hit_description h;
     ray r(point_t(9.1f, 15.0f, 0.0f), 0.0f, -1.0f, 0.0f);
-    BOOST_CHECK( uut.find_nearest_object(&r, &h) == nullptr);
+    BOOST_CHECK( uut.find_nearest_object(&r, &h) == -1);
     BOOST_CHECK(!uut.found_nearer_object(&r, 1.0f));
 }
 
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE( y_ray_away_from_world_test )
     /* Completely miss the world */
     hit_description h;
     ray r(point_t(5.0f, 20.0f, 0.0f), 0.0f, 1.0f, 0.0f);
-    BOOST_CHECK( uut.find_nearest_object(&r, &h) == nullptr);
+    BOOST_CHECK( uut.find_nearest_object(&r, &h) == -1);
     BOOST_CHECK(!uut.found_nearer_object(&r, 1.0f));
 }
 
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE( y_ray_pass_between_test )
     /* Check we dont hit anything in the middle of the partition */
     hit_description h;
     ray r(point_t(5.0f, 5.0f, -10.0f), 0.0f, 0.0f, 1.0f);
-    BOOST_CHECK( uut.find_nearest_object(&r, &h) == nullptr);
+    BOOST_CHECK( uut.find_nearest_object(&r, &h) == -1);
     BOOST_CHECK(!uut.found_nearer_object(&r, 100.0f));
 }
 
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE( y_ray_hit_in_near_test )
     /* Check we hit the small near triangle */
     hit_description h;
     ray r(point_t(4.0f, 15.0f, 0.1f), 0.0f, -1.0f, 0.0f);
-    BOOST_CHECK(uut.find_nearest_object(&r, &h) == y_tris.primitive(4));
+    BOOST_CHECK(uut.find_nearest_object(&r, &h) == 4);
     BOOST_CHECK_CLOSE(h.d, 5.0f, result_tolerance);
 
     /* Check we hit this for found neearer as well */
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE( y_ray_hit_in_near_reverse_test )
     /* Check we hit the small near triangle */
     hit_description h;
     ray r(point_t(4.0f, -15.0f, 0.1f), 0.0f, 1.0f, 0.0f);
-    BOOST_CHECK(uut.find_nearest_object(&r, &h) == y_tris.primitive(0));
+    BOOST_CHECK(uut.find_nearest_object(&r, &h) == 0);
     BOOST_CHECK_CLOSE(h.d, 15.0f, result_tolerance);
 
     /* Check we hit this for found neearer as well */
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE( y_ray_hit_in_far_test )
     /* Check we hit the far large triangle  */
     hit_description h;
     ray r(point_t(8.0f, 15.0f, 0.1f), 0.0f, -1.0f, 0.0f);
-    BOOST_CHECK(uut.find_nearest_object(&r, &h) == y_tris.primitive(0));
+    BOOST_CHECK(uut.find_nearest_object(&r, &h) == 0);
     BOOST_CHECK_CLOSE(h.d, 15.0f, result_tolerance);
 
     /* Check we hit this for found neearer as well */
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE( z_ray_miss_world_test )
     /* Completely miss the world */
     hit_description h;
     ray r(point_t(9.1f, 0.0f, 15.0f), 0.0f, 0.0f, -1.0f);
-    BOOST_CHECK( uut.find_nearest_object(&r, &h) == nullptr);
+    BOOST_CHECK( uut.find_nearest_object(&r, &h) == -1);
     BOOST_CHECK(!uut.found_nearer_object(&r, 1.0f));
 }
 
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE( z_ray_away_from_world_test )
     /* Completely miss the world */
     hit_description h;
     ray r(point_t(5.0f, 0.0f, 20.0f), 0.0f, 0.0f, 1.0f);
-    BOOST_CHECK( uut.find_nearest_object(&r, &h) == nullptr);
+    BOOST_CHECK( uut.find_nearest_object(&r, &h) == -1);
     BOOST_CHECK(!uut.found_nearer_object(&r, 1.0f));
 }
 
@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE( z_ray_pass_between_test )
     /* Check we dont hit anything in the middle of the partition */
     hit_description h;
     ray r(point_t(5.0f, -10.0f, 5.0f), 0.0f, 1.0f, 0.0f);
-    BOOST_CHECK( uut.find_nearest_object(&r, &h) == nullptr);
+    BOOST_CHECK( uut.find_nearest_object(&r, &h) == -1);
     BOOST_CHECK(!uut.found_nearer_object(&r, 100.0f));
 }
 
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE( z_ray_hit_in_near_test )
     /* Check we hit the small near triangle */
     hit_description h;
     ray r(point_t(4.0f, 0.1f, 15.0f), 0.0f, 0.0f, -1.0f);
-    BOOST_CHECK(uut.find_nearest_object(&r, &h) == z_tris.primitive(4));
+    BOOST_CHECK(uut.find_nearest_object(&r, &h) == 4);
     BOOST_CHECK_CLOSE(h.d, 5.0f, result_tolerance);
 
     /* Check we hit this for found neearer as well */
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE( z_ray_hit_in_near_reverse_test )
     /* Check we hit the small near triangle */
     hit_description h;
     ray r(point_t(4.0f, 0.1f, -15.0f), 0.0f, 0.0f, 1.0f);
-    BOOST_CHECK(uut.find_nearest_object(&r, &h) == z_tris.primitive(0));
+    BOOST_CHECK(uut.find_nearest_object(&r, &h) == 0);
     BOOST_CHECK_CLOSE(h.d, 15.0f, result_tolerance);
 
     /* Check we hit this for found neearer as well */
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE( z_ray_hit_in_far_test )
     /* Check we hit the far large triangle  */
     hit_description h;
     ray r(point_t(8.0f, 0.1f, 15.0f), 0.0f, 0.0f, -1.0f);
-    BOOST_CHECK(uut.find_nearest_object(&r, &h) == z_tris.primitive(0));
+    BOOST_CHECK(uut.find_nearest_object(&r, &h) == 0);
     BOOST_CHECK_CLOSE(h.d, 15.0f, result_tolerance);
 
     /* Check we hit this for found neearer as well */

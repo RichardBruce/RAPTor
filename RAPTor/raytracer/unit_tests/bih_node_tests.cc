@@ -84,13 +84,13 @@ BOOST_AUTO_TEST_CASE( ray_test_leaf_node_nearest )
     /* A hit */
     hit_description h0;
     ray r0(point_t(0.0f, 0.5f, 0.25f), 1.0f);
-    BOOST_CHECK(uut.test_leaf_node_nearest(tris, &r0, &h0) == tris.primitive(4));
+    BOOST_CHECK(uut.test_leaf_node_nearest(tris, &r0, &h0) == 4);
     BOOST_CHECK_CLOSE(h0.d, 1.0f, result_tolerance);
 
     /* A miss */
     hit_description h1;
     ray r1(point_t(5.0f, 0.5f, 0.25f), 1.0f);
-    BOOST_CHECK(uut.test_leaf_node_nearest(tris, &r1, &h1) == nullptr);
+    BOOST_CHECK(uut.test_leaf_node_nearest(tris, &r1, &h1) == -1);
     BOOST_CHECK(h1.h == hit_t::miss);
 }
 
@@ -100,13 +100,13 @@ BOOST_AUTO_TEST_CASE( packet_ray_test_leaf_node_nearest )
 
     /* Some hits and misses */
     packet_hit_description h0;
-    const triangle *i_o0[4] = { nullptr };
+    vint_t i_o0(-1);
     packet_ray r0(point_t(0.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f), vfp_t(0.0f, 0.0f, 0.0f, 1.0f));
-    uut.test_leaf_node_nearest(tris, &r0, i_o0, &h0, 1);
-    BOOST_CHECK(i_o0[0] == tris.primitive(4));
-    BOOST_CHECK(i_o0[1] == tris.primitive(4));
-    BOOST_CHECK(i_o0[2] == tris.primitive(4));
-    BOOST_CHECK(i_o0[3] == nullptr);
+    uut.test_leaf_node_nearest(tris, &r0, &i_o0, &h0, 1);
+    BOOST_CHECK(i_o0[0] == 4);
+    BOOST_CHECK(i_o0[1] == 4);
+    BOOST_CHECK(i_o0[2] == 4);
+    BOOST_CHECK(i_o0[3] == -1);
     BOOST_CHECK_CLOSE(h0.d[0], 1.0f, result_tolerance);
     BOOST_CHECK_CLOSE(h0.d[1], 1.0f, result_tolerance);
     BOOST_CHECK_CLOSE(h0.d[2], 1.0f, result_tolerance);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE( frustrum_test_leaf_node_nearest )
 
     /* Some hits and misses */
     packet_hit_description h;
-    const triangle *i_o[4] = { nullptr };
+    vint_t i_o(-1);
     packet_ray r(point_t(0.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(0.0f, 0.0f, 0.05f, 1.0f));
 
     /* Build the frustrum and adapt it to the leaf node */
@@ -127,11 +127,11 @@ BOOST_AUTO_TEST_CASE( frustrum_test_leaf_node_nearest )
     unsigned int packet_addr[1] = { 0 };
     f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
 
-    uut.test_leaf_node_nearest(tris, f, &r, i_o, &h, packet_addr, 1);
-    BOOST_CHECK(i_o[0] == tris.primitive(4));
-    BOOST_CHECK(i_o[1] == tris.primitive(4));
-    BOOST_CHECK(i_o[2] == tris.primitive(4));
-    BOOST_CHECK(i_o[3] == nullptr);
+    uut.test_leaf_node_nearest(tris, f, &r, &i_o, &h, packet_addr, 1);
+    BOOST_CHECK(i_o[0] == 4);
+    BOOST_CHECK(i_o[1] == 4);
+    BOOST_CHECK(i_o[2] == 4);
+    BOOST_CHECK(i_o[3] == -1);
     BOOST_CHECK_CLOSE(h.d[0], 1.0f, result_tolerance);
     BOOST_CHECK_CLOSE(h.d[1], 1.0f, result_tolerance);
     BOOST_CHECK_CLOSE(h.d[2], 1.0f, result_tolerance);
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE( tris_culled_frustrum_test_leaf_node_nearest )
 
     /* Some hits and misses */
     packet_hit_description h;
-    const triangle *i_o[4] = { nullptr };
+    vint_t i_o(-1);
     packet_ray r(point_t(0.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(1.0f, 1.0f, 1.05f, 1.0f));
 
     /* Build the frustrum and adapt it to the leaf node */
@@ -152,11 +152,11 @@ BOOST_AUTO_TEST_CASE( tris_culled_frustrum_test_leaf_node_nearest )
     unsigned int packet_addr[1] = { 0 };
     f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
 
-    uut.test_leaf_node_nearest(tris, f, &r, i_o, &h, packet_addr, 1);
-    BOOST_CHECK(i_o[0] == nullptr);
-    BOOST_CHECK(i_o[1] == nullptr);
-    BOOST_CHECK(i_o[2] == nullptr);
-    BOOST_CHECK(i_o[3] == nullptr);
+    uut.test_leaf_node_nearest(tris, f, &r, &i_o, &h, packet_addr, 1);
+    BOOST_CHECK(i_o[0] == -1);
+    BOOST_CHECK(i_o[1] == -1);
+    BOOST_CHECK(i_o[2] == -1);
+    BOOST_CHECK(i_o[3] == -1);
 }
 
 /* Nearer tests */
