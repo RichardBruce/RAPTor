@@ -11,6 +11,154 @@
 
 namespace raptor_raytracer
 {
+void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const tr, point_t *const t_bl, point_t *const t_tr, const float split, const axis_t axis)
+{
+    /* Find intersection with the split */
+    int i_idx = 0;
+    point_t i[2];
+    float dist_a;
+    float dist_b;
+    float dist_c;
+    switch (axis)
+    {
+        case axis_t::x_axis :
+        {
+            dist_a = split - tri->get_vertex_a().x;
+            dist_b = split - tri->get_vertex_b().x;
+            dist_c = split - tri->get_vertex_c().x;
+            if ((dist_a * dist_b) < 0.0f)
+            {
+                const point_t ab(normalise(tri->get_vertex_a() - tri->get_vertex_b()));
+                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ab.x) * ab);
+            }
+
+            if ((dist_a * dist_c) < 0.0f)
+            {
+                const point_t ac(normalise(tri->get_vertex_a() - tri->get_vertex_c()));
+                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ac.x) * ac);
+            }
+
+            if ((dist_b * dist_c) < 0.0f)
+            {
+                const point_t bc(normalise(tri->get_vertex_b() - tri->get_vertex_c()));
+                i[i_idx++] = tri->get_vertex_b() + ((dist_a / bc.x) * bc);
+            }
+            break;
+        }
+        case axis_t::y_axis :
+        {
+            dist_a = split - tri->get_vertex_a().y;
+            dist_b = split - tri->get_vertex_b().y;
+            dist_c = split - tri->get_vertex_c().y;
+            if ((dist_a * dist_b) < 0.0f)
+            {
+                const point_t ab(normalise(tri->get_vertex_a() - tri->get_vertex_b()));
+                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ab.y) * ab);
+            }
+
+            if ((dist_a * dist_c) < 0.0f)
+            {
+                const point_t ac(normalise(tri->get_vertex_a() - tri->get_vertex_c()));
+                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ac.y) * ac);
+            }
+
+            if ((dist_b * dist_c) < 0.0f)
+            {
+                const point_t bc(normalise(tri->get_vertex_b() - tri->get_vertex_c()));
+                i[i_idx++] = tri->get_vertex_b() + ((dist_a / bc.y) * bc);
+            }
+            break;
+        }
+        case axis_t::z_axis :
+        {
+            dist_a = split - tri->get_vertex_a().z;
+            dist_b = split - tri->get_vertex_b().z;
+            dist_c = split - tri->get_vertex_c().z;
+            if ((dist_a * dist_b) < 0.0f)
+            {
+                const point_t ab(normalise(tri->get_vertex_a() - tri->get_vertex_b()));
+                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ab.z) * ab);
+            }
+
+            if ((dist_a * dist_c) < 0.0f)
+            {
+                const point_t ac(normalise(tri->get_vertex_a() - tri->get_vertex_c()));
+                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ac.z) * ac);
+            }
+
+            if ((dist_b * dist_c) < 0.0f)
+            {
+                const point_t bc(normalise(tri->get_vertex_b() - tri->get_vertex_c()));
+                i[i_idx++] = tri->get_vertex_b() + ((dist_a / bc.z) * bc);
+            }
+            break;
+        }
+        default :
+            assert(false);
+            break;
+    }
+
+    /* Clasify points to the left or right of the split */
+    point_t l[2];
+    point_t r[2];
+    int l_idx = 0;
+    int r_idx = 0;
+    if (dist_a > 0.0f)
+    {
+        l[l_idx++] = tri->get_vertex_a();
+    }
+    else
+    {
+        r[r_idx++] = tri->get_vertex_a();
+    }
+
+    if (dist_b > 0.0f)
+    {
+        l[l_idx++] = tri->get_vertex_b();
+    }
+    else
+    {
+        r[r_idx++] = tri->get_vertex_b();
+    }
+
+    if (dist_c > 0.0f)
+    {
+        l[l_idx++] = tri->get_vertex_c();
+    }
+    else
+    {
+        r[r_idx++] = tri->get_vertex_c();
+    }
+    assert(l_idx < 3);
+    assert(r_idx < 3);
+
+    /* Find bound of intersection and points on one side */
+    const point_t i_tr(max(i[0], i[1]));
+    const point_t i_bl(min(i[0], i[1]));
+
+    point_t l_tr(max(i_tr, l[0]));
+    point_t l_bl(min(i_bl, l[0]));
+
+    point_t r_tr(max(i_tr, r[0]));
+    point_t r_bl(min(i_bl, r[0]));
+    if (l_idx == 2)
+    {
+        l_tr = max(l_tr, l[1]);
+        l_bl = min(l_bl, l[1]);
+    }
+    else
+    {
+        r_tr = max(r_tr, r[1]);
+        r_bl = min(r_bl, r[1]);
+    }
+
+    /* Find intersect with bounding boxes */
+    (*t_bl) = max(*bl, r_bl);
+    (*t_tr) = min(*tr, r_tr);
+    (*bl)   = max(*bl, l_bl);
+    (*tr)   = min(*tr, l_tr);
+}
+
 float approximate_sah_minima(const float cl0, const float cl1, const float cr0, const float cr1, const float x0, const float d, const float xw, const float yw, const float zw)
 {
     /* Check there is a gradient to the counts, minimise area with the most primitives */

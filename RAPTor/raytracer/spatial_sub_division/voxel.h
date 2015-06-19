@@ -22,6 +22,7 @@ namespace raptor_raytracer
 /* Forward declarations */
 class kdt_node;
 
+void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const tr, point_t *const t_bl, point_t *const t_tr, const float split, const axis_t axis);
 float approximate_sah_minima(const float cl0, const float cl1, const float cr0, const float cr1, const float x0, const float d, const float xw, const float yw, const float zw);
 void fix_adaptive_samples(float *const nr_samples, float *const widths, float *const samples, const float *const cl, const float *const cr, const float d0, const float dw, const float prims);
 
