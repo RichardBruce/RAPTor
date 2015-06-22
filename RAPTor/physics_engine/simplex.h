@@ -1,5 +1,4 @@
-#ifndef __SIMPLEX_H__
-#define __SIMPLEX_H__
+#pragma once
 
 /* Shared headers */
 #include <vector>
@@ -310,5 +309,3 @@ class simplex
         unsigned int            _size;      /* The size of the simplex                          */
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __SIMPLEX_H__ */

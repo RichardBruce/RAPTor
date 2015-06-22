@@ -1,5 +1,4 @@
-#ifndef __PHYSICS_OBJECT_H__
-#define __PHYSICS_OBJECT_H__
+#pragma once
 
 /* Standard headers */
 #include <algorithm>
@@ -398,5 +397,3 @@ class physics_object : private boost::noncopyable
         const unsigned int              _type;              /* The type of the material to associate it with a collider     */
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __PHYSICS_OBJECT_H__ */

@@ -1,5 +1,4 @@
-#ifndef __FORCE_H__
-#define __FORCE_H__
+#pragma once
 
 /* Common headers */
 #include "point_t.h"
@@ -229,5 +228,3 @@ class aggregate_force
         const std::vector<force *> &_f;
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __FORCE_H__ */

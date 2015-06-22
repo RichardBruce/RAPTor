@@ -1,5 +1,4 @@
-#ifndef __FORCE_INFO_H__
-#define __FORCE_INFO_H__
+#pragma once
 
 #include "common.h"
 
@@ -14,6 +13,3 @@ struct force_info
     point_t at; /* The point the force is applied at with the object com as the origin  */
     float   t;  /* The length of time to apply the force for                            */
 };
-        
-#endif /* #ifndef __FORCE_INFO_H__ */
-

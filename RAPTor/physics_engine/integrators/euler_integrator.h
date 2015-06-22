@@ -1,5 +1,4 @@
-#ifndef __EULER_INTEGRATOR_H__
-#define __EULER_INTEGRATOR_H__
+#pragma once
 
 /* Common headers */
 #include "point_t.h"
@@ -68,5 +67,3 @@ class euler_integrator
     private :
 };
 } /* namespace raptor_physics */
-
-#endif /* #ifndef __EULER_INTEGRATOR_H__ */

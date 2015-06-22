@@ -1,5 +1,4 @@
-#ifndef __CONTACT_GRAPH_NODE_H__
-#define __CONTACT_GRAPH_NODE_H__
+#pragma once
 
 /* Standard headers */
 #include <map>
@@ -146,5 +145,3 @@ class contact_graph_node : private boost::noncopyable
         std::vector<contact_graph_node*>        _c;
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __CONTACT_GRAPH_NODE_H__ */

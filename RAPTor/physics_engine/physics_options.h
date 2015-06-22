@@ -1,5 +1,4 @@
-#ifndef __PHYSICS_OPTIONS_H__
-#define __PHYSICS_OPTIONS_H__
+#pragma once
 
 /* Standard headers */
 #include <iostream>
@@ -150,5 +149,3 @@ class physics_options
         bool    _error;
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __PHYSICS_OPTIONS_H__ */

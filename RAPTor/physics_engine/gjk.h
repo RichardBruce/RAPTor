@@ -1,5 +1,4 @@
-#ifndef __GJK_H__
-#define __GJK_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/noncopyable.hpp"
@@ -91,5 +90,3 @@ class gjk : private boost::noncopyable
         simplex         *const  _b_simplex; /* The simplex in object b  */
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __GJK_H__ */

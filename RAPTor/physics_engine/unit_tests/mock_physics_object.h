@@ -1,5 +1,4 @@
-#ifndef __MOCK_VERTEX_GROUP_H__
-#define __MOCK_VERTEX_GROUP_H__
+#pragma once
 
 /* Standard headers */
 #include <deque>
@@ -171,5 +170,3 @@ inline raptor_physics::physics_object* physics_object_for_simplex_testing(const 
 {
     return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, new std::vector<int>(), nullptr), o, t, 0.0);
 }
-
-#endif /* #ifndef __MOCK_VERTEX_GROUP_H__ */

@@ -1,5 +1,4 @@
-#ifndef __REGRESSION_CHECKER_H__
-#define __REGRESSION_CHECKER_H__
+#pragma once
 
 /* Standard headers */
 #include <fstream>
@@ -339,5 +338,3 @@ BOOST_CLASS_IMPLEMENTATION(raptor_physics::test::collision_data, object_serializ
 BOOST_CLASS_IMPLEMENTATION(raptor_physics::test::frame_data, object_serializable);
 BOOST_CLASS_IMPLEMENTATION(std::vector<raptor_physics::test::object_data>, object_serializable);
 BOOST_CLASS_IMPLEMENTATION(std::vector<raptor_physics::test::collision_data>, object_serializable);
-
-#endif /* #ifndef __REGRESSION_CHECKER_H__ */

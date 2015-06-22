@@ -1,5 +1,4 @@
-#ifndef __MOCK_FORCE_H__
-#define __MOCK_FORCE_H__
+#pragma once
 
 /* Common headers */
 #include "point_t.h"
@@ -41,5 +40,3 @@ class mock_force : public raptor_physics::force
         point_t _f;
         point_t _t;
 };
-
-#endif /* #ifndef __MOCK_FORCE_H__ */

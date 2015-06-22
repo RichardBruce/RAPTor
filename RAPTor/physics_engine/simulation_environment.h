@@ -1,5 +1,4 @@
-#ifndef __SIMULATION_ENVIRONMENT_H__
-#define __SIMULATION_ENVIRONMENT_H__
+#pragma once
 
 /* Standard headers */
 #include <ctime>
@@ -156,5 +155,3 @@ class simulation_environment
         float                                   _damped_fps;
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __SIMULATION_ENVIRONMENT_H__ */

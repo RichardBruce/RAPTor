@@ -1,5 +1,4 @@
-#ifndef __CONTACT_GRAPH_H__
-#define __CONTACT_GRAPH_H__
+#pragma once
 
 /* Standard headers */
 #include <algorithm>
@@ -453,6 +452,4 @@ class contact_graph : private boost::noncopyable
         int                                     _verts;
         int                                     _edges;
 };
-
-} /* namespace raptor_physics */
-#endif /* #ifndef __CONTACT_GRAPH_H__ */
+}; /* namespace raptor_physics */

@@ -1,5 +1,4 @@
-#ifndef __RIGID_BODY_COLLIDER_H__
-#define __RIGID_BODY_COLLIDER_H__
+#pragma once
 
 #include "collider.h"
 
@@ -203,4 +202,3 @@ class rigid_body_collider : public collider
         const float _mu;     /* Coefficient of friction      */
 };
 }; /* namespace raptor_physics */
-#endif /* #ifndef __RIGID_BODY_COLLIDER_H__ */

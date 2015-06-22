@@ -1,5 +1,4 @@
-#ifndef __RK4_INTEGRATOR_H__
-#define __RK4_INTEGRATOR_H__
+#pragma once
 
 /* Common headers */
 #include "point_t.h"
@@ -108,5 +107,3 @@ class rk4_integrator
     private :
 };
 } /* namespace raptor_physics */
-
-#endif /* #ifndef __RK4_INTEGRATOR_H__ */

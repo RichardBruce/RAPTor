@@ -1,5 +1,4 @@
-#ifndef __COLLIDER_H__
-#define __COLLIDER_H__
+#pragma once
 
 /* Phycsic headers */
 #include "point_t.h"
@@ -18,5 +17,3 @@ class collider
         virtual const collider& collide(physics_object *const po_a, physics_object *const po_b, const point_t &poc, const point_t &noc, const collision_t type) const = 0;
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __COLLIDER_H__ */

@@ -1,5 +1,4 @@
-#ifndef __VERLET_INTEGRATOR_H__
-#define __VERLET_INTEGRATOR_H__
+#pragma once
 
 /* Common headers */
 #include "point_t.h"
@@ -19,5 +18,3 @@ class verlet_integrator
     private :
 };
 } /* namespace raptor_physics */
-
-#endif /* #ifndef __VERLET_INTEGRATOR_H__ */

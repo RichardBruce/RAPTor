@@ -1,5 +1,4 @@
-#ifndef __GJK_TEST_ACCESS_H__
-#define __GJK_TEST_ACCESS_H__
+#pragma once
 
 /* Common headers */
 #include "quaternion_t.h"
@@ -42,5 +41,3 @@ class gjk_test_access
         raptor_physics::gjk _gjk;
         const int _retain[4];
 };
-
-#endif /* #ifndef __GJK_TEST_ACCESS_H__ */

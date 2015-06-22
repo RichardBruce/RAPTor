@@ -1,5 +1,4 @@
-#ifndef __INERTIA_TENSOR_H__
-#define __INERTIA_TENSOR_H__
+#pragma once
 
 
 /* Common headers */
@@ -353,5 +352,3 @@ inline point_t operator*(const T &lhs, const point_t &rhs)
     return point_t(x, y, z);
 }
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __INERTIA_TENSOR_H__ */

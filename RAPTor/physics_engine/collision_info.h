@@ -1,5 +1,4 @@
-#ifndef __COLLISION_INFO_H__
-#define __COLLISION_INFO_H__
+#pragma once
 
 /* Standard headers */
 #include <limits>
@@ -100,5 +99,3 @@ class collision_info
         int                         _repeat;    /* The number of times this pair has collided without time advancing    */
 };
 }; /* namespace raptor_physics */
-
-#endif /* #define __COLLISION_INFO_H__ */

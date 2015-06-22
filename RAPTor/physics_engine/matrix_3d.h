@@ -1,5 +1,4 @@
-#ifndef __MATRIX_3D_H__
-#define __MATRIX_3D_H__
+#pragma once
 
 /* Standard headers */
 #include <vector>
@@ -119,5 +118,3 @@ class matrix_3d : private boost::noncopyable
         std::vector<point_t>    _data;  /* Contents of the matrix   */
         
 };
-
-#endif /* #ifndef __MATRIX_H__ */

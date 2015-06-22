@@ -1,5 +1,4 @@
-#ifndef __PAIR_MANAGER_H__
-#define __PAIR_MANAGER_H__
+#pragma once
 
 /* Standard headers */
 #include <cassert>
@@ -338,5 +337,3 @@ class pair_manager
         unsigned int    _number_of_pairs;
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __PAIR_MANAGER_H__ */

@@ -1,5 +1,4 @@
-#ifndef __SPATIAL_SUB_DIVISION_H__
-#define __SPATIAL_SUB_DIVISION_H__
+#pragma once
 
 /* Standard headers */
 #include <limits>
@@ -365,5 +364,3 @@ class spatial_sub_division : private boost::noncopyable
         object_bound *              _max_sentinel;
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __SPATIAL_SUB_DIVISION_H__ */

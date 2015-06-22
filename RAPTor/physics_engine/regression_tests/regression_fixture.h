@@ -1,5 +1,4 @@
-#ifndef __REGRESSION_FIXTURE_H__
-#define __REGRESSION_FIXTURE_H__
+#pragma once
 
 /* Standard headers */
 #include <chrono>
@@ -143,5 +142,3 @@ struct regression_fixture : private boost::noncopyable
 };
 }; /* namespace test */
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __REGRESSION_FIXTURE_H__ */

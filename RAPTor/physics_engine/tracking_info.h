@@ -1,5 +1,4 @@
-#ifndef __TRACKING_INFO_H__
-#define __TRACKING_INFO_H__
+#pragma once
 
 /* Standard headers */
 #include <map>
@@ -152,5 +151,3 @@ class tracking_info : private boost::noncopyable
         collision_t                         _type;          /* The type of collision                        */
 };
 }; /* namespace raptor_physics */
-
-#endif /* #define __TRACKING_INFO_H__ */

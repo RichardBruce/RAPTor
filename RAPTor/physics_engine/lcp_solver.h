@@ -1,5 +1,4 @@
-#ifndef __LCP_SOLVER_H__
-#define __LCP_SOLVER_H__
+#pragma once
 
 /* Standard headers */
 #include <algorithm>
@@ -347,5 +346,3 @@ class lcp_solver
 lcp_solver squared_distance_solver(const matrix_3d &p0, const matrix_3d &p1, const std::vector<int> &e0, const std::vector<int> &e1);
 
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __LCP_SOLVER_H__ */

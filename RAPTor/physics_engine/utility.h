@@ -1,5 +1,4 @@
-#ifndef __UTILITY_H__
-#define __UTILITY_H__
+#pragma once
 
 /* Standard Headers */
 #include <atomic>
@@ -87,5 +86,3 @@ class flag_clearer
     private :
         std::atomic_flag _flag;
 };
-
-#endif

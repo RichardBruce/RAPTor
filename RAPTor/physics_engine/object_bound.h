@@ -1,5 +1,4 @@
-#ifndef __OBJECT_BOUND_H__
-#define __OBJECT_BOUND_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/noncopyable.hpp"
@@ -64,5 +63,3 @@ class object_bound : private boost::noncopyable
         const bool                  _min;
 };
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __OBJECT_BOUND_H__ */

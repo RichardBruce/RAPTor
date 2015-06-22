@@ -1,5 +1,4 @@
-#ifndef __PHYSICS_COMMON_H__
-#define __PHYSICS_COMMON_H__
+#pragma once
 
 /* Standard headers */
 #include <list>
@@ -70,5 +69,3 @@ float find_exact_none_translating_collision_time(const point_t &pa, const point_
 float find_exact_collision_time(const point_t &pa, const point_t &pb, const point_t &ea, const point_t &eb, const point_t &x0, 
     const point_t &x1, const point_t &q0, const point_t &q1, const float r0, const float r1);
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __PHYSICS_COMMON_H__ */
