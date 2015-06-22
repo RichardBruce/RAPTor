@@ -1,5 +1,4 @@
-#ifndef __HEIGHT_MAP_H__
-#define __HEIGHT_MAP_H__
+#pragma once
 
 /* Common headers */
 #include "common.h"
@@ -53,5 +52,3 @@ class height_map
         const int   _y;         /* Number of y cells    */
 };
 }; /* namespace raptor_terrain */
-
-#endif /* #ifndef __HEIGHT_MAP_H__ */

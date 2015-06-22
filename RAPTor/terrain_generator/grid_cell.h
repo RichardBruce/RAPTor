@@ -1,5 +1,4 @@
-#ifndef __GRID_CELL_H__
-#define __GRID_CELL_H__
+#pragma once
 
 /* Common headers */
 #include "common.h"
@@ -202,5 +201,3 @@ grid_cell** vertices_to_grid_cells(const point_t *const verts, const int y, cons
     return raw_grid_cells;
 }
 }; /* namespace raptor_terrain */
-
-#endif /* #ifndef __GRID_CELL_H__ */
