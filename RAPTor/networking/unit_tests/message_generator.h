@@ -1,5 +1,4 @@
-#ifndef __MESSAGE_GENERATOR_H__
-#define __MESSAGE_GENERATOR_H__
+#pragma once
 
 /* Standard headers */
 #include <algorithm>
@@ -131,5 +130,3 @@ class message_generator
         const std::string   _msg;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __MESSAGE_GENERATOR_H__ */

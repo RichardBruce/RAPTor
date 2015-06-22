@@ -1,5 +1,4 @@
-#ifndef __OBJECT_RESPONSE_H__
-#define __OBJECT_RESPONSE_H__
+#pragma once
 
 /* Standard headers */
 #include <type_traits>
@@ -31,5 +30,3 @@ class object_response
         const T _obj;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __OBJECT_RESPONSE_H__ */

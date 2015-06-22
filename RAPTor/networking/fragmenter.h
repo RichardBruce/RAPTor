@@ -1,5 +1,4 @@
-#ifndef __FRAGMENTER_H__
-#define __FRAGMENTER_H__
+#pragma once
 
 /* Standard headers */
 #include <unordered_map>
@@ -169,5 +168,3 @@ class fixed_size_fragmenter : public stack_component_impl<UpNode, DnNode>
         const std::uint32_t _frag_size; /* The size of the fragment */
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __FRAGMENTER_H__ */

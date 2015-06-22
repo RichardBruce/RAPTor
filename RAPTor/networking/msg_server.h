@@ -1,5 +1,4 @@
-#ifndef __MSG_SERVER_H__
-#define __MSG_SERVER_H__
+#pragma once
 
 /* Standard headers */
 #include <atomic>
@@ -175,5 +174,3 @@ class msg_server
         };
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __MSG_SERVER_H__ */

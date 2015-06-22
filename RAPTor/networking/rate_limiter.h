@@ -1,5 +1,4 @@
-#ifndef __RATE_LIMITER_H__
-#define __RATE_LIMITER_H__
+#pragma once
 
 /* Standard headers */
 #include <chrono>
@@ -71,5 +70,3 @@ class rate_limiter : public stack_component_impl<UpNode, DnNode>
         const float                 _bytes_per_milli_inv;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __RATE_LIMITER_H__ */

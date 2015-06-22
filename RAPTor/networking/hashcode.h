@@ -1,5 +1,4 @@
-#ifndef __HASHCODE_H__
-#define __HASHCODE_H__
+#pragma once
 
 std::uint32_t murmur_hash_3(const std::uint8_t *const key, const std::uint32_t seed, const std::uint32_t len)
 {
@@ -59,5 +58,3 @@ std::uint32_t murmur_hash_3(const std::uint8_t *const key, const std::uint32_t s
 
     return hash;
 }
-
-#endif /* #ifndef __HASHCODE_H__ */

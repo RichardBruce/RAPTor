@@ -1,5 +1,4 @@
-#ifndef __MOCK_STACK_COMPONENT_H__
-#define __MOCK_STACK_COMPONENT_H__
+#pragma once
 
 /* Standard headers */
 #include <deque>
@@ -171,5 +170,3 @@ class mock_stack_component : public stack_component_impl<stack_component, stack_
         const bool                                      _conn;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __MOCK_STACK_COMPONENT_H__ */

@@ -1,5 +1,4 @@
-#ifndef __MOCK_DATA_RECEIVER_H__
-#define __MOCK_DATA_RECEIVER_H__
+#pragma once
 
 /* Standard headers */
 #include <deque>
@@ -71,5 +70,3 @@ class mock_data_receiver : public data_receiver
         std::unique_ptr<const std::string>          _resp_data;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __MOCK_DATA_RECEIVER_H__ */

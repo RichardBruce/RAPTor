@@ -1,5 +1,4 @@
-#ifndef __COMVERSION_H__
-#define __COMVERSION_H__
+#pragma once
 
 namespace raptor_networking
 {
@@ -53,5 +52,3 @@ void to_big_endian_byte_array(const IN val, OUT *const bytes)
     return;
 }
 }; /* namespace raptor_networking */
-
-#endif

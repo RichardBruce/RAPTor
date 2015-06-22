@@ -1,5 +1,4 @@
-#ifndef __MSG_DATA_H__
-#define __MSG_DATA_H__
+#pragma once
 
 /* Standard headers */
 #include <algorithm>
@@ -107,5 +106,3 @@ class msg_data
         size_t                      _missing;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __MSG_DATA_H__ */

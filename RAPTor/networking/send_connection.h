@@ -1,5 +1,4 @@
-#ifndef __SEND_CONNECTION_H__
-#define __SEND_CONNECTION_H__
+#pragma once
 
 /* Standard headers */
 #include <string>
@@ -76,5 +75,3 @@ class send_connection : public Connection
         }
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __SEND_CONNECTION_H__ */

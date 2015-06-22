@@ -1,5 +1,4 @@
-#ifndef __SERIALISATION_H__
-#define __SERIALISATION_H__
+#pragma once
 
 /* Standard headers */
 #include <memory>
@@ -154,5 +153,3 @@ void load(Archive &ar, boost::asio::ip::address &addr, const unsigned int versio
 }
 } /* namespace serialization */
 } /* namespace boost */
-
-#endif /* #ifndef __SERIALISATION_H__ */

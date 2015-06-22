@@ -1,5 +1,4 @@
-#ifndef __UDP_CONNECTION_H__
-#define __UDP_CONNECTION_H__
+#pragma once
 
 /* Standard headers */
 #include <array>
@@ -156,5 +155,3 @@ class udp_connection : public connection<UpNode>
         const short                                 _send_port;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __UDP_CONNECTION_H__ */

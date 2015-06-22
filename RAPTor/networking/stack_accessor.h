@@ -1,5 +1,4 @@
-#ifndef __STACK_ACCESSOR_H__
-#define __STACK_ACCESSOR_H__
+#pragma once
 
 /* Standard headers */
 #include <cstdint>
@@ -82,4 +81,3 @@ class stack_accessor
         stack_map::accessor _acc;   /* Accessor to the stack components */
 };
 }; /* namespace raptor_networking */
-#endif /* #ifndef __STACK_ACCESSOR_H__ */

@@ -1,5 +1,4 @@
-#ifndef __SEQUENCER_H__
-#define __SEQUENCER_H__
+#pragma once
 
 /* Standard headers */
 #include <cstdint>
@@ -130,4 +129,3 @@ class drop_late_sequencer : public stack_component_impl<UpNode, DnNode>
         std::uint32_t   _seq;   /* The next expected sequence id */
 };
 }; /* namespace raptor_networking */
-#endif /* #ifndef __SEQUENCER_H__ */

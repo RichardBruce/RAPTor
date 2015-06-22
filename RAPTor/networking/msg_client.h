@@ -1,5 +1,4 @@
-#ifndef __MSG_CLIENT_H__
-#define __MSG_CLIENT_H__
+#pragma once
 
 /* Standard headers */
 #include <cstdint>
@@ -288,5 +287,3 @@ class msg_client
         bool                        _subscribed;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __MSG_CLIENT_H__ */

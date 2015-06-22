@@ -1,5 +1,4 @@
-#ifndef __BATCHER_H__
-#define __BATCHER_H__
+#pragma once
 
 /* Standard headers */
 #include <algorithm>
@@ -166,5 +165,3 @@ class batcher : public stack_component_impl<UpNode, DnNode>
         const unsigned short                                            _max_size;  /* The maximum size to batch up to in bytes */
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __BATCHER_H__ */

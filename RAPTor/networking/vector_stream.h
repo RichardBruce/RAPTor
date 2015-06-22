@@ -1,5 +1,4 @@
-#ifndef __VECTOR_STREAM_H__
-#define __VECTOR_STREAM_H__
+#pragma once
 
 /* Standard headers */
 #include <algorithm>
@@ -140,5 +139,3 @@ class ivectorbuf_stream : public boost::iostreams::source
         size_t                          _seg;           /* The current sub-vector                   */
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __VECTOR_STREAM_H__ */

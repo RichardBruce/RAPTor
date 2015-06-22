@@ -1,5 +1,4 @@
-#ifndef __MESSAGE_DELIVERY_H__
-#define __MESSAGE_DELIVERY_H__
+#pragma once
 
 /* Standard headers */
 #include <future>
@@ -117,5 +116,3 @@ class message_delivery : public stack_component
         data_receiver  *const   _receiver;      /* User defined class to handle a message   */
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __MESSAGE_DELIVERY_H__ */

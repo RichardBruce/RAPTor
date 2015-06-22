@@ -1,5 +1,4 @@
-#ifndef __RECV_CONNECTION_H__
-#define __RECV_CONNECTION_H__
+#pragma once
 
 /* Standard headers */
 #include <vector>
@@ -87,5 +86,3 @@ class recv_connection : public Connection
         }
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __RECV_CONNECTION_H__ */

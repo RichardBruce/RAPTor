@@ -1,5 +1,4 @@
-#ifndef __DATA_RECEIVER_H__
-#define __DATA_RECEIVER_H__
+#pragma once
 
 namespace raptor_networking
 {
@@ -17,5 +16,3 @@ class data_receiver
         virtual data_receiver* clean_clone() = 0;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __DATA_RECEIVER_H__ */

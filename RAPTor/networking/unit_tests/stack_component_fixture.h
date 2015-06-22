@@ -1,5 +1,4 @@
-#ifndef __STACK_COMPONENT_FIXTURE_H__
-#define __STACK_COMPONENT_FIXTURE_H__
+#pragma once
 
 /* Standard headers */
 
@@ -69,5 +68,3 @@ struct stack_component_fixture : private boost::noncopyable
 };
 }; /* namespace test */
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __STACK_COMPONENT_FIXTURE_H__ */

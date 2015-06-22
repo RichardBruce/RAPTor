@@ -1,5 +1,4 @@
-#ifndef __TCP_CONNECTION_H__
-#define __TCP_CONNECTION_H__
+#pragma once
 
 /* Standard headers */
 #include <array>
@@ -158,5 +157,3 @@ class tcp_connection : public connection<UpNode>
         const short     _send_port;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __TCP_CONNECTION_H__ */

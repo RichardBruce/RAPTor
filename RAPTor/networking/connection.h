@@ -1,5 +1,4 @@
-#ifndef __CONNECTION_H__
-#define __CONNECTION_H__
+#pragma once
 
 /* Standard headers */
 #include <array>
@@ -61,5 +60,3 @@ class connection : public stack_component
         std::unique_ptr<char []>                _data_buf;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __CONNECTION_H__ */

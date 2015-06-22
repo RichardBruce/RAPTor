@@ -1,5 +1,4 @@
-#ifndef __NETWORKING_CONSTANTS_H__
-#define __NETWORKING_CONSTANTS_H__
+#pragma once
 
 /* Standard headers */
 #include <cstdint>
@@ -41,5 +40,3 @@ const std::uint16_t CONTROL_RECV_PORT   = 7001;                     /* The port 
 const std::uint16_t MULTI_CAST_PORT     = 7002;                     /* Multi cast port                                                  */
 const std::string MULTI_CAST_ADDR   = "239.255.0.1";                /* Multi cast address                                               */
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __NETWORKING_CONSTANTS_H__ */

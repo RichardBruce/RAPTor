@@ -1,5 +1,4 @@
-#ifndef __USER_CONNECTION_INFO_H__
-#define __USER_CONNECTION_INFO_H__
+#pragma once
 
 /* Standard headers */
 #include <cstdint>
@@ -22,5 +21,3 @@ class user_connection_info
         std::uint16_t _port;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __USER_CONNECTION_INFO_H__ */

@@ -1,5 +1,4 @@
-#ifndef __PROTOCOL_STACK_H__
-#define __PROTOCOL_STACK_H__
+#pragma once
 
 /* Standard heaaders */
 #include <functional>
@@ -186,5 +185,3 @@ class protocol_stack : private boost::noncopyable
         connection<stack_component> *   _conn;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __PROTOCOL_STACK_H__ */

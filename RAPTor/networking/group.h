@@ -1,5 +1,4 @@
-#ifndef __GROUP_H__
-#define __GROUP_H__
+#pragma once
 
 /* Standard headers */
 #include <algorithm>
@@ -316,5 +315,3 @@ class group : public stack_component_impl<stack_component, stack_component>
         std::pair<std::uint32_t, std::promise<bool>>    _conn;      /* State of a pending connect                           */
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __GROUP_H__ */

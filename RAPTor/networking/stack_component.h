@@ -1,5 +1,4 @@
-#ifndef __STACK_COMPONENT_H__
-#define __STACK_COMPONENT_H__
+#pragma once
 
 /* Standard headers */
 #include <string>
@@ -119,5 +118,3 @@ class stack_component_impl : public stack_component
         DnNode * _dn_node;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __STACK_COMPONENT_H__ */

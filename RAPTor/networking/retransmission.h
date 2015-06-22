@@ -1,5 +1,4 @@
-#ifndef __RETRANSMISSION_H__
-#define __RETRANSMISSION_H__
+#pragma once
 
 /* Standard headers */
 #include <chrono>
@@ -430,5 +429,3 @@ class nack_retransmission : public stack_component_impl<UpNode, DnNode>
         std::uint32_t           _resend_id;     /* The message id to be used for resending      */
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __RETRANSMISSION_H__ */

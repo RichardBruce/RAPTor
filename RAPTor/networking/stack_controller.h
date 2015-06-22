@@ -1,5 +1,4 @@
-#ifndef __STACK_CONTROLLER_H__
-#define __STACK_CONTROLLER_H__
+#pragma once
 
 /* Standard headers */
 #include <cstdint>
@@ -130,4 +129,3 @@ class stack_controller
         stack_component *           _clean_stack_bottom;
 };
 }; /* namespace raptor_networking */
-#endif /* #ifndef __STACK_CONTROLLER_H__ */

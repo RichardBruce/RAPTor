@@ -1,5 +1,4 @@
-#ifndef __STACK_MAP_ELEMENT_H__
-#define __STACK_MAP_ELEMENT_H__
+#pragma once
 
 /* Standard headers */
 #include <cstdint>
@@ -40,4 +39,3 @@ class stack_map_element
         std::uint32_t               _seq;
 };
 }; /* namespace raptor_networking */
-#endif /* #ifndef __STACK_MAP_ELEMENT_H__ */

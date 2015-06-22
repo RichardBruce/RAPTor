@@ -1,5 +1,4 @@
-#ifndef __MSG_HEADER_H__
-#define __MSG_HEADER_H__
+#pragma once
 
 /* Standard headers */
 #include <array>
@@ -241,5 +240,3 @@ class msg_header
         bool                _has_phy;       /* Weather a physical address is available                                              */
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __MSG_HEADER_H__ */

@@ -1,5 +1,4 @@
-#ifndef __SUBSCRIPTION_RESPONSE_H__
-#define __SUBSCRIPTION_RESPONSE_H__
+#pragma once
 
 /* Standard headers */
 #include <iostream>
@@ -148,5 +147,3 @@ class unsubscription_response
         msg_server *const _server;
 };
 }; /* namespace raptor_networking */
-
-#endif /* #ifndef __SUBSCRIPTION_RESPONSE_H__ */
