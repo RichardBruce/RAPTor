@@ -1,5 +1,4 @@
-#ifndef __GRADIENT_MAPPER_H__
-#define __GRADIENT_MAPPER_H__
+#pragma once
 
 /* Standard headers */
 
@@ -86,5 +85,3 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::gradient_mapper 
 }
 }; /* namespace serialization */
 }; /* namespace boost */
-
-#endif /* #ifndef __GRADIENT_MAPPER_H__ */

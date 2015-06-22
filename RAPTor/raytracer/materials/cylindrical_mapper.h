@@ -1,5 +1,4 @@
-#ifndef __CYLINDRICAL_MAPPER_H__
-#define __CYLINDRICAL_MAPPER_H__
+#pragma once
 
 /* Standard headers */
 
@@ -102,5 +101,3 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::cylindrical_mapp
 }
 }; /* namespace serialization */
 }; /* namespace boost */
-
-#endif /* #ifndef __CYLINDRICAL_MAPPER_H__ */

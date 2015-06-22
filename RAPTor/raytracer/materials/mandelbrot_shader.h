@@ -1,5 +1,4 @@
-#ifndef __MANDELBROT_SHADER_H__
-#define __MANDELBROT_SHADER_H__
+#pragma once
 
 #include "common.h"
 #include "material.h"
@@ -33,5 +32,3 @@ class mandelbrot_shader : public material
         int     i;      /* Iteration limit */
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __MANDELBROT_SHADER_H__ */

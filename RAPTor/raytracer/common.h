@@ -1,5 +1,4 @@
-#ifndef __COMMON_H__
-#define __COMMON_H__
+#pragma once
 
 // C headers for strlen() and rand()
 #include <stdlib.h>
@@ -290,5 +289,3 @@ enum class image_format_t : char { tga = 0, jpg = 1, png = 2 };
 /* Function to generate a random number between -1 and 1 */
 float gen_random_mersenne_twister();
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __COMMON_H__ */

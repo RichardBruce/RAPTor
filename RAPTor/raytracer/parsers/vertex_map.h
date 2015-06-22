@@ -1,5 +1,4 @@
-#ifndef __VERTEX_MAP_H__
-#define __VERTEX_MAP_H__
+#pragma once
 
 /* Standard headers */
 #include <map>
@@ -143,5 +142,3 @@ class vertex_map : private boost::noncopyable
         std::map<std::string, std::unique_ptr<map_data>>    _vertex_maps;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __VERTEX_MAP_H__ */

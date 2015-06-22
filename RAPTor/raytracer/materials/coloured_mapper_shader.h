@@ -1,5 +1,4 @@
-#ifndef __COLOURED_MAPPER_SHADER_H__
-#define __COLOURED_MAPPER_SHADER_H__
+#pragma once
 
 #include "common.h"
 #include "point_t.h"
@@ -107,5 +106,3 @@ class coloured_mapper_shader : public material
         const float                 rfd;    /* Reflected diffuseness        */
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __COLOURED_MAPPER_SHADER_H__ */

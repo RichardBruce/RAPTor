@@ -1,5 +1,4 @@
-#ifndef __PERLIN_NOISE_3D_MAPPER_H__
-#define __PERLIN_NOISE_3D_MAPPER_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/serialization/access.hpp"
@@ -79,5 +78,3 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::perlin_noise_3d_
 }
 }; /* namespace serialization */
 }; /* namespace boost */
-
-#endif /* #ifndef __PERLIN_NOISE_3D_MAPPER_H__ */

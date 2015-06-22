@@ -1,5 +1,4 @@
-#ifndef __SSD_H__
-#define __SSD_H__
+#pragma once
 
 /* Standard headers */
 
@@ -44,5 +43,3 @@ class ssd : private boost::noncopyable
     private :
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __SSD_H__ */

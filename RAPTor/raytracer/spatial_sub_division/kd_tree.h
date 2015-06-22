@@ -1,5 +1,4 @@
-#ifndef __KD_TREE_H__
-#define __KD_TREE_H__
+#pragma once
 
 /* Standard headers */
 
@@ -80,5 +79,3 @@ class kd_tree : public ssd
         std::shared_ptr<std::vector<kdt_node>>  _kdt_base;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __KD_TREE_H__ */

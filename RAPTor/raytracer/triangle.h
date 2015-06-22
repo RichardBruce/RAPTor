@@ -1,5 +1,4 @@
-#ifndef __TRIANGLE_H__
-#define __TRIANGLE_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/noncopyable.hpp"
@@ -527,5 +526,3 @@ inline void triangle::find_rays(ray *const r, const point_t &d, const int n) con
     return;
 }
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __TRIANGLE_H__ */

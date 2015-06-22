@@ -1,5 +1,4 @@
-#ifndef __BVH_NODE_H__
-#define __BVH_NODE_H__
+#pragma once
 
 /* Standard headers */
 
@@ -311,5 +310,3 @@ class bvh_node
         bool    _leaf;      /* Weather this is a leaf node          */
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __BVH_NODE_H__ */

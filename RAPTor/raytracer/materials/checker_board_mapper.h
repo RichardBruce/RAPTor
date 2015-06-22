@@ -1,5 +1,4 @@
-#ifndef __CHECKER_BOARD_MAPPER_H__
-#define __CHECKER_BOARD_MAPPER_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/serialization/access.hpp"
@@ -73,5 +72,3 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::checker_board_ma
 }
 }; /* namespace serialization */
 }; /* namespace boost */
-
-#endif /* #ifndef __CHECKER_BOARD_MAPPER_H__ */

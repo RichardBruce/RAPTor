@@ -1,5 +1,4 @@
-#ifndef __RAY_H__
-#define __RAY_H__
+#pragma once
 
 #include "line.h"
 
@@ -174,5 +173,3 @@ class ray
         int     componant;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __RAY_H__ */

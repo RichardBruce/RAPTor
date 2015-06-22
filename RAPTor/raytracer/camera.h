@@ -1,5 +1,4 @@
-#ifndef __CAMERA_H__
-#define __CAMERA_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/noncopyable.hpp"
@@ -666,5 +665,3 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::camera *cam, con
 }
 } /* namespace serialization */
 } /* namespace boost */
-
-#endif /* #ifndef __CAMERA_H__ */

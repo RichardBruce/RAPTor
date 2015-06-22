@@ -17,8 +17,7 @@
 
 --------------------------------------------------------------------------*/
 
-#ifndef __RAYOPT_H
-#define __RAYOPT_H
+#pragma once
 
 #include "vect.h"
 
@@ -55,5 +54,3 @@ unsigned opt_get_bounds (void);
 void abortmsg (char *msg, int exit_code);
 void add_ext (char *fname, char *ext, int force);
 void cleanup_name (char *name);
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef __PHONG_SHADER_H__
-#define __PHONG_SHADER_H__
+#pragma once
 
 #include "common.h"
 #include "point_t.h"
@@ -76,5 +75,3 @@ class phong_shader : public material
         const float         rfd;    /* Reflected diffuseness        */
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __PHONG_SHADER_H__ */

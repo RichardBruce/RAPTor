@@ -1,5 +1,4 @@
-#ifndef __EXT_COLOUR_T_H__
-#define __EXT_COLOUR_T_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/serialization/access.hpp"
@@ -99,5 +98,3 @@ inline float magnitude(const ext_colour_t &a)
     return sqrt((a.r * a.r) + (a.g * a.g) + (a.b * a.b));
 }
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __EXT_COLOUR_T_H__ */

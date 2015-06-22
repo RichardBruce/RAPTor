@@ -1,5 +1,4 @@
-#ifndef __PERLIN_NOISE_2D_MAPPER_H__
-#define __PERLIN_NOISE_2D_MAPPER_H__
+#pragma once
 
 /* Common headers */
 #include "perlin_noise_2d.h"
@@ -45,5 +44,3 @@ class perlin_noise_2d_mapper : public material
         const int               o;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __PERLIN_NOISE_2D_MAPPER_H__ */

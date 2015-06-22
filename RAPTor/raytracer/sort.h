@@ -1,5 +1,4 @@
-#ifndef __SORT_H__
-#define __SORT_H__
+#pragma once
 
 #include "common.h"
 
@@ -24,5 +23,3 @@ bool vmerge_sort(float *a, float *b, const int length);
 
 void radix_sort(float *const farray, float *const sorted, const int elements);
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __SORT_H__ */

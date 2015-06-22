@@ -1,5 +1,4 @@
-#ifndef __TEXTURE_MAPPER_H__
-#define __TEXTURE_MAPPER_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/algorithm/string.hpp"
@@ -653,4 +652,3 @@ inline point_t bump_map(const point_t &n, const point_t &x_0, const point_t &x_1
     return point_t(norm_x, norm_y, norm_z);
 }
 }; /* namespace raptor_raytracer */
-#endif /* #ifndef __TEXTURE_MAPPER_H__ */

@@ -1,5 +1,4 @@
-//#ifndef __LIGHT_SHADER_H__
-//#define __LIGHT_SHADER_H__
+//#pragma once
 //
 //#include "common.h"
 //#include "material.h"
@@ -74,7 +73,4 @@
 //    private :
 //        ext_colour_t    rgb;    /* The colour of the light for shading */
 //};
-//
-//#endif /* #ifndef __LIGHT_SHADER_H__ */
-//
 //}; /* namespace raptor_raytracer */

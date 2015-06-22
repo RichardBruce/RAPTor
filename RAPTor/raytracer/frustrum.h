@@ -1,5 +1,4 @@
-#ifndef __FRUSTRUM_H__
-#define __FRUSTRUM_H__
+#pragma once
 
 /* Ray tracer headers */
 #include "simd.h"
@@ -420,7 +419,5 @@ class frustrum
         // point_t     p_dir;          /* Most positive direction                              */
         int         n;              /* Major direction of the frustrum                      */
 };
-
 }; /* namespace raptor_raytracer */
 #endif /* #ifdef SIMD_PACKET_TRACING */
-#endif /* #ifndef __FRUSTRUM_H__ */

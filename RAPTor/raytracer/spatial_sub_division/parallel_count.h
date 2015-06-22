@@ -1,5 +1,4 @@
-#ifndef __PRIMITIVE_COUNT_H__
-#define __PRIMITIVE_COUNT_H__
+#pragma once
 
 #include "common.h"
 #include "triangle.h"
@@ -79,5 +78,3 @@ class primitive_count
         fp_t                    s[8];
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __PRIMITIVE_COUNT_H__ */

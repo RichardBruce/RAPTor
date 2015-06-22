@@ -1,5 +1,4 @@
-#ifndef __PRIMITIVE_COUNT_H__
-#define __PRIMITIVE_COUNT_H__
+#pragma once
 
 #include "common.h"
 #include "triangle.h"
@@ -142,5 +141,3 @@ class primitive_count
         const axis              n;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __PRIMITIVE_COUNT_H__ */

@@ -1,5 +1,4 @@
-#ifndef __MAPPER_FALLOFF_H__
-#define __MAPPER_FALLOFF_H__
+#pragma once
 
 /* Standard headers */
 
@@ -62,5 +61,3 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::mapper_falloff *
 }
 }; /* namespace serialization */
 }; /* namespace boost */
-
-#endif /* #ifndef __MAPPER_FALLOFF_H__ */

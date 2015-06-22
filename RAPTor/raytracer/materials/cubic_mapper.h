@@ -1,5 +1,4 @@
-#ifndef __CUBIC_MAPPER_H__
-#define __CUBIC_MAPPER_H__
+#pragma once
 
 /* Standard headers */
 
@@ -115,5 +114,3 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::cubic_mapper *t,
 }
 }; /* namespace serialization */
 }; /* namespace boost */
-
-#endif /* #ifndef __CUBIC_MAPPER_H__ */

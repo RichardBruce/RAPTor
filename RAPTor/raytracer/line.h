@@ -1,5 +1,4 @@
-#ifndef __LINE_H__
-#define __LINE_H__
+#pragma once
 
 #include "common.h"
 #include "point_t.h"
@@ -38,5 +37,3 @@ class line
         point_t dir;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __LINE_H__ */

@@ -1,5 +1,4 @@
-#ifndef __KDT_ROOT_H__
-#define __KDT_ROOT_H__
+#pragma once
 
 #include "common.h"
 #include "ray.h"
@@ -24,5 +23,3 @@ class kdt_root
         const point_t  t, b;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __KDT_ROOT_H__ */

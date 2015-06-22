@@ -1,5 +1,4 @@
-#ifndef __BIH_BLOCK_H__
-#define __BIH_BLOCK_H__
+#pragma once
 
 /* Standard headers */
 
@@ -111,5 +110,3 @@ class bih_block
         unsigned int                    _axes;      /* Axes of all nodes packed together    */
 } __attribute__ ((aligned(64)));
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __BIH_BLOCK_H__ */

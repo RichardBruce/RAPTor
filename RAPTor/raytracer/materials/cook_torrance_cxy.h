@@ -1,5 +1,4 @@
-#ifndef __COOK_TORRANCE_CXY_H__
-#define __COOK_TORRANCE_CXY_H__
+#pragma once
 
 #include "common.h"
 #include "point_t.h"
@@ -55,5 +54,3 @@ class cook_torrance_cxy : public material
         const float ri_i;   /* Imaginery refractive index               */
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __COOK_TORRANCE_CXY_H__ */

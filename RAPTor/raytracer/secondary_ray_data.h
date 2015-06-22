@@ -1,5 +1,4 @@
-#ifndef __SECONDARY_RAY_DATA_H__
-#define __SECONDARY_RAY_DATA_H__
+#pragma once
 
 /* Standard headers */
 
@@ -64,5 +63,3 @@ class secondary_ray_data
         float           _value;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __SECONDARY_RAY_DATA_H__ */

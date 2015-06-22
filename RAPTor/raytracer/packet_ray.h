@@ -1,5 +1,4 @@
-#ifndef __PACKET_RAY_H__
-#define __PACKET_RAY_H__
+#pragma once
 
 /* Ray tracer headers */
 #include "simd.h"
@@ -297,4 +296,3 @@ extern const packet_ray_to_co_ordinate packet_ray_to_co_ordinate_lut;
 
 }; /* namespace raptor_raytracer */
 #endif /* #ifdef SIMD_PACKET_TRACING */
-#endif /* #ifndef __PACKET_RAY_H__ */

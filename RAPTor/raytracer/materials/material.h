@@ -1,5 +1,4 @@
-#ifndef __MATERIAL_H__
-#define __MATERIAL_H__
+#pragma once
 
 #include "common.h"
 #include "ext_colour_t.h"
@@ -344,5 +343,3 @@ inline ext_colour_t& cxy_to_rgb(const float c_x, const float c_y, const float y,
     return *rgb;
 }
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __MATERIAL_H__ */

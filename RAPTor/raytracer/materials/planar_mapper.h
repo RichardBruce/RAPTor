@@ -1,5 +1,4 @@
-#ifndef __PLANAR_MAPPER_H__
-#define __PLANAR_MAPPER_H__
+#pragma once
 
 /* Standard headers */
 
@@ -111,5 +110,3 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::planar_mapper *t
 }
 }; /* namespace serialization */
 }; /* namespace boost */
-
-#endif /* #ifndef __PLANAR_MAPPER_H__ */

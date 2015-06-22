@@ -1,5 +1,4 @@
-#ifndef __RESCALED_SCHLICK_SHADER_H__
-#define __RESCALED_SCHLICK_SHADER_H__
+#pragma once
 
 #include "common.h"
 #include "material.h"
@@ -23,5 +22,3 @@ class rescaled_schlick_shader : public material
     private :
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __RESCALED_SCHLICK_SHADER_H__ */

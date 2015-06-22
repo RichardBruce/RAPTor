@@ -1,5 +1,4 @@
-#ifndef __MEM_POOL_H__
-#define __MEM_POOL_H__
+#pragma once
 
 #include "common.h"
 #include "shape.h"
@@ -117,5 +116,3 @@ class mem_pool
         unsigned        cur;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __MEM_POOL_H__ */

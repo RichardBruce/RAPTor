@@ -1,5 +1,4 @@
-#ifndef __SIMD_H__
-#define __SIMD_H__
+#pragma once
 
 #include <cmath>
 #include <immintrin.h>
@@ -913,4 +912,3 @@ inline int min_element(const float *const d, float *const m, const int begin, co
         return min_i;
     }
 }
-#endif /* #ifndef __SIMD_H__ */

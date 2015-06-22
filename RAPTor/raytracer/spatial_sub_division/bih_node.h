@@ -1,5 +1,4 @@
-#ifndef __BIH_NODE_H__
-#define __BIH_NODE_H__
+#pragma once
 
 /* Standard headers */
 
@@ -202,5 +201,3 @@ class bih_node
         };
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __BIH_NODE_H__ */

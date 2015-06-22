@@ -2,8 +2,7 @@
 
 /* SCCSid "@(#)vect.h 1.1 2/8/96 LBL" */
 
-#ifndef __VECT_H
-#define __VECT_H
+#pragma once
 
 #include <stdio.h>
 
@@ -41,5 +40,3 @@ void vect_transform (Vector v1, Vector v2, Matrix mat);
 void mat_decode (Matrix mat, Vector scale, Vector shear, Vector rotate, Vector
 	 transl);
 float mat_inv (Matrix mat1, Matrix mat2);
-
-#endif
