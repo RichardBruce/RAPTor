@@ -39,20 +39,20 @@ void kdt_builder::build(const primitive_store *const objects, std::vector<kdt_no
 #else
     /* Build the tree, top down */
     int child_idx = 1;
-    divide_kdt_node(&base, &child_idx, 0);
+    divide_kdt_node(objects, &base, &child_idx, 0);
     assert(_depth == 0);
 #endif /* #ifdef THREADED_RAY_TRACE */
 
     return;
 }
 
-void kdt_builder::divide_kdt_node(voxel *const base, int *const child_idx, const int node_idx)
+void kdt_builder::divide_kdt_node(const primitive_store *const objects, voxel *const base, int *const child_idx, const int node_idx)
 {
     /* Check the tree is not too deep */
     ++_depth;
     
     /* Divide the node */
-    voxel right_divide(base->divide(&(*_nodes)[node_idx], &(*_nodes)[*child_idx], _depth));
+    voxel right_divide(base->divide(*objects, &(*_nodes)[node_idx], &(*_nodes)[*child_idx], _depth));
     
     /* Check if a leaf node was create */
     if ((*_nodes)[node_idx].get_normal() != axis_t::not_set)
@@ -62,8 +62,8 @@ void kdt_builder::divide_kdt_node(voxel *const base, int *const child_idx, const
         const int right_idx = *child_idx + 1;
         (*child_idx) += 2;
 
-        divide_kdt_node(base, child_idx, left_idx);
-        divide_kdt_node(&right_divide, child_idx, right_idx);
+        divide_kdt_node(objects, base, child_idx, left_idx);
+        divide_kdt_node(objects, &right_divide, child_idx, right_idx);
     }
     
     /* Decrease the depth */

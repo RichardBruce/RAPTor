@@ -379,92 +379,92 @@ BOOST_FIXTURE_TEST_CASE( fix_cr_fix_adaptive_samples_test, fix_adaptive_samples_
 /* Clip triangle test */
 BOOST_AUTO_TEST_CASE( clip_triangle_x_no_parent_bounds )
 {
-    point_t r_bl;
-    point_t r_tr;
+    point_t l_bl;
+    point_t l_tr;
     point_t bl(-MAX_DIST, -MAX_DIST, -MAX_DIST);
     point_t tr( MAX_DIST,  MAX_DIST,  MAX_DIST);
     triangle tri(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 1.0f, 0.0f));
-    clip_triangle(&tri, &bl, &tr, &r_bl, &r_tr, 0.5f, axis_t::x_axis);
+    clip_triangle(&tri, &bl, &tr, &l_bl, &l_tr, 0.5f, axis_t::x_axis);
 
-    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(tr   - point_t(0.5f, 0.5f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_bl - point_t(0.5f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_tr - point_t(1.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_bl - point_t(0.0f,   0.0f,   0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_tr - point_t(0.501f, 0.501f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.499f, 0.0f,   0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(tr   - point_t(1.0f,   1.0f,   0.0f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE( clip_triangle_y_no_parent_bounds )
 {
-    point_t r_bl;
-    point_t r_tr;
+    point_t l_bl;
+    point_t l_tr;
     point_t bl(-MAX_DIST, -MAX_DIST, -MAX_DIST);
     point_t tr( MAX_DIST,  MAX_DIST,  MAX_DIST);
     triangle tri(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 1.0f, 0.0f));
-    clip_triangle(&tri, &bl, &tr, &r_bl, &r_tr, 0.25f, axis_t::y_axis);
+    clip_triangle(&tri, &bl, &tr, &l_bl, &l_tr, 0.25f, axis_t::y_axis);
 
-    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.0f,  0.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(tr   - point_t(1.0f,  0.25f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_bl - point_t(0.25f, 0.25f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_tr - point_t(1.0f,  1.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_bl - point_t(0.0f,   0.0f,   0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_tr - point_t(1.0f,   0.251f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.249f, 0.249f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(tr   - point_t(1.0f,   1.0f,   0.0f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE( clip_triangle_z_no_parent_bounds )
 {
-    point_t r_bl;
-    point_t r_tr;
+    point_t l_bl;
+    point_t l_tr;
     point_t bl(-MAX_DIST, -MAX_DIST, -MAX_DIST);
     point_t tr( MAX_DIST,  MAX_DIST,  MAX_DIST);
     triangle tri(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 5.0f));
-    clip_triangle(&tri, &bl, &tr, &r_bl, &r_tr, 0.75f, axis_t::z_axis);
+    clip_triangle(&tri, &bl, &tr, &l_bl, &l_tr, 0.75f, axis_t::z_axis);
 
-    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.0f,  0.0f, 0.0f)))  < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(tr   - point_t(1.0f,  0.0f, 0.75f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_bl - point_t(0.15f, 0.0f, 0.75f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_tr - point_t(1.0f,  0.0f, 5.0f)))  < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_bl - point_t(0.0f,   0.0f, 0.0f)))   < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_tr - point_t(1.0f,   0.0f, 0.755f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.149f, 0.0f, 0.745f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(tr   - point_t(1.0f,   0.0f, 5.0f)))   < result_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE( clip_triangle_x )
 {
-    point_t r_bl;
-    point_t r_tr;
+    point_t l_bl;
+    point_t l_tr;
     point_t bl(0.1f, 0.2f, 0.0f);
     point_t tr(0.9f, 0.8f, 0.7f);
     triangle tri(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 1.0f, 0.0f));
-    clip_triangle(&tri, &bl, &tr, &r_bl, &r_tr, 0.5f, axis_t::x_axis);
+    clip_triangle(&tri, &bl, &tr, &l_bl, &l_tr, 0.5f, axis_t::x_axis);
 
-    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.1f, 0.2f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(tr   - point_t(0.5f, 0.5f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_bl - point_t(0.5f, 0.2f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_tr - point_t(0.9f, 0.8f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_bl - point_t(0.1f,   0.2f,   0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_tr - point_t(0.501f, 0.501f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.499f, 0.2f,   0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(tr   - point_t(0.9f,   0.8f,   0.0f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE( clip_triangle_y )
 {
-    point_t r_bl;
-    point_t r_tr;
+    point_t l_bl;
+    point_t l_tr;
     point_t bl(0.2f, 0.4f, 0.0f);
     point_t tr(0.6f, 0.7f, 0.0f);
     triangle tri(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 1.0f, 0.0f));
-    clip_triangle(&tri, &bl, &tr, &r_bl, &r_tr, 0.25f, axis_t::y_axis);
+    clip_triangle(&tri, &bl, &tr, &l_bl, &l_tr, 0.25f, axis_t::y_axis);
 
-    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.2f,  0.4f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(tr   - point_t(0.6f,  0.25f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_bl - point_t(0.25f, 0.4f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_tr - point_t(0.6f,  0.7f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_bl - point_t(0.2f,   0.4f,   0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_tr - point_t(0.6f,   0.251f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.249f, 0.4f,   0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(tr   - point_t(0.6f,   0.7f,   0.0f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE( clip_triangle_z )
 {
-    point_t r_bl;
-    point_t r_tr;
+    point_t l_bl;
+    point_t l_tr;
     point_t bl(0.2f, 0.0f, 0.4f);
     point_t tr(0.6f, 0.0f, 0.7f);
     triangle tri(nullptr, point_t(0.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 5.0f));
-    clip_triangle(&tri, &bl, &tr, &r_bl, &r_tr, 0.75f, axis_t::z_axis);
+    clip_triangle(&tri, &bl, &tr, &l_bl, &l_tr, 0.75f, axis_t::z_axis);
 
-    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.2f,  0.0f, 0.4f)))  < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(tr   - point_t(0.6f,  0.0f, 0.7f)))  < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_bl - point_t(0.2f,  0.0f, 0.75f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(r_tr - point_t(0.6f,  0.0f, 0.7f)))  < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_bl - point_t(0.2f,  0.0f, 0.4f)))   < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(l_tr - point_t(0.6f,  0.0f, 0.7f)))   < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(bl   - point_t(0.2f,  0.0f, 0.745f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(tr   - point_t(0.6f,  0.0f, 0.7f)))   < result_tolerance);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

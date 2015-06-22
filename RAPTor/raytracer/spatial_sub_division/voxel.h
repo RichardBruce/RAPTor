@@ -1,5 +1,4 @@
-#ifndef __VOXEL_H__
-#define __VOXEL_H__
+#pragma once
 
 #ifdef THREADED_RAY_TRACE
 #include "parallel_reduce.h"
@@ -57,7 +56,7 @@ class voxel
         int size() const { return _nr_prims; }
         
         /* Functions for creating the kd-tree */
-        voxel divide(kdt_node *const k, kdt_node *const children, const int depth);
+        voxel divide(const primitive_store &prims, kdt_node *const k, kdt_node *const children, const int depth);
         
     private :
         voxel operator=(const voxel &v);
@@ -85,5 +84,3 @@ class voxel
         axis_t                          _n;
 };
 }; /* namespace raptor_raytracer */
-
-#endif /* #ifndef __VOXEL_H__ */

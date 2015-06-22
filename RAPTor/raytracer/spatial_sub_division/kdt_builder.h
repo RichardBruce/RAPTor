@@ -66,7 +66,7 @@ class kdt_builder
         const point_t & scene_lower_bound() const { return _b; }
 
     private :
-        void divide_kdt_node(voxel *const base, int *const child_idx, const int node_idx);
+        void divide_kdt_node(const primitive_store *const objects, voxel *const base, int *const child_idx, const int node_idx);
   
         primitive_store *       _primitives;
         std::vector<kdt_node> * _nodes;

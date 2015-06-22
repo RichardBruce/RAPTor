@@ -11,11 +11,26 @@
 
 namespace raptor_raytracer
 {
-void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const tr, point_t *const t_bl, point_t *const t_tr, const float split, const axis_t axis)
+void clip_line(point_t *const i_l, point_t *const i_r, const point_t &a, const point_t &m, const float dist, const float norm)
+{
+    if (dist > 0.0f)
+    {
+        (*i_l) = a + (((dist / norm) + EPSILON) * m);
+        (*i_r) = a + (((dist / norm) - EPSILON) * m);
+    }
+    else
+    {
+        (*i_l) = a + (((dist / norm) - EPSILON) * m);
+        (*i_r) = a + (((dist / norm) + EPSILON) * m);
+    }
+}
+
+void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const tr, point_t *const b_bl, point_t *const b_tr, const float split, const axis_t axis)
 {
     /* Find intersection with the split */
     int i_idx = 0;
-    point_t i[2];
+    point_t i_l[2];
+    point_t i_r[2];
     float dist_a;
     float dist_b;
     float dist_c;
@@ -26,22 +41,25 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
             dist_a = split - tri->get_vertex_a().x;
             dist_b = split - tri->get_vertex_b().x;
             dist_c = split - tri->get_vertex_c().x;
-            if ((dist_a * dist_b) < 0.0f)
+            if ((dist_a * dist_b) <= 0.0f)
             {
-                const point_t ab(normalise(tri->get_vertex_a() - tri->get_vertex_b()));
-                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ab.x) * ab);
+                const point_t ab(tri->get_vertex_b() - tri->get_vertex_a());
+                clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ab, dist_a, ab.x);
+                ++i_idx;
             }
 
             if ((dist_a * dist_c) < 0.0f)
             {
-                const point_t ac(normalise(tri->get_vertex_a() - tri->get_vertex_c()));
-                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ac.x) * ac);
+                const point_t ac(tri->get_vertex_c() - tri->get_vertex_a());
+                clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ac, dist_a, ac.x);
+                ++i_idx;
             }
 
-            if ((dist_b * dist_c) < 0.0f)
+            if (((dist_b * dist_c) <= 0.0f) && (dist_b != 0.0f))
             {
-                const point_t bc(normalise(tri->get_vertex_b() - tri->get_vertex_c()));
-                i[i_idx++] = tri->get_vertex_b() + ((dist_a / bc.x) * bc);
+                const point_t bc(tri->get_vertex_c() - tri->get_vertex_b());
+                clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_b(), bc, dist_b, bc.x);
+                ++i_idx;
             }
             break;
         }
@@ -50,22 +68,25 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
             dist_a = split - tri->get_vertex_a().y;
             dist_b = split - tri->get_vertex_b().y;
             dist_c = split - tri->get_vertex_c().y;
-            if ((dist_a * dist_b) < 0.0f)
+            if ((dist_a * dist_b) <= 0.0f)
             {
-                const point_t ab(normalise(tri->get_vertex_a() - tri->get_vertex_b()));
-                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ab.y) * ab);
+                const point_t ab(tri->get_vertex_b() - tri->get_vertex_a());
+                clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ab, dist_a, ab.y);
+                ++i_idx;
             }
 
             if ((dist_a * dist_c) < 0.0f)
             {
-                const point_t ac(normalise(tri->get_vertex_a() - tri->get_vertex_c()));
-                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ac.y) * ac);
+                const point_t ac(tri->get_vertex_c() - tri->get_vertex_a());
+                clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ac, dist_a, ac.y);
+                ++i_idx;
             }
 
-            if ((dist_b * dist_c) < 0.0f)
+            if (((dist_b * dist_c) <= 0.0f) && (dist_b != 0.0f))
             {
-                const point_t bc(normalise(tri->get_vertex_b() - tri->get_vertex_c()));
-                i[i_idx++] = tri->get_vertex_b() + ((dist_a / bc.y) * bc);
+                const point_t bc(tri->get_vertex_c() - tri->get_vertex_b());
+                clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_b(), bc, dist_b, bc.y);
+                ++i_idx;
             }
             break;
         }
@@ -74,22 +95,25 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
             dist_a = split - tri->get_vertex_a().z;
             dist_b = split - tri->get_vertex_b().z;
             dist_c = split - tri->get_vertex_c().z;
-            if ((dist_a * dist_b) < 0.0f)
+            if ((dist_a * dist_b) <= 0.0f)
             {
-                const point_t ab(normalise(tri->get_vertex_a() - tri->get_vertex_b()));
-                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ab.z) * ab);
+                const point_t ab(tri->get_vertex_b() - tri->get_vertex_a());
+                clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ab, dist_a, ab.z);
+                ++i_idx;
             }
 
             if ((dist_a * dist_c) < 0.0f)
             {
-                const point_t ac(normalise(tri->get_vertex_a() - tri->get_vertex_c()));
-                i[i_idx++] = tri->get_vertex_a() + ((dist_a / ac.z) * ac);
+                const point_t ac(tri->get_vertex_c() - tri->get_vertex_a());
+                clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ac, dist_a, ac.z);
+                ++i_idx;
             }
 
-            if ((dist_b * dist_c) < 0.0f)
+            if (((dist_b * dist_c) <= 0.0f) && (dist_b != 0.0f))
             {
-                const point_t bc(normalise(tri->get_vertex_b() - tri->get_vertex_c()));
-                i[i_idx++] = tri->get_vertex_b() + ((dist_a / bc.z) * bc);
+                const point_t bc(tri->get_vertex_c() - tri->get_vertex_b());
+                clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_b(), bc, dist_b, bc.z);
+                ++i_idx;
             }
             break;
         }
@@ -97,13 +121,16 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
             assert(false);
             break;
     }
+    assert(i_idx != 0);
+    assert(i_idx != 1);
+    assert(i_idx < 3);
 
     /* Clasify points to the left or right of the split */
     point_t l[2];
     point_t r[2];
     int l_idx = 0;
     int r_idx = 0;
-    if (dist_a > 0.0f)
+    if (dist_a >= 0.0f)
     {
         l[l_idx++] = tri->get_vertex_a();
     }
@@ -112,7 +139,7 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
         r[r_idx++] = tri->get_vertex_a();
     }
 
-    if (dist_b > 0.0f)
+    if (dist_b >= 0.0f)
     {
         l[l_idx++] = tri->get_vertex_b();
     }
@@ -121,7 +148,7 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
         r[r_idx++] = tri->get_vertex_b();
     }
 
-    if (dist_c > 0.0f)
+    if (dist_c >= 0.0f)
     {
         l[l_idx++] = tri->get_vertex_c();
     }
@@ -131,16 +158,19 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
     }
     assert(l_idx < 3);
     assert(r_idx < 3);
+    assert((l_idx == 2) || (r_idx == 2));
 
     /* Find bound of intersection and points on one side */
-    const point_t i_tr(max(i[0], i[1]));
-    const point_t i_bl(min(i[0], i[1]));
+    const point_t i_tr_l(max(i_l[0], i_l[1]));
+    const point_t i_bl_l(min(i_l[0], i_l[1]));
+    const point_t i_tr_r(max(i_r[0], i_r[1]));
+    const point_t i_bl_r(min(i_r[0], i_r[1]));
 
-    point_t l_tr(max(i_tr, l[0]));
-    point_t l_bl(min(i_bl, l[0]));
+    point_t l_tr(max(i_tr_l, l[0]));
+    point_t l_bl(min(i_bl_l, l[0]));
 
-    point_t r_tr(max(i_tr, r[0]));
-    point_t r_bl(min(i_bl, r[0]));
+    point_t r_tr(max(i_tr_r, r[0]));
+    point_t r_bl(min(i_bl_r, r[0]));
     if (l_idx == 2)
     {
         l_tr = max(l_tr, l[1]);
@@ -153,10 +183,10 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
     }
 
     /* Find intersect with bounding boxes */
-    (*t_bl) = max(*bl, r_bl);
-    (*t_tr) = min(*tr, r_tr);
-    (*bl)   = max(*bl, l_bl);
-    (*tr)   = min(*tr, l_tr);
+    (*b_bl) = max(*bl, l_bl);
+    (*b_tr) = min(*tr, l_tr);
+    (*bl)   = max(*bl, r_bl);
+    (*tr)   = min(*tr, r_tr);
 }
 
 float approximate_sah_minima(const float cl0, const float cl1, const float cr0, const float cr1, const float x0, const float d, const float xw, const float yw, const float zw)
@@ -195,7 +225,6 @@ float find_sah_minima(const CostFn &cost_fn, float *const lc, const float *const
 
             /* Cost at minima */
             const float cost = cost_fn(xm, cla[j], cra[j], last_cl, last_cr, sp, adaptive_width[i]);
-            // BOOST_LOG_TRIVIAL(trace) << "sp: " << sp << ", cla: " << cla[j] << ", cra: " << cra[j] << ", split " << xm << ", cost: " << cost;
             if (cost < lowest_cost)
             {
                 lowest_cost = cost;
@@ -214,7 +243,6 @@ float find_sah_minima(const CostFn &cost_fn, float *const lc, const float *const
       
         /* Cost at minima */
         const float cost = cost_fn(xm, cl[i], cr[i], last_cl, last_cr, sp, adaptive_width[i]);
-        // BOOST_LOG_TRIVIAL(trace) << "sp: " << sp << ", cl: " << cl[i] << ", cr: " << cr[i] << ", split: " << xm << ", cost: " << cost;
         if (cost < lowest_cost)
         {
             lowest_cost = cost;
@@ -273,7 +301,7 @@ void fix_adaptive_samples(float *const nr_samples, float *const widths, float *c
 }
 
 
-voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth)
+voxel voxel::divide(const primitive_store &prims, kdt_node *const k, kdt_node *const children, const int depth)
 {
     /* If we hit the depth limit we're done */
     assert(depth < MAX_KDT_STACK_HEIGHT);
@@ -372,7 +400,6 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
         k->set_primitives(leaf_prims);
         return *this;
     }
-    // BOOST_LOG_TRIVIAL(trace) << "Lowest cost: " << lowest_cost << ", cost before: " << cost_before;
     
     /* Adjust the size of the voxel */
     point_t upper_limit = _t;
@@ -382,7 +409,6 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
     {
         case axis_t::x_axis:
             /* Assert the the voxel is really split */
-            // BOOST_LOG_TRIVIAL(trace) << std::setprecision(10) << "Splitting: " << _b.x << " - " << best_split << " - " << _t.x << std::setprecision(6);
             assert(best_split > _b.x);
             assert(best_split < _t.x);
             lower_limit.x   = best_split;
@@ -390,7 +416,6 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
             nxt_n           = axis_t::y_axis;
             break;
         case axis_t::y_axis:
-            // BOOST_LOG_TRIVIAL(trace) << std::setprecision(10) << "Splitting: " << _b.y << " - " << best_split << " - " << _t.y << std::setprecision(6);
             assert(best_split > _b.y);
             assert(best_split < _t.y);
             lower_limit.y   = best_split;
@@ -398,7 +423,6 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
             nxt_n           = axis_t::z_axis;
             break;
         case axis_t::z_axis:
-            // BOOST_LOG_TRIVIAL(trace) << std::setprecision(10) << "Splitting: " << _b.z << " - " << best_split << " - " << _t.z << std::setprecision(6);
             assert(best_split > _b.z);
             assert(best_split < _t.z);
             lower_limit.z   = best_split;
@@ -427,81 +451,57 @@ voxel voxel::divide(kdt_node *const k, kdt_node *const children, const int depth
         case axis_t::x_axis:
             for (voxel_aab_data *i = &(*_ping)[_ping_idx]; i < &(*_ping)[(_ping_idx + _nr_prims)]; ++i)
             {
-#if 0   /* Set to enable clip of split plane to nearest primitive */
-                if (abs((*i)->highest_x() - best_split) < dist_to_clip)
-                {
-                    dist_to_clip = abs((*i)->highest_x() - best_split);
-                    nearest_clip = (*i)->highest_x();
-                }
-                
-                if (abs((*i)->lowest_x() - best_split) < dist_to_clip)
-                {
-                    dist_to_clip = abs((*i)->lowest_x() - best_split);
-                    nearest_clip = (*i)->lowest_x();
-                }
-#endif
-                if (i->low.x <= best_split)
+                if (i->high.x <= best_split)
                 {
                     (*_pong)[left_idx++]  = *i;
                 }
-
-                if (i->high.x >= best_split)
+                else if (i->low.x >= best_split)
                 {
                     (*_ping)[right_idx++] = *i;
+                }
+                else
+                {
+                    clip_triangle(prims.primitive(i->prim), &i->low, &i->high, &(*_pong)[left_idx].low, &(*_pong)[left_idx].high, best_split, axis_t::x_axis);
+                    (*_pong)[left_idx++].prim   = i->prim;
+                    (*_ping)[right_idx++]       = *i;
                 }
             }
             break;
         case axis_t::y_axis:
             for (voxel_aab_data *i = &(*_ping)[_ping_idx]; i < &(*_ping)[(_ping_idx + _nr_prims)]; ++i)
             {
-#if 0  /* Set to enable clip of split plane to nearest primitive */
-                if (abs((*i)->highest_y() - best_split) < dist_to_clip)
-                {
-                    dist_to_clip = abs((*i)->highest_y() - best_split);
-                    nearest_clip = (*i)->highest_y();
-                }
-                
-                if (abs((*i)->lowest_y() - best_split) < dist_to_clip)
-                {
-                    dist_to_clip = abs((*i)->lowest_y() - best_split);
-                    nearest_clip = (*i)->lowest_y();
-                }
-#endif
-                if (i->low.y <= best_split)
+                if (i->high.y <= best_split)
                 {
                     (*_pong)[left_idx++]  = *i;
                 }
-
-                if (i->high.y >= best_split)
+                else if (i->low.y >= best_split)
                 {
                     (*_ping)[right_idx++] = *i;
+                }
+                else
+                {
+                    clip_triangle(prims.primitive(i->prim), &i->low, &i->high, &(*_pong)[left_idx].low, &(*_pong)[left_idx].high, best_split, axis_t::y_axis);
+                    (*_pong)[left_idx++].prim   = i->prim;
+                    (*_ping)[right_idx++]       = *i;
                 }
             }
             break;
         case axis_t::z_axis:
             for (voxel_aab_data *i = &(*_ping)[_ping_idx]; i < &(*_ping)[(_ping_idx + _nr_prims)]; ++i)
             {
-#if 0  /* Set to enable clip of split plane to nearest primitive */
-                if (abs((*i)->highest_z() - best_split) < dist_to_clip)
-                {
-                    dist_to_clip = abs((*i)->highest_z() - best_split);
-                    nearest_clip = (*i)->highest_z();
-                }
-                
-                if (abs((*i)->lowest_z() - best_split) < dist_to_clip)
-                {
-                    dist_to_clip = abs((*i)->lowest_z() - best_split);
-                    nearest_clip = (*i)->lowest_z();
-                }
-#endif
-                if (i->low.z <= best_split)
+                if (i->high.z <= best_split)
                 {
                     (*_pong)[left_idx++]  = *i;
                 }
-
-                if (i->high.z >= best_split)
+                else if (i->low.z >= best_split)
                 {
                     (*_ping)[right_idx++] = *i;
+                }
+                else
+                {
+                    clip_triangle(prims.primitive(i->prim), &i->low, &i->high, &(*_pong)[left_idx].low, &(*_pong)[left_idx].high, best_split, axis_t::z_axis);
+                    (*_pong)[left_idx++].prim   = i->prim;
+                    (*_ping)[right_idx++]       = *i;
                 }
             }
             break;
@@ -536,8 +536,6 @@ float voxel::approximate_split_one_axis(float *const s, const axis_t normal) con
     const float xw_yw   = xw * yw;
     const float xw_zw   = xw * zw;
     const float yw_zw   = yw * zw;
-    // BOOST_LOG_TRIVIAL(trace) << "Widths: " << xw << ", " << yw << ", " << zw;
-    // BOOST_LOG_TRIVIAL(trace) << "Bottoms: " << _b;
     
     /* Sampling variable */
     float cl[9];
@@ -552,7 +550,6 @@ float voxel::approximate_split_one_axis(float *const s, const axis_t normal) con
     {
         case axis_t::x_axis :
         {
-            // BOOST_LOG_TRIVIAL(trace) << "Splitting x"; 
             /* Pick fixed points to evaluate */
             const float dw = xw * (1.0f / 9.0f);
 
@@ -586,7 +583,6 @@ float voxel::approximate_split_one_axis(float *const s, const axis_t normal) con
         }            
         case axis_t::y_axis :
         {
-            // BOOST_LOG_TRIVIAL(trace) << "Splitting y";
             /* Pick fixed points to evaluate */
             const float dw = yw * (1.0f / 9.0f);
             
@@ -620,7 +616,6 @@ float voxel::approximate_split_one_axis(float *const s, const axis_t normal) con
         }
         case axis_t::z_axis :
         {
-            // BOOST_LOG_TRIVIAL(trace) << "Splitting z"
             /* Pick fixed points to evaluate */
             const float dw = zw * (1.0f / 9.0f);
             
