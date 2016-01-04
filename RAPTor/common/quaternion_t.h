@@ -1,5 +1,4 @@
-#ifndef __QUATERNION_T_H__
-#define __QUATERNION_T_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/serialization/access.hpp"
@@ -122,6 +121,24 @@ class quaternion_t
             return *this;
         }
 
+        quaternion_t& operator*=(const float &rhs)
+        {
+            w *= rhs;
+            x *= rhs;
+            y *= rhs;
+            z *= rhs;
+            return *this;
+        }
+
+        quaternion_t& operator/=(const float &rhs)
+        {
+            w /= rhs;
+            x /= rhs;
+            y /= rhs;
+            z /= rhs;
+            return *this;
+        }
+
         bool operator==(const quaternion_t &rhs) const
         {
             return (w == rhs.w) && (x == rhs.x) && (y == rhs.y) && (z == rhs.z);
@@ -133,6 +150,18 @@ class quaternion_t
             x = -x;
             y = -y;
             z = -z;
+            return *this;
+        }
+
+        quaternion_t& inverse()
+        {
+            conjugate();
+
+            const float d_sq = (w * w) + (x * x) + (y * y) + (z * z);
+            w /= d_sq;
+            x /= d_sq;
+            y /= d_sq;
+            z /= d_sq;
             return *this;
         }
 
@@ -176,6 +205,11 @@ class quaternion_t
             return *this;
         }
 
+        point_t point() const
+        {
+            return point_t(x, y, z);
+        }
+
         /* Data members */
         float w;
         float x;
@@ -216,6 +250,11 @@ inline const quaternion_t operator-(const quaternion_t &lhs, const float rhs)
 inline const quaternion_t operator*(const quaternion_t &lhs, const float rhs)
 {
    return quaternion_t(lhs.w * rhs, lhs.x * rhs, lhs.y * rhs, lhs.z * rhs);
+}
+
+inline const quaternion_t operator/(const quaternion_t &lhs, const float rhs)
+{
+   return quaternion_t(lhs.w / rhs, lhs.x / rhs, lhs.y / rhs, lhs.z / rhs);
 }
 
 inline const quaternion_t operator+(const quaternion_t &lhs, const quaternion_t &rhs)
@@ -291,5 +330,3 @@ inline point_t cross_product(const point_t &a, const quaternion_t &b)
 {
     return point_t((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
 }
-
-#endif /* #ifndef __QUATERNION_T_H__ */
