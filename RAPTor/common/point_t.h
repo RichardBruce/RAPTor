@@ -470,7 +470,7 @@ inline float dot_product(const point_t &a, const point_t &b)
 inline void normalise(point_t *const a)
 {
 #ifdef EXACT_NORMALISE
-    const float dist = sqrt((a->x * a->x) + (a->y * a->y) + (a->z * a->z));
+    const float dist = std::sqrt((a->x * a->x) + (a->y * a->y) + (a->z * a->z));
     a->x /= dist;
     a->y /= dist;
     a->z /= dist;
@@ -488,7 +488,7 @@ inline void normalise(point_t *const a)
 inline point_t normalise(point_t a)
 {
 #ifdef EXACT_NORMALISE
-    const float dist = sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
+    const float dist = std::sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
     a.x /= dist;
     a.y /= dist;
     a.z /= dist;
