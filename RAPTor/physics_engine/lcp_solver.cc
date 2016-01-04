@@ -7,7 +7,7 @@ namespace raptor_physics
 {              
 lcp_solver squared_distance_solver(const matrix_3d &p0, const matrix_3d &p1, const std::vector<int> &e0, const std::vector<int> &e1)
 {
-    METHOD_LOG;
+    // METHOD_LOG;
 
     /* Calculate dimenstion and build the solver */
     const int total_pts = (e0.size() + e1.size()) / 3;
@@ -78,16 +78,16 @@ lcp_solver squared_distance_solver(const matrix_3d &p0, const matrix_3d &p1, con
         m[(5 * m_dim) + i] = -m[(i * m_dim) +  5];
     }
 
-    BOOST_LOG_TRIVIAL(trace) << "lcp_solver input matrices: ";
+    // BOOST_LOG_TRIVIAL(trace) << "lcp_solver input matrices: ";
     for (int i = 0; i < m_dim; ++i)
     {
         std::stringstream post;
         post << std::setw(4) << std::setprecision(2) << q[i];
-        BOOST_LOG_TRIVIAL(trace) << array_to_stream(&m[i], [](std::stringstream *s, const float m)
-            {
-                (*s) << std::setw(4) << std::setprecision(2) << m << "\t";
-                return s;
-            }, m_size, m_dim, post.str());
+        // BOOST_LOG_TRIVIAL(trace) << array_to_stream(&m[i], [](std::stringstream *s, const float m)
+            // {
+            //     (*s) << std::setw(4) << std::setprecision(2) << m << "\t";
+            //     return s;
+            // }, m_size, m_dim, post.str());
     }
 
     return sol;

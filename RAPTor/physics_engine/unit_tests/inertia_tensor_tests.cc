@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE( multiply_divide_test )
 /* Test ctor for shapes with unknown tensors */
 BOOST_AUTO_TEST_CASE( infinite_mass_test )
 {
-    matrix_3d p(std::vector<point_t>(
+    std::vector<point_t> p(
         {
             point_t(-1.0, -1.0, -1.0), 
             point_t( 1.0, -1.0, -1.0),
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE( infinite_mass_test )
             point_t( 1.0, -1.0,  1.0),
             point_t( 1.0,  1.0,  1.0),
             point_t(-1.0,  1.0,  1.0)
-        }));
+        });
 
     std::vector<int> e(
         {
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE( infinite_mass_test )
 
 BOOST_AUTO_TEST_CASE( zero_mass_test )
 {
-    matrix_3d p(std::vector<point_t>(
+    std::vector<point_t> p(
         {
             point_t(-1.0, -1.0, -1.0), 
             point_t( 1.0, -1.0, -1.0),
@@ -291,7 +291,7 @@ BOOST_AUTO_TEST_CASE( zero_mass_test )
             point_t( 1.0, -1.0,  1.0),
             point_t( 1.0,  1.0,  1.0),
             point_t(-1.0,  1.0,  1.0)
-        }));
+        });
 
     std::vector<int> e(
         {
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE( zero_mass_test )
 
 BOOST_AUTO_TEST_CASE( origin_cube_test )
 {
-    matrix_3d p(std::vector<point_t>(
+    std::vector<point_t> p(
         {
             point_t(-1.0, -1.0, -1.0), 
             point_t( 1.0, -1.0, -1.0),
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE( origin_cube_test )
             point_t( 1.0, -1.0,  1.0),
             point_t( 1.0,  1.0,  1.0),
             point_t(-1.0,  1.0,  1.0)
-        }));
+        });
 
     std::vector<int> e(
         {
@@ -369,7 +369,7 @@ BOOST_AUTO_TEST_CASE( origin_cube_test )
 
 BOOST_AUTO_TEST_CASE( cube_test )
 {
-    matrix_3d p(std::vector<point_t>(
+    std::vector<point_t> p(
         {
             point_t(3.0, 2.0, 4.0), 
             point_t(6.0, 2.0, 4.0),
@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_CASE( cube_test )
             point_t(6.0, 2.0, 7.0),
             point_t(6.0, 5.0, 7.0),
             point_t(3.0, 5.0, 7.0)
-        }));
+        });
 
     std::vector<int> e(
         {
@@ -416,7 +416,7 @@ BOOST_AUTO_TEST_CASE( cube_test )
 
 BOOST_AUTO_TEST_CASE( cuboid_test )
 {
-    matrix_3d p(std::vector<point_t>(
+    std::vector<point_t> p(
         {
             point_t(3.0, 1.0, 3.0), 
             point_t(6.0, 1.0, 3.0),
@@ -426,7 +426,7 @@ BOOST_AUTO_TEST_CASE( cuboid_test )
             point_t(6.0, 1.0, 8.0),
             point_t(6.0, 5.0, 8.0),
             point_t(3.0, 5.0, 8.0)
-        }));
+        });
 
     std::vector<int> e(
         {
@@ -461,7 +461,7 @@ BOOST_AUTO_TEST_CASE( cuboid_test )
 
 BOOST_AUTO_TEST_CASE( cuboid_with_density_test )
 {
-    matrix_3d p(std::vector<point_t>(
+    std::vector<point_t> p(
         {
             point_t(3.0, 1.0, 3.0), 
             point_t(6.0, 1.0, 3.0),
@@ -471,7 +471,7 @@ BOOST_AUTO_TEST_CASE( cuboid_with_density_test )
             point_t(6.0, 1.0, 8.0),
             point_t(6.0, 5.0, 8.0),
             point_t(3.0, 5.0, 8.0)
-        }));
+        });
 
     std::vector<int> e(
         {
@@ -507,7 +507,7 @@ BOOST_AUTO_TEST_CASE( cuboid_with_density_test )
 
 BOOST_AUTO_TEST_CASE( unaligned_cuboid_with_density_test )
 {
-    matrix_3d p(std::vector<point_t>(
+    std::vector<point_t> p(
         {
             point_t(1.67678,  2.32322,  3.48223),
             point_t(4.23744,  2.76256,  1.98223),
@@ -517,7 +517,7 @@ BOOST_AUTO_TEST_CASE( unaligned_cuboid_with_density_test )
             point_t(6.73744,  0.262563, 5.51777),
             point_t(7.32322,  3.67678,  7.51777),
             point_t(4.76256,  3.23744,  9.01777)
-        }));
+        });
 
     std::vector<int> e(
         {
@@ -553,7 +553,7 @@ BOOST_AUTO_TEST_CASE( unaligned_cuboid_with_density_test )
 
 BOOST_AUTO_TEST_CASE( products_of_inertia_test )
 {
-    matrix_3d p(std::vector<point_t>(
+    std::vector<point_t> p(
         {
             /* Cube about the origin */
             point_t(-2.0, -2.0, -2.0), 
@@ -574,7 +574,7 @@ BOOST_AUTO_TEST_CASE( products_of_inertia_test )
             point_t( 2.0,  1.0,  4.0),
             point_t( 2.0,  2.0,  4.0),
             point_t( 0.0,  2.0,  4.0)
-        }));
+        });
 
     std::vector<int> e(
         {
@@ -619,7 +619,7 @@ BOOST_AUTO_TEST_CASE( products_of_inertia_test )
 /* Test rotated tensor */
 BOOST_AUTO_TEST_CASE( rotated_cube_test )
 {
-    matrix_3d p(std::vector<point_t>(
+    std::vector<point_t> p(
         {
             point_t(3.0, 2.0, 4.0), 
             point_t(6.0, 2.0, 4.0),
@@ -629,7 +629,7 @@ BOOST_AUTO_TEST_CASE( rotated_cube_test )
             point_t(6.0, 2.0, 7.0),
             point_t(6.0, 5.0, 7.0),
             point_t(3.0, 5.0, 7.0)
-        }));
+        });
 
     std::vector<int> e(
         {
@@ -723,7 +723,7 @@ BOOST_AUTO_TEST_CASE( rotated_cube_test )
 
 BOOST_AUTO_TEST_CASE( rotated_cuboid_with_density_test )
 {
-    matrix_3d p(std::vector<point_t>(
+    std::vector<point_t> p(
         {
             point_t(3.0, 1.0, 3.0),
             point_t(6.0, 1.0, 3.0),
@@ -733,7 +733,7 @@ BOOST_AUTO_TEST_CASE( rotated_cuboid_with_density_test )
             point_t(6.0, 1.0, 8.0),
             point_t(6.0, 5.0, 8.0),
             point_t(3.0, 5.0, 8.0) 
-        }));
+        });
 
     std::vector<int> e(
         {

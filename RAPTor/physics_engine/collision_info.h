@@ -14,11 +14,12 @@
 namespace raptor_physics
 {
 /* Class to hold information about a collision */
+template<class S = simplex>
 class collision_info
 {
     public :
         /* CTOR */
-        collision_info(simplex *s, const simplex &other_s, const float t, const collision_t type)
+        collision_info(S *s, const S &other_s, const float t, const collision_t type)
             : _s(s), 
               _other_s(&other_s),
               _t(t), 
@@ -27,7 +28,7 @@ class collision_info
               _repeat(0) {  };
 
         /* Update to the latest collision test */
-        collision_info& update(simplex *s, const simplex &other_s, const float t, const collision_t type) 
+        collision_info& update(S *s, const S &other_s, const float t, const collision_t type) 
         {
             _s.reset(s);
             _other_s = &other_s;
@@ -45,7 +46,7 @@ class collision_info
         }
 
         /* Update after a successful retest */
-        collision_info& successful_retest_update(simplex *s, const simplex &other_s) 
+        collision_info& successful_retest_update(S *s, const S &other_s) 
         {
             _s.reset(s);
             _other_s = &other_s;
@@ -57,7 +58,7 @@ class collision_info
         collision_info& void_collision()
         {
             _t = std::numeric_limits<float>::max();
-            _type = collision_t::NO_COLLISION;
+            // _type = collision_t::NO_COLLISION;
             return *this;
         }
 
@@ -86,16 +87,16 @@ class collision_info
 
 
         /* Access functions */
-        const std::unique_ptr<simplex>& get_simplex() const { return _s;    }
-        float                           get_time()    const { return _t;    }
-        collision_t                     get_type()    const { return _type; }
+        const std::unique_ptr<S>&   get_simplex() const { return _s;    }
+        float                       get_time()    const { return _t;    }
+        collision_t                 get_type()    const { return _type; }
         
     private :
-        std::unique_ptr<simplex>    _s;         /* The final simplex for this side of collision detection               */
-        const simplex *             _other_s;   /* The final simplex for the other side of collision detection          */
-        float                       _t;         /* The time of the collision                                            */
-        float                       _last_t;    /* The last time seen, not cleared by voiding                           */
-        collision_t                 _type;      /* The type of collision                                                */
-        int                         _repeat;    /* The number of times this pair has collided without time advancing    */
+        std::unique_ptr<S>  _s;         /* The final simplex for this side of collision detection               */
+        const S *           _other_s;   /* The final simplex for the other side of collision detection          */
+        float               _t;         /* The time of the collision                                            */
+        float               _last_t;    /* The last time seen, not cleared by voiding                           */
+        collision_t         _type;      /* The type of collision                                                */
+        int                 _repeat;    /* The number of times this pair has collided without time advancing    */
 };
 }; /* namespace raptor_physics */

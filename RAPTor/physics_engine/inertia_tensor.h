@@ -1,12 +1,15 @@
 #pragma once
 
 
+/* Standard headers */
+#include <vector>
+
 /* Common headers */
 #include "logging.h"
+#include "quaternion_t.h"
 
 /* Physics headers */
 #include "physics_common.h"
-#include "matrix_3d.h"
 
 
 namespace raptor_physics
@@ -51,27 +54,26 @@ class inertia_tensor
 {
     public :
         /* CTOR for objects with known inertia tensors. Takes ownership of it */
-        inertia_tensor(float *const it, const point_t &com, const float m)
-            : _it(it), _inv_it(new float [6]), _com(com), _m(m)
+        inertia_tensor(float *const it, const point_t &com, const float m) : _it(it), _inv_it(new float [6]), _com(com), _m(m)
+        {
+            METHOD_LOG;
+            if (m == std::numeric_limits<float>::infinity())
             {
-                METHOD_LOG;
-                if (m == std::numeric_limits<float>::infinity())
-                {
-                    _inv_it[0] = 0.0f;
-                    _inv_it[1] = 0.0f;
-                    _inv_it[2] = 0.0f;
-                    _inv_it[3] = 0.0f;
-                    _inv_it[4] = 0.0f;
-                    _inv_it[5] = 0.0f;
-                }
-                else
-                {
-                    invert_inertia_tensor(_inv_it, _it);
-                }
-            };
+                _inv_it[0] = 0.0f;
+                _inv_it[1] = 0.0f;
+                _inv_it[2] = 0.0f;
+                _inv_it[3] = 0.0f;
+                _inv_it[4] = 0.0f;
+                _inv_it[5] = 0.0f;
+            }
+            else
+            {
+                invert_inertia_tensor(_inv_it, _it);
+            }
+        };
 
         /* CTOR for objects of arbitary shape with no known inertia tensor */
-        inertia_tensor(const matrix_3d &p, const std::vector<int> &e, const float r = 1.0f)
+        inertia_tensor(const std::vector<point_t> &p, const std::vector<int> &e, const float r = 1.0f)
             : _it(new float [6]), _inv_it(new float [6])
         {
             METHOD_LOG;
@@ -84,10 +86,10 @@ class inertia_tensor
                 _m = std::numeric_limits<float>::infinity();
                 BOOST_LOG_TRIVIAL(trace) << "Mass: " << _m;
 
-                _com = p.get_row(0);
-                for (int i = 1; i < p.size(); ++i)
+                _com = p[0];
+                for (int i = 1; i < static_cast<int>(p.size()); ++i)
                 {
-                    _com += p.get_row(i);
+                    _com += p[i];
                 }
                 _com /= p.size();
                 BOOST_LOG_TRIVIAL(trace) << "Center of Mass: " << _com;
@@ -127,9 +129,9 @@ class inertia_tensor
             float integral[10] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
             for (int i = 0; i < static_cast<int>(e.size()); i += 3)
             {
-                const point_t &v0 = p.get_row(e[i    ]);
-                const point_t &v1 = p.get_row(e[i + 1]);
-                const point_t &v2 = p.get_row(e[i + 2]);
+                const point_t &v0 = p[e[i    ]];
+                const point_t &v1 = p[e[i + 1]];
+                const point_t &v2 = p[e[i + 2]];
 
                 surface_integral_subexpressions(&g0.x, &g1.x, &g2.x, &f1.x, &f2.x, &f3.x, v0.x, v1.x, v2.x);   
                 surface_integral_subexpressions(&g0.y, &g1.y, &g2.y, &f1.y, &f2.y, &f3.y, v0.y, v1.y, v2.y);   

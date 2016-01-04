@@ -7,7 +7,6 @@
 #include "logging.h"
 #include "physics_common.h"
 #include "point_t.h"
-#include "matrix_3d.h"
 
 
 namespace raptor_physics
@@ -29,7 +28,7 @@ point_t project_vector(const point_t &v, const point_t &n)
 
 
 /* Find the most extreme vertex in direction d */
-int find_support_vertex(const matrix_3d &m, const point_t &d)
+int find_support_vertex(const std::vector<point_t> &m, const point_t &d)
 {
     float dummy;
     return find_support_vertex(m, d, &dummy);
@@ -37,14 +36,14 @@ int find_support_vertex(const matrix_3d &m, const point_t &d)
 
 
 /* Find the most extreme vertex in direction d and its projection */
-int find_support_vertex(const matrix_3d &m, const point_t &d, float *const val)
+int find_support_vertex(const std::vector<point_t> &m, const point_t &d, float *const val)
 {
     /* Search all vertices for the most extreme in the direction d */
     int max_support_vertex = 0;
-    (*val) = dot_product(m.get_row(0), d);
-    for (int i = 1; i < m.size(); i++)
+    (*val) = dot_product(m[0], d);
+    for (int i = 1; i < static_cast<int>(m.size()); i++)
     {
-        const float v = dot_product(m.get_row(i), d);
+        const float v = dot_product(m[i], d);
         if (v > (*val))
         {
             (*val) = v;
@@ -56,7 +55,7 @@ int find_support_vertex(const matrix_3d &m, const point_t &d, float *const val)
 }
 
 
-int find_support_vertex(const matrix_3d &m, const point_t &w, const point_t &c, const point_t &p, const point_t &n, float *const val)
+int find_support_vertex(const std::vector<point_t> &m, const point_t &w, const point_t &c, const point_t &p, const point_t &n, float *const val)
 {
     /* Check there is rotation */
     const float magn_w = magnitude(w);
@@ -67,15 +66,16 @@ int find_support_vertex(const matrix_3d &m, const point_t &w, const point_t &c, 
     }
 
     /* Loop constants */
-    const float proj_w =  magnitude((cross_product(w, n)));
-    const point_t norm_w(w / magn_w);
+    // const point_t n_cross_w(cross_product(n, w));
 
     /* Search all vertices for the most extreme in the direction d */
     int max_support_vertex = 0;
-    (*val) = (proj_w * magnitude(cross_product(m.get_row(0), norm_w))) - dot_product((c + m.get_row(0)) - p, n);
-    for (int i = 1; i < m.size(); ++i)
+    (*val) = magnitude(cross_product(w, m[0]));
+    // (*val) = (magnitude(cross_product(m[0], w_cross_n))) - dot_product((c + m[0]) - p, n);
+    for (int i = 1; i < static_cast<int>(m.size()); ++i)
     {
-        const float v = (proj_w * magnitude(cross_product(m.get_row(i), norm_w))) - dot_product((c + m.get_row(i)) - p, n);
+        const float v = magnitude(cross_product(w, m[i]));
+        // const float v = (magnitude(cross_product(m[i], w_cross_n))) - dot_product((c + m[i]) - p, n);
         if (v > (*val))
         {
             (*val) = v;
@@ -85,146 +85,6 @@ int find_support_vertex(const matrix_3d &m, const point_t &w, const point_t &c, 
     
     return max_support_vertex;
 }
-
-
-/* Check if a point is "inside" an edge */
-float is_inside_edge(const point_t &c, const point_t &t, const point_t &n)
-{
-    const point_t to_clip(c - t);
-    return dot_product(n, to_clip);
-}
-
-
-/* Check if 2 points are the same */
-bool is_coincident(const point_t &a, const point_t &b)
-{
-    const point_t edge(a - b);
-    return dot_product(edge, edge) < raptor_physics::EPSILON;
-}
-
-
-/* Find the union of two polygons */
-void clip_polygon(std::vector<point_t> *const clip, const std::vector<point_t> &to, const point_t &n)
-{
-    METHOD_LOG;
-
-    BOOST_LOG_TRIVIAL(trace) << "Clipping: ";
-    BOOST_LOG_TRIVIAL(trace) << array_to_stream(clip->begin(), clip->end(), [](std::stringstream *ss, const point_t &p)
-    {
-        (*ss) << "( " << p << " ) ";
-        return ss;
-    });
-    BOOST_LOG_TRIVIAL(trace) << "Clipping to: ";
-    BOOST_LOG_TRIVIAL(trace) << array_to_stream(to.begin(), to.end(), [](std::stringstream *ss, const point_t &p)
-    {
-        (*ss) << "( " << p << " ) ";
-        return ss;
-    });
-
-    typedef std::list<point_t>::iterator            iter;
-    typedef std::vector<point_t>::const_iterator    citer;
-
-    /* Resize to act as ping pong buffer */
-    int ping_size = clip->size();
-    const int buf_size = clip->size() + to.size();
-    clip->resize(buf_size << 1);
-    point_t *clip_ping = &(*clip)[0];
-    point_t *clip_pong = &(*clip)[buf_size];
-    BOOST_LOG_TRIVIAL(trace) << "Set up ping pong buffer of size: " << buf_size;
-
-    /* For each edge of the the polygon being clipped to */
-    citer prev_i = --to.cend();
-    for (citer i = to.cbegin(); i != to.cend(); ++i)
-    {
-        /* Build the plane normal, points inwards for a clockwise polygon */
-        BOOST_LOG_TRIVIAL(trace) << "Testing edge: " << (*prev_i) << " to: " << (*i);
-        const point_t edge((*i) - (*prev_i));
-        const point_t norm(cross_product(edge, n));
-
-        int pong_size = 0;
-        point_t prev_clip(clip_ping[ping_size - 1]);
-        bool prev_inside = (is_inside_edge(prev_clip, *i, norm) > 0.0f);
-        for (int j = 0; j < ping_size; ++j)
-        {
-            const point_t cur_clip(clip_ping[j]);
-            BOOST_LOG_TRIVIAL(trace) << "Testing point: " << cur_clip;
-
-            const float num     = is_inside_edge(cur_clip, *i, norm);
-            const bool inside   = num > 0.0f;
-            if (prev_inside & inside)
-            {
-                clip_pong[pong_size++] = cur_clip;
-                BOOST_LOG_TRIVIAL(trace) << "Remaing inside clip: " << clip_pong[pong_size - 1] << " at: " << (pong_size - 1);
-            }
-            else if ((!prev_inside) & inside)
-            {
-                const point_t clip_edge(cur_clip - prev_clip);
-                const point_t intersect(cur_clip - (clip_edge * (num / dot_product(norm, clip_edge))));
-                clip_pong[pong_size++] = intersect;
-                BOOST_LOG_TRIVIAL(trace) << "Outside moving in, adding: " << clip_pong[pong_size - 1] << " at: " << (pong_size - 1);
-             
-                clip_pong[pong_size++] = cur_clip;
-                BOOST_LOG_TRIVIAL(trace) << "Outside moving in, adding: " << clip_pong[pong_size - 1] << " at: " << (pong_size - 1);
-            }
-            else if (prev_inside & !inside)
-            {
-                const point_t clip_edge(cur_clip - prev_clip);
-                const point_t intersect(cur_clip - (clip_edge * (num / dot_product(norm, clip_edge))));
-                clip_pong[pong_size++] = intersect;
-                BOOST_LOG_TRIVIAL(trace) << "Inside moving out: " << clip_pong[pong_size - 1] << " at: " << (pong_size - 1);
-            }
-        
-            prev_clip = cur_clip;
-            prev_inside = inside;
-        }
-
-        /* Log the new polygon */
-        BOOST_LOG_TRIVIAL(trace) << "New clipped polygon: ";
-        BOOST_LOG_TRIVIAL(trace) << array_to_stream(clip_pong, clip_pong + pong_size, [](std::stringstream *ss, const point_t &p)
-        {
-            (*ss) << "( " << p << " ) ";
-            return ss;
-        });
-
-        /* Update for next loop */
-        prev_i = i;
-        ping_size = pong_size;
-        pong_size = 0;
-        std::swap(clip_ping, clip_pong);
-    }
-
-    /* Put the final object back at the start of clip and resize */
-    /* TODO -- It might be better if the co-incidence tests were done in the outer loop above or when adding point */
-    /*         I would need a bigger data set to test that on that so leaving for now */
-    int clip_idx = 0;
-    for (int i = 1; i < ping_size; ++i)
-    {
-        BOOST_LOG_TRIVIAL(trace) << "Checking for co-incidence: " << clip_ping[i - 1] << " and " << clip_ping[i];
-        if (!is_coincident(clip_ping[i], clip_ping[i - 1]))
-        {
-            BOOST_LOG_TRIVIAL(trace) << "Not co-incident, adding: " << clip_ping[i - 1];
-            (*clip)[clip_idx++] = clip_ping[i - 1];
-        }
-    }
-
-    /* Check the last vs. the first point */
-    BOOST_LOG_TRIVIAL(trace) << "Checking for co-incidence: " << clip_ping[0] << " and " << clip_ping[ping_size - 1];
-    if (!is_coincident(clip_ping[0], clip_ping[ping_size - 1]))
-    {
-        BOOST_LOG_TRIVIAL(trace) << "Not co-incident, adding: " << clip_ping[ping_size - 1];
-        (*clip)[clip_idx++] = clip_ping[ping_size - 1];
-    }
-    clip->resize(clip_idx);
-
-    /* Log the final polygon */
-    BOOST_LOG_TRIVIAL(trace) << "Clipped polygon: ";
-    BOOST_LOG_TRIVIAL(trace) << array_to_stream(clip->begin(), clip->end(), [](std::stringstream *ss, const point_t &p)
-    {
-        (*ss) << "( " << p << " ) ";
-        return ss;
-    });
-}
-
 
 int find_first_positive_real_root(float *const roots, const float a_coeff, const float b_coeff, const float c_coeff, const float d_coeff)
 {

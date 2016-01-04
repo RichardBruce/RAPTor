@@ -9,7 +9,6 @@
 
 /* Forward declarations */
 class point_t;
-class matrix_3d;
 
 namespace raptor_physics
 {
@@ -23,7 +22,7 @@ const float WELD_DISTANCE = 1.0e-3f;
 
 /* Epsilon */
 /* Numbers less different to this are considered the same */
-const float EPSILON = 1.0e-6f;
+const float EPSILON = 1.0e-5f;
 
 /* Too small force */
 /* Forces smaller than this are considered negligable and ignored */
@@ -42,16 +41,13 @@ const float CONTACT_RESOLUTION_RESIDUAL = 0.0005f;
 point_t project_vector(const point_t &v, const point_t &n);
 
 /* Find the most extreme vertex in direction d */
-int find_support_vertex(const matrix_3d &m, const point_t &d);
+int find_support_vertex(const std::vector<point_t> &m, const point_t &d);
 
 /* Find the most extreme vertex in direction d and its projection */
-int find_support_vertex(const matrix_3d &m, const point_t &d, float *const val);
+int find_support_vertex(const std::vector<point_t> &m, const point_t &d, float *const val);
 
-int find_support_vertex(const matrix_3d &m, const point_t &w, const point_t &c, const point_t &p, 
+int find_support_vertex(const std::vector<point_t> &m, const point_t &w, const point_t &c, const point_t &p, 
     const point_t &n, float *const val);
-
-/* Find the union of 2 polygons */
-void clip_polygon(std::vector<point_t> *const clip, const std::vector<point_t> &to, const point_t &n);
 
 /* Find the time that a translating point passes through a plane */
 float find_exact_none_translating_collision_time(const point_t &pa, const point_t &pb, const point_t &nb, const point_t &x0, const point_t &q0, 

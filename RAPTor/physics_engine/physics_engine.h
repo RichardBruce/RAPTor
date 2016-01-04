@@ -257,7 +257,7 @@ class physics_engine : private boost::noncopyable
         /* Collision access functions */
         int number_of_collisions() const { return _collision_cache->size(); }
 
-        const collision_info *const get_collision(const int i, const int j) const
+        const collision_info<> *const get_collision(const int i, const int j) const
         {
             /* Try to find objects */
             auto obj_iter_i = _objects->find(i);

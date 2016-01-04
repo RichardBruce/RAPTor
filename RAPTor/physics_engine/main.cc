@@ -26,22 +26,26 @@ int main(int argc, char **argv)
     raptor_physics::physics_options po(argv, argc);
 
     /* Set up the physics simulation */
-    raptor_physics::physics_engine pe(new raptor_physics::rigid_body_collider(0.9, 0.75));
+    raptor_physics::physics_engine pe(new raptor_physics::rigid_body_collider(0.75f, 0.75f));
     raptor_physics::simulation_environment se(&pe, &po);
 
     /* Lights */
-    se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-    se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+    se.add_light(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t(10.0f,  10.0f, -100.0f));
+    // se.add_light(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t(10.0f, -20.0f, -100.0f));
 
     /* Add moving objects */
-    std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), 1.0));
-    se.add_moving_object(new raptor_physics::physics_object(raptor_physics::make_cube(m.get(), point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, 9.5, 0.0), 10.0));
+    std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), 1.0f));
+    auto po0 = new raptor_physics::physics_object(raptor_physics::make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.0f, 5.0f, 0.0f), 10.0f);
+    po0->set_angular_velocity(point_t(0.0f, 0.0f, 5.0f));
+    se.add_moving_object(po0);
+    // se.add_moving_object(new raptor_physics::physics_object(raptor_physics::make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), quaternion_t(0.939692621ff, 0.0ff, 0.0ff, 0.342020143ff), point_t(0.0f, -9.0f, 0.0f), 10.0f));
 
     /* Add static objects */
-    se.add_object(new raptor_physics::physics_object(raptor_physics::make_plane(m.get(), point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0)), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+    se.add_object(new raptor_physics::physics_object(raptor_physics::make_plane(m.get(), point_t(-10.0f, 0.0f, -10.0f), point_t(10.0f, 0.0f, -10.0f), point_t(-10.0f, 0.0f, 10.0f), point_t(10.0f, 0.0f, 10.0f)), point_t(0.0f, -10.0f, 0.0f), std::numeric_limits<float>::infinity()));
 
     /* Apply forces */
-    se.engine()->apply_force(new raptor_physics::const_force(point_t(0.0, 0.5, 0.0), point_t(50.0, 0.0, 0.0), 0.5), 0);
+    // se.engine()->apply_force(new raptor_physics::const_force(point_t(0.0f,  0.5f, 0.0f), point_t( 5.0f, 0.0f, 0.0f), 0.5f), 0);
+    // se.engine()->apply_force(new raptor_physics::const_force(point_t(0.0f, -0.5f, 0.0f), point_t(-5.0f, 0.0f, 0.0f), 0.5f), 0);
 
     /* Run physics simulation */
     return se.run();

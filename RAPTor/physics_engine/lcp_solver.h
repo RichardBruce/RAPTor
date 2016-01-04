@@ -28,7 +28,7 @@ class lcp_solver
             : _m(new float[m_size * n_size]), _q(new float[m_size]), _e(new float[m_size]), _w_def(new int [m_size]), _z_def(new int [n_size + 1]),
               _m_size(m_size), _n_size(n_size)
         {
-            METHOD_LOG;
+            // METHOD_LOG;
 
             /* Fill in perturbation */
             _e[0] = 0.999999;
@@ -63,7 +63,7 @@ class lcp_solver
             : _m(new float[rhs._m_size * rhs._n_size]), _q(new float[rhs._m_size]), _e(new float[rhs._m_size]), _w_def(new int [rhs._m_size]), 
               _z_def(new int [rhs._n_size + 1]), _m_size(rhs._m_size), _n_size(rhs._n_size)
         {
-            METHOD_LOG;
+            // METHOD_LOG;
 
             memcpy(_m, rhs._m, _m_size * _n_size * sizeof(float));
             memcpy(_q, rhs._q, _m_size * sizeof(float));
@@ -76,7 +76,7 @@ class lcp_solver
         lcp_solver(lcp_solver &&rhs)
             : _m(rhs._m), _q(rhs._q), _e(rhs._e), _w_def(rhs._w_def), _z_def(rhs._z_def), _m_size(rhs._m_size), _n_size(rhs._n_size)
         {
-            METHOD_LOG;
+            // METHOD_LOG;
 
             rhs._m = nullptr;
             rhs._q = nullptr;
@@ -89,7 +89,7 @@ class lcp_solver
         /* DTOR */
         ~lcp_solver()
         {
-            METHOD_LOG;
+            // METHOD_LOG;
 
             if (_m != nullptr)
             {
@@ -124,17 +124,17 @@ class lcp_solver
         /* Returns true to show that a solution was found else false (in which case a solution is not feasible) */
         bool solve(float *const z)
         {
-            METHOD_LOG;
+            // METHOD_LOG;
             dump();
 
             /* Find a pivot for Z0 */
             int pivot_row = find_pivot();
-            BOOST_LOG_TRIVIAL(trace) << "Found initial pivot row: " << pivot_row;
+            // BOOST_LOG_TRIVIAL(trace) << "Found initial pivot row: " << pivot_row;
 
             /* Check if there is anything to do */
             if (pivot_row == -1)
             {
-                BOOST_LOG_TRIVIAL(trace) << "Nothing to be done";
+                // BOOST_LOG_TRIVIAL(trace) << "Nothing to be done";
                 return false;
             }
 
@@ -144,17 +144,17 @@ class lcp_solver
             {
                 /* Eliminate the pivot element */
                 const int left = gaussian_elimination(pivot_row, to_enter);
-                BOOST_LOG_TRIVIAL(trace) << "Variable leaving the dictionary: " << ((left > _n_size) ? "w" : "z") << ((left > _n_size) ? (left - _n_size) : left);
+                // BOOST_LOG_TRIVIAL(trace) << "Variable leaving the dictionary: " << ((left > _n_size) ? "w" : "z") << ((left > _n_size) ? (left - _n_size) : left);
                 dump();
 
                 /* Find complementary variable to the new non-basic variable */
                 const int complementary = (left > _n_size) ? (left - _n_size) : (left + _n_size);
                 to_enter = std::distance(&_z_def[0], std::find(&_z_def[0], &_z_def[_n_size], complementary));
-                BOOST_LOG_TRIVIAL(trace) << "Variable to enter the dictionary: " << ((_z_def[to_enter] > _n_size) ? "w" : "z") << ((_z_def[to_enter] > _n_size) ? (_z_def[to_enter] - _n_size) : _z_def[to_enter]);
+                // BOOST_LOG_TRIVIAL(trace) << "Variable to enter the dictionary: " << ((_z_def[to_enter] > _n_size) ? "w" : "z") << ((_z_def[to_enter] > _n_size) ? (_z_def[to_enter] - _n_size) : _z_def[to_enter]);
 
                 /* Find new pivot row */
                 pivot_row = find_pivot(to_enter);
-                BOOST_LOG_TRIVIAL(trace) << "Pivot row: " << pivot_row;
+                // BOOST_LOG_TRIVIAL(trace) << "Pivot row: " << pivot_row;
 
                 /* Check for no solution */
                 if (pivot_row < 0)
@@ -177,11 +177,11 @@ class lcp_solver
                 }
             }
 
-            BOOST_LOG_TRIVIAL(trace) << "Terminal dictionary, z: (" << z[0] << array_to_stream(&z[1], &z[_m_size], [this](std::stringstream *s, const int z)
-                {
-                    (*s) << ", " << z;
-                    return s;
-                }, ")");
+            // BOOST_LOG_TRIVIAL(trace) << "Terminal dictionary, z: (" << z[0] << array_to_stream(&z[1], &z[_m_size], [this](std::stringstream *s, const int z)
+            // {
+            //     (*s) << ", " << z;
+            //     return s;
+            // }, ")");
 
             /* Return if a solution is possible */
             return true;
@@ -314,20 +314,20 @@ class lcp_solver
         void dump() const
         {
             BOOST_LOG_TRIVIAL(trace) << array_to_stream(&_z_def[0], &_z_def[_n_size], [this](std::stringstream *s, const int z)
-                {
-                    (*s) << std::setw(4) << ((z > _n_size) ? "w" : "z") << ((z > _n_size) ? (z - _n_size) : z) << "\t";
-                    return s;
-                }, "   q\t   e");
+            {
+                (*s) << std::setw(4) << ((z > _n_size) ? "w" : "z") << ((z > _n_size) ? (z - _n_size) : z) << "\t";
+                return s;
+            }, "   q\t   e");
 
             for (int i = 0; i < _m_size; ++i)
             {
                 std::stringstream post;
                 post << std::setw(4) << std::setprecision(2) << _q[i] << "\t" << std::setw(4) << std::setprecision(2) << _e[i];
                 BOOST_LOG_TRIVIAL(trace) << array_to_stream(&_m[i], [this](std::stringstream *s, const float m)
-                    {
-                        (*s) << std::setw(4) << std::setprecision(2) << m << "\t";
-                        return s;
-                    }, _m_size * _n_size, _m_size, post.str());
+                {
+                    (*s) << std::setw(4) << std::setprecision(2) << m << "\t";
+                    return s;
+                }, _m_size * _n_size, _m_size, post.str());
             }
         }
 

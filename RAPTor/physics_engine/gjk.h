@@ -27,7 +27,7 @@ class gjk : private boost::noncopyable
               _a_simplex(sim_a),   /* simplex of vertex 0 */
               _b_simplex(sim_b)    /* simplex of vertex 0 */
         {
-            METHOD_LOG;
+            // METHOD_LOG;
         };
 
         /* Allow default DTOR */
@@ -36,7 +36,7 @@ class gjk : private boost::noncopyable
         /* Returns true if the hulls penetrate. */
         /* dist is set to the distance between the two hulls or zero if they penetrate. */
         /* rel_disp is the relative displacement of the two hulls. */
-        bool find_minimum_distance(point_t *const dist, const point_t &fixed_rel_disp, const point_t &float_rel_disp, const quaternion_t &a_o, const quaternion_t &b_o);
+        bool find_minimum_distance(point_t *const dist, const point_t &fixed_rel_disp, const point_t &float_rel_disp, const quaternion_t &oa, const quaternion_t &ob);
     
     private :
         /* Friend class for testing */

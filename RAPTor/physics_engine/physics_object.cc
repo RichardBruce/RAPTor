@@ -17,32 +17,39 @@ namespace raptor_physics
 {
 const int collision_resolution_max = 50;
 
-bool physics_object::has_collided(physics_object *const po, simplex **const manifold_a, 
-    simplex **const manifold_b, point_t *const d, const float t0, const float t1)
+bool physics_object::has_collided(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, point_t *const d, const float t0, const float t1)
 {
-    METHOD_LOG;
+    return has_collided(po, manifold_a, manifold_b, d, _o, po->_o, t0, t1);
+}
+
+bool physics_object::has_collided(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, point_t *const d, const quaternion_t &oa, const quaternion_t &ob, const float t0, const float t1)
+{
+    // METHOD_LOG;
 
     /* Check for self intersection and return an empty simplex */
     *manifold_a = new simplex(*this);
     *manifold_b = new simplex(*po);
     if (po == this)
     {
-        BOOST_LOG_TRIVIAL(trace) << "Ignoring self collision";
+        // BOOST_LOG_TRIVIAL(trace) << "Ignoring self collision";
         return false;
     }
     
     /* Calculate the relative displacement */
-    rk4_integrator integ;
     const point_t rel_disp(_i->center_of_mass() - po->_i->center_of_mass());
-    const point_t rel_disp0(integ.project_translation(_agg_force, *_i, _v, t0 - _cur_t) - integ.project_translation(po->_agg_force, *po->_i, po->_v, t0 - po->_cur_t));
-    const point_t rel_disp1(integ.project_translation(_agg_force, *_i, _v, t1 - _cur_t) - integ.project_translation(po->_agg_force, *po->_i, po->_v, t1 - po->_cur_t));
+    const point_t rel_disp0((_lv * (t0 - _cur_t)) - (po->_lv * (t0 - po->_cur_t)));
+    const point_t rel_disp1((_lv * (t1 - _cur_t)) - (po->_lv * (t1 - po->_cur_t)));
     const point_t rel_disp_diff(rel_disp1 - rel_disp0);
     const bool sig_disp = dot_product(rel_disp_diff, rel_disp_diff) > raptor_physics::EPSILON;
-    BOOST_LOG_TRIVIAL(trace) << "Relative displacement: " << rel_disp0 << " -> " << rel_disp1;
+    // BOOST_LOG_TRIVIAL(trace) << "Relative displacement: " << rel_disp0 << " -> " << rel_disp1;
+    // BOOST_LOG_TRIVIAL(trace) << "Transformation a: " << (_lv * (t1 - _cur_t)) << ", orientation a: " << oa;
+    // BOOST_LOG_TRIVIAL(trace) << "Transformation b: " << (po->_lv * (t1 - po->_cur_t)) << ", orientation b: " << ob;
     
+    // BOOST_LOG_TRIVIAL(trace) << "Point 7 under transform: " << _vg->get_vertex(-oa, _i->center_of_mass() + (_lv * (t1 - _cur_t)), 7);
+
     /* Test for collision */
     gjk tester(*_vg, *po->_vg, *manifold_a, *manifold_b);
-    const bool collided = tester.find_minimum_distance(d, (sig_disp ? rel_disp0 : rel_disp1) + rel_disp, (sig_disp ? rel_disp_diff : point_t(0.0, 0.0, 0.0)), -_o, -po->_o);
+    const bool collided = tester.find_minimum_distance(d, (sig_disp ? rel_disp0 : rel_disp1) + rel_disp, (sig_disp ? rel_disp_diff : point_t(0.0, 0.0, 0.0)), oa, ob);
     return collided;
 }
 
@@ -51,7 +58,7 @@ bool physics_object::has_collided(physics_object *const po, simplex **const mani
 /* TODO -- Re-write using POSSIBLY_ to avoid some full collision detection */
 collision_t physics_object::exactly_resolve_collisions(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const t)
 {
-    METHOD_LOG;
+    // METHOD_LOG;
 
     /* Check for self intersection and return an empty simplex */
     if (po == this)
@@ -63,7 +70,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
 
     const float min_t = std::max(_cur_t, po->_cur_t);
     const float max_t = *t;
-    BOOST_LOG_TRIVIAL(trace) << "Solving within time range: " << min_t << " to " << max_t;
+    // BOOST_LOG_TRIVIAL(trace) << "Solving within time range: " << min_t << " to " << max_t;
 
     /* Test at start position */
     point_t dir1;
@@ -83,7 +90,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
     {
         delete sim_a;
         delete sim_b;
-        BOOST_LOG_TRIVIAL(trace) << "Object separate, no collision";
+        // BOOST_LOG_TRIVIAL(trace) << "Object separate, no collision";
         return collision_t::NO_COLLISION;
     }
     /* The objects never get any closer, they are sliding or separating */
@@ -98,15 +105,15 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
 
         /* Look for objects moving slightly apart */
         /* It would be really bad if the contact force resolution slightly over did it here, but we have to be strict or there will be wobble */
-        if ((d_t0 - d_t1) < 0.0)
+        if (d_t1 > (d_t0 + raptor_physics::EPSILON))
         {
-            BOOST_LOG_TRIVIAL(trace) << "Object separating, no collision";
+            // BOOST_LOG_TRIVIAL(trace) << "Object separating, no collision";
             return collision_t::NO_COLLISION;
         }
         /* The objects are already sliding */
         else
         {
-            BOOST_LOG_TRIVIAL(trace) << "Sliding collision";
+            // BOOST_LOG_TRIVIAL(trace) << "Sliding collision";
             return collision_t::SLIDING_COLLISION;
         }
     }
@@ -129,7 +136,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
                 delete *manifold_a;
                 delete *manifold_b;
 
-                BOOST_LOG_TRIVIAL(trace) << "Objects " << d_t0 << " (" << t_lo << ") apart and moving to " << t_hi << "(" << d_t1 << ")";
+                // BOOST_LOG_TRIVIAL(trace) << "Objects " << d_t0 << " (" << t_lo << ") apart and moving to " << t_hi << "(" << d_t1 << ")";
                 has_collided(po, manifold_a, manifold_b, &dir, t_mid, t_mid);
                 const float d_mid = magnitude(dir);
 
@@ -147,7 +154,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
             } while (fabs(d_t0 - d_t1) > raptor_physics::EPSILON);
 
             *t = t_mid;
-            BOOST_LOG_TRIVIAL(trace) << "Sliding collision about to happen at: " << t_mid;
+            // BOOST_LOG_TRIVIAL(trace) << "Sliding collision about to happen at: " << t_mid;
             return collision_t::SLIDING_COLLISION;
         }
         else
@@ -164,7 +171,7 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
     delete sim_b;
     
     /* There was a collision bring the objects in contact without penetrating each other */
-    BOOST_LOG_TRIVIAL(trace) << "Objects started apart at " << min_t << " (" << d_t0 << ") and collided by " << max_t << "(" << d_t1 << ")";
+    // BOOST_LOG_TRIVIAL(trace) << "Objects started apart at " << min_t << " (" << d_t0 << ") and collided by " << max_t << "(" << d_t1 << ")";
     int res_col_cnt = 0;
     std::pair<float, float> p_t0(min_t, d_t0);
     std::pair<float, float> p_t1(max_t, d_t1);
@@ -221,9 +228,9 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
 }
 
 
-collision_t physics_object::conservatively_resolve_collisions(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const t)
+collision_t physics_object::conservatively_resolve_collisions(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const t, const bool sliding)
 {
-    METHOD_LOG;
+    // METHOD_LOG;
 
     /* Check for self intersection and return an empty simplex */
     if (po == this)
@@ -235,58 +242,51 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
 
     const float min_t = std::max(_cur_t, po->_cur_t);
     const float max_t = *t;
-    BOOST_LOG_TRIVIAL(trace) << "Solving between " << min_t << " and " << max_t;
-//    BOOST_LOG_TRIVIAL(trace) << "w: " << _w.x << " " << _w.y << " " << _w.z;
+    // BOOST_LOG_TRIVIAL(trace) << "Solving between " << min_t << " and " << max_t;
+   // BOOST_LOG_TRIVIAL(trace) << "w: " << _lw;
+
+    /* Check location at time 1, this test is exact because no movement is involved */
+    /* This test may miss collisions between time 0 and 1 */
+    point_t dir;
+    // const quaternion_t r2(normalise(_o + (quaternion_t(0.0f, _lw.x, _lw.y, _lw.z) * _o) * (0.5f * (max_t - _cur_t))));
+    // const quaternion_t r3(normalise(po->_o + (quaternion_t(0.0f, po->_lw.x, po->_lw.y, po->_lw.z) * po->_o) * (0.5f * (max_t - po->_cur_t))));
+    // has_collided(po, manifold_a, manifold_b, &dir, r2, r3, max_t, max_t);
+    // float d_t1 = magnitude(dir);
 
     /* Check location at time 0, this test is exact because no movement is involved */
-    point_t dir;
-    has_collided(po, manifold_a, manifold_b, &dir, min_t, min_t);
-
-    /* Retreive the distance between the objects and the closest points */
+    const quaternion_t r0(normalise(_o + (quaternion_t(0.0f, _lw.x, _lw.y, _lw.z) * _o) * (0.5f * (min_t - _cur_t))));
+    const quaternion_t r1(normalise(po->_o + (quaternion_t(0.0f, po->_lw.x, po->_lw.y, po->_lw.z) * po->_o) * (0.5f * (min_t - po->_cur_t))));
+    has_collided(po, manifold_a, manifold_b, &dir, r0, r1, min_t, min_t);
     const float d_t0 = magnitude(dir);
-    BOOST_LOG_TRIVIAL(trace) << "Initial separation: " << d_t0;
     assert((d_t0 > raptor_physics::EPSILON) || !"Error: Object must start separated");
-    
+
+    /* Objects start in contact */
+    const point_t noc(dir / d_t0);
+    if (d_t0 < raptor_physics::WELD_DISTANCE)
+    {
+        // if (d_t1 < (0.25f * raptor_physics::WELD_DISTANCE))
+        // {
+            return close_contact_collision_detection(po, manifold_a, manifold_b, t, noc, min_t, d_t0, sliding);
+        // }
+        // else
+        // {
+            // BOOST_LOG_TRIVIAL(trace) << "Sliding collision";
+            // return collision_t::SLIDING_COLLISION;
+        // }
+    }
+
+    /* Check the worst case distance at max_t */
     point_t p_a((*manifold_a)->get_vertex(0));
     point_t p_b((*manifold_b)->get_vertex(0));
     vertex_to_global(&p_a);
     po->vertex_to_global(&p_b);
-//    BOOST_LOG_TRIVIAL(trace) << "closest point on a: " << p_a.x << " " << p_a.y << " " << p_a.z;
-//    BOOST_LOG_TRIVIAL(trace) << "closest point on b: " << p_b.x << " " << p_b.y << " " << p_b.z;
-
-    /* Check the worst case distance at max_t */
-    const point_t noc(dir / d_t0);
     const float max_d = project_maximum_movement_onto((*po), p_a, p_b, noc, max_t);
     float d_t1 = d_t0 - max_d;
 
-    /* Objects start in contact */
-    if (d_t0 < raptor_physics::WELD_DISTANCE)
-    {
-        if (d_t1 < raptor_physics::WELD_DISTANCE)
-        {
-            return close_contact_collision_detection(po, manifold_a, manifold_b, t, noc);
-        }
-        /* Penetrates so impact at min_t */
-        // if (d_t1 < (0.25 * raptor_physics::WELD_DISTANCE))
-        // {
-        //     (*t) = min_t;
-        //     BOOST_LOG_TRIVIAL(trace) << "resting collision: " << d_t1;
-        //     return collision_t::RESTING_COLLISION;
-        // }
-        /* Sliding so impact at max_t */
-        // else if (d_t1 < raptor_physics::WELD_DISTANCE)
-        // {
-        //     (*t) = max_t;
-        //     BOOST_LOG_TRIVIAL(trace) << "possible sliding: " << d_t1;
-        //     return collision_t::POSSIBLE_SLIDING_COLLISION;
-        // }
-        /* Splitting */
-    }
-
-    /* Never any contact or splitting */
+    /* The objects never get within weld ditance, all is well */
     if (d_t1 > raptor_physics::WELD_DISTANCE)
     {
-        BOOST_LOG_TRIVIAL(trace) << "no collision " << d_t1;
+        BOOST_LOG_TRIVIAL(trace) << "Object separate, no collision d t0: " << d_t0 << ", d t1: " << d_t1;
         return collision_t::NO_COLLISION;
     }
 
@@ -296,7 +296,7 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
     std::pair<float, float> p_t1;
     std::pair<float, float> p_t0(min_t, d_t0);
     BOOST_LOG_TRIVIAL(trace) << "Objects started apart at " << min_t << " (" << d_t0 << ") and collided by " << max_t << "(" << d_t1 << ")";
-    do
+    while ((d_t1 < (0.25f * raptor_physics::WELD_DISTANCE)) || (d_t1 > raptor_physics::WELD_DISTANCE))
     {
         assert ((++res_col_cnt < collision_resolution_max) || !"Error: Stuck in the collision resolution loop");
 
@@ -316,119 +316,236 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
         const float vel = (p_t0.second - p_t1.second) / (p_t1.first - p_t0.first);
         const float adj = d_t1 - (0.5 * raptor_physics::WELD_DISTANCE);
         adjusted_t += adj / vel;
+        // BOOST_LOG_TRIVIAL(trace) << "New guess: " << adjusted_t << ", min: " << min_t;
 
         /* Get worst case movement at adjusted t */
         const float max_d = project_maximum_movement_onto((*po), p_a, p_b, noc, adjusted_t);
 
         /* Update worst case distance at adjusted t */
         d_t1 = d_t0 - max_d;
-        BOOST_LOG_TRIVIAL(trace) << "Objects " << p_t0.second << " (" << p_t0.first << ") apart and moving to " << p_t1.second << "(" << p_t1.first << ")";
-    } while ((d_t1 < (0.25 * raptor_physics::WELD_DISTANCE)) || (d_t1 > raptor_physics::WELD_DISTANCE));
+        // BOOST_LOG_TRIVIAL(trace) << "Objects " << p_t0.second << " (" << p_t0.first << ") apart and moving to " << p_t1.second << "(" << p_t1.first << ")";
+    }
 
     (*t) = adjusted_t;
-    BOOST_LOG_TRIVIAL(trace) << "possible collision at: " << adjusted_t << " dist: " << d_t1;
+    // BOOST_LOG_TRIVIAL(trace) << "possible collision at: " << adjusted_t << " dist: " << d_t1;
     return collision_t::POSSIBLE_COLLISION;
 }
 
 
-/* This function is to be called by a conservative collision detection scheme when two object are very close */
+/* This function is to be called by a conservative collision detection scheme when two object are too close */
 /* Conservative schemes do badly in this situation because the two objects will conservatively collide instantly */
-collision_t physics_object::close_contact_collision_detection(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const t, const point_t &noc) const
+collision_t physics_object::close_contact_collision_detection(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const toc, const point_t &noc, float min_t, const float d_t0, const bool sliding)
 {
-    METHOD_LOG;
-    BOOST_LOG_TRIVIAL(trace) << "Determining exact collision time up to: " << *t;
-
-    /* Check for objects moving together, if so they collide instantly */
-    // const float va_dot_vb = dot_product(_v, po->_v);
-    // if (va_dot_vb < 0.0)
-    // {
-    //     BOOST_LOG_TRIVIAL(trace) << "Objects translating towards each other, instant impact";
-    //     *t = 0.0;
-    //     return collision_t::RESTING_COLLISION;
-    // }
-        
-    const point_t n((*manifold_a)->normal_of_impact(**manifold_b));
-    // const point_t poc((*manifold_a)->center_of_impact(**manifold_b, n));
-    // if (va_dot_vb == 0.0)
-    // {
-    //     //if (dot_product(_v, n) < 0.0)
-    //     if (dot_product(get_velocity(poc), n) < 0.0)
-    //     {
-    //         BOOST_LOG_TRIVIAL(trace) << "Object a translating towards b, instant impact";
-    //         *t = 0.0;
-    //         return collision_t::RESTING_COLLISION;
-    //     }
-
-    //     //if (dot_product(po->_v, n) > 0.0)
-    //     if (dot_product(po->get_velocity(poc), n) > 0.0)
-    //     {
-    //         BOOST_LOG_TRIVIAL(trace) << "Objects b translating towards a, instant impact";
-    //         *t = 0.0;
-    //         return collision_t::RESTING_COLLISION;
-    //     }
-    // }
-
-    float full_t = *t;
-    rk4_integrator integ;
-    quaternion_t full_rot(normalise(integ.project_rotation(_agg_force, *_i, _o, _w, full_t - _cur_t)));
-    while (fabs(full_rot.w) < 0.99)
-    {
-        full_t = (_cur_t + full_t) * 0.5;
-        full_rot = integ.project_rotation(_agg_force, *_i, _o, _w, full_t);
-        BOOST_LOG_TRIVIAL(trace) << "Only testing up to time: " << full_t << " because of fast rotation";
-        assert((full_t > _cur_t) || !"Error: Unable to make progress because of extreme rotation");
-    }
-
-    /* Initial relative state, less the safety margin */
-    const point_t x0(_i->center_of_mass() - po->_i->center_of_mass() - (n * (0.25 * raptor_physics::WELD_DISTANCE)));
-
-    const float r0 = 1.0;
-    const point_t q0(0.0, 0.0, 0.0);
-
-    /* Final relative state */
-    const point_t x1(x0 + integ.project_translation(_agg_force, *_i, _v, full_t - _cur_t) - integ.project_translation(po->_agg_force, *po->_i, po->_v, full_t - po->_cur_t));
-
-    const quaternion_t rot(integ.project_rotation(_agg_force, *_i, _o, _w, full_t - _cur_t));
-    const point_t q1(rot.x, rot.y, rot.z);
-    const float r1 = rot.w;
-
-    /* Compute exact time of intersection */
-    const float frac_t = _vg->find_intersection_time(*(po->_vg), n, x0, x1, q0, q1, r0, r1, full_t);
+    // METHOD_LOG;
+    // BOOST_LOG_TRIVIAL(trace) << "Determining exact collision time up to: " << *toc;
     
-    BOOST_LOG_TRIVIAL(trace) << "Exact collision time at: " << (full_t * frac_t);
-    if (frac_t <= 1.0) 
+    /* Pick an object to act as the plane */
+    simplex *pm = *manifold_a;
+    simplex *om = *manifold_b;
+    const physics_object *pl = this;
+    const physics_object *ol = po;
+    // BOOST_LOG_TRIVIAL(trace) << "Simplex sizes: " << (*manifold_a)->unique_size() << " and " << (*manifold_b)->unique_size();
+    if ((*manifold_b)->unique_size() >= (*manifold_a)->unique_size())
     {
-        BOOST_LOG_TRIVIAL(trace) << "Resting collision";
-        (*t) = 0.0;
-        return collision_t::SLIDING_COLLISION;
+        std::swap(pl, ol);
+        std::swap(pm, om);
+        // BOOST_LOG_TRIVIAL(trace) << "Using other object for plane";
     }
-    else if (full_t < *t)
+
+    /* Get the definition of the plane*/
+    point_t plane_n0(noc);
+    if (pl == this)
     {
-        *t = full_t;
-        BOOST_LOG_TRIVIAL(trace) << "No collision in time limit, requesting retest at limit";
-        return collision_t::POSSIBLE_COLLISION;
+        plane_n0 = -plane_n0;
     }
-    else
+    const quaternion_t plo_inv(-pl->_o);
+    const point_t plane_n(plo_inv.rotate(plane_n0));
+
+    const point_t plane_w(pm->get_vertex(0));
+    const point_t plane_w0(pl->_o.rotate(plane_w) + pl->_i->center_of_mass());
+    // BOOST_LOG_TRIVIAL(trace) << "Plane normal: " << plane_n << ", plane point: " << plane_w;
+    // BOOST_LOG_TRIVIAL(trace) << "Points in initial config";
+    // for (int i = 0; i < ol->_vg->get_number_of_vertices(); ++i)
+    // {
+        // const point_t p(ol->_vg->get_vertex(ol->_o, ol->_i->center_of_mass(), i));
+        // BOOST_LOG_TRIVIAL(trace) << "Point: " << i << " at: " << p;
+    // }
+
+    /* Check for min_t collision */
+    point_t ol_t;
+    quaternion_t ol_r;
+    ol->configuration_at_time(&ol_r, &ol_t, min_t);
+
+    point_t pl_t;
+    quaternion_t pl_r;
+    pl->configuration_at_time(&pl_r, &pl_t, min_t);
+
+
+    if (!sliding)
     {
-        BOOST_LOG_TRIVIAL(trace) << "No collision";
+        /* Get velocity of ol */
+        const point_t ol_poc(pm->center_of_impact(*om, pm->normal_of_impact(*om)) - ol->_i->center_of_mass());
+        const point_t ol_speed(ol->_lv + cross_product(ol->_lw, ol_poc));
+
+        /* Get velocity of pl */
+        const point_t poc(ol_r.rotate(ol_poc) + ol_t);
+        const point_t pl_poc(pl_r.rotate(poc - pl_t));
+        const point_t pl_speed(pl->_lv + cross_product(pl->_lw, pl_poc));
+
+
+        /* Get the closing velocity */
+        const point_t speed_noc(pl_r.rotate(plane_n));
+        BOOST_LOG_TRIVIAL(trace) << "Closing velocity: " << (pl_speed - ol_speed) << ", ol v: " << ol->_lv << ", ol w: " << cross_product(ol->_lw, ol_poc);    
+        if (dot_product(speed_noc, pl_speed - ol_speed) > 0.0f)
+        {
+            (*toc) = min_t;
+            // BOOST_LOG_TRIVIAL(trace) << "Object colliding at: " << (*toc);
+            return collision_t::COLLISION;
+        }
+    }
+
+    /* Find target configuration */
+    ol->configuration_at_time(&ol_r, &ol_t, (*toc));
+    pl->configuration_at_time(&pl_r, &pl_t, (*toc));
+        
+    /* Find the deepest point below the plane at t */
+    float max_pen;
+    int max_idx = find_deepest_intersection(*ol->_vg, pl_r, ol_r, pl_t, ol_t, plane_n, plane_w, &max_pen);
+
+    /* Distance is increasing, no collision */
+    if (max_pen > (d_t0 + raptor_physics::EPSILON))
+    {
+        // BOOST_LOG_TRIVIAL(trace) << "Object separate, no collision";
         return collision_t::NO_COLLISION;
     }
+    /* The objects never get any closer, they are sliding */
+    else if ((d_t0 - max_pen) < raptor_physics::EPSILON)
+    {
+        // BOOST_LOG_TRIVIAL(trace) << "Sliding collision";
+        return collision_t::SLIDING_COLLISION;
+    }
+
+    /* Objecs collision, find out when */
+    // BOOST_LOG_TRIVIAL(trace) << "Objects started: " << d_t0 << " apart and moving to: " << max_pen;
+    int res_bil_col = 0;
+    do
+    {
+        assert((++res_bil_col < 10) || !"Error: Stuck in the bilateral collision resolution loop");
+
+        /* Find a time that the deepest point came in contact */
+        const point_t p0(ol->_vg->get_vertex(ol->_o, ol->_i->center_of_mass(), max_idx));
+        const float dist0 = dot_product(p0 - plane_w0, plane_n0);
+
+        int res_max_pen = 0;
+        float new_pen = max_pen;
+        float adjusted_t = (*toc);
+        std::pair<float, float> p_t1;
+        std::pair<float, float> p_t0(min_t, dist0);
+        while ((new_pen < (0.25f * raptor_physics::WELD_DISTANCE)) || (new_pen > raptor_physics::WELD_DISTANCE))
+        {
+            /* Track the interval containing the collision */
+            assert ((++res_max_pen < 25) || !"Error: Stuck in the max penetration resolution loop");
+            if (new_pen < (0.25f * raptor_physics::WELD_DISTANCE))
+            {
+                p_t1.first = adjusted_t;
+                p_t1.second = new_pen;
+            }
+            else
+            {
+                p_t0.first = adjusted_t;
+                p_t0.second = new_pen;
+            }
+
+            /* Refine guess using the secant rule */
+            const float vel = (p_t1.second - p_t0.second) / (p_t1.first - p_t0.first);
+            const float adj = (0.5f * raptor_physics::WELD_DISTANCE) - p_t0.second;
+            adjusted_t = p_t0.first + (adj / vel);
+            // BOOST_LOG_TRIVIAL(trace) << "In time: " << p_t0.first << " -> " << p_t1.first << ", moving: " << p_t0.second << " -> " << p_t1.second << ", vel = " << vel;
+            // BOOST_LOG_TRIVIAL(trace) << "Would like to move distance: " << adj << " = " << (0.5f * raptor_physics::WELD_DISTANCE)  << " - " << p_t0.second;
+            // BOOST_LOG_TRIVIAL(trace) << "Set new guess: " << adjusted_t << ", min time: " << min_t;
+
+            /* These are not the roots you are looking for, try bisection */
+            if (adjusted_t < (min_t + raptor_physics::EPSILON))
+            {
+                adjusted_t = p_t0.first + ((p_t1.first - p_t0.first) * 0.5f);
+                // BOOST_LOG_TRIVIAL(trace) << "Switched to bisection, new guess: " << adjusted_t << ", min time: " << min_t;
+            }
+
+            /* Update target configuration */
+            ol->configuration_at_time(&ol_r, &ol_t, adjusted_t);
+            pl->configuration_at_time(&pl_r, &pl_t, adjusted_t);
+
+            /* Update distance */
+            const point_t plane_ng(pl_r.rotate(plane_n));
+            const point_t plane_wg(pl_r.rotate(plane_w) + pl_t);
+            const point_t p(ol->_vg->get_vertex(ol_r, ol_t, max_idx));
+            new_pen = dot_product(p - plane_wg, plane_ng);
+            // BOOST_LOG_TRIVIAL(trace) << "Time guess: " << adjusted_t << " new distance: " << new_pen;
+
+        }
+        // BOOST_LOG_TRIVIAL(trace) << "Point moved out of surface, moving to next point";
+        
+        /* Find the deepest point below the plane at t */
+        max_idx = find_deepest_intersection(*ol->_vg, pl_r, ol_r, pl_t, ol_t, plane_n, plane_w, &max_pen);
+
+        /* Time of collision was ok */
+        (*toc) = adjusted_t;
+        if ((max_pen > (0.25f * raptor_physics::WELD_DISTANCE)) && (max_pen < raptor_physics::WELD_DISTANCE))
+        {
+            // BOOST_LOG_TRIVIAL(trace) << "Object possibly colliding at: " << (*toc);
+            break;
+        }
+    } while (max_pen < raptor_physics::WELD_DISTANCE);
+
+    return collision_t::POSSIBLE_COLLISION;
+}
+
+void physics_object::configuration_at_time(quaternion_t *const o, point_t *const tr, const float t) const
+{
+    const float dt = t - _cur_t;
+    *tr = _i->center_of_mass() + (_lv * dt);
+    *o = normalise(_o + (quaternion_t(0.0f, _lw.x, _lw.y, _lw.z) * _o) * (dt * 0.5f));
+    // BOOST_LOG_TRIVIAL(trace) << "Target translation: " << (*tr) << " and orientation: " << (*o);
 }
 
 
+int physics_object::find_deepest_intersection(const vertex_group &vg, const quaternion_t &pl_r, const quaternion_t &ol_r, const point_t &pl_t, const point_t &ol_t, const point_t &plane_n, const point_t &plane_w, float *const d) const
+{
+    int max_idx = -1;
+    float max_pen = raptor_physics::WELD_DISTANCE;
+    const point_t plane_ng(pl_r.rotate(plane_n));
+    const point_t plane_wg(pl_r.rotate(plane_w) + pl_t);
+    // BOOST_LOG_TRIVIAL(trace) << "Plane point: " << plane_wg << ", and normal: " << plane_ng;
+    for (int i = 0; i < vg.get_number_of_vertices(); ++i)
+    {
+        const point_t p(vg.get_vertex(ol_r, ol_t, i));
+        const float dist = dot_product(p - plane_wg, plane_ng);
+        // BOOST_LOG_TRIVIAL(trace) << "Point: " << vg.get_vertex(i) << " moving to: " << p << ", dist: " << dist;
+        if (dist < max_pen)
+        {
+            max_idx = i;
+            max_pen = dist;
+        }
+    }
+    // BOOST_LOG_TRIVIAL(trace) << "Deepest point: " << max_idx << ", sank to: " << max_pen;
+
+    (*d) = max_pen;
+    return max_idx;
+}
+
 float physics_object::project_maximum_rotation_onto(const point_t &n, const point_t &po, const float t) const
 {
-    rk4_integrator integ;
-    const point_t apo_ang_vel(integ.project_translation(_agg_force, *_i, _v, t - _cur_t));
+    const float dt = t - _cur_t;
 
     /* Find the vertex moving the most along n */
     float max_rot;
+    const point_t apo_ang_vel(_lw * dt);
     const point_t w_cross_n(cross_product(apo_ang_vel, n));
-//    BOOST_LOG_TRIVIAL(trace) << "n: " << n.x << " " << n.y << " " << n.z;
-//    BOOST_LOG_TRIVIAL(trace) << "w cross n: " << w_cross_n.x << " " << w_cross_n.y << " " << w_cross_n.z;
+   // BOOST_LOG_TRIVIAL(trace) << "n: " << n;
+   // BOOST_LOG_TRIVIAL(trace) << "w0: " << _lw << ", w1: " << vel << ", apo_ang_vel: " << apo_ang_vel;
+   // BOOST_LOG_TRIVIAL(trace) << "w cross n: " << w_cross_n;
     //const int rot_pot = raptor_physics::find_support_vertex(*_verts, w_cross_n, _i->center_of_mass(), po, n, &max_rot);
     _vg->find_support_vertex(apo_ang_vel, _i->center_of_mass(), po, n, &max_rot);
-//    BOOST_LOG_TRIVIAL(trace) << "Most rotating point: " << _verts->get_row(rot_pot).x << " "  << _verts->get_row(rot_pot).y << " " << _verts->get_row(rot_pot).z;
 
     return max_rot;
 }
@@ -437,15 +554,72 @@ float physics_object::project_maximum_rotation_onto(const point_t &n, const poin
 float physics_object::project_maximum_movement_onto(const physics_object &p, const point_t &p_a, const point_t &p_b, const point_t &n, const float t) const
 {
     /* Translation */
-    rk4_integrator integ;
-    const point_t tra_rel(integ.project_translation(p._agg_force, *p._i, p._v, t - p._cur_t) - integ.project_translation(_agg_force, *_i, _v, t - _cur_t));
+    const point_t tra_rel((p._lv * (t - p._cur_t)) - (_lv * (t - _cur_t)));
     const float tra = dot_product(tra_rel, n);
 
     /* Rotation */
     const float rot = p.project_maximum_rotation_onto(-n, p_b, t) + project_maximum_rotation_onto(n, p_a, t);
-    BOOST_LOG_TRIVIAL(trace) << "tra: " << tra << " rot: " << rot;
+    // BOOST_LOG_TRIVIAL(trace) << "tra: " << tra << " rot: " << rot;
 
     /* Total */
     return tra + rot;
+}
+
+physics_object& physics_object::commit_movement(const float t)
+{
+    // METHOD_LOG;
+
+    /* Update time */
+    if (t < _cur_t)
+    {
+        return *this;
+    }
+    const float dt = t - _cur_t;
+    _cur_t = t;
+
+    /* Rotate */
+    point_t vel;
+    rk4_integrator integ;
+
+    integ.project_rotation(_agg_force, *_i, &vel, _o, _w, dt);
+    _w = vel;
+    _o += (quaternion_t(0.0f, _lw.x, _lw.y, _lw.z) * _o) * (dt * 0.5f);
+    normalise(&_o);
+
+    /* Translate */
+    integ.project_translation(_agg_force, *_i, &vel, _v, dt);
+    _v = vel;
+    _i->move_center_of_mass(_lv * dt);
+
+    /* Update bounds for the remainder of the time step */
+    update_bounds();
+
+    /* Update the descrtised motion for this frame */
+    const float lv_sq = dot_product(_lv, _lv);
+    if (fabs(lv_sq) > raptor_physics::EPSILON)
+    {
+        _lv = (_lv / std::sqrt(lv_sq)) * magnitude(_v);
+    }
+
+    const float lw_sq = dot_product(_lw, _lw);
+    if (fabs(lw_sq) > raptor_physics::EPSILON)
+    {
+        _lw = (_lw / std::sqrt(lw_sq)) * magnitude(_w);
+    }
+
+    /* Derement forces */
+    for (auto& f : (*_forces))
+    {
+        if (f->commit(dt))
+        {
+            delete f;
+            f = nullptr;
+        }
+    }
+    
+    /* Remove spent forces */
+    _forces->erase(std::remove(_forces->begin(), _forces->end(), nullptr), _forces->end());
+    
+    return *this;
 }
 }; /* namespace raptor_physics */

@@ -1,6 +1,6 @@
 # Source
 SOURCE  = main.cc lcp_solver.cc simulation_environment.cc physics_common.cc physics_object.cc physics_engine.cc \
-    vertex_group.cc gjk.cc simplex.cc \
+    vertex_group.cc gjk.cc simplex.cc polygon.cc \
     sdl_wrapper.cc sdl_event_handler_factory.cc
 
 # Includes
@@ -29,4 +29,4 @@ SO_LIBS = raytracer SDL2 SDL2_ttf SDL2_image tbb pthread boost_thread boost_file
 LIBRARY = $(SO_LIBS) fftw3f
 
 # Defines
-DEFINES = REFLECTIONS_ON REFRACTIONS_ON SIMD_PACKET_TRACING FRUSTRUM_CULLING BOOST_LOG_DYN_LINK BOOST_LOG_LEVEL=boost::log::trivial::error EXACT_NORMALISE
+DEFINES = REFLECTIONS_ON REFRACTIONS_ON SIMD_PACKET_TRACING FRUSTRUM_CULLING BOOST_LOG_DYN_LINK BOOST_LOG_LEVEL=boost::log::trivial::trace EXACT_NORMALISE

@@ -11,11 +11,13 @@
 #include "inertia_tensor.h"
 #include "vertex_group.h"
 #include "physics_object.h"
-
-using raptor_physics::inertia_tensor;
-using raptor_physics::inertia_tensor_view;
+#include "polygon.h"
 
 
+namespace raptor_physics
+{
+namespace test
+{
 /* Class to act as a vertex group while testing */
 class mock_physics_object
 {
@@ -74,7 +76,18 @@ class mock_physics_object
             return *this;
         }
 
-        mock_physics_object& apply_impulse(const point_t &impulse, const point_t &poc)
+        mock_physics_object& apply_internal_force(const point_t &at, const point_t &f)
+        {
+            if (get_mass() != std::numeric_limits<float>::infinity())
+            {
+                _f += f;
+                _tor += cross_product(at, f);
+            }
+            
+            return *this;
+        }
+
+        mock_physics_object& apply_impulse(const point_t &impulse, const point_t &poc, const bool)
         {
             const point_t l(cross_product(poc - get_center_of_mass(), impulse));
 
@@ -115,10 +128,18 @@ class mock_physics_object
         {
             return inertia_tensor_view(*_i, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f));
         }
+
+        mock_physics_object& update_bounds()
+        {
+            return *this;
+        }
         
         /* Setters */
-        mock_physics_object& apply_impulse(const point_t &n, const point_t &angular_weight, const float impulse)
+        mock_physics_object& apply_impulse(const point_t &n, const point_t &angular_weight, const float impulse, const bool ob = true)
         {
+            _v += (n * (impulse / _i->mass()));
+            _w += (angular_weight * impulse);
+
             _n.push_back(n);
             _angular_weight.push_back(angular_weight);
             _impulse.push_back(impulse);
@@ -148,6 +169,8 @@ class mock_physics_object
             return tmp;
         }
 
+        int number_of_impulses() const { return _impulse.size(); }
+
 
     private :
         inertia_tensor *const   _i;
@@ -161,12 +184,19 @@ class mock_physics_object
 };
 
 /* Build a physics object that is just functional enough to build a simplex with */
-inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t> &verts)
+inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t> *const verts)
 {
-    return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, new std::vector<int>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0);
+    return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, std::vector<polygon>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0);
 }
 
-inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t> &verts, const quaternion_t &o, const point_t &t)
+inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t> *const verts, const quaternion_t &o, const point_t &t)
 {
-    return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, new std::vector<int>(), nullptr), o, t, 0.0);
+    return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, std::vector<polygon>(), nullptr), o, t, 0.0);
 }
+
+inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t> *const verts, const std::vector<int> &polys, const quaternion_t &o, const point_t &t)
+{
+    return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, { polygon(verts, polys) }, nullptr), o, t, 0.0);
+}
+} /* namespace test */
+} /* namespace raptor_physics */

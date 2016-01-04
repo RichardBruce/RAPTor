@@ -47,7 +47,7 @@ class object_data
         object_data() = default;
 
         object_data(const physics_object &po, const int id)
-        : _i(new inertia_tensor(po.get_inertia_tenor())), f(po.get_force()), tor(po.get_torque()), v(po.get_velocity()), w(po.get_angular_velocity()),
+        : _i(new inertia_tensor(po.get_inertia_tenor())), f(po.get_force()), tor(po.get_torque()), v(po.get_velocity_0()), w(po.get_angular_velocity()),
           o(po.get_orientation()), id(id) {  };
 
         object_data(const object_data &o)

@@ -15,16 +15,16 @@ namespace raptor_physics
 class physics_object;
 
 /* Class to track collisions with an object */
-template<class PO>
+template<class PO = physics_object, class S = simplex>
 class tracking_info : private boost::noncopyable
 {
     public :
         /* Convinience typedef */
-        typedef typename std::map<PO*, collision_info*>::const_iterator collision_info_const_iter;
+        typedef typename std::map<PO*, collision_info<S>*>::const_iterator collision_info_const_iter;
 
         /* CTOR */
-        tracking_info(PO *vg, simplex *s, const simplex &other_s, const float t, const collision_t type) 
-            : _collisions(new std::map<PO*, collision_info*>({ {vg, new collision_info(s, other_s, t, type)} })),
+        tracking_info(PO *vg, S *s, const S &other_s, const float t, const collision_t type) 
+            : _collisions(new std::map<PO*, collision_info<S>*>({ {vg, new collision_info<S>(s, other_s, t, type)} })),
               _collide(vg),
               _time(t),
               _type(type) {  };
@@ -40,7 +40,7 @@ class tracking_info : private boost::noncopyable
         }
 
         /* Update the collision info with another object */
-        tracking_info& update(PO *vg, simplex *s, const simplex &other_s, const float t, const collision_t type)
+        tracking_info& update(PO *vg, S *s, const S &other_s, const float t, const collision_t type)
         {
             /* Insert or update the collision cache */
             auto collision = _collisions->find(vg);
@@ -50,7 +50,7 @@ class tracking_info : private boost::noncopyable
             }
             else
             {
-                _collisions->insert({ vg, new collision_info(s, other_s, t, type) });
+                _collisions->insert({ vg, new collision_info<S>(s, other_s, t, type) });
             }
 
             /* Track the first impact */
@@ -69,7 +69,7 @@ class tracking_info : private boost::noncopyable
         }
 
         /* Update the collision info after a successful retest */
-        tracking_info& successful_retest_update(PO *vg, simplex *s, const simplex &other_s)
+        tracking_info& successful_retest_update(PO *vg, S *s, const S &other_s)
         {
             auto collision = _collisions->find(vg);
 
@@ -109,7 +109,7 @@ class tracking_info : private boost::noncopyable
         PO*         get_first_collision()       const { return _collide;    }
 
         /* Get the collision information with vg */
-        collision_info* operator[](PO *const key)
+        collision_info<S>* operator[](PO *const key)
         {
             auto coll_iter = _collisions->find(key);
             if (coll_iter == _collisions->end())
@@ -145,7 +145,7 @@ class tracking_info : private boost::noncopyable
             return *this;
         }
 
-        std::map<PO*, collision_info*> *    _collisions;    /* A cache of all collision with this object    */
+        std::map<PO*, collision_info<S>*> * _collisions;    /* A cache of all collision with this object    */
         PO                             *    _collide;       /* The first thing to be hit                    */
         float                               _time;          /* The time of the first collision              */
         collision_t                         _type;          /* The type of collision                        */

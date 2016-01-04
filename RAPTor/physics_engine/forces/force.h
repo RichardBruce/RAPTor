@@ -202,11 +202,26 @@ class viscous_force : public force
 class aggregate_force
 {
     public :
-        aggregate_force(const std::vector<force *> &f) : _f(f) { }
+        aggregate_force(const std::vector<force *> &f) : _f(f), _if(point_t(0.0f, 0.0f, 0.0f)), _it(point_t(0.0f, 0.0f, 0.0f)) { }
+
+        /* Internal forces */
+        aggregate_force& clear_internal_forces()
+        {
+            _if = point_t(0.0f, 0.0f, 0.0f);
+            _it = point_t(0.0f, 0.0f, 0.0f);
+            return *this;
+        }
+
+        aggregate_force& apply_internal_force(const point_t &at, const point_t &f)
+        {
+            _if += f;
+            _it += cross_product(at, f);
+            return *this;
+        }
 
         point_t get_force(const inertia_tensor &i, const point_t &x, const point_t &v, const float dt) const
         {
-            point_t agg(0.0f, 0.0f, 0.0f);
+            point_t agg(_if);
             for (auto *f : _f)
             {
                 agg += f->get_force(i, x, v, dt);
@@ -216,7 +231,7 @@ class aggregate_force
 
         point_t get_torque(const inertia_tensor &i, const point_t &x, const point_t &w, const float dt) const
         {
-            point_t agg(0.0f, 0.0f, 0.0f);
+            point_t agg(_it);
             for (auto *f : _f)
             {
                 agg += f->get_torque(i, x, w, dt);
@@ -226,5 +241,7 @@ class aggregate_force
 
     private :
         const std::vector<force *> &_f;
+        point_t                     _if;
+        point_t                     _it;
 };
 }; /* namespace raptor_physics */
