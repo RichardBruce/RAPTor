@@ -14,20 +14,13 @@
 
 namespace raptor_convex_decomposition
 {
-inline float compute_local_concavity(const float volume, const float ch_volume)
-{
-    return std::fabs(ch_volume - volume) / ch_volume;
-}
-
 inline float compute_concavity(const float volume, const float ch_volume, const float volume_0)
 {
     return std::fabs(ch_volume - volume) / volume_0;
 }
 
-int convex_decomposition::compute_best_clipping_plane(const std::unique_ptr<primitive_set> &pset, const float volume, const std::vector<plane> &planes, const point_t &cut_dir, const float alpha, const float beta, const float delta, const int dn_samp, plane *const best_plane, float *const min_conc, const convex_decomposition_options &params)
+int convex_decomposition::compute_best_clipping_plane(const std::unique_ptr<primitive_set> &pset, const float volume, const std::vector<plane> &planes, const point_t &cut_dir, const float alpha, const float beta, const int dn_samp, plane *const best_plane, const convex_decomposition_options &params)
 {
-    (*min_conc) = std::numeric_limits<float>::max();
-
     std::unique_ptr<convex_mesh          []> chs(new convex_mesh[2]);
     std::unique_ptr<std::vector<point_t> []> pts(new std::vector<point_t>[2]);
     std::unique_ptr<primitive_set> on_surf(pset->select_on_surface());
@@ -83,15 +76,13 @@ int convex_decomposition::compute_best_clipping_plane(const std::unique_ptr<prim
         const float left_conc   = compute_concavity(left_vol, left_hull.volume(), _volume_hull);
         const float right_conc  = compute_concavity(right_vol, right_hull.volume(), _volume_hull);
         const float concavity   = (left_conc + right_conc);
-        const float local_conc  = delta * (left_conc + right_conc);
 
         /* Compute cost */
-        const float balance     = alpha * std::sqrt(std::pow(left_vol - right_vol, 2.0f)) / _volume_hull;
+        const float balance     = alpha * std::fabs(left_vol - right_vol) / _volume_hull;
         const float symmetry    = beta * dot_product(cut_dir, p.n);
-        const float cost        = concavity + balance + symmetry + local_conc;
+        const float cost        = concavity + balance + symmetry;
         if ((cost < min_cost) || ((cost == min_cost) && (i < best_i)))
         {
-            (*min_conc)     = concavity;
             (*best_plane)   = p;
             best_index      = index;
             min_cost        = cost;
@@ -151,13 +142,12 @@ void convex_decomposition::compute_acd(const convex_decomposition_options &param
                 pset->compute_axes_aligned_clipping_planes(&planes, params.plane_down_sampling);
 
                 plane best_plane;
-                float min_conc = std::numeric_limits<float>::max();
-                const int best_index = compute_best_clipping_plane(pset, volume, planes, cut_dir, concavity * params.alpha, concavity * w * params.beta, concavity * params.delta, params.hull_down_sampling, &best_plane, &min_conc, params);
-                if ((params.plane_down_sampling > 1 || params.hull_down_sampling > 1))
+                const int best_index = compute_best_clipping_plane(pset, volume, planes, cut_dir, concavity * params.alpha, w * concavity * params.beta, params.hull_down_sampling, &best_plane, params);
+                if ((params.plane_down_sampling > 1) || (params.hull_down_sampling > 1))
                 {
                     planes.clear();
-                    pset->refine_axes_aligned_clipping_planes(&planes, best_plane, params.plane_down_sampling, best_index);
-                    compute_best_clipping_plane(pset, volume, planes, cut_dir, concavity * params.alpha, concavity * w * params.beta, concavity * params.delta, 1, &best_plane, &min_conc, params);
+                    pset->refine_axes_aligned_clipping_planes(&planes, best_plane, params.plane_down_sampling, best_index * params.plane_down_sampling);
+                    compute_best_clipping_plane(pset, volume, planes, cut_dir, concavity * params.alpha, w * concavity * params.beta, 1, &best_plane, params);
                 }
 
                 primitive_set *left     = nullptr;

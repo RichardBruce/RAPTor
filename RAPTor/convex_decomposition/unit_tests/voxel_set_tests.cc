@@ -10,7 +10,7 @@
 #include "boost/test/unit_test.hpp"
 
 /* Convex Decomposition headers */
-#include "volume.h"
+#include "voxel_set.h"
 
 
 namespace raptor_convex_decomposition
@@ -585,7 +585,7 @@ BOOST_AUTO_TEST_CASE( refine_axes_aligned_clipping_planes_x_test )
     std::vector<plane> planes;
     diagonal.compute_bounding_box();
 
-    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t(0.0f, 0.0f, 0.0f), 0.0f, axis_t::x_axis), 9, 4);
+    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t(0.0f, 0.0f, 0.0f), 0.0f, axis_t::x_axis), 9, 1);
     BOOST_REQUIRE(planes.size() == 6);
     BOOST_CHECK(planes[0].n             == point_t(1.0f, 0.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[0].p, -0.8f, result_tolerance);
@@ -612,7 +612,7 @@ BOOST_AUTO_TEST_CASE( refine_axes_aligned_clipping_planes_y_test )
     std::vector<plane> planes;
     diagonal.compute_bounding_box();
 
-    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t(0.0f, 0.0f, 0.0f), 0.0f, axis_t::y_axis), 9, 10);
+    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t(0.0f, 0.0f, 0.0f), 0.0f, axis_t::y_axis), 9, 6);
     BOOST_REQUIRE(planes.size() == 11);
     BOOST_CHECK(planes[0].n             == point_t(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[0].p, 12.9f, result_tolerance);
@@ -654,7 +654,7 @@ BOOST_AUTO_TEST_CASE( refine_axes_aligned_clipping_planes_z_test )
     std::vector<plane> planes;
     diagonal.compute_bounding_box();
 
-    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t(0.0f, 0.0f, 0.0f), 0.0f, axis_t::z_axis), 4, 32);
+    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t(0.0f, 0.0f, 0.0f), 0.0f, axis_t::z_axis), 4, 30);
     BOOST_REQUIRE(planes.size() == 9);
     BOOST_CHECK(planes[0].n             == point_t(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[0].p, 61.6f, result_tolerance);

@@ -14,7 +14,6 @@ class convex_decomposition_options
             const float alpha                   = 0.05f,
             const float beta                    = 0.05f,
             const float gamma                   = 0.0005f,
-            const float delta                   = 0.05f,
             const float min_volume_per_hull     = 0.0001f,
             const int resolution                = 100000,
             const int max_vertices_per_hull     = 64,
@@ -28,7 +27,6 @@ class convex_decomposition_options
         alpha(alpha),
         beta(beta),
         gamma(gamma),
-        delta(delta),
         min_volume_per_hull(min_volume_per_hull),
         resolution(resolution),
         max_vertices_per_hull(max_vertices_per_hull),
@@ -44,7 +42,6 @@ class convex_decomposition_options
         const float                 alpha;
         const float                 beta;
         const float                 gamma;
-        const float                 delta;
         const float                 min_volume_per_hull;
         const int                   resolution;
         const int                   max_vertices_per_hull;

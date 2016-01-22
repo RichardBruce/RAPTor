@@ -215,7 +215,7 @@ struct regression_fixture : private boost::noncopyable
         }
 
         /* Save actual results */
-        save_results(uut, "test_data/" + file + ".vrml");
+        save_results(uut, "test_data/" + file + ".wrl");
         save_off(uut, "test_data/" + file + "_act.off", nr_pts, nr_tri);
 
         /* Load expected data */

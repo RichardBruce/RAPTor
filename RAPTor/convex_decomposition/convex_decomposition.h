@@ -42,7 +42,7 @@ class convex_decomposition
         void compute_acd(const convex_decomposition_options &params);
         void merge_convex_hulls(const convex_decomposition_options &params);
         void simplify_convex_hulls(const convex_decomposition_options &params);
-        int compute_best_clipping_plane(const std::unique_ptr<primitive_set> &pset, const float volume, const std::vector<plane> &planes, const point_t &cut_dir, const float alpha, const float beta, const float delta, const int dn_samp, plane *const best_plane, float *const min_conc, const convex_decomposition_options &params);
+        int compute_best_clipping_plane(const std::unique_ptr<primitive_set> &pset, const float volume, const std::vector<plane> &planes, const point_t &cut_dir, const float alpha, const float beta, const int dn_samp, plane *const best_plane, const convex_decomposition_options &params);
 
         void align_mesh(const std::vector<point_t> &points, const std::vector<point_ti> &triangles, const convex_decomposition_options &params)
         {

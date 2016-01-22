@@ -10,7 +10,8 @@
 #include "boost/test/unit_test.hpp"
 
 /* Convex Decomposition headers */
-#include "volume.h"
+#include "primitive_set.h"
+#include "voxel_set.h"
 
 
 namespace raptor_convex_decomposition

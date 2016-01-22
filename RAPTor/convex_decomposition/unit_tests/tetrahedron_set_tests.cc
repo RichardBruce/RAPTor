@@ -11,7 +11,7 @@
 #include "boost/test/unit_test.hpp"
 
 /* Convex Decomposition headers */
-#include "volume.h"
+#include "tetrahedron_set.h"
 
 
 namespace raptor_convex_decomposition
