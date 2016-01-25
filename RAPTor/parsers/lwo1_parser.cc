@@ -9,8 +9,16 @@
 #include "normal_calculator.h"
 #include "picture_functions.h"
 #include "parser_common.h"
+#include "polygon_to_triangles.h"
 #include "lwo_parser.h"
 #include "camera.h"
+
+/* Texture mappers */
+#include "mapper_shader.h"
+#include "perlin_noise_3d_mapper.h"
+#include "cubic_mapper.h"
+#include "cylindrical_mapper.h"
+#include "planar_mapper.h"
 
 
 namespace raptor_raytracer

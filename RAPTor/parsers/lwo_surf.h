@@ -11,6 +11,9 @@
 /* Raytracer headers */
 #include "lwo_clip.h"
 
+/* Texture mappers */
+#include "mapper_shader.h"
+
 
 namespace raptor_raytracer
 {

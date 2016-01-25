@@ -7,6 +7,8 @@ extern "C"
 #include "parser.h"
 }
 
+#include "polygon_to_triangles.h"
+
 
 namespace raptor_raytracer
 {

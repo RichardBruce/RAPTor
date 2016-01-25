@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "parser_common.h"
+#include "primitive_store.h"
 #include "cook_torrance_cxy.h"
 
 namespace raptor_raytracer

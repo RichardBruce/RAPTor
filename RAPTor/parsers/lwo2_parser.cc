@@ -7,6 +7,7 @@
 
 /* Ray tracer headers */
 #include "parser_common.h"
+#include "polygon_to_triangles.h"
 #include "lwo_parser.h"
 #include "lwo_chunks.h"
 #include "lwo_clip.h"

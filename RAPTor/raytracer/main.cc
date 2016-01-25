@@ -11,6 +11,7 @@
 #include "off_parser.h"
 #include "ply_parser.h"
 #include "vrml_parser.h"
+#include "polygon_to_triangles.h"
 #include "bih.h"
 #include "kd_tree.h"
 
