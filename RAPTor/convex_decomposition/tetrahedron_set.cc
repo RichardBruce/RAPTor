@@ -52,10 +52,6 @@ void tetrahedron_set::compute_convex_hull(convex_mesh *const mesh, const int sam
                     points[qu++] = _tetrahedra[p].pts[1];
                     points[qu++] = _tetrahedra[p].pts[2];
                     points[qu++] = _tetrahedra[p].pts[3];
-                    assert((_tetrahedra[p].pts[0] + epsilon) >= _min_bb);
-                    assert((_tetrahedra[p].pts[1] + epsilon) >= _min_bb);
-                    assert((_tetrahedra[p].pts[2] + epsilon) >= _min_bb);
-                    assert((_tetrahedra[p].pts[3] + epsilon) >= _min_bb);
                 }
             }
             ++p;
@@ -88,16 +84,14 @@ void tetrahedron_set::compute_convex_hull(convex_mesh *const mesh, const int sam
 
 bool tetrahedron_set::add(tetrahedron t)
 {
-    const float v = trapezium_volume(t.pts[0], t.pts[1], t.pts[2], t.pts[3]);
-    if (std::fabs(v) < epsilon)
+    const float v = tetrahedron_volume(t.pts[0], t.pts[1], t.pts[2], t.pts[3]);
+    if (v == 0.0f)
     {
         return false;
     }
     else if (v < 0.0f)
     {
-        point_t tmp = t.pts[0];
-        t.pts[0]   = t.pts[1];
-        t.pts[1]   = tmp;
+        std::swap(t.pts[0], t.pts[1]);
     }
 
     if (t.loc == voxel_value_t::primitive_on_surface)
@@ -137,7 +131,7 @@ void tetrahedron_set::add_clipped_tetrahedra(const point_t (&pts) [10], const in
         tetrahedron0.loc = voxel_value_t::primitive_on_surface;
         for (int h = 0; h < 15; ++h)
         {
-            const float v = trapezium_volume(pts[tet[h][0]], pts[tet[h][1]], pts[tet[h][2]], pts[tet[h][3]]);
+            const float v = tetrahedron_volume(pts[tet[h][0]], pts[tet[h][1]], pts[tet[h][2]], pts[tet[h][3]]);
             if (v > max_volume)
             {
                 h0 = h;
@@ -176,7 +170,7 @@ void tetrahedron_set::add_clipped_tetrahedra(const point_t (&pts) [10], const in
         tetrahedron1.loc = voxel_value_t::primitive_on_surface;
         for (int h = 0; h < 4; ++h)
         {
-            const float v = trapezium_volume(pts[a0], tetrahedron0.pts[tet_faces[h][0]], tetrahedron0.pts[tet_faces[h][1]], tetrahedron0.pts[tet_faces[h][2]]);
+            const float v = tetrahedron_volume(pts[a0], tetrahedron0.pts[tet_faces[h][0]], tetrahedron0.pts[tet_faces[h][1]], tetrahedron0.pts[tet_faces[h][2]]);
             if (v > max_volume)
             {
                 h1                  = h;
@@ -204,7 +198,7 @@ void tetrahedron_set::add_clipped_tetrahedra(const point_t (&pts) [10], const in
                 continue;
             }
 
-            const float v = trapezium_volume(pts[a0], tetrahedron0.pts[tet_faces[h][0]], tetrahedron0.pts[tet_faces[h][1]], tetrahedron0.pts[tet_faces[h][2]]);
+            const float v = tetrahedron_volume(pts[a0], tetrahedron0.pts[tet_faces[h][0]], tetrahedron0.pts[tet_faces[h][1]], tetrahedron0.pts[tet_faces[h][2]]);
             if (v > max_volume)
             {
                 h2                  = h;
@@ -225,7 +219,7 @@ void tetrahedron_set::add_clipped_tetrahedra(const point_t (&pts) [10], const in
                     continue;
                 }
 
-                const float v = trapezium_volume(pts[a1], tetrahedron1.pts[tet_faces[h][0]], tetrahedron1.pts[tet_faces[h][1]], tetrahedron1.pts[tet_faces[h][2]]);
+                const float v = tetrahedron_volume(pts[a1], tetrahedron1.pts[tet_faces[h][0]], tetrahedron1.pts[tet_faces[h][1]], tetrahedron1.pts[tet_faces[h][2]]);
                 if (v > max_volume)
                 {
                     h2                  = h;
@@ -326,7 +320,7 @@ void tetrahedron_set::compute_cut_volumes(const plane &p, float *const pos_volum
             cen_dist += p.distance(t.pts[i]);
         }
 
-        const float vol = std::fabs(trapezium_volume(t.pts[0], t.pts[1], t.pts[2], t.pts[3]));
+        const float vol = std::fabs(tetrahedron_volume(t.pts[0], t.pts[1], t.pts[2], t.pts[3]));
         if (cen_dist >= 0.0f)
         {
             pos_vol += vol;
@@ -467,10 +461,6 @@ void tetrahedron_set::cut(const plane &p, primitive_set **const pos_part, primit
                     assert(alpha >= 0.0f && alpha <= 1.0f);
 
                     const point_t s((alpha * p0) + ((1.0f - alpha) * p1));
-                    assert((s.x + epsilon) >= _min_bb.x);
-                    assert((s.y + epsilon) >= _min_bb.y);
-                    assert((s.z + epsilon) >= _min_bb.z);
-
                     pos_pts[npos++] = s;
                     neg_pts[nneg++] = s;
                 }
@@ -577,7 +567,7 @@ float tetrahedron_set::compute_volume() const
     float volume = 0.0f;
     for (const auto &t : _tetrahedra)
     {
-        volume += std::fabs(trapezium_volume(t.pts[0], t.pts[1], t.pts[2], t.pts[3]));
+        volume += std::fabs(tetrahedron_volume(t.pts[0], t.pts[1], t.pts[2], t.pts[3]));
     }
 
     return volume * (1.0f / 6.0f);
@@ -595,7 +585,7 @@ float tetrahedron_set::max_volume_error() const
     {
         if (t.loc == voxel_value_t::primitive_on_surface)
         {
-            volume += std::fabs(trapezium_volume(t.pts[0], t.pts[1], t.pts[2], t.pts[3]));
+            volume += std::fabs(tetrahedron_volume(t.pts[0], t.pts[1], t.pts[2], t.pts[3]));
         }
     }
 

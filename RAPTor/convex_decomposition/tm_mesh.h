@@ -117,7 +117,7 @@ class tmm_triangle
         /* Find the volume of 3 vertices with a point */
         float volume_with_point(const point_t &pt) const
         {
-            return trapezium_volume(_vertices[0]->position(), _vertices[1]->position(), _vertices[2]->position(), pt);
+            return tetrahedron_volume(_vertices[0]->position(), _vertices[1]->position(), _vertices[2]->position(), pt);
         }
 
         /* Access functions */
@@ -196,7 +196,7 @@ class tm_mesh : private boost::noncopyable
             _triangles.clear();
         }
 
-        void points_and_triangles(std::vector<point_t> *const points, std::vector<point_ti> *const triangles)
+        void points_and_triangles(std::vector<point_t> *const points, std::vector<point_ti<>> *const triangles)
         {
             /* Reserve space */
             points->reserve(_vertices.size());

@@ -22,39 +22,39 @@ struct voxel_set_fixture : private boost::noncopyable
 {
     voxel_set_fixture() :
         empty(   {  }, point_t( 3.5f, -2.7f, 1.6f), 1.0f),
-        cube(    { voxel(point_ti(3, 4, 2)) }, point_t( 3.5f, -2.7f, 1.6f), 1.0f),
-        cube2_5x({ voxel(point_ti(3, 4, 2)) }, point_t(-7.8f,  3.9f, 4.6f), 2.5f),
-        cube3x(  { voxel(point_ti(3, 4, 2)) }, point_t(-7.8f,  3.9f, 4.6f), 3.0f),
+        cube(    { voxel(point_ti<>(3, 4, 2)) }, point_t( 3.5f, -2.7f, 1.6f), 1.0f),
+        cube2_5x({ voxel(point_ti<>(3, 4, 2)) }, point_t(-7.8f,  3.9f, 4.6f), 2.5f),
+        cube3x(  { voxel(point_ti<>(3, 4, 2)) }, point_t(-7.8f,  3.9f, 4.6f), 3.0f),
         diagonal(
         {
-            voxel(point_ti(3, 4,   2)),
-            voxel(point_ti(4, 6,   4)),
-            voxel(point_ti(5, 8,   8)),
-            voxel(point_ti(6, 10, 16)),
-            voxel(point_ti(7, 12, 32)),
-            voxel(point_ti(8, 14, 64))
+            voxel(point_ti<>(3, 4,   2)),
+            voxel(point_ti<>(4, 6,   4)),
+            voxel(point_ti<>(5, 8,   8)),
+            voxel(point_ti<>(6, 10, 16)),
+            voxel(point_ti<>(7, 12, 32)),
+            voxel(point_ti<>(8, 14, 64))
         }, point_t(-7.8f,  3.9f, 4.6f), 2.0f),
         row(
         {
-            voxel(point_ti(0, 0, 0)),
-            voxel(point_ti(1, 0, 0)),
-            voxel(point_ti(2, 0, 0)),
-            voxel(point_ti(3, 0, 0)),
-            voxel(point_ti(4, 0, 0)),
-            voxel(point_ti(5, 0, 0)),
-            voxel(point_ti(6, 0, 0)),
-            voxel(point_ti(7, 0, 0))
+            voxel(point_ti<>(0, 0, 0)),
+            voxel(point_ti<>(1, 0, 0)),
+            voxel(point_ti<>(2, 0, 0)),
+            voxel(point_ti<>(3, 0, 0)),
+            voxel(point_ti<>(4, 0, 0)),
+            voxel(point_ti<>(5, 0, 0)),
+            voxel(point_ti<>(6, 0, 0)),
+            voxel(point_ti<>(7, 0, 0))
         }, point_t(1.0f, 2.0f, 3.0f), 1.0f),
         on_surface(
         {
-            voxel(point_ti(0, 0, 0), voxel_value_t::primitive_on_surface),
-            voxel(point_ti(1, 0, 0), voxel_value_t::primitive_on_surface),
-            voxel(point_ti(2, 0, 0), voxel_value_t::primitive_undefined),
-            voxel(point_ti(3, 0, 0), voxel_value_t::primitive_outside_surface),
-            voxel(point_ti(4, 0, 0), voxel_value_t::primitive_inside_surface),
-            voxel(point_ti(5, 0, 0), voxel_value_t::primitive_on_surface),
-            voxel(point_ti(6, 0, 0), voxel_value_t::primitive_undefined),
-            voxel(point_ti(7, 0, 0), voxel_value_t::primitive_undefined)
+            voxel(point_ti<>(0, 0, 0), voxel_value_t::primitive_on_surface),
+            voxel(point_ti<>(1, 0, 0), voxel_value_t::primitive_on_surface),
+            voxel(point_ti<>(2, 0, 0), voxel_value_t::primitive_undefined),
+            voxel(point_ti<>(3, 0, 0), voxel_value_t::primitive_outside_surface),
+            voxel(point_ti<>(4, 0, 0), voxel_value_t::primitive_inside_surface),
+            voxel(point_ti<>(5, 0, 0), voxel_value_t::primitive_on_surface),
+            voxel(point_ti<>(6, 0, 0), voxel_value_t::primitive_undefined),
+            voxel(point_ti<>(7, 0, 0), voxel_value_t::primitive_undefined)
         }, point_t(1.0f, 2.0f, 3.0f), 1.0f)
     {  }
 
@@ -76,7 +76,7 @@ const float result_tolerance = 0.0005f;
 BOOST_AUTO_TEST_CASE( ctor_test )
 {
     BOOST_CHECK(cube.get_min_bb()                           == point_t(3.5f, -2.7f, 1.6f));
-    BOOST_CHECK(cube.get_barycenter()                       == point_ti(0, 0, 0));
+    BOOST_CHECK(cube.get_barycenter()                       == point_ti<>(0, 0, 0));
     BOOST_CHECK(cube.compute_volume()                       == 1.0f);
     BOOST_CHECK(cube.max_volume_error()                     == 0.0f);
     BOOST_CHECK(cube.get_scale()                            == 1.0f);
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE( ctor_test )
     BOOST_CHECK(cube.number_of_primitives_inside()          == 0);
 
     BOOST_CHECK(cube3x.get_min_bb()                         == point_t(-7.8f, 3.9f, 4.6f));
-    BOOST_CHECK(cube3x.get_barycenter()                     == point_ti(0, 0, 0));
+    BOOST_CHECK(cube3x.get_barycenter()                     == point_ti<>(0, 0, 0));
     BOOST_CHECK(cube3x.compute_volume()                     == 27.0f);
     BOOST_CHECK(cube3x.max_volume_error()                   == 0.0f);
     BOOST_CHECK(cube3x.get_scale()                          == 3.0f);
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE( ctor_test )
     BOOST_CHECK(cube3x.number_of_primitives_inside()        == 0);
 
     BOOST_CHECK(diagonal.get_min_bb()                       == point_t(-7.8f, 3.9f, 4.6f));
-    BOOST_CHECK(diagonal.get_barycenter()                   == point_ti(0, 0, 0));
+    BOOST_CHECK(diagonal.get_barycenter()                   == point_ti<>(0, 0, 0));
     BOOST_CHECK(diagonal.compute_volume()                   == 48.0f);
     BOOST_CHECK(diagonal.max_volume_error()                 == 0.0f);
     BOOST_CHECK(diagonal.get_scale()                        == 2.0f);
@@ -112,24 +112,24 @@ BOOST_AUTO_TEST_CASE( const_get_voxels_test )
     const auto *const const_diagonal = &diagonal;
     const auto &v = const_diagonal->get_voxels();
     BOOST_REQUIRE(v.size() == 6);
-    BOOST_CHECK(v[0].coord == point_ti(3, 4,   2));
-    BOOST_CHECK(v[1].coord == point_ti(4, 6,   4));
-    BOOST_CHECK(v[2].coord == point_ti(5, 8,   8));
-    BOOST_CHECK(v[3].coord == point_ti(6, 10, 16));
-    BOOST_CHECK(v[4].coord == point_ti(7, 12, 32));
-    BOOST_CHECK(v[5].coord == point_ti(8, 14, 64));
+    BOOST_CHECK(v[0].coord == point_ti<>(3, 4,   2));
+    BOOST_CHECK(v[1].coord == point_ti<>(4, 6,   4));
+    BOOST_CHECK(v[2].coord == point_ti<>(5, 8,   8));
+    BOOST_CHECK(v[3].coord == point_ti<>(6, 10, 16));
+    BOOST_CHECK(v[4].coord == point_ti<>(7, 12, 32));
+    BOOST_CHECK(v[5].coord == point_ti<>(8, 14, 64));
 }
 
 BOOST_AUTO_TEST_CASE( get_voxels_test )
 {
     auto &v =  diagonal.get_voxels();
     BOOST_REQUIRE(v.size() == 6);
-    BOOST_CHECK(v[0].coord == point_ti(3, 4,   2));
-    BOOST_CHECK(v[1].coord == point_ti(4, 6,   4));
-    BOOST_CHECK(v[2].coord == point_ti(5, 8,   8));
-    BOOST_CHECK(v[3].coord == point_ti(6, 10, 16));
-    BOOST_CHECK(v[4].coord == point_ti(7, 12, 32));
-    BOOST_CHECK(v[5].coord == point_ti(8, 14, 64));
+    BOOST_CHECK(v[0].coord == point_ti<>(3, 4,   2));
+    BOOST_CHECK(v[1].coord == point_ti<>(4, 6,   4));
+    BOOST_CHECK(v[2].coord == point_ti<>(5, 8,   8));
+    BOOST_CHECK(v[3].coord == point_ti<>(6, 10, 16));
+    BOOST_CHECK(v[4].coord == point_ti<>(7, 12, 32));
+    BOOST_CHECK(v[5].coord == point_ti<>(8, 14, 64));
 }
 
 /* Test set scale */
@@ -176,19 +176,19 @@ BOOST_AUTO_TEST_CASE( get_point_point_test )
 
 BOOST_AUTO_TEST_CASE( get_point_voxel_test )
 {
-    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti(0,  0, 0))) - point_t(-7.8f,  3.9f,  4.6f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti(1,  1, 1))) - point_t(-4.8f,  6.9f,  7.6f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti(2, -4, 9))) - point_t(-1.8f, -8.1f, 31.6f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti<>(0,  0, 0))) - point_t(-7.8f,  3.9f,  4.6f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti<>(1,  1, 1))) - point_t(-4.8f,  6.9f,  7.6f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti<>(2, -4, 9))) - point_t(-1.8f, -8.1f, 31.6f))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti(0,  0, 0))) - point_t(-7.8f,  3.9f,  4.6f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti(1,  1, 1))) - point_t(-5.3f,  6.4f,  7.1f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti(2, -4, 9))) - point_t(-2.8f, -6.1f, 27.1f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti<>(0,  0, 0))) - point_t(-7.8f,  3.9f,  4.6f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti<>(1,  1, 1))) - point_t(-5.3f,  6.4f,  7.1f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti<>(2, -4, 9))) - point_t(-2.8f, -6.1f, 27.1f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE( get_points_test )
 {
     point_t pts[8];
-    cube.get_points(voxel(point_ti(0,  0, 0)), &pts[0]);
+    cube.get_points(voxel(point_ti<>(0,  0, 0)), &pts[0]);
     BOOST_CHECK(pts[0] == point_t(3.0f, -3.2f,  1.1f));
     BOOST_CHECK(pts[1] == point_t(4.0f, -3.2f,  1.1f));
     BOOST_CHECK(pts[2] == point_t(4.0f, -2.2f,  1.1f));
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE( get_points_test )
     BOOST_CHECK(pts[6] == point_t(4.0f, -2.2f,  2.1f));
     BOOST_CHECK(pts[7] == point_t(3.0f, -2.2f,  2.1f));
 
-    cube.get_points(voxel(point_ti(1,  1, 1)), &pts[0]);
+    cube.get_points(voxel(point_ti<>(1,  1, 1)), &pts[0]);
     BOOST_CHECK(pts[0] == point_t(4.0f, -2.2f,  2.1f));
     BOOST_CHECK(pts[1] == point_t(5.0f, -2.2f,  2.1f));
     BOOST_CHECK(pts[2] == point_t(5.0f, -1.2f,  2.1f));
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE( get_points_test )
     BOOST_CHECK(pts[6] == point_t(5.0f, -1.2f,  3.1f));
     BOOST_CHECK(pts[7] == point_t(4.0f, -1.2f,  3.1f));
 
-    cube.get_points(voxel(point_ti(2, -4, 9)), &pts[0]);
+    cube.get_points(voxel(point_ti<>(2, -4, 9)), &pts[0]);
     BOOST_CHECK(pts[0] == point_t(5.0f, -7.2f, 10.1f));
     BOOST_CHECK(pts[1] == point_t(6.0f, -7.2f, 10.1f));
     BOOST_CHECK(pts[2] == point_t(6.0f, -6.2f, 10.1f));
@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE( get_points_test )
     BOOST_CHECK(pts[6] == point_t(6.0f, -6.2f, 11.1f));
     BOOST_CHECK(pts[7] == point_t(5.0f, -6.2f, 11.1f));
 
-    cube2_5x.get_points(voxel(point_ti(0,  0, 0)), &pts[0]);
+    cube2_5x.get_points(voxel(point_ti<>(0,  0, 0)), &pts[0]);
     BOOST_CHECK(pts[0] == point_t(-9.05f, 2.65f, 3.35f));
     BOOST_CHECK(pts[1] == point_t(-6.55f, 2.65f, 3.35f));
     BOOST_CHECK(pts[2] == point_t(-6.55f, 5.15f, 3.35f));
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE( get_points_test )
     BOOST_CHECK(pts[6] == point_t(-6.55f, 5.15f, 5.85f));
     BOOST_CHECK(pts[7] == point_t(-9.05f, 5.15f, 5.85f));
 
-    cube2_5x.get_points(voxel(point_ti(1,  1, 1)), &pts[0]);
+    cube2_5x.get_points(voxel(point_ti<>(1,  1, 1)), &pts[0]);
     BOOST_CHECK(pts[0] == point_t(-6.55f, 5.15f, 5.85f));
     BOOST_CHECK(pts[1] == point_t(-4.05f, 5.15f, 5.85f));
     BOOST_CHECK(pts[2] == point_t(-4.05f, 7.65f, 5.85f));
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE( get_points_test )
     BOOST_CHECK(pts[6] == point_t(-4.05f, 7.65f, 8.35f));
     BOOST_CHECK(pts[7] == point_t(-6.55f, 7.65f, 8.35f));
 
-    cube2_5x.get_points(voxel(point_ti(2, -4, 9)), &pts[0]);
+    cube2_5x.get_points(voxel(point_ti<>(2, -4, 9)), &pts[0]);
     BOOST_CHECK(fabs(magnitude(pts[0] - point_t(-4.05f, -7.35f, 25.85f))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(pts[1] - point_t(-1.55f, -7.35f, 25.85f))) < result_tolerance);
     BOOST_CHECK(fabs(magnitude(pts[2] - point_t(-1.55f, -4.85f, 25.85f))) < result_tolerance);
@@ -253,19 +253,19 @@ BOOST_AUTO_TEST_CASE( get_points_test )
 BOOST_AUTO_TEST_CASE( compute_bounding_box_test )
 {
     empty.compute_bounding_box();
-    BOOST_CHECK(empty.get_min_bb_voxels()   == point_ti(0, 0, 0));
-    BOOST_CHECK(empty.get_max_bb_voxels()   == point_ti(0, 0, 0));
-    BOOST_CHECK(empty.get_barycenter()      == point_ti(0, 0, 0));
+    BOOST_CHECK(empty.get_min_bb_voxels()   == point_ti<>(0, 0, 0));
+    BOOST_CHECK(empty.get_max_bb_voxels()   == point_ti<>(0, 0, 0));
+    BOOST_CHECK(empty.get_barycenter()      == point_ti<>(0, 0, 0));
 
     cube.compute_bounding_box();
-    BOOST_CHECK(cube.get_min_bb_voxels()    == point_ti(3, 4, 2));
-    BOOST_CHECK(cube.get_max_bb_voxels()    == point_ti(3, 4, 2));
-    BOOST_CHECK(cube.get_barycenter()       == point_ti(3, 4, 2));
+    BOOST_CHECK(cube.get_min_bb_voxels()    == point_ti<>(3, 4, 2));
+    BOOST_CHECK(cube.get_max_bb_voxels()    == point_ti<>(3, 4, 2));
+    BOOST_CHECK(cube.get_barycenter()       == point_ti<>(3, 4, 2));
 
     diagonal.compute_bounding_box();
-    BOOST_CHECK(diagonal.get_min_bb_voxels()    == point_ti(3,  4,  2));
-    BOOST_CHECK(diagonal.get_max_bb_voxels()    == point_ti(8, 14, 64));
-    BOOST_CHECK(diagonal.get_barycenter()       == point_ti(6,  9, 21));
+    BOOST_CHECK(diagonal.get_min_bb_voxels()    == point_ti<>(3,  4,  2));
+    BOOST_CHECK(diagonal.get_max_bb_voxels()    == point_ti<>(8, 14, 64));
+    BOOST_CHECK(diagonal.get_barycenter()       == point_ti<>(6,  9, 21));
 }
 
 /* Test intersect */
@@ -277,7 +277,7 @@ BOOST_AUTO_TEST_CASE( intersect_clean_test )
     diagonal.intersect(plane(point_t(1.0f, 0.0f, 0.0f), 3.2f, axis_t::x_axis), &pos_pts, &neg_pts, 1);
 
     BOOST_REQUIRE(pos_pts.size() == 24);
-    diagonal.get_points(voxel(point_ti(6, 10, 16)), &pts[0]);
+    diagonal.get_points(voxel(point_ti<>(6, 10, 16)), &pts[0]);
     BOOST_CHECK(pos_pts[0] == pts[0]);
     BOOST_CHECK(pos_pts[1] == pts[1]);
     BOOST_CHECK(pos_pts[2] == pts[2]);
@@ -286,7 +286,7 @@ BOOST_AUTO_TEST_CASE( intersect_clean_test )
     BOOST_CHECK(pos_pts[5] == pts[5]);
     BOOST_CHECK(pos_pts[6] == pts[6]);
     BOOST_CHECK(pos_pts[7] == pts[7]);
-    diagonal.get_points(voxel(point_ti(7, 12, 32)), &pts[0]);
+    diagonal.get_points(voxel(point_ti<>(7, 12, 32)), &pts[0]);
     BOOST_CHECK(pos_pts[ 8] == pts[0]);
     BOOST_CHECK(pos_pts[ 9] == pts[1]);
     BOOST_CHECK(pos_pts[10] == pts[2]);
@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_CASE( intersect_clean_test )
     BOOST_CHECK(pos_pts[13] == pts[5]);
     BOOST_CHECK(pos_pts[14] == pts[6]);
     BOOST_CHECK(pos_pts[15] == pts[7]);
-    diagonal.get_points(voxel(point_ti(8, 14, 64)), &pts[0]);
+    diagonal.get_points(voxel(point_ti<>(8, 14, 64)), &pts[0]);
     BOOST_CHECK(pos_pts[16] == pts[0]);
     BOOST_CHECK(pos_pts[17] == pts[1]);
     BOOST_CHECK(pos_pts[18] == pts[2]);
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE( intersect_clean_test )
     BOOST_CHECK(pos_pts[23] == pts[7]);
 
     BOOST_REQUIRE(neg_pts.size() == 24);
-    diagonal.get_points(voxel(point_ti(3, 4,   2)), &pts[0]);
+    diagonal.get_points(voxel(point_ti<>(3, 4,   2)), &pts[0]);
     BOOST_CHECK(neg_pts[0] == pts[0]);
     BOOST_CHECK(neg_pts[1] == pts[1]);
     BOOST_CHECK(neg_pts[2] == pts[2]);
@@ -315,7 +315,7 @@ BOOST_AUTO_TEST_CASE( intersect_clean_test )
     BOOST_CHECK(neg_pts[5] == pts[5]);
     BOOST_CHECK(neg_pts[6] == pts[6]);
     BOOST_CHECK(neg_pts[7] == pts[7]);
-    diagonal.get_points(voxel(point_ti(4, 6,   4)), &pts[0]);
+    diagonal.get_points(voxel(point_ti<>(4, 6,   4)), &pts[0]);
     BOOST_CHECK(neg_pts[ 8] == pts[0]);
     BOOST_CHECK(neg_pts[ 9] == pts[1]);
     BOOST_CHECK(neg_pts[10] == pts[2]);
@@ -324,7 +324,7 @@ BOOST_AUTO_TEST_CASE( intersect_clean_test )
     BOOST_CHECK(neg_pts[13] == pts[5]);
     BOOST_CHECK(neg_pts[14] == pts[6]);
     BOOST_CHECK(neg_pts[15] == pts[7]);
-    diagonal.get_points(voxel(point_ti(5, 8,   8)), &pts[0]);
+    diagonal.get_points(voxel(point_ti<>(5, 8,   8)), &pts[0]);
     BOOST_CHECK(neg_pts[16] == pts[0]);
     BOOST_CHECK(neg_pts[17] == pts[1]);
     BOOST_CHECK(neg_pts[18] == pts[2]);
@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_CASE( intersect_pos_sampling_test )
     row.intersect(plane(point_t(0.0f, 1.0f, 0.0f), 0.9f, axis_t::x_axis), &pos_pts, &neg_pts, 3);
 
     BOOST_REQUIRE(pos_pts.size() == 16);
-    row.get_points(voxel(point_ti(2, 0, 0)), &pts[0]);
+    row.get_points(voxel(point_ti<>(2, 0, 0)), &pts[0]);
     BOOST_CHECK(pos_pts[0] == pts[0]);
     BOOST_CHECK(pos_pts[1] == pts[1]);
     BOOST_CHECK(pos_pts[2] == pts[2]);
@@ -352,7 +352,7 @@ BOOST_AUTO_TEST_CASE( intersect_pos_sampling_test )
     BOOST_CHECK(pos_pts[5] == pts[5]);
     BOOST_CHECK(pos_pts[6] == pts[6]);
     BOOST_CHECK(pos_pts[7] == pts[7]);
-    row.get_points(voxel(point_ti(5, 0, 0)), &pts[0]);
+    row.get_points(voxel(point_ti<>(5, 0, 0)), &pts[0]);
     BOOST_CHECK(pos_pts[ 8] == pts[0]);
     BOOST_CHECK(pos_pts[ 9] == pts[1]);
     BOOST_CHECK(pos_pts[10] == pts[2]);
@@ -375,7 +375,7 @@ BOOST_AUTO_TEST_CASE( intersect_neg_sampling_test )
     BOOST_REQUIRE(pos_pts.size() == 0);
 
     BOOST_REQUIRE(neg_pts.size() == 16);
-    row.get_points(voxel(point_ti(2, 0, 0)), &pts[0]);
+    row.get_points(voxel(point_ti<>(2, 0, 0)), &pts[0]);
     BOOST_CHECK(neg_pts[0] == pts[0]);
     BOOST_CHECK(neg_pts[1] == pts[1]);
     BOOST_CHECK(neg_pts[2] == pts[2]);
@@ -384,7 +384,7 @@ BOOST_AUTO_TEST_CASE( intersect_neg_sampling_test )
     BOOST_CHECK(neg_pts[5] == pts[5]);
     BOOST_CHECK(neg_pts[6] == pts[6]);
     BOOST_CHECK(neg_pts[7] == pts[7]);
-    row.get_points(voxel(point_ti(5, 0, 0)), &pts[0]);
+    row.get_points(voxel(point_ti<>(5, 0, 0)), &pts[0]);
     BOOST_CHECK(neg_pts[ 8] == pts[0]);
     BOOST_CHECK(neg_pts[ 9] == pts[1]);
     BOOST_CHECK(neg_pts[10] == pts[2]);
@@ -431,9 +431,9 @@ BOOST_AUTO_TEST_CASE( select_on_surface_test )
 
     const auto &v = on_surf->get_voxels();
     BOOST_REQUIRE(v.size() == 3);
-    BOOST_CHECK(v[0].coord == point_ti(0, 0, 0));
-    BOOST_CHECK(v[1].coord == point_ti(1, 0, 0));
-    BOOST_CHECK(v[2].coord == point_ti(5, 0, 0));
+    BOOST_CHECK(v[0].coord == point_ti<>(0, 0, 0));
+    BOOST_CHECK(v[1].coord == point_ti<>(1, 0, 0));
+    BOOST_CHECK(v[2].coord == point_ti<>(5, 0, 0));
 
     BOOST_CHECK(v[0].loc == voxel_value_t::primitive_on_surface);
     BOOST_CHECK(v[1].loc == voxel_value_t::primitive_on_surface);
@@ -453,18 +453,18 @@ BOOST_AUTO_TEST_CASE( cut_diagonal_test )
     BOOST_CHECK(pos_part->number_of_primitives_inside()      == 2);
     BOOST_CHECK(pos_part->max_volume_error()                 == 8.0f);
     BOOST_REQUIRE(pos_part->number_of_primitives()           == 3);
-    BOOST_CHECK(pos_part->get_voxels()[0].coord == point_ti(6, 10, 16));
-    BOOST_CHECK(pos_part->get_voxels()[1].coord == point_ti(7, 12, 32));
-    BOOST_CHECK(pos_part->get_voxels()[2].coord == point_ti(8, 14, 64));
+    BOOST_CHECK(pos_part->get_voxels()[0].coord == point_ti<>(6, 10, 16));
+    BOOST_CHECK(pos_part->get_voxels()[1].coord == point_ti<>(7, 12, 32));
+    BOOST_CHECK(pos_part->get_voxels()[2].coord == point_ti<>(8, 14, 64));
 
 
     BOOST_CHECK(neg_part->number_of_primitives_on_surface()  == 1);
     BOOST_CHECK(neg_part->number_of_primitives_inside()      == 2);
     BOOST_CHECK(neg_part->max_volume_error()                 == 8.0f);
     BOOST_REQUIRE(neg_part->number_of_primitives()           == 3);
-    BOOST_CHECK(neg_part->get_voxels()[0].coord == point_ti(3, 4,   2));
-    BOOST_CHECK(neg_part->get_voxels()[1].coord == point_ti(4, 6,   4));
-    BOOST_CHECK(neg_part->get_voxels()[2].coord == point_ti(5, 8,   8));
+    BOOST_CHECK(neg_part->get_voxels()[0].coord == point_ti<>(3, 4,   2));
+    BOOST_CHECK(neg_part->get_voxels()[1].coord == point_ti<>(4, 6,   4));
+    BOOST_CHECK(neg_part->get_voxels()[2].coord == point_ti<>(5, 8,   8));
 
     delete pos_part;
     delete neg_part;
@@ -482,20 +482,20 @@ BOOST_AUTO_TEST_CASE( cut_on_surface_test )
     BOOST_CHECK(pos_part->number_of_primitives_inside()      == 5);
     BOOST_CHECK(pos_part->max_volume_error()                 == 2.0f);
     BOOST_REQUIRE(pos_part->number_of_primitives()           == 7);
-    BOOST_CHECK(pos_part->get_voxels()[0].coord == point_ti(1, 0, 0));
-    BOOST_CHECK(pos_part->get_voxels()[1].coord == point_ti(2, 0, 0));
-    BOOST_CHECK(pos_part->get_voxels()[2].coord == point_ti(3, 0, 0));
-    BOOST_CHECK(pos_part->get_voxels()[3].coord == point_ti(4, 0, 0));
-    BOOST_CHECK(pos_part->get_voxels()[4].coord == point_ti(5, 0, 0));
-    BOOST_CHECK(pos_part->get_voxels()[5].coord == point_ti(6, 0, 0));
-    BOOST_CHECK(pos_part->get_voxels()[6].coord == point_ti(7, 0, 0));
+    BOOST_CHECK(pos_part->get_voxels()[0].coord == point_ti<>(1, 0, 0));
+    BOOST_CHECK(pos_part->get_voxels()[1].coord == point_ti<>(2, 0, 0));
+    BOOST_CHECK(pos_part->get_voxels()[2].coord == point_ti<>(3, 0, 0));
+    BOOST_CHECK(pos_part->get_voxels()[3].coord == point_ti<>(4, 0, 0));
+    BOOST_CHECK(pos_part->get_voxels()[4].coord == point_ti<>(5, 0, 0));
+    BOOST_CHECK(pos_part->get_voxels()[5].coord == point_ti<>(6, 0, 0));
+    BOOST_CHECK(pos_part->get_voxels()[6].coord == point_ti<>(7, 0, 0));
 
 
     BOOST_CHECK(neg_part->number_of_primitives_on_surface()  == 1);
     BOOST_CHECK(neg_part->number_of_primitives_inside()      == 0);
     BOOST_CHECK(neg_part->max_volume_error()                 == 1.0f);
     BOOST_REQUIRE(neg_part->number_of_primitives()           == 1);
-    BOOST_CHECK(neg_part->get_voxels()[0].coord == point_ti(0, 0, 0));
+    BOOST_CHECK(neg_part->get_voxels()[0].coord == point_ti<>(0, 0, 0));
 
     delete pos_part;
     delete neg_part;

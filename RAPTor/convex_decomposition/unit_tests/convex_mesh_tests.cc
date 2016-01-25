@@ -25,32 +25,32 @@ struct convex_mesh_fixture : private boost::noncopyable
                 point_t(-0.5f, -0.5f, -0.5f), point_t( 0.5f, -0.5f, -0.5f), point_t( 0.5f,  0.5f, -0.5f), point_t(-0.5f,  0.5f, -0.5f), point_t(0.0f, 0.0f, 2.5f)
             },
             { 
-                point_ti(0, 2, 1), point_ti(0, 3, 2), /* Front face */
-                point_ti(0, 1, 4), point_ti(1, 2, 4), point_ti(2, 3, 4), point_ti(3, 0, 4)
+                point_ti<>(0, 2, 1), point_ti<>(0, 3, 2), /* Front face */
+                point_ti<>(0, 1, 4), point_ti<>(1, 2, 4), point_ti<>(2, 3, 4), point_ti<>(3, 0, 4)
             }),
     cube(   {
                 point_t(-0.5f, -0.5f, -0.5f), point_t( 0.5f, -0.5f, -0.5f), point_t( 0.5f,  0.5f, -0.5f), point_t(-0.5f,  0.5f, -0.5f),
                 point_t(-0.5f, -0.5f,  0.5f), point_t( 0.5f, -0.5f,  0.5f), point_t( 0.5f,  0.5f,  0.5f), point_t(-0.5f,  0.5f,  0.5f)
             }, 
             {
-                point_ti(0, 2, 1), point_ti(0, 3, 2),   /* Front face   */
-                point_ti(4, 5, 6), point_ti(4, 6, 7),   /* Back face    */
-                point_ti(4, 7, 0), point_ti(7, 3, 0),   /* Left face    */
-                point_ti(1, 2, 6), point_ti(1, 6, 5),   /* Right face   */
-                point_ti(3, 7, 6), point_ti(3, 6, 2),   /* Top face     */
-                point_ti(0, 1, 4), point_ti(1, 5, 4)    /* Bottom face  */
+                point_ti<>(0, 2, 1), point_ti<>(0, 3, 2),   /* Front face   */
+                point_ti<>(4, 5, 6), point_ti<>(4, 6, 7),   /* Back face    */
+                point_ti<>(4, 7, 0), point_ti<>(7, 3, 0),   /* Left face    */
+                point_ti<>(1, 2, 6), point_ti<>(1, 6, 5),   /* Right face   */
+                point_ti<>(3, 7, 6), point_ti<>(3, 6, 2),   /* Top face     */
+                point_ti<>(0, 1, 4), point_ti<>(1, 5, 4)    /* Bottom face  */
             }),
     cube2x( {
                 point_t( 0.0f,  0.0f,  0.0f), point_t( 2.0f,  0.0f,  0.0f), point_t( 2.0f,  2.0f,  0.0f), point_t( 0.0f,  2.0f,  0.0f),
                 point_t( 0.0f,  0.0f,  2.0f), point_t( 2.0f,  0.0f,  2.0f), point_t( 2.0f,  2.0f,  2.0f), point_t( 0.0f,  2.0f,  2.0f)
             }, 
             {
-                point_ti(0, 2, 1), point_ti(0, 3, 2),   /* Front face   */
-                point_ti(4, 5, 6), point_ti(4, 6, 7),   /* Back face    */
-                point_ti(4, 7, 0), point_ti(7, 3, 0),   /* Left face    */
-                point_ti(1, 2, 6), point_ti(1, 6, 5),   /* Right face   */
-                point_ti(3, 7, 6), point_ti(3, 6, 2),   /* Top face     */
-                point_ti(0, 1, 4), point_ti(1, 5, 4)    /* Bottom face  */
+                point_ti<>(0, 2, 1), point_ti<>(0, 3, 2),   /* Front face   */
+                point_ti<>(4, 5, 6), point_ti<>(4, 6, 7),   /* Back face    */
+                point_ti<>(4, 7, 0), point_ti<>(7, 3, 0),   /* Left face    */
+                point_ti<>(1, 2, 6), point_ti<>(1, 6, 5),   /* Right face   */
+                point_ti<>(3, 7, 6), point_ti<>(3, 6, 2),   /* Top face     */
+                point_ti<>(0, 1, 4), point_ti<>(1, 5, 4)    /* Bottom face  */
             }),
     stellated_cube(
             {
@@ -59,12 +59,12 @@ struct convex_mesh_fixture : private boost::noncopyable
                 point_t( 3.5f,  0.0f,  0.0f), point_t(-3.5f,  0.0f,  0.0f), point_t( 0.0f,  3.5f,  0.0f), point_t( 0.0f, -3.5f,  0.0f), point_t( 0.0f,  0.0f,  3.5f), point_t( 0.0f,  0.0f, -3.5f)
             }, 
             {
-                point_ti(1, 0, 13), point_ti(2, 1, 13), point_ti(3, 2, 13), point_ti(0, 3, 13), /* Front face   */
-                point_ti(4, 5, 12), point_ti(5, 6, 12), point_ti(6, 7, 12), point_ti(7, 4, 12), /* Back face    */
-                point_ti(3, 0,  9), point_ti(0, 4,  9), point_ti(4, 7,  9), point_ti(7, 3,  9), /* Left face    */
-                point_ti(1, 2,  8), point_ti(2, 6,  8), point_ti(6, 5,  8), point_ti(5, 1,  8), /* Right face   */
-                point_ti(2, 3, 10), point_ti(3, 7, 10), point_ti(7, 6, 10), point_ti(6, 2, 10), /* Top face     */
-                point_ti(0, 1, 11), point_ti(1, 5, 11), point_ti(5, 4, 11), point_ti(4, 0, 11)  /* Bottom face  */
+                point_ti<>(1, 0, 13), point_ti<>(2, 1, 13), point_ti<>(3, 2, 13), point_ti<>(0, 3, 13), /* Front face   */
+                point_ti<>(4, 5, 12), point_ti<>(5, 6, 12), point_ti<>(6, 7, 12), point_ti<>(7, 4, 12), /* Back face    */
+                point_ti<>(3, 0,  9), point_ti<>(0, 4,  9), point_ti<>(4, 7,  9), point_ti<>(7, 3,  9), /* Left face    */
+                point_ti<>(1, 2,  8), point_ti<>(2, 6,  8), point_ti<>(6, 5,  8), point_ti<>(5, 1,  8), /* Right face   */
+                point_ti<>(2, 3, 10), point_ti<>(3, 7, 10), point_ti<>(7, 6, 10), point_ti<>(6, 2, 10), /* Top face     */
+                point_ti<>(0, 1, 11), point_ti<>(1, 5, 11), point_ti<>(5, 4, 11), point_ti<>(4, 0, 11)  /* Bottom face  */
             })
       {  };
 

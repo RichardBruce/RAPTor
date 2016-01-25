@@ -78,12 +78,12 @@ struct volume_fixture : private boost::noncopyable
             }),
         cube_triangles(
             {
-                point_ti(0, 1, 2), point_ti(0, 2, 3), /* Front face     */
-                point_ti(4, 6, 5), point_ti(4, 7, 6), /* Back face      */
-                point_ti(4, 0, 7), point_ti(7, 0, 3), /* Left face      */
-                point_ti(1, 6, 2), point_ti(1, 5, 6), /* Right face     */
-                point_ti(3, 6, 7), point_ti(3, 2, 6), /* Top face       */
-                point_ti(0, 4, 1), point_ti(1, 4, 5)  /* Bottom face    */
+                point_ti<>(0, 1, 2), point_ti<>(0, 2, 3), /* Front face     */
+                point_ti<>(4, 6, 5), point_ti<>(4, 7, 6), /* Back face      */
+                point_ti<>(4, 0, 7), point_ti<>(7, 0, 3), /* Left face      */
+                point_ti<>(1, 6, 2), point_ti<>(1, 5, 6), /* Right face     */
+                point_ti<>(3, 6, 7), point_ti<>(3, 2, 6), /* Top face       */
+                point_ti<>(0, 4, 1), point_ti<>(1, 4, 5)  /* Bottom face    */
             })
     {  }
 
@@ -95,20 +95,20 @@ struct volume_fixture : private boost::noncopyable
         return shifted_points;
     }
 
-    std::vector<point_ti> make_cube_pair_triangles() const
+    std::vector<point_ti<>> make_cube_pair_triangles() const
     {
         auto shifted_triangles(cube_triangles);
-        std::transform(shifted_triangles.begin(), shifted_triangles.end(), shifted_triangles.begin(), [](const point_ti &p){ return p + 8; });
+        std::transform(shifted_triangles.begin(), shifted_triangles.end(), shifted_triangles.begin(), [](const point_ti<> &p){ return p + 8; });
         shifted_triangles.insert(shifted_triangles.end(), cube_triangles.begin(), cube_triangles.end());
         return shifted_triangles;
     }
 
-    const std::vector<point_t>  cube_points;
-    const std::vector<point_t>  cubiod_x_points;
-    const std::vector<point_t>  cubiod_y_points;
-    const std::vector<point_t>  cubiod_z_points;
-    const std::vector<point_t>  cube2x_points;
-    const std::vector<point_ti> cube_triangles;
+    const std::vector<point_t>      cube_points;
+    const std::vector<point_t>      cubiod_x_points;
+    const std::vector<point_t>      cubiod_y_points;
+    const std::vector<point_t>      cubiod_z_points;
+    const std::vector<point_t>      cube2x_points;
+    const std::vector<point_ti<>>   cube_triangles;
 };
 
 
@@ -430,9 +430,9 @@ BOOST_AUTO_TEST_CASE( convert_cube_with_inside_voxel_set_test )
     BOOST_CHECK(vset->number_of_primitives_on_surface()  == 26);
     BOOST_CHECK(vset->number_of_primitives_inside()      == 1);
     BOOST_CHECK(vset->get_min_bb()                       == point_t(-0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(vset->get_min_bb_voxels()                == point_ti(0, 0, 0));
-    BOOST_CHECK(vset->get_max_bb_voxels()                == point_ti(2, 2, 2));
-    BOOST_CHECK(vset->get_barycenter()                   == point_ti(1, 1, 1));
+    BOOST_CHECK(vset->get_min_bb_voxels()                == point_ti<>(0, 0, 0));
+    BOOST_CHECK(vset->get_max_bb_voxels()                == point_ti<>(2, 2, 2));
+    BOOST_CHECK(vset->get_barycenter()                   == point_ti<>(1, 1, 1));
     BOOST_CHECK(vset->get_scale()                        == 0.5f);
     BOOST_CHECK(vset->get_unit_volume()                  == 0.125f);
     BOOST_CHECK_CLOSE(vset->compute_volume(), 3.375f, result_tolerance);
@@ -453,9 +453,9 @@ BOOST_AUTO_TEST_CASE( convert_cube_pair_voxel_set_test )
     BOOST_CHECK(vset->number_of_primitives_on_surface()  == 15);
     BOOST_CHECK(vset->number_of_primitives_inside()      == 0);
     BOOST_CHECK(vset->get_min_bb()                       == point_t(-1.0f, -1.0f, -1.0f));
-    BOOST_CHECK(vset->get_min_bb_voxels()                == point_ti(0, 0, 0));
-    BOOST_CHECK(vset->get_max_bb_voxels()                == point_ti(2, 2, 2));
-    BOOST_CHECK(vset->get_barycenter()                   == point_ti(1, 1, 1));
+    BOOST_CHECK(vset->get_min_bb_voxels()                == point_ti<>(0, 0, 0));
+    BOOST_CHECK(vset->get_max_bb_voxels()                == point_ti<>(2, 2, 2));
+    BOOST_CHECK(vset->get_barycenter()                   == point_ti<>(1, 1, 1));
     BOOST_CHECK(vset->get_scale()                        == 1.75f);
     BOOST_CHECK(vset->get_unit_volume()                  == 5.359375f);
     BOOST_CHECK_CLOSE(vset->compute_volume(), 80.3906f, result_tolerance);

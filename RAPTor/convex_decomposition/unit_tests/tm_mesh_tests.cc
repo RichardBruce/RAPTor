@@ -447,15 +447,15 @@ BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_test )
     mesh.add_triangle(e2, e1, e0, v2, v1, v0);
 
     std::vector<point_t>    points;
-    std::vector<point_ti>   triangles;
+    std::vector<point_ti<>> triangles;
     mesh.points_and_triangles(&points, &triangles);
 
     BOOST_CHECK(points[0] == point_t(0.0f, 0.0f, 0.0f));
     BOOST_CHECK(points[1] == point_t(2.0f, 5.0f, 4.0f));
     BOOST_CHECK(points[2] == point_t(2.0f, 0.0f, 0.0f));
 
-    BOOST_CHECK(triangles[0] == point_ti(0, 1, 2));
-    BOOST_CHECK(triangles[1] == point_ti(2, 1, 0));
+    BOOST_CHECK(triangles[0] == point_ti<>(0, 1, 2));
+    BOOST_CHECK(triangles[1] == point_ti<>(2, 1, 0));
 }
 
 BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_after_erase_test )
@@ -487,15 +487,15 @@ BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_after_erase_test )
     mesh.get_vertices().erase(ve4);
 
     std::vector<point_t>    points;
-    std::vector<point_ti>   triangles;
+    std::vector<point_ti<>> triangles;
     mesh.points_and_triangles(&points, &triangles);
 
     BOOST_CHECK(points[0] == point_t(0.0f, 0.0f, 0.0f));
     BOOST_CHECK(points[1] == point_t(2.0f, 5.0f, 4.0f));
     BOOST_CHECK(points[2] == point_t(2.0f, 0.0f, 0.0f));
 
-    BOOST_CHECK(triangles[0] == point_ti(0, 1, 2));
-    BOOST_CHECK(triangles[1] == point_ti(2, 1, 0));
+    BOOST_CHECK(triangles[0] == point_ti<>(0, 1, 2));
+    BOOST_CHECK(triangles[1] == point_ti<>(2, 1, 0));
 }
 
 BOOST_AUTO_TEST_CASE( mesh_check_consistency_edge_with_no_triangles_test )

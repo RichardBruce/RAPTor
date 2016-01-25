@@ -22,37 +22,37 @@ namespace test
 struct primitive_set_fixture : private boost::noncopyable
 {
     primitive_set_fixture() :
-        cube(    { voxel(point_ti(3, 4, 2)) }, point_t( 3.5f, -2.7f, 1.6f), 1.0f),
+        cube(    { voxel(point_ti<>(3, 4, 2)) }, point_t( 3.5f, -2.7f, 1.6f), 1.0f),
         diagonal(
         {
-            voxel(point_ti(3, 4,   2)),
-            voxel(point_ti(4, 6,   4)),
-            voxel(point_ti(5, 8,   8)),
-            voxel(point_ti(6, 10, 16)),
-            voxel(point_ti(7, 12, 32)),
-            voxel(point_ti(8, 14, 64))
+            voxel(point_ti<>(3, 4,   2)),
+            voxel(point_ti<>(4, 6,   4)),
+            voxel(point_ti<>(5, 8,   8)),
+            voxel(point_ti<>(6, 10, 16)),
+            voxel(point_ti<>(7, 12, 32)),
+            voxel(point_ti<>(8, 14, 64))
         }, point_t(-7.8f,  3.9f, 4.6f), 2.0f),
         row(
         {
-            voxel(point_ti(0, 0, 0)),
-            voxel(point_ti(1, 0, 0)),
-            voxel(point_ti(2, 0, 0)),
-            voxel(point_ti(3, 0, 0)),
-            voxel(point_ti(4, 0, 0)),
-            voxel(point_ti(5, 0, 0)),
-            voxel(point_ti(6, 0, 0)),
-            voxel(point_ti(7, 0, 0))
+            voxel(point_ti<>(0, 0, 0)),
+            voxel(point_ti<>(1, 0, 0)),
+            voxel(point_ti<>(2, 0, 0)),
+            voxel(point_ti<>(3, 0, 0)),
+            voxel(point_ti<>(4, 0, 0)),
+            voxel(point_ti<>(5, 0, 0)),
+            voxel(point_ti<>(6, 0, 0)),
+            voxel(point_ti<>(7, 0, 0))
         }, point_t(1.0f, 2.0f, 3.0f), 1.0f),
         stack(
         {
-            voxel(point_ti(0, 0, 0)),
-            voxel(point_ti(0, 1, 0)),
-            voxel(point_ti(0, 2, 0)),
-            voxel(point_ti(0, 3, 0)),
-            voxel(point_ti(0, 4, 0)),
-            voxel(point_ti(0, 5, 0)),
-            voxel(point_ti(0, 6, 0)),
-            voxel(point_ti(0, 7, 0))
+            voxel(point_ti<>(0, 0, 0)),
+            voxel(point_ti<>(0, 1, 0)),
+            voxel(point_ti<>(0, 2, 0)),
+            voxel(point_ti<>(0, 3, 0)),
+            voxel(point_ti<>(0, 4, 0)),
+            voxel(point_ti<>(0, 5, 0)),
+            voxel(point_ti<>(0, 6, 0)),
+            voxel(point_ti<>(0, 7, 0))
         }, point_t(1.0f, 2.0f, 3.0f), 1.0f)
     {  }
 

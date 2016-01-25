@@ -20,7 +20,7 @@ void voxel_set::compute_bounding_box()
     }
     
     bary /= static_cast<float>(_voxels.size());
-    _barycenter = static_cast<point_ti>(bary + 0.5f);
+    _barycenter = static_cast<point_ti<>>(bary + 0.5f);
 }
 
 void voxel_set::compute_convex_hull(convex_mesh *const mesh, const int sampling, const int cluster_size) const
@@ -315,8 +315,8 @@ void voxel_set::convert(convex_mesh *const mesh, const voxel_value_t value) cons
 
 void voxel_set::compute_axes_aligned_clipping_planes(std::vector<plane> *const planes, const int downsampling) const
 {
-    const point_ti &min_pt = get_min_bb_voxels();
-    const point_ti &max_pt = get_max_bb_voxels();
+    const point_ti<> &min_pt = get_min_bb_voxels();
+    const point_ti<> &max_pt = get_max_bb_voxels();
     for (int i = min_pt.x; i <= max_pt.x; i += downsampling)
     {
         const point_t pt(get_point(point_t(i + 0.5f, 0.0f, 0.0f)));
@@ -338,8 +338,8 @@ void voxel_set::compute_axes_aligned_clipping_planes(std::vector<plane> *const p
 
 void voxel_set::refine_axes_aligned_clipping_planes(std::vector<plane> *const planes, const plane &best, const int downsampling, const int index) const
 {
-    const point_ti &min_pt = get_min_bb_voxels();
-    const point_ti &max_pt = get_max_bb_voxels();
+    const point_ti<> &min_pt = get_min_bb_voxels();
+    const point_ti<> &max_pt = get_max_bb_voxels();
     if (best.major_axis == axis_t::x_axis)
     {
         for (int i = std::max(min_pt.x, min_pt.x + index - downsampling); i <= std::min(max_pt.x, min_pt.x + index + downsampling); ++i)

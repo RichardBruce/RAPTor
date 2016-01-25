@@ -35,7 +35,7 @@ inline point_t compute_aligned_point(const point_t &pt, const point_t &barycente
 class volume
 {            
     public :
-        volume(const std::vector<point_t> &points, const std::vector<point_ti> &triangles, const int dim, const point_t &barycenter, const float (& rot)[3][3]) :
+        volume(const std::vector<point_t> &points, const std::vector<point_ti<>> &triangles, const int dim, const point_t &barycenter, const float (& rot)[3][3]) :
             _scale(1.0f),
             _dim{ 0, 0, 0 },
             _prim_on_surface(0),

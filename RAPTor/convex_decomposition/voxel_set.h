@@ -20,9 +20,9 @@ namespace raptor_convex_decomposition
 struct voxel
 {
     public :
-        voxel(const point_ti &coord, const voxel_value_t vv = voxel_value_t::primitive_undefined) : coord(coord), loc(vv) {  };
+        voxel(const point_ti<> &coord, const voxel_value_t vv = voxel_value_t::primitive_undefined) : coord(coord), loc(vv) {  };
 
-        point_ti        coord;
+        point_ti<>      coord;
         voxel_value_t   loc;
 };
 
@@ -43,9 +43,9 @@ class voxel_set : public primitive_set
         voxel_set() : voxel_set(std::vector<voxel>(), point_t(0.0f, 0.0f, 0.0f), 1.0f) {  };
 
         const point_t &     get_min_bb()                        const { return _min_bb;                         }
-        const point_ti &    get_min_bb_voxels()                 const { return _min_bb_voxels;                  }
-        const point_ti &    get_max_bb_voxels()                 const { return _max_bb_voxels;                  }
-        const point_ti &    get_barycenter()                    const { return _barycenter;                     }
+        const point_ti<> &  get_min_bb_voxels()                 const { return _min_bb_voxels;                  }
+        const point_ti<> &  get_max_bb_voxels()                 const { return _max_bb_voxels;                  }
+        const point_ti<> &  get_barycenter()                    const { return _barycenter;                     }
         float               get_scale()                         const { return _scale;                          }
         float               get_unit_volume()                   const { return _unit_volume;                    }
         float               compute_volume()                    const { return _unit_volume * _voxels.size();   }
@@ -105,9 +105,9 @@ class voxel_set : public primitive_set
     private :
         std::vector<voxel>  _voxels;
         point_t             _min_bb;
-        point_ti            _min_bb_voxels;
-        point_ti            _max_bb_voxels;
-        point_ti            _barycenter;
+        point_ti<>          _min_bb_voxels;
+        point_ti<>          _max_bb_voxels;
+        point_ti<>          _barycenter;
         float               _scale;
         float               _unit_volume;
         float               _q[3][3];

@@ -182,7 +182,7 @@ void volume::fill_outside_surface(const int i0, const int j0, const int k0, cons
                                     { -1,  0,  0 },
                                     {  0, -1,  0 },
                                     {  0,  0, -1 }};
-    std::queue<point_ti> fifo; 
+    std::queue<point_ti<>> fifo; 
     for (int i = i0; i < i1; ++i)
     {
         for (int j = j0; j < j1; ++j)
@@ -196,7 +196,7 @@ void volume::fill_outside_surface(const int i0, const int j0, const int k0, cons
                     ++_prim_outside_surface;
                     while (!fifo.empty())
                     {
-                        const point_ti &current = fifo.front();
+                        const point_ti<> &current = fifo.front();
                         for (int h = 0; h < 6; ++h)
                         {
                             const int a = current.x + neighbours[h][0];
@@ -212,7 +212,7 @@ void volume::fill_outside_surface(const int i0, const int j0, const int k0, cons
                             {
                                 v = voxel_value_t::primitive_outside_surface;
                                 ++_prim_outside_surface;
-                                fifo.push(point_ti(a, b, c));
+                                fifo.push(point_ti<>(a, b, c));
                             }
                         }
                         fifo.pop();
@@ -306,7 +306,7 @@ voxel_set* volume::convert_to_voxel_set() const
                 const voxel_value_t &value = get_voxel(i, j, k);
                 if ((value == voxel_value_t::primitive_inside_surface) || (value == voxel_value_t::primitive_on_surface))
                 {
-                    vset->add(voxel(point_ti(i, j, k), value));
+                    vset->add(voxel(point_ti<>(i, j, k), value));
                 }
             }
         }
