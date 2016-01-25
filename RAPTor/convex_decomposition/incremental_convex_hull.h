@@ -477,7 +477,7 @@ class incremental_convex_hull : private boost::noncopyable
             float vol = 0.0f;
             while ((std::fabs(vol) < epsilon) && (v3 != vertices.end()))
             {
-                vol = trapezium_volume(v0->position(), v1->position(), v2->position(), v3->position());
+                vol = tetrahedron_volume(v0->position(), v1->position(), v2->position(), v3->position());
                 ++v3;
             }
 

@@ -19,7 +19,7 @@ class convex_mesh
         convex_mesh() = default;
 
         /* CTOR */
-        convex_mesh(const std::vector<point_t> &points, const std::vector<point_ti> &triangles) : _points(points), _triangles(triangles) {  }
+        convex_mesh(const std::vector<point_t> &points, const std::vector<point_ti<>> &triangles) : _points(points), _triangles(triangles) {  }
 
         /* Access functions */
         int number_of_points()      const { return _points.size();      }
@@ -28,8 +28,8 @@ class convex_mesh
               point_t &                 get_point(const int i)        { return _points[i];  }
         const std::vector<point_t> &    points()                const { return _points;     }
               std::vector<point_t> &    points()                      { return _points;     }
-        const std::vector<point_ti> &   triangles()             const { return _triangles;  }
-              std::vector<point_ti> &   triangles()                   { return _triangles;  }
+        const std::vector<point_ti<>> & triangles()             const { return _triangles;  }
+              std::vector<point_ti<>> & triangles()                   { return _triangles;  }
 
         /* Clear the mesh */
         convex_mesh& clear()
@@ -49,7 +49,7 @@ class convex_mesh
         /* Add a new triangle */
         convex_mesh& add_triangle(const int a, const int b, const int c)
         {
-            _triangles.push_back(point_ti(a, b, c));
+            _triangles.push_back(point_ti<>(a, b, c));
             return *this;
         }
 
@@ -72,7 +72,7 @@ class convex_mesh
             float vol = 0.0f;
             for (const auto &t : _triangles)
             {
-                vol += trapezium_volume(_points[t.x], _points[t.y], _points[t.z], com);
+                vol += tetrahedron_volume(_points[t.x], _points[t.y], _points[t.z], com);
             }
 
             return vol * (1.0f / 6.0f);
@@ -140,7 +140,7 @@ class convex_mesh
             /* Check for positive volume when added to all triangles */
             for (const auto &t : _triangles)
             {
-                const float volume = trapezium_volume(_points[t.x], _points[t.y], _points[t.z], pt);
+                const float volume = tetrahedron_volume(_points[t.x], _points[t.y], _points[t.z], pt);
                 if (volume < 0.0f)
                 {
                     return false;
@@ -172,6 +172,6 @@ class convex_mesh
 
     private :
         std::vector<point_t>    _points;
-        std::vector<point_ti>   _triangles;
+        std::vector<point_ti<>> _triangles;
 };
 } /* namespace raptor_convex_decomposition */

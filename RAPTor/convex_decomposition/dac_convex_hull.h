@@ -97,7 +97,7 @@ class dac_convex_hull : private boost::noncopyable
                 for (int i = 1; i < static_cast<int>(f.size() - 1); ++i)
                 {
                     /* Find volume as sum of simplices */
-                    vol += trapezium_volume(a, _vertices[f[i]], _vertices[f[i + 1]], _center);
+                    vol += tetrahedron_volume(a, _vertices[f[i]], _vertices[f[i + 1]], _center);
                 }
             }
 

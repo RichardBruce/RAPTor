@@ -19,14 +19,14 @@ inline float compute_concavity(const float volume, const float ch_volume, const 
     return std::fabs(ch_volume - volume) / volume_0;
 }
 
-int convex_decomposition::compute_best_clipping_plane(const std::unique_ptr<primitive_set> &pset, const float volume, const std::vector<plane> &planes, const point_t &cut_dir, const float alpha, const float beta, const int dn_samp, plane *const best_plane, const convex_decomposition_options &params)
+int convex_decomposition::compute_best_clipping_plane(const std::unique_ptr<primitive_set> &pset, const float volume, const std::vector<plane> &planes, const point_t &cut_dir, const float alpha, const float beta, const int dn_samp, plane *const best_plane)
 {
     std::unique_ptr<convex_mesh          []> chs(new convex_mesh[2]);
     std::unique_ptr<std::vector<point_t> []> pts(new std::vector<point_t>[2]);
     std::unique_ptr<primitive_set> on_surf(pset->select_on_surface());
 
     std::unique_ptr<primitive_set *[]> psets(nullptr);
-    if (!params.approx_hulls)
+    if (!_params.approx_hulls)
     {
         psets.reset(new primitive_set *[2]);
         psets[0] = nullptr;
@@ -51,7 +51,7 @@ int convex_decomposition::compute_best_clipping_plane(const std::unique_ptr<prim
         convex_mesh &right_hull = chs[1];
         right_hull.clear();
         left_hull.clear();
-        if (params.approx_hulls)
+        if (_params.approx_hulls)
         {
             std::vector<point_t> &left_pts  = pts[0];
             std::vector<point_t> &right_pts = pts[1];
@@ -103,7 +103,7 @@ int convex_decomposition::compute_best_clipping_plane(const std::unique_ptr<prim
     return best_index;
 }
 
-void convex_decomposition::compute_acd(const convex_decomposition_options &params)
+void convex_decomposition::compute_acd()
 {
     std::vector<std::unique_ptr<primitive_set>> parts;
     std::vector<std::unique_ptr<primitive_set>> input_parts;
@@ -112,14 +112,14 @@ void convex_decomposition::compute_acd(const convex_decomposition_options &param
     std::vector<plane> planes;
     int depth = 0;
     bool first_iter = true;
-    while ((depth++ < params.depth) && !input_parts.empty())
+    while ((depth++ < _params.depth) && !input_parts.empty())
     {
         for (auto &pset : input_parts)
         {
             const float volume = pset->compute_volume();
             pset->compute_bounding_box();
             pset->compute_principal_axes();
-            if (params.pca)
+            if (_params.pca)
             {
                 pset->align_to_principal_axes();
             }
@@ -134,20 +134,20 @@ void convex_decomposition::compute_acd(const convex_decomposition_options &param
 
             const float concavity = compute_concavity(volume, ch_volume, _volume_hull);
             const float error     = 1.01f * pset->max_volume_error() / _volume_hull;
-            if ((concavity > params.concavity) && (concavity > error)) 
+            if ((concavity > _params.concavity) && (concavity > error)) 
             {
                 planes.clear();
                 point_t cut_dir;
                 const float w = pset->compute_preferred_cutting_direction(&cut_dir);
-                pset->compute_axes_aligned_clipping_planes(&planes, params.plane_down_sampling);
+                pset->compute_axes_aligned_clipping_planes(&planes, _params.plane_down_sampling);
 
                 plane best_plane;
-                const int best_index = compute_best_clipping_plane(pset, volume, planes, cut_dir, concavity * params.alpha, w * concavity * params.beta, params.hull_down_sampling, &best_plane, params);
-                if ((params.plane_down_sampling > 1) || (params.hull_down_sampling > 1))
+                const int best_index = compute_best_clipping_plane(pset, volume, planes, cut_dir, concavity * _params.alpha, w * concavity * _params.beta, _params.hull_down_sampling, &best_plane);
+                if ((_params.plane_down_sampling > 1) || (_params.hull_down_sampling > 1))
                 {
                     planes.clear();
-                    pset->refine_axes_aligned_clipping_planes(&planes, best_plane, params.plane_down_sampling, best_index * params.plane_down_sampling);
-                    compute_best_clipping_plane(pset, volume, planes, cut_dir, concavity * params.alpha, w * concavity * params.beta, 1, &best_plane, params);
+                    pset->refine_axes_aligned_clipping_planes(&planes, best_plane, _params.plane_down_sampling, best_index * _params.plane_down_sampling);
+                    compute_best_clipping_plane(pset, volume, planes, cut_dir, concavity * _params.alpha, w * concavity * _params.beta, 1, &best_plane);
                 }
 
                 primitive_set *left     = nullptr;
@@ -155,7 +155,7 @@ void convex_decomposition::compute_acd(const convex_decomposition_options &param
                 pset->cut(best_plane, &right, &left);
                 tmp.emplace_back(left);
                 tmp.emplace_back(right);
-                if (params.pca)
+                if (_params.pca)
                 {
                     right->revert_align_to_principal_axes();
                     left->revert_align_to_principal_axes();
@@ -163,7 +163,7 @@ void convex_decomposition::compute_acd(const convex_decomposition_options &param
             }
             else
             {
-                if (params.pca)
+                if (_params.pca)
                 {
                     pset->revert_align_to_principal_axes();
                 }
@@ -218,9 +218,8 @@ void compute_convex_hull(const std::unique_ptr<convex_mesh> &ch1, const std::uni
     }
 }
 
-void convex_decomposition::merge_convex_hulls(const convex_decomposition_options &params)
+void convex_decomposition::merge_convex_hulls()
 {
-    std::cout << "merging: " << _convex_hulls.size() << " hulls" << std::endl;
     if (_convex_hulls.size() < 2)
     {
         return;
@@ -243,7 +242,7 @@ void convex_decomposition::merge_convex_hulls(const convex_decomposition_options
 
     /* Until we cant merge below the maximum cost */
     int cost_end = _convex_hulls.size();
-    const float threshold = params.gamma;
+    const float threshold = _params.gamma;
     while (true)
     {
         /* Search for lowest cost */
@@ -318,19 +317,19 @@ void convex_decomposition::merge_convex_hulls(const convex_decomposition_options
     }
 }
 
-void convex_decomposition::simplify_convex_hulls(const convex_decomposition_options &params)
+void convex_decomposition::simplify_convex_hulls()
 {
-    if (params.max_vertices_per_hull < 4)
+    if (_params.max_vertices_per_hull < 4)
     {
         return;
     }
 
     incremental_convex_hull ic_hull;
-    const float min_volume = _volume_hull * params.min_volume_per_hull;
+    const float min_volume = _volume_hull * _params.min_volume_per_hull;
     for (int i = 0; i < static_cast<int>(_convex_hulls.size()); ++i)
     {
         ic_hull.add_points(_convex_hulls[i]->points());
-        ic_hull.process(params.max_vertices_per_hull, min_volume);
+        ic_hull.process(_params.max_vertices_per_hull, min_volume);
 
         _convex_hulls[i]->clear();
         tm_mesh &mesh = ic_hull.mesh();
