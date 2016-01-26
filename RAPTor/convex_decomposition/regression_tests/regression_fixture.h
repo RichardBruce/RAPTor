@@ -23,35 +23,43 @@ const float result_tolerance = 0.0005f;
 
 struct regression_fixture : private boost::noncopyable
 {
-    regression_fixture(const convex_decomposition_options &options) : options(options) {  }
+    regression_fixture(const convex_decomposition_options &options) : options(options), uut(nullptr) {  }
 
-    void check(const convex_decomposition &uut, const std::string &file)
+    void run()
+    {
+        const auto t0(std::chrono::system_clock::now());
+        uut.reset(new convex_decomposition(points, triangles, options));
+        const auto t1(std::chrono::system_clock::now());
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 5 - Runtime (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+    }
+
+    void check(const std::string &file)
     {
         const float original_volume = convex_mesh(points, triangles).volume();
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Original Volume: " << original_volume;
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - Voxelised volume: " << ((uut.get_primitive_set()->compute_volume() / original_volume) - 1.0f);
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - Voxelised volume: " << ((uut->get_primitive_set()->compute_volume() / original_volume) - 1.0f);
 
-        BOOST_LOG_TRIVIAL(error) << "PERF 3 - Decomposed Number of hulls: " << uut.number_of_convex_hulls();
+        BOOST_LOG_TRIVIAL(error) << "PERF 3 - Decomposed Number of hulls: " << uut->number_of_convex_hulls();
         float total_volume = 0.0f;
-        for (int i = 0; i <  uut.number_of_convex_hulls(); ++i)
+        for (int i = 0; i <  uut->number_of_convex_hulls(); ++i)
         {
-            total_volume += uut.get_convex_hull(i)->volume();
+            total_volume += uut->get_convex_hull(i)->volume();
         }
         BOOST_LOG_TRIVIAL(error) << "PERF 4 - Decomposed Total Volume: " << ((total_volume / original_volume) - 1.0f);
 
         /* Sum number of points and triangles */
         int nr_pts = 0;
         int nr_tri = 0;
-        for (int i = 0; i < uut.number_of_convex_hulls(); ++i)
+        for (int i = 0; i < uut->number_of_convex_hulls(); ++i)
         {
-            const auto *const mesh = uut.get_convex_hull(i);
+            const auto *const mesh = uut->get_convex_hull(i);
             nr_pts += mesh->number_of_points();
             nr_tri += mesh->number_of_triangles();
         }
 
         /* Save actual results */
-        save_convex_decomposition(uut, "test_data/" + file + ".wrl");
-        save_off(uut, "test_data/" + file + "_act.off", nr_pts, nr_tri);
+        save_convex_decomposition(*uut, "test_data/" + file + ".wrl");
+        save_off(*uut, "test_data/" + file + "_act.off", nr_pts, nr_tri);
 
         /* Load expected data */
         std::vector<point_t>    points_exp;
@@ -62,9 +70,9 @@ struct regression_fixture : private boost::noncopyable
         BOOST_REQUIRE(nr_pts == static_cast<int>(points_exp.size()));
 
         int pt_idx = 0;
-        for (int i = 0; i < uut.number_of_convex_hulls(); ++i)
+        for (int i = 0; i < uut->number_of_convex_hulls(); ++i)
         {
-            const auto *const mesh = uut.get_convex_hull(i);
+            const auto *const mesh = uut->get_convex_hull(i);
             for (const auto &pt : mesh->points())
             {
                 BOOST_CHECK_MESSAGE(std::fabs(magnitude(pt - points_exp[pt_idx])) < result_tolerance, pt << " versus: " << points_exp[pt_idx]);
@@ -76,9 +84,9 @@ struct regression_fixture : private boost::noncopyable
         BOOST_REQUIRE(nr_tri == static_cast<int>(triangles_exp.size()));
 
         int tri_idx = 0;
-        for (int i = 0; i < uut.number_of_convex_hulls(); ++i)
+        for (int i = 0; i < uut->number_of_convex_hulls(); ++i)
         {
-            const auto *const mesh = uut.get_convex_hull(i);
+            const auto *const mesh = uut->get_convex_hull(i);
             for (const auto &t : mesh->triangles())
             {
                 BOOST_CHECK(t == triangles_exp[tri_idx++]);
@@ -86,9 +94,10 @@ struct regression_fixture : private boost::noncopyable
         }
     }
 
-    convex_decomposition_options    options;
-    std::vector<point_t>            points;
-    std::vector<point_ti<>>         triangles;
+    convex_decomposition_options            options;
+    std::unique_ptr<convex_decomposition>   uut;
+    std::vector<point_t>                    points;
+    std::vector<point_ti<>>                 triangles;
 };
 }; /* namespace test */
 }; /* namespace raptor_convex_decomposition */
