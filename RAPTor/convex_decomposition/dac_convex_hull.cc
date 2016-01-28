@@ -149,19 +149,19 @@ void dac_convex_hull::compute_internal(intermediate_hull *const result, const in
     merge(result, &hull1);
 }
 
-dac_convex_hull::orientation_t dac_convex_hull::get_orientation(const edge &prev, const edge *const next, const Point32 &s, const Point32 &t)
+dac_convex_hull::orientation_t dac_convex_hull::get_orientation(const edge &prev, const edge *const next, const point_ti<std::int64_t> &s, const point_ti<std::int64_t> &t)
 {
     assert(prev.reverse->target == next->reverse->target);
     if (prev.next == next)
     {
         if (prev.prev == next)
         {
-            const Point64 n(t.cross(s));
-            const Point64 m((*prev.target - *next->reverse->target).cross(*next->target - *next->reverse->target));
-            assert(!m.isZero());
-            assert(n.dot(m) != 0);
+            const point_ti<std::int64_t> n(cross_product(t, s));
+            const point_ti<std::int64_t> m(cross_product(*prev.target - *next->reverse->target, *next->target - *next->reverse->target));
+            assert(m != 0);
+            assert(dot_product(n, m) != 0);
 
-            return (n.dot(m) > 0) ? orientation_t::counter_clockwise : orientation_t::clockwise;
+            return (dot_product(n, m) > 0) ? orientation_t::counter_clockwise : orientation_t::clockwise;
         }
 
         return orientation_t::counter_clockwise;
@@ -176,7 +176,7 @@ dac_convex_hull::orientation_t dac_convex_hull::get_orientation(const edge &prev
     }
 }
 
-dac_convex_hull::edge* dac_convex_hull::find_max_angle(Rational64 *const min_cot, const vertex &start, const Point32 &s, const Point64 &rxs, const Point64 &sxrxs, const bool ccw)
+dac_convex_hull::edge* dac_convex_hull::find_max_angle(Rational64 *const min_cot, const vertex &start, const point_ti<std::int64_t> &s, const point_ti<std::int64_t> &rxs, const point_ti<std::int64_t> &sxrxs, const bool ccw)
 {
     edge* e = start.edges;
     if (e == nullptr)
@@ -189,9 +189,9 @@ dac_convex_hull::edge* dac_convex_hull::find_max_angle(Rational64 *const min_cot
     {
         if (e->copy > _merge_stamp)
         {
-            const Point32 t(*e->target - start);
-            const Rational64 cot(t.dot(sxrxs), t.dot(rxs));
-            assert(!cot.isNaN() || (ccw ? (t.dot(s) < 0) : (t.dot(s) > 0)));
+            const point_ti<std::int64_t> t(*e->target - start);
+            const Rational64 cot(dot_product(t, sxrxs), dot_product(t, rxs));
+            assert(!cot.isNaN() || (ccw ? (dot_product(t, s) < 0) : (dot_product(t, s) > 0)));
 
             if (!cot.isNaN())
             {
@@ -223,31 +223,31 @@ void dac_convex_hull::find_edge_for_coplanar_faces(const vertex &c0, const verte
 {
     edge* start0 = e0;
     edge* start1 = e1;
-    Point32 et0(start0 ? start0->target->point : c0.point);
-    Point32 et1(start1 ? start1->target->point : c1.point);
-    Point32 s(c1.point - c0.point);
-    Point64 normal(((start0 ? start0 : start1)->target->point - c0.point).cross(s));
-    std::int64_t dist = c0.point.dot(normal);
-    assert(!start1 || (start1->target->point.dot(normal) == dist));
-    Point64 perp(s.cross(normal));
-    assert(!perp.isZero());
+    point_ti<std::int64_t> et0(start0 ? start0->target->point : c0.point);
+    point_ti<std::int64_t> et1(start1 ? start1->target->point : c1.point);
+    point_ti<std::int64_t> s(c1.point - c0.point);
+    point_ti<std::int64_t> normal(cross_product((start0 ? start0 : start1)->target->point - c0.point, s));
+    std::int64_t dist = dot_product(c0.point, normal);
+    assert(!start1 || (dot_product(start1->target->point, normal) == dist));
+    point_ti<std::int64_t> perp(cross_product(s, normal));
+    assert(perp != 0);
     
-    std::int64_t maxDot0 = et0.dot(perp);
+    std::int64_t maxDot0 = dot_product(et0, perp);
     if (e0)
     {
         while (e0->target != stop0)
         {
             edge* e = e0->reverse->prev;
-            if (e->target->point.dot(normal) < dist)
+            if (dot_product(e->target->point, normal) < dist)
             {
                 break;
             }
-            assert(e->target->point.dot(normal) == dist);
+            assert(dot_product(e->target->point, normal) == dist);
             if (e->copy == _merge_stamp)
             {
                 break;
             }
-            std::int64_t dot = e->target->point.dot(perp);
+            std::int64_t dot = dot_product(e->target->point, perp);
             if (dot <= maxDot0)
             {
                 break;
@@ -258,24 +258,24 @@ void dac_convex_hull::find_edge_for_coplanar_faces(const vertex &c0, const verte
         }
     }
     
-    std::int64_t maxDot1 = et1.dot(perp);
+    std::int64_t maxDot1 = dot_product(et1, perp);
     if (e1)
     {
         while (e1->target != stop1)
         {
             edge* e = e1->reverse->next;
-            if (e->target->point.dot(normal) < dist)
+            if (dot_product(e->target->point, normal) < dist)
             {
                 break;
             }
 
-            assert(e->target->point.dot(normal) == dist);
+            assert(dot_product(e->target->point, normal) == dist);
             if (e->copy == _merge_stamp)
             {
                 break;
             }
 
-            std::int64_t dot = e->target->point.dot(perp);
+            std::int64_t dot = dot_product(e->target->point, perp);
             if (dot <= maxDot1)
             {
                 break;
@@ -292,18 +292,18 @@ void dac_convex_hull::find_edge_for_coplanar_faces(const vertex &c0, const verte
     {
         while (true)
         {
-            std::int64_t dy = (et1 - et0).dot(s);            
+            std::int64_t dy = dot_product(et1 - et0, s);            
             if (e0 && (e0->target != stop0))
             {
                 edge* f0 = e0->next->reverse;
                 if (f0->copy > _merge_stamp)
                 {
-                    std::int64_t dx0 = (f0->target->point - et0).dot(perp);
-                    std::int64_t dy0 = (f0->target->point - et0).dot(s);
+                    std::int64_t dx0 = dot_product(f0->target->point - et0, perp);
+                    std::int64_t dy0 = dot_product(f0->target->point - et0, s);
                     if ((dx0 == 0) ? (dy0 < 0) : ((dx0 < 0) && (Rational64(dy0, dx0).compare(Rational64(dy, dx)) >= 0)))
                     {
                         et0 = f0->target->point;
-                        dx = (et1 - et0).dot(perp);
+                        dx = dot_product(et1 - et0, perp);
                         e0 = (e0 == start0) ? nullptr : f0;
                         continue;
                     }
@@ -315,12 +315,12 @@ void dac_convex_hull::find_edge_for_coplanar_faces(const vertex &c0, const verte
                 edge* f1 = e1->reverse->next;
                 if (f1->copy > _merge_stamp)
                 {
-                    Point32 d1 = f1->target->point - et1;
-                    if (d1.dot(normal) == 0)
+                    point_ti<std::int64_t> d1 = f1->target->point - et1;
+                    if (dot_product(d1, normal) == 0)
                     {
-                        std::int64_t dx1 = d1.dot(perp);
-                        std::int64_t dy1 = d1.dot(s);
-                        std::int64_t dxn = (f1->target->point - et0).dot(perp);
+                        std::int64_t dx1 = dot_product(d1, perp);
+                        std::int64_t dy1 = dot_product(d1, s);
+                        std::int64_t dxn = dot_product(f1->target->point - et0, perp);
                         if ((dxn > 0) && ((dx1 == 0) ? (dy1 < 0) : ((dx1 < 0) && (Rational64(dy1, dx1).compare(Rational64(dy, dx)) > 0))))
                         {
                             e1 = f1;
@@ -331,7 +331,7 @@ void dac_convex_hull::find_edge_for_coplanar_faces(const vertex &c0, const verte
                     }
                     else
                     {
-                        assert((e1 == start1) && (d1.dot(normal) < 0));
+                        assert((e1 == start1) && (dot_product(d1, normal) < 0));
                     }
                 }
             }
@@ -343,18 +343,18 @@ void dac_convex_hull::find_edge_for_coplanar_faces(const vertex &c0, const verte
     {
         while (true)
         {
-            std::int64_t dy = (et1 - et0).dot(s);            
+            std::int64_t dy = dot_product(et1 - et0, s);            
             if (e1 && (e1->target != stop1))
             {
                 edge* f1 = e1->prev->reverse;
                 if (f1->copy > _merge_stamp)
                 {
-                    std::int64_t dx1 = (f1->target->point - et1).dot(perp);
-                    std::int64_t dy1 = (f1->target->point - et1).dot(s);
+                    std::int64_t dx1 = dot_product(f1->target->point - et1, perp);
+                    std::int64_t dy1 = dot_product(f1->target->point - et1, s);
                     if ((dx1 == 0) ? (dy1 > 0) : ((dx1 < 0) && (Rational64(dy1, dx1).compare(Rational64(dy, dx)) <= 0)))
                     {
                         et1 = f1->target->point;
-                        dx = (et1 - et0).dot(perp);
+                        dx = dot_product(et1 - et0, perp);
                         e1 = (e1 == start1) ? nullptr : f1;
                         continue;
                     }
@@ -366,12 +366,12 @@ void dac_convex_hull::find_edge_for_coplanar_faces(const vertex &c0, const verte
                 edge* f0 = e0->reverse->prev;
                 if (f0->copy > _merge_stamp)
                 {
-                    Point32 d0 = f0->target->point - et0;
-                    if (d0.dot(normal) == 0)
+                    point_ti<std::int64_t> d0 = f0->target->point - et0;
+                    if (dot_product(d0, normal) == 0)
                     {
-                        std::int64_t dx0 = d0.dot(perp);
-                        std::int64_t dy0 = d0.dot(s);
-                        std::int64_t dxn = (et1 - f0->target->point).dot(perp);
+                        std::int64_t dx0 = dot_product(d0, perp);
+                        std::int64_t dy0 = dot_product(d0, s);
+                        std::int64_t dxn = dot_product(et1 - f0->target->point, perp);
                         if ((dxn < 0) && ((dx0 == 0) ? (dy0 > 0) : ((dx0 < 0) && (Rational64(dy0, dx0).compare(Rational64(dy, dx)) < 0))))
                         {
                             e0 = f0;
@@ -382,7 +382,7 @@ void dac_convex_hull::find_edge_for_coplanar_faces(const vertex &c0, const verte
                     }
                     else
                     {
-                        assert((e0 == start0) && (d0.dot(normal) < 0));
+                        assert((e0 == start0) && (dot_product(d0, normal) < 0));
                     }
                 }
             }
@@ -591,15 +591,15 @@ void dac_convex_hull::merge(intermediate_hull *const h0, intermediate_hull *cons
     }
     
     --_merge_stamp;
-    Point32 prevPoint;
+    point_ti<std::int64_t> prevPoint;
     vertex* c0 = nullptr;
     vertex* c1 = nullptr;
     if (merge_projection(h0, h1, c0, c1))
     {
-        Point32 s = *c1 - *c0;
-        Point64 normal = Point32(0, 0, -1).cross(s);
-        Point64 t = s.cross(normal);
-        assert(!t.isZero());
+        point_ti<std::int64_t> s = *c1 - *c0;
+        point_ti<std::int64_t> normal(cross_product(point_ti<std::int64_t>(0, 0, -1), s));
+        point_ti<std::int64_t> t(cross_product(s, normal));
+        assert(t != 0);
 
         edge* e = c0->edges;
         edge* start0 = nullptr;
@@ -607,11 +607,11 @@ void dac_convex_hull::merge(intermediate_hull *const h0, intermediate_hull *cons
         {
             do
             {
-                const std::int64_t dot = (*e->target - *c0).dot(normal);
+                const std::int64_t dot = dot_product(*e->target - *c0, normal);
                 assert(dot <= 0);
-                if ((dot == 0) && ((*e->target - *c0).dot(t) > 0))
+                if ((dot == 0) && (dot_product(*e->target - *c0, t) > 0))
                 {
-                    if (!start0 || (get_orientation(*start0, e, s, Point32(0, 0, -1)) == orientation_t::clockwise))
+                    if (!start0 || (get_orientation(*start0, e, s, point_ti<std::int64_t>(0, 0, -1)) == orientation_t::clockwise))
                     {
                         start0 = e;
                     }
@@ -626,11 +626,11 @@ void dac_convex_hull::merge(intermediate_hull *const h0, intermediate_hull *cons
         {
             do
             {
-                const std::int64_t dot = (*e->target - *c1).dot(normal);
+                const std::int64_t dot = dot_product(*e->target - *c1, normal);
                 assert(dot <= 0);
-                if ((dot == 0) && ((*e->target - *c1).dot(t) > 0))
+                if ((dot == 0) && (dot_product(*e->target - *c1, t) > 0))
                 {
-                    if (!start1 || (get_orientation(*start1, e, s, Point32(0, 0, -1)) == orientation_t::counter_clockwise))
+                    if (!start1 || (get_orientation(*start1, e, s, point_ti<std::int64_t>(0, 0, -1)) == orientation_t::counter_clockwise))
                     {
                         start1 = e;
                     }
@@ -674,10 +674,10 @@ void dac_convex_hull::merge(intermediate_hull *const h0, intermediate_hull *cons
     bool firstRun       = true;
     while (true)
     {
-        const Point32 s(*c1 - *c0);
-        const Point32 r(prevPoint - c0->point);
-        const Point64 rxs(r.cross(s));
-        const Point64 sxrxs(s.cross(rxs));
+        const point_ti<std::int64_t> s(*c1 - *c0);
+        const point_ti<std::int64_t> r(prevPoint - c0->point);
+        const point_ti<std::int64_t> rxs(cross_product(r, s));
+        const point_ti<std::int64_t> sxrxs(cross_product(s, rxs));
         
         Rational64 min_cot0(0, 0);
         edge* min0 = find_max_angle(&min_cot0, *c0, s, rxs, sxrxs, false);
@@ -892,7 +892,7 @@ void dac_convex_hull::compute(const std::vector<point_t> &coords)
 
     _center = (min_pt + max_pt) * 0.5f;
 
-    std::vector<Point32> points;
+    std::vector<point_ti<std::int64_t>> points;
     points.resize(coords.size());
     for (int i = 0; i < static_cast<int>(coords.size()); ++i)
     {
@@ -901,7 +901,7 @@ void dac_convex_hull::compute(const std::vector<point_t> &coords)
         points[i].y = static_cast<std::int32_t>(p[_max_axis]);
         points[i].z = static_cast<std::int32_t>(p[_min_axis]);
     }
-    std::sort(points.begin(), points.end(), [](const Point32 &p, const Point32 &q)
+    std::sort(points.begin(), points.end(), [](const point_ti<std::int64_t> &p, const point_ti<std::int64_t> &q)
         {
             return (p.y < q.y) || ((p.y == q.y) && ((p.x < q.x) || ((p.x == q.x) && (p.z < q.z))));
         });

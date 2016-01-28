@@ -109,79 +109,6 @@ class dac_convex_hull : private boost::noncopyable
         const std::vector<std::vector<int>>&    faces()     const { return _faces;      }
 
     private :
-        class Point64
-        {
-            public :
-                int64_t x;
-                int64_t y;
-                int64_t z;
-                
-                Point64(int64_t x, int64_t y, int64_t z): x(x), y(y), z(z)
-                {
-                }
-
-                bool isZero() const
-                {
-                    return (x == 0) && (y == 0) && (z == 0);
-                }
-
-                int64_t dot(const Point64& b) const
-                {
-                    return x * b.x + y * b.y + z * b.z;
-                }
-        };
-        
-        class Point32
-        {
-            public :
-                int32_t x;
-                int32_t y;
-                int32_t z;
-                
-                Point32()
-                {
-                }
-                
-                Point32(int32_t x, int32_t y, int32_t z): x(x), y(y), z(z)
-                {
-                }
-                
-                bool operator==(const Point32& b) const
-                {
-                    return (x == b.x) && (y == b.y) && (z == b.z);
-                }
-
-                bool operator!=(const Point32& b) const
-                {
-                    return (x != b.x) || (y != b.y) || (z != b.z);
-                }
-
-                Point64 cross(const Point32& b) const
-                {
-                    return Point64(y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x);
-                }
-
-                Point64 cross(const Point64& b) const
-                {
-                    return Point64(y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x);
-                }
-
-                int64_t dot(const Point32& b) const
-                {
-                    return x * b.x + y * b.y + z * b.z;
-                }
-
-                int64_t dot(const Point64& b) const
-                {
-                    return x * b.x + y * b.y + z * b.z;
-                }
-
-                Point32 operator-(const Point32& b) const
-                {
-                    return Point32(x - b.x, y - b.y, z - b.z);
-                }
-        };
-
         class Rational64
         {
             private :
@@ -243,14 +170,14 @@ class dac_convex_hull : private boost::noncopyable
                 vertex* next;
                 vertex* prev;
                 edge* edges;
-                Point32 point;
+                point_ti<std::int64_t> point;
                 int copy;
                 
                 vertex(): next(nullptr), prev(nullptr), edges(nullptr), copy(-1)
                 {
                 }
 
-                Point32 operator-(const vertex& b) const
+                point_ti<std::int64_t> operator-(const vertex& b) const
                 {
                     return point - b.point;
                 }
@@ -348,8 +275,8 @@ class dac_convex_hull : private boost::noncopyable
         void compute(const std::vector<point_t> &coords);
         point_t get_coordinates(const vertex* v);
 
-        static orientation_t get_orientation(const edge &prev, const edge *const next, const Point32 &s, const Point32 &t);
-        edge* find_max_angle(Rational64 *const min_cot, const vertex &start, const Point32 &s, const Point64 &rxs, const Point64 &sxrxs, const bool ccw);
+        static orientation_t get_orientation(const edge &prev, const edge *const next, const point_ti<std::int64_t> &s, const point_ti<std::int64_t> &t);
+        edge* find_max_angle(Rational64 *const min_cot, const vertex &start, const point_ti<std::int64_t> &s, const point_ti<std::int64_t> &rxs, const point_ti<std::int64_t> &sxrxs, const bool ccw);
         void find_edge_for_coplanar_faces(const vertex &c0, const vertex &c1, edge*& e0, edge*& e1, const vertex *const stop0, const vertex *const stop1);
 
         edge* new_edge_pair(vertex* from, vertex* to);
