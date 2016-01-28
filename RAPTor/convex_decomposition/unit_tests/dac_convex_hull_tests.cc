@@ -1029,33 +1029,35 @@ BOOST_AUTO_TEST_CASE( octagon_pyramid_volume_test )
     BOOST_CHECK_CLOSE(uut.volume(), 1.16654f, result_tolerance);
 }
 
-// BOOST_AUTO_TEST_CASE( performance_ctor_test )
-// {
-//     const int number_runs   = 100;
-//     const int number_points = 100000;
+#ifndef VALGRIND_TESTS
+BOOST_AUTO_TEST_CASE( performance_ctor_test )
+{
+    const int number_runs   = 100;
+    const int number_points = 100000;
 
-//     /* Memory to hold points */
-//     std::vector<point_t> points;
-//     points.reserve(number_points);
+    /* Memory to hold points */
+    std::vector<point_t> points;
+    points.reserve(number_points);
 
-//     /* Generate points */
-//     std::default_random_engine gen;
-//     std::uniform_real_distribution<float> dist(-100.0f, 100.0f);
-//     for (int i = 0; i< number_points; ++i)
-//     {
-//         points.emplace_back(dist(gen), dist(gen), dist(gen));
-//     }
+    /* Generate points */
+    std::default_random_engine gen;
+    std::uniform_real_distribution<float> dist(-100.0f, 100.0f);
+    for (int i = 0; i< number_points; ++i)
+    {
+        points.emplace_back(dist(gen), dist(gen), dist(gen));
+    }
 
-//     /* Build */
-//     const auto t0(std::chrono::system_clock::now());
-//     for (int i = 0; i < number_runs; ++i)
-//     {
-//         dac_convex_hull uut(points);
-//         BOOST_REQUIRE(!uut.faces().empty());
-//     }
-//     const auto t1(std::chrono::system_clock::now());
-//     std::cout << "Test took: " << (std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() / number_runs) << " ms per hull" << std::endl;
-// }
+    /* Build */
+    const auto t0(std::chrono::system_clock::now());
+    for (int i = 0; i < number_runs; ++i)
+    {
+        dac_convex_hull uut(points);
+        BOOST_REQUIRE(!uut.faces().empty());
+    }
+    const auto t1(std::chrono::system_clock::now());
+    std::cout << "Test took: " << (std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() / number_runs) << " ms per hull" << std::endl;
+}
+#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_SUITE_END()
 }; /* namespace test */

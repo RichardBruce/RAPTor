@@ -5,6 +5,7 @@
 
 /* Boost headers */
 #include "boost/noncopyable.hpp"
+#include "boost/pool/pool_alloc.hpp"
 
 /* Common headers */
 #include "point_t.h"
@@ -17,9 +18,12 @@ class tmm_edge;
 class tmm_triangle;
 class tm_mesh;
 
-using tmm_vertex_iter   = std::list<tmm_vertex>::iterator;
-using tmm_edge_iter     = std::list<tmm_edge>::iterator;
-using tmm_triangle_iter = std::list<tmm_triangle>::iterator;
+template<class T>
+using allocator = boost::fast_pool_allocator<T, boost::default_user_allocator_new_delete, boost::details::pool::null_mutex, 1024, 4096>;
+
+using tmm_vertex_iter   = std::list<tmm_vertex, allocator<tmm_vertex>>::iterator;
+using tmm_edge_iter     = std::list<tmm_edge, allocator<tmm_edge>>::iterator;
+using tmm_triangle_iter = std::list<tmm_triangle, allocator<tmm_triangle>>::iterator;
 
 class tmm_vertex
 {
@@ -157,35 +161,35 @@ class tm_mesh : private boost::noncopyable
         int                             number_of_vertices()    const { return _vertices.size();    }
         int                             number_of_edges()       const { return _edges.size();       }
         int                             number_of_triangles()   const { return _triangles.size();   }
-        const std::list<tmm_vertex> &   get_vertices()          const { return _vertices;           }
-        const std::list<tmm_edge> &     get_edges()             const { return _edges;              }
-        const std::list<tmm_triangle> & get_triangles()         const { return _triangles;          }
+        const std::list<tmm_vertex, allocator<tmm_vertex>> &        get_vertices()          const { return _vertices;           }
+        const std::list<tmm_edge, allocator<tmm_edge>> &            get_edges()             const { return _edges;              }
+        const std::list<tmm_triangle, allocator<tmm_triangle>> &    get_triangles()         const { return _triangles;          }
 
-        std::list<tmm_vertex> &         get_vertices()  { return _vertices;     }
-        std::list<tmm_edge> &           get_edges()     { return _edges;        }
-        std::list<tmm_triangle> &       get_triangles() { return _triangles;    }
+        std::list<tmm_vertex, allocator<tmm_vertex>> &              get_vertices()  { return _vertices;     }
+        std::list<tmm_edge, allocator<tmm_edge>> &                  get_edges()     { return _edges;        }
+        std::list<tmm_triangle, allocator<tmm_triangle>> &          get_triangles() { return _triangles;    }
 
         tmm_vertex_iter add_vertex(const point_t &pt, const int id)
         {
-            _vertices.emplace_back(_edges.end(), pt, id);
+            _vertices.push_back(tmm_vertex(_edges.end(), pt, id));
             return --_vertices.end();
         }
 
         tmm_edge_iter add_edge(const tmm_vertex_iter &v0, const tmm_vertex_iter &v1)
         {
-            _edges.emplace_back(_triangles.end(), _triangles.end(), _triangles.end(), v0, v1);
+            _edges.push_back(tmm_edge(_triangles.end(), _triangles.end(), _triangles.end(), v0, v1));
             return --_edges.end();
         }
 
         tmm_triangle_iter add_triangle(const tmm_vertex_iter &v0, const tmm_vertex_iter &v1, const tmm_vertex_iter &v2)
         {
-            _triangles.emplace_back(_edges.end(), _edges.end(), _edges.end(), v0, v1, v2);
+            _triangles.push_back(tmm_triangle(_edges.end(), _edges.end(), _edges.end(), v0, v1, v2));
             return --_triangles.end();
         }
 
         tmm_triangle_iter add_triangle(const tmm_edge_iter &e0, const tmm_edge_iter &e1, const tmm_edge_iter &e2, const tmm_vertex_iter &v0, const tmm_vertex_iter &v1, const tmm_vertex_iter &v2)
         {
-            _triangles.emplace_back(e0, e1, e2, v0, v1, v2);
+            _triangles.push_back(tmm_triangle(e0, e1, e2, v0, v1, v2));
             return --_triangles.end();
         }
 
@@ -434,8 +438,8 @@ class tm_mesh : private boost::noncopyable
             }
         }
 
-        std::list<tmm_vertex>    _vertices;
-        std::list<tmm_edge>      _edges;
-        std::list<tmm_triangle>  _triangles;
+        std::list<tmm_vertex, allocator<tmm_vertex>>        _vertices;
+        std::list<tmm_edge, allocator<tmm_edge>>            _edges;
+        std::list<tmm_triangle, allocator<tmm_triangle>>    _triangles;
 };
 }; /* namespace raptor_convex_decomposition */

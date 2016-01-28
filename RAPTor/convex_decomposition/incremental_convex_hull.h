@@ -385,7 +385,6 @@ class incremental_convex_hull : private boost::noncopyable
                 }
             }
             (*total_volume) = tv;
-            assert((static_cast<int>(_delete_triangles.size()) != _mesh.number_of_triangles()) || !"Error: All mesh triangles are visible");
 
             /* If no faces visible from p then p is inside the hull */
             if (!visible && mark_visible_faces)
