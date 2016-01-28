@@ -709,13 +709,13 @@ inline point_ti<T> cross_product(const point_ti<T> &a, const point_ti<T> &b)
 }
 
 template<class T>
-inline int dot_product(const point_ti<T> &a, const point_ti<T> &b)
+inline T dot_product(const point_ti<T> &a, const point_ti<T> &b)
 {
     return ((a.x * b.x) + (a.y * b.y) + (a.z * b.z));
 }
 
 template<class T>
-inline int tetrahedron_volume(const point_ti<T> &a, const point_ti<T> &b, const point_ti<T> &c, const point_ti<T> &d)
+inline T tetrahedron_volume(const point_ti<T> &a, const point_ti<T> &b, const point_ti<T> &c, const point_ti<T> &d)
 {
     return dot_product((a - d), cross_product((b - d), (c - d)));
 }
