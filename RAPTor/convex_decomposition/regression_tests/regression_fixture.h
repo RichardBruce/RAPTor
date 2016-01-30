@@ -30,7 +30,7 @@ struct regression_fixture : private boost::noncopyable
         const auto t0(std::chrono::system_clock::now());
         uut.reset(new convex_decomposition(points, triangles, options));
         const auto t1(std::chrono::system_clock::now());
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 5 - Runtime (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 5 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
     }
 
     void check(const std::string &file)
