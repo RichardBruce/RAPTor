@@ -75,7 +75,10 @@ struct regression_fixture : private boost::noncopyable
             const auto *const mesh = uut->get_convex_hull(i);
             for (const auto &pt : mesh->points())
             {
-                BOOST_CHECK_MESSAGE(std::fabs(magnitude(pt - points_exp[pt_idx])) < result_tolerance, pt << " versus: " << points_exp[pt_idx]);
+                if (std::fabs(magnitude(pt - points_exp[pt_idx])) > result_tolerance)
+                {
+                    BOOST_CHECK(std::fabs(magnitude(pt - points_exp[pt_idx])) < result_tolerance);
+                }
                 pt_idx++;
             }
         }
