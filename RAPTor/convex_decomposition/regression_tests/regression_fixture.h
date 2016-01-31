@@ -37,7 +37,7 @@ struct regression_fixture : private boost::noncopyable
     {
         const float original_volume = convex_mesh(points, triangles).volume();
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Original Volume: " << original_volume;
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - Voxelised volume: " << ((uut->get_primitive_set()->compute_volume() / original_volume) - 1.0f);
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - Voxelised Relative Volume: " << (((uut->get_primitive_set()->compute_volume() / original_volume) - 1.0f) * 100.0f);
 
         BOOST_LOG_TRIVIAL(error) << "PERF 3 - Decomposed Number of hulls: " << uut->number_of_convex_hulls();
         float total_volume = 0.0f;
@@ -45,7 +45,7 @@ struct regression_fixture : private boost::noncopyable
         {
             total_volume += uut->get_convex_hull(i)->volume();
         }
-        BOOST_LOG_TRIVIAL(error) << "PERF 4 - Decomposed Total Volume: " << ((total_volume / original_volume) - 1.0f);
+        BOOST_LOG_TRIVIAL(error) << "PERF 4 - Decomposed Relative Volume: " << (((total_volume / original_volume) - 1.0f) * 100.0f);
 
         /* Sum number of points and triangles */
         int nr_pts = 0;
