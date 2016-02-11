@@ -30,22 +30,26 @@ struct regression_fixture : private boost::noncopyable
         const auto t0(std::chrono::system_clock::now());
         uut.reset(new convex_decomposition(points, triangles, options));
         const auto t1(std::chrono::system_clock::now());
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 5 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 7 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
     }
 
     void check(const std::string &file)
     {
         const float original_volume = convex_mesh(points, triangles).volume();
         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Original Volume: " << original_volume;
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - Voxelised Relative Volume: " << (((uut->get_primitive_set()->compute_volume() / original_volume) - 1.0f) * 100.0f);
 
-        BOOST_LOG_TRIVIAL(error) << "PERF 3 - Decomposed Number of hulls: " << uut->number_of_convex_hulls();
-        float total_volume = 0.0f;
+        const float voxelised_volume = uut->get_primitive_set()->compute_volume();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - Voxelised Volume: " << voxelised_volume;
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 3 - Voxelised Relative Volume: " << (((voxelised_volume / original_volume) - 1.0f) * 100.0f);
+
+        BOOST_LOG_TRIVIAL(error) << "PERF 4 - Decomposed Number of hulls: " << uut->number_of_convex_hulls();
+        float decomposed_volume = 0.0f;
         for (int i = 0; i <  uut->number_of_convex_hulls(); ++i)
         {
-            total_volume += uut->get_convex_hull(i)->volume();
+            decomposed_volume += uut->get_convex_hull(i)->volume();
         }
-        BOOST_LOG_TRIVIAL(error) << "PERF 4 - Decomposed Relative Volume: " << (((total_volume / original_volume) - 1.0f) * 100.0f);
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 5 - Decomposed Volume: " << decomposed_volume;
+        BOOST_LOG_TRIVIAL(error) << "PERF 6 - Decomposed Relative Volume: " << (((decomposed_volume / original_volume) - 1.0f) * 100.0f);
 
         /* Sum number of points and triangles */
         int nr_pts = 0;
