@@ -703,6 +703,17 @@ inline point_ti<T> min(const point_ti<T>& a, const int b)
 }
 
 template<class T>
+point_ti<T> normalise(point_ti<T> a, const T scale)
+{
+    const T dist = scale / std::sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
+    a.x *= dist;
+    a.y *= dist;
+    a.z *= dist;
+
+    return a;
+}
+
+template<class T>
 inline point_ti<T> cross_product(const point_ti<T> &a, const point_ti<T> &b)
 {
     return point_ti<T>((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
