@@ -22,7 +22,7 @@ class incremental_convex_hull : private boost::noncopyable
 {
     public :
         /* Ctor */
-        incremental_convex_hull() : _last_processed(_mesh.get_vertices().end()), _flat(false) {  }
+        incremental_convex_hull(const std::vector<point_t> &points) : _mesh(compute_offset_and_scale(points), _scale_inv), _last_processed(_mesh.get_vertices().end()), _flat(false) {  }
 
         /* Access functions */
         tm_mesh&    mesh()                        { return _mesh;                       }
@@ -136,9 +136,10 @@ class incremental_convex_hull : private boost::noncopyable
 
             /* Process remaining vertices */
             ++_last_processed;
+            const std::int64_t int_min_volume = min_volume * _scale_inv.x * _scale_inv.y * _scale_inv.z;
             while ((_last_processed != vertices.end()) && (points_added < max_points))
             {
-                if (!find_max_volume_point(&_last_processed, (points_added > 3) ? min_volume : 0.0f))
+                if (!find_max_volume_point(&_last_processed, (points_added > 3) ? int_min_volume : 0))
                 {
                     break;
                 }
@@ -147,15 +148,6 @@ class incremental_convex_hull : private boost::noncopyable
                 {
                     ++points_added;
                     points_added -= _mesh.clean_up(&_delete_triangles, &_update_edges, &_delete_edges, _last_processed);
-                    if (!_mesh.check_consistency())
-                    {
-                        // std::cout.precision(17);
-                        // std::cout << "max_points: " << max_points << ", min_volume: " << min_volume << std::endl;
-                        // for (const auto &v : _mesh.get_vertices())
-                        // {
-                        //     std::cout << std::fixed << v.position() << std::endl;
-                        // }
-                    }
                     assert(_mesh.check_consistency() || !"Error: Inconsistent mesh");
                     ++_last_processed;
                 }
@@ -174,51 +166,6 @@ class incremental_convex_hull : private boost::noncopyable
             return convex_hull_error_t::ok;
         }
 
-        bool is_inside(const point_t &pt, const float eps)
-        {
-            if (_flat)
-            {
-                for (const auto &t : _mesh.get_triangles())
-                {
-                    const point_t ver0(t.vertex(0)->position());
-                    const point_t ver1(t.vertex(1)->position());
-                    const point_t ver2(t.vertex(2)->position());
-                    const point_t a(ver1 - ver0);
-                    const point_t b(ver2 - ver0);
-                    const point_t c(pt - ver0);
-
-                    const float a_dot_a = dot_product(a, a);
-                    const float a_dot_b = dot_product(a, b);
-                    const float a_dot_c = dot_product(a, c);
-                    const float b_dot_b = dot_product(b, b);
-                    const float b_dot_c = dot_product(b, c);
-                    const float denom = 1.0f / ((a_dot_a * b_dot_b) - (a_dot_b * a_dot_b));
-                    const float u = ((b_dot_b * a_dot_c) - (a_dot_b * b_dot_c)) * denom;
-                    const float v = ((a_dot_a * b_dot_c) - (a_dot_b * a_dot_c)) * denom;
-                    
-                    if ((u >= 0.0f) && (u <= 1.0f) && (v >= 0.0f) && ((u + v) <= 1.0f))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-            else
-            {
-                for (const auto &t : _mesh.get_triangles())
-                {
-                    const float vol = t.volume_with_point(pt);
-                    if (vol < eps)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }
-
         void clear()
         {    
             _flat = false;
@@ -230,6 +177,58 @@ class incremental_convex_hull : private boost::noncopyable
         }
 
     private :
+        point_t compute_offset_and_scale(const std::vector<point_t> &points)
+        {
+            /* Check for data */
+            if (points.empty())
+            {
+                return point_t(0.0f, 0.0f, 0.0f);
+            }
+
+            /* Find bounds of the points */
+            point_t min_pt(points[0]);
+            point_t max_pt(points[0]);
+            for (int i = 1; i < static_cast<int>(points.size()); ++i)
+            {
+                min_pt = min(min_pt, points[i]);
+                max_pt = max(max_pt, points[i]);
+            }
+
+            /* Find the center */
+            const point_t offset((min_pt + max_pt) * 0.5f);
+
+            /* Calculate scale */
+            _scale_inv = max_pt - min_pt;
+            if (_scale_inv.x != 0.0f)
+            {
+                _scale_inv.x = scale / _scale_inv.x;
+            }
+            else
+            {
+                _scale_inv.x = 1.0f;
+            }
+
+            if (_scale_inv.y != 0.0f)
+            {
+                _scale_inv.y = scale / _scale_inv.y;
+            }
+            else
+            {
+                _scale_inv.y = 1.0f;
+            }
+
+            if (_scale_inv.z != 0.0f)
+            {
+                _scale_inv.z = scale / _scale_inv.z;
+            }
+            else
+            {
+                _scale_inv.z = 1.0f;
+            }
+
+            return offset;
+        }
+
         void restart_if_flat()
         {
             if (_flat)
@@ -249,10 +248,10 @@ class incremental_convex_hull : private boost::noncopyable
             tmm_vertex_iter v2 = _last_processed;
 
             /* Calculate plane normal */
-            const point_t p0(v0->position());
-            const point_t p1(v1->position());
-            const point_t p2(v2->position());
-            _normal = normalise(cross_product((p1 - p0), (p2 - p0)));
+            const point_ti<std::int64_t> p0(v0->position());
+            const point_ti<std::int64_t> p1(v1->position());
+            const point_ti<std::int64_t> p2(v2->position());
+            _normal = normalise(cross_product((p1 - p0), (p2 - p0)), static_cast<std::int64_t>(scale));
 
             _mesh.add_triangle(v0, v1, v2);
             _mesh.add_triangle(v2, v1, v0);
@@ -326,12 +325,12 @@ class incremental_convex_hull : private boost::noncopyable
             }
         }
 
-        bool find_max_volume_point(tmm_vertex_iter *const v, const float min_volume)
+        bool find_max_volume_point(tmm_vertex_iter *const v, const std::int64_t min_volume)
         {
             auto &vertices = _mesh.get_vertices();
             
-            float volume                = 0.0f;
-            float max_volume            = min_volume;
+            std::int64_t volume         = 0;
+            std::int64_t max_volume     = min_volume;
             tmm_vertex_iter v_iter      = *v;
             tmm_vertex_iter vmax_iter   = vertices.end();
             while (v_iter != vertices.end())
@@ -363,17 +362,16 @@ class incremental_convex_hull : private boost::noncopyable
             return true;
         }
 
-        bool compute_point_volume(tmm_vertex_iter *const v, float *const total_volume, bool mark_visible_faces)
+        bool compute_point_volume(tmm_vertex_iter *const v, std::int64_t *const total_volume, bool mark_visible_faces)
         {
             /* Compute volume for all triangles */
-            float tv        = 0.0f;
+            std::int64_t tv = 0;
             bool visible    = false;
-            const point_t pos((*v)->position());
+            const point_ti<std::int64_t> pos((*v)->position());
             for (auto t = _mesh.get_triangles().begin(); t != _mesh.get_triangles().end(); ++t)
             {
-                const float vol = t->volume_with_point(pos);
-                // std::cout << "vol: " << vol << std::endl;
-                if (vol < 0.0f)
+                const std::int64_t vol = t->volume_with_point(pos);
+                if (vol < 0)
                 {
                     tv -= vol;
                     if (mark_visible_faces)
@@ -399,7 +397,7 @@ class incremental_convex_hull : private boost::noncopyable
         bool process_point(tmm_vertex_iter *const v)
         {
             /* Check point visibility and mark visible faces */
-            float total_volume;
+            std::int64_t total_volume;
             if (!compute_point_volume(v, &total_volume, true))
             {
                 return false;
@@ -422,19 +420,16 @@ class incremental_convex_hull : private boost::noncopyable
                 /* Edge is no invisible, mark for delete */
                 if (visible == 2)
                 {
-                    // std::cout << "deleting edge: " << e->vertex(0)->id() << " to: " <<  e->vertex(1)->id() << std::endl;
                     _delete_edges.push_back(e);
                 }
                 /* Edge is on the visible-invisible boudary, add a new face here */
                 else if (visible == 1)
                 {
-                    // std::cout << "updating edge: " << e->vertex(0)->id() << " to: " <<  e->vertex(1)->id() << std::endl;
                     e->new_face(_mesh.make_cone_face(e, *v));
                     _update_edges.push_back(e);
                 }
             }
 
-            // std::cout << std::endl;
             return true;
         }
 
@@ -473,39 +468,39 @@ class incremental_convex_hull : private boost::noncopyable
                 vertices.splice(vertices.begin(), vertices, v0, v3);
             }
 
-            float vol = 0.0f;
-            while ((std::fabs(vol) < epsilon) && (v3 != vertices.end()))
+            std::int64_t vol = 0;
+            while ((vol == 0) && (v3 != vertices.end()))
             {
                 vol = tetrahedron_volume(v0->position(), v1->position(), v2->position(), v3->position());
                 ++v3;
             }
 
             /* Mesh is flat, fake it as slightly less flat */
-            if (std::fabs(vol) < epsilon)
+            if (vol == 0)
             {
                 _flat = true;
 
                 /* Compute the barycenter */
-                point_t bary(0.0f, 0.0f, 0.0f);
+                point_ti<std::int64_t> bary(0, 0, 0);
                 for (const auto &v : vertices)
                 {
                     bary += v.position();
                 }
-                bary /= static_cast<float>(_mesh.number_of_vertices());
+                bary /= _mesh.number_of_vertices();
 
                 /* Compute the normal to the plane */
-                const point_t p0(v0->position());
-                const point_t p1(v1->position());
-                const point_t p2(v2->position());
-                _normal = normalise(cross_product((p1 - p0), (p2 - p0)));
+                const point_ti<std::int64_t> p0(v0->position());
+                const point_ti<std::int64_t> p1(v1->position());
+                const point_ti<std::int64_t> p2(v2->position());
+                _normal = normalise(cross_product((p1 - p0), (p2 - p0)) / scale, static_cast<std::int64_t>(scale));
 
                 /* Add dummy vertex placed at (bary + normal) */
-                add_point(bary + _normal, dummy_index); 
+                _mesh.add_vertex(bary + _normal, dummy_index);
                 vertices.splice(++v2, vertices, --vertices.end());
                 return true;
             }
 
-            /* Move the point creating a volume to be the next one processed*/
+            /* Move the point creating a volume to be the next one processed */
             --v3;
             ++v2;
             if (v2 != v3)
@@ -516,15 +511,16 @@ class incremental_convex_hull : private boost::noncopyable
             return true;
         }
 
+        point_t                         _scale_inv;
         tm_mesh                         _mesh;
         std::vector<tmm_edge_iter>      _delete_edges;
         std::vector<tmm_edge_iter>      _update_edges;
         std::vector<tmm_triangle_iter>  _delete_triangles; 
         tmm_vertex_iter                 _last_processed;
-        point_t                         _normal;
+        point_ti<std::int64_t>          _normal;
         bool                            _flat;
 
-        static constexpr float epsilon      = 1.0e-8f;
+        static constexpr float scale        = 1048576.0f;
         static constexpr int   dummy_index  = std::numeric_limits<int>::max();
 };
 } /* namespace raptor_convex_decomposition */

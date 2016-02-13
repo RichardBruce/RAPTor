@@ -324,10 +324,10 @@ void convex_decomposition::simplify_convex_hulls()
         return;
     }
 
-    incremental_convex_hull ic_hull;
     const float min_volume = _volume_hull * _params.min_volume_per_hull;
     for (int i = 0; i < static_cast<int>(_convex_hulls.size()); ++i)
     {
+        incremental_convex_hull ic_hull(_convex_hulls[i]->points());
         ic_hull.add_points(_convex_hulls[i]->points());
         ic_hull.process(_params.max_vertices_per_hull, min_volume);
 

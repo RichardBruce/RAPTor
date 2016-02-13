@@ -19,7 +19,7 @@ class tmm_triangle;
 class tm_mesh;
 
 template<class T>
-using allocator = boost::fast_pool_allocator<T, boost::default_user_allocator_new_delete, boost::details::pool::null_mutex, 1024, 4096>;
+using allocator = boost::fast_pool_allocator<T, boost::default_user_allocator_new_delete, boost::details::pool::null_mutex, 1024, 0>;
 
 using tmm_vertex_iter   = std::list<tmm_vertex, allocator<tmm_vertex>>::iterator;
 using tmm_edge_iter     = std::list<tmm_edge, allocator<tmm_edge>>::iterator;
@@ -28,7 +28,7 @@ using tmm_triangle_iter = std::list<tmm_triangle, allocator<tmm_triangle>>::iter
 class tmm_vertex
 {
     public :
-        tmm_vertex(const tmm_edge_iter &duplicate, const point_t &pos, const int id) :
+        tmm_vertex(const tmm_edge_iter &duplicate, const point_ti<std::int64_t> &pos, const int id) :
             _duplicate(duplicate),
             _pos(pos),
             _name(id),
@@ -37,11 +37,11 @@ class tmm_vertex
         {  }
 
         /* Getters */
-        tmm_edge_iter   duplicate() const { return _duplicate;  }
-        const point_t&  position()  const { return _pos;        }
-        int             name()      const { return _name;       }
-        int             id()        const { return _id;         }
-        bool            on_hull()   const { return _on_hull;    }
+        tmm_edge_iter                   duplicate() const { return _duplicate;  }
+        const point_ti<std::int64_t>&   position()  const { return _pos;        }
+        int                             name()      const { return _name;       }
+        int                             id()        const { return _id;         }
+        bool                            on_hull()   const { return _on_hull;    }
 
         /* Setters */
         tmm_vertex& duplicate(const tmm_edge_iter &dup)
@@ -63,11 +63,11 @@ class tmm_vertex
         }
 
     private :
-        tmm_edge_iter   _duplicate;        // pointer to incident cone edge (or NULL)
-        point_t         _pos;
-        int             _name;
-        int             _id;
-        bool            _on_hull;
+        tmm_edge_iter           _duplicate;        // pointer to incident cone edge (or NULL)
+        point_ti<std::int64_t>  _pos;
+        int                     _name;
+        int                     _id;
+        bool                    _on_hull;
 };
 
 class tmm_edge
@@ -119,7 +119,7 @@ class tmm_triangle
         {  }
 
         /* Find the volume of 3 vertices with a point */
-        float volume_with_point(const point_t &pt) const
+        std::int64_t volume_with_point(const point_ti<std::int64_t> &pt) const
         {
             return tetrahedron_volume(_vertices[0]->position(), _vertices[1]->position(), _vertices[2]->position(), pt);
         }
@@ -158,6 +158,8 @@ class tmm_triangle
 class tm_mesh : private boost::noncopyable
 {
     public :
+        tm_mesh(const point_t &offset, const point_t &scale_inv) : _offset(offset), _scale_inv(scale_inv) {  }
+
         int                             number_of_vertices()    const { return _vertices.size();    }
         int                             number_of_edges()       const { return _edges.size();       }
         int                             number_of_triangles()   const { return _triangles.size();   }
@@ -170,6 +172,12 @@ class tm_mesh : private boost::noncopyable
         std::list<tmm_triangle, allocator<tmm_triangle>> &          get_triangles() { return _triangles;    }
 
         tmm_vertex_iter add_vertex(const point_t &pt, const int id)
+        {
+            _vertices.push_back(tmm_vertex(_edges.end(), point_ti<std::int64_t>((pt - _offset) * _scale_inv), id));
+            return --_vertices.end();
+        }
+
+        tmm_vertex_iter add_vertex(const point_ti<std::int64_t> &pt, const int id)
         {
             _vertices.push_back(tmm_vertex(_edges.end(), pt, id));
             return --_vertices.end();
@@ -210,7 +218,7 @@ class tm_mesh : private boost::noncopyable
             int idx = 0;
             for (auto &v : _vertices)
             {
-                points->push_back(v.position());
+                points->push_back((point_t(v.position()) / _scale_inv) + _offset);
                 v.id(idx++);
             }
 
@@ -441,5 +449,7 @@ class tm_mesh : private boost::noncopyable
         std::list<tmm_vertex, allocator<tmm_vertex>>        _vertices;
         std::list<tmm_edge, allocator<tmm_edge>>            _edges;
         std::list<tmm_triangle, allocator<tmm_triangle>>    _triangles;
+        const point_t                                       _offset;
+        const point_t                                       _scale_inv;
 };
 }; /* namespace raptor_convex_decomposition */

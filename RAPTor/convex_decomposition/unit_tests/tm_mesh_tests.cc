@@ -22,15 +22,16 @@ namespace test
 struct tm_mesh_fixture : private boost::noncopyable
 {
     tm_mesh_fixture() :
-        v0(edges.end(), point_t(1.1f, 2.3f, 3.5f), 6),
-        v1(edges.end(), point_t(2.1f, 4.3f, 6.5f), 7),
-        v2(edges.end(), point_t(1.5f, 3.3f, 4.5f), 8),
+        v0(edges.end(), point_ti<std::int64_t>(1, 2, 3), 6),
+        v1(edges.end(), point_ti<std::int64_t>(2, 4, 6), 7),
+        v2(edges.end(), point_ti<std::int64_t>(1, 3, 4), 8),
         vertices(build_vertices()),
         e0(triangles.end(), triangles.end(), triangles.end(), vertices.begin(), ++vertices.begin()),
         e1(triangles.end(), triangles.end(), triangles.end(), ++vertices.begin(), ++(++vertices.begin())),
         e2(triangles.end(), triangles.end(), triangles.end(), ++(++vertices.begin()), vertices.begin()),
         t0(edges.end(), edges.end(), edges.end(), vertices.end(), vertices.end(), vertices.end()),
-        t1(edges.end(), edges.end(), edges.end(), vertices.begin(), ++vertices.begin(), ++(++vertices.begin()))
+        t1(edges.end(), edges.end(), edges.end(), vertices.begin(), ++vertices.begin(), ++(++vertices.begin())),
+        mesh(point_t(-1.0f, 2.1f, 3.3f), point_t(2.3f, 1.2f, 3.7f))
     {
         edges.push_back(e0);
         edges.push_back(e1);
@@ -72,7 +73,7 @@ const float result_tolerance = 0.0005f;
 BOOST_AUTO_TEST_CASE( vertex_ctor_test )
 {
     BOOST_CHECK(v0.duplicate()  == edges.end());
-    BOOST_CHECK(v0.position()   == point_t(1.1f, 2.3f, 3.5f));
+    BOOST_CHECK(v0.position()   == point_ti<std::int64_t>(1, 2, 3));
     BOOST_CHECK(v0.name()       == 6);
     BOOST_CHECK(v0.id()         == 6);
     BOOST_CHECK(v0.on_hull()    == false);
@@ -161,8 +162,8 @@ BOOST_AUTO_TEST_CASE( triangle_ctor_test )
 
 BOOST_AUTO_TEST_CASE( triangle_volume_with_point_test )
 {
-    BOOST_CHECK_CLOSE(t1.volume_with_point(point_t(0.0f, 0.0f, 0.0f)),  0.059999f, result_tolerance);
-    BOOST_CHECK_CLOSE(t1.volume_with_point(point_t(0.0f, 8.0f, 0.0f)), -1.539999f, result_tolerance);
+    BOOST_CHECK(t1.volume_with_point(point_ti<std::int64_t>(2, 0, 1)) == 1);
+    BOOST_CHECK(t1.volume_with_point(point_ti<std::int64_t>(0, 8, 0)) == 8);
 }
 
 BOOST_AUTO_TEST_CASE( triangle_edge_test )
@@ -243,7 +244,7 @@ BOOST_AUTO_TEST_CASE( mesh_add_vertex_test )
     /* Checks */
     auto v_iter = mesh.get_vertices().begin();
     BOOST_CHECK(v_iter->id()        == 0);
-    BOOST_CHECK(v_iter->position()  == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(v_iter->position()  == point_ti<std::int64_t>(2, -2, -12));
     BOOST_CHECK(v_iter->name()      == 0);
     BOOST_CHECK(v_iter->duplicate() == mesh.get_edges().end());
     BOOST_CHECK(v_iter->on_hull()   == false);
@@ -257,7 +258,38 @@ BOOST_AUTO_TEST_CASE( mesh_add_vertex_test )
     /* Checks */
     ++v_iter;
     BOOST_CHECK(v_iter->id()        == 1);
-    BOOST_CHECK(v_iter->position()  == point_t(2.0f, 5.0f, 4.0f));
+    BOOST_CHECK(v_iter->position()  == point_ti<std::int64_t>(6, 3, 2));
+    BOOST_CHECK(v_iter->name()      == 1);
+    BOOST_CHECK(v_iter->duplicate() == mesh.get_edges().end());
+    BOOST_CHECK(v_iter->on_hull()   == false);
+}
+
+BOOST_AUTO_TEST_CASE( mesh_add_integer_vertex_test )
+{
+    /* Add vertex */
+    mesh.add_vertex(point_ti<std::int64_t>(0, 2, 3), 0);
+    BOOST_REQUIRE(mesh.number_of_vertices() == 1);
+    BOOST_CHECK(mesh.number_of_edges()      == 0);
+    BOOST_CHECK(mesh.number_of_triangles()  == 0);
+
+    /* Checks */
+    auto v_iter = mesh.get_vertices().begin();
+    BOOST_CHECK(v_iter->id()        == 0);
+    BOOST_CHECK(v_iter->position()  == point_ti<std::int64_t>(0, 2, 3));
+    BOOST_CHECK(v_iter->name()      == 0);
+    BOOST_CHECK(v_iter->duplicate() == mesh.get_edges().end());
+    BOOST_CHECK(v_iter->on_hull()   == false);
+
+    /* Add vertex */
+    mesh.add_vertex(point_ti<std::int64_t>(-2, 5, 4), 1);
+    BOOST_REQUIRE(mesh.number_of_vertices() == 2);
+    BOOST_CHECK(mesh.number_of_edges()      == 0);
+    BOOST_CHECK(mesh.number_of_triangles()  == 0);
+
+    /* Checks */
+    ++v_iter;
+    BOOST_CHECK(v_iter->id()        == 1);
+    BOOST_CHECK(v_iter->position()  == point_ti<std::int64_t>(-2, 5, 4));
     BOOST_CHECK(v_iter->name()      == 1);
     BOOST_CHECK(v_iter->duplicate() == mesh.get_edges().end());
     BOOST_CHECK(v_iter->on_hull()   == false);
@@ -449,10 +481,9 @@ BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_test )
     std::vector<point_t>    points;
     std::vector<point_ti<>> triangles;
     mesh.points_and_triangles(&points, &triangles);
-
-    BOOST_CHECK(points[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(points[1] == point_t(2.0f, 5.0f, 4.0f));
-    BOOST_CHECK(points[2] == point_t(2.0f, 0.0f, 0.0f));
+    BOOST_CHECK(std::fabs(magnitude(points[0] - point_t(-0.130435f, 0.433333f, 0.0567567f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(points[1] - point_t( 1.6087f,   4.6f,      3.84054f  ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(points[2] - point_t( 1.6087f,   0.433333f, 0.056756f ))) < result_tolerance);
 
     BOOST_CHECK(triangles[0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(triangles[1] == point_ti<>(2, 1, 0));
@@ -489,10 +520,9 @@ BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_after_erase_test )
     std::vector<point_t>    points;
     std::vector<point_ti<>> triangles;
     mesh.points_and_triangles(&points, &triangles);
-
-    BOOST_CHECK(points[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(points[1] == point_t(2.0f, 5.0f, 4.0f));
-    BOOST_CHECK(points[2] == point_t(2.0f, 0.0f, 0.0f));
+    BOOST_CHECK(std::fabs(magnitude(points[0] - point_t(-0.130435f, 0.433333f, 0.0567567f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(points[1] - point_t( 1.6087f,   4.6f,      3.84054f  ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(points[2] - point_t( 1.6087f,   0.433333f, 0.056756f ))) < result_tolerance);
 
     BOOST_CHECK(triangles[0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(triangles[1] == point_ti<>(2, 1, 0));
