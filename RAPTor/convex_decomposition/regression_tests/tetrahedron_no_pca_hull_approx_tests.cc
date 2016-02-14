@@ -106,7 +106,6 @@ BOOST_AUTO_TEST_CASE( cow1_tetrahedron_no_pca_hull_approx_test )
     /* Save resutls */
     check("cow1_tetrahedron_no_pca_hull_approx");
 }
-#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( cow2_tetrahedron_no_pca_hull_approx_test )
 {
@@ -120,7 +119,6 @@ BOOST_AUTO_TEST_CASE( cow2_tetrahedron_no_pca_hull_approx_test )
     check("cow2_tetrahedron_no_pca_hull_approx");
 }
 
-#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( crank_tetrahedron_no_pca_hull_approx_test )
 {
     /* Load file */
@@ -672,6 +670,7 @@ BOOST_AUTO_TEST_CASE( Teapot_tetrahedron_no_pca_hull_approx_test )
     /* Save resutls */
     check("Teapot_tetrahedron_no_pca_hull_approx");
 }
+#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( test2_tetrahedron_no_pca_hull_approx_test )
 {
@@ -685,6 +684,7 @@ BOOST_AUTO_TEST_CASE( test2_tetrahedron_no_pca_hull_approx_test )
     check("test2_tetrahedron_no_pca_hull_approx");
 }
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( test_tetrahedron_no_pca_hull_approx_test )
 {
     /* Load file */

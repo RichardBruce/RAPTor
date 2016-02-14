@@ -82,7 +82,6 @@ BOOST_AUTO_TEST_CASE( casting_tetrahedron_pca_hull_approx_test )
     /* Save results */
     check("casting_tetrahedron_pca_hull_approx");
 }
-#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( chair_tetrahedron_pca_hull_approx_test )
 {
@@ -96,7 +95,6 @@ BOOST_AUTO_TEST_CASE( chair_tetrahedron_pca_hull_approx_test )
     check("chair_tetrahedron_pca_hull_approx");
 }
 
-#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( cow1_tetrahedron_pca_hull_approx_test )
 {
     /* Load file */
@@ -684,6 +682,7 @@ BOOST_AUTO_TEST_CASE( test2_tetrahedron_pca_hull_approx_test )
     /* Save results */
     check("test2_tetrahedron_pca_hull_approx");
 }
+#endif /* #ifndef VALGRIND_TESTS */
 
 BOOST_AUTO_TEST_CASE( test_tetrahedron_pca_hull_approx_test )
 {
@@ -697,6 +696,7 @@ BOOST_AUTO_TEST_CASE( test_tetrahedron_pca_hull_approx_test )
     check("test_tetrahedron_pca_hull_approx");
 }
 
+#ifndef VALGRIND_TESTS
 BOOST_AUTO_TEST_CASE( torus_tetrahedron_pca_hull_approx_test )
 {
     /* Load file */
