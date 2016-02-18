@@ -154,7 +154,7 @@ class lcp_solver
 
                 /* Find new pivot row */
                 pivot_row = find_pivot(to_enter);
-                // BOOST_LOG_TRIVIAL(trace) << "Pivot row: " << pivot_row;
+                BOOST_LOG_TRIVIAL(trace) << "Pivot row: " << pivot_row;
 
                 /* Check for no solution */
                 if (pivot_row < 0)
@@ -177,11 +177,11 @@ class lcp_solver
                 }
             }
 
-            // BOOST_LOG_TRIVIAL(trace) << "Terminal dictionary, z: (" << z[0] << array_to_stream(&z[1], &z[_m_size], [this](std::stringstream *s, const int z)
-            // {
-            //     (*s) << ", " << z;
-            //     return s;
-            // }, ")");
+            BOOST_LOG_TRIVIAL(trace) << "Terminal dictionary, z: (" << z[0] << array_to_stream(&z[1], &z[_m_size], [this](std::stringstream *s, const float z)
+            {
+                (*s) << ", " << z;
+                return s;
+            }, ")");
 
             /* Return if a solution is possible */
             return true;

@@ -24,8 +24,11 @@ class mock_physics_object
     public :
         typedef mock_physics_object inner_vg;
 
-        mock_physics_object(inertia_tensor *const i, const point_t &v = point_t(0.0, 0.0, 0.0), const point_t &w = point_t(0.0, 0.0, 0.0)) 
-            : _i(i), _v(v), _w(w), _f(point_t(0.0, 0.0, 0.0)), _tor(point_t(0.0, 0.0, 0.0)) {  };
+        mock_physics_object(inertia_tensor *const i, const point_t &v = point_t(0.0f, 0.0f, 0.0f), const point_t &w = point_t(0.0f, 0.0f, 0.0f), const unsigned int t = 0) :
+            _i(i), _v(v), _w(w), _f(point_t(0.0f, 0.0f, 0.0f)), _tor(point_t(0.0f, 0.0f, 0.0f)), _type(t) {  };
+
+        mock_physics_object(inertia_tensor *const i, const unsigned int t) : mock_physics_object(i, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), t) {  };
+
 
         ~mock_physics_object()
         {
@@ -106,6 +109,7 @@ class mock_physics_object
         point_t                 get_center_of_mass()            const { return _i->center_of_mass();    }
         inertia_tensor&         get_inertia_tenor()             const { return *_i;                     }
         float                   get_mass()                      const { return _i->mass();              }
+        unsigned int            get_physical_type()             const { return _type;                   }
 
         point_t get_velocity(const point_t &p) const
         {
@@ -181,6 +185,7 @@ class mock_physics_object
         point_t                 _w;
         point_t                 _f;
         point_t                 _tor;
+        unsigned int            _type;
 };
 
 /* Build a physics object that is just functional enough to build a simplex with */

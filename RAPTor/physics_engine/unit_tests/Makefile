@@ -17,7 +17,7 @@ all:: main.out collision_info_tests.out contact_graph_tests.out exact_collision_
 	vertex_group_tests.out pair_manager_tests.out physics_object_tests.out
 
 $(eval $(call test_suite_template, collision_info_tests.out, simplex.o polygon.o))
-$(eval $(call test_suite_template, contact_graph_tests.out, simplex.o polygon.o))
+$(eval $(call test_suite_template, contact_graph_tests.out, simplex.o polygon.o physics_common.o))
 $(eval $(call test_suite_template, exact_collision_time_tests.out, physics_common.o common.o)) # misses some if's in cubic root finder
 $(eval $(call test_suite_template, force_tests.out, ))
 $(eval $(call test_suite_template, gjk_tests.out, gjk.o physics_common.o polygon.o))

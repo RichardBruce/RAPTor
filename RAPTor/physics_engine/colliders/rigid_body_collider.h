@@ -252,8 +252,7 @@ void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t
 class rigid_body_collider : public collider
 {
     public :
-        rigid_body_collider(const float cor, const float mu)
-            : _cor(cor), _mu(mu) {  };
+        rigid_body_collider(const float cor, const float mu) : collider(cor, mu) {  };
         
         virtual const rigid_body_collider& collide(physics_object *const po_a, physics_object *const po_b, const point_t &poc, const point_t &noc, const collision_t type) const
         {
@@ -269,7 +268,5 @@ class rigid_body_collider : public collider
         }
         
     private :
-        const float _cor;    /* Coefficient of restitution   */
-        const float _mu;     /* Coefficient of friction      */
 };
 }; /* namespace raptor_physics */
