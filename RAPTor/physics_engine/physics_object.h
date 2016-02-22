@@ -26,8 +26,7 @@ class physics_engine;
 
 /* Enum to show the different ways objects can connect */
 /* Possible is used for rotating object were only a conservative result can be given */
-enum class collision_t : char { NO_COLLISION = 0, SLIDING_COLLISION = 1, COLLISION = 2, 
-    POSSIBLE_SLIDING_COLLISION = 5, POSSIBLE_COLLISION = 6 };
+enum class collision_t : char { NO_COLLISION = 0, SLIDING_COLLISION = 1, COLLISION = 2, POSSIBLE_SLIDING_COLLISION = 5, POSSIBLE_COLLISION = 6 };
 
 /* Check for a POSSIBLY_ prefix */
 inline bool is_uncertain(const collision_t c)
@@ -45,43 +44,41 @@ inline collision_t to_certain(const collision_t c)
 class physics_object : private boost::noncopyable
 {
     public :
-        typedef vertex_group inner_vg;
-
         /* Ownership isnt taken of vg */
-        physics_object(vertex_group *const vg, const point_t &com, const float density, const unsigned int t = 0)
-            : physics_object(vg, quaternion_t(1.0, 0.0, 0.0, 0.0), com, density, t) {  };
+        physics_object(vertex_group *const vg, const point_t &com, const float density, const unsigned int t = 0) : 
+            physics_object(vg, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), com, density, t) {  };
               
-        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t &com, const float density, const unsigned int t = 0)
-            : physics_object(vg, o, com, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), density, t) {  };
+        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t &com, const float density, const unsigned int t = 0) : 
+            physics_object(vg, o, com, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), density, t) {  };
 
-        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t &com, const point_t &v, const point_t &w, const float density, const unsigned int t = 0)
-            : _vg(vg),
-              _forces(new std::vector<force *>()),
-              _agg_force(*_forces),
-              _i(_vg->build_inertia_tensor(density)),
-              _w(w),
-              _v(v),
-              _lw(w),
-              _lv(v),
-              _o(o),
-              _cur_t(0.0),
-              _t_step(0.0),
-              _type(t)
-              {
-                    _i->move_center_of_mass(com - _i->center_of_mass());
+        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t &com, const point_t &v, const point_t &w, const float density, const unsigned int t = 0) :
+            _vg(vg),
+            _forces(new std::vector<force *>()),
+            _agg_force(*_forces),
+            _i(_vg->build_inertia_tensor(density)),
+            _w(w),
+            _v(v),
+            _lw(w),
+            _lv(v),
+            _o(o),
+            _cur_t(0.0f),
+            _t_step(0.0f),
+            _type(t)
+        {
+            _i->move_center_of_mass(com - _i->center_of_mass());
 
-                    /* Build bounds */
-                    point_t hi;
-                    point_t lo;
-                    get_bounds(&hi, &lo);
+            /* Build bounds */
+            point_t hi;
+            point_t lo;
+            get_bounds(&hi, &lo);
 
-                    _lower_bound[0] = new object_bound(this, lo.x, true);
-                    _upper_bound[0] = new object_bound(this, hi.x, false);
-                    _lower_bound[1] = new object_bound(this, lo.y, true);
-                    _upper_bound[1] = new object_bound(this, hi.y, false);
-                    _lower_bound[2] = new object_bound(this, lo.z, true);
-                    _upper_bound[2] = new object_bound(this, hi.z, false);
-              };
+            _lower_bound[0] = new object_bound(this, lo.x, true);
+            _upper_bound[0] = new object_bound(this, hi.x, false);
+            _lower_bound[1] = new object_bound(this, lo.y, true);
+            _upper_bound[1] = new object_bound(this, hi.y, false);
+            _lower_bound[2] = new object_bound(this, lo.z, true);
+            _upper_bound[2] = new object_bound(this, hi.z, false);
+        };
 
         ~physics_object()
         {
@@ -116,7 +113,7 @@ class physics_object : private boost::noncopyable
         physics_object& begin_time_step(const float t_step)
         {
             /* Set the step times */
-            _cur_t  = 0.0;
+            _cur_t  = 0.0f;
             _t_step = t_step;
 
             /* Update the bounds for the full time step */
@@ -256,13 +253,13 @@ class physics_object : private boost::noncopyable
         const point_t get_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
-            return (_i->mass() == std::numeric_limits<float>::infinity()) ? 0.0 : ( _i->mass() * _lv);
+            return (_i->mass() == std::numeric_limits<float>::infinity()) ? 0.0f : ( _i->mass() * _lv);
         }
 
         const point_t get_angular_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
-            return (_i->mass() == std::numeric_limits<float>::infinity()) ? point_t(0.0, 0.0, 0.0) : (get_orientated_tensor() * _lw);
+            return (_i->mass() == std::numeric_limits<float>::infinity()) ? point_t(0.0f, 0.0f, 0.0f) : (get_orientated_tensor() * _lw);
         }
 
         /* Vertex getters */

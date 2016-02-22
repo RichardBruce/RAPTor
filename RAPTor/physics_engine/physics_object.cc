@@ -27,8 +27,8 @@ bool physics_object::has_collided(physics_object *const po, simplex **const mani
     // METHOD_LOG;
 
     /* Check for self intersection and return an empty simplex */
-    *manifold_a = new simplex(*this);
-    *manifold_b = new simplex(*po);
+    *manifold_a = new simplex(*this, true);
+    *manifold_b = new simplex(*po, false);
     if (po == this)
     {
         // BOOST_LOG_TRIVIAL(trace) << "Ignoring self collision";
@@ -63,8 +63,8 @@ collision_t physics_object::exactly_resolve_collisions(physics_object *const po,
     /* Check for self intersection and return an empty simplex */
     if (po == this)
     {
-        *manifold_a = new simplex(*this);
-        *manifold_b = new simplex(*po);
+        *manifold_a = new simplex(*this, true);
+        *manifold_b = new simplex(*po, false);
         return collision_t::NO_COLLISION;
     }
 
@@ -235,8 +235,8 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
     /* Check for self intersection and return an empty simplex */
     if (po == this)
     {
-        *manifold_a = new simplex(*this);
-        *manifold_b = new simplex(*po);
+        *manifold_a = new simplex(*this, true);
+        *manifold_b = new simplex(*po, false);
         return collision_t::NO_COLLISION;
     }
 

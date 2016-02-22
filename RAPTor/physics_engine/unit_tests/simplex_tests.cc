@@ -31,8 +31,8 @@ namespace test
 /* Test data */
 struct simplex_fixture : private boost::noncopyable
 {
-    simplex_fixture()
-    : data0(new std::vector<point_t>(
+    simplex_fixture() :
+    data0(new std::vector<point_t>(
         {
             point_t( 1.0f, 0.0f,  1.0f),
             point_t( 1.0f, 0.0f, -1.0f),
@@ -155,23 +155,23 @@ struct simplex_fixture : private boost::noncopyable
     p14(physics_object_for_simplex_testing(data14, quaternion_t(sqrt(0.5),  sqrt(0.5),      0.0,       0.0),  point_t(0.0, 0.0, 2.0 ))),
     p15(physics_object_for_simplex_testing(data15, { 7, 6, 5, 4, 3, 2, 1, 0 }, quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0))),
     p16(physics_object_for_simplex_testing(data16, { 0, 1, 2, 3, 4, 5, 6, 7 }, quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(1.0, 1.0, 0.0))),
-    s0(*p0),
-    s1(*p1),
-    s2(*p2),
-    s3(*p3),
-    s4(*p4),
-    s5(*p5),
-    s6(*p6),
-    s7(*p7),
-    s8(*p8),
-    s9(*p9),
-    s10(*p10),
-    s11(*p11),
-    s12(*p12),
-    s13(*p13),
-    s14(*p14),
-    s15(*p15),
-    s16(*p16)
+    s0(*p0, true),
+    s1(*p1, true),
+    s2(*p2, false),
+    s3(*p3, true),
+    s4(*p4, true),
+    s5(*p5, false),
+    s6(*p6, true),
+    s7(*p7, true),
+    s8(*p8, true),
+    s9(*p9, true),
+    s10(*p10, true),
+    s11(*p11, true),
+    s12(*p12, true),
+    s13(*p13, true),
+    s14(*p14, true),
+    s15(*p15, true),
+    s16(*p16, false)
     {  };
 
     std::vector<point_t> *const data0;

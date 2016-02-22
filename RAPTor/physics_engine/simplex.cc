@@ -156,8 +156,8 @@ point_t simplex::center_of_impact(const simplex &s, const point_t &noc)
     /* Simplex must alway be the same size */
     assert(_size == s._size);
 
-    const simplex *const min_s = std::min(static_cast<const simplex *const>(this), &s);
-    const simplex *const max_s = std::max(static_cast<const simplex *const>(this), &s);
+    const simplex *const min_s =  _forward ? this : &s;
+    const simplex *const max_s = !_forward ? this : &s;
     
     const point_t min_noc((min_s == this) ? noc : -noc);
     const point_t max_noc(-min_noc);

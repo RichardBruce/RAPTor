@@ -16,11 +16,11 @@ class simplex
 {
     public :
         /* CTOR */
-        simplex(const physics_object &po)
-            : _po(po), _verts{0, 0, 0, 0, 0, 0, 0, 0}, _verts_rd(&_verts[0]), _verts_wr(&_verts[4]), _size(1), _cm_size(0) {  };
+        simplex(const physics_object &po, const bool forward)
+            : _po(po), _verts{0, 0, 0, 0, 0, 0, 0, 0}, _verts_rd(&_verts[0]), _verts_wr(&_verts[4]), _size(1), _cm_size(0), _forward(forward) {  };
 
         /* Copy CTOR */
-        simplex(const simplex &s) : _po(s._po), _dir(s._dir), _size(s._size), _cm_size(s._cm_size)
+        simplex(const simplex &s) : _po(s._po), _dir(s._dir), _size(s._size), _cm_size(s._cm_size), _forward(s._forward)
         {
             memcpy(_verts, s._verts, 8 * sizeof(int));
             if (s._verts_rd > s._verts_wr)
@@ -327,5 +327,6 @@ class simplex
         int                  *  _verts_wr;  /* Pointer to read current simplex from             */
         unsigned int            _size;      /* The size of the simplex                          */
         int                     _cm_size;   /* The size of the contact manifold                 */
+        const bool              _forward;   /* Forward or backward simplex                      */
 };
 }; /* namespace raptor_physics */
