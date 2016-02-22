@@ -18,6 +18,7 @@
 /* Raytracer headers */
 #include "camera.h"
 #include "parser_common.h"
+#include "polygon_to_triangles.h"
 
 /* Physics headers */
 #include "physics_options.h"
