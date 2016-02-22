@@ -13,7 +13,7 @@ INCLUDE = $(LOCAL_INCLUDES) \
     $(LIBARYS_PATH)/libtga-$(LIBTGA_VER)/include \
     $(LIBARYS_PATH)/fftw-$(FFTW_VER)/include 
 LOCAL_INCLUDES  = . $(RAPTOR_HOME)/physics_engine/colliders $(RAPTOR_HOME)/physics_engine/integrators $(RAPTOR_HOME)/physics_engine/forces $(RAPTOR_HOME)/sdl_wrappers $(RAPTOR_HOME)/networking \
-    $(RAPTOR_HOME)/common \
+    $(RAPTOR_HOME)/common $(RAPTOR_HOME)/parsers \
     $(RAYTRACER_HOME) $(RAYTRACER_HOME)/materials $(RAYTRACER_HOME)/parsers $(RAYTRACER_HOME)/spatial_sub_division
 vpath %.cc $(LOCAL_INCLUDES)
 
