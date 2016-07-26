@@ -35,16 +35,21 @@ int main(int argc, char **argv)
 
     /* Add moving objects */
     std::unique_ptr<raptor_raytracer::material> m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), 1.0f));
-    auto po0 = new raptor_physics::physics_object(raptor_physics::make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.0f, 5.0f, 0.0f), 10.0f);
-    po0->set_angular_velocity(point_t(0.0f, 0.0f, 5.0f));
+    // auto po0 = new raptor_physics::physics_object(raptor_physics::make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.0f, 5.0f, 0.0f), 10.0f);
+    // po0->set_angular_velocity(point_t(0.0f, 0.0f, 5.0f));
+    // se.add_moving_object(po0);
+
+    //  Add static objects 
+    // se.add_object(new raptor_physics::physics_object(raptor_physics::make_plane(m.get(), point_t(-10.0f, 0.0f, -10.0f), point_t(10.0f, 0.0f, -10.0f), point_t(-10.0f, 0.0f, 10.0f), point_t(10.0f, 0.0f, 10.0f)), point_t(0.0f, -10.0f, 0.0f), std::numeric_limits<float>::infinity()));
+
+    auto po0 = new raptor_physics::physics_object(raptor_physics::make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.0f, -9.0f, 0.0f), 10.0f);
     se.add_moving_object(po0);
-    // se.add_moving_object(new raptor_physics::physics_object(raptor_physics::make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), quaternion_t(0.939692621ff, 0.0ff, 0.0ff, 0.342020143ff), point_t(0.0f, -9.0f, 0.0f), 10.0f));
 
     /* Add static objects */
     se.add_object(new raptor_physics::physics_object(raptor_physics::make_plane(m.get(), point_t(-10.0f, 0.0f, -10.0f), point_t(10.0f, 0.0f, -10.0f), point_t(-10.0f, 0.0f, 10.0f), point_t(10.0f, 0.0f, 10.0f)), point_t(0.0f, -10.0f, 0.0f), std::numeric_limits<float>::infinity()));
 
     /* Apply forces */
-    // se.engine()->apply_force(new raptor_physics::const_force(point_t(0.0f,  0.5f, 0.0f), point_t( 5.0f, 0.0f, 0.0f), 0.5f), 0);
+    se.engine()->apply_force(new raptor_physics::const_force(point_t(0.0f, 0.0f, 0.0f), point_t(10.0f, 0.0f, 0.0f), 5.0f), 0);
     // se.engine()->apply_force(new raptor_physics::const_force(point_t(0.0f, -0.5f, 0.0f), point_t(-5.0f, 0.0f, 0.0f), 0.5f), 0);
 
     /* Run physics simulation */

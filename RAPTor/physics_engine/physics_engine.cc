@@ -78,10 +78,10 @@ physics_engine& physics_engine::advance_time(const float t)
         for (auto &p : (*_collision_cache))
         {
             /* Find all objects left in contact */
-            cg.rebuild(*_collision_cache, p.first);
+            cg.rebuild(&_collider_map, *_collision_cache, p.first);
             if (cg.number_of_edges() > 0)
             {
-                cg.resolve_forces();
+                cg.resolve_forces(t_step);
                 cg.void_collisions(_collision_cache);
             }
         }

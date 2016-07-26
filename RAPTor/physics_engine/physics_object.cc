@@ -258,7 +258,7 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
     const quaternion_t r1(normalise(po->_o + (quaternion_t(0.0f, po->_lw.x, po->_lw.y, po->_lw.z) * po->_o) * (0.5f * (min_t - po->_cur_t))));
     has_collided(po, manifold_a, manifold_b, &dir, r0, r1, min_t, min_t);
     const float d_t0 = magnitude(dir);
-    assert((d_t0 > raptor_physics::EPSILON) || !"Error: Object must start separated");
+    assert((d_t0 > ((0.25f * raptor_physics::WELD_DISTANCE) - raptor_physics::EPSILON)) || !"Error: Object must start separated");
 
     /* Objects start in contact */
     const point_t noc(dir / d_t0);
@@ -337,7 +337,7 @@ collision_t physics_object::conservatively_resolve_collisions(physics_object *co
 collision_t physics_object::close_contact_collision_detection(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const toc, const point_t &noc, float min_t, const float d_t0, const bool sliding)
 {
     // METHOD_LOG;
-    // BOOST_LOG_TRIVIAL(trace) << "Determining exact collision time up to: " << *toc;
+    BOOST_LOG_TRIVIAL(trace) << "Determining exact collision time up to: " << *toc;
     
     /* Pick an object to act as the plane */
     simplex *pm = *manifold_a;
@@ -399,7 +399,7 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
         if (dot_product(speed_noc, pl_speed - ol_speed) > 0.0f)
         {
             (*toc) = min_t;
-            // BOOST_LOG_TRIVIAL(trace) << "Object colliding at: " << (*toc);
+            BOOST_LOG_TRIVIAL(trace) << "Object colliding at: " << (*toc) << ", distance: " << d_t0;
             return collision_t::COLLISION;
         }
     }
@@ -415,18 +415,18 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
     /* Distance is increasing, no collision */
     if (max_pen > (d_t0 + raptor_physics::EPSILON))
     {
-        // BOOST_LOG_TRIVIAL(trace) << "Object separate, no collision";
+        BOOST_LOG_TRIVIAL(trace) << "Object separate, no collision";
         return collision_t::NO_COLLISION;
     }
     /* The objects never get any closer, they are sliding */
     else if ((d_t0 - max_pen) < raptor_physics::EPSILON)
     {
-        // BOOST_LOG_TRIVIAL(trace) << "Sliding collision";
+        BOOST_LOG_TRIVIAL(trace) << "Sliding collision";
         return collision_t::SLIDING_COLLISION;
     }
 
     /* Objecs collision, find out when */
-    // BOOST_LOG_TRIVIAL(trace) << "Objects started: " << d_t0 << " apart and moving to: " << max_pen;
+    BOOST_LOG_TRIVIAL(trace) << "Objects started: " << d_t0 << " apart and moving to: " << max_pen;
     int res_bil_col = 0;
     do
     {
@@ -465,7 +465,7 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
             // BOOST_LOG_TRIVIAL(trace) << "Set new guess: " << adjusted_t << ", min time: " << min_t;
 
             /* These are not the roots you are looking for, try bisection */
-            if (adjusted_t < (min_t + raptor_physics::EPSILON))
+            if ((adjusted_t < (min_t + raptor_physics::EPSILON)) || (adjusted_t > ((*toc) + raptor_physics::EPSILON)))
             {
                 adjusted_t = p_t0.first + ((p_t1.first - p_t0.first) * 0.5f);
                 // BOOST_LOG_TRIVIAL(trace) << "Switched to bisection, new guess: " << adjusted_t << ", min time: " << min_t;
