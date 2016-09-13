@@ -23,33 +23,92 @@
 
 namespace raptor_physics
 {
-/* File constants */
-static const int SPANNING_VECTORS = 8;
-
-
 /* Forward declarations */
 class physics_object;
 
 
 /* Class to hold the information associated with an edge in the contact graph */
-template<class S = simplex>
+template<class PO = physics_object, class S = simplex>
 class contact_graph_edge
 {
     public :
         /* CTOR */
-        contact_graph_edge(collision_info<S> *const info, const int to, const int edge) : _info(info), _to(to), _edge(edge) {  }
+        contact_graph_edge(collision_info<S> *const info, const int to, const int edge) : _info(info), _to(to), _edge(edge), _dynamic(true)
+        {  }
 
         /* Allow default DTOR and copy CTOR */
 
         /* Access functions */
-        collision_info<S> *const    info()      const { return _info;   }
-        int                         to()        const { return _to;     }
-        int                         edge_id()   const { return _edge;   }
+        void calculate_span(const PO &a, const PO &b)
+        {
+            const auto &simplex_i = _info->get_simplex();
+            const point_t noc(_info->get_normal_of_collision());
+            for (int i = 0; i < simplex_i->contact_manifold_size(); ++i)
+            {
+                /* Find relative velocity */
+                const point_t poc(simplex_i->contact_manifold_point(i));
+                const point_t va(a.get_velocity(poc));
+                const point_t vb(b.get_velocity(poc));
+                const point_t rel_vel(va - vb);
+
+                const point_t tan_vel(rel_vel - (noc * dot_product(noc, rel_vel)));
+                const float vel_tan_magn = dot_product(tan_vel, tan_vel);
+                if (vel_tan_magn > contact_graph_edge::TANJENT_MOVEMENT_EPSILON)
+                {
+                    _span[i] = tan_vel / std::sqrt(vel_tan_magn);
+                    BOOST_LOG_TRIVIAL(trace) << "Contact " << i << " poc " << poc << " relative velocity " << rel_vel << " tangent velocity " << tan_vel << " span " << _span[i];
+                }
+                /* No relative velocity, this is a static contact, fall back on acceleration */
+                else
+                {
+                    _dynamic = false;
+                    const point_t aa(a.get_acceleration(poc));
+                    const point_t ab(b.get_acceleration(poc));
+                    const point_t rel_acc(aa - ab);
+
+                    const point_t tan_acc(rel_acc - (noc * dot_product(noc, rel_acc)));
+                    const float acc_tan_magn = dot_product(tan_acc, tan_acc);
+                    if (acc_tan_magn > contact_graph_edge::TANJENT_MOVEMENT_EPSILON)
+                    {
+                        _span[i] = tan_acc / std::sqrt(acc_tan_magn);
+                        BOOST_LOG_TRIVIAL(trace) << "Contact " << i << " poc " << poc << " relative acceleration " << rel_acc << " tangent acceleration " << tan_acc << " span " << _span[i];
+                    }
+                    /* Nothing going on at this contact */
+                    else
+                    {
+                        BOOST_LOG_TRIVIAL(trace) << "No tanjent movement (acceleration magnitude: " << acc_tan_magn << ", velocity magnitude: " << vel_tan_magn << ") setting span 0";
+                        _span[i] = point_t(0.0, 0.0, 0.0);
+                    }
+                }
+            }
+        }
+
+        void reverse_span(const contact_graph_edge &reverse)
+        {
+            _span[0] = -reverse._span[0];
+            _span[1] = -reverse._span[1];
+            _span[2] = -reverse._span[2];
+            _span[3] = -reverse._span[3];
+        }
+
+        point_t span_vector(const int i, const int from) const
+        {
+            return (from != to()) ? -_span[i] : _span[i];
+        }
+
+        collision_info<S> *const    info()      const { return _info;       }
+        int                         to()        const { return _to;         }
+        int                         edge_id()   const { return _edge;       }
+        bool                        dynamic()   const { return _dynamic;    }
 
     private :
         collision_info<S> *const    _info;
+        point_t                     _span[4];
         const int                   _to;
         const int                   _edge;
+        bool                        _dynamic;
+
+        static constexpr float      TANJENT_MOVEMENT_EPSILON = 8.0e-010f;
 };
 
 /* Class to represent a contact graph */
@@ -58,14 +117,14 @@ class contact_graph : private boost::noncopyable
 {
     public :
         using vert_list = std::vector<PO *>;
-        using adj_list  = std::vector<contact_graph_edge<S>>;
+        using adj_list  = std::vector<contact_graph_edge<PO, S>>;
         using col_map   = std::map<unsigned int, std::map<unsigned int, const collider*>*>;
 
         /* CTOR */
-        contact_graph() : _collider_map(nullptr), _verts(0), _edges(0), _contacts(0) {  };
+        contact_graph() : _collider_map(nullptr), _default_collider(nullptr), _verts(0), _contacts(0) {  };
 
-        contact_graph(const col_map *const collider_map, std::map<PO*, tracking_info<PO, S>*> &info, PO *const r) :
-            _collider_map(collider_map), _verts(1), _edges(0), _contacts(0)
+        contact_graph(const col_map *const collider_map, const collider *const default_collider, std::map<PO*, tracking_info<PO, S>*> &info, PO *const r) :
+            _collider_map(collider_map), _default_collider(default_collider), _verts(1), _contacts(0)
         {
             // METHOD_LOG;
             start_build_contact_graph(info, r);
@@ -74,15 +133,15 @@ class contact_graph : private boost::noncopyable
 
         /* Construct, but re-using as much dynamic memory as possible */
         /* The edges are still deleted and newed again */
-        void rebuild(const col_map *const collider_map, std::map<PO*, tracking_info<PO, S>*> &info, PO *const r)
+        void rebuild(const col_map *const collider_map, const collider *const default_collider, std::map<PO*, tracking_info<PO, S>*> &info, PO *const r)
         {
             // METHOD_LOG;
 
             /* Reset data structures */
-            _collider_map   = collider_map;
-            _verts          = 1;
-            _edges          = 0;
-            _contacts       = 0;
+            _collider_map       = collider_map;
+            _default_collider   = default_collider;
+            _verts              = 1;
+            _contacts           = 0;
             _adj_map.clear();
             _inv_lookup.clear();
 
@@ -92,7 +151,6 @@ class contact_graph : private boost::noncopyable
 
         /* Access functions */
         int                 number_of_vertices()    const { return _verts;              }
-        int                 number_of_edges()       const { return _edges;              }
         int                 number_of_contacts()    const { return _contacts;           }
         const vert_list &   vertices()              const { return _inv_lookup;         }
         const adj_list &    adjacent(const int v)   const { return _adj_map[v].second;  }
@@ -104,7 +162,7 @@ class contact_graph : private boost::noncopyable
 
             /* Contact matrix, one entry per pair of contact pairs */
             lcp_solver sol_v(_contacts, _contacts + 1);
-            compute_contact_matrix(sol_v.initialise_m());
+            compute_contact_matrix(sol_v.initialise_m(), false);
 
             /* Fix up the velocities */
             /* Pre-impluse closing velocities, one entry per contact pair */
@@ -143,23 +201,23 @@ class contact_graph : private boost::noncopyable
                             // BOOST_LOG_TRIVIAL(trace) << "New p0 v: " << v.first->get_velocity() << ", w: " << v.first->get_angular_velocity() << ", t: " << v.first->get_velocity(poc);
                             // BOOST_LOG_TRIVIAL(trace) << "New p1 v: " << _adj_map[e.to()].first->get_velocity() << ", w: " << _adj_map[e.to()].first->get_angular_velocity() << ", t: " << _adj_map[e.to()].first->get_velocity(poc);
                         }
+                        e.calculate_span(*_adj_map[e.to()].first, *v.first);
+                        auto rev_edge = find_edge(e.to(), from_idx);
+                        rev_edge->reverse_span(e);
                     }
                     ++from_idx;
                 }
             }
 
-            /* Calculate friction forces */
-            // appply_friction_forces(t_step);
-
             /* Contact matrix, one entry per pair of contact pairs */
-            lcp_solver sol_f(_contacts, _contacts + 1);
-            compute_contact_matrix(sol_f.initialise_m());
+            lcp_solver sol_f(_contacts * 3, (_contacts * 3) + 1);
+            compute_contact_matrix(sol_f.initialise_m(), true);
 
             /* One entry per contact pair */
-            compute_relative_acceleration(sol_f.initialise_q());
+            compute_relative_acceleration(sol_f.initialise_q(), t_step);
 
             /* Solve */
-            std::unique_ptr<float []> resting_forces(new float [_contacts]);
+            std::unique_ptr<float []> resting_forces(new float [_contacts * 3]);
             const bool solve_force = sol_f.solve(resting_forces.get());
             // assert(solve_force || !"Resting force resolution failed");
             if (solve_force)
@@ -167,6 +225,7 @@ class contact_graph : private boost::noncopyable
                 /* Apply forces */
                 int from_idx    = 0;
                 int force_idx   = 0;
+                int fric_idx    = _contacts << 1;
                 for (auto &v : _adj_map)
                 {
                     /* For each edge from that vertex */
@@ -184,11 +243,17 @@ class contact_graph : private boost::noncopyable
                         for (int pt = 0; pt < s->contact_manifold_size(); ++pt)
                         {
                             const point_t poc(s->contact_manifold_point(pt));
-                            const point_t force(noc * resting_forces[force_idx++]);
+                            const point_t noc_force(noc * resting_forces[force_idx++]);
                             
-                            BOOST_LOG_TRIVIAL(trace) << "Applying force: " << force << " to contact pair: " << from_idx << ", " << e.to() << " noc: " << noc << " to: " << v.first;
-                            v.first->apply_internal_force(poc - v.first->get_center_of_mass(), force);
-                            b->apply_internal_force(poc - b->get_center_of_mass(), -force);
+                            BOOST_LOG_TRIVIAL(trace) << "Applying reaction force: " << noc_force << " to poc: " << poc << " noc: " << noc;
+                            v.first->apply_internal_force(poc - v.first->get_center_of_mass(), noc_force);
+                            b->apply_internal_force(poc - b->get_center_of_mass(), -noc_force);
+
+                            const point_t span(e.span_vector(pt, e.to()));
+                            const point_t tan_force(span * resting_forces[fric_idx++]);
+                            BOOST_LOG_TRIVIAL(trace) << "Applying friction force: " << tan_force << " to poc: " << poc << " span: " << span;
+                            v.first->apply_internal_force(poc - v.first->get_center_of_mass(), tan_force);
+                            b->apply_internal_force(poc - b->get_center_of_mass(), -tan_force);
                         }
                     }
                     ++from_idx;
@@ -247,7 +312,7 @@ class contact_graph : private boost::noncopyable
             int from_idx = 0;
             build_contact_graph(info, r, from_idx);
 
-            // BOOST_LOG_TRIVIAL(trace) << "Built contact graph, edges: " << _edges << ", vertices: " << _verts;
+            // BOOST_LOG_TRIVIAL(trace) << "Built contact graph, contacts: " << _contacts << ", vertices: " << _verts;
         }
 
         void build_contact_graph(std::map<PO*, tracking_info<PO, S>*>  &info, PO *const r, const int from_idx)
@@ -289,9 +354,10 @@ class contact_graph : private boost::noncopyable
                     /* Add edge to adjacent map */
                     p.second->get_point_of_collision();
                     (*info[p.first])[r]->get_point_of_collision();
+
+                    const auto &adj = _adj_map[from_idx];
                     _adj_map[from_idx].second.emplace_back(p.second, to_idx, _contacts);
                     _adj_map[to_idx].second.emplace_back((*info[p.first])[r], from_idx, _contacts);
-                    ++_edges;
                     _contacts += p.second->get_simplex()->contact_manifold_size();
                     // BOOST_LOG_TRIVIAL(trace) << "Added edge: " << from_idx << " -> " << to_idx;
                     assert(dot_product(_adj_map[from_idx].second.back().info()->get_normal_of_collision(), r->get_center_of_mass() - p.first->get_center_of_mass()) > 0.0 || !"Error: Inconsitant normal");
@@ -303,13 +369,18 @@ class contact_graph : private boost::noncopyable
             }
         }
 
-        const contact_graph<PO, S>& compute_contact_matrix(float *const c) const
+        const contact_graph<PO, S>& compute_contact_matrix(float *const c, const bool ext) const
         {
             /* Clear the matrix */
-            memset(&c[0], 0, _contacts * _contacts * sizeof(float));
+            const int matrix_width = ext ? (_contacts * 3) : _contacts;
+            memset(&c[0], 0, matrix_width * matrix_width * sizeof(float));
 
             /* For each vertex */
             int from_idx = 0;
+            const int mu_offset         = _contacts;
+            const int lambda_offset     = (matrix_width * _contacts) + _contacts;
+            const int fric_reac_offset  = (matrix_width * _contacts) << 1;
+            const int fric_fric_offset  = fric_reac_offset + _contacts;
             for (auto &v_i : _adj_map)
             {
                 /* For each edge from that vertex */
@@ -328,53 +399,103 @@ class contact_graph : private boost::noncopyable
                     const point_t noc_i(e_i.info()->get_normal_of_collision());
                     for (int pt_i = 0; pt_i < simplex_i->contact_manifold_size(); ++pt_i)
                     {
-                        const int row_idx = (e_i.edge_id() + pt_i) * _contacts;
+                        /* For everything in contact with a_i find the effects on this contact */
+                        const int row_idx = (e_i.edge_id() + pt_i) * matrix_width;
+                        const point_t noc_t(e_i.span_vector(pt_i, e_i.to()));
                         const point_t poc_i(simplex_i->contact_manifold_point(pt_i));
-                        
-                        /* For everything in contact with a_i */
-                        const point_t ra_n_i(cross_product(poc_i - a_i->get_center_of_mass(), noc_i));
                         for (auto &e_j : _adj_map[from_idx].second)
                         {
-                            const point_t noc_j(e_j.info()->get_normal_of_collision());
-                            const float lin = dot_product(noc_i, noc_j) / a_i->get_mass();
-
                             const auto& simplex_j = e_j.info()->get_simplex();
+                            const point_t noc_j(e_j.info()->get_normal_of_collision());
                             for (int pt_j = 0; pt_j < simplex_j->contact_manifold_size(); ++pt_j)
                             {
+                                const int col_idx = (e_j.edge_id() + pt_j) * matrix_width;
                                 const point_t poc_j(simplex_j->contact_manifold_point(pt_j));
-                                const point_t ra_n_j(cross_product(poc_j - a_i->get_center_of_mass(), noc_j));
+                                c[row_idx + e_j.edge_id() + pt_j] += acceleration_effect_on(*a_i, noc_i, noc_j, poc_i, poc_j);
 
-                                const float rot = dot_product(ra_n_i, ra_n_j / a_i->get_orientated_tensor());
-                                c[row_idx + e_j.edge_id() + pt_j] += (lin + rot);
+                                /* Add effects of friciton on the reaction force and friction forces on each other */
+                                if (ext)
+                                {
+                                    const point_t noc_f(e_j.span_vector(pt_j, e_j.to()));
+                                    const int sub_mtrix_idx = col_idx + e_i.edge_id() + pt_i;
+                                    c[fric_reac_offset + sub_mtrix_idx] += acceleration_effect_on(*a_i, noc_i, noc_f, poc_i, poc_j);
+                                    c[fric_fric_offset + sub_mtrix_idx] -= acceleration_effect_on(*a_i, noc_t, noc_f, poc_i, poc_j);
+                                }
                             }
                         }
 
-                        /* For everything in contact with b_i */
-                        const point_t rb_n_i(cross_product(poc_i - b_i->get_center_of_mass(), noc_i));
+                        /* For everything in contact with b_i find the effects on this contact */
                         for (auto &e_j : _adj_map[e_i.to()].second)
                         {
-                            const point_t noc_j(e_j.info()->get_normal_of_collision());
-                            const float lin = dot_product(noc_i, noc_j) / b_i->get_mass();
-
                             const auto& simplex_j = e_j.info()->get_simplex();
+                            const point_t noc_j(e_j.info()->get_normal_of_collision());
                             for (int pt_j = 0; pt_j < simplex_j->contact_manifold_size(); ++pt_j)
                             {
+                                const int col_idx = (e_j.edge_id() + pt_j) * matrix_width;
                                 const point_t poc_j(simplex_j->contact_manifold_point(pt_j));
-                                const point_t rb_n_j(cross_product(poc_j - b_i->get_center_of_mass(), noc_j));
+                                c[row_idx + e_j.edge_id() + pt_j] -= acceleration_effect_on(*b_i, noc_i, noc_j, poc_i, poc_j);
 
-                                const float rot = dot_product(rb_n_i, rb_n_j / b_i->get_orientated_tensor());
-                                c[row_idx + e_j.edge_id() + pt_j] -= (lin + rot);
+                                /* Add effects of friciton on the reaction force and friction forces on each other */
+                                if (ext)
+                                {
+                                    const point_t noc_f(e_j.span_vector(pt_j, -1));
+                                    const int sub_mtrix_idx = col_idx + e_i.edge_id() + pt_i;
+                                    c[fric_reac_offset + sub_mtrix_idx] += acceleration_effect_on(*b_i, noc_i, noc_f, poc_i, poc_j);
+                                    c[fric_fric_offset + sub_mtrix_idx] -= acceleration_effect_on(*b_i, noc_t, noc_f, poc_i, poc_j);
+                                }
                             }
+                        }
+
+                        /* Add coefficient of friction */
+                        if (ext)
+                        {
+                            const float mu_d = friction(a_i->get_physical_type(), b_i->get_physical_type(), e_i.dynamic());
+                            const int sub_mtrix_idx = row_idx + e_i.edge_id() + pt_i;
+                            c[mu_offset + _contacts + sub_mtrix_idx] = -mu_d;
+
+                            const int fric_fric_idx = fric_fric_offset + sub_mtrix_idx;
+                            c[mu_offset + sub_mtrix_idx] = mu_d * c[fric_fric_idx];
+                            c[lambda_offset + sub_mtrix_idx] = -c[fric_fric_idx];
+                            c[fric_fric_idx] = 0.0f;
                         }
                     }
                 }
 
                 ++from_idx;
             }
+ 
+            /* Populate unit vectors */
+            if (ext)
+            {
+                int lambda_offset = (_contacts * matrix_width) + (_contacts << 1);
+                for (int i = 0; i < _contacts; ++i)
+                {
+                    c[lambda_offset++] = 1.0f;
+                    lambda_offset += matrix_width;
+                }
+
+                int beta_offset = mu_offset + _contacts + ((_contacts * matrix_width) << 1);
+                for (int i = 0; i < _contacts; ++i)
+                {
+                    c[beta_offset++] = 1.0f;
+                    beta_offset += matrix_width;
+                }
+
+            }
 
             return *this;
         }
 
+        float acceleration_effect_on(const PO &po, const point_t &noc_i, const point_t &noc_j, const point_t &poc_i, const point_t &poc_j) const
+        {
+            const float lin = dot_product(noc_i, noc_j) / po.get_mass();
+
+            const point_t ra_n_i(cross_product(poc_i - po.get_center_of_mass(), noc_i));
+            const point_t ra_n_j(cross_product(poc_j - po.get_center_of_mass(), noc_j));
+            const float rot = dot_product(ra_n_i, ra_n_j / po.get_orientated_tensor());
+            
+            return (lin + rot);
+        }
 
         const contact_graph<PO, S>& compute_relative_velocity(float *const v_vec)
         {
@@ -410,17 +531,18 @@ class contact_graph : private boost::noncopyable
 
                 ++from_idx;
             }
-         
+
             return *this;
         }
 
-        const contact_graph<PO, S>& compute_relative_acceleration(float *const b_vec)
+        const contact_graph<PO, S>& compute_relative_acceleration(float *const b_vec, const float t_step)
         {
-            memset(&b_vec[0], 0, _contacts * sizeof(float));
+            memset(&b_vec[0], 0, _contacts * 3 * sizeof(float));
 
             /* For each vertex */
             int from_idx    = 0;
             int accel_idx   = 0;
+            int relvel_idx  = _contacts;
             for (auto &v : _adj_map)
             {
                 /* For each edge from that vertex */
@@ -473,6 +595,20 @@ class contact_graph : private boost::noncopyable
                         // BOOST_LOG_TRIVIAL(trace) << "dn_dt: " << dn_dt;
                         b_vec[accel_idx++] = dot_product(noc, at1 + at2 + at3 - bt1 - bt2 - bt3) + (2.0 * dot_product(dn_dt, at4 - bt4)) - RELATIVE_ACCELERATION_EPSILON;
                         // BOOST_LOG_TRIVIAL(trace) << "closing acceleration: " << b_vec[accel_idx - 1] << ", poc: " << poc;
+
+                        /* Tanjent force to stop the objects moving relative to eachother */
+                        const point_t span(e.span_vector(pt, e.to()));
+                        if (e.dynamic())
+                        {
+                            const point_t va(a->get_velocity(poc));
+                            const point_t vb(b->get_velocity(poc));
+                            const float tan_speed = dot_product(span, vb - va);
+                            b_vec[relvel_idx] = tan_speed / t_step;
+                        }
+
+                        const point_t aa(a->get_acceleration(poc));
+                        const point_t ab(b->get_acceleration(poc));
+                        b_vec[relvel_idx++] += dot_product(span, ab - aa);
                     }
                 }
 
@@ -482,110 +618,29 @@ class contact_graph : private boost::noncopyable
             return *this;
         }
 
-        const contact_graph<PO, S>& appply_friction_forces(const float t_step)
-        {
-            /* For each vertex */
-            int from_idx = 0;
-            for (auto &v : _adj_map)
-            {
-                /* For each edge from that vertex */
-                PO *const a = v.first;
-                for (auto &e : v.second)
-                {
-                    /* Only consider the "forward" contacts */
-                    if (from_idx < e.to())
-                    {
-                        continue;
-                    }
-
-                    PO *const b = _adj_map[e.to()].first;
-                    const point_t noc(e.info()->get_normal_of_collision());
-
-                    /* Foreach contact point */
-                    const auto& s = e.info()->get_simplex();
-                    for (int pt = 0; pt < s->contact_manifold_size(); ++pt)
-                    {
-                        const point_t poc(s->contact_manifold_point(pt));
-
-                        const point_t a_f(a->get_force());
-                        const point_t b_f(b->get_force());
-                        const point_t rel_f(a_f - b_f);
-                        const float norm_f = std::fabs(dot_product(rel_f, noc));
-
-                        /* Projected velocity */
-                        const point_t t_a_abso(a->get_velocity(poc));
-                        const point_t t_b_abso(b->get_velocity(poc));
-                        const point_t t_a_proj(project_vector(t_a_abso, -noc));
-                        const point_t t_b_proj(project_vector(t_b_abso,  noc));
-                        const point_t t_a_tanj(t_a_abso - t_a_proj);
-                        const point_t t_b_tanj(t_b_abso - t_b_proj);
-
-                        /* The tanjent vector */
-                        const point_t tanj_v_close(t_b_tanj - t_a_tanj);
-                        point_t t_noc(tanj_v_close);
-                        const float tanj_v_magn = magnitude(tanj_v_close);
-                        if (tanj_v_magn > raptor_physics::EPSILON)
-                        {
-                            t_noc /= tanj_v_magn;
-                        }
-                        BOOST_LOG_TRIVIAL(trace) << "Tanjent velocity: " << tanj_v_close << ", tanjent: " << t_noc;
-
-                        if ((std::fabs(tanj_v_magn) > raptor_physics::EPSILON) && (norm_f > raptor_physics::EPSILON))
-                        {
-                            const float mu = dynamic_friction(a->get_physical_type(), b->get_physical_type());
-                            const float max_fric = mu * norm_f * 0.5f;
-
-                            /* Velocity at the end of this frame */
-                            const point_t ra(poc - a->get_center_of_mass());
-                            const point_t a_t(cross_product(ra, t_noc));
-                            const point_t a_a(t_noc / a->get_mass() + cross_product(a_t / a->get_orientated_tensor(), ra));
-                            const point_t a_v1(a_a * t_step);
-
-                            const point_t rb(poc - b->get_center_of_mass());
-                            const point_t b_t(cross_product(rb, t_noc));
-                            const point_t b_a(t_noc / b->get_mass() + cross_product(b_t / b->get_orientated_tensor(), rb));
-                            const point_t b_v1(b_a * t_step);
-
-                            /* If the velocity does change direction then scale the frictional force */
-                            BOOST_LOG_TRIVIAL(trace) << "Friction to stop: " << (tanj_v_magn / dot_product(a_v1 + b_v1, t_noc));
-                            const point_t fric(t_noc * std::min(max_fric, tanj_v_magn / dot_product(a_v1 + b_v1, t_noc)));
-
-                            /* Apply friction */
-                            a->apply_internal_force(ra,  fric);
-                            b->apply_internal_force(rb, -fric);
-                        }
-                    }
-                }
-
-                ++from_idx;
-            }
-         
-            return *this;
-        }
-
-        float dynamic_friction(const unsigned int i, const unsigned int j) const
+        float friction(const unsigned int i, const unsigned int j, const bool dynamic) const
         {
             const auto outer_iter = _collider_map->find(std::min(i, j));
             if (outer_iter == _collider_map->end())
             {
                 BOOST_LOG_TRIVIAL(trace) << "Dynamic friction defaulted collider at outer level";
-                return 0.0f;
+                return dynamic ? _default_collider->dynamic_friction() : _default_collider->static_friction();
             }
 
             const auto inner_iter = outer_iter->second->find(std::max(i, j));
             if (inner_iter == outer_iter->second->end())
             {
                 BOOST_LOG_TRIVIAL(trace) << "Dynamic friction defaulted collider at inner level";
-                return 0.0f;
+                return dynamic ? _default_collider->dynamic_friction() : _default_collider->static_friction();
             }
 
-            return inner_iter->second->dynamic_friction();
+            return dynamic ? inner_iter->second->dynamic_friction() : inner_iter->second->static_friction();
         }
 
         typename adj_list::iterator find_edge(const int from, const int to)
         {
             /* TODO -- This is a linear search for now */
-            auto e = std::find_if(_adj_map[from].second.begin(), _adj_map[from].second.end(), [=] (const contact_graph_edge<S> &m)
+            auto e = std::find_if(_adj_map[from].second.begin(), _adj_map[from].second.end(), [=] (const contact_graph_edge<PO, S> &m)
                 {
                     return m.to() == to;
                 });
@@ -594,10 +649,10 @@ class contact_graph : private boost::noncopyable
         }
 
         const col_map *                         _collider_map;
+        const collider *                        _default_collider;
         vert_list                               _inv_lookup;
         std::vector<std::pair<PO*, adj_list>>   _adj_map;
         int                                     _verts;
-        int                                     _edges;
         int                                     _contacts;
         static constexpr float                  RELATIVE_VELOCITY_EPSILON       = 0.0f;
         static constexpr float                  RELATIVE_ACCELERATION_EPSILON   = 0.0f;

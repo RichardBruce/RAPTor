@@ -78,8 +78,8 @@ physics_engine& physics_engine::advance_time(const float t)
         for (auto &p : (*_collision_cache))
         {
             /* Find all objects left in contact */
-            cg.rebuild(&_collider_map, *_collision_cache, p.first);
-            if (cg.number_of_edges() > 0)
+            cg.rebuild(&_collider_map, _collider, *_collision_cache, p.first);
+            if (cg.number_of_contacts() > 0)
             {
                 cg.resolve_forces(t_step);
                 cg.void_collisions(_collision_cache);
@@ -236,6 +236,20 @@ bool physics_engine::collide_and_cache(physics_object *const vg_a, physics_objec
     {
         delete simplex_a;
         delete simplex_b;
+
+        /* Possible that wasnt anything */
+        auto vg_a_iter = _collision_cache->find(vg_a);
+        if (vg_a_iter != _collision_cache->end())
+        {
+            vg_a_iter->second->void_collision(vg_b);
+        }
+
+        auto vg_b_iter = _collision_cache->find(vg_b);
+        if (vg_b_iter != _collision_cache->end())
+        {
+            vg_b_iter->second->void_collision(vg_a);
+        }
+
     }
 
     return false;

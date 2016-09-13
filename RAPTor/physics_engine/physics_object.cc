@@ -392,7 +392,6 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
         const point_t pl_poc(pl_r.rotate(poc - pl_t));
         const point_t pl_speed(pl->_lv + cross_product(pl->_lw, pl_poc));
 
-
         /* Get the closing velocity */
         const point_t speed_noc(pl_r.rotate(plane_n));
         BOOST_LOG_TRIVIAL(trace) << "Closing velocity: " << (pl_speed - ol_speed) << ", ol v: " << ol->_lv << ", ol w: " << cross_product(ol->_lw, ol_poc);    
@@ -418,8 +417,8 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
         BOOST_LOG_TRIVIAL(trace) << "Object separate, no collision";
         return collision_t::NO_COLLISION;
     }
-    /* The objects never get any closer, they are sliding */
-    else if ((d_t0 - max_pen) < raptor_physics::EPSILON)
+    /* The objects never get too close, they are sliding */
+    else if (max_pen > (0.25f * raptor_physics::WELD_DISTANCE))
     {
         BOOST_LOG_TRIVIAL(trace) << "Sliding collision";
         return collision_t::SLIDING_COLLISION;
@@ -480,7 +479,7 @@ collision_t physics_object::close_contact_collision_detection(physics_object *co
             const point_t plane_wg(pl_r.rotate(plane_w) + pl_t);
             const point_t p(ol->_vg->get_vertex(ol_r, ol_t, max_idx));
             new_pen = dot_product(p - plane_wg, plane_ng);
-            // BOOST_LOG_TRIVIAL(trace) << "Time guess: " << adjusted_t << " new distance: " << new_pen;
+            BOOST_LOG_TRIVIAL(trace) << "Time guess: " << adjusted_t << " new distance: " << new_pen;
 
         }
         // BOOST_LOG_TRIVIAL(trace) << "Point moved out of surface, moving to next point";

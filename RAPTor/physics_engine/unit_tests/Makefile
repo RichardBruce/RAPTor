@@ -26,8 +26,8 @@ $(eval $(call test_suite_template, integrator_tests.out, ))
 $(eval $(call test_suite_template, lcp_solver_tests.out, lcp_solver.o)) # misses no solution during main loop
 $(eval $(call test_suite_template, object_bound_tests.out, ))
 $(eval $(call test_suite_template, pair_manager_tests.out, ))
-$(eval $(call test_suite_template, physics_engine_tests.out, physics_engine.o vertex_group.o physics_object.o physics_common.o gjk.o simplex.o))
-$(eval $(call test_suite_template, physics_object_tests.out, physics_object.o physics_common.o gjk.o simplex.o)) # rotating collision not well covered
+$(eval $(call test_suite_template, physics_engine_tests.out, physics_engine.o vertex_group.o physics_object.o physics_common.o gjk.o simplex.o polygon.o))
+$(eval $(call test_suite_template, physics_object_tests.out, physics_object.o physics_common.o gjk.o simplex.o polygon.o)) # rotating collision not well covered
 $(eval $(call test_suite_template, physics_options_tests.out, ))
 $(eval $(call test_suite_template, polygon_tests.out, polygon.o))
 $(eval $(call test_suite_template, rigid_body_collider_tests.out, physics_common.o polygon.o))

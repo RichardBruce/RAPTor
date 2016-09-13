@@ -154,9 +154,14 @@ class collision_data
     public :
         collision_data() = default;
 
-        collision_data(const collision_info &c, const int i, const int j)
-        : noc(c.get_normal_of_collision()), poc(c.get_point_of_collision()), t(c.get_time()), type(c.get_type()),
-          po_i(i), po_j(j) {  };
+        collision_data(const collision_info<> &c, const int i, const int j) : 
+            noc((c.get_time() == std::numeric_limits<float>::max()) ? point_t(0.0f, 0.0f, 0.0f) : c.get_normal_of_collision()), 
+            poc((c.get_time() == std::numeric_limits<float>::max()) ? point_t(0.0f, 0.0f, 0.0f) : c.get_point_of_collision()), 
+            t(c.get_time()), 
+            type(c.get_type()),
+            po_i(i),
+            po_j(j)
+        {  };
 
         const collision_data& check(const collision_data &rhs) const
         {
@@ -204,8 +209,7 @@ class frame_data
         frame_data() = default;
 
         /* CTOR from physics engine for actual data */
-        frame_data(const physics_engine &pe, const int frame)
-        : frame(frame)
+        frame_data(const physics_engine &pe, const int frame) : frame(frame)
         {
             /* Build objects */
             const int nr_objects = pe.next_object_id();

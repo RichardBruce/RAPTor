@@ -60,9 +60,9 @@ const float result_tolerance = 0.0005f;
 BOOST_AUTO_TEST_CASE( ctor_test )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    simplex *s1 = new simplex(*data1);
-    simplex *s2 = new simplex(*data1);
+    simplex *s0 = new simplex(*data0, true);
+    simplex *s1 = new simplex(*data1, true);
+    simplex *s2 = new simplex(*data1, true);
 
     /* Test certain collision */
     collision_info<> uut0(s0, *s1, 0.1f, collision_t::COLLISION);
@@ -93,8 +93,8 @@ BOOST_AUTO_TEST_CASE( ctor_test )
 BOOST_AUTO_TEST_CASE( void_collsion_test )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    std::unique_ptr<simplex> s1(new simplex(*data1));
+    simplex *s0 = new simplex(*data0, true);
+    std::unique_ptr<simplex> s1(new simplex(*data1, true));
 
     /* Construct and test */
     collision_info<> uut(s0, *s1, 0.1f, collision_t::COLLISION);
@@ -119,9 +119,9 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
 BOOST_AUTO_TEST_CASE( successful_retest_update_test )
 {
     /* New simplices, the collision infos will delete these */
-    std::unique_ptr<simplex> s0(new simplex(*data0));
-    simplex *s1 = new simplex(*data1);
-    simplex *s2 = new simplex(*data1);
+    std::unique_ptr<simplex> s0(new simplex(*data0, true));
+    simplex *s1 = new simplex(*data1, true);
+    simplex *s2 = new simplex(*data1, true);
     
     /* Construct and test */
     collision_info<> uut(s1, *s0, 1.5f, collision_t::POSSIBLE_COLLISION);
@@ -146,10 +146,10 @@ BOOST_AUTO_TEST_CASE( successful_retest_update_test )
 BOOST_AUTO_TEST_CASE( update_test )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    simplex *s1 = new simplex(*data1);
-    simplex *s2 = new simplex(*data1);
-    simplex *s3 = new simplex(*data0);
+    simplex *s0 = new simplex(*data0, true);
+    simplex *s1 = new simplex(*data1, true);
+    simplex *s2 = new simplex(*data1, true);
+    simplex *s3 = new simplex(*data0, true);
 
     /* Construct certain collision and test */
     collision_info<> uut0(s0, *s1, 0.1f, collision_t::COLLISION);
@@ -193,9 +193,9 @@ BOOST_AUTO_TEST_CASE( update_test )
 BOOST_AUTO_TEST_CASE( switch_to_sliding )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    simplex *s1 = new simplex(*data1);
-    simplex *s2 = new simplex(*data1);
+    simplex *s0 = new simplex(*data0, true);
+    simplex *s1 = new simplex(*data1, true);
+    simplex *s2 = new simplex(*data1, true);
 
     /* Construct certain collision and test */
     collision_info<> uut(s0, *s1, 0.1f, collision_t::COLLISION);

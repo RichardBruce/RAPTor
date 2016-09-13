@@ -33,7 +33,7 @@ namespace test
 struct physics_engine_fixture : private boost::noncopyable
 {
     physics_engine_fixture()
-    :  collider(new rigid_body_collider(0.9f, 0.75f)),
+    :  collider(new rigid_body_collider(0.9f, 0.0f, 0.75f)),
        uut(collider),
        m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), 1.0f)),
        po0_check(new physics_object(make_cube(m, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.0f,  9.5f, 0.0f), 10.0f)),
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE( add_moving_object_test )
 
 BOOST_AUTO_TEST_CASE( add_no_cleaning_test )
 {
-    rigid_body_collider *const pe_collider = new rigid_body_collider(0.9f, 0.75f);
+    rigid_body_collider *const pe_collider = new rigid_body_collider(0.9f, 0.0f, 0.75f);
     physics_engine pe(pe_collider, false);
     BOOST_CHECK(pe.number_of_objects() == 0);
     BOOST_CHECK(pe.number_of_moving_objects() == 0);
@@ -610,7 +610,7 @@ BOOST_AUTO_TEST_CASE( default_collider_test )
     BOOST_CHECK(uut.number_of_collisions() == 0);
     BOOST_CHECK(uut.default_collider() == collider);
 
-    auto collider1 = new rigid_body_collider(0.5f, 0.5f);
+    auto collider1 = new rigid_body_collider(0.5f, 0.0f, 0.5f);
     uut.default_collider(collider1);
     BOOST_CHECK(uut.number_of_objects() == 0);
     BOOST_CHECK(uut.number_of_moving_objects() == 0);
@@ -630,7 +630,7 @@ BOOST_AUTO_TEST_CASE( add_pairwise_collider_test )
     BOOST_CHECK(uut.number_of_collisions() == 0);
     BOOST_CHECK(uut.default_collider() == collider);
 
-    auto collider00 = new rigid_body_collider(0.5f, 0.5f);
+    auto collider00 = new rigid_body_collider(0.5f, 0.0f, 0.5f);
     uut.pair_collider(collider00, 0, 0);
     BOOST_CHECK(uut.number_of_objects() == 0);
     BOOST_CHECK(uut.number_of_moving_objects() == 0);
@@ -640,7 +640,7 @@ BOOST_AUTO_TEST_CASE( add_pairwise_collider_test )
     BOOST_CHECK(uut.default_collider() == collider);
     BOOST_CHECK(uut.pair_collider(0, 0) == collider00);
 
-    auto collider01 = new rigid_body_collider(0.5f, 0.5f);
+    auto collider01 = new rigid_body_collider(0.5f, 0.0f, 0.5f);
     uut.pair_collider(collider01, 0, 1);
     BOOST_CHECK(uut.number_of_objects() == 0);
     BOOST_CHECK(uut.number_of_moving_objects() == 0);
@@ -651,7 +651,7 @@ BOOST_AUTO_TEST_CASE( add_pairwise_collider_test )
     BOOST_CHECK(uut.pair_collider(0, 1) == collider01);
     BOOST_CHECK(uut.pair_collider(1, 0) == collider01);
 
-    auto collider10 = new rigid_body_collider(0.5f, 0.5f);
+    auto collider10 = new rigid_body_collider(0.5f, 0.0f, 0.5f);
     uut.pair_collider(collider10, 1, 0);
     BOOST_CHECK(uut.number_of_objects() == 0);
     BOOST_CHECK(uut.number_of_moving_objects() == 0);
@@ -662,7 +662,7 @@ BOOST_AUTO_TEST_CASE( add_pairwise_collider_test )
     BOOST_CHECK(uut.pair_collider(0, 1) == collider10);
     BOOST_CHECK(uut.pair_collider(1, 0) == collider10);
 
-    auto collider11 = new rigid_body_collider(0.5f, 0.5f);
+    auto collider11 = new rigid_body_collider(0.5f, 0.0f, 0.5f);
     uut.pair_collider(collider11, 1, 1);
     BOOST_CHECK(uut.number_of_objects() == 0);
     BOOST_CHECK(uut.number_of_moving_objects() == 0);
@@ -683,7 +683,7 @@ BOOST_AUTO_TEST_CASE( update_pairwise_collider_test )
     BOOST_CHECK(uut.number_of_collisions() == 0);
     BOOST_CHECK(uut.default_collider() == collider);
 
-    auto collider00 = new rigid_body_collider(0.5f, 0.5f);
+    auto collider00 = new rigid_body_collider(0.5f, 0.0f, 0.5f);
     uut.pair_collider(collider00, 0, 0);
     BOOST_CHECK(uut.number_of_objects() == 0);
     BOOST_CHECK(uut.number_of_moving_objects() == 0);
@@ -693,7 +693,7 @@ BOOST_AUTO_TEST_CASE( update_pairwise_collider_test )
     BOOST_CHECK(uut.default_collider() == collider);
     BOOST_CHECK(uut.pair_collider(0, 0) == collider00);
 
-    auto collider01 = new rigid_body_collider(0.5f, 0.5f);
+    auto collider01 = new rigid_body_collider(0.5f, 0.0f, 0.5f);
     uut.pair_collider(collider01, 0, 0);
     BOOST_CHECK(uut.number_of_objects() == 0);
     BOOST_CHECK(uut.number_of_moving_objects() == 0);
@@ -719,7 +719,7 @@ BOOST_AUTO_TEST_CASE( get_pairwise_collider_test )
     BOOST_CHECK(uut.pair_collider( 0,  1) == collider);
     BOOST_CHECK(uut.pair_collider(-7, 18) == collider);
 
-    auto collider00 = new rigid_body_collider(0.5f, 0.5f);
+    auto collider00 = new rigid_body_collider(0.5f, 0.0f, 0.5f);
     uut.pair_collider(collider00, 0, 0);
     BOOST_CHECK(uut.number_of_objects() == 0);
     BOOST_CHECK(uut.number_of_moving_objects() == 0);
@@ -742,7 +742,7 @@ BOOST_AUTO_TEST_CASE( advance_time_collide_test )
     uut.add_moving_object(po0.release());
     uut.add_moving_object(po1.release());
 
-    rigid_body_collider *const c = new rigid_body_collider(0.5f, 0.0f);
+    rigid_body_collider *const c = new rigid_body_collider(0.5f, 0.0f, 0.0f);
     uut.default_collider(c);
 
     BOOST_CHECK(uut.number_of_objects() == 2);
@@ -777,10 +777,10 @@ BOOST_AUTO_TEST_CASE( advance_time_three_way_collide_test )
     uut.add_moving_object(po1.release());
     uut.add_moving_object(po4.release());
 
-    rigid_body_collider *const dc = new rigid_body_collider(0.5f, 0.0f);
+    rigid_body_collider *const dc = new rigid_body_collider(0.5f, 0.0f, 0.0f);
     uut.default_collider(dc);
 
-    rigid_body_collider *const pc = new rigid_body_collider(0.0f, 0.0f);
+    rigid_body_collider *const pc = new rigid_body_collider(0.0f, 0.0f, 0.0f);
     uut.pair_collider(pc, 0, 1);
 
     BOOST_CHECK(uut.number_of_objects() == 3);
@@ -853,7 +853,7 @@ BOOST_AUTO_TEST_CASE( advance_time_rotating_in_plane_collide_test )
     uut.add_moving_object(po0.release());
     uut.add_moving_object(po1.release());
 
-    rigid_body_collider *const c = new rigid_body_collider(0.5f, 0.0f);
+    rigid_body_collider *const c = new rigid_body_collider(0.5f, 0.0f, 0.0f);
     uut.default_collider(c);
 
     BOOST_CHECK(uut.number_of_objects() == 2);
@@ -888,7 +888,7 @@ BOOST_AUTO_TEST_CASE( advance_time_rotating_in_plane_collide_and_slide_test )
     uut.add_moving_object(po0.release());
     uut.add_moving_object(po1.release());
 
-    rigid_body_collider *const c = new rigid_body_collider(0.0f, 0.0f);
+    rigid_body_collider *const c = new rigid_body_collider(0.0f, 0.0f, 0.0f);
     uut.default_collider(c);
 
     BOOST_CHECK(uut.number_of_objects() == 2);

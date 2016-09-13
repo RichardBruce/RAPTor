@@ -62,8 +62,8 @@ class gjk_fixture
             })),
             po_a(new physics_object(new vertex_group(verts_a, std::vector<polygon>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0)),
             po_b(new physics_object(new vertex_group(verts_b, std::vector<polygon>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0)),
-            sim_a(new simplex(*po_a)),
-            sim_b(new simplex(*po_b)),
+            sim_a(new simplex(*po_a, true)),
+            sim_b(new simplex(*po_b, false)),
             uut(*po_a->get_vertex_group(), *po_b->get_vertex_group(), sim_a.get(), sim_b.get()),
             verts{0, 0, 0, 0}
         {  };
@@ -1206,8 +1206,8 @@ BOOST_AUTO_TEST_CASE( basic_hit_test )
         });
     physics_object po_b(new vertex_group(b_verts, std::vector<polygon>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0);
 
-    std::unique_ptr<simplex> sim_a(new simplex(po_a));
-    std::unique_ptr<simplex> sim_b(new simplex(po_b));
+    std::unique_ptr<simplex> sim_a(new simplex(po_a, true));
+    std::unique_ptr<simplex> sim_b(new simplex(po_b, false));
     
     gjk test_gjk(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(test_gjk.find_minimum_distance(&dir, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
@@ -1236,8 +1236,8 @@ BOOST_AUTO_TEST_CASE( basic_miss_test )
         });
     physics_object po_b(new vertex_group(b_verts, std::vector<polygon>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0);
 
-    std::unique_ptr<simplex> sim_a(new simplex(po_a));
-    std::unique_ptr<simplex> sim_b(new simplex(po_b));
+    std::unique_ptr<simplex> sim_a(new simplex(po_a, true));
+    std::unique_ptr<simplex> sim_b(new simplex(po_b, false));
     
     gjk test_gjk(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(!test_gjk.find_minimum_distance(&dir, point_t(0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
@@ -1267,8 +1267,8 @@ BOOST_AUTO_TEST_CASE( displaced_hit_test )
     });
     physics_object po_b(new vertex_group(b_verts, std::vector<polygon>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0);
 
-    std::unique_ptr<simplex> sim_a(new simplex(po_a));
-    std::unique_ptr<simplex> sim_b(new simplex(po_b));
+    std::unique_ptr<simplex> sim_a(new simplex(po_a, true));
+    std::unique_ptr<simplex> sim_b(new simplex(po_b, false));
     
     gjk test_gjk(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(test_gjk.find_minimum_distance(&dir, point_t(0.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
@@ -1297,21 +1297,21 @@ BOOST_AUTO_TEST_CASE( displaced_miss_test )
     });
     physics_object po_b(new vertex_group(b_verts, std::vector<polygon>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0);
 
-    std::unique_ptr<simplex> sim_a(new simplex(po_a));
-    std::unique_ptr<simplex> sim_b(new simplex(po_b));
+    std::unique_ptr<simplex> sim_a(new simplex(po_a, true));
+    std::unique_ptr<simplex> sim_b(new simplex(po_b, false));
     
     gjk test_gjk0(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(!test_gjk0.find_minimum_distance(&dir, point_t(0.0, -0.5, 0.0), point_t(0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
     BOOST_CHECK(dir == point_t(0.0, -0.25, 0.0));
 
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk1(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(!test_gjk1.find_minimum_distance(&dir, point_t(0.0, 1.5, 0.0), point_t(0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
     BOOST_CHECK(dir == point_t(0.0, 0.75, 0.0));
 
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk2(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(!test_gjk2.find_minimum_distance(&dir, point_t(0.0, 0.0, 11.0), point_t(0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
     BOOST_CHECK(dir == point_t(0.0, 0.0, 0.5));
@@ -1340,14 +1340,14 @@ BOOST_AUTO_TEST_CASE( displacing_hit_test )
     });
     physics_object po_b(new vertex_group(b_verts, std::vector<polygon>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0);
 
-    std::unique_ptr<simplex> sim_a(new simplex(po_a));
-    std::unique_ptr<simplex> sim_b(new simplex(po_b));
+    std::unique_ptr<simplex> sim_a(new simplex(po_a, true));
+    std::unique_ptr<simplex> sim_b(new simplex(po_b, false));
     
     gjk test_gjk0(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(test_gjk0.find_minimum_distance(&dir, point_t(0.0, -7.0, 0.0), point_t(0.0, -4.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
 
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk1(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(test_gjk1.find_minimum_distance(&dir, point_t(0.0, -9.25, 0.0), point_t(0.0, 4.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
 }
@@ -1375,21 +1375,21 @@ BOOST_AUTO_TEST_CASE( displacing_miss_test )
     });
     physics_object po_b(new vertex_group(b_verts, std::vector<polygon>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0);
 
-    std::unique_ptr<simplex> sim_a(new simplex(po_a));
-    std::unique_ptr<simplex> sim_b(new simplex(po_b));
+    std::unique_ptr<simplex> sim_a(new simplex(po_a, true));
+    std::unique_ptr<simplex> sim_b(new simplex(po_b, false));
     
     gjk test_gjk0(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(!test_gjk0.find_minimum_distance(&dir, point_t(0.0, -0.5, 0.0), point_t(0.0, -5.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
     BOOST_CHECK(dir == point_t(0.0, -0.25, 0.0));
 
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk1(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(!test_gjk1.find_minimum_distance(&dir, point_t(0.0, 3.5, 0.0), point_t(0.0, -2.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
     BOOST_CHECK(dir == point_t(0.0, 0.75, 0.0));
 
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk2(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(!test_gjk2.find_minimum_distance(&dir, point_t(0.0, 0.0, 11.0), point_t(5.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0), quaternion_t(1.0, 0.0, 0.0, 0.0)));
     BOOST_CHECK(dir == point_t(0.0, 0.0, 0.5));
@@ -1400,14 +1400,14 @@ BOOST_AUTO_TEST_CASE( rotated_hit_test )
 {
     physics_object po_a(new vertex_group(origin_a_verts.release(), std::vector<polygon>(), nullptr), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0);
     physics_object po_b(new vertex_group(origin_b_verts.release(), std::vector<polygon>(), nullptr), quaternion_t(sqrt(0.5),  sqrt(0.5), 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0);
-    std::unique_ptr<simplex> sim_a(new simplex(po_a));
-    std::unique_ptr<simplex> sim_b(new simplex(po_b));
+    std::unique_ptr<simplex> sim_a(new simplex(po_a, true));
+    std::unique_ptr<simplex> sim_b(new simplex(po_b, false));
     
     gjk test_gjk0(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(test_gjk0.find_minimum_distance(&dir, point_t(0.0, -10.0, 0.0), point_t(0.0, 0.0, 0.0), quaternion_t(sqrt(0.5), sqrt(0.5), 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0)));
 
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk1(*po_b.get_vertex_group(), *po_a.get_vertex_group(), sim_b.get(), sim_a.get());
     BOOST_CHECK(test_gjk1.find_minimum_distance(&dir, point_t(0.0, 10.0, 0.0), point_t(0.0, 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0), quaternion_t(sqrt(0.5), sqrt(0.5), 0.0, 0.0)));
 }
@@ -1417,21 +1417,21 @@ BOOST_AUTO_TEST_CASE( rotated_miss_test )
 {
     physics_object po_a(new vertex_group(origin_a_verts.release(), std::vector<polygon>(), nullptr), quaternion_t(sqrt(0.5), sqrt(0.5), 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0);
     physics_object po_b(new vertex_group(origin_b_verts.release(), std::vector<polygon>(), nullptr), quaternion_t(sqrt(0.5), sqrt(0.5), 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0);
-    std::unique_ptr<simplex> sim_a(new simplex(po_a));
-    std::unique_ptr<simplex> sim_b(new simplex(po_b));
+    std::unique_ptr<simplex> sim_a(new simplex(po_a, true));
+    std::unique_ptr<simplex> sim_b(new simplex(po_b, false));
     
     gjk test_gjk0(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(!test_gjk0.find_minimum_distance(&dir, point_t(0.0, 0.0, -1.0), point_t(0.0, 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0)));
     BOOST_CHECK(fabs(magnitude(dir - point_t(0.0, 0.0, -0.5))) < result_tolerance);
     
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk1(*po_b.get_vertex_group(), *po_a.get_vertex_group(), sim_b.get(), sim_a.get());
     BOOST_CHECK(!test_gjk1.find_minimum_distance(&dir, point_t(0.0, 0.0, -1.0), point_t(0.0, 0.0, -10.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0)));
     BOOST_CHECK(fabs(magnitude(dir - point_t(0.0, 0.0, -0.5))) < result_tolerance);
     
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk2(*po_b.get_vertex_group(), *po_a.get_vertex_group(), sim_b.get(), sim_a.get());
     BOOST_CHECK(!test_gjk2.find_minimum_distance(&dir, point_t(0.0, 0.0, -1.0), point_t(0.0, 0.0, 0.49), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0)));
     BOOST_CHECK(fabs(magnitude(dir - point_t(0.0, 0.0, -0.01))) < result_tolerance);
@@ -1442,14 +1442,14 @@ BOOST_AUTO_TEST_CASE( rotated_translating_hit_test )
 {
     physics_object po_a(new vertex_group(origin_a_verts.release(), std::vector<polygon>(), nullptr), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0);
     physics_object po_b(new vertex_group(origin_b_verts.release(), std::vector<polygon>(), nullptr), quaternion_t(sqrt(0.5),  sqrt(0.5), 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0);
-    std::unique_ptr<simplex> sim_a(new simplex(po_a));
-    std::unique_ptr<simplex> sim_b(new simplex(po_b));
+    std::unique_ptr<simplex> sim_a(new simplex(po_a, true));
+    std::unique_ptr<simplex> sim_b(new simplex(po_b, false));
     
     gjk test_gjk0(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(test_gjk0.find_minimum_distance(&dir, point_t(0.0, -10.0, -1.0), point_t(0.0, 0.0, 2.0), quaternion_t(sqrt(0.5), sqrt(0.5), 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0)));
 
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk1(*po_b.get_vertex_group(), *po_a.get_vertex_group(), sim_b.get(), sim_a.get());
     BOOST_CHECK(test_gjk1.find_minimum_distance(&dir, point_t(-11.0, 10.0, 0.0), point_t(0.5, 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0), quaternion_t(sqrt(0.5), sqrt(0.5), 0.0, 0.0)));
 }
@@ -1459,21 +1459,21 @@ BOOST_AUTO_TEST_CASE( rotated_translating_miss_test )
 {
     physics_object po_a(new vertex_group(origin_a_verts.release(), std::vector<polygon>(), nullptr), quaternion_t(sqrt(0.5), sqrt(0.5), 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0);
     physics_object po_b(new vertex_group(origin_b_verts.release(), std::vector<polygon>(), nullptr), quaternion_t(sqrt(0.5), sqrt(0.5), 0.0, 0.0), point_t(0.0, 0.0, 0.0), 0.0);
-    std::unique_ptr<simplex> sim_a(new simplex(po_a));
-    std::unique_ptr<simplex> sim_b(new simplex(po_b));
+    std::unique_ptr<simplex> sim_a(new simplex(po_a, true));
+    std::unique_ptr<simplex> sim_b(new simplex(po_b, false));
     
     gjk test_gjk0(*po_a.get_vertex_group(), *po_b.get_vertex_group(), sim_a.get(), sim_b.get());
     BOOST_CHECK(!test_gjk0.find_minimum_distance(&dir, point_t(0.0, 0.0, -1.0), point_t(0.0, 10.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0)));
     BOOST_CHECK(fabs(magnitude(dir - point_t(0.0, 0.0, -0.5))) < result_tolerance);
     
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk1(*po_b.get_vertex_group(), *po_a.get_vertex_group(), sim_b.get(), sim_a.get());
     BOOST_CHECK(!test_gjk1.find_minimum_distance(&dir, point_t(0.0, 0.0, -10.0), point_t(0.0, 0.0, 9.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0)));
     BOOST_CHECK(fabs(magnitude(dir - point_t(0.0, 0.0, -0.5))) < result_tolerance);
     
-    sim_a.reset(new simplex(po_a));
-    sim_b.reset(new simplex(po_b));
+    sim_a.reset(new simplex(po_a, true));
+    sim_b.reset(new simplex(po_b, false));
     gjk test_gjk2(*po_b.get_vertex_group(), *po_a.get_vertex_group(), sim_b.get(), sim_a.get());
     BOOST_CHECK(!test_gjk2.find_minimum_distance(&dir, point_t(0.0, 0.0, 10.0), point_t(0.0, 0.0, -9.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0), quaternion_t(sqrt(0.5), -sqrt(0.5), 0.0, 0.0)));
     BOOST_CHECK(fabs(magnitude(dir - point_t(0.0, 0.0, 0.5))) < result_tolerance);

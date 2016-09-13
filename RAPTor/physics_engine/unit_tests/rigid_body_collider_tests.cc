@@ -1077,7 +1077,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_test )
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 0.5f, 0.5f), 1.0f));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 1.5f, 0.5f), 1.0f));
 
-    std::unique_ptr<collider> uut(new rigid_body_collider(0.1f, 0.3f));
+    std::unique_ptr<collider> uut(new rigid_body_collider(0.1f, 0.0f, 0.3f));
 
     /* Collide and check */
     po_a->set_velocity(point_t(-10.0f,  10.0f, 0.0f));
@@ -1114,7 +1114,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_reverse_test )
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 0.5f, 0.5f), 1.0f));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 1.5f, 0.5f), 1.0f));
 
-    std::unique_ptr<collider> uut(new rigid_body_collider(0.1f, 0.3f));
+    std::unique_ptr<collider> uut(new rigid_body_collider(0.1f, 0.0f, 0.3f));
 
     /* Collide and check */
     po_a->set_velocity(point_t( 10.0f,  10.0f, 0.0f));
@@ -1151,7 +1151,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_more_friction_test )
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 0.5f, 0.5f), 1.0f));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 1.5f, 0.5f), 1.0f));
     
-    std::unique_ptr<collider> uut(new rigid_body_collider(0.1f, 0.35f));
+    std::unique_ptr<collider> uut(new rigid_body_collider(0.1f, 0.0f, 0.35f));
 
     /* Collide and check */
     po_a->set_velocity(point_t(-10.0f,  10.0f, 0.0f));
@@ -1188,7 +1188,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_max_friction_test )
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 0.5f, 0.5f), 1.0f));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 1.5f, 0.5f), 1.0f));
 
-    std::unique_ptr<collider> uut(new rigid_body_collider(0.1f, 0.9f));
+    std::unique_ptr<collider> uut(new rigid_body_collider(0.1f, 0.0f, 0.9f));
 
     /* Collide and check */
     po_a->set_velocity(point_t(-10.0f,  10.0f, 0.0f));
@@ -1224,7 +1224,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_zero_tanjent_velocity_test )
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 0.5f, 0.5f), 1.0f));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 1.5f, 0.5f), 1.0f));
 
-    std::unique_ptr<collider> uut(new rigid_body_collider(0.1f, 0.3f));
+    std::unique_ptr<collider> uut(new rigid_body_collider(0.1f, 0.0f, 0.3f));
     
     /* Collide and check */
     po_a->set_velocity(point_t(0.0f,  10.0f, 0.0f));
@@ -1261,7 +1261,7 @@ BOOST_AUTO_TEST_CASE( rigid_body_collider_class_zero_mu_test )
     std::unique_ptr<physics_object> po_a(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 0.5f, 0.5f), 1.0f));
     std::unique_ptr<physics_object> po_b(new physics_object(make_cube(m.get(), point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.5f, 1.5f, 0.5f), 1.0f));
 
-    std::unique_ptr<collider> uut(new rigid_body_collider(0.0f, 0.3f));
+    std::unique_ptr<collider> uut(new rigid_body_collider(0.0f, 0.0f, 0.3f));
     
     /* Collide and check */
     po_a->begin_time_step(1.0f);

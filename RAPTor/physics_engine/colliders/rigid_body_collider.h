@@ -197,7 +197,7 @@ void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t
     const float reac_num = dot_product(proj_v_close * (1.0f + cor), noc);
     const float reac_den = n_lin + dot_product(angular_change, noc);
     const float max_reac_i = reac_num / reac_den;
-    BOOST_LOG_TRIVIAL(trace) << "Maximum reactive impulse: " << max_reac_i;
+    BOOST_LOG_TRIVIAL(trace) << "Maximum reactive impulse: " << max_reac_i << ", numerator: " << reac_num << ", denominator: " << reac_den;
 
     /* Apply friction impulses. A negative impulse bringing sliding to a halt indicates the normal impulse accelerating sliding more than the friction impulse can slow it */
     const float min_i   = (max_fric_i < 0.0f) ? max_reac_i : std::min(max_reac_i, max_fric_i);
@@ -252,7 +252,7 @@ void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t
 class rigid_body_collider : public collider
 {
     public :
-        rigid_body_collider(const float cor, const float mu) : collider(cor, mu) {  };
+        rigid_body_collider(const float cor, const float mus, const float mud) : collider(cor, mus, mud) {  };
         
         virtual const rigid_body_collider& collide(physics_object *const po_a, physics_object *const po_b, const point_t &poc, const point_t &noc, const collision_t type) const
         {
@@ -262,7 +262,7 @@ class rigid_body_collider : public collider
             assert(type == collision_t::COLLISION);
 
             /* Actual collision processing */
-            instantaneous_collide(po_a, po_b, poc, noc, _cor, _mu);
+            instantaneous_collide(po_a, po_b, poc, noc, _cor, dynamic_friction());
 
             return *this;
         }

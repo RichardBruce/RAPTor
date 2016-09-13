@@ -15,6 +15,7 @@ const raptor_physics::init_logger init_logger;
 
 /* Raytracer */
 #include "material.h"
+#include "phong_shader.h"
 
 /* Physics headers */
 #include "simulation_environment.h"
@@ -31,7 +32,7 @@ namespace test
 struct simulation_environment_fixture : private boost::noncopyable
 {
     simulation_environment_fixture()
-    :  pe(new rigid_body_collider(0.9, 0.75)),
+    :  pe(new rigid_body_collider(0.9, 0.8, 0.75)),
        po(-1.0, 0.0, 1, false, false), /* Cant check the rendered output so make sure that code isnt even run */
        m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), 1.0))
     {  };

@@ -250,6 +250,13 @@ class physics_object : private boost::noncopyable
             return _v + rot_vel;
         }
 
+        point_t get_acceleration(const point_t &poc) const
+        {
+            const point_t lin(get_force() / _i->mass());
+            const point_t rot(cross_product(get_torque() / get_orientated_tensor(), poc - _i->center_of_mass()));
+            return lin + rot;
+        }
+
         const point_t get_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */

@@ -60,8 +60,8 @@ const float result_tolerance = 0.0005f;
 BOOST_AUTO_TEST_CASE( ctor_test )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    std::unique_ptr<simplex> s1(new simplex(*data1));
+    simplex *s0 = new simplex(*data0, true);
+    std::unique_ptr<simplex> s1(new simplex(*data1, true));
 
     /* Test certain collision */
     /* This is a bit naughty, but dont actaully need a class here */
@@ -83,8 +83,8 @@ BOOST_AUTO_TEST_CASE( ctor_test )
 BOOST_AUTO_TEST_CASE( get_test )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    std::unique_ptr<simplex> s1(new simplex(*data1));
+    simplex *s0 = new simplex(*data0, true);
+    std::unique_ptr<simplex> s1(new simplex(*data1, true));
 
     /* Test certain collision */
     /* This is a bit naughty, but dont actaully need a class here */
@@ -100,9 +100,9 @@ BOOST_AUTO_TEST_CASE( get_test )
 BOOST_AUTO_TEST_CASE( update_test )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    simplex *s1 = new simplex(*data1);
-    simplex *s2 = new simplex(*data0);
+    simplex *s0 = new simplex(*data0, true);
+    simplex *s1 = new simplex(*data1, true);
+    simplex *s2 = new simplex(*data0, true);
 
     /* Construct and test */
     /* This is a bit naughty, but dont actaully need a class here */
@@ -151,10 +151,10 @@ BOOST_AUTO_TEST_CASE( update_test )
 BOOST_AUTO_TEST_CASE( void_collsion_test )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    simplex *s1 = new simplex(*data1);
-    simplex *s2 = new simplex(*data0);
-    std::unique_ptr<simplex> s3(new simplex(*data1));
+    simplex *s0 = new simplex(*data0, true);
+    simplex *s1 = new simplex(*data1, true);
+    simplex *s2 = new simplex(*data0, true);
+    std::unique_ptr<simplex> s3(new simplex(*data1, true));
 
     /* Construct and test */
     physics_object *vg0 = reinterpret_cast<physics_object *>(0x5);
@@ -237,9 +237,9 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
 BOOST_AUTO_TEST_CASE( void_all_and_update_test )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    simplex *s2 = new simplex(*data0);
-    std::unique_ptr<simplex> s1(new simplex(*data1));
+    simplex *s0 = new simplex(*data0, true);
+    simplex *s2 = new simplex(*data0, true);
+    std::unique_ptr<simplex> s1(new simplex(*data1, true));
 
     /* Construct and test */
     physics_object *vg0 = reinterpret_cast<physics_object *>(0x5);
@@ -276,9 +276,9 @@ BOOST_AUTO_TEST_CASE( void_all_and_update_test )
 BOOST_AUTO_TEST_CASE( successful_retest_update_test )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    simplex *s2 = new simplex(*data0);
-    std::unique_ptr<simplex> s1(new simplex(*data1));
+    simplex *s0 = new simplex(*data0, true);
+    simplex *s2 = new simplex(*data0, true);
+    std::unique_ptr<simplex> s1(new simplex(*data1, true));
 
     /* Construct and check */
     physics_object *vg = reinterpret_cast<physics_object *>(0x5);
@@ -311,10 +311,10 @@ BOOST_AUTO_TEST_CASE( successful_retest_update_test )
 BOOST_AUTO_TEST_CASE( iter_test )
 {
     /* New simplices, the collision infos will delete these */
-    simplex *s0 = new simplex(*data0);
-    simplex *s1 = new simplex(*data1);
-    simplex *s2 = new simplex(*data0);
-    simplex *s3 = new simplex(*data1);
+    simplex *s0 = new simplex(*data0, true);
+    simplex *s1 = new simplex(*data1, true);
+    simplex *s2 = new simplex(*data0, true);
+    simplex *s3 = new simplex(*data1, true);
 
     /* Construct and check a little */
     physics_object *vg0 = reinterpret_cast<physics_object *>(0x5);

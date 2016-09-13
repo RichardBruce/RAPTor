@@ -65,7 +65,7 @@ inline void generate_array_mersenne_twister()
     }
 
     /* Process the upper part of the array ie/ After mod((i+397),624) as wrapped around */
-    for (int i = 227; i < 624; i++)
+    for (int i = 227; i < 623; i++)
     {
         y = (0x80000000 & mt[i]) + (0x7FFFFFFF & mt[i + 1]);
         if (y & 0x1)

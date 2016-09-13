@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     raptor_physics::physics_options po(argv, argc);
 
     /* Set up the physics simulation */
-    raptor_physics::physics_engine pe(new raptor_physics::rigid_body_collider(0.75f, 0.75f));
+    raptor_physics::physics_engine pe(new raptor_physics::rigid_body_collider(0.75f, 0.75f, 0.5f));
     raptor_physics::simulation_environment se(&pe, &po);
 
     /* Lights */

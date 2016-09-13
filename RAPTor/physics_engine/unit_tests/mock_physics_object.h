@@ -128,6 +128,13 @@ class mock_physics_object
             return (_i->mass() == std::numeric_limits<float>::infinity()) ? point_t(0.0f, 0.0f, 0.0f) : (get_orientated_tensor() * _w);
         }
 
+        point_t get_acceleration(const point_t &poc) const
+        {
+            const point_t lin(_f / _i->mass());
+            const point_t rot(cross_product(_tor / get_orientated_tensor(), poc - _i->center_of_mass()));
+            return lin + rot;
+        }
+
         const inertia_tensor_view get_orientated_tensor() const
         {
             return inertia_tensor_view(*_i, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f));

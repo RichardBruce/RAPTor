@@ -282,9 +282,9 @@ class physics_engine : private boost::noncopyable
     private :
         /* typedef for convinence */
         friend physics_object;
-        typedef std::pair<physics_object *, float> bound_point;
-        typedef std::unordered_map<int, physics_object*>::iterator obj_iter;
-        typedef std::unordered_map<int, physics_object*>::const_iterator const_obj_iter;
+        using bound_point       = std::pair<physics_object *, float>;
+        using obj_iter          = std::unordered_map<int, physics_object*>::iterator;
+        using const_obj_iter    = std::unordered_map<int, physics_object*>::const_iterator;
         
 
         /* Functor to check what sort of a collision a collision cache element represents */
