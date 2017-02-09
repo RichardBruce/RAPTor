@@ -1,4 +1,5 @@
 /* Standard headers */
+#include <limits>
 
 /* Physics headers */
 #include "contact_graph_node.h"
@@ -9,7 +10,7 @@
 
 namespace raptor_physics
 {
-point_t contact_graph_node::resolve_forces_iteration(std::unordered_map<int, physics_object*> *o, const fp_t t_step)
+point_t contact_graph_node::resolve_forces_iteration(std::unordered_map<int, physics_object*> *o, const float t_step)
 {
     std::pair<point_t, point_t> perp_f;
     std::pair<point_t, point_t> proj_f;
@@ -100,15 +101,15 @@ const contact_graph_node& contact_graph_node::componentise(std::pair<point_t, po
 }
 
 
-point_t contact_graph_node::calculate_projected_forces(std::pair<point_t, point_t> *const proj_f, const point_t &noc, const fp_t m_a, const fp_t m_b) const
+point_t contact_graph_node::calculate_projected_forces(std::pair<point_t, point_t> *const proj_f, const point_t &noc, const float m_a, const float m_b) const
 {
     /* Save the original state */
     const point_t first(proj_f->first);
     const point_t second(proj_f->second);
 
     /* Process the forces acting on the objects */
-    const fp_t total_m = m_a + m_b;
-    const fp_t a_dot_noc = dot_product(proj_f->first, noc);
+    const float total_m = m_a + m_b;
+    const float a_dot_noc = dot_product(proj_f->first, noc);
 
     /* Forces push in the same direction */
 //    cout << "Input projected forces: " << endl;
@@ -119,14 +120,14 @@ point_t contact_graph_node::calculate_projected_forces(std::pair<point_t, point_
         const point_t acc_a_proj(proj_f->first / m_a);
         const point_t acc_b_proj(proj_f->second / m_b);
 
-        const fp_t acc_a_magn = magnitude(acc_a_proj);
-        const fp_t acc_b_magn = magnitude(acc_b_proj);
+        const float acc_a_magn = magnitude(acc_a_proj);
+        const float acc_b_magn = magnitude(acc_b_proj);
 
         /* Trailer (a) accelerating fastest */
         if ((acc_a_magn > acc_b_magn) && (a_dot_noc < 0.0))
         {
 //            cout << "trailing a fastest" << endl;
-            if (total_m == numeric_limits<fp_t>::infinity())
+            if (total_m == numeric_limits<float>::infinity())
             {
                 proj_f->first   = 0.0;
                 proj_f->second  = 0.0;
@@ -143,7 +144,7 @@ point_t contact_graph_node::calculate_projected_forces(std::pair<point_t, point_
         else if ((acc_b_magn > acc_a_magn) && (a_dot_noc > 0.0))
         {
 //            cout << "trailing b fastest" << endl;
-            if (total_m == numeric_limits<fp_t>::infinity())
+            if (total_m == numeric_limits<float>::infinity())
             {
                 proj_f->first   = 0.0;
                 proj_f->second  = 0.0;
@@ -162,11 +163,11 @@ point_t contact_graph_node::calculate_projected_forces(std::pair<point_t, point_
     else
     {
         /* Pushing against each other */
-        const fp_t b_dot_noc = dot_product(proj_f->second, noc);
+        const float b_dot_noc = dot_product(proj_f->second, noc);
         if ((a_dot_noc < 0.0) || (b_dot_noc > 0.0))
         {
 //            cout << "pushing together" << endl;
-            if (total_m == numeric_limits<fp_t>::infinity())
+            if (total_m == numeric_limits<float>::infinity())
             {
                 proj_f->first   = 0.0;
                 proj_f->second  = 0.0;
@@ -193,14 +194,14 @@ point_t contact_graph_node::calculate_projected_forces(std::pair<point_t, point_
 }
 
 
-point_t contact_graph_node::calculate_perpendicular_force(std::pair<point_t, point_t> *const perp_f, const std::pair<point_t, point_t> &proj_f, const std::pair<point_t, point_t> &perp_v, const point_t &noc, const fp_t m_a, const fp_t m_b, const fp_t mus, const fp_t muk, const fp_t t) const
+point_t contact_graph_node::calculate_perpendicular_force(std::pair<point_t, point_t> *const perp_f, const std::pair<point_t, point_t> &proj_f, const std::pair<point_t, point_t> &perp_v, const point_t &noc, const float m_a, const float m_b, const float mus, const float muk, const float t) const
 {
     /* Save the original state */
     const point_t first(perp_f->first);
     const point_t second(perp_f->second);
 
     /* Process the forces acting on the objects */
-    const fp_t a_dot_noc = dot_product(proj_f.first, noc);
+    const float a_dot_noc = dot_product(proj_f.first, noc);
     const point_t net_v_perp(perp_v.first - perp_v.second);
 
     /* Forces push in the same direction */
@@ -213,8 +214,8 @@ point_t contact_graph_node::calculate_perpendicular_force(std::pair<point_t, poi
         const point_t acc_a_proj(proj_f.first / m_a);
         const point_t acc_b_proj(proj_f.second / m_a);
 
-        const fp_t acc_a_magn = magnitude(acc_a_proj);
-        const fp_t acc_b_magn = magnitude(acc_b_proj);
+        const float acc_a_magn = magnitude(acc_a_proj);
+        const float acc_b_magn = magnitude(acc_b_proj);
 
         /* Trailer (a) accelerating fastest */
         if ((acc_a_magn > acc_b_magn) && (a_dot_noc < 0.0))
@@ -234,7 +235,7 @@ point_t contact_graph_node::calculate_perpendicular_force(std::pair<point_t, poi
     else
     {
         /* Pushing against each other */
-        const fp_t b_dot_noc = dot_product(proj_f.second, noc);
+        const float b_dot_noc = dot_product(proj_f.second, noc);
         if ((a_dot_noc < 0.0) || (b_dot_noc > 0.0))
         {
             const point_t net_f_proj(proj_f.first - proj_f.second);
@@ -254,14 +255,14 @@ point_t contact_graph_node::calculate_perpendicular_force(std::pair<point_t, poi
 }
 
 
-const contact_graph_node& contact_graph_node::apply_friction(std::pair<point_t, point_t> *const perp_f, const point_t &net_f_proj, const point_t &net_v_perp, const fp_t mus, const fp_t muk, const fp_t m_a, const fp_t m_b, const fp_t t) const
+const contact_graph_node& contact_graph_node::apply_friction(std::pair<point_t, point_t> *const perp_f, const point_t &net_f_proj, const point_t &net_v_perp, const float mus, const float muk, const float m_a, const float m_b, const float t) const
 {
-    const fp_t magn_f_proj = magnitude(net_f_proj);
+    const float magn_f_proj = magnitude(net_f_proj);
 
     /* Kinetic friction */
     if (magnitude(net_v_perp) > raptor_physics::EPSILON)
     {
-        const fp_t fric_k = magn_f_proj * muk;
+        const float fric_k = magn_f_proj * muk;
 //        cout << "Friction k: " << fric_k << endl;
         const point_t norm_v_perp = normalise(net_v_perp);
 
@@ -275,20 +276,20 @@ const contact_graph_node& contact_graph_node::apply_friction(std::pair<point_t, 
         {
 //            cout << "full friction would change direction" << endl;
             /* Apply symetric force */
-            if ((m_a != numeric_limits<fp_t>::infinity()) && (m_b != numeric_limits<fp_t>::infinity()))
+            if ((m_a != numeric_limits<float>::infinity()) && (m_b != numeric_limits<float>::infinity()))
             {
                 const point_t chg_a_perp((net_v_perp * 0.5) / t);
                 perp_f->first   -= chg_a_perp * m_a;
                 perp_f->second  += chg_a_perp * m_b;
             }
             /* Apply one sided force */
-            else if (m_a != numeric_limits<fp_t>::infinity())
+            else if (m_a != numeric_limits<float>::infinity())
             {
                 const point_t chg_a_perp(net_v_perp / t);
 //                cout << "accelerating first at: " << chg_a_perp.x << " " << chg_a_perp.y << " " << chg_a_perp.z << endl;
                 perp_f->first = chg_a_perp * -m_a;
             }
-            else if (m_b != numeric_limits<fp_t>::infinity())
+            else if (m_b != numeric_limits<float>::infinity())
             {
                 const point_t chg_a_perp(net_v_perp / t);
 //                cout << "accelerating second at: " << chg_a_perp.x << " " << chg_a_perp.y << " " << chg_a_perp.z << endl;
@@ -299,12 +300,12 @@ const contact_graph_node& contact_graph_node::apply_friction(std::pair<point_t, 
         /* Slow the motion by the force of friction */
         else
         {
-            if (m_a != numeric_limits<fp_t>::infinity())
+            if (m_a != numeric_limits<float>::infinity())
             {
                 perp_f->first   -= norm_v_perp * fric_k;
             }
 
-            if (m_b != numeric_limits<fp_t>::infinity())
+            if (m_b != numeric_limits<float>::infinity())
             {
                 perp_f->second  += norm_v_perp * fric_k;
             }
@@ -313,10 +314,10 @@ const contact_graph_node& contact_graph_node::apply_friction(std::pair<point_t, 
     /* Static friction */
     else
     {
-        const fp_t fric_s = magn_f_proj * mus;
+        const float fric_s = magn_f_proj * mus;
 //        cout << "Friction s: " << fric_s << endl;
-        const fp_t mag_a_perp = magnitude(perp_f->first);
-        const fp_t mag_b_perp = magnitude(perp_f->second);
+        const float mag_a_perp = magnitude(perp_f->first);
+        const float mag_b_perp = magnitude(perp_f->second);
 
         /* Reduce the size of the forces by the smallest of friction or the force itself */
         if (mag_a_perp > 0.0)
@@ -334,14 +335,14 @@ const contact_graph_node& contact_graph_node::apply_friction(std::pair<point_t, 
 }
 
 
-point_t contact_graph_node::average_volocities(std::pair<point_t, point_t> *const v, const fp_t m_a, const fp_t m_b) const
+point_t contact_graph_node::average_volocities(std::pair<point_t, point_t> *const v, const float m_a, const float m_b) const
 {
     /* Save the original state */
     const point_t first(v->first);
     const point_t second(v->second);
 
     /* Average */
-    if ((m_a != numeric_limits<fp_t>::infinity()) && (m_b != numeric_limits<fp_t>::infinity()))
+    if ((m_a != numeric_limits<float>::infinity()) && (m_b != numeric_limits<float>::infinity()))
     {
         v->first    = (v->first + v->second) * 0.5;
         v->second   = v->first;

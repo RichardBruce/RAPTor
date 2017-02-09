@@ -1,6 +1,7 @@
 # Source
 SOURCE  = main.cc lcp_solver.cc simulation_environment.cc physics_common.cc physics_object.cc physics_engine.cc \
     vertex_group.cc gjk.cc simplex.cc polygon.cc \
+    isosurface.cc \
     sdl_wrapper.cc sdl_event_handler_factory.cc
 
 # Includes

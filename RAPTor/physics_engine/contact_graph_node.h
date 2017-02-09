@@ -82,7 +82,7 @@ class contact_graph_node : private boost::noncopyable
         unsigned int size() const { return _c.size(); }
 
         /* Perform 1 iteration of resolve forces on the contact graph */
-        point_t resolve_forces_iteration(std::unordered_map<int, physics_object*> *o, const fp_t t_step);
+        point_t resolve_forces_iteration(std::unordered_map<int, physics_object*> *o, const float t_step);
 
         /* Void collisions with everything we processed */
         const contact_graph_node& void_collisions(physics_engine &p) const;
@@ -135,10 +135,10 @@ class contact_graph_node : private boost::noncopyable
         }
 
         const contact_graph_node&   componentise(std::pair<point_t, point_t> *const perp, std::pair<point_t, point_t> *const proj, const point_t &a, const point_t &b, const point_t &noc) const;
-        point_t                     calculate_projected_forces(std::pair<point_t, point_t> *const proj_f, const point_t &noc, const fp_t m_a, const fp_t m_b) const;
-        point_t                     calculate_perpendicular_force(std::pair<point_t, point_t> *const perp_f, const std::pair<point_t, point_t> &proj_f, const std::pair<point_t, point_t> &perp_v, const point_t &noc, const fp_t m_a, const fp_t m_b, const fp_t mus, const fp_t muk, const fp_t t) const;
-        const contact_graph_node&   apply_friction(std::pair<point_t, point_t> *const perp_f, const point_t &net_f_proj, const point_t &net_v_perp, const fp_t mus, const fp_t muk, const fp_t m_a, const fp_t m_b, const fp_t t) const;
-        point_t                     average_volocities(std::pair<point_t, point_t> *const v, const fp_t m_a, const fp_t m_b) const;
+        point_t                     calculate_projected_forces(std::pair<point_t, point_t> *const proj_f, const point_t &noc, const float m_a, const float m_b) const;
+        point_t                     calculate_perpendicular_force(std::pair<point_t, point_t> *const perp_f, const std::pair<point_t, point_t> &proj_f, const std::pair<point_t, point_t> &perp_v, const point_t &noc, const float m_a, const float m_b, const float mus, const float muk, const float t) const;
+        const contact_graph_node&   apply_friction(std::pair<point_t, point_t> *const perp_f, const point_t &net_f_proj, const point_t &net_v_perp, const float mus, const float muk, const float m_a, const float m_b, const float t) const;
+        point_t                     average_volocities(std::pair<point_t, point_t> *const v, const float m_a, const float m_b) const;
 
         physics_object                         *const  _r;
         tracking_info<physics_object>                   *const  _t;

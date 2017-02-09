@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
     /* Enviroment set up */
     po.max_timestep(0.1);
     po.min_timestep(0.1);
-    pe.default_collider(new rigid_body_collider(0.9, 0.75));
+    pe.default_collider(new rigid_body_collider(0.9, 0.75, 0.75));
 
     /* Lights */
     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));

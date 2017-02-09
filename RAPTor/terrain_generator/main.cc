@@ -9,6 +9,7 @@
 /* Raytracer headers */
 #include "parser_common.h"
 #include "coloured_mapper_shader.h"
+#include "phong_shader.h"
 #include "planar_mapper.h"
 
 /* Physics headers */
@@ -109,8 +110,8 @@ int main()
 
     /* Enviroment set up */
     raptor_physics::physics_options po(0.04f, 0.04f, -1, false, true);
-    raptor_physics::physics_engine pe(new raptor_physics::rigid_body_collider(0.5f, 0.75f), false);
-    pe.default_collider(new raptor_physics::rigid_body_collider(0.5f, 0.3f));
+    raptor_physics::physics_engine pe(new raptor_physics::rigid_body_collider(0.5f, 0.75f, 0.75f), false);
+    pe.default_collider(new raptor_physics::rigid_body_collider(0.5f, 0.3f, 0.3f));
     raptor_physics::simulation_environment se(&pe, &po);
     se.load_screen("./load_screen.png");
 
@@ -392,21 +393,22 @@ int main()
     {
         /* Collect vertices */
         BOOST_LOG_TRIVIAL(trace) << "Collecting vertices";
-        std::vector<point_t> facet_verts;
+        std::vector<point_t> *const facet_verts = new std::vector<point_t>();
         for (int f : facet)
         {
             assert(f >= 0 || !"Vertex index is out of range");
             assert(f < (x * y) || !"Error: Vertex index is out of range");
-            facet_verts.push_back(verts[f]);
+            facet_verts->push_back(verts[f]);
         }
 
         /* Bash into triangles */
-        std::vector<int> *const tris = new std::vector<int>();
-        raptor_raytracer::face_to_triangle_edges(tris, facet_verts);
-        assert((tris->size() == ((facet_verts.size() - 2) * 3)) || !"Error: There is a triangle missing");
+        std::vector<int> tris;
+        raptor_raytracer::face_to_triangle_edges(&tris, *facet_verts);
+        assert((tris.size() == ((facet_verts->size() - 2) * 3)) || !"Error: There is a triangle missing");
 
         /* Add static objects */
-        raptor_physics::vertex_group *const vg = new raptor_physics::vertex_group(facet_verts, tris, m[0].get());
+        const std::vector<raptor_physics::polygon> polys{ raptor_physics::polygon(facet_verts, tris) };
+        raptor_physics::vertex_group *const vg = new raptor_physics::vertex_group(facet_verts, polys, m[0].get());
         raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0f, 0.0f, 0.0f), std::numeric_limits<float>::infinity());
         se.add_object(phy_obj);
     }
