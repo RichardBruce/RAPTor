@@ -61,14 +61,93 @@ int main(int argc, char **argv)
 
 
     std::vector<raptor_physics::meta_ball> meta_balls;
-    meta_balls.emplace_back(point_t(  5.0f, 0.0f, 0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -5.0f,  16.0f,   2.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t(  5.0f,  16.0f,   2.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,  12.0f,  -1.0f), 12.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,   7.0f,   0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,   2.0f,   0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f,   0.0f,   2.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  7.0f,   0.0f,   2.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  2.0f,  -7.0f,  -1.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -2.0f,  -7.0f,   0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f, -12.0f,   0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f, -14.0f,   2.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  7.0f, -14.0f,   2.0f), 10.0f, false);
+
+
+    meta_balls.emplace_back(point_t( -5.0f,   2.0f,  16.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t(  5.0f,   2.0f,  16.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,  -1.0f,  12.0f), 12.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,   0.0f,   7.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,   0.0f,   2.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f,   2.0f,   0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  7.0f,   2.0f,   0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  2.0f,  -1.0f,  -7.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -2.0f,   0.0f,  -7.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,   0.0f, -12.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f,   2.0f, -14.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  7.0f,   2.0f, -14.0f), 10.0f, false);
+
+    meta_balls.emplace_back(point_t( 16.0f, -5.0f,   2.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t( 16.0f,  5.0f,   2.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t( 12.0f,  0.0f,  -1.0f), 12.0f, false);
+    meta_balls.emplace_back(point_t(  7.0f,  0.0f,   0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  2.0f,  0.0f,   0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f, -7.0f,   2.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,  7.0f,   2.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f,  2.0f,  -1.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f, -2.0f,   0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(-12.0f,  0.0f,   0.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(-14.0f, -7.0f,   2.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(-14.0f,  7.0f,   2.0f), 10.0f, false);
+
+    meta_balls.emplace_back(point_t( -5.0f,  16.0f,   22.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t(  5.0f,  16.0f,   22.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,  12.0f,  -21.0f), 12.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,   7.0f,   20.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,   2.0f,   20.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f,   0.0f,   22.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  7.0f,   0.0f,   22.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  2.0f,  -7.0f,  -21.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -2.0f,  -7.0f,   20.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f, -12.0f,   20.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f, -14.0f,   22.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  7.0f, -14.0f,   22.0f), 10.0f, false);
+
+
+    meta_balls.emplace_back(point_t( -5.0f,   2.0f,  216.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t(  5.0f,   2.0f,  216.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,  -1.0f,  212.0f), 12.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,   0.0f,   27.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,   0.0f,   22.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f,   2.0f,   20.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  7.0f,   2.0f,   20.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  2.0f,  -1.0f,  -27.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -2.0f,   0.0f,  -27.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,   0.0f, -212.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f,   2.0f, -214.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  7.0f,   2.0f, -214.0f), 10.0f, false);
+
+    meta_balls.emplace_back(point_t( 16.0f, -5.0f,   22.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t( 16.0f,  5.0f,   22.0f),  6.0f, false);
+    meta_balls.emplace_back(point_t( 12.0f,  0.0f,  -21.0f), 12.0f, false);
+    meta_balls.emplace_back(point_t(  7.0f,  0.0f,   20.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  2.0f,  0.0f,   20.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f, -7.0f,   22.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(  0.0f,  7.0f,   22.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f,  2.0f,  -21.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t( -7.0f, -2.0f,   20.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(-12.0f,  0.0f,   20.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(-14.0f, -7.0f,   22.0f), 10.0f, false);
+    meta_balls.emplace_back(point_t(-14.0f,  7.0f,   22.0f), 10.0f, false);
     meta_balls.emplace_back(point_t( -5.0f, 0.0f, 0.0f), 7.0f, true);
 
     auto *tris = new raptor_raytracer::primitive_store();
     raptor_physics::isosurface surface(meta_balls, m.get(), 0.25f);
     surface.to_triangles(tris);
+    std::cout << "Created " << tris->size() << " triangles" << std::endl;
 
-    const point_t cam_p(-5.0f, -0.0f,  30.0f);                                                      /* Position                 */
+    const point_t cam_p( 0.0f,  0.0f, 50.0f);                                                      /* Position                 */
     const point_t x_vec( 1.0f,  0.0f,  0.0f);                                                        /* Horizontal vector        */
     const point_t y_vec( 0.0f,  1.0f,  0.0f);                                                        /* Virtical vector          */
     const point_t z_vec( 0.0f,  0.0f, -1.0f);                                                        /* Forward vector           */
@@ -82,7 +161,7 @@ int main(int argc, char **argv)
     raptor_raytracer::camera cam(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya);
 
     raptor_raytracer::light_list lights;
-    new_light(&lights, raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t(-100.0f,  0.0f, 100.0f), 0.0f, 0.0f);
+    new_light(&lights, raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t(0.0f,  0.0f, 100.0f), 0.0f, 0.0f);
     
     std::unique_ptr<raptor_raytracer::bih> ssd(new raptor_raytracer::bih(*tris));
     raptor_raytracer::ray_tracer(ssd.get(), lights, *tris, cam);

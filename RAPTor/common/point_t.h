@@ -549,6 +549,8 @@ class point_ti
         inline const bool           operator!=(const point_ti &rhs) const   { return ((this->x != rhs.x) || (this->y != rhs.y) || (this->z != rhs.z));  }
         inline const bool           operator<(const point_ti &rhs)  const   { return ((this->x <  rhs.x) && (this->y <  rhs.y) && (this->z <  rhs.z));  }
         inline const bool           operator>(const point_ti &rhs)  const   { return ((this->x >  rhs.x) && (this->y >  rhs.y) && (this->z >  rhs.z));  }
+        inline const bool           operator<=(const point_ti &rhs) const   { return ((this->x <= rhs.x) && (this->y <= rhs.y) && (this->z <= rhs.z));  }
+        inline const bool           operator>=(const point_ti &rhs) const   { return ((this->x >= rhs.x) && (this->y >= rhs.y) && (this->z >= rhs.z));  }
 
         inline const point_ti<T>&   operator+=(const point_ti &rhs)         { this->x += rhs.x; this->y += rhs.y; this->z += rhs.z; return *this;       }
         inline const point_ti<T>&   operator-=(const point_ti &rhs)         { this->x -= rhs.x; this->y -= rhs.y; this->z -= rhs.z; return *this;       }

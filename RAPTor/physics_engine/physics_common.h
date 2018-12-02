@@ -36,7 +36,18 @@ const float TOO_SMALL_V = 1.0e-6f;
 /* The percent amount of change that can occur during contact resolution before it is considered done */
 const float CONTACT_RESOLUTION_RESIDUAL = 0.0005f;
 
-/* Shared funcitons */
+/* Shared functions */
+/* Find next power of 2 */
+inline unsigned int next_power_of_two(unsigned int x)
+{
+    x |= (x >> 1);
+    x |= (x >> 2);
+    x |= (x >> 4);
+    x |= (x >> 8);
+    x |= (x >> 16);
+    return x + 1;
+}
+
 /* Find the component of v that projects on to n */
 point_t project_vector(const point_t &v, const point_t &n);
 
