@@ -1,5 +1,4 @@
-#ifndef __POINT_T_H__
-#define __POINT_T_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/serialization/access.hpp"
@@ -7,7 +6,6 @@
 
 /* Common headers */
 #include "simd.h"
-#include "common.h"
 
 
 /* Class to hold a 3-D co-ordinate */
@@ -18,7 +16,7 @@ class point_t
         float y;
         float z;
         point_t(const float x = 0.0, const float y = 0.0, const float z = 0.0) : x(x), y(y), z(z) { };
-        
+
         /* Element access */
         inline       float &     operator[](const int i)                 {       float* a = &this->x; return a[i];                                  }
         inline const float &     operator[](const int i) const           { const float* a = &this->x; return a[i];                                  }
@@ -501,5 +499,3 @@ inline point_t normalise(point_t a)
 
     return a;
 }
-
-#endif /* #ifndef __POINT_T_H__ */

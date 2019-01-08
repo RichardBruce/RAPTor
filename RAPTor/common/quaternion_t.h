@@ -1,5 +1,4 @@
-#ifndef __QUATERNION_T_H__
-#define __QUATERNION_T_H__
+#pragma once
 
 /* Boost headers */
 #include "boost/serialization/access.hpp"
@@ -7,8 +6,6 @@
 
 /* Common headers */
 #include "point_t.h"
-#include "common.h"
-#include "logging.h"
 
 
 /* Forward declarations */
@@ -176,6 +173,22 @@ class quaternion_t
             return *this;
         }
 
+        point_t axis() const
+        {
+            const float s = sqrt(1.0f - (w * w));
+            if (s < 0.001f)
+            {
+                return point_t(1.0f, 0.0f, 0.0f);
+            }
+
+            return point_t(x, y, z) / s;
+        }
+
+        float angle() const
+        {
+            return 2.0f * acos(w);
+        }
+
         /* Data members */
         float w;
         float x;
@@ -251,13 +264,11 @@ inline const quaternion_t operator*(const float lhs, const quaternion_t &rhs)
    return quaternion_t(lhs * rhs.w, lhs * rhs.x, lhs * rhs.y, lhs * rhs.z);
 }
 
-
 /* Special functions */
 inline float magnitude(const quaternion_t &a)
 {
     return sqrt((a.w * a.w) + (a.x * a.x) + (a.y * a.y) + (a.z * a.z));
 }
-
 
 inline void normalise(quaternion_t *const a)
 {
@@ -269,7 +280,6 @@ inline void normalise(quaternion_t *const a)
     return;
 }
 
-
 inline quaternion_t normalise(quaternion_t a)
 {
     const float dist = sqrt((a.w * a.w) + (a.x * a.x) + (a.y * a.y) + (a.z * a.z));
@@ -280,16 +290,12 @@ inline quaternion_t normalise(quaternion_t a)
     return a;
 }
 
-
 inline point_t cross_product(const quaternion_t &a, const point_t &b)
 {
     return point_t((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
 }
 
-
 inline point_t cross_product(const point_t &a, const quaternion_t &b)
 {
     return point_t((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
 }
-
-#endif /* #ifndef __QUATERNION_T_H__ */
