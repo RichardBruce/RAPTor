@@ -10,7 +10,7 @@ set(CMAKE_C_FLAGS "--std=c11 -fPIC -Wno-deprecated -Wno-unused-variable -Wno-may
 set(CMAKE_C_FLAGS_DEBUG "-g3 -Og")
 set(CMAKE_C_FLAGS_RELEASE "-O3 -g -mfpmath=sse -msse4a -mpopcnt -fexpensive-optimizations")
 
-set(CMAKE_CXX_FLAGS "--std=c++1y -fPIC -Wno-deprecated -Wno-unused-variable -Wno-maybe-uninitialized -Wall -pipe")
+set(CMAKE_CXX_FLAGS "--std=c++17 -fPIC -Wno-deprecated -Wno-unused-variable -Wno-maybe-uninitialized -Wall -pipe")
 set(CMAKE_CXX_FLAGS_DEBUG "-g3 -Og")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g -mfpmath=sse -msse4a -mpopcnt -fexpensive-optimizations")
 if(COVERAGE STREQUAL "Yes")
