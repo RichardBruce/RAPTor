@@ -1,5 +1,4 @@
-#ifndef __PERLIN_NOISE_3D_H__
-#define __PERLIN_NOISE_3D_H__
+#pragma once
 
 /* Common headers */
 #include "common.h"
@@ -26,5 +25,3 @@ class perlin_noise_3d
 
         const int _s;   /* Random seed  */
 };
-
-#endif /* #ifndef __PERLIN_NOISE_3D_H__ */
