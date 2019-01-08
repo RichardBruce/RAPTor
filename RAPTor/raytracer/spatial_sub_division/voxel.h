@@ -25,12 +25,12 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
 float approximate_sah_minima(const float cl0, const float cl1, const float cr0, const float cr1, const float x0, const float d, const float xw, const float yw, const float zw);
 void fix_adaptive_samples(float *const nr_samples, float *const widths, float *const samples, const float *const cl, const float *const cr, const float d0, const float dw, const float prims);
 
-struct voxel_aab_data
+struct alignas(32) voxel_aab_data
 {
     point_t     low;
     point_t     high;
     int         prim;
-} ALIGN(32);
+};
 
 class voxel
 {

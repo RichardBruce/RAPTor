@@ -19,6 +19,7 @@
 #include "camera.h"
 #include "parser_common.h"
 #include "polygon_to_triangles.h"
+#include "raytracer_event_handler_factory.h"
 
 /* Physics headers */
 #include "physics_options.h"
@@ -54,8 +55,12 @@ class simulation_environment
         simulation_environment(physics_engine *const pe, physics_options *const po)
         : _po(po), _pe(pe), _window(nullptr), _renderer(nullptr), _texture(nullptr), _load_screen(nullptr), _font(nullptr), 
           _cam(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya), 
-          _lights(), _cam_event_handler(get_camera_event_handler(&_cam, "physics_snapshot")), _sim_time(clock()), _time_run(0.0), _damped_fps(0.0)
-        {    
+          _lights(), _sim_time(clock()), _time_run(0.0), _damped_fps(0.0)
+        {
+            auto handler_map = get_camera_event_handler(&_cam);
+            append_raytracer_camera_event_handler(handler_map, &_cam, "physics_snapshot");
+            _cam_event_handler.reset(new sdl_event_handler(handler_map));
+
             /* Initialise and lock the screen */
             if (_po->render())
             {

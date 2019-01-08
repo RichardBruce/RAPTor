@@ -7,6 +7,7 @@
 /* Standard headers */
 #include <chrono>
 #include <iostream>
+#include <random>
 
 /* Boost headers */
 #include "boost/noncopyable.hpp"

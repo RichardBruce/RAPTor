@@ -25,6 +25,7 @@
 /* Raytracer headers */
 #include "camera.h"
 #include "perlin_noise_3d_mapper.h"
+#include "raytracer_event_handler_factory.h"
 
 
 namespace raptor_networking
@@ -131,7 +132,9 @@ class msg_client
 
         sdl_event_handler_base* event_handler()
         {
-            return get_camera_event_handler(_cam, "networking");
+            auto handler_map = get_camera_event_handler(_cam);
+            append_raytracer_camera_event_handler(handler_map, _cam, "networking");
+            return new sdl_event_handler(handler_map);
         }
 
         msg_client& send_request(std::shared_ptr<std::vector<char>> &msg)

@@ -10,6 +10,7 @@ const raptor_physics::init_logger init_logger;
 
 /* Standard headers */
 #include <chrono>
+#include <random>
 
 /* Common headers */
 #include "logging.h"

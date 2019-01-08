@@ -2,14 +2,16 @@
 #define BOOST_TEST_MODULE normal_calculator test
 
 /* Common headers */
-#include "common.h"
 #include "logging.h"
 
 /* Initialise logger */
 const raptor_physics::init_logger init_logger;
 #endif /* #ifdef STAND_ALONE */
 
-// Standard headers
+/* Standard headers */
+
+/* Common headers */
+#include "common.h"
 
 #include "normal_calculator.h"
 

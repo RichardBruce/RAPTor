@@ -545,7 +545,7 @@ float voxel::approximate_split_one_axis(float *const s, const axis_t normal) con
     float best_split = MAX_DIST;
     float adaptive_width[9];
     float bins_per_sample[9];
-    float sample[8] ALIGN(16);
+    alignas(16) float sample[8];
     switch (normal)
     {
         case axis_t::x_axis :
@@ -658,7 +658,7 @@ float voxel::approximate_split_one_axis(float *const s, const axis_t normal) con
 float voxel::brute_force_split_all_axis(float *s, axis_t * normal) const
 {
     /* Find the best split position of the primitives */
-    float sample[9] ALIGN(16);
+    alignas(16) float sample[9];
     vfp_t valid_mask[2];
 
     vfp_t l_vec[2], r_vec[2], s_vec[2];

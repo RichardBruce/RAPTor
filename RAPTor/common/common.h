@@ -25,9 +25,6 @@ extern const float PI;
 
 namespace raptor_raytracer
 {
-/* Alignment */
-#define ALIGN(x) __attribute__ ((aligned (x)))
-
 /* Minimum magnitude of a reflected ray, effectily limits the number
    of reflections to < 22 while 'assert(this->reflectivity <= 0.9);' */
 #ifndef MIN_REFLECTIVE_POWER

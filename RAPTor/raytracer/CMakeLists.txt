@@ -21,6 +21,7 @@ set(SOURCE
     line.cc
     packet_ray.cc
     camera.cc
+    raytracer_event_handler_factory.cc
     ../sdl_wrappers/sdl_wrapper.cc
     ../sdl_wrappers/sdl_event_handler_factory.cc
     spatial_sub_division/kd_tree.cc
