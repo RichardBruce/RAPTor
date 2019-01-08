@@ -1,5 +1,8 @@
 #pragma once
 
+#include "material.h"
+#include "primitive_store.h"
+
 namespace raptor_raytracer
 {
 class camera;

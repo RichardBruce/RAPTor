@@ -37,7 +37,7 @@ physics_engine& physics_engine::advance_time(const float t)
         for (auto &p : (*_objects))
         {
             p.second->begin_time_step(t_step);
-            BOOST_LOG_TRIVIAL(trace) << p.first << " started frame segment at: " << p.second->get_center_of_mass() << " moving: " << p.second->get_velocity() << " force: " << p.second->get_force();
+            BOOST_LOG_TRIVIAL(trace) << p.first << " started frame segment at: " << p.second->get_center_of_mass() << " moving: " << p.second->get_velocity() << " rotating: " << p.second->get_angular_velocity() << " force: " << p.second->get_force() << " torque: " << p.second->get_torque();
         }
 
         for (auto &c : (*_collision_cache))
@@ -78,23 +78,8 @@ physics_engine& physics_engine::advance_time(const float t)
         for (auto &p : (*_collision_cache))
         {
             /* Find all objects left in contact */
-            // contact_graph_node *root = new contact_graph_node(_objects, *_collision_cache, p.first);
-            // if (root->size() > 0)
-            // {
-            //     /* Iterate until the system settles */
-            //     point_t inf_norm;
-            //     do
-            //     {
-            //         inf_norm = root->resolve_forces_iteration(_objects, t_step);
-            //     } while (magnitude(inf_norm) > raptor_physics::CONTACT_RESOLUTION_RESIDUAL);
-
-            //     /* Clean up the contact graph */
-            //     root->void_collisions(*this);
-            // }
-
-            // delete root;
-            cg.rebuild(*_collision_cache, p.first);
-            if (cg.number_of_edges() > 0)
+            cg.rebuild(&_collider_map, _collider, *_collision_cache, p.first);
+            if (cg.number_of_contacts() > 0)
             {
                 cg.resolve_forces(t_step);
                 cg.void_collisions(_collision_cache);
@@ -104,7 +89,7 @@ physics_engine& physics_engine::advance_time(const float t)
         BOOST_LOG_TRIVIAL(trace) << "After contact resolution:";
         for (auto &p : (*_objects))
         {
-            BOOST_LOG_TRIVIAL(trace) << p.first << " started frame segment at: " << p.second->get_center_of_mass() << " moving: " << p.second->get_velocity() << " force: " << p.second->get_force();
+            BOOST_LOG_TRIVIAL(trace) << p.first << " started frame segment at: " << p.second->get_center_of_mass() << " moving: " << p.second->get_velocity() << " rotating: " << p.second->get_angular_velocity() << " force: " << p.second->get_force() << " torque: " << p.second->get_torque();
         }
 
         /* Full collision detection */
@@ -152,8 +137,8 @@ physics_engine& physics_engine::advance_time(const float t)
             /* Track the objects for repeat collisions */
             physics_object *vg_a = fc->first;
             physics_object *vg_b = fc->second->get_first_collision();
-            collision_info *const col_a = (*(*_collision_cache)[vg_a])[vg_b];
-            collision_info *const col_b = (*(*_collision_cache)[vg_b])[vg_a];
+            collision_info<> *const col_a = (*(*_collision_cache)[vg_a])[vg_b];
+            collision_info<> *const col_b = (*(*_collision_cache)[vg_b])[vg_a];
             if (col_a->switch_to_sliding() | col_b->switch_to_sliding()) /* Definately want bitwise or so both legs get run */
             {
                 BOOST_LOG_TRIVIAL(trace) << "Moving to sliding, moving to next frame for contact resolution";
@@ -173,7 +158,7 @@ physics_engine& physics_engine::advance_time(const float t)
                 {
                     /* Not actually colliding, try again later */
                     BOOST_LOG_TRIVIAL(info) << "Uncertain collision was conservative";
-                    assert((++col_ref_cnt < 50) || !"Error: Stuck in the collision refinement loop.");
+                    assert((++col_ref_cnt < 500) || !"Error: Stuck in the collision refinement loop.");
                     continue;
                 }
                 else
@@ -213,18 +198,19 @@ physics_engine& physics_engine::advance_time(const float t)
             /* Re-collide a and b, if they stick we need to use the contact resolution stage */
             BOOST_LOG_TRIVIAL(trace) << "Refinement testing: " << vg_a_idx << " (vg_a) versus " << vg_b_idx << " (vg_b)";
             collide_and_cache(vg_a, vg_b, t_step);
-            assert((++col_ref_cnt < 50) || !"Error: Stuck in the collision refinement loop");
+            assert((++col_ref_cnt < 500) || !"Error: Stuck in the collision refinement loop");
         }
 
         /* Commit all remaining movement */
         for (auto& p : (*_objects))
         {
             p.second->commit_movement(t_step);
+            p.second->clear_internal_forces();
         }
 
         /* Update time */
         t_now += t_step;
-        assert((frm_seg_cnt < 50) || !"Error: Stuck in the frame segment loop");
+        assert((++frm_seg_cnt < 50) || !"Error: Stuck in the frame segment loop");
     }
     
     return *this;
@@ -236,7 +222,9 @@ bool physics_engine::collide_and_cache(physics_object *const vg_a, physics_objec
     simplex *simplex_a;
     simplex *simplex_b;
     float toc = t;
-    collision_t collision_type = vg_a->resolve_collisions(vg_b, &simplex_a, &simplex_b, &toc);
+    auto col_iter = _collision_cache->find(vg_a);
+    const bool sliding = (col_iter != _collision_cache->end()) && ((*col_iter->second)[vg_b] != nullptr) && ((*col_iter->second)[vg_b]->get_type() == collision_t::SLIDING_COLLISION);
+    collision_t collision_type = vg_a->resolve_collisions(vg_b, &simplex_a, &simplex_b, &toc, sliding);
     if (collision_type != collision_t::NO_COLLISION)
     {
         /* Update all info */
@@ -248,6 +236,20 @@ bool physics_engine::collide_and_cache(physics_object *const vg_a, physics_objec
     {
         delete simplex_a;
         delete simplex_b;
+
+        /* Possible that wasnt anything */
+        auto vg_a_iter = _collision_cache->find(vg_a);
+        if (vg_a_iter != _collision_cache->end())
+        {
+            vg_a_iter->second->void_collision(vg_b);
+        }
+
+        auto vg_b_iter = _collision_cache->find(vg_b);
+        if (vg_b_iter != _collision_cache->end())
+        {
+            vg_b_iter->second->void_collision(vg_a);
+        }
+
     }
 
     return false;
@@ -259,7 +261,9 @@ bool physics_engine::retest_and_cache(physics_object *const vg_a, physics_object
     simplex *simplex_a;
     simplex *simplex_b;
     float toc = t;
-    collision_t collision_type = vg_a->resolve_collisions(vg_b, &simplex_a, &simplex_b, &toc);
+    auto col_iter = _collision_cache->find(vg_a);
+    const bool sliding = (col_iter != _collision_cache->end()) && ((*col_iter->second)[vg_b] != nullptr) && ((*col_iter->second)[vg_b]->get_type() == collision_t::SLIDING_COLLISION);
+    collision_t collision_type = vg_a->resolve_collisions(vg_b, &simplex_a, &simplex_b, &toc, sliding);
     if (collision_type != collision_t::NO_COLLISION)
     {
         /* Retest as resting collsion means retest passed. Just update the simplices */

@@ -1068,7 +1068,7 @@ BOOST_FIXTURE_TEST_CASE( self_collision_exact_resolve_collisions_test, physics_o
     simplex *manifold_b;
 
     /* Check not colliding */
-    BOOST_CHECK(cube_po0->resolve_collisions(cube_po0, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(cube_po0, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(t == 10.0); 
     delete manifold_a;
     delete manifold_b;
@@ -1083,7 +1083,7 @@ BOOST_FIXTURE_TEST_CASE( self_collision_conservative_resolve_collisions_test, ph
 
     /* Check not colliding */
     cube_po0->set_angular_velocity(point_t(0.1, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(cube_po0, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(cube_po0, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(t == 10.0); 
     delete manifold_a;
     delete manifold_b;
@@ -1091,7 +1091,7 @@ BOOST_FIXTURE_TEST_CASE( self_collision_conservative_resolve_collisions_test, ph
     mock_force *const mf = new mock_force(point_t(0.0, 0.0, 0.0), point_t(0.1, 0.0, 0.0), 1.0);
     cube_po0->register_force(mf);
     cube_po0->set_angular_velocity(point_t(0.0, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(cube_po0, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(cube_po0, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(t == 10.0); 
     delete manifold_a;
     delete manifold_b;
@@ -1105,7 +1105,7 @@ BOOST_FIXTURE_TEST_CASE( no_movement_resolve_collisions_no_collision_test, physi
     simplex *manifold_b;
 
     /* Check not colliding */
-    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(t == 10.0);
     delete manifold_a;
     delete manifold_b;
@@ -1119,7 +1119,7 @@ BOOST_FIXTURE_TEST_CASE( no_movement_resolve_collisions_sliding_collision_test, 
     simplex *manifold_b;
 
     /* Check colliding */
-    BOOST_CHECK(cube_po0->resolve_collisions(nearer_po, &manifold_a, &manifold_b, &t) == collision_t::SLIDING_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(nearer_po, &manifold_a, &manifold_b, &t, false) == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(t == 10.0);
     delete manifold_a;
     delete manifold_b;
@@ -1136,7 +1136,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_no_collision_test, p
     mock_force *const mf = new mock_force(point_t(5.0, 1.0, -2.0), point_t(0.0, 0.0, 0.0), 1.0);
     cube_po0->register_force(mf);
     cube_po0->set_velocity(point_t(10.0, -1.0, 2.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(fabs(t - 0.02) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1144,7 +1144,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_no_collision_test, p
     /* Starting together and heading away */
     mf->set_force(point_t(-5.0, -1.0, -2.0));
     cube_po0->set_velocity(point_t(-10.0, -1.0, 2.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(nearer_po, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(nearer_po, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(fabs(t - 0.02) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1153,7 +1153,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_no_collision_test, p
     /* Technically there may have been a collision, but who could see it */
     mf->set_force(point_t(-1000.0, 0.0, 0.0));
     cube_po0->set_velocity(point_t(0.5, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(fabs(t - 0.02) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1170,7 +1170,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_sliding_collision_te
     mock_force *const mf = new mock_force(point_t(0.0, 5.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0);
     cube_po0->register_force(mf);
     cube_po0->set_velocity(point_t(0.0, 10.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t) == collision_t::SLIDING_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t, false) == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(fabs(t - 0.02) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1178,7 +1178,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_sliding_collision_te
     /* Starting close and getting a little bit closer, but never penetrating */
     mf->set_force(point_t(5.0, 0.0, 0.0));
     cube_po0->set_velocity(point_t(10.0, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(t < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1187,7 +1187,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_sliding_collision_te
     t = 0.02;
     mf->set_force(point_t(5.0, 6.0, 8.0));
     cube_po0->set_velocity(point_t(10.0, 3.0, 7.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(t < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1196,7 +1196,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_sliding_collision_te
     t = 0.02;
     mf->set_force(point_t(1000.0, 0.0, 0.0));
     cube_po0->set_velocity(point_t(-0.5, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t) == collision_t::SLIDING_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t, false) == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(fabs(t - 0.001) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1205,7 +1205,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_sliding_collision_te
     t = 0.02;
     mf->set_force(point_t(0.0, 0.0, 0.0));
     cube_po0->set_velocity(point_t(1000.0, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(t < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1220,7 +1220,7 @@ BOOST_FIXTURE_TEST_CASE( one_translating_resolve_collisions_collision_test, phys
 
     /* Starting apart and heading together */
     cube_po0->set_velocity(point_t(0.0, 18.0, -0.5));
-    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(fabs(t - 0.999951) < result_tolerance); 
     delete manifold_a;
     delete manifold_b;
@@ -1242,7 +1242,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_no_collision_test, p
     far_po->register_force(mf1);
     cube_po0->set_velocity(point_t(10.0, -1.0, 2.0));
     far_po->set_velocity(point_t(-10.0, 1.0, 2.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(fabs(t - 0.02) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1252,7 +1252,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_no_collision_test, p
     cube_po0->set_velocity(point_t(-10.0, -1.0, 2.0));
     nearer_po->register_force(mf2);
     nearer_po->set_velocity(point_t(10.0, 1.0, 2.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(nearer_po, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(nearer_po, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(fabs(t - 0.02) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1263,7 +1263,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_no_collision_test, p
     cube_po0->set_velocity(point_t(0.5, 0.0, 0.0));
     hit_except_x_po->register_force(mf3);
     hit_except_x_po->set_velocity(point_t(-1.0, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(fabs(t - 0.02) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1284,7 +1284,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_sliding_collision_te
     hit_except_x_po->register_force(mf1);
     cube_po0->set_velocity(point_t(0.0, 10.0, 0.0));
     hit_except_x_po->set_velocity(point_t(0.0, 0.0 -7.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(fabs(t - 0.02) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1294,7 +1294,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_sliding_collision_te
     cube_po0->set_velocity(point_t(10.0, 0.0, 0.0));
     near_po->register_force(mf2);
     near_po->set_velocity(point_t(7.0, -10.7, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(t < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1305,7 +1305,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_sliding_collision_te
     cube_po0->set_velocity(point_t(10.0, 3.0, 7.0));
     mf2->set_force(point_t(4.0, -1.0, -6.5));
     near_po->set_velocity(point_t(-10.0, 1.0, 2.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(t < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1316,7 +1316,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_sliding_collision_te
     cube_po0->set_velocity(point_t(-0.5, 0.0, 0.0));
     mf1->set_force(point_t(-2000.0, 0.0, 0.0));
     hit_except_x_po->set_velocity(point_t(1.0, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t) == collision_t::SLIDING_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t, false) == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(fabs(t - 0.001) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1327,7 +1327,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_sliding_collision_te
     cube_po0->set_velocity(point_t(1000.0, 0.0, 0.0));
     mf1->set_force(point_t(0.0, 0.0, 0.0));
     hit_except_x_po->set_velocity(point_t(-2000.0, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(hit_except_x_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(t < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1347,7 +1347,7 @@ BOOST_FIXTURE_TEST_CASE( two_translating_resolve_collisions_collision_test, phys
     far_po->register_force(mf1);
     cube_po0->set_velocity(point_t(0.0, 8.0, -0.5));
     far_po->set_velocity(point_t(0.5, -10.0, -1.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(fabs(t - 0.999972) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1364,7 +1364,7 @@ BOOST_FIXTURE_TEST_CASE( translating_solver_resolve_collisions_test, physics_obj
     mock_force *const mf = new mock_force(point_t(0.0, -10.8, 0.0), point_t(0.0, 0.0, 0.0), 1.0);
     cube_po1->register_force(mf);
     cube_po1->set_velocity(point_t(0.0, -8.0, -0.5));
-    BOOST_CHECK(cube_po1->resolve_collisions(plane_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po1->resolve_collisions(plane_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(fabs(t - 1.27597) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1373,7 +1373,7 @@ BOOST_FIXTURE_TEST_CASE( translating_solver_resolve_collisions_test, physics_obj
     t = 5.0;
     mf->set_force(point_t(0.0, -10.7, 0.0));
     cube_po1->set_velocity(point_t(0.0, -8.0, -0.5));
-    BOOST_CHECK(cube_po1->resolve_collisions(plane_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po1->resolve_collisions(plane_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(fabs(t - 1.27972) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1382,7 +1382,7 @@ BOOST_FIXTURE_TEST_CASE( translating_solver_resolve_collisions_test, physics_obj
     t = 5.0;
     mf->set_force(point_t(0.0, -10.81, 0.0));
     cube_po1->set_velocity(point_t(0.0, -8.0, -0.5));
-    BOOST_CHECK(cube_po1->resolve_collisions(plane_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po1->resolve_collisions(plane_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(fabs(t - 1.27597) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1391,7 +1391,7 @@ BOOST_FIXTURE_TEST_CASE( translating_solver_resolve_collisions_test, physics_obj
     t = 5.0;
     mf->set_force(point_t(0.0, -9.82, 0.0));
     cube_po1->set_velocity(point_t(0.0, 0.0, 0.0));
-    BOOST_CHECK(cube_po1->resolve_collisions(plane_po, &manifold_a, &manifold_b, &t) == collision_t::COLLISION);
+    BOOST_CHECK(cube_po1->resolve_collisions(plane_po, &manifold_a, &manifold_b, &t, false) == collision_t::COLLISION);
     BOOST_CHECK(fabs(t - 1.96712) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1409,7 +1409,7 @@ BOOST_FIXTURE_TEST_CASE( one_rotating_resolve_collisions_test, physics_object_fi
     mock_force *const mf1 = new mock_force(point_t(0.0, 0.0, 0.0), point_t(-5.0, -1.0, -2.0), 1.0);
     far_po->register_force(mf0);
     far_po->set_angular_velocity(point_t(10.0, -1.0, 2.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(fabs(t - 0.02) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1417,7 +1417,7 @@ BOOST_FIXTURE_TEST_CASE( one_rotating_resolve_collisions_test, physics_object_fi
     /* Starting together and heading away */
     near_po->register_force(mf1);
     near_po->set_angular_velocity(point_t(0.0, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t) == collision_t::NO_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t, false) == collision_t::NO_COLLISION);
     BOOST_CHECK(fabs(t - 0.02) < result_tolerance);
     delete manifold_a;
     delete manifold_b;
@@ -1429,7 +1429,7 @@ BOOST_FIXTURE_TEST_CASE( one_rotating_resolve_collisions_test, physics_object_fi
     // near_po->set_velocity(point_t(0.0, -10.0, -7.8));
     // near_po->set_torque(point_t(1.0, 0.0, 0.0));
     // near_po->set_angular_velocity(point_t(5.0, 0.0, 0.0));
-    // BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t) == collision_t::SLIDING_COLLISION);
+    // BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t, false) == collision_t::SLIDING_COLLISION);
     // BOOST_CHECK(fabs(t - 0.02) < result_tolerance, t);
     // delete manifold_a;
     // delete manifold_b;
@@ -1438,7 +1438,7 @@ BOOST_FIXTURE_TEST_CASE( one_rotating_resolve_collisions_test, physics_object_fi
     mf1->set_torque(point_t(5.0, 0.0, 0.0));
     near_po->set_velocity(point_t(-1.0, 0.0, 0.0));
     near_po->set_angular_velocity(point_t(1.7, 0.0, 0.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t) == collision_t::SLIDING_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(near_po, &manifold_a, &manifold_b, &t, false) == collision_t::SLIDING_COLLISION);
     BOOST_CHECK(t == 0.0);
     delete manifold_a;
     delete manifold_b;
@@ -1448,7 +1448,7 @@ BOOST_FIXTURE_TEST_CASE( one_rotating_resolve_collisions_test, physics_object_fi
     cube_po0->set_velocity(point_t(0.0, 18.0, -0.5));
     mf1->set_torque(point_t(1.7, 8.4, 7.2));
     near_po->set_angular_velocity(point_t(-5.0, -1.0, -2.0));
-    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t) == collision_t::POSSIBLE_COLLISION);
+    BOOST_CHECK(cube_po0->resolve_collisions(far_po, &manifold_a, &manifold_b, &t, false) == collision_t::POSSIBLE_COLLISION);
     BOOST_CHECK(fabs(t - 0.980449) < result_tolerance);
     delete manifold_a;
     delete manifold_b;

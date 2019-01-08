@@ -1,9 +1,17 @@
 #include "common.h"
 #include "parser_common.h"
+#include "polygon_to_triangles.h"
 
 #include "camera.h"
 #include "obj_parser.h"
 #include "picture_functions.h"
+
+/* Shaders */
+#include "phong_shader.h"
+
+/* Texture mappers */
+#include "coloured_mapper_shader.h"
+#include "planar_mapper.h"
 
 
 namespace raptor_raytracer

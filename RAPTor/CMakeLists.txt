@@ -1,0 +1,6 @@
+add_subdirectory(convex_decomposition)
+add_subdirectory(networking)
+add_subdirectory(physics_engine)
+add_subdirectory(terrain_generator)
+add_subdirectory(common)
+add_subdirectory(raytracer)

@@ -4,39 +4,41 @@
 
 namespace raptor_physics
 {              
-bool gjk::find_minimum_distance(point_t *const dist, const point_t &fixed_rel_disp, const point_t &float_rel_disp, const quaternion_t &a_o, const quaternion_t &b_o)
+bool gjk::find_minimum_distance(point_t *const dist, const point_t &fixed_rel_disp, const point_t &float_rel_disp, const quaternion_t &oa, const quaternion_t &ob)
 {
-    METHOD_LOG;
-    BOOST_LOG_TRIVIAL(trace) << "Fixed relative displacement: " << fixed_rel_disp;
-    BOOST_LOG_TRIVIAL(trace) << "Floating relative displacement: " << float_rel_disp;
+    // METHOD_LOG;
+    // BOOST_LOG_TRIVIAL(trace) << "Fixed relative displacement: " << fixed_rel_disp;
+    // BOOST_LOG_TRIVIAL(trace) << "Floating relative displacement: " << float_rel_disp;
     
     /* Until converged */
     point_t dir;
     point_t c_space[4];
     int min_verts[4];
+    const quaternion_t oa_inv(-oa);
+    const quaternion_t ob_inv(-ob);
     while (true)
     {
         /* Sample c space at the vertices of the current simplices */
-        _a_simplex->compute_c_space(*_b_simplex, c_space, fixed_rel_disp, float_rel_disp);
+        _a_simplex->compute_c_space(*_b_simplex, c_space, oa, ob, fixed_rel_disp, float_rel_disp);
         
         /* Search c space for the closest point to the origin */
         /* Return the closest feature and a line to it from the origin */
         const int min_simplex = find_closest_feature_to_origin(c_space, min_verts, &dir);
-        BOOST_LOG_TRIVIAL(trace) << "Minimum simplex size: " << min_simplex;
-        BOOST_LOG_TRIVIAL(trace) << "Direction: " << dir;
+        // BOOST_LOG_TRIVIAL(trace) << "Minimum simplex size: " << min_simplex;
+        // BOOST_LOG_TRIVIAL(trace) << "Direction: " << dir;
         
         /* The origin is contained within the simplices */
         if ((min_simplex == 4) || (magnitude(dir) < raptor_physics::EPSILON))
         {
             (*dist) = point_t(0.0f, 0.0f, 0.0f);
-            BOOST_LOG_TRIVIAL(trace) << "Hit";
+            // BOOST_LOG_TRIVIAL(trace) << "Hit";
             return true;
         }
         
         /* Update the simplices */
-        const int a_sup = _a.find_support_vertex(a_o.rotate(-dir), a_o.rotate(float_rel_disp));
-        const int b_sup = _b.find_support_vertex(b_o.rotate( dir));
-        BOOST_LOG_TRIVIAL(trace) << "Support vertex search found: " << a_sup << " " << b_sup;
+        const int a_sup = _a.find_support_vertex(oa_inv.rotate(-dir), oa_inv.rotate(float_rel_disp));
+        const int b_sup = _b.find_support_vertex(ob_inv.rotate( dir));
+        // BOOST_LOG_TRIVIAL(trace) << "Support vertex search found: " << a_sup << " " << b_sup;
 
         const bool improve = _a_simplex->is_new_pair(*_b_simplex, a_sup, b_sup);
         _a_simplex->retain_vertices(min_verts, min_simplex);
@@ -44,7 +46,10 @@ bool gjk::find_minimum_distance(point_t *const dist, const point_t &fixed_rel_di
         if (!improve)
         {
             (*dist) = dir;
-            BOOST_LOG_TRIVIAL(trace) << "No hit, distance: " << (*dist);
+            // BOOST_LOG_TRIVIAL(trace) << "No hit, distance: " << (*dist);
+            
+            _a_simplex->distance_to_impact( dir);
+            _b_simplex->distance_to_impact(-dir);
             return false;
         }
         
@@ -55,7 +60,7 @@ bool gjk::find_minimum_distance(point_t *const dist, const point_t &fixed_rel_di
 
 int gjk::find_closest_feature_to_origin(const point_t *const c_space, int *const verts, point_t *const dir) const
 {
-    METHOD_LOG;
+    // METHOD_LOG;
     
     /* Find the closest point to the origin */
     unsigned int size = _a_simplex->size();

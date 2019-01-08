@@ -19,7 +19,7 @@ INCLUDE = $(LOCAL_INCLUDES) \
 	$(LIBARYS_PATH)/libtga-$(LIBTGA_VER)/include \
 	${BOOST_INCLUDE_PATH}
 LOCAL_INCLUDES = . $(RAPTOR_HOME)/raytracer/materials/ $(RAPTOR_HOME)/raytracer/spatial_sub_division/ \
-	$(RAPTOR_HOME)/raytracer/parsers/ $(RAPTOR_HOME)/raytracer/parsers/mgflib $(RAPTOR_HOME)/sdl_wrappers $(RAPTOR_HOME)/common/
+	$(RAPTOR_HOME)/parsers/ $(RAPTOR_HOME)/parsers/mgflib $(RAPTOR_HOME)/sdl_wrappers $(RAPTOR_HOME)/common/
 vpath %.c $(LOCAL_INCLUDES)
 vpath %.cc $(LOCAL_INCLUDES)
 

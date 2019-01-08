@@ -11,6 +11,13 @@
 #include "lwo_clip.h"
 #include "lwo_bloks.h"
 
+/* Texture mappers */
+#include "checker_board_mapper.h"
+#include "cubic_mapper.h"
+#include "cylindrical_mapper.h"
+#include "planar_mapper.h"
+#include "perlin_noise_3d_mapper.h"
+
 
 namespace raptor_raytracer
 {

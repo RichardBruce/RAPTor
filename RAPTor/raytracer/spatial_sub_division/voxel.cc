@@ -126,8 +126,8 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
     assert(i_idx < 3);
 
     /* Clasify points to the left or right of the split */
-    point_t l[2];
-    point_t r[2];
+    point_t l[3];
+    point_t r[3];
     int l_idx = 0;
     int r_idx = 0;
     if (dist_a >= 0.0f)

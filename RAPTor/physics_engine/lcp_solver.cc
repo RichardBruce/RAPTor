@@ -7,7 +7,7 @@ namespace raptor_physics
 {              
 lcp_solver squared_distance_solver(const matrix_3d &p0, const matrix_3d &p1, const std::vector<int> &e0, const std::vector<int> &e1)
 {
-    METHOD_LOG;
+    // METHOD_LOG;
 
     /* Calculate dimenstion and build the solver */
     const int total_pts = (e0.size() + e1.size()) / 3;
@@ -46,8 +46,8 @@ lcp_solver squared_distance_solver(const matrix_3d &p0, const matrix_3d &p1, con
         m[m_idx + 2] = norm.z;
 
         /* Calculate dot product to a vertex */
+        assert(q_idx < m_dim);
         q[q_idx++] = dot_product(p0.get_row(e0[i]), norm);
-
         m_idx += m_dim;
     }
 
@@ -62,32 +62,22 @@ lcp_solver squared_distance_solver(const matrix_3d &p0, const matrix_3d &p1, con
         m[m_idx + 5] = norm.z;
 
         /* Calculate dot product to a vertex */
+        assert(q_idx < m_dim);
         q[q_idx++] = dot_product(p1.get_row(e1[i]), norm);
-
         m_idx += m_dim;
     }
 
     /* Build transpose of a in m */
     for (int i = 6; i < m_dim; ++i)
     {
-        m[              i] = -m[(i * m_dim)     ];
-        m[     m_dim  + i] = -m[(i * m_dim) +  1];
-        m[(2 * m_dim) + i] = -m[(i * m_dim) +  2];
-        m[(3 * m_dim) + i] = -m[(i * m_dim) +  3];
-        m[(4 * m_dim) + i] = -m[(i * m_dim) +  4];
-        m[(5 * m_dim) + i] = -m[(i * m_dim) +  5];
-    }
-
-    BOOST_LOG_TRIVIAL(trace) << "lcp_solver input matrices: ";
-    for (int i = 0; i < m_dim; ++i)
-    {
-        std::stringstream post;
-        post << std::setw(4) << std::setprecision(2) << q[i];
-        BOOST_LOG_TRIVIAL(trace) << array_to_stream(&m[i], [](std::stringstream *s, const float m)
-            {
-                (*s) << std::setw(4) << std::setprecision(2) << m << "\t";
-                return s;
-            }, m_size, m_dim, post.str());
+        m[              i] = -m[(i * m_dim)    ];
+        m[     m_dim  + i] = -m[(i * m_dim) + 1];
+        m[(2 * m_dim) + i] = -m[(i * m_dim) + 2];
+        m[(3 * m_dim) + i] = -m[(i * m_dim) + 3];
+        m[(4 * m_dim) + i] = -m[(i * m_dim) + 4];
+        m[(5 * m_dim) + i] = -m[(i * m_dim) + 5];
+        assert(((5 * m_dim) + i) < m_size);
+        assert(((i * m_dim) + 5) < m_size);
     }
 
     return sol;

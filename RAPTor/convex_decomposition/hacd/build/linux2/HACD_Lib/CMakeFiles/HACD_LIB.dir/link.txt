@@ -1,2 +1,0 @@
-/usr/bin/ar cr libHACD_LIB.a  CMakeFiles/HACD_LIB.dir/src/hacdMeshDecimator.cpp.o CMakeFiles/HACD_LIB.dir/src/hacdGraph.cpp.o CMakeFiles/HACD_LIB.dir/src/hacdRaycastMesh.cpp.o CMakeFiles/HACD_LIB.dir/src/hacdHACD.cpp.o CMakeFiles/HACD_LIB.dir/src/hacdMicroAllocator.cpp.o CMakeFiles/HACD_LIB.dir/src/hacdManifoldMesh.cpp.o CMakeFiles/HACD_LIB.dir/src/hacdICHull.cpp.o
-/usr/bin/ranlib libHACD_LIB.a

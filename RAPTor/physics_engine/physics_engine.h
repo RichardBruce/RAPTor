@@ -257,7 +257,7 @@ class physics_engine : private boost::noncopyable
         /* Collision access functions */
         int number_of_collisions() const { return _collision_cache->size(); }
 
-        const collision_info *const get_collision(const int i, const int j) const
+        const collision_info<> *const get_collision(const int i, const int j) const
         {
             /* Try to find objects */
             auto obj_iter_i = _objects->find(i);
@@ -282,9 +282,9 @@ class physics_engine : private boost::noncopyable
     private :
         /* typedef for convinence */
         friend physics_object;
-        typedef std::pair<physics_object *, float> bound_point;
-        typedef std::unordered_map<int, physics_object*>::iterator obj_iter;
-        typedef std::unordered_map<int, physics_object*>::const_iterator const_obj_iter;
+        using bound_point       = std::pair<physics_object *, float>;
+        using obj_iter          = std::unordered_map<int, physics_object*>::iterator;
+        using const_obj_iter    = std::unordered_map<int, physics_object*>::const_iterator;
         
 
         /* Functor to check what sort of a collision a collision cache element represents */

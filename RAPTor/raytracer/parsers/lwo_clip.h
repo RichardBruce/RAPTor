@@ -9,6 +9,7 @@
 
 /* Raytracer headers */
 #include "picture_functions.h"
+#include "texture_mapper.h"
 
 
 namespace raptor_raytracer

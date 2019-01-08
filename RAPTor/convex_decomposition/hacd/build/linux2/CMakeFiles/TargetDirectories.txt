@@ -1,2 +1,0 @@
-/home/bruce/work/RAPTor/terrain_generator/hacd/build/linux2/HACD_Lib/CMakeFiles/HACD_LIB.dir
-/home/bruce/work/RAPTor/terrain_generator/hacd/build/linux2/test/CMakeFiles/testHACD.dir

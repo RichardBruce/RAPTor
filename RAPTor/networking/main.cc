@@ -1,66 +1,68 @@
 /* Standard headers */
-#include <string>
+#include <memory>
 
 /* Networking headers */
-#include "udp_server.h"
-#include "udp_client.h"
-#include "subscription_response.h"
+#include "serialisation.h"
+#include "msg_client.h"
+
+/* Display headers */
+#include "sdl_event_handler.h"
+
+/* Raytracer headers */
+#include "camera.h"
+#include "perlin_noise_3d_mapper.h"
+
+void my_terminate()
+{
+    std::cout << "Program about to terminate" << std::endl;
+    abort();
+}
+
+namespace
+{
+    /* Invoke set_terminate as part of global constant initialization */
+    static const bool SET_TERMINATE = std::set_terminate(my_terminate);
+}
 
 
+/* Main routine */
 int main(int argc, char **argv)
 {
-    bool run_as_client = false;
-    std::string host = "0.0.0.0";
-
-    /* Parse input arguements */
-    if (argc > 1)
+    /* Check number of arguements */
+    if (argc != 4)
     {
-        for (int i=1; i<argc; i++)
-        {
-            if ((argv[i][0] == '-') && (argv[i][1] == '-'))
-            {
-                argv[i]++;
-            }
-
-            if (strcmp(argv[i], "-client") == 0)
-            {
-                run_as_client = true;
-            }
-        }
+        std::cout << "Usage: " << std::endl;
+        std::cout << "./video_receiver <server address> <send port> <recv port>" << std::endl;
+        std::cout << "Example: ./video_receiver 0.0.0.0 7000 7001" << std::endl;
+        std::cout << std::endl;
+        return 1;
     }
 
-    if (run_as_client)
-    {
-        raptor_networking::udp_client client(host, raptor_networking::CONTROL_PORT);
-        client.try_subscribe_to_server();
+    /* Construct udp client */
+    const std::string addr(argv[1]);
+    const short send_port = boost::lexical_cast<short>(argv[2]);
+    const short recv_port = boost::lexical_cast<short>(argv[3]);
+    std::unique_ptr<raptor_networking::msg_client> client (new raptor_networking::msg_client("0.0.0.0", send_port, recv_port, 0));
 
-        std::string recv;
-        client.start_listening_for_refresh(&recv);
-        std::cout << "Received: " << recv << std::endl;
-
-        client.unsubscribe_from_server();
-    }
-    else
+    /* Attempt to connect to server */
+    std::cout << "Attempting to connect to server: " << addr << " " << send_port << " " << recv_port << std::endl;
+    if (!client->start("videocst", addr, 10000))
     {
-        raptor_networking::udp_server server(raptor_networking::MULTI_CAST_ADDR, raptor_networking::CONTROL_PORT, raptor_networking::MULTI_CAST_PORT);
-        server.start_listening_for_client(raptor_networking::console_ask_subscription_response());
-        server.start_listening_for_client(raptor_networking::console_ask_subscription_response());
-        std::cout << "sending multi cast" << std::endl;
-        sleep(1);
-        server.publish_unconfirmed("Multi cast hello world");
-        server.start_listening_for_client(raptor_networking::console_ask_subscription_response());
-        server.start_listening_for_client(raptor_networking::console_ask_subscription_response());
+        std::cout << "Connection with sever could not be established" << std::endl;
+        return 2;
     }
 
-    // raptor_networking::udp_connection conn;
-    // if (run_as_client)
-    // {
-    //     conn.send_and_confirm(host, port, "Hello world!", 50, 1000);
-    // }
-    // else
-    // {
-    //     conn.listen_and_confirm(raptor_networking::UDP_ACKNOWLEDGE, boost::lexical_cast<int>(port), 50);
-    // }
+    /* Drawing loop */
+    int do_next = 0;
+    std::unique_ptr<sdl_event_handler_base> cam_event_handler(client->event_handler());
+    while (do_next != 1)
+    {
+        /* Process user input */
+        do_next = cam_event_handler->wait_for_event();
 
+        /* TODO -- Send events back to the server */
+    }
+
+    /* msg_client DTOR will let the server know the client is exitting */
     return 0;
 }

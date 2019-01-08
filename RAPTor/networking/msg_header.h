@@ -2,6 +2,7 @@
 
 /* Standard headers */
 #include <array>
+#include <iostream>
 
 /* Boost headers */
 #include "boost/asio/ip/address.hpp"

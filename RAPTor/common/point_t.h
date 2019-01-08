@@ -8,6 +8,10 @@
 #include "simd.h"
 
 
+/* Forward declarations */
+template<class T>
+class point_ti;
+
 /* Class to hold a 3-D co-ordinate */
 class point_t
 {
@@ -15,14 +19,28 @@ class point_t
         float x;
         float y;
         float z;
-        point_t(const float x = 0.0, const float y = 0.0, const float z = 0.0) : x(x), y(y), z(z) { };
+
+        point_t(const float x = 0.0f, const float y = 0.0f, const float z = 0.0f) : x(x), y(y), z(z) {  };
+
+        int min_axis() const
+        {
+            return x < y ? (x < z ? 0 : 2) : (y < z ? 1 : 2);
+        }
+
+        int max_axis() const
+        {
+            return x < y ? (y < z ? 2 : 1) : (x < z ? 2 : 0);
+        }
 
         /* Element access */
-        inline       float &     operator[](const int i)                 {       float* a = &this->x; return a[i];                                  }
-        inline const float &     operator[](const int i) const           { const float* a = &this->x; return a[i];                                  }
+        inline       float &     operator[](const int i)                {       float* a = &this->x; return a[i];                                   }
+        inline const float &     operator[](const int i) const          { const float* a = &this->x; return a[i];                                   }
 
         /* Unary operators */
-        inline const point_t    operator-()   const                     { return point_t(-this->x, -this->y, -this->z);                             }
+        inline const point_t    operator-()     const                   { return point_t(-this->x, -this->y, -this->z);                             }
+
+        template<class T>
+        explicit operator point_ti<T>()         const;
 
         /* With Point_t */
         inline const bool       operator==(const point_t &rhs)  const   { return ((this->x == rhs.x) && (this->y == rhs.y) && (this->z == rhs.z));  }
@@ -36,13 +54,13 @@ class point_t
         inline const point_t&   operator/=(const point_t &rhs)          { this->x /= rhs.x; this->y /= rhs.y; this->z /= rhs.z; return *this;       }
 
         /* With float */
-        inline const bool       operator==(const float rhs)              { return ((this->x == rhs) && (this->y == rhs) && (this->z == rhs));        }
-        inline const bool       operator!=(const float rhs)              { return ((this->x != rhs) || (this->y != rhs) || (this->z != rhs));        }
+        inline const bool       operator==(const float rhs)             { return ((this->x == rhs) && (this->y == rhs) && (this->z == rhs));        }
+        inline const bool       operator!=(const float rhs)             { return ((this->x != rhs) || (this->y != rhs) || (this->z != rhs));        }
 
-        inline const point_t&   operator+=(const float rhs)              { this->x += rhs;   this->y += rhs;   this->z += rhs;   return *this;       }
-        inline const point_t&   operator-=(const float rhs)              { this->x -= rhs;   this->y -= rhs;   this->z -= rhs;   return *this;       }
-        inline const point_t&   operator*=(const float rhs)              { this->x *= rhs;   this->y *= rhs;   this->z *= rhs;   return *this;       }
-        inline const point_t&   operator/=(const float rhs)              { this->x /= rhs;   this->y /= rhs;   this->z /= rhs;   return *this;       }
+        inline const point_t&   operator+=(const float rhs)             { this->x += rhs;   this->y += rhs;   this->z += rhs;   return *this;       }
+        inline const point_t&   operator-=(const float rhs)             { this->x -= rhs;   this->y -= rhs;   this->z -= rhs;   return *this;       }
+        inline const point_t&   operator*=(const float rhs)             { this->x *= rhs;   this->y *= rhs;   this->z *= rhs;   return *this;       }
+        inline const point_t&   operator/=(const float rhs)             { this->x /= rhs;   this->y /= rhs;   this->z /= rhs;   return *this;       }
 
     private :
         friend class boost::serialization::access;
@@ -134,7 +152,7 @@ inline point_t max(const point_t& a, const point_t &b)
     ret.x = std::max(a.x, b.x);
     ret.y = std::max(a.y, b.y);
     ret.z = std::max(a.z, b.z);
-    
+
     return ret;
 }
 
@@ -145,7 +163,7 @@ inline point_t min(const point_t& a, const point_t &b)
     ret.x = std::min(a.x, b.x);
     ret.y = std::min(a.y, b.y);
     ret.z = std::min(a.z, b.z);
-    
+
     return ret;
 }
 
@@ -156,7 +174,7 @@ inline point_t max(const point_t& a, const float b)
     ret.x = std::max(a.x, b);
     ret.y = std::max(a.y, b);
     ret.z = std::max(a.z, b);
-    
+
     return ret;
 }
 
@@ -167,7 +185,7 @@ inline point_t min(const point_t& a, const float b)
     ret.x = std::min(a.x, b);
     ret.y = std::min(a.y, b);
     ret.z = std::min(a.z, b);
-    
+
     return ret;
 }
 
@@ -179,17 +197,17 @@ inline point_t max_magn(const point_t& a, const point_t &b)
     {
         ret.x = b.x;
     }
-    
+
     if (std::fabs(b.y) > std::fabs(a.y))
     {
         ret.y = b.y;
     }
-    
+
     if (std::fabs(b.z) > std::fabs(a.z))
     {
         ret.z = b.z;
     }
-    
+
     return ret;
 }
 
@@ -201,17 +219,17 @@ inline point_t min_magn(const point_t& a, const point_t &b)
     {
         ret.x = b.x;
     }
-    
+
     if (std::fabs(b.y) < std::fabs(a.y))
     {
         ret.y = b.y;
     }
-    
+
     if (std::fabs(b.z) < std::fabs(a.z))
     {
         ret.z = b.z;
     }
-    
+
     return ret;
 }
 
@@ -224,17 +242,17 @@ inline point_t max_magn(const point_t& a, const float b)
     {
         ret.x = abs_b;
     }
-    
+
     if (abs_b > std::fabs(a.y))
     {
         ret.y = abs_b;
     }
-    
+
     if (abs_b > std::fabs(a.z))
     {
         ret.z = abs_b;
     }
-    
+
     return ret;
 }
 
@@ -247,17 +265,17 @@ inline point_t min_magn(const point_t& a, const float b)
     {
         ret.x = abs_b;
     }
-    
+
     if (abs_b <std:: fabs(a.y))
     {
         ret.y = abs_b;
     }
-    
+
     if (abs_b < std::fabs(a.z))
     {
         ret.z = abs_b;
     }
-    
+
     return ret;
 }
 
@@ -437,7 +455,6 @@ inline void cross_product(const point_t &a, const point_t &b, point_t *const c)
     c->z = (a.x * b.y) - (a.y * b.x);
 }
 
-
 /*****************************************************
  Function to compute the cross product of 2 vectors.
  
@@ -447,7 +464,6 @@ inline point_t cross_product(const point_t &a, const point_t &b)
 {
     return point_t((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
 }
-
 
 /*****************************************************
  Function to compute the dot product of 2 vectors.
@@ -459,7 +475,6 @@ inline float dot_product(const point_t &a, const point_t &b)
     return ((a.x * b.x) + (a.y * b.y)+ (a.z * b.z));
 }
 
-
 /*****************************************************
  Function to normalise vectors.
  
@@ -468,7 +483,7 @@ inline float dot_product(const point_t &a, const point_t &b)
 inline void normalise(point_t *const a)
 {
 #ifdef EXACT_NORMALISE
-    const float dist = sqrt((a->x * a->x) + (a->y * a->y) + (a->z * a->z));
+    const float dist = std::sqrt((a->x * a->x) + (a->y * a->y) + (a->z * a->z));
     a->x /= dist;
     a->y /= dist;
     a->z /= dist;
@@ -482,11 +497,10 @@ inline void normalise(point_t *const a)
     return;
 }
 
-
 inline point_t normalise(point_t a)
 {
 #ifdef EXACT_NORMALISE
-    const float dist = sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
+    const float dist = std::sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
     a.x /= dist;
     a.y /= dist;
     a.z /= dist;
@@ -499,3 +513,236 @@ inline point_t normalise(point_t a)
 
     return a;
 }
+
+inline float tetrahedron_volume(const point_t &a, const point_t &b, const point_t &c, const point_t &d)
+{
+    return dot_product((a - d), cross_product((b - d), (c - d)));
+}
+
+inline const bool co_linear(const point_t &a, const point_t &b, const point_t &c)
+{
+    return ((c.z - a.z) * (b.y - a.y) - (b.z - a.z) * (c.y - a.y) == 0.0f) &&
+           ((b.z - a.z) * (c.x - a.x) - (b.x - a.x) * (c.z - a.z) == 0.0f) &&
+           ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) == 0.0f);
+}
+
+/* Class to hold a 3-D integer co-ordinate */
+template<class T = int>
+class point_ti
+{
+    public :
+        T x;
+        T y;
+        T z;
+        point_ti(const T x = 0, const T y = 0, const T z = 0) : x(x), y(y), z(z) { };
+ 
+        /* Element access */
+        inline       T &            operator[](const T i)                   {       T* a = &this->x; return a[i];                                       }
+        inline const T &            operator[](const T i) const             { const T* a = &this->x; return a[i];                                       }
+
+        /* Unary operators */
+        inline const point_ti   operator-()                         const   { return point_ti<T>(-this->x, -this->y, -this->z);                         }
+        explicit operator point_t()                                 const;
+
+        /* With Point_t */
+        inline const bool           operator==(const point_ti &rhs) const   { return ((this->x == rhs.x) && (this->y == rhs.y) && (this->z == rhs.z));  }
+        inline const bool           operator!=(const point_ti &rhs) const   { return ((this->x != rhs.x) || (this->y != rhs.y) || (this->z != rhs.z));  }
+        inline const bool           operator<(const point_ti &rhs)  const   { return ((this->x <  rhs.x) && (this->y <  rhs.y) && (this->z <  rhs.z));  }
+        inline const bool           operator>(const point_ti &rhs)  const   { return ((this->x >  rhs.x) && (this->y >  rhs.y) && (this->z >  rhs.z));  }
+        inline const bool           operator<=(const point_ti &rhs) const   { return ((this->x <= rhs.x) && (this->y <= rhs.y) && (this->z <= rhs.z));  }
+        inline const bool           operator>=(const point_ti &rhs) const   { return ((this->x >= rhs.x) && (this->y >= rhs.y) && (this->z >= rhs.z));  }
+
+        inline const point_ti<T>&   operator+=(const point_ti &rhs)         { this->x += rhs.x; this->y += rhs.y; this->z += rhs.z; return *this;       }
+        inline const point_ti<T>&   operator-=(const point_ti &rhs)         { this->x -= rhs.x; this->y -= rhs.y; this->z -= rhs.z; return *this;       }
+        inline const point_ti<T>&   operator*=(const point_ti &rhs)         { this->x *= rhs.x; this->y *= rhs.y; this->z *= rhs.z; return *this;       }
+        inline const point_ti<T>&   operator/=(const point_ti &rhs)         { this->x /= rhs.x; this->y /= rhs.y; this->z /= rhs.z; return *this;       }
+
+        /* With int */
+        inline const bool           operator==(const T rhs)                 { return ((this->x == rhs) && (this->y == rhs) && (this->z == rhs));        }
+        inline const bool           operator!=(const T rhs)                 { return ((this->x != rhs) || (this->y != rhs) || (this->z != rhs));        }
+
+        inline const point_ti<T>&   operator+=(const T rhs)                 { this->x += rhs;   this->y += rhs;   this->z += rhs;   return *this;       }
+        inline const point_ti<T>&   operator-=(const T rhs)                 { this->x -= rhs;   this->y -= rhs;   this->z -= rhs;   return *this;       }
+        inline const point_ti<T>&   operator*=(const T rhs)                 { this->x *= rhs;   this->y *= rhs;   this->z *= rhs;   return *this;       }
+        inline const point_ti<T>&   operator/=(const T rhs)                 { this->x /= rhs;   this->y /= rhs;   this->z /= rhs;   return *this;       }
+
+    private :
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_NVP(x);
+            ar & BOOST_SERIALIZATION_NVP(y);
+            ar & BOOST_SERIALIZATION_NVP(z);
+        }
+};
+
+/* Degugging */
+template<class T>
+inline std::ostream& operator<<(std::ostream &os, const point_ti<T> &p)
+{
+    return os << p.x << ", " << p.y << ", " << p.z;
+}
+
+/* Binary operators */
+template<class T>
+inline const point_ti<T> operator+(const point_ti<T> &lhs, const int rhs)
+{
+   return point_ti<T>(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs);
+}
+
+template<class T>
+inline const point_ti<T> operator-(const point_ti<T> &lhs, const int rhs)
+{
+   return point_ti<T>(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs);
+}
+
+template<class T>
+inline const point_ti<T> operator*(const point_ti<T> &lhs, const int rhs)
+{
+   return point_ti<T>(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs);
+}
+
+template<class T>
+inline const point_ti<T> operator/(const point_ti<T> &lhs, const int rhs)
+{
+   return point_ti<T>(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs);
+}
+
+template<class T>
+inline const point_ti<T> operator+(const point_ti<T> &lhs, const point_ti<T> &rhs)
+{
+   return point_ti<T>(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
+}
+
+template<class T>
+inline const point_ti<T> operator-(const point_ti<T> &lhs, const point_ti<T> &rhs)
+{
+   return point_ti<T>(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+}
+
+template<class T>
+inline const point_ti<T> operator*(const point_ti<T> &lhs, const point_ti<T> &rhs)
+{
+   return point_ti<T>(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z);
+}
+
+template<class T>
+inline const point_ti<T> operator/(const point_ti<T> &lhs, const point_ti<T> &rhs)
+{
+   return point_ti<T>(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z);
+}
+
+template<class T>
+inline const point_ti<T> operator+(const int lhs, const point_ti<T> &rhs)
+{
+   return point_ti<T>(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z);
+}
+
+template<class T>
+inline const point_ti<T> operator-(const int lhs, const point_ti<T> &rhs)
+{
+   return point_ti<T>(lhs - rhs.x, lhs - rhs.y, lhs - rhs.z);
+}
+
+template<class T>
+inline const point_ti<T> operator*(const int lhs, const point_ti<T> &rhs)
+{
+   return point_ti<T>(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z);
+}
+
+template<class T>
+inline const point_ti<T> operator/(const int lhs, const point_ti<T> &rhs)
+{
+   return point_ti<T>(lhs / rhs.x, lhs / rhs.y, lhs / rhs.z);
+}
+
+
+/* Other useful functions */
+template<class T>
+inline point_ti<T> max(const point_ti<T>& a, const point_ti<T> &b)
+{
+    point_ti<T> ret;
+    ret.x = std::max(a.x, b.x);
+    ret.y = std::max(a.y, b.y);
+    ret.z = std::max(a.z, b.z);
+    
+    return ret;
+}
+
+template<class T>
+inline point_ti<T> min(const point_ti<T>& a, const point_ti<T> &b)
+{
+    point_ti<T> ret;
+    ret.x = std::min(a.x, b.x);
+    ret.y = std::min(a.y, b.y);
+    ret.z = std::min(a.z, b.z);
+    
+    return ret;
+}
+
+template<class T>
+inline point_ti<T> max(const point_ti<T>& a, const int b)
+{
+    point_ti<T> ret;
+    ret.x = std::max(a.x, b);
+    ret.y = std::max(a.y, b);
+    ret.z = std::max(a.z, b);
+    
+    return ret;
+}
+
+template<class T>
+inline point_ti<T> min(const point_ti<T>& a, const int b)
+{
+    point_ti<T> ret;
+    ret.x = std::min(a.x, b);
+    ret.y = std::min(a.y, b);
+    ret.z = std::min(a.z, b);
+    
+    return ret;
+}
+
+template<class T>
+point_ti<T> normalise(point_ti<T> a, const T scale)
+{
+    const T dist = scale / std::sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
+    a.x *= dist;
+    a.y *= dist;
+    a.z *= dist;
+
+    return a;
+}
+
+template<class T>
+inline point_ti<T> cross_product(const point_ti<T> &a, const point_ti<T> &b)
+{
+    return point_ti<T>((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
+}
+
+template<class T>
+inline T dot_product(const point_ti<T> &a, const point_ti<T> &b)
+{
+    return ((a.x * b.x) + (a.y * b.y) + (a.z * b.z));
+}
+
+template<class T>
+inline T tetrahedron_volume(const point_ti<T> &a, const point_ti<T> &b, const point_ti<T> &c, const point_ti<T> &d)
+{
+    return dot_product((a - d), cross_product((b - d), (c - d)));
+}
+
+template<class T>
+inline const bool co_linear(const point_ti<T> &a, const point_ti<T> &b, const point_ti<T> &c)
+{
+    return ((c.z - a.z) * (b.y - a.y) - (b.z - a.z) * (c.y - a.y) == 0) &&
+           ((b.z - a.z) * (c.x - a.x) - (b.x - a.x) * (c.z - a.z) == 0) &&
+           ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) == 0);
+}
+
+/* Conversions */
+template<class T>
+inline point_ti<T>::operator point_t()   const   { return point_t(x, y, z);     }
+template<class T>
+inline point_t::operator point_ti<T>()   const   { return point_ti<T>(x, y, z); }

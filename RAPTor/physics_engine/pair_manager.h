@@ -7,6 +7,7 @@
 #include "boost/functional/hash.hpp"
 
 /* Physics headers */
+#include "physics_common.h"
 #include "physics_object.h"
 
 
@@ -25,16 +26,6 @@ inline void sort(const physics_object *& id0, const physics_object *& id1)
 inline bool is_different_pair(const contents& p, const physics_object *id0, const physics_object *id1)
 {
     return (id0 != p.first) | (id1 != p.second);
-}
-
-inline unsigned int next_power_of_two(unsigned int x)
-{
-    x |= (x >> 1);
-    x |= (x >> 2);
-    x |= (x >> 4);
-    x |= (x >> 8);
-    x |= (x >> 16);
-    return x + 1;
 }
 
 const unsigned int INVALID_ID = 0xffffffff;

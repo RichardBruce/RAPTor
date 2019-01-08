@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "parser_common.h"
+#include "polygon_to_triangles.h"
 
 
 namespace raptor_raytracer

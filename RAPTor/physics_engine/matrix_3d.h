@@ -67,23 +67,6 @@ class matrix_3d : private boost::noncopyable
             return true;
         }
 
-        /* Find the maximum and minimum values in each column. */
-        const matrix_3d& get_extremities(point_t *const hi, point_t *const lo) const
-        {
-            /* Initialise to the first data point */
-            *hi = _data[0];
-            *lo = _data[0];
-            
-            /* Loop finding extremities */
-            for (unsigned int i = 1; i < _data.size(); i++)
-            {
-                *hi = max(*hi, _data[i]);
-                *lo = min(*lo, _data[i]);
-            }
-            
-            return *this;
-        }
-        
         const point_t& get_row(const int i) const
         {
             return _data[i];
