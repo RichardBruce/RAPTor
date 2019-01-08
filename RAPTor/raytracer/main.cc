@@ -18,6 +18,7 @@
 #include "sdl_wrapper.h"
 #include "sdl_event_handler.h"
 #include "sdl_event_handler_factory.h"
+#include "raytracer_event_handler_factory.h"
 
 
 /*****************************************************
@@ -722,12 +723,14 @@ int main (int argc, char **argv)
 
         /* Run until exitted */
         int do_next = 0;
-        std::unique_ptr<sdl_event_handler_base> cam_event_handler(get_camera_event_handler(cam, output_file, jpg_quality, image_format));
+        auto handler_map = get_camera_event_handler(cam);
+        append_raytracer_camera_event_handler(handler_map, cam, output_file, jpg_quality, image_format);
+        sdl_event_handler cam_event_handler(handler_map);
         std::unique_ptr<unsigned char[]> screen_data(new unsigned char [cam->x_resolution() * cam->y_resolution() * 3]);
-        while(do_next != 1) 
+        while (do_next != 1) 
         {
             /* Poll for user input */
-            do_next = cam_event_handler->process_events();
+            do_next = cam_event_handler.process_events();
             
             /* Draw if required */
             if (do_next == 0)

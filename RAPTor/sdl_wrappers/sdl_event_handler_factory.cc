@@ -1,151 +1,118 @@
 /* Standard headers */
+#include <cmath>
 #include <map>
 #include <string>
 
 /* Common headers */
-#include "common.h"
+#include "base_camera.h"
 
 /* Event handlers */
 #include "SDL.h"
 #include "sdl_event_handler.h"
 #include "sdl_event_handler_factory.h"
 
-/* Local headers */
-#include "camera.h"
-#include "common.h"
 
-using raptor_raytracer::camera;
-using raptor_raytracer::image_format_t;
-using raptor_raytracer::tone_mapping_mode_t;
+// using raptor_raytracer::camera;
+// using raptor_raytracer::image_format_t;
+// using raptor_raytracer::tone_mapping_mode_t;
 
 /* Function to create an handler for the camera mappings of SDL_Keycode */
 /*  cam is the camera that will be updated. ownership is not taken of the camera */
 /*  a pointer to an sdl_event_handler<camera> is returned */
-sdl_event_handler<camera>* get_camera_event_handler(camera *const cam, const std::string &output_file, const int jpg_quality, const image_format_t image_format)
+std::map<SDL_Keycode, sdl_event_handler::key_handler_function>* get_camera_event_handler(base_camera *const cam)
 {
-    typedef std::function<int (const SDL_Keycode, camera*)> handler_function;
+    using handler_function = sdl_event_handler::key_handler_function;
 
     std::map<SDL_Keycode, handler_function> *handler_map = new std::map<SDL_Keycode, handler_function>({
-        { SDLK_KP_PLUS, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_KP_PLUS, [cam](const SDL_Keycode key, const float)
             {
-                c->speed_up(); return -1;
+                cam->speed_up(); return -1;
             }
         },
-        { SDLK_KP_MINUS, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_KP_MINUS, [cam](const SDL_Keycode key, const float)
             {
-                c->slow_down(); return -1;
+                cam->slow_down(); return -1;
             }
         },
-        { SDLK_ESCAPE, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_ESCAPE, [cam](const SDL_Keycode key, const float)
             {
                 return 1;
             }
         },
-        { SDLK_q, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_q, [cam](const SDL_Keycode key, const float)
             {
                 return 1;
             }
         },
         /* Rotation */
-        { SDLK_UP, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_UP, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->tilt( 0.01f * PI); return 0;
+                cam->tilt( 0.01f * delta_time * M_PI); return 0;
             }
         },
-        { SDLK_DOWN, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_DOWN, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->tilt(-0.01f * PI); return 0;
+                cam->tilt(-0.01f * delta_time * M_PI); return 0;
             }
         },
-        { SDLK_RIGHT, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_RIGHT, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->pan( 0.01f * PI); return 0;
+                cam->pan( 0.01f * delta_time * M_PI); return 0;
             }
         },
-        { SDLK_LEFT, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_LEFT, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->pan(-0.01f * PI); return 0;
+                cam->pan(-0.01f * delta_time * M_PI); return 0;
             }
         },
-        { SDLK_PAGEDOWN, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_PAGEDOWN, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->roll( 0.01f * PI); return 0;
+                cam->roll( 0.01f * delta_time * M_PI); return 0;
             }
         },
-        { SDLK_PAGEUP, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_PAGEUP, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->roll(-0.01f * PI); return 0;
+                cam->roll(-0.01f * delta_time * M_PI); return 0;
             }
         },
         /* Movement */
-        { SDLK_SPACE, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_SPACE, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->move_up(); return 0;
+                cam->move_up(delta_time); return 0;
             }
         },
-        { SDLK_LCTRL, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_LCTRL, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->move_up(-1.0); return 0;
+                cam->move_up(-delta_time); return 0;
             }
         },
-        { SDLK_a, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_a, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->move_right(-1.0); return 0;
+                cam->move_right(-delta_time); return 0;
             }
         },
-        { SDLK_d, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_d, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->move_right(); return 0;
+                cam->move_right(delta_time); return 0;
             }
         },
-        { SDLK_s, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_s, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->move_forward(-1.0); return 0;
+                cam->move_forward(-delta_time); return 0;
             }
         },
-        { SDLK_w, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_w, [cam](const SDL_Keycode key, const float delta_time)
             {
-                c->move_forward(); return 0;
+                cam->move_forward(delta_time); return 0;
             }
         },
         /* Print the angle and position of the camera */
-        { SDLK_p, [](const SDL_Keycode key, camera* c) -> int
+        { SDLK_p, [cam](const SDL_Keycode key, const float)
             {
-                c->print_position_data(); return 0;
-            }
-        },
-        { SDLK_f, [&output_file, jpg_quality, image_format](const SDL_Keycode key, camera* c) -> int
-            {
-                static unsigned int snapshot_nr = 0;
-                std::ostringstream file_name(std::ostringstream::out);
-
-                /* Tone map */
-                c->tone_map(tone_mapping_mode_t::local_human_histogram);
-                
-                /* Output image */
-                switch (image_format)
-                {
-                    case image_format_t::tga :
-                        file_name << output_file << "_" << snapshot_nr++ << ".tga";
-                        c->write_tga_file(file_name.str());
-                        break;
-                    case image_format_t::jpg :
-                        file_name << output_file << "_" << snapshot_nr++ << ".jpg";
-                        c->write_jpeg_file(file_name.str(), jpg_quality);
-                        break;
-                    case image_format_t::png :
-                        file_name << output_file << "_" << snapshot_nr++ << ".png";
-                        c->write_png_file(file_name.str());
-                        break;
-                    default :
-                        assert(!"Error unknown image format");
-                        break;
-                }
-
-                return 0;
+                cam->print_position_data(); return -1;
             }
         }
     });
 
-    return new sdl_event_handler<camera>(handler_map, cam);
+    return handler_map;
 }

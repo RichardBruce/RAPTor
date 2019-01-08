@@ -1,9 +1,11 @@
 #pragma once
 
 /* Boost headers */
-#include "boost/noncopyable.hpp"
 #include "boost/archive/text_oarchive.hpp"
 #include "boost/archive/text_iarchive.hpp"
+
+// Common headers
+#include "base_camera.h"
 
 /* Ray tracer headers */
 #include "point_t.h"
@@ -46,26 +48,28 @@ void write_png_file(const std::string &file_name, unsigned char *png_data, const
 void read_png_file(const std::string &file_name, unsigned char *png_data, unsigned int *const x, unsigned int *const y);
 
 /* Class representing a camera, shouldn't be copied */
-class camera : private boost::noncopyable
+class camera : public base_camera
 {
     public :
-        camera(const point_t &c, const point_t &x, const point_t    &y, const point_t    &z, const ext_colour_t     &b, const     float w, 
-               const    float  h, const     float  t, const unsigned x_res, const unsigned y_res, const unsigned x_a_res = 1, const unsigned y_a_res = 1) :
+        camera(const point_t &c, const point_t &x, const point_t &y, const point_t &z, const ext_colour_t &b, const float w, 
+               const float h, const float t, const unsigned x_res, const unsigned y_res, const unsigned x_a_res = 1, const unsigned y_a_res = 1) :
+                base_camera(c, x, y, z, 1.0f),
                 tm(nullptr), image(new ext_colour_t [ (x_res * x_a_res) * (y_res * y_a_res) ]), scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), temporal_glare_filter(nullptr),
-                u(point_t(0.0f, 0.0f, 0.0f)), l(point_t(0.0f, 0.0f, 0.0f)), c(c), x(x), y(y), z(z), b(b), x_m(-w), y_m(-h), x_inc((w * 2.0f)/static_cast<float>(x_res * x_a_res)), y_inc((h * 2.0f)/static_cast<float>(y_res * y_a_res)), 
+                u(point_t(0.0f, 0.0f, 0.0f)), l(point_t(0.0f, 0.0f, 0.0f)), b(b), x_m(-w), y_m(-h), x_inc((w * 2.0f)/static_cast<float>(x_res * x_a_res)), y_inc((h * 2.0f)/static_cast<float>(y_res * y_a_res)), 
                 t(t), x_res(x_res * x_a_res), y_res(y_res * y_a_res), out_x_res(x_res), out_y_res(y_res), r_vec(point_t(0.0, 0.0, 0.0)), r_angle(0.0),
-                r_pivot(point_t(0.0, 0.0, 0.0)), speed(1.0), time_step(0.0), adatption_level(0.0)
+                r_pivot(point_t(0.0, 0.0, 0.0)), time_step(0.0), adatption_level(0.0)
         { };
 
         camera(const std::vector<texture_mapper *>  * const tm, const point_t &u, const point_t &l, const point_t &c, 
                const point_t &x, const point_t    &y, const point_t    &z, const ext_colour_t     &b, const     float w, 
                const float  h, const     float  t, const unsigned x_res, const unsigned y_res, 
                const point_t &r_vec = point_t(0.0, 0.0, 0.0), const float r_angle = 0.0, const point_t &r_pivot = point_t(0.0, 0.0, 0.0),
-               const unsigned  x_a_res = 1, const unsigned y_a_res = 1, const float speed = 1.0, const float time_step = 0.0)
-            : tm(tm), image(new ext_colour_t [ (x_res * x_a_res) * (y_res * y_a_res) ]), scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), temporal_glare_filter(nullptr),
-            u(u), l(l), c(c), x(x), y(y), z(z), b(b), x_m(-w), y_m(-h), x_inc((w * 2.0f)/static_cast<float>(x_res * x_a_res)), y_inc((h * 2.0f)/static_cast<float>(y_res * y_a_res)), 
+               const unsigned  x_a_res = 1, const unsigned y_a_res = 1, const float speed = 1.0, const float time_step = 0.0) :
+            base_camera(c, x, y, z, speed),
+            tm(tm), image(new ext_colour_t [ (x_res * x_a_res) * (y_res * y_a_res) ]), scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), temporal_glare_filter(nullptr),
+            u(u), l(l), b(b), x_m(-w), y_m(-h), x_inc((w * 2.0f)/static_cast<float>(x_res * x_a_res)), y_inc((h * 2.0f)/static_cast<float>(y_res * y_a_res)), 
             t(t), x_res(x_res * x_a_res), y_res(y_res * y_a_res), out_x_res(x_res), out_y_res(y_res), r_vec(r_vec), r_angle(r_angle),
-            r_pivot(r_pivot), speed(speed), time_step(time_step), adatption_level(0.0)
+            r_pivot(r_pivot), time_step(time_step), adatption_level(0.0)
         {  };
 
         ~camera()
@@ -96,7 +100,6 @@ class camera : private boost::noncopyable
         };
         
         /* Access function */
-        point_t  camera_position()  const   { return this->c;           }
         unsigned x_resolution()     const   { return this->out_x_res;   }
         unsigned y_resolution()     const   { return this->out_y_res;   }
         unsigned x_number_of_rays() const   { return this->x_res;       }
@@ -108,86 +111,6 @@ class camera : private boost::noncopyable
             this->time_step = t;
             return *this;
         }
-
-        /* Speed control */
-        camera& speed_up()
-        {
-            this->speed *= 2.0f;
-            return *this;
-        }
-        
-        camera& slow_down()
-        {
-            this->speed /= 2.0f;
-            return *this;
-        }
-
-        /* Camera movement */
-        camera& move_to(const point_t &p)
-        {
-            this->c = p;
-            return *this;
-        }
-        
-        camera& move_forward(const float d = 1.0f)
-        {
-            this->c += this->z * speed * d;
-            return *this;
-        }
-        
-        camera& move_up(const float d = 1.0f)
-        {
-            this->c += this->y * speed * d;
-            return *this;
-        }
-        
-        camera& move_right(const float d = 1.0f)
-        {
-            this->c += this->x * speed * d;
-            return *this;
-        }
-        
-        /* Camera rotate */
-        camera& angle_to(const point_t &x, const point_t &y, const point_t &z)
-        {
-            this->x = x;
-            this->y = y;
-            this->z = z;
-            return *this;
-        }
-        
-        /* Rotate about y */
-        camera& pan(const float a)
-        {
-            rotate_about_origin(&this->x, &this->y, speed * a);
-            rotate_about_origin(&this->z, &this->y, speed * a);
-            return *this;
-        }
-    
-        /* Rotate about x */
-        camera& tilt(const float a)
-        {
-            rotate_about_origin(&this->y, &this->x, speed * a);
-            rotate_about_origin(&this->z, &this->x, speed * a);
-            return *this;
-        }
-
-        /* Rotate about z */
-        camera& roll(const float a)
-        {
-            rotate_about_origin(&this->x, &this->z, speed * a);
-            rotate_about_origin(&this->y, &this->z, speed * a);
-            return *this;
-        }
-        
-        /* Rotate about an arbitary axis */
-        camera& rotate_about(const point_t &v, const float a)
-        {
-            rotate_about_origin(&this->x, &v, a);
-            rotate_about_origin(&this->y, &v, a);
-            rotate_about_origin(&this->z, &v, a);
-            return *this;
-        }
         
         /* Pixel to co-ordinate conversion */
         point_t pixel_to_co_ordinate(const int x, const int y, const int a_x = 0, const int a_y = 0) const
@@ -197,15 +120,14 @@ class camera : private boost::noncopyable
             const float x_t = (static_cast<float>(x) * x_inc) + x_m;
             const float y_t = (static_cast<float>(y) * y_inc) + y_m;
             
-            return (this->x * x_t) + (this->y * y_t) + (this->z * this->t);
+            return (x_axis() * x_t) + (y_axis() * y_t) + (z_axis() * this->t);
         }
 
         /* Convert a line from the origin into a pixel address */
         inline bool direction_to_pixel(const point_t &d, float *xy) const
         {
             /* Find the intersection the the line from the origin and the image plane */
-            const float n_dot_d      = dot_product(this->z, d);
-            //const float n_dot_dist   = dot_product(this->z, (this->z * this->t));
+            const float n_dot_d      = dot_product(z_axis(), d);
             
             /* Direction perphendicular to the image plane */
             if (n_dot_d == 0.0f)
@@ -216,11 +138,11 @@ class camera : private boost::noncopyable
             const point_t hit_point = d * (this->t / n_dot_d);
             
             /* Convert the intersection pont to a co-ordinate */
-            const point_t plane_centre = this->z * t;
+            const point_t plane_centre = z_axis() * t;
             const point_t diff = hit_point - plane_centre;
             
-            xy[0] = (dot_product(this->x, diff) - this->x_m) / this->x_inc;
-            xy[1] = (dot_product(this->y, diff) - this->y_m) / this->y_inc;
+            xy[0] = (dot_product(x_axis(), diff) - this->x_m) / this->x_inc;
+            xy[1] = (dot_product(y_axis(), diff) - this->y_m) / this->y_inc;
             
             return ((xy[0] <= this->x_res) && (xy[0] >= 0.0f) && 
                     (xy[1] <= this->y_res) && (xy[1] >= 0.0f));
@@ -250,17 +172,17 @@ class camera : private boost::noncopyable
                 vfp_t vx_t((vx * vfp_t(x_inc)) + vfp_t(this->x_m));
                 vfp_t vy_t((vy * vfp_t(y_inc)) + vfp_t(this->y_m));
 
-                vfp_t vd_x(vfp_t(this->x.x) * vx_t);
-                vfp_t vd_y(vfp_t(this->x.y) * vx_t);
-                vfp_t vd_z(vfp_t(this->x.z) * vx_t);
+                vfp_t vd_x(vfp_t(x_axis().x) * vx_t);
+                vfp_t vd_y(vfp_t(x_axis().y) * vx_t);
+                vfp_t vd_z(vfp_t(x_axis().z) * vx_t);
              
-                vd_x += vfp_t(this->y.x) * vy_t;
-                vd_y += vfp_t(this->y.y) * vy_t;
-                vd_z += vfp_t(this->y.z) * vy_t;
+                vd_x += vfp_t(y_axis().x) * vy_t;
+                vd_y += vfp_t(y_axis().y) * vy_t;
+                vd_z += vfp_t(y_axis().z) * vy_t;
 
-                vd_x += vfp_t(this->z.x) * vfp_t(this->t);
-                vd_y += vfp_t(this->z.y) * vfp_t(this->t);
-                vd_z += vfp_t(this->z.z) * vfp_t(this->t);
+                vd_x += vfp_t(z_axis().x) * vfp_t(this->t);
+                vd_y += vfp_t(z_axis().y) * vfp_t(this->t);
+                vd_z += vfp_t(z_axis().z) * vfp_t(this->t);
              
                 /* Normalise */
                 vfp_t vec_len(inverse_sqrt((vd_x * vd_x) + (vd_y * vd_y) + (vd_z * vd_z)));
@@ -320,17 +242,7 @@ class camera : private boost::noncopyable
                 return c;
             }
         }
-        
-        /* Dump function */
-        void print_position_data() const
-        {
-            std::cout << "--cam " << this->c.x   << " "  << this->c.y << " " << this->c.z << std::endl;
-            std::cout << "--dx  " << this->x.x   << " "  << this->x.y << " " << this->x.z << std::endl;
-            std::cout << "--dy  " << this->y.x   << " "  << this->y.y << " " << this->y.z << std::endl;
-            std::cout << "--dz  " << this->z.x   << " "  << this->z.y << " " << this->z.z << std::endl;
-            std::cout << "speed " << this->speed                                          << std::endl;
-        }
-        
+
         /* Setting pixel colour */
         camera & set_pixel(const ext_colour_t &p, const int x, const int y)
         {
@@ -450,11 +362,11 @@ class camera : private boost::noncopyable
             {
                 ar & image[i];
             }
-            ar & c;
-            ar & x;
-            ar & y;
-            ar & z;
-            ar & speed;
+            // ar & c;
+            // ar & x;
+            // ar & y;
+            // ar & z;
+            // ar & speed;
             ar & time_step;
             ar & adatption_level;
         }
@@ -462,8 +374,9 @@ class camera : private boost::noncopyable
         camera(const std::vector<texture_mapper *>  *const tm, const point_t &u, const point_t &l, const ext_colour_t &b,
             const float x_m, const float y_m, const float x_inc, const float y_inc, const float t, 
             const unsigned x_res, const unsigned y_res, const unsigned out_x_res, const unsigned out_y_res, 
-            const point_t &r_vec, const float r_angle, const point_t &r_pivot)
-            : tm(tm), image(new ext_colour_t[x_res * y_res]), 
+            const point_t &r_vec, const float r_angle, const point_t &r_pivot) : 
+            base_camera(point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f),
+            tm(tm), image(new ext_colour_t[x_res * y_res]),
             scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), 
             temporal_glare_filter(nullptr), u(u), l(l), b(b), x_m(x_m), y_m(y_m), x_inc(x_inc), y_inc(y_inc), 
             t(t), x_res(x_res), y_res(y_res), out_x_res(out_x_res), out_y_res(out_y_res), r_vec(r_vec), 
@@ -588,9 +501,6 @@ class camera : private boost::noncopyable
         const point_t                                   u;                          /* Upper bounds of the sky box                                      */
         const point_t                                   l;                          /* Lower bounds of the sky box                                      */
         point_t                                         c;                          /* Camera position                                                  */
-        point_t                                         x;                          /* Horizontal axis                                                  */
-        point_t                                         y;                          /* Vertical axis                                                    */
-        point_t                                         z;                          /* Forward axis                                                     */
         const ext_colour_t                              b;                          /* Background colour                                                */
         const float                                     x_m;                        /* Minimum X co-ordinate                                            */
         const float                                     y_m;                        /* Minimum y co-ordinate                                            */
@@ -604,7 +514,6 @@ class camera : private boost::noncopyable
         const point_t                                   r_vec;                      /* Sky box rotation axis                                            */
         const float                                     r_angle;                    /* Sky box rotation                                                 */
         const point_t                                   r_pivot;                    /* Sky box pivot point                                              */
-        float                                           speed;                      /* Speed of movement                                                */
         float                                           time_step;                  /* Time step between last and current frame in seconds              */
         float                                           adatption_level;            /* Current light level that has been adapted to                     */
 };

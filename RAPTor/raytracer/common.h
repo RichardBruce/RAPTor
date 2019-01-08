@@ -21,26 +21,6 @@
 #endif
 
 
-/* Template for casting bits from one type to another */
-template<class T, class S>
-inline S bit_cast(const T t_in)
-{
-    assert(sizeof(T) == sizeof(S));
-
-    /* Create union of the types */
-    union
-    {
-        T t;
-        S s;
-    } cast_union;
-    
-    /* Input one type */
-    cast_union.t = t_in;
-    
-    /* And return the other */
-    return cast_union.s;
-}
-
 extern const float PI;
 
 namespace raptor_raytracer
@@ -134,16 +114,6 @@ namespace raptor_raytracer
 #endif
 
 /* SIMD numbers */
-/* The number of elements in the SIMD vetor */
-#ifndef SIMD_WIDTH
-#define SIMD_WIDTH              4
-#endif
-
-/* Log base 2 of the SIMD_WIDTH */
-#ifndef LOG2_SIMD_WIDTH
-#define LOG2_SIMD_WIDTH         2
-#endif
-
 #ifdef SIMD_PACKET_TRACING
 /* The maximum allowed number of SIMD vectors in a packet */
 /* Must be a power of 4, including 0 */

@@ -6,7 +6,7 @@ include Project.mk
 all:: raytracer libraytracer.a libraytracer.so
 
 # Link the object files to build the raytracer
-raytracer : $(CPP_OBJECTS) $(C_OBJECTS) $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib/libSDL2-2.0.so.0.2.1 $(LIBARYS_PATH)/tbb$(TBB_VER)/build/build_release/libtbb.so.2 $(LIBARYS_PATH)/tbb$(TBB_VER)/build/build_release/libtbbmalloc.so.2
+raytracer : $(CPP_OBJECTS) $(C_OBJECTS) $(LIBARYS_PATH)/SDL2-$(SDL_VER)/lib/libSDL2.so $(LIBARYS_PATH)/tbb$(TBB_VER)/build/build_release/libtbb.so.2 $(LIBARYS_PATH)/tbb$(TBB_VER)/build/build_release/libtbbmalloc.so.2
 	$(CPP) $(LD_OPT) -o $@ $(CPP_OBJECTS) $(C_OBJECTS) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBRARY))
 
 # Clean targets

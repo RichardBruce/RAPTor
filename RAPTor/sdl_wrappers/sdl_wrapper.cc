@@ -19,29 +19,29 @@ const int DEPTH      = 32;
 void sdl_clean_up(SDL_Window *const window, SDL_Renderer *const renderer, SDL_Texture *const texture, TTF_Font *const font)
 {
     /* TTF clean up */
-    if (font != NULL)
+    if (font != nullptr)
     {
         TTF_CloseFont(font);
         TTF_Quit();
     }
     
     /* SDL clean up */
-    if (texture != NULL)
+    if (texture != nullptr)
     {
         SDL_DestroyTexture(texture);
     }
 
-    if (renderer != NULL)
+    if (renderer != nullptr)
     {
         SDL_DestroyRenderer(renderer);
     }
 
-    if (window != NULL)
+    if (window != nullptr)
     {
         SDL_DestroyWindow(window);
     }
 
-    if ((texture != NULL) || (renderer != NULL) || (window != NULL))
+    if ((texture != nullptr) || (renderer != nullptr) || (window != nullptr))
     {
         SDL_Quit();
     }
@@ -55,8 +55,9 @@ void sdl_clean_up(SDL_Window *const window, SDL_Renderer *const renderer, SDL_Te
 /*  caption will be used as the window caption. */
 /*  x_res is the x resolution of the screen */
 /*  y_res is the y resolution of the screen */
+/*  flags are flags for window creation */
 /*  returns 0 if successfull, else an error code indicating where the error occurred */
-int sdl_set_up(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture, const std::string &caption, const int x_res, const int y_res)
+int sdl_set_up(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture, const std::string &caption, const int x_res, const int y_res, const int flags)
 {
     /* Initialise and lock the screen */
     if (SDL_Init(SDL_INIT_VIDEO) < 0 )
@@ -65,13 +66,27 @@ int sdl_set_up(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **textu
         return 1;
     }
    
-    if (!((*window) = SDL_CreateWindow(caption.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, x_res, y_res, 0)))
+    if (!((*window) = SDL_CreateWindow(caption.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, x_res, y_res, flags)))
     {
         std::cout << "Error: SDL create window failed with error: " << SDL_GetError() << std::endl;
         SDL_Quit();
         return 2;
     }
+
+    if (flags & SDL_WINDOW_VULKAN)
+    {
+        std::cout << "Vulkan set up complete" << std::endl;
+        return 0;
+    }
     
+    SDL_RendererInfo info;
+    std::cout << "Got " << SDL_GetNumRenderDrivers() << " render drivers" << std::endl;
+    for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
+    {
+        SDL_GetRenderDriverInfo(i, &info);
+        std::cout << "\t" << info.name << std::endl;
+    }
+
     if (!((*renderer) = SDL_CreateRenderer(*window, -1, 0)))
     {
         std::cout << "Error: SDL create renderer failed with error: " << SDL_GetError() << std::endl;
@@ -105,11 +120,12 @@ int sdl_set_up(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **textu
 /*  caption will be used as the window caption. */
 /*  x_res is the x resolution of the screen */
 /*  y_res is the y resolution of the screen */
+/*  flags are flags for window creation */
 /*  returns 0 if successfull, else an error code indicating where the error occurred */
-int sdl_set_up(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture, TTF_Font **font, const std::string &caption, const int x_res, const int y_res)
+int sdl_set_up(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture, TTF_Font **font, const std::string &caption, const int x_res, const int y_res, const int flags)
 {
     /* Initialise SDL and check error state */
-    const int sdl_status = sdl_set_up(window, renderer, texture, caption, x_res, y_res);
+    const int sdl_status = sdl_set_up(window, renderer, texture, caption, x_res, y_res, flags);
     if (sdl_status)
     {
         return sdl_status;
@@ -119,16 +135,16 @@ int sdl_set_up(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **textu
     if (TTF_Init() != 0)
     {
         std::cout << "Error: SDL TTF init failed with " << TTF_GetError() << std::endl;
-        sdl_clean_up(*window, *renderer, *texture, NULL);
+        sdl_clean_up(*window, *renderer, *texture, nullptr);
         return 5;
     }
     
     (*font) = TTF_OpenFont("FreeSans.ttf", 12);
-    if ((*font) == NULL)
+    if ((*font) == nullptr)
     {
         std::cout << "Error: Failed to open TTF font with " << TTF_GetError() << std::endl;
         TTF_Quit();
-        sdl_clean_up(*window, *renderer, *texture, NULL);
+        sdl_clean_up(*window, *renderer, *texture, nullptr);
         return 6;
     }
 
@@ -143,7 +159,7 @@ int draw_screen(SDL_Renderer *renderer, SDL_Texture *texture)
 {
     /* Write out the data */
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
     
     return 0;
@@ -158,12 +174,12 @@ int draw_screen(SDL_Renderer *renderer, SDL_Texture *texture, const unsigned cha
 {
     /* Get texture width */
     int w, h;
-    SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+    SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
 
     /* Write out the data */
-    SDL_UpdateTexture(texture, NULL, screen_data, w * 3);
+    SDL_UpdateTexture(texture, nullptr, screen_data, w * 3);
     SDL_RenderClear(renderer);
-    SDL_RenderCopyEx(renderer, texture, NULL, NULL, 0, NULL, SDL_FLIP_VERTICAL);
+    SDL_RenderCopyEx(renderer, texture, nullptr, nullptr, 0, nullptr, SDL_FLIP_VERTICAL);
     SDL_RenderPresent(renderer);
     
     return 0;
@@ -182,7 +198,7 @@ int draw_screen(SDL_Window *window, SDL_Renderer *renderer, SDL_Texture *texture
 
     const SDL_Color text_colour = { 255, 255, 255 };
     SDL_Surface *sdl_text = TTF_RenderText_Solid(font, text.c_str(), text_colour);
-    if (sdl_text == NULL)
+    if (sdl_text == nullptr)
     {
         std::cout << "Error: Failed to set text with " << TTF_GetError() << std::endl;
         sdl_clean_up(window, renderer, texture, font);
@@ -192,17 +208,17 @@ int draw_screen(SDL_Window *window, SDL_Renderer *renderer, SDL_Texture *texture
     int texW = 0;
     int texH = 0;
     SDL_Texture *ttf_texture = SDL_CreateTextureFromSurface(renderer, sdl_text);
-    SDL_QueryTexture(ttf_texture, NULL, NULL, &texW, &texH);
+    SDL_QueryTexture(ttf_texture, nullptr, nullptr, &texW, &texH);
     SDL_Rect dstrect = { 0, 0, texW, texH };
     
     /* Add the text */
-    SDL_RenderCopy(renderer, ttf_texture, NULL, &dstrect);
+    SDL_RenderCopy(renderer, ttf_texture, nullptr, &dstrect);
     SDL_RenderPresent(renderer);
 
     /* Clean up the text */
     SDL_FreeSurface(sdl_text);
     SDL_DestroyTexture(ttf_texture);
-    sdl_text = NULL;
+    sdl_text = nullptr;
     
     return 0;
 }

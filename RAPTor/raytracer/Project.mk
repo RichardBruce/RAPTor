@@ -1,7 +1,7 @@
 # Source
 SOURCE  = $(MAIN) $(TEXTURE) $(SSD) $(PARSER) $(MGF) #$(SHAPE)
 MAIN    = main.cc raytracer.cc common.cc ray.cc scene.cc sort.cc line.cc simd.cc packet_ray.cc camera.cc \
-	sdl_wrapper.cc sdl_event_handler_factory.cc
+	sdl_wrapper.cc sdl_event_handler_factory.cc raytracer_event_handler_factory.cc
 #SHAPE   = shape.cc line.cc sphere.cc cylinder.cc cone.cc torus.cc ring.cc
 SSD	 = kd_tree.cc kdt_builder.cc voxel.cc bih.cc bih_builder.cc bvh.cc bvh_builder.cc
 TEXTURE = picture_functions.cc phong_shader.cc cook_torrance_cxy.cc mandelbrot_shader.cc \
