@@ -3,4 +3,4 @@
 	url = git@github.com:RichardBruce/lib.git
 [submodule "dat"]
 	path = data
-	url = bruce@CootieKiller:/home/bruce/work/git/data.git
+	url = git@github.com:RichardBruce/data.git
