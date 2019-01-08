@@ -20,7 +20,6 @@ class euler_integrator
             return project_translation(f, i, &v1, v0, dt);
         }
 
-
         point_t project_translation(const aggregate_force &f, const inertia_tensor &i, point_t *const v1, const point_t &v0, const float dt) const
         {
             assert(dt >= 0.0f || !"Error: Negative time step");
@@ -37,13 +36,11 @@ class euler_integrator
             return (v0 + (*v1)) * (dt * 0.5f);
         }
 
-
         quaternion_t project_rotation(const aggregate_force &t, const inertia_tensor &i, const quaternion_t &o0, const point_t &w0, const float dt) const
         {
             point_t w1;
             return project_rotation(t, i, &w1, o0, w0, dt);
         }
-
 
         quaternion_t project_rotation(const aggregate_force &t, const inertia_tensor &i, point_t *const w1, const quaternion_t &o0, const point_t &w0, const float dt) const
         {
@@ -57,8 +54,8 @@ class euler_integrator
             /* Ve1ocity */
             /* v0 = U + (A * t) */
             (*w1) = w0 + (a * dt);
-            
-            /* Convert to quaternion rotation */    
+
+            /* Convert to quaternion rotation */
             const point_t apo_w((w0 + (*w1)) * 0.5f);
             const quaternion_t w_quat(0.5f * quaternion_t(0.0f, apo_w.x, apo_w.y, apo_w.z) * o0);
             return w_quat * dt;
