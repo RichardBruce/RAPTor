@@ -140,5 +140,22 @@ function(add_exe_and_libs headers source libs)
     install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_NAME}/bin)
 endfunction(add_exe_and_libs)
 
+function(add_shaders shaders)
+    foreach(SHADER ${shaders})
+        get_filename_component(FILE_NAME ${SHADER} NAME)
+        set(SPIRV "${PROJECT_BINARY_DIR}/${FILE_NAME}.spv")
+        add_custom_command(
+            OUTPUT ${SPIRV}
+            COMMAND glslangValidator -V ${CMAKE_CURRENT_SOURCE_DIR}/${SHADER} -o ${SPIRV}
+            DEPENDS ${SHADER}
+            VERBATIM)
+        list(APPEND SPIRV_BINARY_FILES ${SPIRV})
+    endforeach(SHADER)
+
+    add_custom_target(shaders_${PROJECT_NAME} DEPENDS ${SPIRV_BINARY_FILES})
+    add_dependencies(${PROJECT_NAME} shaders_${PROJECT_NAME})
+    install(FILES ${SPIRV_BINARY_FILES} DESTINATION ${PROJECT_NAME}/bin)
+endfunction(add_shaders)
+
 # Sub projects
 add_subdirectory(RAPTor)
