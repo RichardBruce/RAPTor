@@ -12,6 +12,10 @@
 template<class T>
 class point_ti;
 
+class point_t;
+const point_t operator-(const point_t &lhs, const point_t &rhs);
+float magnitude(const point_t &a);
+
 /* Class to hold a 3-D co-ordinate */
 class point_t
 {
@@ -30,6 +34,11 @@ class point_t
         int max_axis() const
         {
             return x < y ? (y < z ? 2 : 1) : (x < z ? 2 : 0);
+        }
+
+        bool close(const point_t &rhs, const float tolerance) const
+        {
+            return fabs(magnitude(*this - rhs)) < tolerance;
         }
 
         /* Element access */

@@ -150,16 +150,7 @@ namespace raptor_raytracer
 #define SPLIT_PACKET_DIVISOR    1
 #endif
 
-/* The number of elements in the SIMD vetor */
-#ifndef SIMD_WIDTH
-#define SIMD_WIDTH              1
-#endif
-
 #define PACKET_WIDTH            (unsigned)sqrt(MAXIMUM_PACKET_SIZE * SIMD_WIDTH)
-
-#ifndef LOG2_SIMD_WIDTH
-#define LOG2_SIMD_WIDTH         0
-#endif
 #endif  /* #ifdef SIMD_PACKET_TRACING */
 
 /* Primitive list to hold primitives */

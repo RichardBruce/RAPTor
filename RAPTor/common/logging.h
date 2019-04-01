@@ -1,5 +1,4 @@
-#ifndef __LOGGING_H__
-#define __LOGGING_H__
+#pragma once
 
 /* Standard headers */
 #include <numeric>
@@ -89,5 +88,3 @@ std::string array_to_stream(const T *const t, const Formatter &f, const int size
     return ss.str();
 }
 }; /* namespace raptor_physics */
-
-#endif /* #ifndef __LOGGING_H__ */
