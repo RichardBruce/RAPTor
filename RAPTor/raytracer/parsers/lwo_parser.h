@@ -1,5 +1,9 @@
 #pragma once
 
+/* Parser headers */
+#include "parser.h"
+
+/* Ray tracer headers */
 #include "material.h"
 #include "primitive_store.h"
 
@@ -31,12 +35,12 @@ inline void check_for_chunk(const char **const a, const char *const e, const int
 
 inline std::uint32_t parse_vx(const char **at)
 {
-    std::uint32_t idx = from_byte_stream<std::uint16_t>(at);
+    std::uint32_t idx = raptor_parsers::from_byte_stream<std::uint16_t>(at);
     if ((idx & 0xff00) == 0xff00)
     {
         idx &= 0x00ff;
         idx <<= 16;
-        idx += from_byte_stream<std::uint16_t>(at);
+        idx += raptor_parsers::from_byte_stream<std::uint16_t>(at);
     }
 
     return idx;

@@ -27,7 +27,7 @@ const char * cfg_next_statement(const char *c, const char *const end)
     c--;
     do
     {
-        find_next_line(&c);
+        raptor_parsers::find_next_line(&c);
     } while ((c < end) && ((c[0] == '#') || (c[0] == '\n')));
     
     return c;
@@ -72,7 +72,7 @@ void cfg_parser(
             break;
         }
 
-        const std::string statement(get_this_string(&at));
+        const std::string statement(raptor_parsers::get_this_string(&at));
         
         auto i = format.find(statement);
 //        cout << "parsing : " << statement << endl;
@@ -85,7 +85,7 @@ void cfg_parser(
         std::ifstream   input_stream;
         std::string     path;
         size_t          last_slash;
-        const std::string input_file(base_path + get_this_string(&at));
+        const std::string input_file(base_path + raptor_parsers::get_this_string(&at));
 //        cout << "path: " << input_file << endl;
         switch ((*i).second)
         {

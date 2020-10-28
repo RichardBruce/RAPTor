@@ -175,7 +175,7 @@ inline std::uint32_t find_surf_chunk(const char *p, const char **s, std::uint32_
     check_for_chunk(&p, "POLS", 4);
     
     /* Skip the POLS chunk */
-    std::uint32_t tmp = from_byte_stream<std::uint32_t>(&p);
+    std::uint32_t tmp = raptor_parsers::from_byte_stream<std::uint32_t>(&p);
     (*s) = p + tmp;
     
     /* Check the SURF chunk has been found */
@@ -208,6 +208,8 @@ inline mapper_type_t pick_shader(const char *const c)
         BOOST_LOG_TRIVIAL(error) << "Unknown texture: " << c;
         assert(false);
     }
+
+    return mapper_type_t::planar;
 }
 
 
@@ -232,7 +234,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
     while (i < surf_len)
     {
         tmp_ptr = (*ptr) + 4;
-        std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
+        std::uint16_t sec_len = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
         BOOST_LOG_TRIVIAL(trace) << "Parsing: " << *ptr << " with length " << sec_len;
         
         if ((current_info.shader != mapper_type_t::non) && (strncmp((*ptr + 1), "TEX", 3) == 0))
@@ -257,7 +259,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
             if (vkd == 0.0f)
             {
                 tmp_ptr = (*ptr) + 6;
-                vkd = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
+                vkd = static_cast<float>(raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
             }
             BOOST_LOG_TRIVIAL(trace) << "DIFF: " << vkd;
         }
@@ -266,7 +268,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         else if (strncmp((*ptr), "VDIF", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            vkd = from_byte_stream<float>(&tmp_ptr);
+            vkd = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "VDIF: " << vkd;
         }
         /* Integer percentage specular co-efficient */
@@ -275,7 +277,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
             if (vks == 0.0f)
             {
                 tmp_ptr = (*ptr) + 6;
-                vks = from_byte_stream<float>(&tmp_ptr) / 255.0f;
+                vks = raptor_parsers::from_byte_stream<float>(&tmp_ptr) / 255.0f;
             }
             BOOST_LOG_TRIVIAL(trace) << "SPEC: " << vks;
         }
@@ -284,13 +286,13 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         else if (strncmp((*ptr), "VSPC", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            vks = from_byte_stream<float>(&tmp_ptr);
+            vks = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "VSPC: " << vks;
         }
         else if (strncmp((*ptr), "GLOS", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            s = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr));
+            s = static_cast<float>(raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr));
             BOOST_LOG_TRIVIAL(trace) << "GLOS: " << s;
         }
         /* Integer percentage transmittance co-efficient */
@@ -299,7 +301,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
             if (vt == 0.0f)
             {
                 tmp_ptr = (*ptr) + 6;
-                vt = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
+                vt = static_cast<float>(raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
             }
             BOOST_LOG_TRIVIAL(trace) << "TRAN: " << vt;
         }
@@ -308,7 +310,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         else if (strncmp((*ptr), "VTRN", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            vt = from_byte_stream<float>(&tmp_ptr);
+            vt = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "VTRN: " << vt;
         }
         /* Integer percentage reflectance co-efficient */
@@ -317,7 +319,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
             if (vr == 0.0f)
             {
                 tmp_ptr = (*ptr) + 6;
-                vr = static_cast<float>(from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
+                vr = static_cast<float>(raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr)) / 255.0f;
             }
             BOOST_LOG_TRIVIAL(trace) << "REFL: " << vr;
         }
@@ -326,7 +328,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         else if (strncmp((*ptr), "VRFL", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            vr = from_byte_stream<float>(&tmp_ptr);
+            vr = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "VRFL: " << vr;
         }
         else if (strncmp((*ptr), "RFLT", 4) == 0)
@@ -337,7 +339,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         else if (strncmp((*ptr), "RIND", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            ri = from_byte_stream<float>(&tmp_ptr);
+            ri = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
         }
         /* Integer percentage luminance co-efficient */
         else if (strncmp((*ptr), "LUMI", 4) == 0)
@@ -354,7 +356,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         {
             /* Texture flags */
             tmp_ptr = (*ptr) + 6;
-            short_tmp = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            short_tmp = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "TFLG (not handled fully): " << short_tmp;
             
             /* Get the normal */
@@ -368,9 +370,9 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         {
             /* Texture size */
             tmp_ptr = (*ptr) + 6;
-            current_info.tsiz.x = from_byte_stream<float>(&tmp_ptr);
-            current_info.tsiz.y = from_byte_stream<float>(&tmp_ptr);
-            current_info.tsiz.z = from_byte_stream<float>(&tmp_ptr);
+            current_info.tsiz.x = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            current_info.tsiz.y = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            current_info.tsiz.z = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             
             BOOST_LOG_TRIVIAL(trace) << "TSIZ: " << current_info.tsiz;
         }
@@ -391,21 +393,21 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         else if (strncmp((*ptr), "TIP0", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            current_info.tip = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            current_info.tip = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TIP0: " << current_info.tip;
         }
         /* Floating point texture parameter 0 */
         else if (strncmp((*ptr), "TFP0", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            current_info.tfp[0] = from_byte_stream<float>(&tmp_ptr);
+            current_info.tfp[0] = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TFP0: " << current_info.tfp[0];
         }
         /* Floating point texture parameter 1 */
         else if (strncmp((*ptr), "TFP1", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            current_info.tfp[1] = from_byte_stream<float>(&tmp_ptr);
+            current_info.tfp[1] = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TFP1: " << current_info.tfp[1];
         }
         /* Texture image name */
@@ -421,17 +423,17 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         {
             /* Texture wrapping options */
             tmp_ptr = (*ptr) + 6;
-            current_info.twrp_mode_x = static_cast<texture_wrapping_mode_t>(from_byte_stream<std::uint16_t>(&tmp_ptr));
-            current_info.twrp_mode_y = static_cast<texture_wrapping_mode_t>(from_byte_stream<std::uint16_t>(&tmp_ptr));
+            current_info.twrp_mode_x = static_cast<texture_wrapping_mode_t>(raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr));
+            current_info.twrp_mode_y = static_cast<texture_wrapping_mode_t>(raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr));
             BOOST_LOG_TRIVIAL(trace) << "TWRP: " << static_cast<int>(current_info.twrp_mode_x) << ", " << static_cast<int>(current_info.twrp_mode_y);
         }
         /* Texture center */
         else if (strncmp((*ptr), "TCTR", 4) == 0)
         {
             tmp_ptr = (*ptr) + 6;
-            current_info.tctr.x = from_byte_stream<float>(&tmp_ptr);
-            current_info.tctr.y = from_byte_stream<float>(&tmp_ptr);
-            current_info.tctr.z = from_byte_stream<float>(&tmp_ptr);
+            current_info.tctr.x = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            current_info.tctr.y = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            current_info.tctr.z = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             
             BOOST_LOG_TRIVIAL(trace) << "TCTR: "<< current_info.tctr;
         }
@@ -439,7 +441,7 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         {
             /* Texture opaqueness */
             tmp_ptr = (*ptr) + 6;
-            current_info.topc = from_byte_stream<float>(&tmp_ptr);
+            current_info.topc = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TOPC: " << current_info.topc;
         }
         /* Algorithmic texture mappers name */
@@ -476,21 +478,21 @@ inline static float parse_surf(material **m, const std::string &p, const char **
         {
             /* Bump texture amplitude */
             tmp_ptr = (*ptr) + 6;
-            current_info.tamp = from_byte_stream<float>(&tmp_ptr);
+            current_info.tamp = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TAMP: " << current_info.tamp;
         }
         else if (strncmp((*ptr), "TVAL", 4) == 0)
         {
             /* Texture value (Percentage modifier for DTEX STEX RTEX TTEX LTEX) */
             tmp_ptr = (*ptr) + 6;
-            current_info.tval = from_byte_stream<std::uint16_t>(&tmp_ptr) / 256.0f;
+            current_info.tval = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr) / 256.0f;
             BOOST_LOG_TRIVIAL(trace) << "TVAL: " << current_info.tval;
         }
         else if (strncmp((*ptr), "SMAN", 4) == 0)
         {
             /* Maximum smooting angle */
             tmp_ptr = (*ptr) + 6;
-            sman = from_byte_stream<float>(&tmp_ptr);
+            sman = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "SMAN: " << sman;
         }
         /* Catch unknown entities */
@@ -530,13 +532,13 @@ const char * lwo1_parser(
     check_for_chunk(&at, "PNTS", 4);
     
     /* Gather all the points */
-    std::uint32_t nr_of_verts   = from_byte_stream<std::uint32_t>(&at) / 12;
+    std::uint32_t nr_of_verts   = raptor_parsers::from_byte_stream<std::uint32_t>(&at) / 12;
     std::vector<point_t> all_points(nr_of_verts);
     for (std::uint32_t i = 0; i < nr_of_verts; i++)
     {
-        all_points[i].x = from_byte_stream<float>(&at);
-        all_points[i].y = from_byte_stream<float>(&at);
-        all_points[i].z = from_byte_stream<float>(&at);
+        all_points[i].x = raptor_parsers::from_byte_stream<float>(&at);
+        all_points[i].y = raptor_parsers::from_byte_stream<float>(&at);
+        all_points[i].z = raptor_parsers::from_byte_stream<float>(&at);
     }
     
     /* Check this is the SRFS chunk */
@@ -544,7 +546,7 @@ const char * lwo1_parser(
     
     /* Find the SURF chunk */
     const char *surfs_start;
-    std::uint32_t srfs_len       = from_byte_stream<std::uint32_t>(&at);
+    std::uint32_t srfs_len       = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
     std::uint32_t num_of_surfs   = find_surf_chunk(at, &surfs_start, srfs_len);
 
     /* Parse the names of the surfaces (SRFS chunk) */
@@ -564,7 +566,7 @@ const char * lwo1_parser(
     material **surf_materials = new material *[num_of_surfs];
     for (std::uint32_t i = 0; i < num_of_surfs; ++i)
     {
-        const std::uint32_t surf_len = from_byte_stream<std::uint32_t>(&surfs_start);
+        const std::uint32_t surf_len = raptor_parsers::from_byte_stream<std::uint32_t>(&surfs_start);
         if(strcmp(surfs_start, srfs[i]) != 0)
         {
             BOOST_LOG_TRIVIAL(error) << "Expected: " << srfs[i];
@@ -592,26 +594,26 @@ const char * lwo1_parser(
 
     std::vector<int> pol_vert;
     std::uint16_t vert_this_pol = 0;
-    std::uint32_t pols_bytes    = from_byte_stream<std::uint32_t>(&at);
+    std::uint32_t pols_bytes    = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
     for (std::uint32_t i = 0; i < pols_bytes; i += (4 + (vert_this_pol << 1)))
     {
-        vert_this_pol = from_byte_stream<std::uint16_t>(&at);
+        vert_this_pol = raptor_parsers::from_byte_stream<std::uint16_t>(&at);
         for (std::uint32_t j = 0; j < vert_this_pol; j++)
         {
-            std::uint16_t vert_num = from_byte_stream<std::uint16_t>(&at);
+            std::uint16_t vert_num = raptor_parsers::from_byte_stream<std::uint16_t>(&at);
             assert(vert_num < nr_of_verts);
             
             pol_vert.push_back(vert_num);
         }
         
         /* Parse the material to use */
-        std::int16_t mat_num = from_byte_stream<std::int16_t>(&at);
+        std::int16_t mat_num = raptor_parsers::from_byte_stream<std::int16_t>(&at);
 
         /* Check for detail polygons, but then parse them as normal polygons */
         if (mat_num < 0)
         {
             BOOST_LOG_TRIVIAL(trace) << "Found detail polygons at: 0x" << std::hex << static_cast<std::uint32_t>((at) - begin) << std::dec;
-            from_byte_stream<std::int16_t>(&at);
+            raptor_parsers::from_byte_stream<std::int16_t>(&at);
             mat_num = abs(mat_num);
             i += 2;
         }
@@ -664,7 +666,7 @@ const char * lwo1_parser(
     {
         check_for_chunk(&at, "SURF", 4);
 
-        std::uint32_t surf_len = from_byte_stream<std::uint32_t>(&at);
+        std::uint32_t surf_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
         std::uint32_t srf_len = strlen(srfs[i]) + 1;
         srf_len     += srf_len & 0x1;
         at          += srf_len;
@@ -673,7 +675,7 @@ const char * lwo1_parser(
         while (static_cast<int>(surf_len) > 0)
         {
             at += 4;
-            const std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&at);
+            const std::uint16_t sec_len = raptor_parsers::from_byte_stream<std::uint16_t>(&at);
             at          += sec_len;
             surf_len    -= sec_len + 6;
         }

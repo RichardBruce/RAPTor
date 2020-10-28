@@ -31,7 +31,7 @@ class lwo_chunks
                 if ((strncmp(at, "TAGS", 4) == 0) && (_tags == nullptr))
                 {
                     at += 4;
-                    _tags_len = from_byte_stream<std::uint32_t>(&at);
+                    _tags_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _tags = at;
 
                     BOOST_LOG_TRIVIAL(trace) << "TAGS " << _tags_len;
@@ -40,7 +40,7 @@ class lwo_chunks
                 else if (strncmp(at, "CLIP", 4) == 0)
                 {
                     at += 4;
-                    const std::uint32_t clip_len = from_byte_stream<std::uint32_t>(&at);
+                    const std::uint32_t clip_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _clips.emplace_back(at, clip_len);
 
                     at += clip_len;
@@ -49,7 +49,7 @@ class lwo_chunks
                 else if (strncmp(at, "SURF", 4) == 0)
                 {
                     at += 4;
-                    const std::uint32_t surf_len = from_byte_stream<std::uint32_t>(&at);
+                    const std::uint32_t surf_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _surfs.emplace_back(at, surf_len);
 
                     at += surf_len;
@@ -60,7 +60,7 @@ class lwo_chunks
                     /* Skip it */
                     BOOST_LOG_TRIVIAL(trace) << "Skipping: " << std::string(at, 4);
                     at += 4;
-                    const std::uint32_t len = from_byte_stream<std::uint32_t>(&at);
+                    const std::uint32_t len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     at += len;
                 }
             }
@@ -76,7 +76,7 @@ class lwo_chunks
             new_layer();
 
             const char *at = _next_layr + 4;
-            _layr_len = from_byte_stream<std::uint32_t>(&at);
+            _layr_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
             _layr = at;   /* This might not be a layr if file starts with data not in a layr */
             at += _layr_len;
             while (at < _end)
@@ -89,7 +89,7 @@ class lwo_chunks
                 else if (strncmp(at, "PNTS", 4) == 0)
                 {
                     at += 4;
-                    _pnts_len = from_byte_stream<std::uint32_t>(&at);
+                    _pnts_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _pnts = at;
 
                     BOOST_LOG_TRIVIAL(trace) << "PNTS " << _pnts_len;
@@ -98,7 +98,7 @@ class lwo_chunks
                 else if (strncmp(at, "POLS", 4) == 0)
                 {
                     at += 4;
-                    _pols_len = from_byte_stream<std::uint32_t>(&at);
+                    _pols_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _pols = at;
 
                     BOOST_LOG_TRIVIAL(trace) << "POLS " << _pols_len;
@@ -107,7 +107,7 @@ class lwo_chunks
                 else if (strncmp(at, "VMAP", 4) == 0)
                 {
                     at += 4;
-                    const std::uint32_t vmap_len = from_byte_stream<std::uint32_t>(&at);
+                    const std::uint32_t vmap_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _vmaps.emplace_back(at, vmap_len);
 
                     BOOST_LOG_TRIVIAL(trace) << "VMAP " <<vmap_len;
@@ -116,7 +116,7 @@ class lwo_chunks
                 else if (strncmp(at, "PTAG", 4) == 0)
                 {
                     at += 4;
-                    _ptag_len = from_byte_stream<std::uint32_t>(&at);
+                    _ptag_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _ptag = at;
 
                     BOOST_LOG_TRIVIAL(trace) << "PTAG " << _ptag_len;
@@ -125,7 +125,7 @@ class lwo_chunks
                 else if (strncmp(at, "VMAD", 4) == 0)
                 {
                     at += 4;
-                    const std::uint32_t vmad_len = from_byte_stream<std::uint32_t>(&at);
+                    const std::uint32_t vmad_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _vmads.emplace_back(at, vmad_len);
 
                     BOOST_LOG_TRIVIAL(trace) << "VMAD " << vmad_len;
@@ -146,7 +146,7 @@ class lwo_chunks
                 else if (strncmp(at, "BBOX", 4) == 0)
                 {
                     at += 4;
-                    _bbox_len = from_byte_stream<std::uint32_t>(&at);
+                    _bbox_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _bbox = at;
 
                     BOOST_LOG_TRIVIAL(info) << "BBOX (ignored) " << _bbox_len;
@@ -155,7 +155,7 @@ class lwo_chunks
                 else if (strncmp(at, "DESC", 4) == 0)
                 {
                     at += 4;
-                    _desc_len = from_byte_stream<std::uint32_t>(&at);
+                    _desc_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _desc = at;
 
                     BOOST_LOG_TRIVIAL(info) << "DESC (ignored) " << _desc_len;
@@ -164,7 +164,7 @@ class lwo_chunks
                 else if (strncmp(at, "TEXT", 4) == 0)
                 {
                     at += 4;
-                    _text_len = from_byte_stream<std::uint32_t>(&at);
+                    _text_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _text = at;
 
                     BOOST_LOG_TRIVIAL(info) << "TEXT (ignored) " << _text_len;
@@ -173,7 +173,7 @@ class lwo_chunks
                 else if (strncmp(at, "ICON", 4) == 0)
                 {
                     at += 4;
-                    _icon_len = from_byte_stream<std::uint32_t>(&at);
+                    _icon_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _icon = at;
 
                     BOOST_LOG_TRIVIAL(info) << "ICON (ignored) " << _icon_len;
@@ -182,7 +182,7 @@ class lwo_chunks
                 else if (strncmp(at, "VMPA", 4) == 0)
                 {
                     at += 4;
-                    _vmpa_len = from_byte_stream<std::uint32_t>(&at);
+                    _vmpa_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
                     _vmpa = at;
 
                     BOOST_LOG_TRIVIAL(info) << "VMPA (ignored) " << _vmpa_len;

@@ -30,7 +30,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
     while (i < blok_len)
     {
         const char *tmp_ptr = (*ptr) + 4;
-        const std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
+        const std::uint16_t sec_len = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
         BOOST_LOG_TRIVIAL(trace) << "Parsing: " << *ptr << " with length " << sec_len;
 
         /* Image map */
@@ -60,7 +60,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         }
         else if (strncmp((*ptr), "PROJ", 4) == 0)
         {
-            const std::uint16_t proj = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const std::uint16_t proj = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "PROJ: " << proj;
             _shader = pick_shader(proj);
         }
@@ -70,7 +70,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
             BOOST_LOG_TRIVIAL(trace) << "AXIS";
             
             /* Get the normal */
-            const std::uint16_t tflg = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const std::uint16_t tflg = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             _tnorm.x = (tflg == 0) ? 1.0f : 0.0f;
             _tnorm.y = (tflg == 1) ? 1.0f : 0.0f;
             _tnorm.z = (tflg == 2) ? 1.0f : 0.0f;
@@ -78,8 +78,8 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         /* Texture wrapping options */
         else if (strncmp((*ptr), "WRAP", 4) == 0)
         {
-            _twrp_mode_x = get_wrapping_mode(from_byte_stream<std::uint16_t>(&tmp_ptr));
-            _twrp_mode_y = get_wrapping_mode(from_byte_stream<std::uint16_t>(&tmp_ptr));
+            _twrp_mode_x = get_wrapping_mode(raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr));
+            _twrp_mode_y = get_wrapping_mode(raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr));
             BOOST_LOG_TRIVIAL(trace) << "WRAP: " << static_cast<int>(_twrp_mode_x) << ", " << static_cast<int>(_twrp_mode_y);
         }
         /* Image index */
@@ -97,38 +97,38 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         }
         else if (strncmp((*ptr), "WRPW", 4) == 0)
         {
-            _wrpw = from_byte_stream<float>(&tmp_ptr);
+            _wrpw = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "WRPW: " << _wrpw;
         }
         else if (strncmp((*ptr), "WRPH", 4) == 0)
         {
-            _wrph = from_byte_stream<float>(&tmp_ptr);
+            _wrph = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "WRPH (not handled): " << _wrph;
         }
         else if (strncmp((*ptr), "AAST", 4) == 0)
         {
-            const std::uint16_t flag = from_byte_stream<std::uint16_t>(&tmp_ptr);
-            const float stren = from_byte_stream<float>(&tmp_ptr);
+            const std::uint16_t flag = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const float stren = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "AAST (not handled): " << flag << ", strength: " << stren;
         }
         else if (strncmp((*ptr), "PIXB", 4) == 0)
         {
-            const std::uint16_t pixb = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const std::uint16_t pixb = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "PIXB (not handled): " << pixb;
         }
         else if (strncmp((*ptr), "VALU", 4) == 0)
         {
-            _valu[0] = from_byte_stream<float>(&tmp_ptr);
+            _valu[0] = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "VALU 0: " << _valu[0];
             if (sec_len > 4)
             {
-                _valu[1] = from_byte_stream<float>(&tmp_ptr);
+                _valu[1] = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
                 BOOST_LOG_TRIVIAL(trace) << "VALU 1: " << _valu[1];
             }
 
             if (sec_len > 8)
             {
-                _valu[2] = from_byte_stream<float>(&tmp_ptr);
+                _valu[2] = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
                 BOOST_LOG_TRIVIAL(trace) << "VALU 2: " << _valu[2];
             }
         }
@@ -138,7 +138,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         // }
         else if (strncmp((*ptr), "TAMP", 4) == 0)
         {
-            _tamp = from_byte_stream<float>(&tmp_ptr);
+            _tamp = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TAMP: " << _tamp;
         }
         else if (strncmp((*ptr), "VMAP", 4) == 0)
@@ -166,7 +166,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         }
         else if (strncmp((*ptr), "GRPT", 4) == 0)
         {
-            const std::uint16_t grpt = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const std::uint16_t grpt = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "GRPT: " << grpt;
             assert(grpt == 0);
         }
@@ -174,16 +174,16 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         {
             while (tmp_ptr < ((*ptr) + sec_len + 6))
             {
-                const float key = from_byte_stream<float>(&tmp_ptr);
+                const float key = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
                 _fkey_key.push_back(key);
 
                 ext_colour_t rgb;
-                rgb.r = from_byte_stream<float>(&tmp_ptr);
-                rgb.g = from_byte_stream<float>(&tmp_ptr);
-                rgb.b = from_byte_stream<float>(&tmp_ptr);
+                rgb.r = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+                rgb.g = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+                rgb.b = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
                 rgb *= 255.0f;
 
-                const float alpha = from_byte_stream<float>(&tmp_ptr);
+                const float alpha = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
 
                 _fkey_value.emplace_back(rgb, alpha);
                 BOOST_LOG_TRIVIAL(trace) << "FKEY, key: " << key << ", colour: " << rgb << ", alpha: " << alpha;
@@ -193,7 +193,7 @@ std::string lwo_bloks::parse(const std::map<std::uint32_t, lwo_clip *> &clips, c
         {
             while (tmp_ptr < ((*ptr) + sec_len + 6))
             {
-                const std::uint16_t ikey = from_byte_stream<std::uint16_t>(&tmp_ptr);
+                const std::uint16_t ikey = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
                 BOOST_LOG_TRIVIAL(trace) << "IKEY: " << ikey;
                 _ikey.push_back(static_cast<grad_interpolation_t>(ikey));
             }
@@ -364,6 +364,8 @@ inline mapper_type_t lwo_bloks::pick_shader(const std::uint16_t m)
             BOOST_LOG_TRIVIAL(error) << "Unknown texture: " << m;
             assert(false);
     }
+
+    return mapper_type_t::planar;
 }
 
 
@@ -374,9 +376,9 @@ inline void lwo_bloks::pick_procedural_shader(const char *c)
         c += 14;
 
         _shader = mapper_type_t::f_noise;
-        _tip = from_byte_stream<std::uint32_t>(&c);
-        _tfp[1] = from_byte_stream<float>(&c);
-        _tfp[0] = from_byte_stream<float>(&c);
+        _tip = raptor_parsers::from_byte_stream<std::uint32_t>(&c);
+        _tfp[1] = raptor_parsers::from_byte_stream<float>(&c);
+        _tfp[0] = raptor_parsers::from_byte_stream<float>(&c);
         BOOST_LOG_TRIVIAL(trace) << "Fractal noise: " << _tip << ", " << _tfp[1] << ", " << _tfp[0];
 
     }
@@ -391,9 +393,9 @@ inline void lwo_bloks::pick_procedural_shader(const char *c)
     {
         c += 12;
         _shader = mapper_type_t::f_noise;
-        _tip = from_byte_stream<std::uint32_t>(&c);
-        _tfp[1] = from_byte_stream<float>(&c);
-        _tfp[0] = from_byte_stream<float>(&c);
+        _tip = raptor_parsers::from_byte_stream<std::uint32_t>(&c);
+        _tfp[1] = raptor_parsers::from_byte_stream<float>(&c);
+        _tfp[0] = raptor_parsers::from_byte_stream<float>(&c);
         BOOST_LOG_TRIVIAL(trace) << "Turbulent noise: " << _tip << ", " << _tfp[1] << ", " << _tfp[0];
 
     }
@@ -499,6 +501,8 @@ inline mapper_of_t lwo_bloks::pick_channel(const char *const c)
         BOOST_LOG_TRIVIAL(error) << "Unknown channel: " << c;
         assert(false);
     }
+
+    return mapper_of_t::map_ctex;
 }
 
 
@@ -518,6 +522,8 @@ inline texture_wrapping_mode_t lwo_bloks::get_wrapping_mode(const std::uint16_t 
             BOOST_LOG_TRIVIAL(error) << "Unknown wrapping mode: " << m;
             assert(false);
     }
+
+    return texture_wrapping_mode_t::blank;
 }
 
 
@@ -527,32 +533,32 @@ inline void lwo_bloks::parse_tmap(const char **ptr, const std::uint32_t tmap_len
     while (i < tmap_len)
     {
         const char *tmp_ptr = (*ptr) + 4;
-        const std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
+        const std::uint16_t sec_len = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
         BOOST_LOG_TRIVIAL(trace) << "Parsing: " << *ptr << " with length " << sec_len;
 
         /* Texture center */
         if (strncmp((*ptr), "CNTR", 4) == 0)
         {
-            _tctr.x = from_byte_stream<float>(&tmp_ptr);
-            _tctr.y = from_byte_stream<float>(&tmp_ptr);
-            _tctr.z = from_byte_stream<float>(&tmp_ptr);
+            _tctr.x = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            _tctr.y = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            _tctr.z = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             
             BOOST_LOG_TRIVIAL(trace) << "CNTR:" << _tctr;
         }
         /* Texture size */
         else if (strncmp((*ptr), "SIZE", 4) == 0)
         {
-            _tsiz.x = from_byte_stream<float>(&tmp_ptr);
-            _tsiz.y = from_byte_stream<float>(&tmp_ptr);
-            _tsiz.z = from_byte_stream<float>(&tmp_ptr);
+            _tsiz.x = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            _tsiz.y = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            _tsiz.z = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             
             BOOST_LOG_TRIVIAL(trace) << "SIZE: "<< _tsiz;
         }
         else if (strncmp((*ptr), "ROTA", 4) == 0)
         {
-            const float rota_x = from_byte_stream<float>(&tmp_ptr);
-            const float rota_y = from_byte_stream<float>(&tmp_ptr);
-            const float rota_z = from_byte_stream<float>(&tmp_ptr);
+            const float rota_x = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            const float rota_y = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            const float rota_z = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "ROTA: " << rota_x << ", " << rota_y << ", " << rota_z;
             assert(rota_x == 0.0f);
             assert(rota_y == 0.0f);
@@ -560,10 +566,10 @@ inline void lwo_bloks::parse_tmap(const char **ptr, const std::uint32_t tmap_len
         }
         else if (strncmp((*ptr), "FALL", 4) == 0)
         {
-            _fall_type = static_cast<falloff_type_t>(from_byte_stream<std::uint16_t>(&tmp_ptr));
-            _fall_grad.x = from_byte_stream<float>(&tmp_ptr);
-            _fall_grad.y = from_byte_stream<float>(&tmp_ptr);
-            _fall_grad.z = from_byte_stream<float>(&tmp_ptr);
+            _fall_type = static_cast<falloff_type_t>(raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr));
+            _fall_grad.x = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            _fall_grad.y = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
+            _fall_grad.z = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "FALL: " << static_cast<int>(_fall_type) << ", in: " << _fall_grad;
         }
         else if (strncmp((*ptr), "OREF", 4) == 0)
@@ -573,7 +579,7 @@ inline void lwo_bloks::parse_tmap(const char **ptr, const std::uint32_t tmap_len
         }
         else if (strncmp((*ptr), "CSYS", 4) == 0)
         {
-            const std::uint16_t csys = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const std::uint16_t csys = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "CSYS (not handled): " << csys;
         }
         /* Catch unknown entities */
@@ -600,7 +606,7 @@ inline bool lwo_bloks::parse_header(const char **ptr, const std::uint32_t header
     while (i < header_len)
     {
         const char *tmp_ptr = (*ptr) + 4;
-        const std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
+        const std::uint16_t sec_len = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
         BOOST_LOG_TRIVIAL(trace) << "Parsing: " << *ptr << " with length " << sec_len;
 
         /* The mapped channel */
@@ -611,19 +617,19 @@ inline bool lwo_bloks::parse_header(const char **ptr, const std::uint32_t header
         }
         else if (strncmp((*ptr), "OPAC", 4) == 0)
         {
-            const std::uint16_t opac = from_byte_stream<std::uint16_t>(&tmp_ptr);
-            const float value = from_byte_stream<float>(&tmp_ptr);
+            const std::uint16_t opac = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const float value = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "OPAC (not handled): " << opac << ", value: " << value;
         }
         else if (strncmp((*ptr), "ENAB", 4) == 0)
         {
-            const std::uint16_t enab = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const std::uint16_t enab = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             enabled = (enab != 0);
             BOOST_LOG_TRIVIAL(trace) << "ENAB: " << enab;
         }
         else if (strncmp((*ptr), "NEGA", 4) == 0)
         {
-            const std::uint16_t nega = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const std::uint16_t nega = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             _nega = (nega != 0);
             BOOST_LOG_TRIVIAL(trace) << "NEGA: " << nega;
         }

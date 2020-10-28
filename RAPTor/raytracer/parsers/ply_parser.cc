@@ -24,7 +24,7 @@ const char * next_statement(const char *c)
 {
     do
     {
-        find_next_line(&c);
+        raptor_parsers::find_next_line(&c);
     } while ((strncmp(c, "comment ", 8) == 0) || (strncmp(c, "obj_info ", 9) == 0));
     
     return c;
@@ -47,7 +47,7 @@ unsigned parse_element_vertex(const char **c, unsigned *const skip, bool *const 
     /* Get the number of vertices */
     assert(strncmp(*c, "element vertex ", 15) == 0);
     (*c) += 14;
-    unsigned v = get_next_unsigned(c);
+    unsigned v = raptor_parsers::get_next_unsigned(c);
 
     /* Check they are x, y, z vertices */
     (*c) = next_statement(*c);
@@ -164,7 +164,7 @@ unsigned parse_element_face(const char **c, unsigned *const pre_skip, unsigned *
     /* Get the number of vertices */
     assert(strncmp(*c, "element face ", 13) == 0);
     (*c) += 12;
-    unsigned f = get_next_unsigned(c);
+    unsigned f = raptor_parsers::get_next_unsigned(c);
     
     /* Check for extra data before the point list */
     (*c) = next_statement(*c);
@@ -246,12 +246,12 @@ void parse_binary_face(light_list *l, primitive_store *e, std::vector<point_t> &
     static std::vector<point_t> face;
     
     /* Parse all vextex data for the face */
-    unsigned char v_this_f = from_byte_stream<unsigned char>(c);
+    unsigned char v_this_f = raptor_parsers::from_byte_stream<unsigned char>(c);
     face.resize(v_this_f);
     for (unsigned char i = 0; i < v_this_f; ++i)
     {
         /* Parse vertex */
-        int vert_num = from_byte_stream<int>(c);
+        int vert_num = raptor_parsers::from_byte_stream<int>(c);
         assert(vert_num < (int)v.size());
         assert(vert_num >= 0);
         face[i] = v[vert_num];
@@ -336,11 +336,11 @@ void parse_face(light_list *l, primitive_store *e, std::vector<point_t> &vn, std
     for (unsigned i = 0; i < v_this_f; i++)
     {
         /* Parse vertex */
-        unsigned vert_num = get_next_unsigned(c);
+        unsigned vert_num = raptor_parsers::get_next_unsigned(c);
         assert(vert_num < v.size());
         face[i] = v[vert_num];
     }
-    find_next_line(c);
+    raptor_parsers::find_next_line(c);
 
     /* Parse optional colour information */
     material *m;
@@ -411,9 +411,9 @@ void parse_binary_vertex(std::vector<point_t> *const vs, std::vector<point_t> *c
     point_t v;
 
     /* Parse the vertex position */
-    v.x = from_byte_stream<float>(c);
-    v.y = from_byte_stream<float>(c);
-    v.z = from_byte_stream<float>(c);
+    v.x = raptor_parsers::from_byte_stream<float>(c);
+    v.y = raptor_parsers::from_byte_stream<float>(c);
+    v.z = raptor_parsers::from_byte_stream<float>(c);
     vs->push_back(v);
 
     /* Ignore the vertex colour */
@@ -425,9 +425,9 @@ void parse_binary_vertex(std::vector<point_t> *const vs, std::vector<point_t> *c
     /* Parse the vertex normal */
     if (normal)
     {
-        v.x = from_byte_stream<float>(c);
-        v.y = from_byte_stream<float>(c);
-        v.z = from_byte_stream<float>(c);
+        v.x = raptor_parsers::from_byte_stream<float>(c);
+        v.y = raptor_parsers::from_byte_stream<float>(c);
+        v.z = raptor_parsers::from_byte_stream<float>(c);
         vn->push_back(v);
     }
 }
@@ -446,21 +446,21 @@ void parse_vertex(std::vector<point_t> *const vs, std::vector<point_t> *const vn
 
     /* Parse the vertex position */
     v.x = atof(*c);
-    v.y = get_next_float(c);
-    v.z = get_next_float(c);
+    v.y = raptor_parsers::get_next_float(c);
+    v.z = raptor_parsers::get_next_float(c);
     vs->push_back(v);
     
     /* Parse the vertex normal */
     if (normal)
     {
-        v.x = get_next_float(c);
-        v.y = get_next_float(c);
-        v.z = get_next_float(c);
+        v.x = raptor_parsers::get_next_float(c);
+        v.y = raptor_parsers::get_next_float(c);
+        v.z = raptor_parsers::get_next_float(c);
         vn->push_back(v);
     }
 
     /* Move to the next line */
-    find_next_line(c);
+    raptor_parsers::find_next_line(c);
 }
 
 

@@ -1,0 +1,114 @@
+#pragma once
+/* Standard headers */
+#include <chrono>
+
+/* Boost headers */
+#include "boost/noncopyable.hpp"
+
+/* Common headers */
+#include "logging.h"
+
+/* Parser headers */
+#include "parser.h"
+
+/* Mesh decimation headers */
+#include "mesh_decimation.h"
+#include "mesh_decimation_options.h"
+
+namespace raptor_mesh_decimation
+{
+namespace test
+{
+#define LOAD_TEST_DATA(FILE)   const std::string test_name(boost::unit_test::framework::current_test_case().p_name); \
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << test_name; \
+    const std::string data_dir(getenv("RAPTOR_DATA")); \
+    BOOST_REQUIRE(raptor_parsers::load_off(data_dir + "/" + (FILE), &points, &triangles));
+
+
+struct regression_fixture : private boost::noncopyable
+{
+    regression_fixture(const mesh_decimation_options &options) : options(options), uut(nullptr) {  }
+
+    void run()
+    {
+        const auto t0(std::chrono::system_clock::now());
+        uut.reset(new mesh_decimation(points, triangles, options));
+        const auto t1(std::chrono::system_clock::now());
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 7 - Runtime ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+    }
+
+    void check(const std::string &file)
+    {
+        // const float original_volume = convex_mesh(points, triangles).volume();
+        // BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Original Volume: " << original_volume;
+
+        // const float voxelised_volume = uut->get_primitive_set()->compute_volume();
+        // BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - Voxelised Volume: " << voxelised_volume;
+        // BOOST_LOG_TRIVIAL(fatal) << "PERF 3 - Voxelised Relative Volume: " << (((voxelised_volume / original_volume) - 1.0f) * 100.0f);
+
+        // BOOST_LOG_TRIVIAL(error) << "PERF 4 - Decomposed Number of hulls: " << uut->number_of_convex_hulls();
+        // float decomposed_volume = 0.0f;
+        // for (int i = 0; i <  uut->number_of_convex_hulls(); ++i)
+        // {
+        //     decomposed_volume += uut->get_convex_hull(i)->volume();
+        // }
+        // BOOST_LOG_TRIVIAL(fatal) << "PERF 5 - Decomposed Volume: " << decomposed_volume;
+        // BOOST_LOG_TRIVIAL(error) << "PERF 6 - Decomposed Relative Volume: " << (((decomposed_volume / original_volume) - 1.0f) * 100.0f);
+
+        // /* Sum number of points and triangles */
+        // int nr_pts = 0;
+        // int nr_tri = 0;
+        // for (int i = 0; i < uut->number_of_convex_hulls(); ++i)
+        // {
+        //     const auto *const mesh = uut->get_convex_hull(i);
+        //     nr_pts += mesh->number_of_points();
+        //     nr_tri += mesh->number_of_triangles();
+        // }
+
+        // /* Save actual results */
+        // save_convex_decomposition(*uut, "test_data/" + file + ".wrl");
+        // save_off(*uut, "test_data/" + file + "_act.off", nr_pts, nr_tri);
+
+        // /* Load expected data */
+        // std::vector<point_t>    points_exp;
+        // std::vector<point_ti<>> triangles_exp;
+        // BOOST_REQUIRE(load_off("test_data/" + file + "_exp.off", &points_exp, &triangles_exp));
+
+        // /* Check points */
+        // BOOST_REQUIRE(nr_pts == static_cast<int>(points_exp.size()));
+
+        // int pt_idx = 0;
+        // for (int i = 0; i < uut->number_of_convex_hulls(); ++i)
+        // {
+        //     const auto *const mesh = uut->get_convex_hull(i);
+        //     for (const auto &pt : mesh->points())
+        //     {
+        //         if (std::fabs(magnitude(pt - points_exp[pt_idx])) > result_tolerance)
+        //         {
+        //             BOOST_CHECK(std::fabs(magnitude(pt - points_exp[pt_idx])) < result_tolerance);
+        //         }
+        //         pt_idx++;
+        //     }
+        // }
+
+        // /* Check triangles */
+        // BOOST_REQUIRE(nr_tri == static_cast<int>(triangles_exp.size()));
+
+        // int tri_idx = 0;
+        // for (int i = 0; i < uut->number_of_convex_hulls(); ++i)
+        // {
+        //     const auto *const mesh = uut->get_convex_hull(i);
+        //     for (const auto &t : mesh->triangles())
+        //     {
+        //         BOOST_CHECK(t == triangles_exp[tri_idx++]);
+        //     }
+        // }
+    }
+
+    mesh_decimation_options             options;
+    std::unique_ptr<mesh_decimation>    uut;
+    std::vector<point_t>                points;
+    std::vector<point_ti<>>             triangles;
+};
+} /* namespace test */
+} /* namespace raptor_mesh_decimation */

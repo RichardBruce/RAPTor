@@ -32,7 +32,7 @@ class vertex_map : private boost::noncopyable
             check_for_chunk(&vmap_at, "TXUV", 4, __LINE__);
         
             /* Get dimension and name */
-            const std::uint16_t vmap_dim = from_byte_stream<std::uint16_t>(&vmap_at);
+            const std::uint16_t vmap_dim = raptor_parsers::from_byte_stream<std::uint16_t>(&vmap_at);
             const char *vmap_name = parse_string(&vmap_at);
             BOOST_LOG_TRIVIAL(trace) << "VMAP of dimensions: " << vmap_dim << " called: " << vmap_name;
 
@@ -47,7 +47,7 @@ class vertex_map : private boost::noncopyable
                 /* Add vmap points */
                 for (std::uint16_t i = 0; i < vmap_dim; ++i)
                 {
-                    vertex_map->values.push_back(from_byte_stream<float>(&vmap_at));
+                    vertex_map->values.push_back(raptor_parsers::from_byte_stream<float>(&vmap_at));
                 }
             }
 
@@ -62,7 +62,7 @@ class vertex_map : private boost::noncopyable
             check_for_chunk(&vmad_at, "TXUV", 4, __LINE__);
 
             /* Get dimension and name */
-            const std::uint16_t vmad_dim = from_byte_stream<std::uint16_t>(&vmad_at);
+            const std::uint16_t vmad_dim = raptor_parsers::from_byte_stream<std::uint16_t>(&vmad_at);
             const char *vmad_name = parse_string(&vmad_at);
             BOOST_LOG_TRIVIAL(trace) << "VMAD of dimensions: " << vmad_dim << " called: " << vmad_name;
 
@@ -78,7 +78,7 @@ class vertex_map : private boost::noncopyable
                 /* Add vmad points */
                 for (std::uint16_t i = 0; i < vmad_dim; ++i)
                 {
-                    vertex_map->values.push_back(from_byte_stream<float>(&vmad_at));
+                    vertex_map->values.push_back(raptor_parsers::from_byte_stream<float>(&vmad_at));
                 }
             }
 

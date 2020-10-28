@@ -42,7 +42,7 @@ void lwo_parser(
     check_for_chunk(&at, "FORM", 4);
     
     /* Check the declared number of bytes matchs the actual */
-    std::uint32_t file_len = from_byte_stream<std::uint32_t>(&at);
+    std::uint32_t file_len = raptor_parsers::from_byte_stream<std::uint32_t>(&at);
     if ((file_len + 8) != len)
     {
         BOOST_LOG_TRIVIAL(error) << "File length is " << len << " where " << (file_len + 8) << " expected";

@@ -24,7 +24,7 @@ class lwo_clip
         bool parse()
         {
             const char *tmp_ptr = _data;
-            _clip_idx = from_byte_stream<std::uint32_t>(&tmp_ptr);
+            _clip_idx = raptor_parsers::from_byte_stream<std::uint32_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "CLIP idx: " << _clip_idx;
         
             while (tmp_ptr < (_data + _size))
@@ -32,7 +32,7 @@ class lwo_clip
                 if (strncmp(tmp_ptr, "STIL", 4) == 0)
                 {
                     tmp_ptr += 4;
-                    const std::uint16_t stil_len = from_byte_stream<std::uint16_t>(&tmp_ptr);
+                    const std::uint16_t stil_len = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
                     BOOST_LOG_TRIVIAL(trace) << "STIL: " << (_path + tmp_ptr);
                     
                     /* Load image */
@@ -50,7 +50,7 @@ class lwo_clip
                 {
                     /* Brightness adjust for above still */
                     tmp_ptr += 6;
-                    const float brit = from_byte_stream<float>(&tmp_ptr);
+                    const float brit = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
                     BOOST_LOG_TRIVIAL(trace) << "BRIT: " << brit;
                     assert(_img.get() != nullptr);
                     brightness_adjust(_img.get(), _img_width * _img_height * _cpp, brit);
@@ -60,7 +60,7 @@ class lwo_clip
                 {
                     /* Contrast adjust for above still */
                     tmp_ptr += 6;
-                    const float cont = from_byte_stream<float>(&tmp_ptr);
+                    const float cont = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
                     BOOST_LOG_TRIVIAL(trace) << "CONT: " << cont;
                     assert(_img.get() != nullptr);
                     contrast_adjust(_img.get(), _img_width * _img_height * _cpp, cont);
@@ -70,7 +70,7 @@ class lwo_clip
                 {
                     /* Contrast adjust for above still */
                     tmp_ptr += 6;
-                    const float satr = from_byte_stream<float>(&tmp_ptr);
+                    const float satr = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
                     BOOST_LOG_TRIVIAL(trace) << "SATR: " << satr;
                     assert(_img.get() != nullptr);
                     saturation_adjust(_img.get(), _img_width * _img_height * _cpp, satr);
@@ -80,7 +80,7 @@ class lwo_clip
                 {
                     /* Contrast adjust for above still */
                     tmp_ptr += 6;
-                    const float gamm = from_byte_stream<float>(&tmp_ptr);
+                    const float gamm = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
                     BOOST_LOG_TRIVIAL(trace) << "GAMM: " << gamm;
                     assert(_img.get() != nullptr);
                     gamma_adjust(_img.get(), _img_width * _img_height * _cpp, gamm);
@@ -90,7 +90,7 @@ class lwo_clip
                 {
                     /* Contrast adjust for above still */
                     tmp_ptr += 6;
-                    const std::uint16_t nega = from_byte_stream<std::uint16_t>(&tmp_ptr);
+                    const std::uint16_t nega = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
                     BOOST_LOG_TRIVIAL(trace) << "NEGA: " << nega;
                     assert(_img.get() != nullptr);
                     negative(_img.get(), _img_width * _img_height * _cpp);

@@ -36,71 +36,71 @@ bool lwo_surf::parse(const std::map<std::uint32_t, lwo_clip *> &clips, const cha
     {
         const char *sec_ptr = tmp_ptr;
         const char *len_ptr = tmp_ptr + 4;
-        const std::uint16_t sec_len = from_byte_stream<std::uint16_t>(&len_ptr);
+        const std::uint16_t sec_len = raptor_parsers::from_byte_stream<std::uint16_t>(&len_ptr);
         BOOST_LOG_TRIVIAL(trace) << "Parsing: " << tmp_ptr << " with length " << sec_len;
         
         /* Base image colour */
         if (strncmp(tmp_ptr, "COLR", 4) == 0)
         {
             tmp_ptr += 6;
-            rgb.r = from_byte_stream<float>(&tmp_ptr) * 255.0f;
-            rgb.g = from_byte_stream<float>(&tmp_ptr) * 255.0f;
-            rgb.b = from_byte_stream<float>(&tmp_ptr) * 255.0f;
+            rgb.r = raptor_parsers::from_byte_stream<float>(&tmp_ptr) * 255.0f;
+            rgb.g = raptor_parsers::from_byte_stream<float>(&tmp_ptr) * 255.0f;
+            rgb.b = raptor_parsers::from_byte_stream<float>(&tmp_ptr) * 255.0f;
             BOOST_LOG_TRIVIAL(trace) << "COLR: "<< rgb.r << ", " << rgb.g << ", " << rgb.b;
         }
         /* Floating point percentage diffuse co-efficient */
         else if (strncmp(tmp_ptr, "DIFF", 4) == 0)
         {
             tmp_ptr += 6;
-            vkd = from_byte_stream<float>(&tmp_ptr);
+            vkd = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "DIFF: " << vkd;
         }
         /* Floating point percentage specular co-efficient */
         else if (strncmp(tmp_ptr, "SPEC", 4) == 0)
         {
             tmp_ptr += 6;
-            vks = from_byte_stream<float>(&tmp_ptr);
+            vks = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "SPEC: " << vks;
         }
         else if (strncmp(tmp_ptr, "GLOS", 4) == 0)
         {
             tmp_ptr += 6;
-            s = pow(2.0f, ((10.0f * from_byte_stream<float>(&tmp_ptr)) + 2.0f));
+            s = pow(2.0f, ((10.0f * raptor_parsers::from_byte_stream<float>(&tmp_ptr)) + 2.0f));
             BOOST_LOG_TRIVIAL(trace) << "GLOS: " << s;
         }
         /* Floating point percentage transmittance co-efficient. */
         else if (strncmp(tmp_ptr, "TRAN", 4) == 0)
         {
             tmp_ptr += 6;
-            vt = from_byte_stream<float>(&tmp_ptr);
+            vt = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "TRAN: " << vt;
         }
         /* Floating point percentage reflectance co-efficient. */
         else if (strncmp(tmp_ptr, "REFL", 4) == 0)
         {
             tmp_ptr += 6;
-            vr = from_byte_stream<float>(&tmp_ptr);
+            vr = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "REFL: " << vr;
         }
         /* Refractive index */
         else if (strncmp(tmp_ptr, "RIND", 4) == 0)
         {
             tmp_ptr += 6;
-            ri = from_byte_stream<float>(&tmp_ptr);
+            ri = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "RIND: " << ri;
         }
         /* Floating point percentage luminance co-efficient */
         else if (strncmp(tmp_ptr, "LUMI", 4) == 0)
         {
             tmp_ptr += 6;
-            const float lumi = from_byte_stream<float>(&tmp_ptr);
+            const float lumi = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "LUMI (not handled): " << lumi;
         }
         /* Floating point percentage luminance co-efficient */
         else if (strncmp(tmp_ptr, "FLAG", 4) == 0)
         {
             tmp_ptr += 6;
-            const std::uint16_t flag = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const std::uint16_t flag = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "FLAG (not handled): " << flag;
         }
         /* Texture mapper or shader block */
@@ -125,7 +125,7 @@ bool lwo_surf::parse(const std::map<std::uint32_t, lwo_clip *> &clips, const cha
         {
             /* Translucency */
             tmp_ptr += 6;
-            const float trnl = from_byte_stream<float>(&tmp_ptr);
+            const float trnl = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "TRNL (not handled): " << trnl;
         }
         else if (strncmp(tmp_ptr, "TIMG", 4) == 0)
@@ -146,42 +146,42 @@ bool lwo_surf::parse(const std::map<std::uint32_t, lwo_clip *> &clips, const cha
         {
             /* Maximum smooting angle */
             tmp_ptr += 6;
-            _smoothing_threshold = from_byte_stream<float>(&tmp_ptr);
+            _smoothing_threshold = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "SMAN: " << _smoothing_threshold;
         }
         else if (strncmp(tmp_ptr, "BUMP", 4) == 0)
         {
             /* Bump height scaling */
             tmp_ptr += 6;
-            bump = from_byte_stream<float>(&tmp_ptr);
+            bump = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "BUMP: " << bump;
         }
         else if (strncmp(tmp_ptr, "SHRP", 4) == 0)
         {
             /* Sharpness of shadow cutoff, ignored because this should be determined by geometry */
             tmp_ptr += 6;
-            const float shrp = from_byte_stream<float>(&tmp_ptr);
+            const float shrp = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(info) << "SHRP (ignored): " << shrp;
         }
         else if (strncmp(tmp_ptr, "CLRF", 4) == 0)
         {
             /* The blending of transparency colour between the object and lights colour */
             tmp_ptr += 6;
-            clrf = from_byte_stream<float>(&tmp_ptr);
+            clrf = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "CLRF: " << clrf;
         }
         else if (strncmp(tmp_ptr, "CLRH", 4) == 0)
         {
             /* The blending of specular highlight colour between the object and lights colour */
             tmp_ptr += 6;
-            clrh = from_byte_stream<float>(&tmp_ptr);
+            clrh = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "CLRH: " << clrh;
         }
         else if (strncmp(tmp_ptr, "ADTR", 4) == 0)
         {
             /* Additive transparency */
             tmp_ptr += 6;
-            const float adtr = from_byte_stream<float>(&tmp_ptr);
+            const float adtr = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(trace) << "ADTR: " << adtr;
 
             /* Use colour filter if present, otherwise additive transparency */
@@ -194,8 +194,8 @@ bool lwo_surf::parse(const std::map<std::uint32_t, lwo_clip *> &clips, const cha
         {
             /* Alpha */
             tmp_ptr += 6;
-            const std::uint16_t mode = from_byte_stream<std::uint16_t>(&tmp_ptr);
-            const float alph = from_byte_stream<float>(&tmp_ptr);
+            const std::uint16_t mode = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const float alph = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "ALPH (not handled): " << mode << ", value: " << alph;
         }
         else if (strncmp(tmp_ptr, "SIDE", 4) == 0)
@@ -209,7 +209,7 @@ bool lwo_surf::parse(const std::map<std::uint32_t, lwo_clip *> &clips, const cha
         {
             /* Glow value */
             tmp_ptr += 6;
-            const float gval = from_byte_stream<float>(&tmp_ptr);
+            const float gval = raptor_parsers::from_byte_stream<float>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "GVAL (not handled): " << gval;
         }
         else if (strncmp(tmp_ptr, "RFOP", 4) == 0)
@@ -238,7 +238,7 @@ bool lwo_surf::parse(const std::map<std::uint32_t, lwo_clip *> &clips, const cha
             (strncmp(sec_ptr, "BLOK", 4) != 0) && (strncmp(sec_ptr, "RIMG", 4) != 0) && (strncmp(sec_ptr, "TIMG", 4) != 0) && (strncmp(sec_ptr, "ALPH", 4) != 0) && 
             (strncmp(sec_ptr, "FLAG", 4) != 0))
         {
-            const std::uint16_t envelop_id = from_byte_stream<std::uint16_t>(&tmp_ptr);
+            const std::uint16_t envelop_id = raptor_parsers::from_byte_stream<std::uint16_t>(&tmp_ptr);
             BOOST_LOG_TRIVIAL(warning) << "Envelop (not handled): " << envelop_id;
             assert(envelop_id == 0);   /* The envelop must be null */
         }

@@ -111,7 +111,7 @@ void parse_pols(const lwo_chunks &chunks, light_list &l, primitive_store &e, con
     {
         /* Parse the material to use */
         const std::uint32_t ptag_pol = parse_vx(&ptags_at);
-        const std::uint16_t mat_num = from_byte_stream<std::uint16_t>(&ptags_at);
+        const std::uint16_t mat_num = raptor_parsers::from_byte_stream<std::uint16_t>(&ptags_at);
         assert((ptag_pol == pol) || !"Error: ptag is not for this polygon");
 
         /* Range check the material */
@@ -123,7 +123,7 @@ void parse_pols(const lwo_chunks &chunks, light_list &l, primitive_store &e, con
         assert(surfs[mat_num] != nullptr);
 
         /* Parse vertices */
-        const std::uint16_t vert_this_pol = from_byte_stream<std::uint16_t>(&at);
+        const std::uint16_t vert_this_pol = raptor_parsers::from_byte_stream<std::uint16_t>(&at);
         for (std::uint32_t j = 0; j < vert_this_pol; j++)
         {
             const std::uint32_t vert_num = parse_vx(&at);
@@ -248,9 +248,9 @@ void lwo2_parser(
         for (std::uint32_t i = 0; i < nr_of_verts; i++)
         {
             point_t pnt;
-            pnt.x = from_byte_stream<float>(&pnts);
-            pnt.y = from_byte_stream<float>(&pnts);
-            pnt.z = from_byte_stream<float>(&pnts);
+            pnt.x = raptor_parsers::from_byte_stream<float>(&pnts);
+            pnt.y = raptor_parsers::from_byte_stream<float>(&pnts);
+            pnt.z = raptor_parsers::from_byte_stream<float>(&pnts);
             all_points.push_back(pnt);
         }
 

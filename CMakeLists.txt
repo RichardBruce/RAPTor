@@ -21,8 +21,8 @@ endif()
 # Compiler definitions
 add_definitions(-DREFLECTIONS_ON)
 add_definitions(-DREFRACTIONS_ON)
-add_definitions(-DSIMD_PACKET_TRACING)
-add_definitions(-DFRUSTRUM_CULLING)
+#add_definitions(-DSIMD_PACKET_TRACING)
+#add_definitions(-DFRUSTRUM_CULLING)
 add_definitions(-DEXACT_NORMALISE)
 add_definitions(-DBOOST_LOG_LEVEL=boost::log::trivial::trace)
 add_definitions(-DBOOST_LOG_DYN_LINK)
@@ -52,7 +52,7 @@ function(add_unit_test tests)
         add_custom_target(run_${test_name} DEPENDS ${test_name} COMMAND ${test_name})
 
         set(source ${source} unit_tests/${test_name}.cc)
-        
+
         install(TARGETS ${test_name} DESTINATION ${PROJECT_NAME}/bin)
     endforeach(test_name)
 
@@ -72,7 +72,7 @@ function(add_regression_test tests)
         add_custom_target(run_${test_name} DEPENDS ${test_name} COMMAND ${test_name})
 
         set(source ${source} regression_tests/${test_name}.cc)
-        
+
         install(TARGETS ${test_name} DESTINATION ${PROJECT_NAME}/bin)
     endforeach(test_name)
 
@@ -93,7 +93,7 @@ function(add_analysis sources headers)
     # add a custom _target_analysis target
     add_custom_target(${PROJECT_NAME}_analysis)
     set_target_properties(${PROJECT_NAME}_analysis PROPERTIES EXCLUDE_FROM_ALL TRUE)
-    
+
     # add the cppcheck command to the target
     set(CPPCHECK_ARG -DDIFFUSE_REFLECTIONS=128.0 -DSOFT_SHADOW=256.0 --enable=all --error-exitcode=1 --force --inline-suppr --xml-version=2)
     add_custom_command(TARGET ${PROJECT_NAME}_analysis PRE_BUILD
@@ -104,12 +104,17 @@ function(add_analysis sources headers)
         VERBATIM)
 endfunction()
 
-function(add_libs headers source libs)
+function(add_interface headers)
     # Headers
     add_library(${PROJECT_NAME}_headers INTERFACE)
     target_include_directories(${PROJECT_NAME}_headers INTERFACE ${headers})
     add_library(${PROJECT_NAME}::headers ALIAS ${PROJECT_NAME}_headers)
     install(DIRECTORY ${headers} DESTINATION ${PROJECT_NAME}/include FILES_MATCHING PATTERN "*.h")
+endfunction(add_interface)
+
+function(add_libs headers source libs)
+    # Headers
+    add_interface("${headers}")
 
     # Libraries
     add_library(${PROJECT_NAME}_static STATIC ${source})

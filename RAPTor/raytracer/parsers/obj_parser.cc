@@ -378,7 +378,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
             
             /* Get the name of the next material to parse */
             at += 6;
-            mn = get_next_string(&at);
+            mn = raptor_parsers::get_next_string(&at);
             
             /* Default parameters */
             t_ka    = nullptr;
@@ -399,11 +399,11 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Ambient colour */
         else if (strncmp(at, "Ka", 2) == 0)
         {
-            ka.r = get_next_float(&at) * 255.0f;
-            if (!end_of_line(at))
+            ka.r = raptor_parsers::get_next_float(&at) * 255.0f;
+            if (!raptor_parsers::end_of_line(at))
             {
-                ka.g = get_next_float(&at) * 255.0f;
-                ka.b = get_next_float(&at) * 255.0f;
+                ka.g = raptor_parsers::get_next_float(&at) * 255.0f;
+                ka.b = raptor_parsers::get_next_float(&at) * 255.0f;
             }
             else
             {
@@ -414,11 +414,11 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Diffuse colour */
         else if (strncmp(at, "Kd", 2) == 0)
         {
-            kd.r = get_next_float(&at) * 255.0f;
-            if (!end_of_line(at))
+            kd.r = raptor_parsers::get_next_float(&at) * 255.0f;
+            if (!raptor_parsers::end_of_line(at))
             {
-                kd.g = get_next_float(&at) * 255.0f;
-                kd.b = get_next_float(&at) * 255.0f;
+                kd.g = raptor_parsers::get_next_float(&at) * 255.0f;
+                kd.b = raptor_parsers::get_next_float(&at) * 255.0f;
             }
             else
             {
@@ -429,11 +429,11 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Specular colour */
         else if (strncmp(at, "Ks", 2) == 0)
         {
-            ks.r = get_next_float(&at) * 255.0f;
-            if (!end_of_line(at))
+            ks.r = raptor_parsers::get_next_float(&at) * 255.0f;
+            if (!raptor_parsers::end_of_line(at))
             {
-                ks.g = get_next_float(&at) * 255.0f;
-                ks.b = get_next_float(&at) * 255.0f;
+                ks.g = raptor_parsers::get_next_float(&at) * 255.0f;
+                ks.b = raptor_parsers::get_next_float(&at) * 255.0f;
             }
             else
             {
@@ -444,11 +444,11 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Transmitted colour */
         else if (strncmp(at, "Tf", 2) == 0)
         {
-            tf.r = get_next_float(&at) * 255.0f;
-            if (!end_of_line(at))
+            tf.r = raptor_parsers::get_next_float(&at) * 255.0f;
+            if (!raptor_parsers::end_of_line(at))
             {
-                tf.g = get_next_float(&at) * 255.0f;
-                tf.b = get_next_float(&at) * 255.0f;
+                tf.g = raptor_parsers::get_next_float(&at) * 255.0f;
+                tf.b = raptor_parsers::get_next_float(&at) * 255.0f;
             }
             else
             {
@@ -461,11 +461,11 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Emitted colour */
         else if (strncmp(at, "Ke", 2) == 0)
         {
-            ke.r = get_next_float(&at) * 255.0f;
-            if (!end_of_line(at))
+            ke.r = raptor_parsers::get_next_float(&at) * 255.0f;
+            if (!raptor_parsers::end_of_line(at))
             {
-                ke.g = get_next_float(&at) * 255.0f;
-                ke.b = get_next_float(&at) * 255.0f;
+                ke.g = raptor_parsers::get_next_float(&at) * 255.0f;
+                ke.b = raptor_parsers::get_next_float(&at) * 255.0f;
             }
             else
             {
@@ -478,36 +478,36 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Specular exponant */
         else if (strncmp(at, "Ns", 2) == 0)
         {
-            ns = get_next_float(&at);
+            ns = raptor_parsers::get_next_float(&at);
         }
         /* Refractive index */
         else if (strncmp(at, "Ni", 2) == 0)
         {
-            ri = get_next_float(&at);
+            ri = raptor_parsers::get_next_float(&at);
         }
         /* Opaque-ness */
         else if (strncmp(at, "d", 1) == 0)
         {
-            const float d = get_next_float(&at);
+            const float d = raptor_parsers::get_next_float(&at);
             BOOST_LOG_TRIVIAL(trace) << "d: " << d;
             trans = 1.0f - d;
         }
         /* Opaque-ness by another name */
         else if (strncmp(at, "Tr", 2) == 0)
         {
-            trans = get_next_float(&at);
+            trans = raptor_parsers::get_next_float(&at);
             BOOST_LOG_TRIVIAL(trace) << "Tr: " << trans;
         }
         /* Shader mode --ignored, everything is ray traced */
         else if (strncmp(at, "illum", 5) == 0)
         {
-            illum = get_next_unsigned(&at);
+            illum = raptor_parsers::get_next_unsigned(&at);
             BOOST_LOG_TRIVIAL(trace) << "illum: " << illum;
         }
         /* Ambiant texture map */
         else if (strncmp(at, "map_Ka", 6) == 0)
         {
-            const std::string map_file(p + get_next_string(&at));
+            const std::string map_file(p + raptor_parsers::get_next_string(&at));
             BOOST_LOG_TRIVIAL(trace) << "map_Ka: " << map_file;
 
             t_ka = load_image(&image_cache, map_file);
@@ -515,7 +515,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Diffuse texture map */
         else if (strncmp(at, "map_Kd", 6) == 0)
         {
-            const std::string map_file(p + get_next_string(&at));
+            const std::string map_file(p + raptor_parsers::get_next_string(&at));
             BOOST_LOG_TRIVIAL(trace) << "map_Kd: " << map_file;
 
             t_kd = load_image(&image_cache, map_file);
@@ -523,7 +523,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Specular texture map */
         else if (strncmp(at, "map_Ks", 6) == 0)
         {
-            const std::string map_file(p + get_next_string(&at));
+            const std::string map_file(p + raptor_parsers::get_next_string(&at));
             BOOST_LOG_TRIVIAL(trace) << "map_Ks: " << map_file;
             
             t_ks = load_image(&image_cache, map_file);
@@ -531,7 +531,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Reflection texture map */
         else if (strncmp(at, "map_refl", 8) == 0)
         {
-            const std::string map_file(p + get_next_string(&at));
+            const std::string map_file(p + raptor_parsers::get_next_string(&at));
             BOOST_LOG_TRIVIAL(trace) << "map_refl: " << map_file;
 
             t_rf = load_image(&image_cache, map_file);
@@ -539,14 +539,14 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Bump texture map */
         else if (strncmp(at, "map_bump", 8) == 0)
         {
-            const std::string map_file(p + get_next_string(&at));
+            const std::string map_file(p + raptor_parsers::get_next_string(&at));
             BOOST_LOG_TRIVIAL(warning) << "map_bump: " << map_file << " (not handled)";
 
             // t_kd = load_image(&image_cache, map_file);
         }
         else if (strncmp(at, "bump", 4) == 0)
         {
-            const std::string map_file(p + get_next_string(&at));
+            const std::string map_file(p + raptor_parsers::get_next_string(&at));
             BOOST_LOG_TRIVIAL(warning) << "bump: " << map_file << " (not handled)";
 
             // t_kd = load_image(&image_cache, map_file);
@@ -554,7 +554,7 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         /* Opaqueness texture map */
         else if (strncmp(at, "map_d", 5) == 0)
         {
-            const std::string map_file(p + get_next_string(&at));
+            const std::string map_file(p + raptor_parsers::get_next_string(&at));
             BOOST_LOG_TRIVIAL(trace) << "map_d: " << map_file;
 
             t_tran = load_image(&image_cache, map_file, true);
@@ -562,12 +562,12 @@ material * parse_mtllib(std::map<std::string, material *> *const s, std::ifstrea
         else
         {
             BOOST_LOG_TRIVIAL(error) << "Found unknown: " << std::string(&at[0], 6) << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]);
-            find_next_line(&at);
+            raptor_parsers::find_next_line(&at);
             assert(false);
         }
         
         /* Get next lone for parsing */
-        find_next_line(&at);
+        raptor_parsers::find_next_line(&at);
     }
 
     /* Create the last material parsed */
@@ -671,10 +671,10 @@ material * parse_mtllib_statement(std::map<std::string, material *> *const s, co
     material *m = nullptr;
     
     /* Parse till the end of the line */
-    while (!end_of_line(*c))
+    while (!raptor_parsers::end_of_line(*c))
     {
         /* Get the material library to open */
-        std::string mtllib = p + get_next_string(c);
+        std::string mtllib = p + raptor_parsers::get_next_string(c);
         BOOST_LOG_TRIVIAL(trace) << "Opening material file: " << mtllib;
         std::ifstream f(mtllib.c_str());
         assert(f.is_open());
@@ -688,7 +688,7 @@ material * parse_mtllib_statement(std::map<std::string, material *> *const s, co
     }
     
     /* Advance to the next line */
-    find_next_line(c);
+    raptor_parsers::find_next_line(c);
     return m;
 }
 
@@ -696,7 +696,7 @@ material * parse_mtllib_statement(std::map<std::string, material *> *const s, co
 void parse_usemtl_statement(std::map<std::string, material *> *const s, material **m, const char **c)
 {
     /* Get the name of the material and look it up in the hash */
-    std::string usemtl = get_next_string(c);
+    std::string usemtl = raptor_parsers::get_next_string(c);
     auto i = s->find(usemtl);
     
     /* Check if the material was found */
@@ -710,7 +710,7 @@ void parse_usemtl_statement(std::map<std::string, material *> *const s, material
         (*s)[usemtl] = *m;
     }
         
-   find_next_line(c);
+   raptor_parsers::find_next_line(c);
 }
 
 
@@ -718,12 +718,12 @@ void parse_v_statement(std::vector<point_t> *const vs, const char **c)
 {
     point_t v;
 
-    v.x = get_next_float(c);
-    v.y = get_next_float(c);
-    v.z = get_next_float(c);
+    v.x = raptor_parsers::get_next_float(c);
+    v.y = raptor_parsers::get_next_float(c);
+    v.z = raptor_parsers::get_next_float(c);
 //    BOOST_LOG_TRIVIAL(trace) << "Parsed v: " << v;
 
-    find_next_line(c);
+    raptor_parsers::find_next_line(c);
 
     vs->push_back(v);
 }
@@ -733,11 +733,11 @@ void parse_vt_statement(std::vector<point_t> *const vs, const char **c)
 {
     point_t v;
 
-    v.x = get_next_float(c);
-    v.y = get_next_float(c);
+    v.x = raptor_parsers::get_next_float(c);
+    v.y = raptor_parsers::get_next_float(c);
 //    BOOST_LOG_TRIVIAL(trace) << "Parsed vt: " << v.x << ", " << v.y;
 
-    find_next_line(c);
+    raptor_parsers::find_next_line(c);
 
     vs->push_back(v);
 }
@@ -747,13 +747,13 @@ void parse_vn_statement(std::vector<point_t> *const vs, const char **c)
 {
     point_t v;
 
-    v.x = get_next_float(c);
-    v.y = get_next_float(c);
-    v.z = get_next_float(c);
+    v.x = raptor_parsers::get_next_float(c);
+    v.y = raptor_parsers::get_next_float(c);
+    v.z = raptor_parsers::get_next_float(c);
     normalise(&v);
 //    BOOST_LOG_TRIVIAL(trace) << "Parsed vn: " << v;
 
-    find_next_line(c);
+    raptor_parsers::find_next_line(c);
 
     vs->push_back(v);
 }
@@ -825,22 +825,22 @@ void obj_parser(
         /* Group */
         else if (*at == 'g')
         {
-            find_next_line(&at);
+            raptor_parsers::find_next_line(&at);
         }
         /* Object */
         else if (*at == 'o')
         {
-            find_next_line(&at);
+            raptor_parsers::find_next_line(&at);
         }
         /* Smoothing group */
         else if (*at == 's')
         {
-            find_next_line(&at);
+            raptor_parsers::find_next_line(&at);
         }
         else
         {
             BOOST_LOG_TRIVIAL(error) << "Found unknown statement: " << at << ", at: " << reinterpret_cast<long>(at) << ", of: " << reinterpret_cast<long>(&buffer[len - 1]);
-            find_next_line(&at);
+            raptor_parsers::find_next_line(&at);
             assert(false);
         }
     }
