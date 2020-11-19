@@ -20,7 +20,9 @@ set(UNIT_TESTS
 add_unit_test("${UNIT_TESTS}")
 
 set(REGRESSION_TESTS
-    mesh_decimation_edge_tests)
+    vertex_target_0_2_tests
+    vertex_target_0_5_tests
+    vertex_target_0_8_tests)
 add_regression_test("${REGRESSION_TESTS}")
 
 # Generate Outputs

@@ -59,10 +59,19 @@ BOOST_AUTO_TEST_CASE( merge_error_triangle_test )
     add_vertices({ point_t(0.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(1.0f, 1.0f, 0.0f) });
     add_face(&vertices[0], &vertices[1], &vertices[2]);
 
+    BOOST_CHECK(vertices[0].merge_error(vertices[1], v_new) == 0.0f);
+    BOOST_CHECK(v_new == vertices[1].position());
+    std::cout << std::endl;
+}
 
-    std::cout << "merge cost " << vertices[0].merge_error(vertices[1], v_new) << std::endl;
-    std::cout << "new vertex " << v_new << std::endl;
-    // BOOST_CHECK(proj_vertices[0].index() == 0);
+BOOST_AUTO_TEST_CASE( merge_error_shifted_triangle_test )
+{
+    add_vertices({ point_t(0.0f, 0.0f, 5.0f), point_t(1.0f, 0.0f, 5.0f), point_t(1.0f, 1.0f, 5.0f) });
+    add_face(&vertices[0], &vertices[1], &vertices[2]);
+
+    BOOST_CHECK(vertices[0].merge_error(vertices[1], v_new) == 0.0f);
+    BOOST_CHECK(v_new == vertices[1].position());
+    std::cout << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE( merge_error_square_test )
@@ -71,9 +80,20 @@ BOOST_AUTO_TEST_CASE( merge_error_square_test )
     add_face(&vertices[0], &vertices[1], &vertices[2]);
     add_face(&vertices[0], &vertices[2], &vertices[3]);
 
-    std::cout << "merge cost " << vertices[0].merge_error(vertices[1], v_new) << std::endl;
-    std::cout << "new vertex " << v_new << std::endl;
-    // BOOST_CHECK(proj_vertices[0].index() == 0);
+    BOOST_CHECK(vertices[0].merge_error(vertices[1], v_new) == 0.0f);
+    BOOST_CHECK(v_new == vertices[1].position());
+    std::cout << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( merge_error_shifted_square_test )
+{
+    add_vertices({ point_t(0.0f, 0.0f, 5.0f), point_t(1.0f, 0.0f, 5.0f), point_t(1.0f, 1.0f, 5.0f), point_t(0.0f, 1.0f, 5.0f) });
+    add_face(&vertices[0], &vertices[1], &vertices[2]);
+    add_face(&vertices[0], &vertices[2], &vertices[3]);
+
+    BOOST_CHECK(vertices[0].merge_error(vertices[1], v_new) == 0.0f);
+    BOOST_CHECK(v_new == vertices[1].position());
+    std::cout << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE( merge_error_square_with_center_test )
@@ -84,9 +104,22 @@ BOOST_AUTO_TEST_CASE( merge_error_square_with_center_test )
     add_face(&vertices[0], &vertices[3], &vertices[4]);
     add_face(&vertices[0], &vertices[4], &vertices[1]);
 
-    std::cout << "merge cost " << vertices[0].merge_error(vertices[1], v_new) << std::endl;
-    std::cout << "new vertex " << v_new << std::endl;
-    // BOOST_CHECK(proj_vertices[0].index() == 0);
+    BOOST_CHECK(vertices[0].merge_error(vertices[1], v_new) == 0.0f);
+    BOOST_CHECK(v_new == vertices[1].position());
+    std::cout << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( merge_error_shifted_square_with_center_test )
+{
+    add_vertices({ point_t(0.0f, 0.0f, 5.0f), point_t(-1.0f, -1.0f, 5.0f), point_t(1.0f, -1.0f, 5.0f), point_t(1.0f, 1.0f, 5.0f), point_t(-1.0f, 1.0f, 5.0f) });
+    add_face(&vertices[0], &vertices[1], &vertices[2]);
+    add_face(&vertices[0], &vertices[2], &vertices[3]);
+    add_face(&vertices[0], &vertices[3], &vertices[4]);
+    add_face(&vertices[0], &vertices[4], &vertices[1]);
+
+    BOOST_CHECK(vertices[0].merge_error(vertices[1], v_new) == 0.0f);
+    BOOST_CHECK(v_new == vertices[1].position());
+    std::cout << std::endl;
 }
 
 // BOOST_AUTO_TEST_CASE( merge_error_double_tet_test )
