@@ -82,11 +82,11 @@ float parse_directional_light(light_list &l, const char *a, const char *eob)
         raptor_parsers::find_next_line(&a);
         raptor_parsers::skip_white_space(&a);
         assert(strncmp(a, "direction", 9) == 0);
-        point_t d;
+        point_t<> d;
         d.x = raptor_parsers::get_next_float(&a);
         d.y = raptor_parsers::get_next_float(&a);
         d.z = raptor_parsers::get_next_float(&a);
-        point_t c(-d * 1000.0f);
+        point_t<> c(-d * 1000.0f);
 
 
         raptor_parsers::find_next_line(&a);
@@ -105,7 +105,7 @@ void parse_viewpoint(camera *c, const std::string &v, const char *a, const char 
 {
     std::string desc = "";
     float angle  = 0.0f;
-    point_t p, r;
+    point_t<> p, r;
     while ((a != eob) && (v != desc))
     {
         while ((a != eob) && (strncmp(a, "Viewpoint {", 11) != 0))
@@ -153,7 +153,7 @@ void parse_viewpoint(camera *c, const std::string &v, const char *a, const char 
 }
 
 
-void parse_points(std::vector<point_t> *p, const char *a, const char *eob)
+void parse_points(std::vector<point_t<>> *p, const char *a, const char *eob)
 {
     while ((a != eob) && (strncmp(a, "point [", 7) != 0))
     {
@@ -164,7 +164,7 @@ void parse_points(std::vector<point_t> *p, const char *a, const char *eob)
     {
         do 
         {
-            point_t tp;
+            point_t<> tp;
             raptor_parsers::find_next_line(&a);
             tp.x = raptor_parsers::get_next_float(&a);
             tp.y = raptor_parsers::get_next_float(&a);
@@ -177,7 +177,7 @@ void parse_points(std::vector<point_t> *p, const char *a, const char *eob)
 }
 
 
-void parse_triangles(primitive_store &prim, std::list<material *> &m, const std::vector<point_t> &p, const std::vector<ext_colour_t> &c, const float ka, const char *a, const char *eob)
+void parse_triangles(primitive_store &prim, std::list<material *> &m, const std::vector<point_t<>> &p, const std::vector<ext_colour_t> &c, const float ka, const char *a, const char *eob)
 {
     while ((a != eob) && (strncmp(a, "coordIndex [", 12) != 0))
     {
@@ -256,7 +256,7 @@ void vrml_parser(
     ext_colour_t bg;
 
     /* Vector for face to triangle conversion */
-    std::vector<point_t>        points;
+    std::vector<point_t<>>        points;
     std::vector<ext_colour_t>   colours;
 
     /* Parse the file */

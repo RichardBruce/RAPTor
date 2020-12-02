@@ -34,7 +34,7 @@ class vertex_group : private boost::noncopyable
 {
     public :
         /* CTORs and DTORs */
-        vertex_group(const std::vector<point_t> *const verts, const std::vector<polygon> &polys, raptor_raytracer::material *const mat) : 
+        vertex_group(const std::vector<point_t<>> *const verts, const std::vector<polygon> &polys, raptor_raytracer::material *const mat) : 
             _verts(verts),
             _polys(polys),
             _tris(build_tris()),
@@ -55,15 +55,15 @@ class vertex_group : private boost::noncopyable
 
         /* Vertex access */
         int     get_number_of_vertices()    const { return _verts->size();  }
-        point_t get_vertex(const int i)     const { return (*_verts)[i];    }
+        point_t<> get_vertex(const int i)     const { return (*_verts)[i];    }
         
-        point_t get_vertex(const quaternion_t &r, const point_t &t, const int i) const
+        point_t<> get_vertex(const quaternion_t &r, const point_t<> &t, const int i) const
         {
             return r.rotate((*_verts)[i]) + t;
         }
 
         /* Get the groups bounding box */
-        const vertex_group& get_bounds(point_t *const hi, point_t *const lo) const
+        const vertex_group& get_bounds(point_t<> *const hi, point_t<> *const lo) const
         {
             /* Initialise to the first data point */
             *hi = (*_verts)[0];
@@ -81,14 +81,14 @@ class vertex_group : private boost::noncopyable
 
         /* TODO -- These could all potentially be sped up with some acceleration structure */
         /* Find the most extreme vertex in direction d */
-        int find_support_vertex(const point_t &d) const
+        int find_support_vertex(const point_t<> &d) const
         {
             /* Find a support vertex as normal */
             return raptor_physics::find_support_vertex(*_verts, d);
         }
 
         /* Find the most extreme vertex in direction d taking the movement of the objects into account */
-        int find_support_vertex(const point_t &d, const point_t &rel_disp) const
+        int find_support_vertex(const point_t<> &d, const point_t<> &rel_disp) const
         {
             /* Find a support vertex as normal */
             int max_support_vertex = find_support_vertex(d);
@@ -104,12 +104,12 @@ class vertex_group : private boost::noncopyable
         }
 
         /* Find support vertex including movement and rotation and penalising for distance in n */
-        int find_support_vertex(const point_t &w, const point_t &c, const point_t &p, const point_t &n, float *const val) const
+        int find_support_vertex(const point_t<> &w, const point_t<> &c, const point_t<> &p, const point_t<> &n, float *const val) const
         {
             return raptor_physics::find_support_vertex(*_verts, w, c, p, n, val);
         }
 
-        float find_intersection_time(const vertex_group &vg, const point_t &nb, const point_t &x0, const point_t &x1, const point_t &q0, const point_t &q1, const float r0, const float r1, const float full_t)
+        float find_intersection_time(const vertex_group &vg, const point_t<> &nb, const point_t<> &x0, const point_t<> &x1, const point_t<> &q0, const point_t<> &q1, const float r0, const float r1, const float full_t)
         {
             BOOST_LOG_TRIVIAL(trace) << "Verts: " << _verts->size();
             BOOST_LOG_TRIVIAL(trace) << "Tris: " << vg._tris.size();
@@ -119,12 +119,12 @@ class vertex_group : private boost::noncopyable
             for (int i = 0; i < static_cast<int>(_verts->size()); ++i)
             {
                 /* See when it is inside all face of vg */
-                const point_t &pa = (*_verts)[i];
+                const point_t<> &pa = (*_verts)[i];
                 for (int j = 0; j < static_cast<int>(vg._tris.size()); j += 3)
                 {
                     /* Build face normal */
-                    const point_t &pb_0 = (*vg._verts)[vg._tris[j]];
-                    // const point_t nb(cross_product(pb_1 - pb_0, pb_2 - pb_0));
+                    const point_t<> &pb_0 = (*vg._verts)[vg._tris[j]];
+                    // const point_t<> nb(cross_product(pb_1 - pb_0, pb_2 - pb_0));
 
                     /* Find intersection time */
                     const float inter = find_exact_collision_time(pa, pb_0, nb, x0, x1, q0, q1, r0, r1);
@@ -137,7 +137,7 @@ class vertex_group : private boost::noncopyable
         }
 
         /* Find the polygon most matched to the points and normal */
-        const polygon * find_polygon(const int *const pt_begin, const int *const pt_end, const point_t &n) const
+        const polygon * find_polygon(const int *const pt_begin, const int *const pt_end, const point_t<> &n) const
         {
             float best_dir = -0.5f; /* Back face culling */
             const polygon *best_poly = nullptr;
@@ -162,10 +162,10 @@ class vertex_group : private boost::noncopyable
         }
 
         /* Build triangles for rendering */
-        const vertex_group& triangles(raptor_raytracer::primitive_store *p, const quaternion_t &r, const point_t &t) const
+        const vertex_group& triangles(raptor_raytracer::primitive_store *p, const quaternion_t &r, const point_t<> &t) const
         {
             /* Position vertices */
-            std::vector<point_t> pos_verts;
+            std::vector<point_t<>> pos_verts;
             pos_verts.reserve(_verts->size());
             for (int i = 0; i < static_cast<int>(_verts->size()); ++i)
             {
@@ -215,7 +215,7 @@ class vertex_group : private boost::noncopyable
             return edges;
         }        
 
-        const std::vector<point_t> *const   _verts; /* Vertices making up the group     */
+        const std::vector<point_t<>> *const _verts; /* Vertices making up the group     */
         const std::vector<polygon>          _polys; /* Face polygons                    */
         const std::vector<int>              _tris;  /* Triples of triangle edges        */
         const std::vector<int>      *const  _edges; /* Per vertex connectivity          */
@@ -224,10 +224,10 @@ class vertex_group : private boost::noncopyable
 
 
 /* Routine to make plane out of triangles */
-inline vertex_group* make_plane(raptor_raytracer::material *m, const point_t &bl, const point_t &br, const point_t &tl, const point_t &tr)
+inline vertex_group* make_plane(raptor_raytracer::material *m, const point_t<> &bl, const point_t<> &br, const point_t<> &tl, const point_t<> &tr)
 {
     /* Vertices of the plane */
-    auto verts = new std::vector<point_t>(
+    auto verts = new std::vector<point_t<>>(
     {
         bl, tl, tr, br
     });
@@ -244,19 +244,19 @@ inline vertex_group* make_plane(raptor_raytracer::material *m, const point_t &bl
 
 
 /* Routine to make cubes out of triangles */
-inline vertex_group* make_cube(raptor_raytracer::material *m, const point_t &bl, const point_t &tr)
+inline vertex_group* make_cube(raptor_raytracer::material *m, const point_t<> &bl, const point_t<> &tr)
 {
     /* Vertices of the cube */
-    auto verts = new std::vector<point_t>(
+    auto verts = new std::vector<point_t<>>(
     {
-        point_t(bl.x, bl.y, bl.z),
-        point_t(tr.x, bl.y, bl.z),
-        point_t(tr.x, tr.y, bl.z),
-        point_t(bl.x, tr.y, bl.z),
-        point_t(bl.x, bl.y, tr.z),
-        point_t(tr.x, bl.y, tr.z),
-        point_t(tr.x, tr.y, tr.z),
-        point_t(bl.x, tr.y, tr.z)
+        point_t<>(bl.x, bl.y, bl.z),
+        point_t<>(tr.x, bl.y, bl.z),
+        point_t<>(tr.x, tr.y, bl.z),
+        point_t<>(bl.x, tr.y, bl.z),
+        point_t<>(bl.x, bl.y, tr.z),
+        point_t<>(tr.x, bl.y, tr.z),
+        point_t<>(tr.x, tr.y, tr.z),
+        point_t<>(bl.x, tr.y, tr.z)
     });
 
     /* Polygons making up the cube */

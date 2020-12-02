@@ -14,8 +14,8 @@ void kdt_builder::build(const primitive_store *const objects, std::vector<kdt_no
     const int nr_primitives = objects->size();
 
     /* Cache primitive bounds */
-    _b = point_t(MAX_DIST, MAX_DIST, MAX_DIST);
-    _t = point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST);
+    _b = point_t<>(MAX_DIST, MAX_DIST, MAX_DIST);
+    _t = point_t<>(-MAX_DIST, -MAX_DIST, -MAX_DIST);
     std::vector<voxel_aab_data> ping(nr_primitives << 1);
     std::vector<voxel_aab_data> pong(nr_primitives << 1);
     for (int i = 0; i < nr_primitives; ++i)

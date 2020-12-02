@@ -9,7 +9,7 @@ namespace raptor_raytracer
 void scene_init(light_list &lights, primitive_store &everything, std::list<material *> &materials, camera **c)
 {
     /* Set up the camera */
-    *c = new camera(point_t(0.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f), point_t(0.0f, 0.0f, 1.0f), ext_colour_t(0.0f ,0.0f ,255.0f), 7.5f, 10.0f, 10.0f, 640, 480);
+    *c = new camera(point_t(0.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f), point_t(0.0f, 0.0f, 1.0f), ext_colour_t(0.0f ,0.0f ,255.0f), 7.5f, 10.0f, 10.0f, 640, 480, 1, 1, 0.0f, 0.0f);
 
     phong_shader *frame_mat = new phong_shader(ext_colour_t(125.0f, 125.0f, 125.0f), 0.3330f, 0.3330f, 0.0300f);
     materials.push_back(frame_mat);

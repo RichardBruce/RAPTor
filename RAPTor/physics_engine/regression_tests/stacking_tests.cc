@@ -29,17 +29,17 @@ BOOST_FIXTURE_TEST_SUITE( stacking_tests, regression_fixture );
 //     pe.default_collider(new rigid_body_collider(0.1, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0,  10.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0, -20.0, -100.0));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, -4.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  0.5, 0.0), 20.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  5.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 10.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, -4.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  0.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  5.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, 10.5, 0.0), 20.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
 //     run(&checker, 150);
@@ -57,17 +57,17 @@ BOOST_FIXTURE_TEST_SUITE( stacking_tests, regression_fixture );
 //     pe.default_collider(new rigid_body_collider(0.5, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0,  10.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0, -20.0, -100.0));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, -4.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  0.5, 0.0), 20.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  5.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 10.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, -4.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  0.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  5.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, 10.5, 0.0), 20.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
 //     run(&checker, 150);
@@ -85,17 +85,17 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
     pe.default_collider(new rigid_body_collider(0.9, 0.75, 0.75));
 
     /* Lights */
-    se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-    se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+    se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0,  10.0, -100.0));
+    se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0, -20.0, -100.0));
 
     /* Add moving objects */
-    se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, -4.5, 0.0), 10.0));
-    se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  0.5, 0.0), 20.0));
-    se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  5.5, 0.0), 10.0));
-    se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 10.5, 0.0), 20.0));
+    se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, -4.5, 0.0), 10.0));
+    se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  0.5, 0.0), 20.0));
+    se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  5.5, 0.0), 10.0));
+    se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, 10.5, 0.0), 20.0));
 
     /* Add static objects */
-    se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+    se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
     /* Run physics simulation */
     run(&checker, 150);
@@ -113,17 +113,17 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
 //     pe.default_collider(new rigid_body_collider(0.1, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0,  10.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0, -20.0, -100.0));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, -4.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  0.5, 0.0), 20.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  5.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 10.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, -4.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  0.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  5.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, 10.5, 0.0), 20.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
 //     run(&checker, 200);
@@ -141,17 +141,17 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
 //     pe.default_collider(new rigid_body_collider(0.5, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0,  10.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0, -20.0, -100.0));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, -4.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  0.5, 0.0), 20.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  5.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 10.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, -4.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  0.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  5.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, 10.5, 0.0), 20.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
 //     run(&checker, 200);
@@ -169,17 +169,17 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
 //     pe.default_collider(new rigid_body_collider(0.9, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0,  10.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0, -20.0, -100.0));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, -4.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  0.5, 0.0), 20.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  5.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 10.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, -4.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  0.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  5.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, 10.5, 0.0), 20.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
 //     run(&checker, 250);
@@ -197,17 +197,17 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
 //     pe.default_collider(new rigid_body_collider(0.1, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0,  10.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0, -20.0, -100.0));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, -4.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  0.5, 0.0), 20.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  5.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 10.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, -4.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  0.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  5.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, 10.5, 0.0), 20.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
 //     run(&checker, 450);
@@ -225,17 +225,17 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
 //     pe.default_collider(new rigid_body_collider(0.5, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0,  10.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0, -20.0, -100.0));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, -4.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  0.5, 0.0), 20.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  5.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 10.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, -4.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  0.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  5.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, 10.5, 0.0), 20.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
 //     run(&checker, 450);
@@ -253,17 +253,17 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
 //     pe.default_collider(new rigid_body_collider(0.9, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0,  10.0, -100.0));
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10.0, -20.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0,  10.0, -100.0));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10.0, -20.0, -100.0));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, -4.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  0.5, 0.0), 20.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0,  5.5, 0.0), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5), point_t(0.0, 10.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, -4.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  0.5, 0.0), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0,  5.5, 0.0), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5), point_t<>(0.0, 10.5, 0.0), 20.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
 //     run(&checker, 800);
@@ -282,17 +282,17 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
 //     pe.default_collider(new rigid_body_collider(0.5, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10,  10, -100));
-//     se.add_light(raptor_raytracer::ext_colour_t(255, 255, 255), point_t(10, -20, -100));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10,  10, -100));
+//     se.add_light(raptor_raytracer::ext_colour_t(255, 255, 255), point_t<>(10, -20, -100));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(0.0, -5.0, -0.5), point_t(1.0, -4.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-4.0, 5.0, -0.5), point_t(5.0, 6.0, 0.5), 20.0));
-//     se.add_moving_object(make_cube(m, point_t(-4.0, 10.0, -0.5), point_t(-3.0, 11.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(4.0, 10.0, -0.5), point_t(5.0, 11.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(0.0, -5.0, -0.5), point_t<>(1.0, -4.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-4.0, 5.0, -0.5), point_t<>(5.0, 6.0, 0.5), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-4.0, 10.0, -0.5), point_t<>(-3.0, 11.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(4.0, 10.0, -0.5), point_t<>(5.0, 11.0, 0.5), 10.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
     // run(&checker, 400);
@@ -310,20 +310,20 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
 //     pe.default_collider(new rigid_body_collider(0.5, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10,  10, -100));
-//     se.add_light(raptor_raytracer::ext_colour_t(255, 255, 255), point_t(10, -20, -100));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10,  10, -100));
+//     se.add_light(raptor_raytracer::ext_colour_t(255, 255, 255), point_t<>(10, -20, -100));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(0.0, -5.0, -0.5), point_t(1.0, -4.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(0.0, 0.0, -0.5), point_t(1.0, 1.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-4.0, 5.0, -0.5), point_t(5.0, 6.0, 0.5), 20.0));
-//     se.add_moving_object(make_cube(m, point_t(-4.0, 10.0, -0.5), point_t(-3.0, 11.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(4.0, 10.0, -0.5), point_t(5.0, 11.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-4.0, 15.0, -0.5), point_t(-3.0, 16.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(4.0, 15.0, -0.5), point_t(5.0, 16.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(0.0, -5.0, -0.5), point_t<>(1.0, -4.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(0.0, 0.0, -0.5), point_t<>(1.0, 1.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-4.0, 5.0, -0.5), point_t<>(5.0, 6.0, 0.5), 20.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-4.0, 10.0, -0.5), point_t<>(-3.0, 11.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(4.0, 10.0, -0.5), point_t<>(5.0, 11.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-4.0, 15.0, -0.5), point_t<>(-3.0, 16.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(4.0, 15.0, -0.5), point_t<>(5.0, 16.0, 0.5), 10.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
     // run(&checker, 400);
@@ -341,17 +341,17 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
 //     pe.default_collider(new rigid_body_collider(0.5, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10,  10, -100));
-//     se.add_light(raptor_raytracer::ext_colour_t(255, 255, 255), point_t(10, -20, -100));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10,  10, -100));
+//     se.add_light(raptor_raytracer::ext_colour_t(255, 255, 255), point_t<>(10, -20, -100));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(-5.0, -5.0, -0.5), point_t(-4.0, -3.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(4.0, -5.0, -0.5), point_t(5.0, -4.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(4.0, 0.0, -0.5), point_t(5.0, 1.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-5.0, 5.0, -0.5), point_t(5.0, 6.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-5.0, -5.0, -0.5), point_t<>(-4.0, -3.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(4.0, -5.0, -0.5), point_t<>(5.0, -4.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(4.0, 0.0, -0.5), point_t<>(5.0, 1.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-5.0, 5.0, -0.5), point_t<>(5.0, 6.0, 0.5), 10.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
     // run(&checker, 400);
@@ -369,21 +369,21 @@ BOOST_AUTO_TEST_CASE( four_straight_stack_10_fps_cor_0_9_test )
 //     pe.default_collider(new rigid_body_collider(0.5, 0.75));
 
 //     /* Lights */
-//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(10,  10, -100));
-//     se.add_light(raptor_raytracer::ext_colour_t(255, 255, 255), point_t(10, -20, -100));
+//     se.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(10,  10, -100));
+//     se.add_light(raptor_raytracer::ext_colour_t(255, 255, 255), point_t<>(10, -20, -100));
 
 //     /* Add moving objects */
-//     se.add_moving_object(make_cube(m, point_t(-5.0, -5.0, -0.5), point_t(-4.0, -3.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(4.0, -5.0, -0.5), point_t(5.0, -4.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(4.0, 0.0, -0.5), point_t(5.0, 1.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-5.0, 5.0, -0.5), point_t(5.0, 6.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-5.0, 10.0, -0.5), point_t(-4.0, 12.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(4.0, 10.0, -0.5), point_t(5.0, 11.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(4.0, 15.0, -0.5), point_t(5.0, 16.0, 0.5), 10.0));
-//     se.add_moving_object(make_cube(m, point_t(-5.0, 20.0, -0.5), point_t(5.0, 21.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-5.0, -5.0, -0.5), point_t<>(-4.0, -3.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(4.0, -5.0, -0.5), point_t<>(5.0, -4.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(4.0, 0.0, -0.5), point_t<>(5.0, 1.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-5.0, 5.0, -0.5), point_t<>(5.0, 6.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-5.0, 10.0, -0.5), point_t<>(-4.0, 12.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(4.0, 10.0, -0.5), point_t<>(5.0, 11.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(4.0, 15.0, -0.5), point_t<>(5.0, 16.0, 0.5), 10.0));
+//     se.add_moving_object(make_cube(m, point_t<>(-5.0, 20.0, -0.5), point_t<>(5.0, 21.0, 0.5), 10.0));
 
 //     /* Add static objects */
-//     se.add_object(make_plane(m, point_t(-10.0, 0.0, -10.0), point_t(10.0, 0.0, -10.0), point_t(-10.0, 0.0, 10.0), point_t(10.0, 0.0, 10.0), point_t(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
+//     se.add_object(make_plane(m, point_t<>(-10.0, 0.0, -10.0), point_t<>(10.0, 0.0, -10.0), point_t<>(-10.0, 0.0, 10.0), point_t<>(10.0, 0.0, 10.0), point_t<>(0.0, -10.0, 0.0), std::numeric_limits<float>::infinity()));
 
 //     /* Run physics simulation */
     // run(&checker, 400);

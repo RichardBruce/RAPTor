@@ -19,8 +19,8 @@ void isosurface::to_triangles(raptor_raytracer::primitive_store *p)
     
     /* Find are covered by meta balls */
     float min_radius = _meta_balls[0].radius();
-    point_t lower_bound(_meta_balls[0].center() - _meta_balls[0].radius());
-    point_t upper_bound(_meta_balls[0].center() + _meta_balls[0].radius());
+    point_t<> lower_bound(_meta_balls[0].center() - _meta_balls[0].radius());
+    point_t<> upper_bound(_meta_balls[0].center() + _meta_balls[0].radius());
     for (std::size_t i = 1; i < _meta_balls.size(); ++i)
     {
         min_radius = std::min(min_radius, _meta_balls[i].radius());
@@ -31,7 +31,7 @@ void isosurface::to_triangles(raptor_raytracer::primitive_store *p)
 
     /* The grid needs to be atleast min_radius or we would miss entire balls */
     const float grid_cell_size = (min_radius * 0.0625);
-    const point_t grid_size(upper_bound - lower_bound);
+    const point_t<> grid_size(upper_bound - lower_bound);
     const int x_size = grid_size.x / grid_cell_size;
     const int y_size = grid_size.y / grid_cell_size;
     const int z_size = grid_size.z / grid_cell_size;
@@ -92,19 +92,19 @@ void isosurface::to_triangles(raptor_raytracer::primitive_store *p)
     _grid_values.reset(new float[grid_value_mask + 1]);
     std::memset(&_grid_values[0], 0, (grid_value_mask + 1) * sizeof(float));
 
-    point_t v_n[3];
-    point_t normals[12];
-    point_t intersects[12];
-    const point_t vertex_offsets[8] = 
+    point_t<> v_n[3];
+    point_t<> normals[12];
+    point_t<> intersects[12];
+    const point_t<> vertex_offsets[8] = 
     {
-        point_t(grid_cell_size, grid_cell_size, grid_cell_size),
-        point_t(grid_cell_size, grid_cell_size,           0.0f),
-        point_t(grid_cell_size,           0.0f,           0.0f),
-        point_t(grid_cell_size,           0.0f, grid_cell_size),
-        point_t(          0.0f, grid_cell_size, grid_cell_size),
-        point_t(          0.0f, grid_cell_size,           0.0f),
-        point_t(          0.0f,           0.0f,           0.0f),
-        point_t(          0.0f,           0.0f, grid_cell_size),
+        point_t<>(grid_cell_size, grid_cell_size, grid_cell_size),
+        point_t<>(grid_cell_size, grid_cell_size,           0.0f),
+        point_t<>(grid_cell_size,           0.0f,           0.0f),
+        point_t<>(grid_cell_size,           0.0f, grid_cell_size),
+        point_t<>(          0.0f, grid_cell_size, grid_cell_size),
+        point_t<>(          0.0f, grid_cell_size,           0.0f),
+        point_t<>(          0.0f,           0.0f,           0.0f),
+        point_t<>(          0.0f,           0.0f, grid_cell_size),
     };
 
     const int x_cell = (y_size + 1) * (z_size + 1);
@@ -112,7 +112,7 @@ void isosurface::to_triangles(raptor_raytracer::primitive_store *p)
     // std::cout << "x cell: " << x_cell << ", y cell: " << y_cell << std::endl;
 
     int grid_value_offset = 0;
-    point_t pos(lower_bound.x + grid_cell_size, lower_bound.y, lower_bound.z);
+    point_t<> pos(lower_bound.x + grid_cell_size, lower_bound.y, lower_bound.z);
     for (int x = 0; x < x_size; ++x)
     {
         for (int z = 0; z < (z_size + 1); ++z)
@@ -317,7 +317,7 @@ void isosurface::to_triangles(raptor_raytracer::primitive_store *p)
     }
 }
 
-int isosurface::calculate_grid_value(const int *grid_begin, const int *const grid_end, const point_t &pos, const int grid_value_offset, const int grid_value_mask)
+int isosurface::calculate_grid_value(const int *grid_begin, const int *const grid_end, const point_t<> &pos, const int grid_value_offset, const int grid_value_mask)
 {
     /* Calculate newest grid value */
     _grid_values[grid_value_offset] = 0.0f;
@@ -330,12 +330,12 @@ int isosurface::calculate_grid_value(const int *grid_begin, const int *const gri
     return (grid_value_offset + 1) & grid_value_mask;
 }
 
-point_t isosurface::bisect(const int *grid_begin, const int *const grid_end, const point_t &pa, const point_t &pb, const float va, const float vb) const
+point_t<> isosurface::bisect(const int *grid_begin, const int *const grid_end, const point_t<> &pa, const point_t<> &pb, const float va, const float vb) const
 {
     float lv;
     float uv;
-    point_t lp;
-    point_t up;
+    point_t<> lp;
+    point_t<> up;
     if (va < vb)
     {
         lp = pa;
@@ -353,8 +353,8 @@ point_t isosurface::bisect(const int *grid_begin, const int *const grid_end, con
 
     float value;
     int iter = 0;
-    point_t guess;
-    point_t dist;
+    point_t<> guess;
+    point_t<> dist;
     do
     {
         // std::cout << "Upper point: " << up << ", upper value: " << uv << ", lower point: " << lp << ", lower value: " << lv << std::endl;
@@ -386,9 +386,9 @@ point_t isosurface::bisect(const int *grid_begin, const int *const grid_end, con
     return guess;
 }
 
-point_t isosurface::normal(const int *const grid_begin, const int *const grid_end, const point_t &pos) const
+point_t<> isosurface::normal(const int *const grid_begin, const int *const grid_end, const point_t<> &pos) const
 {
-    point_t normal;
+    point_t<> normal;
     for (const int *i = grid_begin; i < grid_end; ++i)
     {
         const auto &m = _meta_balls[*i];

@@ -62,16 +62,16 @@ class kdt_builder
         void build(const primitive_store *const objects, std::vector<kdt_node> *const nodes, axis_t normal);
 
         /* Access to the trees bounds */
-        const point_t & scene_upper_bound() const { return _t; }
-        const point_t & scene_lower_bound() const { return _b; }
+        const point_t<> & scene_upper_bound() const { return _t; }
+        const point_t<> & scene_lower_bound() const { return _b; }
 
     private :
         void divide_kdt_node(const primitive_store *const objects, voxel *const base, int *const child_idx, const int node_idx);
   
         primitive_store *       _primitives;
         std::vector<kdt_node> * _nodes;
-        point_t                 _t;
-        point_t                 _b;
+        point_t<>               _t;
+        point_t<>               _b;
         int                     _depth;
 };
 }; /* namespace raptor_raytracer */

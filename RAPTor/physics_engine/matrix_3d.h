@@ -16,12 +16,12 @@ class matrix_3d : private boost::noncopyable
 {
     public :
         /* Ownership is taken of data and it will be deleted */
-        matrix_3d(const std::vector<point_t> &data) : _data(data) {  };
+        matrix_3d(const std::vector<point_t<>> &data) : _data(data) {  };
             
         /* Allow default DTOR */
             
         /* Standard operators. */
-        matrix_3d& operator+=(const point_t &p)
+        matrix_3d& operator+=(const point_t<> &p)
         {
             for (auto &d : _data)
             {
@@ -31,7 +31,7 @@ class matrix_3d : private boost::noncopyable
             return *this;
         }
 
-        matrix_3d& operator-=(const point_t &p)
+        matrix_3d& operator-=(const point_t<> &p)
         {
             for (auto &d : _data)
             {
@@ -41,15 +41,15 @@ class matrix_3d : private boost::noncopyable
             return *this;
         }
 
-        point_t operator*(const point_t& rhs) const
+        point_t<> operator*(const point_t<>& rhs) const
         {
             /* Calculate */
-            return point_t (((rhs.x * _data[0].x) + (rhs.y * _data[0].y) + (rhs.z * _data[0].z)),
+            return point_t<> (((rhs.x * _data[0].x) + (rhs.y * _data[0].y) + (rhs.z * _data[0].z)),
                             ((rhs.x * _data[1].x) + (rhs.y * _data[1].y) + (rhs.z * _data[1].z)),
                             ((rhs.x * _data[2].x) + (rhs.y * _data[2].y) + (rhs.z * _data[2].z)));
         }
 
-        const point_t& operator[](const int i) const
+        const point_t<>& operator[](const int i) const
         {
             return _data[i];
         }
@@ -67,7 +67,7 @@ class matrix_3d : private boost::noncopyable
             return true;
         }
 
-        const point_t& get_row(const int i) const
+        const point_t<>& get_row(const int i) const
         {
             return _data[i];
         }
@@ -98,6 +98,6 @@ class matrix_3d : private boost::noncopyable
         }
 
         /* Note the data goes accoss the colums and then down the rows */
-        std::vector<point_t>    _data;  /* Contents of the matrix   */
+        std::vector<point_t<>>  _data;  /* Contents of the matrix   */
         
 };

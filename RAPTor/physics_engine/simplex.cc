@@ -12,7 +12,7 @@
 
 namespace raptor_physics
 {
-point_t simplex::normal_of_impact(const simplex &s) const
+point_t<> simplex::normal_of_impact(const simplex &s) const
 {
     // METHOD_LOG;
     // BOOST_LOG_TRIVIAL(trace) << "Finding normal of impact with simplex size: " << _size;
@@ -21,7 +21,7 @@ point_t simplex::normal_of_impact(const simplex &s) const
     assert(_size == s._size);
 
     /* Get unique points defining the simplex */
-    point_t simplex_verts[6];
+    point_t<> simplex_verts[6];
     const int a_size = get_unique_points(&simplex_verts[0]);
     const int b_size = s.get_unique_points(&simplex_verts[3]);
     // BOOST_LOG_TRIVIAL(trace) << "Unique points: " << a_size << " and: " << b_size;
@@ -37,8 +37,8 @@ point_t simplex::normal_of_impact(const simplex &s) const
     assert(b_size > 0);
 
     /* Get the normal of the collision */
-    point_t *l_points;
-    point_t *s_points;
+    point_t<> *l_points;
+    point_t<> *s_points;
     if (a_size >= b_size)
     {
         l_points = &simplex_verts[0];
@@ -50,7 +50,7 @@ point_t simplex::normal_of_impact(const simplex &s) const
         l_points = &simplex_verts[3];
     }
 
-    point_t norm;
+    point_t<> norm;
     switch (std::max(a_size, b_size))
     {
         /* Line between 2 points */
@@ -78,8 +78,8 @@ point_t simplex::normal_of_impact(const simplex &s) const
                 s._po.vertex_to_global(&l_points[1]);
             }
 
-            const point_t l_dir(normalise(l_points[1] - l_points[0]));
-            const point_t s_dir(normalise(s_points[1] - s_points[0]));
+            const point_t<> l_dir(normalise(l_points[1] - l_points[0]));
+            const point_t<> s_dir(normalise(s_points[1] - s_points[0]));
 
             /* If there is only a point or the lines are parallel */
             if ((std::min(a_size, b_size) == 1) || (fabs(dot_product(l_dir, s_dir)) > (1.0f - raptor_physics::EPSILON)))
@@ -89,7 +89,7 @@ point_t simplex::normal_of_impact(const simplex &s) const
                 // BOOST_LOG_TRIVIAL(trace) << "S points: " << s_points[0] << " and " << s_points[1];
 
                 /* Find the point on l0 -> l1 most opposite s0 */
-                const point_t perp((l_points[0] - (l_dir * dot_product(l_dir, l_points[0] - s_points[0]))) - s_points[0]);
+                const point_t<> perp((l_points[0] - (l_dir * dot_product(l_dir, l_points[0] - s_points[0]))) - s_points[0]);
 
                 /* Check if the nearest point to s is s */
                 const float perp_dist = magnitude(perp);
@@ -149,7 +149,7 @@ point_t simplex::normal_of_impact(const simplex &s) const
     return norm;
 }
 
-point_t simplex::center_of_impact(const simplex &s, const point_t &noc)
+point_t<> simplex::center_of_impact(const simplex &s, const point_t<> &noc)
 {
     // METHOD_LOG;
 
@@ -159,8 +159,8 @@ point_t simplex::center_of_impact(const simplex &s, const point_t &noc)
     const simplex *const min_s =  _forward ? this : &s;
     const simplex *const max_s = !_forward ? this : &s;
     
-    const point_t min_noc((min_s == this) ? noc : -noc);
-    const point_t max_noc(-min_noc);
+    const point_t<> min_noc((min_s == this) ? noc : -noc);
+    const point_t<> max_noc(-min_noc);
 
     /* Find the polygon the simplices are on */
     int pts[4];
@@ -204,13 +204,13 @@ point_t simplex::center_of_impact(const simplex &s, const point_t &noc)
     /* Find extreme vertices for the manifold */
     else
     {
-        const point_t perp_norm(perpendicular(max_noc));
-        const point_t norm_norm(cross_product(max_noc, perp_norm));
+        const point_t<> perp_norm(perpendicular(max_noc));
+        const point_t<> norm_norm(cross_product(max_noc, perp_norm));
         _cm[0] = wp0.extreme_vertices(&_cm[1], perp_norm);
         _cm[2] = wp0.extreme_vertices(&_cm[3], norm_norm);
     }
 
-    const point_t half_dir(max_s->_dir * 0.5f);
+    const point_t<> half_dir(max_s->_dir * 0.5f);
     _cm[0] += half_dir;
     _cm[1] += half_dir;
     _cm[2] += half_dir;
@@ -225,7 +225,7 @@ point_t simplex::center_of_impact(const simplex &s, const point_t &noc)
     return wp0.center() + half_dir;
 }
 
-int simplex::get_unique_points(point_t *const points) const
+int simplex::get_unique_points(point_t<> *const points) const
 {
     /* The are only 4 verts (and the last should alway be a duplicate) */
     /* So accept O(n^2) complexity */
@@ -249,22 +249,22 @@ int simplex::get_unique_points(point_t *const points) const
     return size;
 }
 
-std::vector<point_t>* simplex::get_points_in_contact_plane(const point_t &noc) const
+std::vector<point_t<>>* simplex::get_points_in_contact_plane(const point_t<> &noc) const
 {
     /* Get all verts on the colliding feature */
-    std::vector<point_t> *verts = new std::vector<point_t>();
+    std::vector<point_t<>> *verts = new std::vector<point_t<>>();
 
     /* Find all verts perpendicular to noc in a */
-    point_t noc_l(noc);
+    point_t<> noc_l(noc);
     const quaternion_t inv_o(-_po.get_orientation());
     inv_o.rotate(&noc_l);
     // BOOST_LOG_TRIVIAL(trace) << "Local normal of collision: " << noc_l << ", rotated: " << noc << ", by: " << inv_o;
-    const point_t a(get_vertex(0));
+    const point_t<> a(get_vertex(0));
     for (int i = 0; i < _po.get_vertex_group()->get_number_of_vertices(); ++i)
     {
         /* Check for vert is a */
-        const point_t vert(_po.get_vertex_group()->get_vertex(i));
-        const point_t diff(vert - a);
+        const point_t<> vert(_po.get_vertex_group()->get_vertex(i));
+        const point_t<> diff(vert - a);
         // BOOST_LOG_TRIVIAL(trace) << "Testing: " << vert << " for inclusion against: " << a;
         if (std::fabs(dot_product(diff, noc_l)) < (5.0f * raptor_physics::EPSILON))
         {

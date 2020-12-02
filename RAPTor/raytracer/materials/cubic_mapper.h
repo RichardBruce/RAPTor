@@ -23,10 +23,10 @@ class ext_colour_t;
 class cubic_mapper : public image_texture_mapper
 {
     public :
-        cubic_mapper(const boost::shared_array<float> &img, const point_t &c, const point_t &n, const point_t &s, const texture_wrapping_mode_t uw, 
+        cubic_mapper(const boost::shared_array<float> &img, const point_t<> &c, const point_t<> &n, const point_t<> &s, const texture_wrapping_mode_t uw, 
             const texture_wrapping_mode_t vw, const unsigned int cpp, const unsigned int w, const unsigned int h, const int u_off = 0, 
             const int v_off = 0, const int u_max = -1, const int v_max = -1) : 
-            image_texture_mapper(img, c, s, point_t(n.y + n.z, 0.0f, n.x), point_t(0.0f, n.x + n.z, n.y), 1.0f / static_cast<float>(w), 1.0f / static_cast<float>(h), w, h, cpp, uw, vw, u_off, v_off, u_max, v_max), _n(n)
+            image_texture_mapper(img, c, s, point_t<>(n.y + n.z, 0.0f, n.x), point_t<>(0.0f, n.x + n.z, n.y), 1.0f / static_cast<float>(w), 1.0f / static_cast<float>(h), w, h, cpp, uw, vw, u_off, v_off, u_max, v_max), _n(n)
             {
                 BOOST_LOG_TRIVIAL(trace) << "Loaded cubic texture map with parameters: ";
                 BOOST_LOG_TRIVIAL(trace) << "U vec : " << _u;
@@ -36,16 +36,16 @@ class cubic_mapper : public image_texture_mapper
                 BOOST_LOG_TRIVIAL(trace) << "Width : " << _w;
             }
 
-        cubic_mapper(const boost::shared_array<float> &img, const point_t &u, const point_t &v, const point_t &c, const point_t &n, const point_t &s, 
+        cubic_mapper(const boost::shared_array<float> &img, const point_t<> &u, const point_t<> &v, const point_t<> &c, const point_t<> &n, const point_t<> &s, 
             const unsigned cpp, const unsigned w, const unsigned h, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
             const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1) :
-                image_texture_mapper(img, c, point_t((u * s.x) + (v * s.y) + (n * s.z)), u, v, 1.0f / static_cast<float>(w), 1.0f / static_cast<float>(h), w, h, cpp, uw, vw, u_off, v_off, u_max, v_max), _n(n)
+                image_texture_mapper(img, c, point_t<>((u * s.x) + (v * s.y) + (n * s.z)), u, v, 1.0f / static_cast<float>(w), 1.0f / static_cast<float>(h), w, h, cpp, uw, vw, u_off, v_off, u_max, v_max), _n(n)
             {  }
 
         virtual ~cubic_mapper() { };
 
     protected :
-        void texture_coordinates(float *const u_co, float *const v_co, const point_t &dst, const point_t &n) const override;
+        void texture_coordinates(float *const u_co, float *const v_co, const point_t<> &dst, const point_t<> &n) const override;
 
     private :
         friend class boost::serialization::access;
@@ -54,7 +54,7 @@ class cubic_mapper : public image_texture_mapper
         template<class Archive>
         void serialize(Archive &ar, const unsigned int version) { }
 
-        const point_t   _n; /* Normal of the texture    */
+        const point_t<> _n; /* Normal of the texture    */
 };
 }; /* namespace raptor_raytracer */
 
@@ -86,7 +86,7 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::cubic_mapper *t,
 {
     /* Retreive the fields */
     raptor_raytracer::mapper_falloff *falloff;
-    point_t c, n, u, s, v;
+    point_t<> c, n, u, s, v;
     raptor_raytracer::texture_wrapping_mode_t uw, vw;
     float *img;
     unsigned int h, w, cpp, u_max, v_max;

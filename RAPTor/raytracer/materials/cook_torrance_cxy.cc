@@ -6,7 +6,7 @@
 
 namespace raptor_raytracer
 {
-void cook_torrance_cxy::generate_rays(const ray_trace_engine &r, ray &i, point_t *const n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
+void cook_torrance_cxy::generate_rays(const ray_trace_engine &r, ray &i, point_t<> *const n, const point_t<> &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
@@ -24,7 +24,7 @@ void cook_torrance_cxy::generate_rays(const ray_trace_engine &r, ray &i, point_t
 }
 
 
-void cook_torrance_cxy::shade(const ray_trace_engine &r, ray &i, const point_t &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const
+void cook_torrance_cxy::shade(const ray_trace_engine &r, ray &i, const point_t<> &n, const hit_t h, ext_colour_t *const c, const point_t<> &vt) const
 {
     /* A common dot product to all light sources */
     const float nv = dot_product(n, i.get_dir());
@@ -46,7 +46,7 @@ void cook_torrance_cxy::shade(const ray_trace_engine &r, ray &i, const point_t &
         }
         
         /* Take the half vector */
-        point_t half;
+        point_t<> half;
         half.x = (illum.get_x_grad() + i.get_x_grad()) * 0.5f;
         half.y = (illum.get_y_grad() + i.get_y_grad()) * 0.5f;
         half.z = (illum.get_z_grad() + i.get_z_grad()) * 0.5f;

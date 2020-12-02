@@ -11,7 +11,7 @@
 
 namespace raptor_raytracer
 {
-void clip_line(point_t *const i_l, point_t *const i_r, const point_t &a, const point_t &m, const float dist, const float norm)
+void clip_line(point_t<> *const i_l, point_t<> *const i_r, const point_t<> &a, const point_t<> &m, const float dist, const float norm)
 {
     if (dist > 0.0f)
     {
@@ -25,12 +25,12 @@ void clip_line(point_t *const i_l, point_t *const i_r, const point_t &a, const p
     }
 }
 
-void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const tr, point_t *const b_bl, point_t *const b_tr, const float split, const axis_t axis)
+void clip_triangle(const triangle *const tri, point_t<> *const bl, point_t<> *const tr, point_t<> *const b_bl, point_t<> *const b_tr, const float split, const axis_t axis)
 {
     /* Find intersection with the split */
     int i_idx = 0;
-    point_t i_l[2];
-    point_t i_r[2];
+    point_t<> i_l[2];
+    point_t<> i_r[2];
     float dist_a;
     float dist_b;
     float dist_c;
@@ -43,21 +43,21 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
             dist_c = split - tri->get_vertex_c().x;
             if ((dist_a * dist_b) <= 0.0f)
             {
-                const point_t ab(tri->get_vertex_b() - tri->get_vertex_a());
+                const point_t<> ab(tri->get_vertex_b() - tri->get_vertex_a());
                 clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ab, dist_a, ab.x);
                 ++i_idx;
             }
 
             if ((dist_a * dist_c) < 0.0f)
             {
-                const point_t ac(tri->get_vertex_c() - tri->get_vertex_a());
+                const point_t<> ac(tri->get_vertex_c() - tri->get_vertex_a());
                 clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ac, dist_a, ac.x);
                 ++i_idx;
             }
 
             if (((dist_b * dist_c) <= 0.0f) && (dist_b != 0.0f))
             {
-                const point_t bc(tri->get_vertex_c() - tri->get_vertex_b());
+                const point_t<> bc(tri->get_vertex_c() - tri->get_vertex_b());
                 clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_b(), bc, dist_b, bc.x);
                 ++i_idx;
             }
@@ -70,21 +70,21 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
             dist_c = split - tri->get_vertex_c().y;
             if ((dist_a * dist_b) <= 0.0f)
             {
-                const point_t ab(tri->get_vertex_b() - tri->get_vertex_a());
+                const point_t<> ab(tri->get_vertex_b() - tri->get_vertex_a());
                 clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ab, dist_a, ab.y);
                 ++i_idx;
             }
 
             if ((dist_a * dist_c) < 0.0f)
             {
-                const point_t ac(tri->get_vertex_c() - tri->get_vertex_a());
+                const point_t<> ac(tri->get_vertex_c() - tri->get_vertex_a());
                 clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ac, dist_a, ac.y);
                 ++i_idx;
             }
 
             if (((dist_b * dist_c) <= 0.0f) && (dist_b != 0.0f))
             {
-                const point_t bc(tri->get_vertex_c() - tri->get_vertex_b());
+                const point_t<> bc(tri->get_vertex_c() - tri->get_vertex_b());
                 clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_b(), bc, dist_b, bc.y);
                 ++i_idx;
             }
@@ -97,21 +97,21 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
             dist_c = split - tri->get_vertex_c().z;
             if ((dist_a * dist_b) <= 0.0f)
             {
-                const point_t ab(tri->get_vertex_b() - tri->get_vertex_a());
+                const point_t<> ab(tri->get_vertex_b() - tri->get_vertex_a());
                 clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ab, dist_a, ab.z);
                 ++i_idx;
             }
 
             if ((dist_a * dist_c) < 0.0f)
             {
-                const point_t ac(tri->get_vertex_c() - tri->get_vertex_a());
+                const point_t<> ac(tri->get_vertex_c() - tri->get_vertex_a());
                 clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_a(), ac, dist_a, ac.z);
                 ++i_idx;
             }
 
             if (((dist_b * dist_c) <= 0.0f) && (dist_b != 0.0f))
             {
-                const point_t bc(tri->get_vertex_c() - tri->get_vertex_b());
+                const point_t<> bc(tri->get_vertex_c() - tri->get_vertex_b());
                 clip_line(&i_l[i_idx], &i_r[i_idx], tri->get_vertex_b(), bc, dist_b, bc.z);
                 ++i_idx;
             }
@@ -126,8 +126,8 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
     assert(i_idx < 3);
 
     /* Clasify points to the left or right of the split */
-    point_t l[3];
-    point_t r[3];
+    point_t<> l[3];
+    point_t<> r[3];
     int l_idx = 0;
     int r_idx = 0;
     if (dist_a >= 0.0f)
@@ -161,16 +161,16 @@ void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const 
     assert((l_idx == 2) || (r_idx == 2));
 
     /* Find bound of intersection and points on one side */
-    const point_t i_tr_l(max(i_l[0], i_l[1]));
-    const point_t i_bl_l(min(i_l[0], i_l[1]));
-    const point_t i_tr_r(max(i_r[0], i_r[1]));
-    const point_t i_bl_r(min(i_r[0], i_r[1]));
+    const point_t<> i_tr_l(max(i_l[0], i_l[1]));
+    const point_t<> i_bl_l(min(i_l[0], i_l[1]));
+    const point_t<> i_tr_r(max(i_r[0], i_r[1]));
+    const point_t<> i_bl_r(min(i_r[0], i_r[1]));
 
-    point_t l_tr(max(i_tr_l, l[0]));
-    point_t l_bl(min(i_bl_l, l[0]));
+    point_t<> l_tr(max(i_tr_l, l[0]));
+    point_t<> l_bl(min(i_bl_l, l[0]));
 
-    point_t r_tr(max(i_tr_r, r[0]));
-    point_t r_bl(min(i_bl_r, r[0]));
+    point_t<> r_tr(max(i_tr_r, r[0]));
+    point_t<> r_bl(min(i_bl_r, r[0]));
     if (l_idx == 2)
     {
         l_tr = max(l_tr, l[1]);
@@ -402,8 +402,8 @@ voxel voxel::divide(const primitive_store &prims, kdt_node *const k, kdt_node *c
     }
     
     /* Adjust the size of the voxel */
-    point_t upper_limit = _t;
-    point_t lower_limit = _b;
+    point_t<> upper_limit = _t;
+    point_t<> lower_limit = _b;
     axis_t  nxt_n;
     switch (normal)
     {

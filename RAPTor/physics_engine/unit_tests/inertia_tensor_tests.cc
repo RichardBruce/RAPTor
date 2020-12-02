@@ -32,7 +32,7 @@ const float result_tolerance = 0.0005;
 BOOST_AUTO_TEST_CASE( basic_test )
 {
     const float m = 1.5;
-    const point_t com(3.1, 4.7, 9.3);
+    const point_t<> com(3.1, 4.7, 9.3);
     float *const it = new float [6] { 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0 };
     const float it_inv[6] = { 0.223, 0.338, 0.259, -0.158, -0.151, -0.014 };
     
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE( basic_test )
 BOOST_AUTO_TEST_CASE( inifinite_mass_basic_test )
 {
     const float m = std::numeric_limits<float>::infinity();
-    const point_t com(30.1, -4.7, 5.3);
+    const point_t<> com(30.1, -4.7, 5.3);
     float *const it = new float [6] { m, m, m, m, m, m };
     const float it_inv[6] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0 };
     
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE( inifinite_mass_basic_test )
 BOOST_AUTO_TEST_CASE( zero_mass_basic_test )
 {
     const float m = 0.0;
-    const point_t com(10.1, 14.7, -1.3);
+    const point_t<> com(10.1, 14.7, -1.3);
     float *const it = new float [6] { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0 };
     const float it_inv[6] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0 };
     
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( zero_mass_basic_test )
 BOOST_AUTO_TEST_CASE( copy_test )
 {
     const float m = 1.5;
-    const point_t com(3.1, 4.7, 9.3);
+    const point_t<> com(3.1, 4.7, 9.3);
     float *const it = new float [6] { 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0 };
     const float it_inv[6] = { 0.223, 0.338, 0.259, -0.158, -0.151, -0.014 };
     
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE( copy_test )
 BOOST_AUTO_TEST_CASE( move_test )
 {
     const float m = 1.5;
-    const point_t com(3.1, 4.7, 9.3);
+    const point_t<> com(3.1, 4.7, 9.3);
     float *const it = new float [6] { 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0 };
     const float it_inv[6] = { 0.223, 0.338, 0.259, -0.158, -0.151, -0.014 };
     
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE( move_test )
 BOOST_AUTO_TEST_CASE( move_com_test )
 {
     const float m = 1.5;
-    const point_t com0(3.1, 4.7, 9.3);
+    const point_t<> com0(3.1, 4.7, 9.3);
     float *const it = new float [6] { 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0 };
     const float it_inv[6] = { 0.223, 0.338, 0.259, -0.158, -0.151, -0.014 };
 
@@ -184,9 +184,9 @@ BOOST_AUTO_TEST_CASE( move_com_test )
     BOOST_CHECK(uut.center_of_mass() == com0);
     BOOST_CHECK(uut.mass() == m);
 
-    const point_t com1(4.2, 7.2, -0.2);
+    const point_t<> com1(4.2, 7.2, -0.2);
 
-    uut.move_center_of_mass(point_t(1.1, 2.5, -9.5));
+    uut.move_center_of_mass(point_t<>(1.1, 2.5, -9.5));
     BOOST_CHECK(std::equal(&it[0], &it[6], uut.tensor(), [] (const float exp, const float act)
         {
             const float abs_diff = fabs(exp - act);
@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_CASE( move_com_test )
 BOOST_AUTO_TEST_CASE( multiply_divide_test )
 {
     const float m = 1.5;
-    const point_t com0(3.1, 4.7, 9.3);
+    const point_t<> com0(3.1, 4.7, 9.3);
     float *const it = new float [6] { 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0 };
     const float it_inv[6] = { 0.223, 0.338, 0.259, -0.158, -0.151, -0.014 };
 
@@ -224,13 +224,13 @@ BOOST_AUTO_TEST_CASE( multiply_divide_test )
     BOOST_CHECK(uut.center_of_mass() == com0);
     BOOST_CHECK(uut.mass() == m);
 
-    const point_t vec(9.7, 8.8, 6.4);
-    const point_t div(vec / uut);
-    const point_t exp_div(0.678417, 0.473381, 0.188489);
+    const point_t<> vec(9.7, 8.8, 6.4);
+    const point_t<> div(vec / uut);
+    const point_t<> exp_div(0.678417, 0.473381, 0.188489);
     BOOST_CHECK(magnitude(div - exp_div) < result_tolerance);
 
-    const point_t mul(uut * vec);
-    const point_t exp_mul(165.7, 160.6, 127.6);
+    const point_t<> mul(uut * vec);
+    const point_t<> exp_mul(165.7, 160.6, 127.6);
     BOOST_CHECK(magnitude(mul - exp_mul) < result_tolerance);
 }
 
@@ -238,16 +238,16 @@ BOOST_AUTO_TEST_CASE( multiply_divide_test )
 /* Test ctor for shapes with unknown tensors */
 BOOST_AUTO_TEST_CASE( infinite_mass_test )
 {
-    std::vector<point_t> p(
+    std::vector<point_t<>> p(
         {
-            point_t(-1.0f, -1.0f, -1.0f), 
-            point_t( 1.0f, -1.0f, -1.0f),
-            point_t( 1.0f,  1.0f, -1.0f),
-            point_t(-1.0f,  1.0f, -1.0f),
-            point_t(-1.0f, -1.0f,  1.0f), 
-            point_t( 1.0f, -1.0f,  1.0f),
-            point_t( 1.0f,  1.0f,  1.0f),
-            point_t(-1.0f,  1.0f,  1.0f)
+            point_t<>(-1.0f, -1.0f, -1.0f), 
+            point_t<>( 1.0f, -1.0f, -1.0f),
+            point_t<>( 1.0f,  1.0f, -1.0f),
+            point_t<>(-1.0f,  1.0f, -1.0f),
+            point_t<>(-1.0f, -1.0f,  1.0f), 
+            point_t<>( 1.0f, -1.0f,  1.0f),
+            point_t<>( 1.0f,  1.0f,  1.0f),
+            point_t<>(-1.0f,  1.0f,  1.0f)
         });
 
     std::vector<int> e(
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE( infinite_mass_test )
         });
 
     const float m = std::numeric_limits<float>::infinity();
-    const point_t com(0.0f, 0.0f, 0.0f);
+    const point_t<> com(0.0f, 0.0f, 0.0f);
     const float tensor = std::numeric_limits<float>::infinity();
     const float it[6] = { tensor, tensor, tensor, tensor, tensor, tensor };
     const float it_inv[6] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0 };
@@ -281,16 +281,16 @@ BOOST_AUTO_TEST_CASE( infinite_mass_test )
 
 BOOST_AUTO_TEST_CASE( zero_mass_test )
 {
-    std::vector<point_t> p(
+    std::vector<point_t<>> p(
         {
-            point_t(-1.0f, -1.0f, -1.0f), 
-            point_t( 1.0f, -1.0f, -1.0f),
-            point_t( 1.0f,  1.0f, -1.0f),
-            point_t(-1.0f,  1.0f, -1.0f),
-            point_t(-1.0f, -1.0f,  1.0f), 
-            point_t( 1.0f, -1.0f,  1.0f),
-            point_t( 1.0f,  1.0f,  1.0f),
-            point_t(-1.0f,  1.0f,  1.0f)
+            point_t<>(-1.0f, -1.0f, -1.0f), 
+            point_t<>( 1.0f, -1.0f, -1.0f),
+            point_t<>( 1.0f,  1.0f, -1.0f),
+            point_t<>(-1.0f,  1.0f, -1.0f),
+            point_t<>(-1.0f, -1.0f,  1.0f), 
+            point_t<>( 1.0f, -1.0f,  1.0f),
+            point_t<>( 1.0f,  1.0f,  1.0f),
+            point_t<>(-1.0f,  1.0f,  1.0f)
         });
 
     std::vector<int> e(
@@ -304,7 +304,7 @@ BOOST_AUTO_TEST_CASE( zero_mass_test )
         });
 
     const float m = 0.0;
-    const point_t com(0.0f, 0.0f, 0.0f);
+    const point_t<> com(0.0f, 0.0f, 0.0f);
     const float it[6] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0 };
     const float it_inv[6] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0 };
 
@@ -322,16 +322,16 @@ BOOST_AUTO_TEST_CASE( zero_mass_test )
 
 BOOST_AUTO_TEST_CASE( origin_cube_test )
 {
-    std::vector<point_t> p(
+    std::vector<point_t<>> p(
         {
-            point_t(-1.0f, -1.0f, -1.0f), 
-            point_t( 1.0f, -1.0f, -1.0f),
-            point_t( 1.0f,  1.0f, -1.0f),
-            point_t(-1.0f,  1.0f, -1.0f),
-            point_t(-1.0f, -1.0f,  1.0f), 
-            point_t( 1.0f, -1.0f,  1.0f),
-            point_t( 1.0f,  1.0f,  1.0f),
-            point_t(-1.0f,  1.0f,  1.0f)
+            point_t<>(-1.0f, -1.0f, -1.0f), 
+            point_t<>( 1.0f, -1.0f, -1.0f),
+            point_t<>( 1.0f,  1.0f, -1.0f),
+            point_t<>(-1.0f,  1.0f, -1.0f),
+            point_t<>(-1.0f, -1.0f,  1.0f), 
+            point_t<>( 1.0f, -1.0f,  1.0f),
+            point_t<>( 1.0f,  1.0f,  1.0f),
+            point_t<>(-1.0f,  1.0f,  1.0f)
         });
 
     std::vector<int> e(
@@ -345,7 +345,7 @@ BOOST_AUTO_TEST_CASE( origin_cube_test )
         });
 
     const float m = 8.0;
-    const point_t com(0.0f, 0.0f, 0.0f);
+    const point_t<> com(0.0f, 0.0f, 0.0f);
     const float tensor = (8.0 / 12.0f) * m;
     const float it[6] = { tensor, tensor, tensor, 0.0f, 0.0f, 0.0 };
     const float tensor_inv = 0.1875;
@@ -369,16 +369,16 @@ BOOST_AUTO_TEST_CASE( origin_cube_test )
 
 BOOST_AUTO_TEST_CASE( cube_test )
 {
-    std::vector<point_t> p(
+    std::vector<point_t<>> p(
         {
-            point_t(3.0f, 2.0f, 4.0f), 
-            point_t(6.0f, 2.0f, 4.0f),
-            point_t(6.0f, 5.0f, 4.0f),
-            point_t(3.0f, 5.0f, 4.0f),
-            point_t(3.0f, 2.0f, 7.0f), 
-            point_t(6.0f, 2.0f, 7.0f),
-            point_t(6.0f, 5.0f, 7.0f),
-            point_t(3.0f, 5.0f, 7.0f)
+            point_t<>(3.0f, 2.0f, 4.0f), 
+            point_t<>(6.0f, 2.0f, 4.0f),
+            point_t<>(6.0f, 5.0f, 4.0f),
+            point_t<>(3.0f, 5.0f, 4.0f),
+            point_t<>(3.0f, 2.0f, 7.0f), 
+            point_t<>(6.0f, 2.0f, 7.0f),
+            point_t<>(6.0f, 5.0f, 7.0f),
+            point_t<>(3.0f, 5.0f, 7.0f)
         });
 
     std::vector<int> e(
@@ -392,7 +392,7 @@ BOOST_AUTO_TEST_CASE( cube_test )
         });
 
     const float m = 27.0;
-    const point_t com(4.5, 3.5, 5.5);
+    const point_t<> com(4.5, 3.5, 5.5);
     const float tensor = (18.0 / 12.0f) * m;
     const float it[6] = { tensor, tensor, tensor, 0.0f, 0.0f, 0.0 };
     const float tensor_inv = 0.02469;
@@ -416,16 +416,16 @@ BOOST_AUTO_TEST_CASE( cube_test )
 
 BOOST_AUTO_TEST_CASE( cuboid_test )
 {
-    std::vector<point_t> p(
+    std::vector<point_t<>> p(
         {
-            point_t(3.0f, 1.0f, 3.0f), 
-            point_t(6.0f, 1.0f, 3.0f),
-            point_t(6.0f, 5.0f, 3.0f),
-            point_t(3.0f, 5.0f, 3.0f),
-            point_t(3.0f, 1.0f, 8.0f), 
-            point_t(6.0f, 1.0f, 8.0f),
-            point_t(6.0f, 5.0f, 8.0f),
-            point_t(3.0f, 5.0f, 8.0f)
+            point_t<>(3.0f, 1.0f, 3.0f), 
+            point_t<>(6.0f, 1.0f, 3.0f),
+            point_t<>(6.0f, 5.0f, 3.0f),
+            point_t<>(3.0f, 5.0f, 3.0f),
+            point_t<>(3.0f, 1.0f, 8.0f), 
+            point_t<>(6.0f, 1.0f, 8.0f),
+            point_t<>(6.0f, 5.0f, 8.0f),
+            point_t<>(3.0f, 5.0f, 8.0f)
         });
 
     std::vector<int> e(
@@ -439,7 +439,7 @@ BOOST_AUTO_TEST_CASE( cuboid_test )
         });
 
     const float m = 60.0f;
-    const point_t com(4.5f, 3.0f, 5.5f);
+    const point_t<> com(4.5f, 3.0f, 5.5f);
     const float it[6] = { (41.0f / 12.0f) * m, (34.0f / 12.0f) * m, (25.0f / 12.0f) * m, 0.0f, 0.0f, 0.0f };
     const float it_inv[6] = { 0.00488f, 0.00588f, 0.008f, 0.0f, 0.0f, 0.0f };
 
@@ -461,16 +461,16 @@ BOOST_AUTO_TEST_CASE( cuboid_test )
 
 BOOST_AUTO_TEST_CASE( cuboid_with_density_test )
 {
-    std::vector<point_t> p(
+    std::vector<point_t<>> p(
         {
-            point_t(3.0f, 1.0f, 3.0f), 
-            point_t(6.0f, 1.0f, 3.0f),
-            point_t(6.0f, 5.0f, 3.0f),
-            point_t(3.0f, 5.0f, 3.0f),
-            point_t(3.0f, 1.0f, 8.0f), 
-            point_t(6.0f, 1.0f, 8.0f),
-            point_t(6.0f, 5.0f, 8.0f),
-            point_t(3.0f, 5.0f, 8.0f)
+            point_t<>(3.0f, 1.0f, 3.0f), 
+            point_t<>(6.0f, 1.0f, 3.0f),
+            point_t<>(6.0f, 5.0f, 3.0f),
+            point_t<>(3.0f, 5.0f, 3.0f),
+            point_t<>(3.0f, 1.0f, 8.0f), 
+            point_t<>(6.0f, 1.0f, 8.0f),
+            point_t<>(6.0f, 5.0f, 8.0f),
+            point_t<>(3.0f, 5.0f, 8.0f)
         });
 
     std::vector<int> e(
@@ -485,7 +485,7 @@ BOOST_AUTO_TEST_CASE( cuboid_with_density_test )
 
     const float r = 2.7f;
     const float m = 60.0f * r;
-    const point_t com(4.5f, 3.0f, 5.5f);
+    const point_t<> com(4.5f, 3.0f, 5.5f);
     const float it[6] = { (41.0f / 12.0f) * m, (34.0f / 12.0f) * m, (25.0f / 12.0f) * m, 0.0f, 0.0f, 0.0f };
     const float it_inv[6] = { 0.0018067f, 0.0021786f, 0.00296295f, 0.0f, 0.0f, 0.0f };
 
@@ -507,16 +507,16 @@ BOOST_AUTO_TEST_CASE( cuboid_with_density_test )
 
 BOOST_AUTO_TEST_CASE( unaligned_cuboid_with_density_test )
 {
-    std::vector<point_t> p(
+    std::vector<point_t<>> p(
         {
-            point_t(1.67678f,  2.32322f,  3.48223f),
-            point_t(4.23744f,  2.76256f,  1.98223f),
-            point_t(4.82322f,  6.17678f,  3.98223f),
-            point_t(2.26256f,  5.73744f,  5.48223f),
-            point_t(4.17678f, -0.176777f, 7.01777f),
-            point_t(6.73744f,  0.262563f, 5.51777f),
-            point_t(7.32322f,  3.67678f,  7.51777f),
-            point_t(4.76256f,  3.23744f,  9.01777f)
+            point_t<>(1.67678f,  2.32322f,  3.48223f),
+            point_t<>(4.23744f,  2.76256f,  1.98223f),
+            point_t<>(4.82322f,  6.17678f,  3.98223f),
+            point_t<>(2.26256f,  5.73744f,  5.48223f),
+            point_t<>(4.17678f, -0.176777f, 7.01777f),
+            point_t<>(6.73744f,  0.262563f, 5.51777f),
+            point_t<>(7.32322f,  3.67678f,  7.51777f),
+            point_t<>(4.76256f,  3.23744f,  9.01777f)
         });
 
     std::vector<int> e(
@@ -531,7 +531,7 @@ BOOST_AUTO_TEST_CASE( unaligned_cuboid_with_density_test )
 
     const float r = 2.7f;
     const float m = 60.0f * r;
-    const point_t com(4.5f, 3.0f, 5.5f);
+    const point_t<> com(4.5f, 3.0f, 5.5f);
     const float it[6] = { 497.47f, 430.66f, 421.877f, 42.188f, 36.0414f, -83.2838f };
     const float it_inv[6] = { 0.00210374f, 0.00236671f, 0.0024778f, -0.000242576f, -0.000250078f, 0.000436028f };
 
@@ -553,27 +553,27 @@ BOOST_AUTO_TEST_CASE( unaligned_cuboid_with_density_test )
 
 BOOST_AUTO_TEST_CASE( products_of_inertia_test )
 {
-    std::vector<point_t> p(
+    std::vector<point_t<>> p(
         {
             /* Cube about the origin */
-            point_t(-2.0f, -2.0f, -2.0f), 
-            point_t( 2.0f, -2.0f, -2.0f),
-            point_t( 2.0f,  2.0f, -2.0f),
-            point_t(-2.0f,  2.0f, -2.0f),
-            point_t(-2.0f, -2.0f,  2.0f), 
-            point_t( 2.0f, -2.0f,  2.0f),
-            point_t( 2.0f,  2.0f,  2.0f),
-            point_t(-2.0f,  2.0f,  2.0f),
+            point_t<>(-2.0f, -2.0f, -2.0f), 
+            point_t<>( 2.0f, -2.0f, -2.0f),
+            point_t<>( 2.0f,  2.0f, -2.0f),
+            point_t<>(-2.0f,  2.0f, -2.0f),
+            point_t<>(-2.0f, -2.0f,  2.0f), 
+            point_t<>( 2.0f, -2.0f,  2.0f),
+            point_t<>( 2.0f,  2.0f,  2.0f),
+            point_t<>(-2.0f,  2.0f,  2.0f),
 
             /* Cube on one octant o the original cube */
-            point_t( 0.0f,  1.0f,  0.0f), 
-            point_t( 2.0f,  1.0f,  0.0f),
-            point_t( 2.0f,  2.0f,  0.0f),
-            point_t( 0.0f,  2.0f,  0.0f),
-            point_t( 0.0f,  1.0f,  4.0f), 
-            point_t( 2.0f,  1.0f,  4.0f),
-            point_t( 2.0f,  2.0f,  4.0f),
-            point_t( 0.0f,  2.0f,  4.0f)
+            point_t<>( 0.0f,  1.0f,  0.0f), 
+            point_t<>( 2.0f,  1.0f,  0.0f),
+            point_t<>( 2.0f,  2.0f,  0.0f),
+            point_t<>( 0.0f,  2.0f,  0.0f),
+            point_t<>( 0.0f,  1.0f,  4.0f), 
+            point_t<>( 2.0f,  1.0f,  4.0f),
+            point_t<>( 2.0f,  2.0f,  4.0f),
+            point_t<>( 0.0f,  2.0f,  4.0f)
         });
 
     std::vector<int> e(
@@ -596,7 +596,7 @@ BOOST_AUTO_TEST_CASE( products_of_inertia_test )
         });
 
     const float m = 72.0f;
-    const point_t com(1.0f / 9.0f, 1.5f / 9.0f, 2.0f / 9.0f);
+    const point_t<> com(1.0f / 9.0f, 1.5f / 9.0f, 2.0f / 9.0f);
     const float it[6] = { 226.444f, 219.556f, 197.111f, -10.6667f, -14.2222f, -12.3333f };
     const float it_inv[6] = { 0.00444974f, 0.0046171f, 0.00515444f, 0.00025f, 0.00051775f, 0.00034812f };
 
@@ -619,16 +619,16 @@ BOOST_AUTO_TEST_CASE( products_of_inertia_test )
 /* Test rotated tensor */
 BOOST_AUTO_TEST_CASE( rotated_cube_test )
 {
-    std::vector<point_t> p(
+    std::vector<point_t<>> p(
         {
-            point_t(3.0f, 2.0f, 4.0f), 
-            point_t(6.0f, 2.0f, 4.0f),
-            point_t(6.0f, 5.0f, 4.0f),
-            point_t(3.0f, 5.0f, 4.0f),
-            point_t(3.0f, 2.0f, 7.0f), 
-            point_t(6.0f, 2.0f, 7.0f),
-            point_t(6.0f, 5.0f, 7.0f),
-            point_t(3.0f, 5.0f, 7.0f)
+            point_t<>(3.0f, 2.0f, 4.0f), 
+            point_t<>(6.0f, 2.0f, 4.0f),
+            point_t<>(6.0f, 5.0f, 4.0f),
+            point_t<>(3.0f, 5.0f, 4.0f),
+            point_t<>(3.0f, 2.0f, 7.0f), 
+            point_t<>(6.0f, 2.0f, 7.0f),
+            point_t<>(6.0f, 5.0f, 7.0f),
+            point_t<>(3.0f, 5.0f, 7.0f)
         });
 
     std::vector<int> e(
@@ -723,16 +723,16 @@ BOOST_AUTO_TEST_CASE( rotated_cube_test )
 
 BOOST_AUTO_TEST_CASE( rotated_cuboid_with_density_test )
 {
-    std::vector<point_t> p(
+    std::vector<point_t<>> p(
         {
-            point_t(3.0f, 1.0f, 3.0f),
-            point_t(6.0f, 1.0f, 3.0f),
-            point_t(6.0f, 5.0f, 3.0f),
-            point_t(3.0f, 5.0f, 3.0f),
-            point_t(3.0f, 1.0f, 8.0f),
-            point_t(6.0f, 1.0f, 8.0f),
-            point_t(6.0f, 5.0f, 8.0f),
-            point_t(3.0f, 5.0f, 8.0f) 
+            point_t<>(3.0f, 1.0f, 3.0f),
+            point_t<>(6.0f, 1.0f, 3.0f),
+            point_t<>(6.0f, 5.0f, 3.0f),
+            point_t<>(3.0f, 5.0f, 3.0f),
+            point_t<>(3.0f, 1.0f, 8.0f),
+            point_t<>(6.0f, 1.0f, 8.0f),
+            point_t<>(6.0f, 5.0f, 8.0f),
+            point_t<>(3.0f, 5.0f, 8.0f) 
         });
 
     std::vector<int> e(
@@ -835,7 +835,7 @@ BOOST_AUTO_TEST_CASE( rotated_cuboid_with_density_test )
 BOOST_AUTO_TEST_CASE( inifinite_mass_view_test )
 {
     const float m = std::numeric_limits<float>::infinity();
-    const point_t com(30.1, -4.7, 5.3);
+    const point_t<> com(30.1, -4.7, 5.3);
     float *const it = new float [6] { m, m, m, m, m, m };
     const float it_inv[6] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0 };
     

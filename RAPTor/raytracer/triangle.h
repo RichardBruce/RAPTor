@@ -20,7 +20,7 @@ namespace raptor_raytracer
 class triangle : boost::noncopyable
 {
     public :
-        triangle(material *const m, const point_t &a, const point_t &b, const point_t &c, bool l = false, const point_t *v_n = nullptr, const point_t *v_t = nullptr);
+        triangle(material *const m, const point_t<> &a, const point_t<> &b, const point_t<> &c, bool l = false, const point_t<> *v_n = nullptr, const point_t<> *v_t = nullptr);
         ~triangle()
         {
             /* REVISIT -- Consider using indices for these */
@@ -41,20 +41,20 @@ class triangle : boost::noncopyable
         bool is_transparent()       const { return get_material()->is_transparent();        }
 
         /* Shadow ray targetting */
-        const point_t& get_centre() const { return this->vertex_c;                          }
+        const point_t<>& get_centre() const { return this->vertex_c;                          }
         
         /* Frustrum separation algorithm */
-        point_t get_vertex_a()      const { return this->vertex_a;                          }
-        point_t get_vertex_b()      const { return this->vertex_b;                          }
-        point_t get_vertex_c()      const { return this->vertex_c;                          }
+        point_t<> get_vertex_a()      const { return this->vertex_a;                          }
+        point_t<> get_vertex_b()      const { return this->vertex_b;                          }
+        point_t<> get_vertex_c()      const { return this->vertex_c;                          }
 
         /* KD-tree node classification */
         float get_x0()              const { return this->vertex_c.x;                        }
         float get_y0()              const { return this->vertex_c.y;                        }
         float get_z0()              const { return this->vertex_c.z;                        }
 
-        point_t low_bound()         const { return min(vertex_a, min(vertex_b, vertex_c));  }
-        point_t high_bound()        const { return max(vertex_a, max(vertex_b, vertex_c));  }
+        point_t<> low_bound()         const { return min(vertex_a, min(vertex_b, vertex_c));  }
+        point_t<> high_bound()        const { return max(vertex_a, max(vertex_b, vertex_c));  }
         
         /* Ray tracing functions */
         inline void is_intersecting(const ray *const r, hit_description *const h) const;
@@ -62,17 +62,17 @@ class triangle : boost::noncopyable
         inline void is_intersecting(const packet_ray *const r, packet_hit_description *const h, vint_t *const i_o, const unsigned int size, const int tri_idx) const;
         inline void is_intersecting(const frustrum &f, const packet_ray *const r, packet_hit_description *const h, vint_t *const i_o, const unsigned *c, const unsigned size, const int tri_idx) const;
 #endif
-        inline point_t normal_at_point(ray *const r, hit_description *const h) const;
-        inline void find_rays(ray *const r, const point_t &d, const int n) const;
+        inline point_t<> normal_at_point(ray *const r, hit_description *const h) const;
+        inline void find_rays(ray *const r, const point_t<> &d, const int n) const;
         
         /* Generate secondary rays for packet tracing */
-        inline point_t generate_rays(const ray_trace_engine &r, ray &i, point_t *const text, hit_description *const h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
+        inline point_t<> generate_rays(const ray_trace_engine &r, ray &i, point_t<> *const text, hit_description *const h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
         {
             /* Calculate the normal */
-            point_t norm(normal_at_point(&i, h));
+            point_t<> norm(normal_at_point(&i, h));
 
             /* Interpolate the texture co-ordinate if possible */
-            point_t vt(MAX_DIST);
+            point_t<> vt(MAX_DIST);
             if ((this->vnt != nullptr) && (this->vnt[3].x != MAX_DIST))
             {
                 vt = (h->u * this->vnt[5]) + (h->v * this->vnt[4]) + ((1.0f - (h->u + h->v)) * this->vnt[3]);
@@ -85,7 +85,7 @@ class triangle : boost::noncopyable
         }
         
         /* Call the materials shader with the triangles normal */
-        inline void shade(const ray_trace_engine &r, ray &i, const point_t &n, const point_t &vt, const hit_description &h, ext_colour_t *const c) const
+        inline void shade(const ray_trace_engine &r, ray &i, const point_t<> &n, const point_t<> &vt, const hit_description &h, ext_colour_t *const c) const
         {
             /* Call the material shader */
             get_material()->shade(r, i, n, h.h, c, vt);
@@ -104,11 +104,11 @@ class triangle : boost::noncopyable
 
         static_assert(sizeof(std::int64_t) == sizeof(material *), "Error: Material pointers dont fit in std::int64_t");
         std::int64_t    m;          /* Pointer to the triangles shader          */
-        point_t       * vnt;        /* Pointer to vertex normals and textures   */
-        point_t         vertex_a;   /* Vertex a of the triangle                 */
-        point_t         vertex_b;   /* Vertex b of the triangle                 */
-        point_t         vertex_c;   /* Vertex c of the triangle                 */
-        point_t         n;          /* Normal of the triangle                   */
+        point_t<>       * vnt;        /* Pointer to vertex normals and textures   */
+        point_t<>         vertex_a;   /* Vertex a of the triangle                 */
+        point_t<>         vertex_b;   /* Vertex b of the triangle                 */
+        point_t<>         vertex_c;   /* Vertex c of the triangle                 */
+        point_t<>         n;          /* Normal of the triangle                   */
 };
 
 
@@ -121,7 +121,7 @@ class triangle : boost::noncopyable
  The normal and the bounding box of the triangle are 
  precomputed.
 ************************************************************/
-inline triangle::triangle(material *const m, const point_t &a, const point_t &b, const point_t &c, bool l, const point_t *v_n, const point_t *v_t) : 
+inline triangle::triangle(material *const m, const point_t<> &a, const point_t<> &b, const point_t<> &c, bool l, const point_t<> *v_n, const point_t<> *v_t) : 
     m(reinterpret_cast<std::int64_t>(m)), vertex_a(a), vertex_b(b), vertex_c(c)
 { 
     /* Vertex checks */
@@ -136,7 +136,7 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
 
     if ((v_n != nullptr) || (v_t != nullptr))
     {
-        this->vnt = new point_t [6];
+        this->vnt = new point_t<> [6];
     }
     else
     {
@@ -168,8 +168,8 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
     }
 
     /* Calculate the normal */
-    const point_t dir_b(this->vertex_b - this->vertex_a);
-    const point_t dir_c(this->vertex_c - this->vertex_a);
+    const point_t<> dir_b(this->vertex_b - this->vertex_a);
+    const point_t<> dir_c(this->vertex_c - this->vertex_a);
     cross_product(dir_b, dir_c, &this->n);
     assert(this->n != 0.0f);
     normalise(&this->n);
@@ -190,11 +190,11 @@ inline triangle::triangle(material *const m, const point_t &a, const point_t &b,
 inline void triangle::is_intersecting(const ray *const r, hit_description *const h) const 
 {
     /* Find vectors for two edges sharing V1 */
-    const point_t e1(vertex_c - vertex_a);
-    const point_t e2(vertex_b - vertex_a);
+    const point_t<> e1(vertex_c - vertex_a);
+    const point_t<> e2(vertex_b - vertex_a);
     
     /* Begin calculating determinant - also used to calculate u parameter */
-    const point_t P(cross_product(r->get_dir(), e2));
+    const point_t<> P(cross_product(r->get_dir(), e2));
 
     /* if determinant is near zero, ray lies in plane of triangle */
     const float det = dot_product(e1, P);
@@ -206,7 +206,7 @@ inline void triangle::is_intersecting(const ray *const r, hit_description *const
     const float inv_det = 1.0f / det;
 
     /* calculate distance from V1 to ray origin */
-    const point_t T(r->get_ogn() - vertex_a);
+    const point_t<> T(r->get_ogn() - vertex_a);
 
     /* Calculate u parameter and test bound */
     const float u = dot_product(T, P) * inv_det;
@@ -217,7 +217,7 @@ inline void triangle::is_intersecting(const ray *const r, hit_description *const
     }
 
     /* Calculate V parameter and test bound */
-    const point_t Q(cross_product(T, e1));
+    const point_t<> Q(cross_product(T, e1));
     const float v = dot_product(r->get_dir(), Q) * inv_det;
     if ((v < 0.0f) || ((u + v) > 1.0f))
     {
@@ -461,7 +461,7 @@ inline void triangle::is_intersecting(const frustrum &f, const packet_ray *const
  if vertex normals are used. Also set weather the ray is
  entering of leaving the triangle.
 ************************************************************/
-inline point_t triangle::normal_at_point(ray *const r, hit_description *const h) const
+inline point_t<> triangle::normal_at_point(ray *const r, hit_description *const h) const
 {
     const float denom  = dot_product(this->n, r->get_dir());
     /* Re-calculate the intesection of the ray with the plane of the triangle */
@@ -470,7 +470,7 @@ inline point_t triangle::normal_at_point(ray *const r, hit_description *const h)
     r->change_length(num / denom);
 
     /* Interpolate the vertex normals */
-    point_t shader_norm;
+    point_t<> shader_norm;
     if ((this->vnt != nullptr) && (this->vnt[0].x != MAX_DIST))
     {
         shader_norm = (h->u * this->vnt[2]) + (h->v * this->vnt[1]) + ((1.0f - (h->u + h->v)) * this->vnt[0]);
@@ -501,7 +501,7 @@ inline point_t triangle::normal_at_point(ray *const r, hit_description *const h)
 /***********************************************************
   .
 ************************************************************/
-inline void triangle::find_rays(ray *const r, const point_t &d, const int n) const
+inline void triangle::find_rays(ray *const r, const point_t<> &d, const int n) const
 {
     /* Scales */
     const float beta_scale    = 1.0f / static_cast<float>((n >> 4) + ((n & 0xe) != 0) + 1);
@@ -517,7 +517,7 @@ inline void triangle::find_rays(ray *const r, const point_t &d, const int n) con
         const float alpha   = 1.0f - (beta + gamma);
 
         /* Convert to cartesian co-ordinates */
-        point_t p = (this->vertex_a * alpha) + (this->vertex_b * beta) + (this->vertex_c * gamma);
+        point_t<> p = (this->vertex_a * alpha) + (this->vertex_b * beta) + (this->vertex_c * gamma);
         
         /* Create a new ray */
         r[i].set_up(d, p);

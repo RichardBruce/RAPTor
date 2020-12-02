@@ -10,7 +10,7 @@
 
 namespace raptor_raytracer
 {
-float gradient_mapper::run_procedure(ext_colour_t *const c, const point_t &dst, const point_t &dir, const point_t &n) const
+float gradient_mapper::run_procedure(ext_colour_t *const c, const point_t<> &dst, const point_t<> &dir, const point_t<> &n) const
 {
     /* Calculate the key for interpolation */
     float key;

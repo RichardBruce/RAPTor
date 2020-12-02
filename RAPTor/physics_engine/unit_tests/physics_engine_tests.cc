@@ -36,11 +36,11 @@ struct physics_engine_fixture : private boost::noncopyable
     :  collider(new rigid_body_collider(0.9f, 0.0f, 0.75f)),
        uut(collider),
        m(new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), 1.0f)),
-       po0_check(new physics_object(make_cube(m, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.0f,  9.5f, 0.0f), 10.0f)),
-       po1_check(new physics_object(make_cube(m, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.0f, -9.5f, 0.0f), 10.0f)),
-       po2_check(new physics_object(make_cube(m, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.0f, -8.4999975f, 0.0f), 10.0f)),
-       po3_check(new physics_object(make_cube(m, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.0f, -7.4999925f, 0.0f), 10.0f)),
-       po4_check(new physics_object(make_cube(m, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f, 0.5f, 0.5f)), point_t(0.0f, 11.0f, 0.0f), 10.0f, 1)),
+       po0_check(new physics_object(make_cube(m, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f, 0.5f, 0.5f)), point_t<>(0.0f,  9.5f, 0.0f), 10.0f)),
+       po1_check(new physics_object(make_cube(m, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f, 0.5f, 0.5f)), point_t<>(0.0f, -9.5f, 0.0f), 10.0f)),
+       po2_check(new physics_object(make_cube(m, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f, 0.5f, 0.5f)), point_t<>(0.0f, -8.4999975f, 0.0f), 10.0f)),
+       po3_check(new physics_object(make_cube(m, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f, 0.5f, 0.5f)), point_t<>(0.0f, -7.4999925f, 0.0f), 10.0f)),
+       po4_check(new physics_object(make_cube(m, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f, 0.5f, 0.5f)), point_t<>(0.0f, 11.0f, 0.0f), 10.0f, 1)),
        po0(po0_check),
        po1(po1_check),
        po2(po2_check),
@@ -277,79 +277,79 @@ BOOST_AUTO_TEST_CASE( scene_to_triangles_test )
     std::unique_ptr<raptor_raytracer::primitive_store> tris(uut.scene_to_triangles());
     BOOST_CHECK(tris->size() == 24);
 
-    BOOST_CHECK(tris->primitive( 0)->get_vertex_a() == point_t(-0.5f, -10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 0)->get_vertex_b() == point_t( 0.5f,  -9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 0)->get_vertex_c() == point_t( 0.5f, -10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 1)->get_vertex_a() == point_t(-0.5f, -10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 1)->get_vertex_b() == point_t(-0.5f,  -9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 1)->get_vertex_c() == point_t( 0.5f,  -9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 2)->get_vertex_a() == point_t(-0.5f, -10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 2)->get_vertex_b() == point_t( 0.5f, -10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 2)->get_vertex_c() == point_t( 0.5f,  -9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 3)->get_vertex_a() == point_t(-0.5f, -10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 3)->get_vertex_b() == point_t( 0.5f,  -9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 3)->get_vertex_c() == point_t(-0.5f,  -9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 4)->get_vertex_a() == point_t(-0.5f, -10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 4)->get_vertex_b() == point_t(-0.5f,  -9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 4)->get_vertex_c() == point_t(-0.5f, -10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 5)->get_vertex_a() == point_t(-0.5f,  -9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 5)->get_vertex_b() == point_t(-0.5f,  -9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 5)->get_vertex_c() == point_t(-0.5f, -10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 6)->get_vertex_a() == point_t( 0.5f, -10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 6)->get_vertex_b() == point_t( 0.5f,  -9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 6)->get_vertex_c() == point_t( 0.5f,  -9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 7)->get_vertex_a() == point_t( 0.5f, -10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 7)->get_vertex_b() == point_t( 0.5f,  -9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 7)->get_vertex_c() == point_t( 0.5f, -10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 8)->get_vertex_a() == point_t(-0.5f,  -9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 8)->get_vertex_b() == point_t(-0.5f,  -9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 8)->get_vertex_c() == point_t( 0.5f,  -9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 9)->get_vertex_a() == point_t(-0.5f,  -9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive( 9)->get_vertex_b() == point_t( 0.5f,  -9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive( 9)->get_vertex_c() == point_t( 0.5f,  -9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(10)->get_vertex_a() == point_t(-0.5f, -10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(10)->get_vertex_b() == point_t( 0.5f, -10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(10)->get_vertex_c() == point_t(-0.5f, -10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(11)->get_vertex_a() == point_t( 0.5f, -10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(11)->get_vertex_b() == point_t( 0.5f, -10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(11)->get_vertex_c() == point_t(-0.5f, -10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 0)->get_vertex_a() == point_t<>(-0.5f, -10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 0)->get_vertex_b() == point_t<>( 0.5f,  -9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 0)->get_vertex_c() == point_t<>( 0.5f, -10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 1)->get_vertex_a() == point_t<>(-0.5f, -10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 1)->get_vertex_b() == point_t<>(-0.5f,  -9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 1)->get_vertex_c() == point_t<>( 0.5f,  -9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 2)->get_vertex_a() == point_t<>(-0.5f, -10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 2)->get_vertex_b() == point_t<>( 0.5f, -10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 2)->get_vertex_c() == point_t<>( 0.5f,  -9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 3)->get_vertex_a() == point_t<>(-0.5f, -10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 3)->get_vertex_b() == point_t<>( 0.5f,  -9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 3)->get_vertex_c() == point_t<>(-0.5f,  -9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 4)->get_vertex_a() == point_t<>(-0.5f, -10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 4)->get_vertex_b() == point_t<>(-0.5f,  -9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 4)->get_vertex_c() == point_t<>(-0.5f, -10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 5)->get_vertex_a() == point_t<>(-0.5f,  -9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 5)->get_vertex_b() == point_t<>(-0.5f,  -9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 5)->get_vertex_c() == point_t<>(-0.5f, -10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 6)->get_vertex_a() == point_t<>( 0.5f, -10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 6)->get_vertex_b() == point_t<>( 0.5f,  -9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 6)->get_vertex_c() == point_t<>( 0.5f,  -9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 7)->get_vertex_a() == point_t<>( 0.5f, -10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 7)->get_vertex_b() == point_t<>( 0.5f,  -9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 7)->get_vertex_c() == point_t<>( 0.5f, -10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 8)->get_vertex_a() == point_t<>(-0.5f,  -9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 8)->get_vertex_b() == point_t<>(-0.5f,  -9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 8)->get_vertex_c() == point_t<>( 0.5f,  -9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 9)->get_vertex_a() == point_t<>(-0.5f,  -9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive( 9)->get_vertex_b() == point_t<>( 0.5f,  -9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive( 9)->get_vertex_c() == point_t<>( 0.5f,  -9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(10)->get_vertex_a() == point_t<>(-0.5f, -10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(10)->get_vertex_b() == point_t<>( 0.5f, -10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(10)->get_vertex_c() == point_t<>(-0.5f, -10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(11)->get_vertex_a() == point_t<>( 0.5f, -10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(11)->get_vertex_b() == point_t<>( 0.5f, -10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(11)->get_vertex_c() == point_t<>(-0.5f, -10.0f,  0.5f));
 
-    BOOST_CHECK(tris->primitive(12)->get_vertex_a() == point_t(-0.5f,  9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(12)->get_vertex_b() == point_t( 0.5f, 10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(12)->get_vertex_c() == point_t( 0.5f,  9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(13)->get_vertex_a() == point_t(-0.5f,  9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(13)->get_vertex_b() == point_t(-0.5f, 10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(13)->get_vertex_c() == point_t( 0.5f, 10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(14)->get_vertex_a() == point_t(-0.5f,  9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(14)->get_vertex_b() == point_t( 0.5f,  9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(14)->get_vertex_c() == point_t( 0.5f, 10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(15)->get_vertex_a() == point_t(-0.5f,  9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(15)->get_vertex_b() == point_t( 0.5f, 10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(15)->get_vertex_c() == point_t(-0.5f, 10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(16)->get_vertex_a() == point_t(-0.5f,  9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(16)->get_vertex_b() == point_t(-0.5f, 10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(16)->get_vertex_c() == point_t(-0.5f,  9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(17)->get_vertex_a() == point_t(-0.5f, 10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(17)->get_vertex_b() == point_t(-0.5f, 10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(17)->get_vertex_c() == point_t(-0.5f,  9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(18)->get_vertex_a() == point_t( 0.5f,  9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(18)->get_vertex_b() == point_t( 0.5f, 10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(18)->get_vertex_c() == point_t( 0.5f, 10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(19)->get_vertex_a() == point_t( 0.5f,  9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(19)->get_vertex_b() == point_t( 0.5f, 10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(19)->get_vertex_c() == point_t( 0.5f,  9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(20)->get_vertex_a() == point_t(-0.5f, 10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(20)->get_vertex_b() == point_t(-0.5f, 10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(20)->get_vertex_c() == point_t( 0.5f, 10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(21)->get_vertex_a() == point_t(-0.5f, 10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(21)->get_vertex_b() == point_t( 0.5f, 10.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(21)->get_vertex_c() == point_t( 0.5f, 10.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(22)->get_vertex_a() == point_t(-0.5f,  9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(22)->get_vertex_b() == point_t( 0.5f,  9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(22)->get_vertex_c() == point_t(-0.5f,  9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(23)->get_vertex_a() == point_t( 0.5f,  9.0f, -0.5f));
-    BOOST_CHECK(tris->primitive(23)->get_vertex_b() == point_t( 0.5f,  9.0f,  0.5f));
-    BOOST_CHECK(tris->primitive(23)->get_vertex_c() == point_t(-0.5f,  9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(12)->get_vertex_a() == point_t<>(-0.5f,  9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(12)->get_vertex_b() == point_t<>( 0.5f, 10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(12)->get_vertex_c() == point_t<>( 0.5f,  9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(13)->get_vertex_a() == point_t<>(-0.5f,  9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(13)->get_vertex_b() == point_t<>(-0.5f, 10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(13)->get_vertex_c() == point_t<>( 0.5f, 10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(14)->get_vertex_a() == point_t<>(-0.5f,  9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(14)->get_vertex_b() == point_t<>( 0.5f,  9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(14)->get_vertex_c() == point_t<>( 0.5f, 10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(15)->get_vertex_a() == point_t<>(-0.5f,  9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(15)->get_vertex_b() == point_t<>( 0.5f, 10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(15)->get_vertex_c() == point_t<>(-0.5f, 10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(16)->get_vertex_a() == point_t<>(-0.5f,  9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(16)->get_vertex_b() == point_t<>(-0.5f, 10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(16)->get_vertex_c() == point_t<>(-0.5f,  9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(17)->get_vertex_a() == point_t<>(-0.5f, 10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(17)->get_vertex_b() == point_t<>(-0.5f, 10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(17)->get_vertex_c() == point_t<>(-0.5f,  9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(18)->get_vertex_a() == point_t<>( 0.5f,  9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(18)->get_vertex_b() == point_t<>( 0.5f, 10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(18)->get_vertex_c() == point_t<>( 0.5f, 10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(19)->get_vertex_a() == point_t<>( 0.5f,  9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(19)->get_vertex_b() == point_t<>( 0.5f, 10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(19)->get_vertex_c() == point_t<>( 0.5f,  9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(20)->get_vertex_a() == point_t<>(-0.5f, 10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(20)->get_vertex_b() == point_t<>(-0.5f, 10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(20)->get_vertex_c() == point_t<>( 0.5f, 10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(21)->get_vertex_a() == point_t<>(-0.5f, 10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(21)->get_vertex_b() == point_t<>( 0.5f, 10.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(21)->get_vertex_c() == point_t<>( 0.5f, 10.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(22)->get_vertex_a() == point_t<>(-0.5f,  9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(22)->get_vertex_b() == point_t<>( 0.5f,  9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(22)->get_vertex_c() == point_t<>(-0.5f,  9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(23)->get_vertex_a() == point_t<>( 0.5f,  9.0f, -0.5f));
+    BOOST_CHECK(tris->primitive(23)->get_vertex_b() == point_t<>( 0.5f,  9.0f,  0.5f));
+    BOOST_CHECK(tris->primitive(23)->get_vertex_c() == point_t<>(-0.5f,  9.0f,  0.5f));
 }
 
 
@@ -367,18 +367,18 @@ BOOST_AUTO_TEST_CASE( apply_force_test )
     BOOST_CHECK(uut.number_of_collisions() == 0);
     BOOST_CHECK(uut.default_collider() == collider);
 
-    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t<>(0.0f, 0.0f, 0.0f));
 
-    uut.apply_force(new mock_force(point_t( 0.65f, -2.25f, 1.05f), point_t(0.0f,  0.0f, 0.0f), 1.0f), 0);
-    uut.apply_force(new mock_force(point_t(-3.3f,   4.5f,  0.1f ), point_t(0.0f, -0.2f, 9.0f), 1.0f), 1);
+    uut.apply_force(new mock_force(point_t<>( 0.65f, -2.25f, 1.05f), point_t<>(0.0f,  0.0f, 0.0f), 1.0f), 0);
+    uut.apply_force(new mock_force(point_t<>(-3.3f,   4.5f,  0.1f ), point_t<>(0.0f, -0.2f, 9.0f), 1.0f), 1);
 
-    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t( 0.65f, -2.25f, 1.05f));
-    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t(-3.3f,   4.5f,  0.1f ));
-    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t( 0.0f,   0.0f,  0.0f ));
-    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t( 0.0f,  -0.2f,  9.0f ));
+    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t<>( 0.65f, -2.25f, 1.05f));
+    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t<>(-3.3f,   4.5f,  0.1f ));
+    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t<>( 0.0f,   0.0f,  0.0f ));
+    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t<>( 0.0f,  -0.2f,  9.0f ));
 }
 
 BOOST_AUTO_TEST_CASE( apply_force_not_moving_test )
@@ -394,18 +394,18 @@ BOOST_AUTO_TEST_CASE( apply_force_not_moving_test )
     BOOST_CHECK(uut.number_of_collisions() == 0);
     BOOST_CHECK(uut.default_collider() == collider);
 
-    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t<>(0.0f, 0.0f, 0.0f));
 
-    uut.apply_force(new mock_force(point_t( 0.65f, -2.25f, 1.05f), point_t(0.0f,  0.0f, 0.0f), 1.0f), 0);
-    uut.apply_force(new mock_force(point_t(-3.3f,   4.5f,  0.1f ), point_t(0.0f, -0.2f, 9.0f), 1.0f), 1);
+    uut.apply_force(new mock_force(point_t<>( 0.65f, -2.25f, 1.05f), point_t<>(0.0f,  0.0f, 0.0f), 1.0f), 0);
+    uut.apply_force(new mock_force(point_t<>(-3.3f,   4.5f,  0.1f ), point_t<>(0.0f, -0.2f, 9.0f), 1.0f), 1);
 
-    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t<>(0.0f, 0.0f, 0.0f));
 }
 
 
@@ -423,21 +423,21 @@ BOOST_AUTO_TEST_CASE( apply_acceleration_test )
     BOOST_CHECK(uut.number_of_collisions() == 0);
     BOOST_CHECK(uut.default_collider() == collider);
 
-    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(0)->get_force()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(1)->get_force()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(0)->get_torque() == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_object(1)->get_torque() == point_t<>(0.0f, 0.0f, 0.0f));
 
-    uut.apply_force(new mock_force(point_t( 0.65f, -2.25f, 1.05f), point_t(0.0f,  0.0f, 0.0f), 1.0f), 0);
-    uut.apply_force(new mock_force(point_t(-3.3f,   4.5f,  0.1f ), point_t(0.0f, -0.2f, 9.0f), 1.0f), 1);
+    uut.apply_force(new mock_force(point_t<>( 0.65f, -2.25f, 1.05f), point_t<>(0.0f,  0.0f, 0.0f), 1.0f), 0);
+    uut.apply_force(new mock_force(point_t<>(-3.3f,   4.5f,  0.1f ), point_t<>(0.0f, -0.2f, 9.0f), 1.0f), 1);
 
     uut.advance_time(0.5f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_force()    - point_t( 0.65f,   -2.25f,   1.05f  ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_force()    - point_t(-3.3f,     4.5f,    0.1f   ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_torque()   - point_t( 0.0f,     0.0f,    0.0f   ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_torque()   - point_t( 0.0f,    -0.2f,    9.0f   ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t( 0.0325f, -0.1125f, 0.0525f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(-0.165f,   0.225f,  0.005f ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_force()    - point_t<>( 0.65f,   -2.25f,   1.05f  ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_force()    - point_t<>(-3.3f,     4.5f,    0.1f   ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_torque()   - point_t<>( 0.0f,     0.0f,    0.0f   ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_torque()   - point_t<>( 0.0f,    -0.2f,    9.0f   ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>( 0.0325f, -0.1125f, 0.0525f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(-0.165f,   0.225f,  0.005f ))) < result_tolerance);
 }
 
 
@@ -460,26 +460,26 @@ BOOST_AUTO_TEST_CASE( get_collision_test )
     BOOST_CHECK(uut.default_collider() == collider);
 
     const collision_info<> *const c1_2 = uut.get_collision(1, 2);
-    BOOST_CHECK(fabs(magnitude(c1_2->get_normal_of_collision() - point_t(0.0f, -1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(c1_2->get_point_of_collision()  - point_t(0.0f, -9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c1_2->get_normal_of_collision() - point_t<>(0.0f, -1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c1_2->get_point_of_collision()  - point_t<>(0.0f, -9.0f, 0.0f))) < result_tolerance);
     BOOST_CHECK(c1_2->get_time() == 0.0f);
     BOOST_CHECK(c1_2->get_type() == collision_t::SLIDING_COLLISION);
 
     const collision_info<> *const c2_1 = uut.get_collision(2, 1);
-    BOOST_CHECK(fabs(magnitude(c2_1->get_normal_of_collision() - point_t(0.0f,  1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(c2_1->get_point_of_collision()  - point_t(0.0f, -9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c2_1->get_normal_of_collision() - point_t<>(0.0f,  1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c2_1->get_point_of_collision()  - point_t<>(0.0f, -9.0f, 0.0f))) < result_tolerance);
     BOOST_CHECK(c2_1->get_time() == 0.0f);
     BOOST_CHECK(c2_1->get_type() == collision_t::SLIDING_COLLISION);
 
     const collision_info<> *const c2_3 = uut.get_collision(2, 3);
-    BOOST_CHECK(fabs(magnitude(c2_3->get_normal_of_collision() - point_t(0.0f, -1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(c2_3->get_point_of_collision()  - point_t(0.0f, -8.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c2_3->get_normal_of_collision() - point_t<>(0.0f, -1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c2_3->get_point_of_collision()  - point_t<>(0.0f, -8.0f, 0.0f))) < result_tolerance);
     BOOST_CHECK(c2_3->get_time() == 0.0f);
     BOOST_CHECK(c2_3->get_type() == collision_t::SLIDING_COLLISION);
 
     const collision_info<> *const c3_2 = uut.get_collision(3, 2);
-    BOOST_CHECK(fabs(magnitude(c3_2->get_normal_of_collision() - point_t(0.0f,  1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(c3_2->get_point_of_collision()  - point_t(0.0f, -8.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c3_2->get_normal_of_collision() - point_t<>(0.0f,  1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c3_2->get_point_of_collision()  - point_t<>(0.0f, -8.0f, 0.0f))) < result_tolerance);
     BOOST_CHECK(c3_2->get_time() == 0.0f);
     BOOST_CHECK(c3_2->get_type() == collision_t::SLIDING_COLLISION);
 
@@ -533,8 +533,8 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
     BOOST_CHECK(uut.number_of_collisions() == 3);
 
     const collision_info<> *const c1_2_0 = uut.get_collision(1, 2);
-    BOOST_CHECK(fabs(magnitude(c1_2_0->get_normal_of_collision() - point_t(0.0f, -1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(c1_2_0->get_point_of_collision()  - point_t(0.0f, -9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c1_2_0->get_normal_of_collision() - point_t<>(0.0f, -1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c1_2_0->get_point_of_collision()  - point_t<>(0.0f, -9.0f, 0.0f))) < result_tolerance);
     BOOST_CHECK(c1_2_0->get_time() == 0.0f);
     BOOST_CHECK(c1_2_0->get_type() == collision_t::SLIDING_COLLISION);
 
@@ -543,14 +543,14 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
     BOOST_CHECK(c2_1_0->get_type() == collision_t::NO_COLLISION);
     
     const collision_info<> *const c2_3_0 = uut.get_collision(2, 3);
-    BOOST_CHECK(fabs(magnitude(c2_3_0->get_normal_of_collision() - point_t(0.0f, -1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(c2_3_0->get_point_of_collision()  - point_t(0.0f, -8.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c2_3_0->get_normal_of_collision() - point_t<>(0.0f, -1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c2_3_0->get_point_of_collision()  - point_t<>(0.0f, -8.0f, 0.0f))) < result_tolerance);
     BOOST_CHECK(c2_3_0->get_time() == 0.0f);
     BOOST_CHECK(c2_3_0->get_type() == collision_t::SLIDING_COLLISION);
 
     const collision_info<> *const c3_2_0 = uut.get_collision(3, 2);
-    BOOST_CHECK(fabs(magnitude(c3_2_0->get_normal_of_collision() - point_t(0.0f,  1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(c3_2_0->get_point_of_collision()  - point_t(0.0f, -8.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c3_2_0->get_normal_of_collision() - point_t<>(0.0f,  1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c3_2_0->get_point_of_collision()  - point_t<>(0.0f, -8.0f, 0.0f))) < result_tolerance);
     BOOST_CHECK(c3_2_0->get_time() == 0.0f);
     BOOST_CHECK(c3_2_0->get_type() == collision_t::SLIDING_COLLISION);
 
@@ -559,8 +559,8 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
     BOOST_CHECK(uut.number_of_collisions() == 3);
 
     const collision_info<> *const c1_2_1 = uut.get_collision(1, 2);
-    BOOST_CHECK(fabs(magnitude(c1_2_1->get_normal_of_collision() - point_t(0.0f, -1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(c1_2_1->get_point_of_collision()  - point_t(0.0f, -9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c1_2_1->get_normal_of_collision() - point_t<>(0.0f, -1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c1_2_1->get_point_of_collision()  - point_t<>(0.0f, -9.0f, 0.0f))) < result_tolerance);
     BOOST_CHECK(c1_2_1->get_time() == 0.0f);
     BOOST_CHECK(c1_2_1->get_type() == collision_t::SLIDING_COLLISION);
 
@@ -573,8 +573,8 @@ BOOST_AUTO_TEST_CASE( void_all_collisions_with_in_steps_test )
     BOOST_CHECK(c2_3_1->get_type() == collision_t::NO_COLLISION);
 
     const collision_info<> *const c3_2_1 = uut.get_collision(3, 2);
-    BOOST_CHECK(fabs(magnitude(c3_2_1->get_normal_of_collision() - point_t(0.0f,  1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(c3_2_1->get_point_of_collision()  - point_t(0.0f, -8.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c3_2_1->get_normal_of_collision() - point_t<>(0.0f,  1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(c3_2_1->get_point_of_collision()  - point_t<>(0.0f, -8.0f, 0.0f))) < result_tolerance);
     BOOST_CHECK(c3_2_1->get_time() == 0.0f);
     BOOST_CHECK(c3_2_1->get_type() == collision_t::SLIDING_COLLISION);
 
@@ -737,8 +737,8 @@ BOOST_AUTO_TEST_CASE( get_pairwise_collider_test )
 
 BOOST_AUTO_TEST_CASE( advance_time_collide_test )
 {
-    po0->set_velocity(point_t(0.0f, -9.0f, 0.0f));
-    po1->set_velocity(point_t(0.0f,  9.0f, 0.0f));
+    po0->set_velocity(point_t<>(0.0f, -9.0f, 0.0f));
+    po1->set_velocity(point_t<>(0.0f,  9.0f, 0.0f));
     uut.add_moving_object(po0.release());
     uut.add_moving_object(po1.release());
 
@@ -755,24 +755,24 @@ BOOST_AUTO_TEST_CASE( advance_time_collide_test )
     BOOST_CHECK(uut.default_collider() == c);
 
     uut.advance_time(0.5f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t(0.0f, -9.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(0.0f,  9.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t(0.0f,  5.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t(0.0f, -5.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>(0.0f, -9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(0.0f,  9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t<>(0.0f,  5.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t<>(0.0f, -5.0f, 0.0f))) < result_tolerance);
 
     uut.advance_time(0.6f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t(0.0f,  4.5f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(0.0f, -4.5f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t(0.0f,  0.95f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t(0.0f, -0.95f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>(0.0f,  4.5f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(0.0f, -4.5f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t<>(0.0f,  0.95f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t<>(0.0f, -0.95f, 0.0f))) < result_tolerance);
 }
 
 
 BOOST_AUTO_TEST_CASE( advance_time_three_way_collide_test )
 {
-    po0->set_velocity(point_t(0.0f, -9.0f, 0.0f));
-    po1->set_velocity(point_t(0.0f,  9.0f, 0.0f));
-    po4->set_velocity(point_t(0.0f, -9.0f, 0.0f));
+    po0->set_velocity(point_t<>(0.0f, -9.0f, 0.0f));
+    po1->set_velocity(point_t<>(0.0f,  9.0f, 0.0f));
+    po4->set_velocity(point_t<>(0.0f, -9.0f, 0.0f));
     uut.add_moving_object(po0.release());
     uut.add_moving_object(po1.release());
     uut.add_moving_object(po4.release());
@@ -795,29 +795,29 @@ BOOST_AUTO_TEST_CASE( advance_time_three_way_collide_test )
     BOOST_CHECK(uut.pair_collider(0, 1) == pc);
 
     uut.advance_time(0.5f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t(0.0f, -9.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(0.0f,  9.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(2)->get_velocity() - point_t(0.0f, -9.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t(0.0f,  5.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t(0.0f, -5.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(2)->get_center_of_mass() - point_t(0.0f,  6.5f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>(0.0f, -9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(0.0f,  9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(2)->get_velocity() - point_t<>(0.0f, -9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t<>(0.0f,  5.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t<>(0.0f, -5.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(2)->get_center_of_mass() - point_t<>(0.0f,  6.5f, 0.0f))) < result_tolerance);
 
     uut.advance_time(0.6f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t(0.0f, -2.25f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(0.0f, -4.5f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(2)->get_velocity() - point_t(0.0f, -2.25f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t(0.0f,  0.524812f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t(0.0f, -0.95f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(2)->get_center_of_mass() - point_t(0.0f,  1.52556f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>(0.0f, -2.25f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(0.0f, -4.5f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(2)->get_velocity() - point_t<>(0.0f, -2.25f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t<>(0.0f,  0.524812f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t<>(0.0f, -0.95f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(2)->get_center_of_mass() - point_t<>(0.0f,  1.52556f, 0.0f))) < result_tolerance);
 }
 
 
 BOOST_AUTO_TEST_CASE( advance_time_rotating_past_test )
 {
-    po0->set_velocity(point_t( 1.0f, 0.0f, 0.0f));
-    po4->set_velocity(point_t(-1.0f, 0.0f, 0.0f));
-    po0->set_angular_velocity(point_t(1.0f, 0.0f, 10.0f));
-    po4->set_angular_velocity(point_t(1.0f, 0.0f, 10.0f));
+    po0->set_velocity(point_t<>( 1.0f, 0.0f, 0.0f));
+    po4->set_velocity(point_t<>(-1.0f, 0.0f, 0.0f));
+    po0->set_angular_velocity(point_t<>(1.0f, 0.0f, 10.0f));
+    po4->set_angular_velocity(point_t<>(1.0f, 0.0f, 10.0f));
     uut.add_moving_object(po0.release());
     uut.add_moving_object(po4.release());
 
@@ -831,25 +831,25 @@ BOOST_AUTO_TEST_CASE( advance_time_rotating_past_test )
     BOOST_CHECK(uut.default_collider() == collider);
 
     uut.advance_time(0.5f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t( 1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(-1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t( 0.5f,  9.5f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t(-0.5f, 11.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>( 1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(-1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t<>( 0.5f,  9.5f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t<>(-0.5f, 11.0f, 0.0f))) < result_tolerance);
 
     uut.advance_time(0.5f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t( 1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(-1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t( 1.0f,  9.5f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t(-1.0f, 11.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>( 1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(-1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t<>( 1.0f,  9.5f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t<>(-1.0f, 11.0f, 0.0f))) < result_tolerance);
 }
 
 
 BOOST_AUTO_TEST_CASE( advance_time_rotating_in_plane_collide_test )
 {
-    po0->set_velocity(point_t(0.0f, -9.0f, 0.0f));
-    po1->set_velocity(point_t(0.0f,  9.0f, 0.0f));
-    po0->set_angular_velocity(point_t(0.0f, -9.0f, 0.0f));
-    po1->set_angular_velocity(point_t(0.0f,  9.0f, 0.0f));
+    po0->set_velocity(point_t<>(0.0f, -9.0f, 0.0f));
+    po1->set_velocity(point_t<>(0.0f,  9.0f, 0.0f));
+    po0->set_angular_velocity(point_t<>(0.0f, -9.0f, 0.0f));
+    po1->set_angular_velocity(point_t<>(0.0f,  9.0f, 0.0f));
     uut.add_moving_object(po0.release());
     uut.add_moving_object(po1.release());
 
@@ -866,25 +866,25 @@ BOOST_AUTO_TEST_CASE( advance_time_rotating_in_plane_collide_test )
     BOOST_CHECK(uut.default_collider() == c);
 
     uut.advance_time(0.5f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t(0.0f, -9.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(0.0f,  9.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t(0.0f,  5.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t(0.0f, -5.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>(0.0f, -9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(0.0f,  9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t<>(0.0f,  5.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t<>(0.0f, -5.0f, 0.0f))) < result_tolerance);
 
     uut.advance_time(0.6f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t(0.0f,  4.5f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(0.0f, -4.5f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t(0.0f,  0.95f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t(0.0f, -0.95f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>(0.0f,  4.5f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(0.0f, -4.5f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t<>(0.0f,  0.95f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t<>(0.0f, -0.95f, 0.0f))) < result_tolerance);
 }
 
 
 BOOST_AUTO_TEST_CASE( advance_time_rotating_in_plane_collide_and_slide_test )
 {
-    po0->set_velocity(point_t(0.0f, -9.0f, 0.0f));
-    po1->set_velocity(point_t(0.0f,  9.0f, 0.0f));
-    po0->set_angular_velocity(point_t(0.0f, -9.0f, 0.0f));
-    po1->set_angular_velocity(point_t(0.0f,  9.0f, 0.0f));
+    po0->set_velocity(point_t<>(0.0f, -9.0f, 0.0f));
+    po1->set_velocity(point_t<>(0.0f,  9.0f, 0.0f));
+    po0->set_angular_velocity(point_t<>(0.0f, -9.0f, 0.0f));
+    po1->set_angular_velocity(point_t<>(0.0f,  9.0f, 0.0f));
     uut.add_moving_object(po0.release());
     uut.add_moving_object(po1.release());
 
@@ -901,16 +901,16 @@ BOOST_AUTO_TEST_CASE( advance_time_rotating_in_plane_collide_and_slide_test )
     BOOST_CHECK(uut.default_collider() == c);
 
     uut.advance_time(0.5f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t(0.0f, -9.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(0.0f,  9.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t(0.0f,  5.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t(0.0f, -5.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>(0.0f, -9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(0.0f,  9.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t<>(0.0f,  5.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t<>(0.0f, -5.0f, 0.0f))) < result_tolerance);
 
     uut.advance_time(0.6f);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t(0.0f,  0.5f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t(0.0f, -0.5f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_velocity() - point_t<>(0.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_velocity() - point_t<>(0.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(0)->get_center_of_mass() - point_t<>(0.0f,  0.5f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(uut.get_object(1)->get_center_of_mass() - point_t<>(0.0f, -0.5f, 0.0f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

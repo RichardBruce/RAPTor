@@ -172,7 +172,7 @@ class physics_engine : private boost::noncopyable
             auto outer_iter = _collider_map.find(min);
             if (outer_iter == _collider_map.end())
             {
-                const auto inserted = _collider_map.insert(std::make_pair(min, new std::map<unsigned int, const collider *>()));
+                [[maybe_unused]] const auto inserted = _collider_map.insert(std::make_pair(min, new std::map<unsigned int, const collider *>()));
                 assert(inserted.second);
                 outer_iter = inserted.first;
             }
@@ -180,7 +180,7 @@ class physics_engine : private boost::noncopyable
             auto inner_iter = outer_iter->second->find(max);
             if (inner_iter == outer_iter->second->end())
             {
-                const auto inserted = outer_iter->second->insert(std::make_pair(max, c));
+                [[maybe_unused]] const auto inserted = outer_iter->second->insert(std::make_pair(max, c));
                 assert(inserted.second);
             }
             else
@@ -212,7 +212,7 @@ class physics_engine : private boost::noncopyable
 
         int add_object(physics_object *const v)
         {
-            const auto inserted = _objects->insert(std::make_pair(_entry++, v));
+            [[maybe_unused]] const auto inserted = _objects->insert(std::make_pair(_entry++, v));
             assert(inserted.second);
 
             return _entry;
@@ -221,7 +221,7 @@ class physics_engine : private boost::noncopyable
         int add_moving_object(physics_object *const v)
         {
             /* Add as an object */
-            const auto obj_inserted = _objects->insert(std::make_pair(_entry, v));
+            [[maybe_unused]] const auto obj_inserted = _objects->insert(std::make_pair(_entry, v));
             assert(obj_inserted.second);
 
             /* Add as a moving object */

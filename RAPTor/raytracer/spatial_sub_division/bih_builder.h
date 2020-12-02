@@ -15,8 +15,8 @@ namespace raptor_raytracer
 {
 struct bih_voxel_data
 {
-    point_t low;
-    point_t high;
+    point_t<> low;
+    point_t<> high;
 };
 
 class bih_builder
@@ -28,18 +28,18 @@ class bih_builder
         void build(primitive_store *const primitives, std::vector<bih_block> *const blocks);
     
         /* Access to the trees bounds */
-        const point_t & scene_upper_bound() const { return _t; }
-        const point_t & scene_lower_bound() const { return _b; }
+        const point_t<> & scene_upper_bound() const { return _t; }
+        const point_t<> & scene_lower_bound() const { return _b; }
         
     private :
         struct block_splitting_data
         {
-            const point_t *         hist_bl[8];
-            const point_t *         hist_tr[8];
-            point_t                 bl[8];
-            point_t                 tr[8];
-            point_t                 node_bl[8];
-            point_t                 node_tr[8];
+            const point_t<> *       hist_bl[8];
+            const point_t<> *       hist_tr[8];
+            point_t<>               bl[8];
+            point_t<>               tr[8];
+            point_t<>               node_bl[8];
+            point_t<>               node_tr[8];
             const unsigned int *    bins[8];
             int                     level[8];
             int                     end[8];
@@ -50,18 +50,18 @@ class bih_builder
         /* Radix sort */
         // cppcheck-suppress unusedPrivateFunction
         void bucket_build();
-        void bucket_build_mid(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
-        void bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e);
+        void bucket_build_mid(point_t<> *const bl, point_t<> *const tr, unsigned int *const hist, const int b, const int e);
+        void bucket_build_low(point_t<> *const bl, point_t<> *const tr, unsigned int *const hist, const int b, const int e);
 
         void convert_to_primitve_builder(const int b, const int e);
         // void convert_to_primitve_builder(triangle **const active_prims, const int b, const int e);
         void level_switch(block_splitting_data *const split_data, const int block_idx, const int node_idx, const int data_idx);
 
-        void divide_bih_block(const point_t *const hist_bl, const point_t *const hist_tr, const unsigned int *const bins, const point_t &bl, const point_t &tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level = 2, const int depth = 0);
+        void divide_bih_block(const point_t<> *const hist_bl, const point_t<> *const hist_tr, const unsigned int *const bins, const point_t<> &bl, const point_t<> &tr, const point_t<> &node_bl, const point_t<> &node_tr, const int block_idx, const int b, const int e, const int level = 2, const int depth = 0);
         void divide_bih_block(block_splitting_data *const split_data, const int block_idx, const int node_idx);
         bool divide_bih_node_binned(block_splitting_data *const split_data, const int in_idx, const int out_idx, const int block_idx, const int node_idx);
 
-        void divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int depth = 0, const int node_idx = 0);
+        void divide_bih_block(point_t<> bl, point_t<> tr, const point_t<> &node_bl, const point_t<> &node_tr, const int block_idx, const int b, const int e, const int depth = 0, const int node_idx = 0);
         void divide_bih_node(block_splitting_data *const split_data, const int in_idx, const int out_idx, const int block_idx, const int node_idx);
 
         primitive_store *                   _primitives;
@@ -70,8 +70,8 @@ class bih_builder
         std::unique_ptr<int []>             _code_buffer;
         std::vector<bih_block> *            _blocks;
         std::unique_ptr<bih_voxel_data []>  _bounds;
-        point_t                             _t;
-        point_t                             _b;
+        point_t<>                           _t;
+        point_t<>                           _b;
         float                               _width;
         float                               _width_epsilon;
         float                               _width_inv;

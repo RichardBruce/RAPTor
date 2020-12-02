@@ -12,7 +12,7 @@
 
 namespace raptor_raytracer
 {
-void shared_normal::add(shared_normal **user_0, const point_t &norm_0)
+void shared_normal::add(shared_normal **user_0, const point_t<> &norm_0)
 {
     /* Update normal */
     const float use_cnt_0 = static_cast<float>(_users.size());
@@ -68,9 +68,9 @@ void normal_calculator::add_point_usage(const std::vector<int> &pnts, const floa
     /* Calculate the polygons normal */
     if (pnts.size() > 2)
     {
-        const point_t ab(_pnts[pnts.back()] - _pnts[pnts[0]]);
-        const point_t bc(_pnts[pnts[0]] - _pnts[pnts[1]]);
-        const point_t norm(cross_product(ab, bc));
+        const point_t<> ab(_pnts[pnts.back()] - _pnts[pnts[0]]);
+        const point_t<> bc(_pnts[pnts[0]] - _pnts[pnts[1]]);
+        const point_t<> norm(cross_product(ab, bc));
         info->normal = normalise(norm);
     }
 
@@ -113,8 +113,8 @@ void normal_calculator::calculate()
                 }
 
                 /* Check for merge */
-                point_t norm_0(info_0->normal);
-                point_t norm_1(info_1->normal);
+                point_t<> norm_0(info_0->normal);
+                point_t<> norm_1(info_1->normal);
                 const float cos_angle = dot_product(norm_0, norm_1);
                 if (cos_angle > info_0->cos_threshold)
                 {
@@ -150,7 +150,7 @@ void normal_calculator::calculate()
     }
 }
 
-std::vector<point_t>* normal_calculator::normals(std::vector<point_t> *const norms, const int pol) const
+std::vector<point_t<>>* normal_calculator::normals(std::vector<point_t<>> *const norms, const int pol) const
 {
     /* Check if any shared normals are used */
     const pol_info *const info = &_pols[pol];

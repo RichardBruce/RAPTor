@@ -3,6 +3,7 @@
 /* Boost headers */
 
 /* Common headers */
+#include "sort.h"
 
 /* Mesh decimation headers */
 #include "mesh_decimation.h"
@@ -10,416 +11,330 @@
 
 namespace raptor_mesh_decimation
 {
-std::priority_queue<mesh_decimation::queue_entry> mesh_decimation::decimation_costs()
+bool mesh_decimation::can_update(std::vector<bool> &removed, const vertex *v, const point_t<double> &p, const vertex *to)
 {
-    /* Depth first search to build vertex merge costs */
-    std::priority_queue<mesh_decimation::queue_entry> costs;
-    for (auto &e : _edges)
+    for (int i = 0; i < v->links(); ++i)
     {
-        if (!e.removed() && !e.complex())
-        {
-            e.recalculate(false);
-            costs.emplace(&e, e.merge_cost());
-        }
-    }
-
-    return costs;
-}
-
-void mesh_decimation::next_cost(std::priority_queue<mesh_decimation::queue_entry> *const costs)
-{
-    costs->pop();
-    if (costs->empty())
-    {
-        (*costs) = decimation_costs();
-    }
-}
-
-bool mesh_decimation::can_merge_fan(const edge *const start, const edge *const end, vertex *const around, const point_t &vm)
-{
-    const edge *step = start;
-    do
-    {
-        /* Check for triangles that would flip */
-        const face *r = step->right_face(around);
-        if (r->flipped(around, vm))
-        {
-            return true;
-        }
-
-        step = r->next_edge(step);
-    } while (step != end);
-
-    return false;
-}
-
-std::pair<face*, edge*> mesh_decimation::remove_edge(edge *merge, vertex *v0, vertex *v1)
-{
-    /* Get triangles next to merge */
-    std::cout << "Removing duplicate edge " << std::hex << merge << std::dec << std::endl;
-    face *left = merge->left_face(v0);
-    edge *left_next = left->next_edge(merge);
-    edge *left_previous = left->previous_edge(merge);
-    face *left_merge_face = left_next->right_face(v1);
-    assert(!left_next->complex() && !left_previous->complex());
-
-    face *right = merge->right_face(v0);
-    edge *right_next = right->next_edge(merge);
-    edge *right_previous = right->previous_edge(merge);
-    face *right_merge_face = right_next->right_face(v0);
-    assert(!right_next->complex() && !right_previous->complex());
-
-    assert(left_next != merge);
-    assert(left_previous != merge);
-    assert(left_previous != left_next);
-    assert(left_next->left_face(v1) == left);
-    assert(left_previous->right_face(v0) == left);
-    
-    assert(right_next != merge);
-    assert(right_previous != merge);
-    assert(right_previous != right_next);
-    assert(right_next->left_face(v0) == right);
-    assert(right_previous->right_face(v1) == right);
-
-    assert(left_merge_face != left);
-    assert(left_merge_face != right);
-    assert(right_merge_face != left);
-    assert(right_merge_face != right);
-
-    /* Drop triangles by merging its remaining edges*/
-    left_previous->update_right_face(left_merge_face, v0);
-    left_next->removed(true);
-
-    right_previous->update_right_face(right_merge_face, v1);
-    right_next->removed(true);
-
-    /* Update edges of surviving faces */
-    left_merge_face->update_edge(left_next, left_previous);
-    right_merge_face->update_edge(right_next, right_previous);
-
-    /* Merge the edge vertices */
-    merge->removed(true);
-    left->removed(true);
-    right->removed(true);
-    return { left_merge_face, left_previous };
-}
-
-void mesh_decimation::decimate(edge *root)
-{
-    /* Get initial costs */
-    auto costs(decimation_costs());
-
-    /* While costs below limit merge edges */
-    std::cout << "Decimating from " << costs.top().cost << " to " << _options.max_cost << std::endl;
-    float recalc_cost = std::numeric_limits<float>::max();
-    while ((_iteration < _options.max_iterations) && !costs.empty())
-    {
-        /* Check if the edge is still valid */
-        edge *merge = costs.top().e;
-        if (merge->removed())
-        {
-            std::cout << "Edge already removed" << std::endl;
-            next_cost(&costs);
-            continue;
-        }
-
-        const float cost = costs.top().cost;
-        if (merge->recalculate())
-        {
-            std::cout << "Edge requires recalculating " << cost << std::endl;
-            next_cost(&costs);
-            recalc_cost = std::min(recalc_cost, cost);
-            continue;
-        }
-
-        /* Check if we have a chance to reduce cost by recalculating */
-        std::cout << "Attempting at cost " << cost << std::endl;
-        if (cost > std::max(1.0f, (recalc_cost * 1.1f)))
-        {
-            std::cout << "Cost recalculation at iteration " << _iteration << " at cost " << cost << " versus recalc cost " << recalc_cost << std::endl;
-            recalc_cost = std::numeric_limits<float>::max();
-            costs = decimation_costs();
-            continue;
-        }
-
-        /* Check if the cost is too high */
-        if (cost > _options.max_cost)
-        {
-            // std::cout << "Max cost hit, stopping" << std::endl;
-            break;
-        }
-
-        /* Check for complex vertices */
-        auto *v0 = merge->vertex0();
-        auto *v1 = merge->vertex1();
-        if (v0->complex() || v1->complex())
-        {
-            next_cost(&costs);
-            continue;
-        }
-
-        std::cout << "Merging " << std::hex << merge << std::dec << " at cost " << cost << " iteration " << _iteration << std::hex << " dropping faces " << merge->edges_left_face() << ", " << merge->edges_right_face() << std::dec << std::endl;
-        std::cout << "End vertices " << v0->position() << " and " << v1->position() << std::endl;
-
-        /* Get triangles next to merge */
-        face *left = merge->edges_left_face();
-        std::cout << "Left vertices " << left->vertice(0)->position() << " and " << left->vertice(1)->position() << " and " << left->vertice(2)->position() << std::endl;
-        edge *left_next = left->next_edge(merge);
-        edge *left_previous = left->previous_edge(merge);
-        if (left_next->complex() || left_previous->complex())
-        {
-            next_cost(&costs);
-            continue;
-        }
-        face *left_merge_face = left_previous->left_face(v0);
-        std::cout << std::hex << "Left next " << left_next << " faces " << left_next->edges_left_face() << ", " << left_next->edges_right_face() << " updated with left prev " << left_previous << " face " << left_merge_face << ", " << left_previous->right_face(v0) << std::dec << std::endl;
-
-        face *right = merge->edges_right_face();
-        std::cout << "Right vertices " << right->vertice(0)->position() << " and " << right->vertice(1)->position() << " and " << right->vertice(2)->position() << std::endl;
-        edge *right_next = right->next_edge(merge);
-        edge *right_previous = right->previous_edge(merge);
-        if (right_next->complex() || right_previous->complex())
-        {
-            next_cost(&costs);
-            continue;
-        }
-        face *right_merge_face = right_previous->left_face(v1);
-        std::cout << std::hex << "Right next " << right_next << " faces " << right_next->edges_left_face() << ", " << right_next->edges_right_face() << " updated with right prev " << right_previous << " face " << right_merge_face << ", " << right_previous->right_face(v1) << std::dec << std::endl;
-
-        /* Handle cases that have reduce to back to back triangles */
-        if ((left_merge_face == right) || (right_merge_face == left))
-        {
-            merge->removed(true);
-            left->removed(true);
-            right->removed(true);
-            if (left_merge_face == right)
-            {
-                std::cout << "Wrapping left merge face to right" << std::endl;
-                left_previous->removed(true);
-            }
-
-            if (right_merge_face == left)
-            {
-                std::cout << "Wrapping right merge face to left" << std::endl;
-                right_previous->removed(true);
-            }
-
-            next_cost(&costs);
-            ++_iteration;
-            std::cout << std::endl;
-            continue;
-        }
-
-        assert(left_next != merge);
-        assert(left_previous != merge);
-        assert(left_previous != left_next);
-        assert(left_next->left_face(v1) == left);
-        assert(left_previous->right_face(v0) == left);
-        
-        assert(right_next != merge);
-        assert(right_previous != merge);
-        assert(right_previous != right_next);
-        assert(right_next->left_face(v0) == right);
-        assert(right_previous->right_face(v1) == right);
-
-        assert(left_merge_face != left);
-        assert(left_merge_face != right);
-        assert(right_merge_face != left);
-        assert(right_merge_face != right);
-
-        /* Check if any faces would flip */
-        const point_t &vm = merge->merge_point();
-        if (can_merge_fan(left_next, right_previous, v1, vm) || can_merge_fan(right_next, left_previous, v0, vm))
-        {
-            std::cout << "Triangle flipped" << std::endl;
-            costs.pop();
-            continue;
-        }
-
-        /* Flag merged edges for recalculate */
-        edge *step = right_next;
-        do
-        {
-            face *r = step->right_face(v0);
-            step->recalculate(true);
-            step = r->next_edge(step);
-        } while (step != left_previous);
-        std::cout << "v0 invalidated" << std::endl;
-
-        /* Update vertices of surviving edges and faces */
-        std::cout << "Remove at cost " << cost << std::endl;
-        step = left_next;
-        do
-        {
-            /* Check for triangle collapse to line */
-            face *r = step->right_face(v1);
-            edge *duplicate = r->update_vertex(v1, v0);
-            if (duplicate != nullptr)
-            {
-                assert(duplicate != right_previous);
-
-                auto [ f, e ] = remove_edge(duplicate, v0, v1);
-                f->update_vertex(v1, v0);
-                assert(!left_next->removed());
-                assert(!right_next->removed());
-
-                step->update_vertex(v1, v0);
-                step->recalculate(true);
-                if ((e == right_previous) || right_previous->removed())
-                {
-                    std::cout << "Next edge is done" << std::endl;
-                    break;
-                }
-                e->recalculate(true);
-
-                step = f->next_edge(e);
-            }
-            else
-            {
-                step->update_vertex(v1, v0);
-                step->recalculate(true);
-                step = r->next_edge(step);
-            }
-        } while (step != right_previous);
-        std::cout << "v1 updated" << std::endl;
-
-        /* Drop triangles by merging its remaining edges*/
-        left_next->update_left_face(left_merge_face, v0);
-        left_previous->removed(true);
-
-        right_next->update_left_face(right_merge_face, v0);
-        right_previous->removed(true);
-
-        /* Update edges of surviving faces */
-        left_merge_face->update_edge(left_next, v0);
-        right_merge_face->update_edge(right_next, v0);
-
-        /* Merge the edge vertices */
-        v0->collapse(v1, vm, cost);
-        merge->removed(true);
-        left->removed(true);
-        right->removed(true);
-
-        costs.pop();
-        ++_iteration;
-        std::cout << std::endl;
-    }
-    // std::cout << "Done, iteration " << _iteration << " costs " << costs.size() << std::endl;
-}
-
-void mesh_decimation::compact_output(std::vector<point_t> &vertices, std::vector<point_ti<>> &tris)
-{
-    /* Grab plenty of space */
-    std::map<const vertex *, int> written;
-    vertices.reserve(_vertices.size());
-    tris.reserve(_faces.size());
-
-    /* Find a valid face and write it out */
-    for (const auto &f : _faces)
-    {
+        /* Find face */
+        const auto &l = _links[v->first_link() + i];
+        face &f = _faces[l.face()];
         if (f.removed())
         {
             continue;
         }
 
-        point_ti<> tri;
-        for (int i = 0; i < 3; ++i)
+        /* Check if an edge has collapsed to a point */
+        const vertex* v0 = f.vertices((l.vertex() + 1) % 3);
+        const vertex* v1 = f.vertices((l.vertex() + 2) % 3);
+        if ((v0 == to) || (v1 == to))
         {
-            tri[i] = vertices.size();
-            if (const auto &wit = written.emplace(f.vertice(i), tri[i]); wit.second)
-            {
-                const vertex *v = f.vertice(i);
-                assert(!v->removed());
-                vertices.emplace_back(v->position());
-            }
-            else
-            {
-                tri[i] = wit.first->second;
-            }
+            removed[i] = true;
+            continue;
         }
 
-        tris.emplace_back(tri);
+        /* Check for face flipped */
+        removed[i] = false;
+        const point_t<double> d0(v0->position() - p);
+        const point_t<double> d1(v1->position() - p);
+        const point_t<double> n(normalise(cross_product(d0, d1)));
+        if (dot_product(n, f.normal()) <= 0.1)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void mesh_decimation::update_mesh(std::vector<bool> &removed, int &cleaned, const vertex *v, vertex *to)
+{
+    point_t<double> p;
+    for (int i = 0; i < v->links(); ++i)
+    {
+        /* Find face */
+        const link &l = _links[v->first_link() + i];
+        face &f = _faces[l.face()];
+        if (f.removed())
+        {
+            continue;
+        }
+
+        /* Remove collapsed faces */
+        if (removed[i])
+        {
+            f.remove();
+            ++cleaned;
+            continue;
+        }
+
+        /* Update vertex and cost */
+        f.vertices(l.vertex(), to);
+        f.face_error(_options.max_cumulative_cost);
+
+        /* Push link for new vertex */
+        _links.push_back(l);
     }
 }
 
-mesh_decimation::mesh_decimation(const std::vector<point_t> &points, const std::vector<point_ti<>> &triangles, const mesh_decimation_options &options) : _options(options), _iteration(0)
+void mesh_decimation::build_links()
+{
+    /* Clean link location */
+    for (auto &v : _vertices)
+    {
+        v.reset_link();
+    }
+
+    /* Count faces that each vertex is in */
+    for (const auto &f : _faces)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            f.vertices(i)->add_links();
+        }
+    }
+
+    /* Prefix sum into each vertex start location */
+    int first_link = 0;
+    for (auto &v : _vertices)
+    {
+        v.first_link(first_link);
+        first_link += v.links();
+        v.links(0);
+    }
+
+    /* Update links */
+    _links.resize(_faces.size() * 3);
+    for (size_t i = 0; i < _faces.size(); ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            vertex *v = _faces[i].vertices(j);
+            _links[v->first_link() + v->links()] = link(i, j);
+            v->add_links();
+        }
+    }
+}
+
+void mesh_decimation::decimate()
+{
+    /* Initialise face costs */
+    for (auto &f : _faces)
+    {
+        f.face_error(_options.max_cumulative_cost);
+    }
+
+    int cleaned = 0;
+    bool progress = true;
+    std::vector<bool> removed0;
+    std::vector<bool> removed1;
+    std::vector<double> sortarry(_faces.size());    
+    std::vector<double> percentiles(_faces.size());    
+    while (progress)
+    {
+        /* Build percentiles */
+        int live_faces = 0;
+        for (size_t i = 0; i < _faces.size(); ++i)
+        {
+            if (!_faces[i].removed() && (_faces[i].cost() < _options.max_merge_cost))
+            {
+                percentiles[live_faces++] = _faces[i].cost();
+            }
+        }
+        percentiles.resize(live_faces);
+        radix_sort(percentiles.data(), sortarry.data(), live_faces);
+
+        /* Decimate based on the percentile cost curve */
+        progress = false;
+        const double items_per_perc = live_faces / 100.0;
+        double max_perc = std::min(live_faces - 1.0, std::max(_options.percentile_pass_max * items_per_perc, 1.0));
+        for (double percetile_idx = std::max(items_per_perc, 1.0); percetile_idx <= max_perc; percetile_idx += std::max(_options.percentile_pass_stride * items_per_perc, 1.0))
+        {
+            const double threshold = percentiles[std::floor(percetile_idx)];
+            for (auto &f : _faces)
+            {
+                if (f.removed() || (f.cost() > threshold))
+                {
+                    continue;
+                }
+
+                /* Check if we can upate */
+                point_t<double> p;
+                vertex *v0 = f.vertices(f.index());
+                vertex *v1 = f.vertices((f.index() + 1) % 3);
+                v0->vertex_error(v1, _options.max_cumulative_cost, p);
+                removed0.resize(v0->links());
+                removed1.resize(v1->links());
+                if (!can_update(removed0, v0, p, v1) || !can_update(removed1, v1, p, v0))
+                {
+                    max_perc = std::min(static_cast<double>(live_faces - 1), max_perc + 1.0);
+                    continue;
+                }
+
+                /* Update vertex and its fan */
+                v0->update(v1, p, f.cost());
+
+                const int first_link = _links.size();
+                update_mesh(removed0, cleaned, v0, v0);
+                update_mesh(removed1, cleaned, v1, v0);
+                const int links = _links.size() - first_link;
+                if (links <= v0->links())
+                {
+                    if (links)
+                    {
+                        memcpy(&_links[v0->first_link()], &_links[first_link], links * sizeof(link));
+                        _links.resize(first_link);
+                    }
+                }
+                else
+                {
+                    v0->first_link(first_link);
+                }
+                v0->links(links);
+
+                /* Done */
+                if (++_iteration >= _options.max_iterations)
+                {
+                    return;
+                }
+
+                progress = true;
+            }
+
+            /* Check if its face cleaning time */
+            if (cleaned > (_options.face_clean_perc * _faces.size()))
+            {
+                cleaned = 0;
+                _faces.erase(std::remove_if(_faces.begin(), _faces.end(), [](const face &f) { return f.removed(); }), _faces.end());
+                build_links();
+            }
+        }
+    }
+}
+
+mesh_decimation::mesh_decimation(const std::vector<point_t<>> &points, const std::vector<point_ti<>> &triangles, const mesh_decimation_options &options) : _options(options), _cost(0.0), _iteration(0)
 {
     /* Find the model size */
-    point_t max_bound(points[0]);
-    point_t min_bound(points[0]);
+    point_t<> max_bound(points[0]);
+    point_t<> min_bound(points[0]);
     for (const auto &p : points)
     {
         max_bound = max(max_bound, p);
         min_bound = min(min_bound, p);
     }
-    const point_t offset((max_bound + min_bound) * 0.5f);
-    const point_t scale((max_bound - min_bound) * 0.5f);
-    const float max_scale_inv = 1.0f / std::max(scale.x, std::max(scale.y, scale.z));
-    const point_t scale_inv(max_scale_inv, max_scale_inv, max_scale_inv);
+    const point_t<> offset((max_bound + min_bound) * 0.5f);
+    const point_t<> scale((max_bound - min_bound) * 0.5f);
+    const double max_scale_inv = 1.0 / std::max(scale.x, std::max(scale.y, scale.z));
+    const point_t<> scale_inv(max_scale_inv, max_scale_inv, max_scale_inv);
 
-    /* Build vertices, triangles and edges */
-    point_t com;
+    /* Build rescaled vertices and faces */
     _vertices.reserve(points.size());
     for (const auto &p : points)
     {
-        const point_t local((p - offset) * scale_inv);
-        com += local;
-        _vertices.emplace_back(local);
+        const point_t<> local((p - offset) * scale_inv);
+        _vertices.emplace_back(point_t<double>(local));
     }
-    com /= static_cast<float>(_vertices.size());
 
     _faces.reserve(triangles.size());
-    _edges.reserve(triangles.size() * 3);
-    for (const auto &t : triangles)
+    for (const auto t : triangles)
     {
         _faces.emplace_back(&_vertices[t.x], &_vertices[t.y], &_vertices[t.z]);
-        add_edge(&_vertices[t.x], &_vertices[t.y], &_faces.back());
-        add_edge(&_vertices[t.y], &_vertices[t.z], &_faces.back());
-        add_edge(&_vertices[t.z], &_vertices[t.x], &_faces.back());
-        _vertices[t.x].add_face(_faces.back());
-        _vertices[t.y].add_face(_faces.back());
-        _vertices[t.z].add_face(_faces.back());
     }
 
-    /* Fix up boundary edges */
-    for (const auto &ue : _unique_edges)
-    {
-        _edges.push_back(ue);
-        
-        /* Add last face to edge */
-        auto &e = _edges.back();
-        e.complex(true);
-        e.vertex0()->complex(true);
-        e.vertex1()->complex(true);
-        std::cout << "Boundary edge " << e.vertex0()->position() << " and " << e.vertex1()->position() << std::endl;
+    /* Build link from vertex to face */
+    build_links();
 
-        /* Add edge to faces */
-        if (face *f = e.edges_left_face(); f != nullptr)
+    /* Find boundary vertices */
+    std::vector<std::pair<vertex*, int>> vertex_id;
+    for (auto &v : _vertices)
+    {
+        vertex_id.clear();
+        for (int i = v.first_link(); i < (v.first_link() + v.links()); ++i)
         {
-            f->add_edge(&e);
+            const face &f = _faces[_links[i].face()];
+            for (int j = 0; j < 3; ++j)
+            {
+                const auto vit = std::find_if(vertex_id.begin(), vertex_id.end(), [id = f.vertices(j)](const auto &p) { return p.first == id; });
+                if (vit == vertex_id.end())
+                {
+                    vertex_id.emplace_back(f.vertices(j), 0);
+                }
+                else
+                {
+                    ++(vit->second);
+                }
+            }
         }
 
-        if (face *f = e.edges_right_face(); f != nullptr)
+        for (const auto &p : vertex_id)
         {
-            f->add_edge(&e);
+            if (p.second == 0)
+            {
+                p.first->boundary(true);
+            }
         }
     }
 
-    /* Check edges */
-    for (const auto &e : _edges)
+    /* Decimate */
+    _options.absolute_costs(_vertices.size());
+    decimate();
+
+    /* Compact output */
+    for (auto &v : _vertices)
     {
-        assert(e.check());
+        v.links(0);
     }
 
-    /* Check faces */
+    /* Find live face and mark their vertices */
+    int face_idx = 0;
     for (const auto &f : _faces)
     {
-        assert(f.check());
+        if (!f.removed())
+        {
+            _faces[face_idx++] = f;
+            for (int i = 0; i < 3; ++i)
+            {
+                f.vertices(i)->links(1);
+            }
+        }
+    }
+    _faces.resize(face_idx);
+
+    /* Move vertices and remember where to */
+    /* This destorys the vertex decimation information for faster moving, buts its ok, we're done if we sum the cost as we go */
+    int vertex_idx = 0;
+    for (auto &v : _vertices)
+    {
+        if (v.links() > 0)
+        {
+            _cost += v.cost();
+            v.first_link(vertex_idx);
+            _vertices[vertex_idx++].position(v.position());
+        }
     }
 
-    const float com_cost = std::accumulate(_vertices.begin(), _vertices.end(), 0.0f, [com](const float s, const vertex &v) { return s + v.merge_error(com); });
-    _options.absolute_costs(com_cost, _vertices.size());
-    // std::cout << "com cost " << com_cost << " absolute cost limit " << _options.max_cost << " absolute iteration limit " << _options.max_iterations << std::endl;
-    decimate(&_edges[0]);
+    /* Update face indexes. Done decimating so dont rebuild links */
+    for (auto &f : _faces)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            f.vertices(i, &_vertices[f.vertices(i)->first_link()]);
+        }
+    }
+    _vertices.resize(vertex_idx);
+}
+
+void mesh_decimation::compact_output(std::vector<point_t<>> &vertices, std::vector<point_ti<>> &triangles)
+{
+    vertices.reserve(_vertices.size());
+    for (const auto &v : _vertices)
+    {
+        vertices.emplace_back(v.position().x, v.position().y, v.position().z);
+    }
+    
+    triangles.reserve(_faces.size());
+    for (const auto &f : _faces)
+    {
+        triangles.emplace_back(std::distance(&_vertices[0], f.vertices(0)), std::distance(&_vertices[0], f.vertices(1)), std::distance(&_vertices[0], f.vertices(2)));
+    }
 }
 } /* namespace raptor_mesh_decimation */

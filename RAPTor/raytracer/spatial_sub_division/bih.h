@@ -60,11 +60,11 @@ class bih : public ssd
             vfp_t   vt_max;
             vfp_t   vt_min;
 #endif
-            point_t u;
-            point_t l;
-            float   t_max;
-            float   t_min;
-            int     idx;
+            point_t<>   u;
+            point_t<>   l;
+            float       t_max;
+            float       t_min;
+            int         idx;
         };
 
 #ifdef SIMD_PACKET_TRACING
@@ -77,7 +77,7 @@ class bih : public ssd
 
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
-        inline bool find_leaf_node(const ray &r, bih_stack_element *const entry_point, bih_stack_element **const out, const point_t &i_rd) const;
+        inline bool find_leaf_node(const ray &r, bih_stack_element *const entry_point, bih_stack_element **const out, const point_t<> &i_rd) const;
 
         /* The stack is mutable because it will never be known to a user of this class */
         const primitive_store &                 _prims;

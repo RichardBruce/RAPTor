@@ -11,7 +11,7 @@
 namespace raptor_raytracer
 {
 /* Declare triangle */
-inline void new_triangle(primitive_store *e, std::vector<int> *t, material *m, const point_t &a, const point_t &b, const point_t &c, const bool li, const point_t *vn=nullptr, const point_t *vt=nullptr)
+inline void new_triangle(primitive_store *e, std::vector<int> *t, material *m, const point_t<> &a, const point_t<> &b, const point_t<> &c, const bool li, const point_t<> *vn=nullptr, const point_t<> *vt=nullptr)
 {
     const int idx = e->emplace_back(m, a, b, c, li, vn, vt);
     if (li)
@@ -22,34 +22,34 @@ inline void new_triangle(primitive_store *e, std::vector<int> *t, material *m, c
 
 
 /* Declare light */
-inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const float d, const float r)
+inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t<> &c, const float d, const float r)
 {
     l->push_back(light(rgb, c, d, r));
 }
 
 
-inline void new_light(light_list *const l, const primitive_store *const e, const ext_colour_t &rgb, const point_t &c, const float d, const std::vector<int> *const t)
+inline void new_light(light_list *const l, const primitive_store *const e, const ext_colour_t &rgb, const point_t<> &c, const float d, const std::vector<int> *const t)
 {
     l->push_back(light(e, rgb, c, d, t));
 }
 
 
-inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &c, const point_t &n, const float d, const float s_a, const float s_b, const float r)
+inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t<> &c, const point_t<> &n, const float d, const float s_a, const float s_b, const float r)
 {
     l->push_back(light(rgb, c, n, d, s_a, s_b, r));
 }
 
 
-inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t &n, const float d)
+inline void new_light(light_list *const l, const ext_colour_t &rgb, const point_t<> &n, const float d)
 {
     l->push_back(light(rgb, n, d));
 }
 
-inline point_t find_centre(const std::vector<point_t> &p)
+inline point_t<> find_centre(const std::vector<point_t<>> &p)
 {
     /* Add all the points together */
-    point_t total;
-    for (const point_t &p_i : p)
+    point_t<> total;
+    for (const point_t<> &p_i : p)
     {
         total += p_i;
     }
@@ -58,7 +58,7 @@ inline point_t find_centre(const std::vector<point_t> &p)
     return total / static_cast<float>(p.size());
 }
 
-inline int find_furthest(const std::vector<point_t> &p, const point_t &c)
+inline int find_furthest(const std::vector<point_t<>> &p, const point_t<> &c)
 {
     int max_point = 0;
     float max_dist = 0.0f;
@@ -80,20 +80,20 @@ inline int find_furthest(const std::vector<point_t> &p, const point_t &c)
 }
 
 
-inline bool is_straight_line(const point_t &a, point_t b, point_t c)
+inline bool is_straight_line(const point_t<> &a, point_t<> b, point_t<> c)
 {
     b -= a;
     c -= a;
-    point_t n;
+    point_t<> n;
     cross_product(b, c, &n);
     return (n == 0.0f);
 }
 
 
-inline bool same_side(const point_t &p, const point_t &a, const point_t &ab, const point_t &fn)
+inline bool same_side(const point_t<> &p, const point_t<> &a, const point_t<> &ab, const point_t<> &fn)
 {
     /* Normal of the triangle formed by the tested point */
-    point_t cp;
+    point_t<> cp;
     cross_product((p - a), ab, &cp);
     
     /* Check the normal is in the same direction as the face normal */
@@ -108,15 +108,15 @@ inline bool same_side(const point_t &p, const point_t &a, const point_t &ab, con
 }
 
 
-inline bool is_in_triangle(const std::vector<point_t> &p, const point_t &a, const point_t &b, const point_t &c, const point_t &fn)
+inline bool is_in_triangle(const std::vector<point_t<>> &p, const point_t<> &a, const point_t<> &b, const point_t<> &c, const point_t<> &fn)
 {
     /* Pre-calculate some useful vectors */
-    const point_t ab(a - b);
-    const point_t ca(c - a);
-    const point_t bc(b - c);
+    const point_t<> ab(a - b);
+    const point_t<> ca(c - a);
+    const point_t<> bc(b - c);
     
     /* Check each point if it is inside the triangle */
-    for (const point_t &p_i : p)
+    for (const point_t<> &p_i : p)
     {
         /* Check the point is on the same side of AB as C, BC as A and CA as B */
         if (same_side(p_i, a, ab, fn) && same_side(p_i, b, bc, fn) && same_side(p_i, c, ca, fn))
@@ -129,7 +129,7 @@ inline bool is_in_triangle(const std::vector<point_t> &p, const point_t &a, cons
 }
 
 
-inline void face_to_triangle_edges(std::vector<int> *const tris, std::vector<point_t> &p)
+inline void face_to_triangle_edges(std::vector<int> *const tris, std::vector<point_t<>> &p)
 {
     /* Progress tracking */
     unsigned size = p.size();
@@ -137,7 +137,7 @@ inline void face_to_triangle_edges(std::vector<int> *const tris, std::vector<poi
     memset(invalid.get(), 0, sizeof(char) * p.size());
 
     /* Find the furthest point from the center */
-    point_t  com = find_centre(p);
+    point_t<>  com = find_centre(p);
     unsigned max = find_furthest(p, com);
 
     /* Use the points either side of this point to find the surface normal */
@@ -160,9 +160,9 @@ inline void face_to_triangle_edges(std::vector<int> *const tris, std::vector<poi
         max_p1 = max + 1;
     }
         
-    point_t face_normal;
-    const point_t ab(p[max_m1] - p[max]);
-    const point_t bc(p[max] - p[max_p1]);
+    point_t<> face_normal;
+    const point_t<> ab(p[max_m1] - p[max]);
+    const point_t<> bc(p[max] - p[max_p1]);
     
     cross_product(ab, bc, &face_normal);
     normalise(&face_normal);
@@ -174,18 +174,18 @@ inline void face_to_triangle_edges(std::vector<int> *const tris, std::vector<poi
         bool success = 1;
         
         /* Take the first 3 points of the face to try and form a triangle */
-        const point_t a(p[max_m1]);
-        const point_t b(p[max   ]);
-        const point_t c(p[max_p1]);
+        const point_t<> a(p[max_m1]);
+        const point_t<> b(p[max   ]);
+        const point_t<> c(p[max_p1]);
         
         /* If the points form a straight line the triangle is invalid */ 
         if (!is_straight_line(a, b, c))
         {
             /* If the triangle has a different normal to the face it is invalid */
-            const point_t ab(a - b);
-            const point_t bc(b - c);
+            const point_t<> ab(a - b);
+            const point_t<> bc(b - c);
     
-            point_t tri_normal;
+            point_t<> tri_normal;
             cross_product(ab, bc, &tri_normal);
             normalise(&tri_normal);
 
@@ -237,7 +237,7 @@ inline void face_to_triangle_edges(std::vector<int> *const tris, std::vector<poi
 }
 
 
-inline void face_to_triangles(primitive_store *e, light_list *l, std::vector<point_t> &p, material *const m, const bool li, std::vector<point_t> *vn = nullptr, std::vector<point_t> *vt = nullptr, const float d = 0.0f)
+inline void face_to_triangles(primitive_store *e, light_list *l, std::vector<point_t<>> &p, material *const m, const bool li, std::vector<point_t<>> *vn = nullptr, std::vector<point_t<>> *vt = nullptr, const float d = 0.0f)
 {
     /* Progress tracking */
     unsigned size = p.size();
@@ -245,10 +245,10 @@ inline void face_to_triangles(primitive_store *e, light_list *l, std::vector<poi
     memset(invalid.get(), 0, sizeof(char) * p.size());
 
     /* Vertex normal and texture arrays */
-    point_t  vn_a[3];
-    point_t  vt_a[3];
-    point_t *vn_p = nullptr;
-    point_t *vt_p = nullptr;
+    point_t<>  vn_a[3];
+    point_t<>  vt_a[3];
+    point_t<> *vn_p = nullptr;
+    point_t<> *vt_p = nullptr;
 
     if ((vn != nullptr) && (!vn->empty()))
     {    
@@ -271,7 +271,7 @@ inline void face_to_triangles(primitive_store *e, light_list *l, std::vector<poi
     }
 
     /* Find the furthest point from the center */
-    point_t  com = find_centre(p);
+    point_t<>  com = find_centre(p);
     unsigned max = find_furthest(p, com);
 
     /* Use the points either side of this point to find the surface normal */
@@ -294,9 +294,9 @@ inline void face_to_triangles(primitive_store *e, light_list *l, std::vector<poi
         max_p1 = max + 1;
     }
         
-    point_t face_normal;
-    const point_t ab(p[max_m1] - p[max]);
-    const point_t bc(p[max] - p[max_p1]);
+    point_t<> face_normal;
+    const point_t<> ab(p[max_m1] - p[max]);
+    const point_t<> bc(p[max] - p[max_p1]);
     
     cross_product(ab, bc, &face_normal);
     normalise(&face_normal);
@@ -308,17 +308,17 @@ inline void face_to_triangles(primitive_store *e, light_list *l, std::vector<poi
         bool success = 1;
         
         /* Take the first 3 points of the face to try and form a triangle */
-        const point_t a(p[max_m1]);
-        const point_t b(p[max   ]);
-        const point_t c(p[max_p1]);
+        const point_t<> a(p[max_m1]);
+        const point_t<> b(p[max   ]);
+        const point_t<> c(p[max_p1]);
         
         /* If the points form a straight line the triangle is invalid */ 
         if (!is_straight_line(a, b, c))
         {
             /* If the triangle has a different normal to the face it is invalid */
-            point_t tri_normal;
-            const point_t ab(a - b);
-            const point_t bc(b - c);
+            point_t<> tri_normal;
+            const point_t<> ab(a - b);
+            const point_t<> bc(b - c);
     
             cross_product(ab, bc, &tri_normal);
             normalise(&tri_normal);

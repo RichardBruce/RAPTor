@@ -6,18 +6,18 @@
 
 namespace raptor_raytracer
 {
-void mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t *const n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
+void mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t<> *const n, const point_t<> &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* Normal mapping */
-    point_t normal(*n);
-    // point_t bump_size(0.0f, 0.0f, 0.0f);
+    point_t<> normal(*n);
+    // point_t<> bump_size(0.0f, 0.0f, 0.0f);
     // for (auto j : _btex)
     // {
     //     /* Sample the surrounding texture */
-    //     point_t x_0;
-    //     point_t x_1;
-    //     point_t y_0;
-    //     point_t y_1;
+    //     point_t<> x_0;
+    //     point_t<> x_1;
+    //     point_t<> y_0;
+    //     point_t<> y_1;
     //     j->texture_map_monochrome(i, &bump_size, *n, vt, 0, 0);
     //     j->texture_map_monochrome(i, &x_0, *n, vt, -1,  0);
     //     j->texture_map_monochrome(i, &x_1, *n, vt,  1,  0);
@@ -43,7 +43,7 @@ void mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t *co
     }
 
     /* Request reflections */
-    point_t sample;
+    point_t<> sample;
     float refl  = _rf;
     float alpha = 1.0f;
     for (auto j : _rtex)
@@ -81,7 +81,7 @@ void mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t *co
 }
 
 
-void mapper_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const
+void mapper_shader::shade(const ray_trace_engine &r, ray &i, const point_t<> &n, const hit_t h, ext_colour_t *const c, const point_t<> &vt) const
 {
     /* Get the colour of the material */
     float alpha  = 1.0f;
@@ -98,7 +98,7 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, c
     
     /* Get the materials kd */
     alpha = 1.0f;
-    point_t param;
+    point_t<> param;
     float cur_kd = _kd;
     for (auto j : _dtex)
     {
@@ -142,7 +142,7 @@ void mapper_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, c
         }
 
         /* Find the reflection of the light ray */
-        point_t ref_dir;
+        point_t<> ref_dir;
         float shade_x2 = 2.0f * diff_shade;
         ref_dir.x = illum.get_x_grad() - n.x * shade_x2;
         ref_dir.y = illum.get_y_grad() - n.y * shade_x2;

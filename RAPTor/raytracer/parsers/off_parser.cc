@@ -56,8 +56,8 @@ void off_parser(
     raptor_parsers::find_next_line(&at);
 
     /* Get vertices */
-    point_t vert;
-    std::vector<point_t> vertices;
+    point_t<> vert;
+    std::vector<point_t<>> vertices;
     vertices.reserve(nr_v);
     for (unsigned int i = 0; i < nr_v; ++i)
     {
@@ -70,7 +70,7 @@ void off_parser(
     }
 
     /* Get faces */
-    std::vector<point_t> face;
+    std::vector<point_t<>> face;
     for (unsigned int i = 0; i < nr_f; ++i)
     {
         const unsigned int nr_verts = raptor_parsers::get_this_unsigned(&at);

@@ -75,7 +75,7 @@ void parse_surf(const lwo_chunks &chunks, std::list<material *> &m, const std::s
     }
 }
 
-void parse_pols(const lwo_chunks &chunks, light_list &l, primitive_store &e, const std::map<std::string, std::uint16_t> &tag_map, const std::vector<std::unique_ptr<lwo_surf>> &surfs, const std::vector<point_t> &all_points, const char *const buffer)
+void parse_pols(const lwo_chunks &chunks, light_list &l, primitive_store &e, const std::map<std::string, std::uint16_t> &tag_map, const std::vector<std::unique_ptr<lwo_surf>> &surfs, const std::vector<point_t<>> &all_points, const char *const buffer)
 {
     /* Check this is the POLS chunk */
     const char *at = chunks.pols();
@@ -143,9 +143,9 @@ void parse_pols(const lwo_chunks &chunks, light_list &l, primitive_store &e, con
     nc.calculate();
 
     /* Build polyongs */
-    std::vector<point_t> pol_pnts;
-    std::vector<point_t> pol_norm;
-    std::vector<point_t> pol_vmap;
+    std::vector<point_t<>> pol_pnts;
+    std::vector<point_t<>> pol_norm;
+    std::vector<point_t<>> pol_vmap;
     for (int i = 0; i < nc.number_of_polygons(); ++i)
     {
         /* Check we have enough points */
@@ -166,11 +166,11 @@ void parse_pols(const lwo_chunks &chunks, light_list &l, primitive_store &e, con
                 auto vmad_iter = vmad.find(vmap_name, i, pnt);
                 if (vmad_iter != nullptr)
                 {
-                    pol_vmap.push_back(point_t(vmad_iter[0], vmad_iter[1], 0.0f));
+                    pol_vmap.push_back(point_t<>(vmad_iter[0], vmad_iter[1], 0.0f));
                 }
                 else if (vmap_iter != nullptr)
                 {
-                    pol_vmap.push_back(point_t(vmap_iter[0], vmap_iter[1], 0.0f));
+                    pol_vmap.push_back(point_t<>(vmap_iter[0], vmap_iter[1], 0.0f));
                 }
             }
         }
@@ -233,7 +233,7 @@ void lwo2_parser(
     parse_surf(chunks, m, p, tag_map, &surfs);
 
     /* Work through layrs */
-    std::vector<point_t> all_points;
+    std::vector<point_t<>> all_points;
     while (!chunks.eof())
     {
         if (!chunks.populate_layer())
@@ -247,7 +247,7 @@ void lwo2_parser(
         std::uint32_t nr_of_verts   = chunks.pnts_len() / 12;
         for (std::uint32_t i = 0; i < nr_of_verts; i++)
         {
-            point_t pnt;
+            point_t<> pnt;
             pnt.x = raptor_parsers::from_byte_stream<float>(&pnts);
             pnt.y = raptor_parsers::from_byte_stream<float>(&pnts);
             pnt.z = raptor_parsers::from_byte_stream<float>(&pnts);

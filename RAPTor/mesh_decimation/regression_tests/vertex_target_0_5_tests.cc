@@ -21,21 +21,20 @@ namespace raptor_mesh_decimation
 namespace test
 {
 /* Test data */
-struct mesh_decimation_regression_fixture : public regression_fixture
+struct vertex_target_0_5_regression_fixture : public regression_fixture
 {
-    mesh_decimation_regression_fixture() :
-        regression_fixture(mesh_decimation_options(1000.0f, 0.5f))
-        // regression_fixture(mesh_decimation_options(5000.0f, 5504))
+    vertex_target_0_5_regression_fixture() :
+        regression_fixture(mesh_decimation_options(100.0f, 100.0f, 0.5f))
     {  }
 };
 
 
-BOOST_FIXTURE_TEST_SUITE( vertex_target_0_5_tests, mesh_decimation_regression_fixture )
+BOOST_FIXTURE_TEST_SUITE( regression_tests, vertex_target_0_5_regression_fixture )
 
 
 /* Tests */
 #ifndef VALGRIND_TESTS
-BOOST_AUTO_TEST_CASE( block_test )
+BOOST_AUTO_TEST_CASE( block_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/block.off");
@@ -44,10 +43,10 @@ BOOST_AUTO_TEST_CASE( block_test )
     run();
 
     /* Save resutls */
-    check("block");
+    check("vertex_target_0_5_tests_block");
 }
 
-BOOST_AUTO_TEST_CASE( bunny_test )
+BOOST_AUTO_TEST_CASE( bunny_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/bunny.off");
@@ -56,10 +55,10 @@ BOOST_AUTO_TEST_CASE( bunny_test )
     run();
 
     /* Save resutls */
-    check("bunny");
+    check("vertex_target_0_5_tests_bunny");
 }
 
-BOOST_AUTO_TEST_CASE( camel_test )
+BOOST_AUTO_TEST_CASE( camel_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/camel.off");
@@ -68,10 +67,10 @@ BOOST_AUTO_TEST_CASE( camel_test )
     run();
 
     /* Save resutls */
-    check("camel");
+    check("vertex_target_0_5_tests_camel");
 }
 
-BOOST_AUTO_TEST_CASE( casting_test )
+BOOST_AUTO_TEST_CASE( casting_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/casting.off");
@@ -80,10 +79,10 @@ BOOST_AUTO_TEST_CASE( casting_test )
     run();
 
     /* Save resutls */
-    check("casting");
+    check("vertex_target_0_5_tests_casting");
 }
 
-BOOST_AUTO_TEST_CASE( chair_test )
+BOOST_AUTO_TEST_CASE( chair_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/chair.off");
@@ -92,10 +91,10 @@ BOOST_AUTO_TEST_CASE( chair_test )
     run();
 
     /* Save resutls */
-    check("chair");
+    check("vertex_target_0_5_tests_chair");
 }
 
-BOOST_AUTO_TEST_CASE( cow1_test )
+BOOST_AUTO_TEST_CASE( cow1_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/cow1.off");
@@ -104,10 +103,10 @@ BOOST_AUTO_TEST_CASE( cow1_test )
     run();
 
     /* Save resutls */
-    check("cow1");
+    check("vertex_target_0_5_tests_cow1");
 }
 
-BOOST_AUTO_TEST_CASE( cow2_test )
+BOOST_AUTO_TEST_CASE( cow2_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/cow2.off");
@@ -116,11 +115,11 @@ BOOST_AUTO_TEST_CASE( cow2_test )
     run();
 
     /* Save resutls */
-    check("cow2");
+    check("vertex_target_0_5_tests_cow2");
 }
 #endif /* #ifndef VALGRIND_TESTS */
 
-BOOST_AUTO_TEST_CASE( crank_test )
+BOOST_AUTO_TEST_CASE( crank_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/crank.off");
@@ -129,11 +128,11 @@ BOOST_AUTO_TEST_CASE( crank_test )
     run();
 
     /* Save resutls */
-    check("crank");
+    check("vertex_target_0_5_tests_crank");
 }
 
 #ifndef VALGRIND_TESTS
-BOOST_AUTO_TEST_CASE( cup_test )
+BOOST_AUTO_TEST_CASE( cup_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/cup.off");
@@ -142,10 +141,10 @@ BOOST_AUTO_TEST_CASE( cup_test )
     run();
 
     /* Save resutls */
-    check("cup");
+    check("vertex_target_0_5_tests_cup");
 }
 
-BOOST_AUTO_TEST_CASE( dancer2_test )
+BOOST_AUTO_TEST_CASE( dancer2_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/dancer2.off");
@@ -154,10 +153,10 @@ BOOST_AUTO_TEST_CASE( dancer2_test )
     run();
 
     /* Save resutls */
-    check("dancer2");
+    check("vertex_target_0_5_tests_dancer2");
 }
 
-BOOST_AUTO_TEST_CASE( deer_bound_test )
+BOOST_AUTO_TEST_CASE( deer_bound_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/deer_bound.off");
@@ -166,10 +165,10 @@ BOOST_AUTO_TEST_CASE( deer_bound_test )
     run();
 
     /* Save resutls */
-    check("deer_bound");
+    check("vertex_target_0_5_tests_deer_bound");
 }
 
-BOOST_AUTO_TEST_CASE( dilo_test )
+BOOST_AUTO_TEST_CASE( dilo_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/dilo.off");
@@ -178,10 +177,10 @@ BOOST_AUTO_TEST_CASE( dilo_test )
     run();
 
     /* Save resutls */
-    check("dilo");
+    check("vertex_target_0_5_tests_dilo");
 }
 
-BOOST_AUTO_TEST_CASE( dino_test )
+BOOST_AUTO_TEST_CASE( dino_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/dino.off");
@@ -190,10 +189,10 @@ BOOST_AUTO_TEST_CASE( dino_test )
     run();
 
     /* Save resutls */
-    check("dino");
+    check("vertex_target_0_5_tests_dino");
 }
 
-BOOST_AUTO_TEST_CASE( DRAGON_F_test )
+BOOST_AUTO_TEST_CASE( DRAGON_F_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/DRAGON_F.off");
@@ -202,10 +201,10 @@ BOOST_AUTO_TEST_CASE( DRAGON_F_test )
     run();
 
     /* Save resutls */
-    check("DRAGON_F");
+    check("vertex_target_0_5_tests_DRAGON_F");
 }
 
-BOOST_AUTO_TEST_CASE( drum_test )
+BOOST_AUTO_TEST_CASE( drum_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/drum.off");
@@ -214,10 +213,10 @@ BOOST_AUTO_TEST_CASE( drum_test )
     run();
 
     /* Save resutls */
-    check("drum");
+    check("vertex_target_0_5_tests_drum");
 }
 
-BOOST_AUTO_TEST_CASE( eight_test )
+BOOST_AUTO_TEST_CASE( eight_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/eight.off");
@@ -226,10 +225,10 @@ BOOST_AUTO_TEST_CASE( eight_test )
     run();
 
     /* Save resutls */
-    check("eight");
+    check("vertex_target_0_5_tests_eight");
 }
 
-BOOST_AUTO_TEST_CASE( elephant_test )
+BOOST_AUTO_TEST_CASE( elephant_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/elephant.off");
@@ -238,10 +237,10 @@ BOOST_AUTO_TEST_CASE( elephant_test )
     run();
 
     /* Save resutls */
-    check("elephant");
+    check("vertex_target_0_5_tests_elephant");
 }
 
-BOOST_AUTO_TEST_CASE( elk_test )
+BOOST_AUTO_TEST_CASE( elk_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/elk.off");
@@ -250,10 +249,10 @@ BOOST_AUTO_TEST_CASE( elk_test )
     run();
 
     /* Save resutls */
-    check("elk");
+    check("vertex_target_0_5_tests_elk");
 }
 
-BOOST_AUTO_TEST_CASE( egea_test )
+BOOST_AUTO_TEST_CASE( egea_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/egea.off");
@@ -262,10 +261,10 @@ BOOST_AUTO_TEST_CASE( egea_test )
     run();
 
     /* Save resutls */
-    check("egea");
+    check("vertex_target_0_5_tests_egea");
 }
 
-BOOST_AUTO_TEST_CASE( face_yh_test )
+BOOST_AUTO_TEST_CASE( face_yh_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/face-YH.off");
@@ -274,10 +273,10 @@ BOOST_AUTO_TEST_CASE( face_yh_test )
     run();
 
     /* Save resutls */
-    check("face-YH");
+    check("vertex_target_0_5_tests_face-YH");
 }
 
-BOOST_AUTO_TEST_CASE( feline_test )
+BOOST_AUTO_TEST_CASE( feline_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/feline.off");
@@ -286,10 +285,10 @@ BOOST_AUTO_TEST_CASE( feline_test )
     run();
 
     /* Save resutls */
-    check("feline");
+    check("vertex_target_0_5_tests_feline");
 }
 
-BOOST_AUTO_TEST_CASE( fish_test )
+BOOST_AUTO_TEST_CASE( fish_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/fish.off");
@@ -298,10 +297,10 @@ BOOST_AUTO_TEST_CASE( fish_test )
     run();
 
     /* Save resutls */
-    check("fish");
+    check("vertex_target_0_5_tests_fish");
 }
 
-BOOST_AUTO_TEST_CASE( foot_test )
+BOOST_AUTO_TEST_CASE( foot_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/foot.off");
@@ -310,10 +309,10 @@ BOOST_AUTO_TEST_CASE( foot_test )
     run();
 
     /* Save resutls */
-    check("foot");
+    check("vertex_target_0_5_tests_foot");
 }
 
-BOOST_AUTO_TEST_CASE( genus3_test )
+BOOST_AUTO_TEST_CASE( genus3_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/genus3.off");
@@ -322,10 +321,10 @@ BOOST_AUTO_TEST_CASE( genus3_test )
     run();
 
     /* Save resutls */
-    check("genus3");
+    check("vertex_target_0_5_tests_genus3");
 }
 
-BOOST_AUTO_TEST_CASE( greek_sculpture_test )
+BOOST_AUTO_TEST_CASE( greek_sculpture_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/greek_sculpture.off");
@@ -334,10 +333,10 @@ BOOST_AUTO_TEST_CASE( greek_sculpture_test )
     run();
 
     /* Save resutls */
-    check("greek_sculpture");
+    check("vertex_target_0_5_tests_greek_sculpture");
 }
 
-BOOST_AUTO_TEST_CASE( hand1_test )
+BOOST_AUTO_TEST_CASE( hand1_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/Hand1.off");
@@ -346,10 +345,10 @@ BOOST_AUTO_TEST_CASE( hand1_test )
     run();
 
     /* Save resutls */
-    check("Hand1");
+    check("vertex_target_0_5_tests_Hand1");
 }
 
-BOOST_AUTO_TEST_CASE( hand2_test )
+BOOST_AUTO_TEST_CASE( hand2_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/hand2.off");
@@ -358,10 +357,10 @@ BOOST_AUTO_TEST_CASE( hand2_test )
     run();
 
     /* Save resutls */
-    check("hand2");
+    check("vertex_target_0_5_tests_hand2");
 }
 
-BOOST_AUTO_TEST_CASE( horse_test )
+BOOST_AUTO_TEST_CASE( horse_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/horse.off");
@@ -370,10 +369,10 @@ BOOST_AUTO_TEST_CASE( horse_test )
     run();
 
     /* Save resutls */
-    check("horse");
+    check("vertex_target_0_5_tests_horse");
 }
 
-BOOST_AUTO_TEST_CASE( helix_test )
+BOOST_AUTO_TEST_CASE( helix_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/helix.off");
@@ -382,10 +381,10 @@ BOOST_AUTO_TEST_CASE( helix_test )
     run();
 
     /* Save resutls */
-    check("helix");
+    check("vertex_target_0_5_tests_helix");
 }
 
-BOOST_AUTO_TEST_CASE( helmet_test )
+BOOST_AUTO_TEST_CASE( helmet_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/helmet.off");
@@ -394,10 +393,10 @@ BOOST_AUTO_TEST_CASE( helmet_test )
     run();
 
     /* Save resutls */
-    check("helmet");
+    check("vertex_target_0_5_tests_helmet");
 }
 
-BOOST_AUTO_TEST_CASE( hero_test )
+BOOST_AUTO_TEST_CASE( hero_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/hero.off");
@@ -406,10 +405,10 @@ BOOST_AUTO_TEST_CASE( hero_test )
     run();
 
     /* Save resutls */
-    check("hero");
+    check("vertex_target_0_5_tests_hero");
 }
 
-BOOST_AUTO_TEST_CASE( homer_test )
+BOOST_AUTO_TEST_CASE( homer_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/homer.off");
@@ -418,10 +417,10 @@ BOOST_AUTO_TEST_CASE( homer_test )
     run();
 
     /* Save resutls */
-    check("homer");
+    check("vertex_target_0_5_tests_homer");
 }
 
-BOOST_AUTO_TEST_CASE( hornbug_test )
+BOOST_AUTO_TEST_CASE( hornbug_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/hornbug.off");
@@ -430,10 +429,10 @@ BOOST_AUTO_TEST_CASE( hornbug_test )
     run();
 
     /* Save resutls */
-    check("hornbug");
+    check("vertex_target_0_5_tests_hornbug");
 }
 
-BOOST_AUTO_TEST_CASE( maneki_neko_test )
+BOOST_AUTO_TEST_CASE( maneki_neko_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/maneki-neko.off");
@@ -442,10 +441,10 @@ BOOST_AUTO_TEST_CASE( maneki_neko_test )
     run();
 
     /* Save resutls */
-    check("maneki-neko");
+    check("vertex_target_0_5_tests_maneki-neko");
 }
 
-BOOST_AUTO_TEST_CASE( mannequin_devil_test )
+BOOST_AUTO_TEST_CASE( mannequin_devil_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/mannequin-devil.off");
@@ -454,10 +453,10 @@ BOOST_AUTO_TEST_CASE( mannequin_devil_test )
     run();
 
     /* Save resutls */
-    check("mannequin-devil");
+    check("vertex_target_0_5_tests_mannequin-devil");
 }
 
-BOOST_AUTO_TEST_CASE( mannequin_test )
+BOOST_AUTO_TEST_CASE( mannequin_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/mannequin.off");
@@ -466,10 +465,10 @@ BOOST_AUTO_TEST_CASE( mannequin_test )
     run();
 
     /* Save resutls */
-    check("mannequin");
+    check("vertex_target_0_5_tests_mannequin");
 }
 
-BOOST_AUTO_TEST_CASE( mask_test )
+BOOST_AUTO_TEST_CASE( mask_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/mask.off");
@@ -478,10 +477,10 @@ BOOST_AUTO_TEST_CASE( mask_test )
     run();
 
     /* Save resutls */
-    check("mask");
+    check("vertex_target_0_5_tests_mask");
 }
 
-BOOST_AUTO_TEST_CASE( moaimoai_test )
+BOOST_AUTO_TEST_CASE( moaimoai_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/moaimoai.off");
@@ -490,10 +489,10 @@ BOOST_AUTO_TEST_CASE( moaimoai_test )
     run();
 
     /* Save resutls */
-    check("moaimoai");
+    check("vertex_target_0_5_tests_moaimoai");
 }
 
-BOOST_AUTO_TEST_CASE( monk_test )
+BOOST_AUTO_TEST_CASE( monk_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/monk.off");
@@ -502,10 +501,10 @@ BOOST_AUTO_TEST_CASE( monk_test )
     run();
 
     /* Save resutls */
-    check("monk");
+    check("vertex_target_0_5_tests_monk");
 }
 
-BOOST_AUTO_TEST_CASE( octopus_test )
+BOOST_AUTO_TEST_CASE( octopus_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/octopus.off");
@@ -514,10 +513,10 @@ BOOST_AUTO_TEST_CASE( octopus_test )
     run();
 
     /* Save resutls */
-    check("octopus");
+    check("vertex_target_0_5_tests_octopus");
 }
 
-BOOST_AUTO_TEST_CASE( pig_test )
+BOOST_AUTO_TEST_CASE( pig_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/pig.off");
@@ -526,10 +525,10 @@ BOOST_AUTO_TEST_CASE( pig_test )
     run();
 
     /* Save resutls */
-    check("pig");
+    check("vertex_target_0_5_tests_pig");
 }
 
-BOOST_AUTO_TEST_CASE( pinocchio_b_test )
+BOOST_AUTO_TEST_CASE( pinocchio_b_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/pinocchio_b.off");
@@ -538,10 +537,10 @@ BOOST_AUTO_TEST_CASE( pinocchio_b_test )
     run();
 
     /* Save resutls */
-    check("pinocchio_b");
+    check("vertex_target_0_5_tests_pinocchio_b");
 }
 
-BOOST_AUTO_TEST_CASE( polygirl_test )
+BOOST_AUTO_TEST_CASE( polygirl_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/polygirl.off");
@@ -550,10 +549,10 @@ BOOST_AUTO_TEST_CASE( polygirl_test )
     run();
 
     /* Save resutls */
-    check("polygirl");
+    check("vertex_target_0_5_tests_polygirl");
 }
 
-BOOST_AUTO_TEST_CASE( rabbit_test )
+BOOST_AUTO_TEST_CASE( rabbit_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/rabbit.off");
@@ -562,10 +561,10 @@ BOOST_AUTO_TEST_CASE( rabbit_test )
     run();
 
     /* Save resutls */
-    check("rabbit");
+    check("vertex_target_0_5_tests_rabbit");
 }
 
-BOOST_AUTO_TEST_CASE( rocker_arm_test )
+BOOST_AUTO_TEST_CASE( rocker_arm_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/rocker-arm.off");
@@ -574,10 +573,10 @@ BOOST_AUTO_TEST_CASE( rocker_arm_test )
     run();
 
     /* Save resutls */
-    check("rocker-arm");
+    check("vertex_target_0_5_tests_rocker-arm");
 }
 
-BOOST_AUTO_TEST_CASE( screwdriver_test )
+BOOST_AUTO_TEST_CASE( screwdriver_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/screwdriver.off");
@@ -586,10 +585,10 @@ BOOST_AUTO_TEST_CASE( screwdriver_test )
     run();
 
     /* Save resutls */
-    check("screwdriver");
+    check("vertex_target_0_5_tests_screwdriver");
 }
 
-BOOST_AUTO_TEST_CASE( shark_b_test )
+BOOST_AUTO_TEST_CASE( shark_b_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/shark_b.off");
@@ -598,10 +597,10 @@ BOOST_AUTO_TEST_CASE( shark_b_test )
     run();
 
     /* Save resutls */
-    check("shark_b");
+    check("vertex_target_0_5_tests_shark_b");
 }
 
-BOOST_AUTO_TEST_CASE( sketched_brunnen_test )
+BOOST_AUTO_TEST_CASE( sketched_brunnen_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/Sketched-Brunnen.off");
@@ -610,10 +609,10 @@ BOOST_AUTO_TEST_CASE( sketched_brunnen_test )
     run();
 
     /* Save resutls */
-    check("Sketched-Brunnen");
+    check("vertex_target_0_5_tests_Sketched-Brunnen");
 }
 
-BOOST_AUTO_TEST_CASE( sledge_test )
+BOOST_AUTO_TEST_CASE( sledge_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/sledge.off");
@@ -622,10 +621,10 @@ BOOST_AUTO_TEST_CASE( sledge_test )
     run();
 
     /* Save resutls */
-    check("sledge");
+    check("vertex_target_0_5_tests_sledge");
 }
 
-BOOST_AUTO_TEST_CASE( squirrel_test )
+BOOST_AUTO_TEST_CASE( squirrel_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/squirrel.off");
@@ -634,10 +633,10 @@ BOOST_AUTO_TEST_CASE( squirrel_test )
     run();
 
     /* Save resutls */
-    check("squirrel");
+    check("vertex_target_0_5_tests_squirrel");
 }
 
-BOOST_AUTO_TEST_CASE( sword_test )
+BOOST_AUTO_TEST_CASE( sword_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/sword.off");
@@ -646,10 +645,10 @@ BOOST_AUTO_TEST_CASE( sword_test )
     run();
 
     /* Save resutls */
-    check("sword");
+    check("vertex_target_0_5_tests_sword");
 }
 
-BOOST_AUTO_TEST_CASE( table_test )
+BOOST_AUTO_TEST_CASE( table_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/table.off");
@@ -658,10 +657,10 @@ BOOST_AUTO_TEST_CASE( table_test )
     run();
 
     /* Save resutls */
-    check("table");
+    check("vertex_target_0_5_tests_table");
 }
 
-BOOST_AUTO_TEST_CASE( teapot_test )
+BOOST_AUTO_TEST_CASE( teapot_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/Teapot.off");
@@ -670,11 +669,11 @@ BOOST_AUTO_TEST_CASE( teapot_test )
     run();
 
     /* Save resutls */
-    check("Teapot");
+    check("vertex_target_0_5_tests_Teapot");
 
 }
 
-BOOST_AUTO_TEST_CASE( test2_test )
+BOOST_AUTO_TEST_CASE( test2_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/test2.off");
@@ -683,10 +682,10 @@ BOOST_AUTO_TEST_CASE( test2_test )
     run();
 
     /* Save resutls */
-    check("test2");
+    check("vertex_target_0_5_tests_test2");
 }
 
-BOOST_AUTO_TEST_CASE( test_test )
+BOOST_AUTO_TEST_CASE( test_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/test.off");
@@ -695,10 +694,10 @@ BOOST_AUTO_TEST_CASE( test_test )
     run();
 
     /* Save resutls */
-    check("test");
+    check("vertex_target_0_5_tests_test");
 }
 
-BOOST_AUTO_TEST_CASE( torus_test )
+BOOST_AUTO_TEST_CASE( torus_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/tstTorusModel2.off");
@@ -707,10 +706,10 @@ BOOST_AUTO_TEST_CASE( torus_test )
     run();
 
     /* Save resutls */
-    check("tstTorusModel2");
+    check("vertex_target_0_5_tests_tstTorusModel2");
 }
 
-BOOST_AUTO_TEST_CASE( tstTorusModel3_test )
+BOOST_AUTO_TEST_CASE( tstTorusModel3_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/tstTorusModel3.off");
@@ -719,10 +718,10 @@ BOOST_AUTO_TEST_CASE( tstTorusModel3_test )
     run();
 
     /* Save resutls */
-    check("tstTorusModel3");
+    check("vertex_target_0_5_tests_tstTorusModel3");
 }
 
-BOOST_AUTO_TEST_CASE( tstTorusModel_test )
+BOOST_AUTO_TEST_CASE( tstTorusModel_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/tstTorusModel.off");
@@ -731,10 +730,10 @@ BOOST_AUTO_TEST_CASE( tstTorusModel_test )
     run();
 
     /* Save resutls */
-    check("tstTorusModel");
+    check("vertex_target_0_5_tests_tstTorusModel");
 }
 
-BOOST_AUTO_TEST_CASE( tube1_test )
+BOOST_AUTO_TEST_CASE( tube1_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/tube1.off");
@@ -743,10 +742,10 @@ BOOST_AUTO_TEST_CASE( tube1_test )
     run();
 
     /* Save resutls */
-    check("tube1");
+    check("vertex_target_0_5_tests_tube1");
 }
 
-BOOST_AUTO_TEST_CASE( venus_test )
+BOOST_AUTO_TEST_CASE( venus_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/venus.off");
@@ -755,10 +754,10 @@ BOOST_AUTO_TEST_CASE( venus_test )
     run();
 
     /* Save resutls */
-    check("venus");
+    check("vertex_target_0_5_tests_venus");
 }
 
-BOOST_AUTO_TEST_CASE( venus_original_test )
+BOOST_AUTO_TEST_CASE( venus_original_vertex_target_0_5_test )
 {
     /* Load file */
     LOAD_TEST_DATA("off_scenes/venus-original.off");
@@ -767,7 +766,7 @@ BOOST_AUTO_TEST_CASE( venus_original_test )
     run();
 
     /* Save resutls */
-    check("venus-original");
+    check("vertex_target_0_5_tests_venus-original");
 }
 #endif /* #ifndef VALGRIND_TESTS */
 

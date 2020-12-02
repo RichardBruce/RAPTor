@@ -106,17 +106,17 @@ class symetric_matrix4
 
         T determinant(const int i11, const int i12, const int i13, const int i21, const int i22, const int i23, const int i31, const int i32, const int i33) const
         {
-            return  (_data[i11] * ((_data[i22] * _data[i33]) - (_data[i23] * _data[i32]))) +
-                    (_data[i12] * ((_data[i23] * _data[i31]) - (_data[i21] * _data[i33]))) +
-                    (_data[i13] * ((_data[i21] * _data[i32]) - (_data[i22] * _data[i31])));
+            return (_data[i11] * ((_data[i22] * _data[i33]) - (_data[i23] * _data[i32]))) + 
+                   (_data[i12] * ((_data[i23] * _data[i31]) - (_data[i21] * _data[i33]))) + 
+                   (_data[i13] * ((_data[i21] * _data[i32]) - (_data[i22] * _data[i31])));
         }
 
-        T quadric(const point_t &p) const
+        T quadric(const point_t<double> &p) const
         {
-            return  (_data[0] * p.x * p.x) + (2.0f * _data[1] * p.x * p.y) + (2.0f * _data[2] * p.x * p.z) + (2.0f * _data[3] * p.x) + 
-                    (_data[4] * p.y * p.y) + (2.0f * _data[5] * p.y * p.z) + (2.0f * _data[6] * p.y) + 
-                    (_data[7] * p.z * p.z) + (2.0f * _data[8] * p.z) + 
-                    _data[9];
+            return  (2.0 * ((_data[1] * p.x * p.y) + (_data[2] * p.x * p.z) + (_data[3] * p.x) + 
+                            (_data[5] * p.y * p.z) + (_data[6] * p.y) + 
+                            (_data[8] * p.z))) + 
+                    (_data[0] * p.x * p.x) + (_data[4] * p.y * p.y) + (_data[7] * p.z * p.z) + _data[9];
         }
 
         void dump() const
@@ -131,594 +131,225 @@ class symetric_matrix4
         T _data[10];
 };
 
-class edge;
-class face;
 class vertex
 {
     public:
-        explicit vertex(const point_t &p) : _q(0.0f), _p(p), _cost(0.0f), _complex(false), _removed(false) { }
+        vertex() : _q(0.0) { }
+        vertex(const point_t<double> &p) : _q(0.0), _p(p), _cost(0.0), _boundary(false) { }
 
-        bool complex() const { return _complex; }
-        void complex(const bool c) { _complex = c; }
+        double cost() const { return _cost; }
 
-        bool removed() const { return _removed; }
-        void removed(const bool r) { _removed = r; }
+        point_t<double> position() const { return _p; }
+        void position(const point_t<double> &p) { _p = p; }
 
-        const point_t& position() const { return _p; }
-        void position(const point_t &p) { _p = p; }
+        int links() const { return _links; }
+        void links(const int t) { _links = t; }
+        void add_links() { ++_links; }
 
-        void add_face(const face &f);
-
-        void collapse(vertex *const v1, const point_t &v_new, const float cost)
+        int first_link() const { return _first_link; }
+        void first_link(const int t) { _first_link = t; }
+        void reset_link()
         {
-            _cost += cost;
-            _q += v1->_q;
-            _p = v_new;
+            _first_link = 0;
+            _links = 0;
         }
 
-        float merge_error(const vertex &v1, point_t &v_new) const
-        {
-            symetric_matrix4<float> q(_q + v1._q);
-            // std::cout << "Input points " << _p << " and " << v1._p << std::endl;
-            // std::cout << "Input matrix " << std::endl;
-            // q.dump();
-            const float det = q.determinant(0, 1, 2, 1, 4, 5, 2, 5, 7);
+        void boundary(const bool boundary) { _boundary = boundary; }
 
-            /* Cant invert cost, this could be a planar vertex, removing it would be free */
-            // std::cout << "Det " << det << std::endl;
-            if (std::fabs(det) < 0.001f)
+        void add_face(const symetric_matrix4<double> &q)
+        {
+            _q += q;
+        }
+
+        void update(const vertex *v, const point_t<double> &p, const double cost)
+        {
+            _p = p;
+            _q += v->_q;
+            _cost += (v->_cost + cost);
+        }
+
+        point_t<double> vertex_error(const vertex *v) const
+        {
+            /* Attempt to optimise */
+            symetric_matrix4<double> q(_q + v->_q);
+            if (!(_boundary & v->_boundary))
             {
-                // std::cout << "Det too small" << std::endl;
-                v_new = v1.position();
+                const double det = q.determinant(0, 1, 2, 1, 4, 5, 2, 5, 7);
+                if (det != 0.0)
+                {
+                    return (1.0 / det) * point_t<double>(-q.determinant(1, 2, 3, 4, 5, 6, 5, 7, 8), q.determinant(0, 2, 3, 1, 5, 6, 2, 7, 8), -q.determinant(0, 1, 3, 1, 4, 6, 2, 5, 8));
+                }
             }
-            else
+
+            /* Fall back */
+            point_t<double> v_new(_p);
+            double cost = q.quadric(_p);
+            if (const double c = q.quadric(v->_p); c < cost)
             {
-                const float det_inv = 1.0f / det;
-                const float det_x = q.determinant(1, 2, 3, 4, 5, 6, 5, 7, 8);
-                const float det_y = q.determinant(0, 2, 3, 1, 5, 6, 2, 7, 8);
-                const float det_z = q.determinant(0, 1, 3, 1, 4, 6, 2, 5, 8);
-                v_new = max(min(_p, v1._p), min(max(_p, v1._p), point_t(-det_x, det_y, -det_z) * det_inv));
+                cost = c;
+                v_new = v->_p;
             }
-            // std::cout << "v new " << v_new << ", cost " << q.quadric(v_new) << std::endl;
 
-            // assert(q.quadric(v_new) > -1.0f);
-            return q.quadric(v_new);
+            const point_t<double> p_mid((_p + v->_p) * 0.5);
+            if (const double c = q.quadric(p_mid); c < cost)
+            {
+                cost = c;
+                v_new = p_mid;
+            }
+
+            return v_new;
         }
 
-        float merge_error(const point_t &p) const
+        double vertex_error(const vertex *v, const double max_cumulative_cost, point_t<double> &v_new) const
         {
-            return _q.quadric(p);
-        }
+            /* Dont merged edges into the body of meshes */
+            if (_boundary ^ v->_boundary)
+            {
+                return std::numeric_limits<double>::infinity();
+            }
 
-        float cost() const { return _cost; }
+            /* Attempt to optimise */
+            symetric_matrix4<double> q(_q + v->_q);
+            if (!(_boundary & v->_boundary))
+            {
+                const double det = q.determinant(0, 1, 2, 1, 4, 5, 2, 5, 7);
+                if (det != 0.0)
+                {
+                    v_new = (1.0 / det) * point_t<double>(-q.determinant(1, 2, 3, 4, 5, 6, 5, 7, 8), q.determinant(0, 2, 3, 1, 5, 6, 2, 7, 8), -q.determinant(0, 1, 3, 1, 4, 6, 2, 5, 8));
+                    
+                    const double cost = q.quadric(v_new);
+                    if ((_cost + v->_cost + cost) > max_cumulative_cost)
+                    {
+                        return std::numeric_limits<double>::infinity();
+                    }
+
+                    return cost;
+                }
+            }
+
+            /* Fall back */
+            v_new = _p;
+            double cost = q.quadric(_p);
+            if (const double c = q.quadric(v->_p); c < cost)
+            {
+                cost = c;
+                v_new = v->_p;
+            }
+
+            const point_t<double> p_mid((_p + v->_p) * 0.5);
+            if (const double c = q.quadric(p_mid); c < cost)
+            {
+                cost = c;
+                v_new = p_mid;
+            }
+
+            /* Ignore this edge if the cumulative cost would be too high */
+            if ((_cost + v->_cost + cost) > max_cumulative_cost)
+            {
+                cost = std::numeric_limits<double>::infinity();
+            }
+
+            return cost;
+        }
 
     private:
-        symetric_matrix4<float> _q;
-        point_t                 _p;
-        float                   _cost;
-        bool                    _complex;
-        bool                    _removed;
+        symetric_matrix4<double>    _q;             /* Quadric cost matrix */
+        point_t<double>             _p;             /* Position */
+        double                      _cost;          /* Accumulated cost */
+        int                         _first_link;    /* Index of first link */
+        int                         _links;         /* Number of faces this vertex links to */
+        bool                        _boundary;      /* If this is a vertex on the boundary */
+
 };
 
-class edge
+class alignas(64) face
 {
     public:
-        edge(face *const f, vertex *const v0, vertex *const v1) : _removed(false), _recalc(true), _complex(false)
+        face() = default;
+        face(vertex *v0, vertex *v1, vertex *v2) : _v{v0, v1, v2}, _removed(false)
         {
-            if (v0 < v1)
-            {
-                _faces[0] = f;
-                _faces[1] = nullptr;
-                _vertices[0] = v0;
-                _vertices[1] = v1;
-            }
-            else
-            {
-                _faces[0] = nullptr;
-                _faces[1] = f;
-                _vertices[0] = v1;
-                _vertices[1] = v0;
-            }
+            const point_t<double> &p0 = _v[0]->position();
+            _n = normalise(cross_product(_v[1]->position() - p0, _v[2]->position() - p0));
+            _v[0]->add_face(symetric_matrix4<double>(_n.x, _n.y, _n.z, dot_product(-_n, p0)));
+            _v[1]->add_face(symetric_matrix4<double>(_n.x, _n.y, _n.z, dot_product(-_n, p0)));
+            _v[2]->add_face(symetric_matrix4<double>(_n.x, _n.y, _n.z, dot_product(-_n, p0)));
         }
 
-        bool operator<(const edge &e) const
+        /* Calculate the cost of merging each edge and take the smallest */
+        double face_error(const double max_cumulative_cost)
         {
-            if (_vertices[0] == e._vertices[0])
+            _min_idx = 0;
+            point_t<double> p;
+            _min_cost = _v[0]->vertex_error(_v[1], max_cumulative_cost, p);
+            if (const double c = _v[1]->vertex_error(_v[2], max_cumulative_cost, p); c < _min_cost)
             {
-                return _vertices[1] < e._vertices[1];
+                _min_cost = c;
+                _min_idx = 1;
             }
 
-            return (_vertices[0] < e._vertices[0]);
+            if (const double c = _v[2]->vertex_error(_v[0], max_cumulative_cost, p); c < _min_cost)
+            {
+                _min_cost = c;
+                _min_idx = 2;
+            }
+
+            return _min_cost;
         }
 
+        point_t<double> normal() const { return _n; }
+
+        vertex* vertices(const int idx) const { return _v[idx]; }
+        void vertices(const int idx, vertex *v) { _v[idx] = v; }
+
+        void remove() { _removed = true; }
         bool removed() const { return _removed; }
-        void removed(const bool r) { _removed = r; }
 
-        bool recalculate() const { return _recalc; }
-        void recalculate(const bool r) { _recalc = r; }
-
-        bool complex() const { return _complex; }
-        void complex(const bool c) const { _complex = c; }
-
-        vertex *vertex0() const { return _vertices[0]; }
-        vertex *vertex1() const { return _vertices[1]; }
-        void vertex0(vertex *v) { _vertices[0] = v; }
-        void vertex1(vertex *v) { _vertices[1] = v; }
-
-        vertex* other_vertex(const vertex *const from)
-        {
-            if (_vertices[0] == from)
-            {
-                return _vertices[1];
-            }
-
-            assert(_vertices[1] == from);
-            return _vertices[0];
-        }
-
-        point_t &merge_point() { return _merge; }
-
-        face *left_face(const vertex *const from)  const { return (_vertices[0] == from) ? _faces[0] : _faces[1]; }
-        face *right_face(const vertex *const from) const { return (_vertices[0] == from) ? _faces[1] : _faces[0]; }
-
-        void edges_left_face(face *f)  { _faces[0] = f;                    }
-        void edges_right_face(face *f) { _faces[1] = f;                    }
-        face *edges_left_face()  const { return left_face(_vertices[0]);   }
-        face *edges_right_face() const { return right_face(_vertices[0]);  }
-
-        void update_left_face(face *f, const vertex *const from)
-        {
-            if (_vertices[0] == from)
-            {
-                _faces[0] = f;
-            }
-            else
-            {
-                assert(_vertices[1] == from);
-                _faces[1] = f;
-            }
-        }
-
-        void update_right_face(face *f, const vertex *const from)
-        {
-            if (_vertices[0] == from)
-            {
-                _faces[1] = f;
-            }
-            else
-            {
-                assert(_vertices[1] == from);
-                _faces[0] = f;
-            }
-        }
-
-        float merge_cost()
-        {
-            // std::cout << std::hex << "Merge cost for " << this << " with vertices " << _vertices[0] << ", " << _vertices[1] << std::dec << std::endl;
-            return _vertices[0]->merge_error(*_vertices[1], _merge);
-        }
-
-        void update_vertex(vertex *const v0, vertex *const v1)
-        {
-            if (_vertices[0] == v0)
-            {
-                _vertices[0] = v1;
-            }
-            else
-            {
-                assert(_vertices[1] == v0);
-                _vertices[1] = v1;
-            }
-
-            assert(_vertices[0] != _vertices[1]);
-        }
-
-        bool check() const
-        {
-            return (_complex || ((_faces[0] != nullptr) && (_faces[1] != nullptr))) && (_vertices[0] != nullptr) && (_vertices[1] != nullptr);
-        }
+        double cost() const { return _min_cost; }
+        int index() const { return _min_idx; }
 
     private:
-        face           *_faces[2];
-        vertex         *_vertices[2];
-        point_t         _merge;
-        bool            _removed;
-        bool            _recalc;
-        mutable bool    _complex;
+        vertex *        _v[3];      /* Index of this faces vertices */
+        point_t<double> _n;         /* The normal of this face */
+        double          _min_cost;  /* The lowest edge merge cost */
+        int             _min_idx;   /* The index of the lowest edge */
+        bool            _removed;   /* Could save this byte, but still 1 per cache line */
 };
 
-class face
+class link
 {
     public:
-        face(vertex *const v0, vertex *const v1, vertex *const v2) :
-            _vertices{v0, v1, v2}, _edges{nullptr}, _removed(false) { }
+        link() = default;
+        link(const int face_idx, const int vertex_idx) : _face_idx(face_idx), _vertex_idx(vertex_idx) { }
 
-        bool removed() const { return _removed; }
-        void removed(const bool r) { _removed = r; }
-
-        point_t normal() const
-        {
-            const point_t e0(_vertices[1]->position() - _vertices[0]->position());
-            const point_t e1(_vertices[2]->position() - _vertices[0]->position());
-            return cross_product(e0, e1);
-        }
-
-        bool flipped(vertex *const v, const point_t &p) const
-        {
-            const point_t n0(normal());
-            const point_t t(v->position());
-            v->position(p);
-
-            const point_t n1(normal());
-            v->position(t);
-            
-            // std::cout << "Normals " << n0 << " and " << n1 << std::endl;
-            return dot_product(n0, n1) < 0.0f;
-        }
-
-        void add_edge(edge *const e)
-        {
-            if (_vertices[0] == e->vertex0())
-            {
-                if (_vertices[1] == e->vertex1())
-                {
-                    assert(_edges[0] == nullptr);
-                    _edges[0] = e;
-                }
-                else
-                {
-                    assert(_vertices[2] == e->vertex1());
-                    assert(_edges[2] == nullptr);
-                    _edges[2] = e;
-                }
-            }
-            else if (_vertices[1] == e->vertex0())
-            {
-                if (_vertices[2] == e->vertex1())
-                {
-                    assert(_edges[1] == nullptr);
-                    _edges[1] = e;
-                }
-                else
-                {
-                    assert(_vertices[0] == e->vertex1());
-                    assert(_edges[0] == nullptr);
-                    _edges[0] = e;
-                }
-            }
-            else
-            {
-                assert(_vertices[2] == e->vertex0());
-                if (_vertices[0] == e->vertex1())
-                {
-                    assert(_edges[2] == nullptr);
-                    _edges[2] = e;
-                }
-                else
-                {
-                    assert(_vertices[1] == e->vertex1());
-                    assert(_edges[1] == nullptr);
-                    _edges[1] = e;
-                }
-            }
-
-            return;
-        }
-
-        edge *next_edge(const edge *e)
-        {
-            assert(_edges[0] != _edges[1]);
-            assert(_edges[0] != _edges[2]);
-            assert(_edges[1] != _edges[2]);
-
-            if (_edges[0] == e)
-            {
-                return _edges[1];
-            }
-
-            if (_edges[1] == e)
-            {
-                return _edges[2];
-            }
-
-            assert(_edges[2] == e);
-            return _edges[0];
-        }
-
-        const edge *next_edge(const edge *e) const
-        {
-            assert(_edges[0] != _edges[1]);
-            assert(_edges[0] != _edges[2]);
-            assert(_edges[1] != _edges[2]);
-
-            if (_edges[0] == e)
-            {
-                return _edges[1];
-            }
-
-            if (_edges[1] == e)
-            {
-                return _edges[2];
-            }
-
-            assert(_edges[2] == e);
-            return _edges[0];
-        }
-
-        edge *previous_edge(const edge *e)
-        {
-            assert(_edges[0] != _edges[1]);
-            assert(_edges[0] != _edges[2]);
-            assert(_edges[1] != _edges[2]);
-
-            if (_edges[1] == e)
-            {
-                return _edges[0];
-            }
-
-            if (_edges[2] == e)
-            {
-                return _edges[1];
-            }
-
-            assert(_edges[0] == e);
-            return _edges[2];   
-        }
-
-        void update_edge(edge *const e, vertex *const v)
-        {
-            if (_vertices[0] == v)
-            {
-                _edges[0] = e;
-            }
-            else if (_vertices[1] == v)
-            {
-                _edges[1] = e;
-            }
-            else
-            {
-                assert(_vertices[2] == v);
-                _edges[2] = e;
-            }
-
-            assert(_edges[0] != _edges[1]);
-            assert(_edges[0] != _edges[2]);
-            assert(_edges[1] != _edges[2]);
-        }
-
-        void update_edge(edge *const from, edge *const to)
-        {
-            if (_edges[0] == from)
-            {
-                _edges[0] = to;
-            }
-            else if (_edges[1] == from)
-            {
-                _edges[1] = to;
-            }
-            else
-            {
-                assert(_edges[2] == from);
-                _edges[2] = to;
-            }
-
-            assert(_edges[0] != _edges[1]);
-            assert(_edges[0] != _edges[2]);
-            assert(_edges[1] != _edges[2]);
-        }
-
-        const vertex *opposite(const edge *const e) const
-        {
-            if (_edges[0] == e)
-            {
-                assert((e->vertex0() == _vertices[0]) || (e->vertex0() == _vertices[1]));
-                assert((e->vertex1() == _vertices[0]) || (e->vertex1() == _vertices[1]));
-                return _vertices[2];
-            }
-
-            if (_edges[1] == e)
-            {
-                assert((e->vertex0() == _vertices[1]) || (e->vertex0() == _vertices[2]));
-                assert((e->vertex1() == _vertices[1]) || (e->vertex1() == _vertices[2]));
-                return _vertices[0];
-            }
-
-            assert((e->vertex0() == _vertices[0]) || (e->vertex0() == _vertices[2]));
-            assert((e->vertex1() == _vertices[0]) || (e->vertex1() == _vertices[2]));
-            assert(_edges[2] == e);
-            return _vertices[1];
-        }
-
-        edge* update_vertex(vertex *const v0, vertex *const v1)
-        {
-            assert(_vertices[0] != _vertices[1]);
-            assert(_vertices[0] != _vertices[2]);
-            assert(_vertices[1] != _vertices[2]);
-
-            if (_vertices[0] == v0)
-            {
-                if (_vertices[1] == v1)
-                {
-                    return _edges[0];
-                }
-
-                if (_vertices[2] == v1)
-                {
-                    return _edges[2];
-                }
-
-                _vertices[0] = v1;
-            }
-            else if (_vertices[1] == v0)
-            {
-                if (_vertices[0] == v1)
-                {
-                    return _edges[0];
-                }
-
-                if (_vertices[2] == v1)
-                {
-                    return _edges[1];
-                }
-
-                _vertices[1] = v1;
-            }
-            else
-            {
-                assert(_vertices[2] == v0);
-                if (_vertices[0] == v1)
-                {
-                    return _edges[2];
-                }
-
-                if (_vertices[1] == v1)
-                {
-                    return _edges[1];
-                }
-
-                _vertices[2] = v1;
-            }
-
-            assert(_vertices[0] != _vertices[1]);
-            assert(_vertices[0] != _vertices[2]);
-            assert(_vertices[1] != _vertices[2]);
-            return nullptr;
-        }
-
-        bool check() const
-        {
-            return (_vertices[0] != nullptr) && (_vertices[1] != nullptr) && (_vertices[2] != nullptr) && (_edges[0] != nullptr) && (_edges[1] != nullptr) && (_edges[2] != nullptr);
-        }
-
-        const vertex *vertice(const int i) const { return _vertices[i]; }
-        edge *edges(const int i) { return _edges[i]; }
+        int face()      const { return _face_idx;   }
+        int vertex()    const { return _vertex_idx; }
 
     private:
-        vertex  *_vertices[3]; /* Vertices in anti clockwise order */
-        edge    *_edges[3];
-        bool    _removed;
+        int _face_idx;      /* A face that this vertex belongs to */
+        int _vertex_idx;    /* The index of this vertex within the above face */
 };
-
-inline void vertex::add_face(const face &f)
-{
-    const point_t &n = normalise(f.normal());
-    _q += symetric_matrix4(n.x, n.y, n.z, -dot_product(n, _p));
-}
 
 class mesh_decimation
 {
     public:
-        mesh_decimation(const std::vector<point_t> &points, const std::vector<point_ti<>> &triangles, const mesh_decimation_options &options);
+        mesh_decimation(const std::vector<point_t<>> &points, const std::vector<point_ti<>> &triangles, const mesh_decimation_options &options);
 
-        std::vector<point_ti<>> triangles() const
-        {
-            std::vector<point_ti<>> ret;
-            for (const auto &f : _faces)
-            {
-                if (!f.removed())
-                {
-                    assert(!f.vertice(0)->removed());
-                    assert(!f.vertice(1)->removed());
-                    assert(!f.vertice(2)->removed());
-                    ret.emplace_back(std::distance(&_vertices[0], f.vertice(0)), std::distance(&_vertices[0], f.vertice(1)), std::distance(&_vertices[0], f.vertice(2)));
-                }
-            }
+        void compact_output(std::vector<point_t<>> &vertices, std::vector<point_ti<>> &triangles);
 
-            return ret;
-        }
-
-        std::vector<point_t> vertices() const
-        {
-            /* Must output all vertices because the faces arent re-pointed */
-            std::vector<point_t> ret;
-            for (const auto &v : _vertices)
-            {
-                ret.emplace_back(v.position());
-            }
-
-            return ret;
-        }
-
-        void compact_output(std::vector<point_t> &vertices, std::vector<point_ti<>> &tris);
-
-        float cost() const
-        {
-            return std::accumulate(_vertices.begin(), _vertices.end(), 0.0f, [](const float s, const vertex &v) { return s + v.cost(); });
-        }
-
-        int iterations() const
-        {
-            return _iteration;
-        }
+        int iterations() const { return _iteration; }
+        double cost() const { return _cost; }
 
     private:
-        struct queue_entry
-        {
-            queue_entry(edge *const e, const float cost) : e(e), cost(cost) { }
-
-            bool operator<(const queue_entry &q) const { return cost > q.cost; }
-
-            edge *e;
-            float cost;
-        };
-
-        void decimate(edge *root);
-        std::pair<face*, edge*> remove_edge(edge *merge, vertex *v0, vertex *v1);
-        std::priority_queue<queue_entry> decimation_costs();
-        void next_cost(std::priority_queue<mesh_decimation::queue_entry> *const costs);
-        bool can_merge_fan(const edge *const start, const edge *const end, vertex *const around, const point_t &vm);
-
-        void add_edge(vertex *const v0, vertex *const v1, face *const f)
-        {
-            if (const auto &fit = _unique_edges.emplace(f, v0, v1); !fit.second)
-            {
-                _edges.push_back(*fit.first);
-                // End vertices -9.28726, 134.434, -17.6481 and -8.72672, 133.726, -18.313
-                /* Add last face to edge */
-                auto &e = _edges.back();
-                if (e.left_face(v0) != nullptr)
-                {
-                    e.complex(true);
-                    e.vertex0()->complex(true);
-                    e.vertex1()->complex(true);
-                    e.update_right_face(f, v0);
-                    // std::cout << "Double edge " << fit.first->vertex0()->position() << " and " << fit.first->vertex1()->position() << std::endl;
-                }
-                else
-                {
-                    e.update_left_face(f, v0);
-                    // std::cout << "Finishing edge " << fit.first->vertex0()->position() << " and " << fit.first->vertex1()->position() << std::endl;
-                }
-
-                /* Add edge to faces */
-                e.edges_left_face()->add_edge(&e);
-                e.edges_right_face()->add_edge(&e);
-
-                _unique_edges.erase(fit.first);
-            }
-            else
-            {
-                if (const auto &cit = _created_edges.emplace(f, v0, v1); !cit.second)
-                {
-                    // std::cout << "Duplicate edge " << fit.first->vertex0()->position() << " and " << fit.first->vertex1()->position() << std::endl;
-                    cit.first->complex(true);
-                    fit.first->complex(true);
-                    fit.first->vertex0()->complex(true);
-                    fit.first->vertex1()->complex(true);
-                }
-                else
-                {
-                    // std::cout << "Created edge " << fit.first->vertex0()->position() << " and " << fit.first->vertex1()->position() << std::endl;
-                }
-            }
-        }
+        bool can_update(std::vector<bool> &removed, const vertex *v, const point_t<double> &p, const vertex *to);
+        void update_mesh(std::vector<bool> &removed, int &cleaned, const vertex *v, vertex *to);
+        void build_links();
+        void decimate();
 
         mesh_decimation_options _options;
-        std::vector<vertex>     _vertices;
         std::vector<face>       _faces;
-        std::vector<edge>       _edges;
-        std::set<edge>          _unique_edges;
-        std::set<edge>          _created_edges;
+        std::vector<vertex>     _vertices;
+        std::vector<link>       _links;
+        double                  _cost;
         int                     _iteration;
 };
 } /* namespace raptor_mesh_decimation */

@@ -15,14 +15,22 @@ set (LIBS raptor_parsers::headers raptor_common::static raptor_common::headers j
 link_directories($ENV{LIBARYS_PATH}/libtga-$ENV{LIBTGA_VER}/lib )
 
 # Tests
-set(UNIT_TESTS
-    mesh_decimation_tests)
-add_unit_test("${UNIT_TESTS}")
-
 set(REGRESSION_TESTS
+    cumulative_cost_1_0_tests
+    cumulative_cost_0_1_tests
+    cumulative_cost_0_01_tests
+    cumulative_cost_0_001_tests
+    cumulative_cost_0_00001_tests
+    merge_cost_1_0_tests
+    merge_cost_0_1_tests
+    merge_cost_0_001_tests
+    merge_cost_0_00001_tests
+    merge_cost_0_000000001_tests
     vertex_target_0_2_tests
     vertex_target_0_5_tests
-    vertex_target_0_8_tests)
+    vertex_target_0_8_tests
+    vertex_target_0_9_tests
+    vertex_target_0_95_tests)
 add_regression_test("${REGRESSION_TESTS}")
 
 # Generate Outputs

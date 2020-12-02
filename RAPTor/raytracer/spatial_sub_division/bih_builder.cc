@@ -37,8 +37,8 @@ void bih_builder::build(primitive_store *const primitives, std::vector<bih_block
     _blocks->resize(std::max(1, static_cast<int>(_primitives->size() * 0.2f)));
 
     /* Cache primitive min and max */
-    _b = point_t(MAX_DIST, MAX_DIST, MAX_DIST);
-    _t = point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST);
+    _b = point_t<>(MAX_DIST, MAX_DIST, MAX_DIST);
+    _t = point_t<>(-MAX_DIST, -MAX_DIST, -MAX_DIST);
     _bounds.reset(new bih_voxel_data [_primitives->size()]);
     for (int i = 0; i < _primitives->size(); ++i)
     {
@@ -75,7 +75,7 @@ void bih_builder::build(primitive_store *const primitives, std::vector<bih_block
 void bih_builder::bucket_build()
 {
     /* Calculate Morton codes and build MSB histogram */
-    const point_t scene_width(_t - _b);
+    const point_t<> scene_width(_t - _b);
     _width = std::max(std::max(scene_width.x, scene_width.y), scene_width.z) * (1.00001f / 1024.0f);
     _width_epsilon = _width * 1.09f;
     _width_inv = 1.0f / _width;
@@ -92,10 +92,10 @@ void bih_builder::bucket_build()
     const vfp_t scene_lo_x(_b.x);
     const vfp_t scene_lo_y(_b.y);
     const vfp_t scene_lo_z(_b.z);
-    point_t bl[histogram_size];
-    point_t tr[histogram_size];
-    std::fill_n(bl, histogram_size, point_t( MAX_DIST,  MAX_DIST,  MAX_DIST));
-    std::fill_n(tr, histogram_size, point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST));
+    point_t<> bl[histogram_size];
+    point_t<> tr[histogram_size];
+    std::fill_n(bl, histogram_size, point_t<>( MAX_DIST,  MAX_DIST,  MAX_DIST));
+    std::fill_n(tr, histogram_size, point_t<>(-MAX_DIST, -MAX_DIST, -MAX_DIST));
     for (int i = 0; i <= (static_cast<int>(_primitives->size()) - SIMD_WIDTH); i += SIMD_WIDTH)
     {
         /* Calculate morton code*/
@@ -137,7 +137,7 @@ void bih_builder::bucket_build()
     for (int i = (static_cast<int>(_primitives->size()) & ~(SIMD_WIDTH - 1)); i < static_cast<int>(_primitives->size()); ++i)
     {
         /* Calculate morton code*/
-        const point_t t(((_bounds[i].high + _bounds[i].low) * 0.5f) - _b);
+        const point_t<> t(((_bounds[i].high + _bounds[i].low) * 0.5f) - _b);
         _morton_codes[i] = morton_code(t.x, t.y, t.z, _width_inv, _width_inv, _width_inv);
 
         /* Build histogram of morton codes */
@@ -179,7 +179,7 @@ void bih_builder::bucket_build()
     divide_bih_block(bl, tr, hist, _b, _b + (_width * 1024.0f), _b, _t, 0, 0, histogram_size);
 }
 
-void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e)
+void bih_builder::bucket_build_mid(point_t<> *const bl, point_t<> *const tr, unsigned int *const hist, const int b, const int e)
 {
     /* Build histogram */
     const int mc_check = _code_buffer[b] >> 23;
@@ -223,7 +223,7 @@ void bih_builder::bucket_build_mid(point_t *const bl, point_t *const tr, unsigne
 }
 
 // __attribute__((optimize("unroll-loops")))
-void bih_builder::bucket_build_low(point_t *const bl, point_t *const tr, unsigned int *const hist, const int b, const int e)
+void bih_builder::bucket_build_low(point_t<> *const bl, point_t<> *const tr, unsigned int *const hist, const int b, const int e)
 {
     /* Build histogram */
     const int mc_check = _morton_codes[b] >> 13;
@@ -336,10 +336,10 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
             unsigned int hist[histogram_size + 1];
             memset(hist, 0, histogram_size * sizeof(float));
             
-            point_t bl[histogram_size];
-            point_t tr[histogram_size];
-            std::fill_n(bl, histogram_size, point_t( MAX_DIST,  MAX_DIST,  MAX_DIST));
-            std::fill_n(tr, histogram_size, point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST));
+            point_t<> bl[histogram_size];
+            point_t<> tr[histogram_size];
+            std::fill_n(bl, histogram_size, point_t<>( MAX_DIST,  MAX_DIST,  MAX_DIST));
+            std::fill_n(tr, histogram_size, point_t<>(-MAX_DIST, -MAX_DIST, -MAX_DIST));
 
             bucket_build_low(bl, tr, hist, bins[b], bins[e]);
 
@@ -359,10 +359,10 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
             unsigned int hist[histogram_size + 1];
             memset(hist, 0, histogram_size * sizeof(float));
             
-            point_t bl[histogram_size];
-            point_t tr[histogram_size];
-            std::fill_n(bl, histogram_size, point_t( MAX_DIST,  MAX_DIST,  MAX_DIST));
-            std::fill_n(tr, histogram_size, point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST));
+            point_t<> bl[histogram_size];
+            point_t<> tr[histogram_size];
+            std::fill_n(bl, histogram_size, point_t<>( MAX_DIST,  MAX_DIST,  MAX_DIST));
+            std::fill_n(tr, histogram_size, point_t<>(-MAX_DIST, -MAX_DIST, -MAX_DIST));
 
             bucket_build_mid(bl, tr, hist, bins[b], bins[e]);
 
@@ -382,7 +382,7 @@ void bih_builder::level_switch(block_splitting_data *const split_data, const int
 }
 
 /* Divide within a block, breadth first, with outside the block depth first */
-void bih_builder::divide_bih_block(const point_t *const hist_bl, const point_t *const hist_tr, const unsigned int *const bins, const point_t &bl, const point_t &tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int level, const int depth)
+void bih_builder::divide_bih_block(const point_t<> *const hist_bl, const point_t<> *const hist_tr, const unsigned int *const bins, const point_t<> &bl, const point_t<> &tr, const point_t<> &node_bl, const point_t<> &node_tr, const int block_idx, const int b, const int e, const int level, const int depth)
 {
     block_splitting_data split_data;
     split_data.hist_bl[0]   = hist_bl;
@@ -592,14 +592,14 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
 {
     int e = split_data->end[in_idx];
     int b = split_data->begin[in_idx];
-    point_t tr(split_data->tr[in_idx]);
-    point_t bl(split_data->bl[in_idx]);
+    point_t<> tr(split_data->tr[in_idx]);
+    point_t<> bl(split_data->bl[in_idx]);
     const int level = split_data->level[in_idx];
     const int depth = split_data->depth[in_idx] + 1;
-    const point_t &node_tr = split_data->node_tr[in_idx];
-    const point_t &node_bl = split_data->node_bl[in_idx];
-    const point_t *const hist_bl = split_data->hist_bl[in_idx];
-    const point_t *const hist_tr = split_data->hist_tr[in_idx];
+    const point_t<> &node_tr = split_data->node_tr[in_idx];
+    const point_t<> &node_bl = split_data->node_bl[in_idx];
+    const point_t<> *const hist_bl = split_data->hist_bl[in_idx];
+    const point_t<> *const hist_tr = split_data->hist_tr[in_idx];
     const unsigned int *const bins = split_data->bins[in_idx];
 
     /* Checks */
@@ -623,8 +623,8 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     }
 
     /* Pick longest side to divide in with a preference to z for floating point ties */
-    point_t tm;
-    point_t bm(bl);
+    point_t<> tm;
+    point_t<> bm(bl);
     float split_pnt;
     float dx = tr.x - bl.x;
     float dy = tr.y - bl.y;
@@ -650,8 +650,8 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
                 else
                 {
                     split_axis = axis_t::x_axis;
-                    bm         = point_t(split_pnt, bl.y, bl.z);
-                    tm         = point_t(split_pnt, tr.y, tr.z);
+                    bm         = point_t<>(split_pnt, bl.y, bl.z);
+                    tm         = point_t<>(split_pnt, tr.y, tr.z);
                     break;
                 }
             }
@@ -671,8 +671,8 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
                 else
                 {
                     split_axis = axis_t::z_axis;
-                    bm         = point_t(bl.x, bl.y, split_pnt);
-                    tm         = point_t(tr.x, tr.y, split_pnt);
+                    bm         = point_t<>(bl.x, bl.y, split_pnt);
+                    tm         = point_t<>(tr.x, tr.y, split_pnt);
                     break;
                 }
             }
@@ -695,8 +695,8 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
                 else
                 {
                     split_axis = axis_t::y_axis;
-                    bm         = point_t(bl.x, split_pnt, bl.z);
-                    tm         = point_t(tr.x, split_pnt, tr.z);
+                    bm         = point_t<>(bl.x, split_pnt, bl.z);
+                    tm         = point_t<>(tr.x, split_pnt, tr.z);
                     break;
                 }
             }
@@ -716,8 +716,8 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
                 else
                 {
                     split_axis = axis_t::z_axis;
-                    bm         = point_t(bl.x, bl.y, split_pnt);
-                    tm         = point_t(tr.x, tr.y, split_pnt);
+                    bm         = point_t<>(bl.x, bl.y, split_pnt);
+                    tm         = point_t<>(tr.x, tr.y, split_pnt);
                     break;
                 }
             }
@@ -725,7 +725,7 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     }
 
     /* Calculate which bins are are looking at */
-    const point_t code_pnt(bm + (_width * 0.09f) - _b);
+    const point_t<> code_pnt(bm + (_width * 0.09f) - _b);
     const int split_mc = morton_code(code_pnt.x, code_pnt.y, code_pnt.z, _width_inv, _width_inv, _width_inv);
     const int split_idx = (split_mc >> (level * 10)) & 0x3ff;
 
@@ -741,8 +741,8 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
     }
 
     /* Partition primitives */
-    point_t node_tm(node_tr);
-    point_t node_bm(node_bl);
+    point_t<> node_tm(node_tr);
+    point_t<> node_bm(node_bl);
     float max_left  = -MAX_DIST;
     float min_right =  MAX_DIST;
     switch (split_axis)
@@ -911,7 +911,7 @@ bool bih_builder::divide_bih_node_binned(block_splitting_data *const split_data,
 }
 
 /* Divide within a block, breadth first, with outside the block depth first */
-void bih_builder::divide_bih_block(point_t bl, point_t tr, const point_t &node_bl, const point_t &node_tr, const int block_idx, const int b, const int e, const int depth, const int node_idx)
+void bih_builder::divide_bih_block(point_t<> bl, point_t<> tr, const point_t<> &node_bl, const point_t<> &node_tr, const int block_idx, const int b, const int e, const int depth, const int node_idx)
 {
     block_splitting_data split_data;
     split_data.end[0]       = e;
@@ -987,10 +987,10 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
     const int e = split_data->end[in_idx];
     const int b = split_data->begin[in_idx];
     const int depth = split_data->depth[in_idx] + 1;
-    const point_t &tr = split_data->tr[in_idx];
-    const point_t &bl = split_data->bl[in_idx];
-    const point_t &node_tr = split_data->node_tr[in_idx];
-    const point_t &node_bl = split_data->node_bl[in_idx];
+    const point_t<> &tr = split_data->tr[in_idx];
+    const point_t<> &bl = split_data->bl[in_idx];
+    const point_t<> &node_tr = split_data->node_tr[in_idx];
+    const point_t<> &node_bl = split_data->node_bl[in_idx];
 
     /* Checks */
     assert(depth <= MAX_BIH_STACK_HEIGHT);
@@ -1005,8 +1005,8 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
     }
 
     /* Pick longest side to divide in */
-    point_t bm;
-    point_t tm;
+    point_t<> bm;
+    point_t<> tm;
     float split_pnt;
     axis_t split_axis   = axis_t::not_set;
     const float dx      = tr.x - bl.x;
@@ -1018,15 +1018,15 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
         {
             split_axis = axis_t::x_axis;
             split_pnt  = bl.x + (dx * 0.5f);
-            bm         = point_t(split_pnt, bl.y, bl.z);
-            tm         = point_t(split_pnt, tr.y, tr.z);
+            bm         = point_t<>(split_pnt, bl.y, bl.z);
+            tm         = point_t<>(split_pnt, tr.y, tr.z);
         }
         else
         {
             split_axis = axis_t::z_axis;
             split_pnt  = bl.z + (dz * 0.5f);
-            bm         = point_t(bl.x, bl.y, split_pnt);
-            tm         = point_t(tr.x, tr.y, split_pnt);
+            bm         = point_t<>(bl.x, bl.y, split_pnt);
+            tm         = point_t<>(tr.x, tr.y, split_pnt);
         }
     }
     else
@@ -1035,23 +1035,23 @@ void bih_builder::divide_bih_node(block_splitting_data *const split_data, const 
         {
             split_axis = axis_t::y_axis;
             split_pnt  = bl.y + (dy * 0.5f);
-            bm         = point_t(bl.x, split_pnt, bl.z);
-            tm         = point_t(tr.x, split_pnt, tr.z);
+            bm         = point_t<>(bl.x, split_pnt, bl.z);
+            tm         = point_t<>(tr.x, split_pnt, tr.z);
         }
         else
         {
             split_axis = axis_t::z_axis;
             split_pnt  = bl.z + (dz * 0.5f);
-            bm         = point_t(bl.x, bl.y, split_pnt);
-            tm         = point_t(tr.x, tr.y, split_pnt);
+            bm         = point_t<>(bl.x, bl.y, split_pnt);
+            tm         = point_t<>(tr.x, tr.y, split_pnt);
         }
     }
 
     /* Partition primitives */
     int left_size;
     int right_size;
-    point_t node_tm(node_tr);
-    point_t node_bm(node_bl);
+    point_t<> node_tm(node_tr);
+    point_t<> node_bm(node_bl);
     float max_left  = -MAX_DIST;
     float min_right =  MAX_DIST;
     int top         = e;

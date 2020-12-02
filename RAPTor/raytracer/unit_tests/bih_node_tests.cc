@@ -68,255 +68,255 @@ BOOST_AUTO_TEST_CASE( create_leaf_node_test )
 }
 
 /* Generic node */
-BOOST_AUTO_TEST_CASE( create_generic_node_test )
-{
-    uut.create_generic_node(4.2f, 7.3f);
+// BOOST_AUTO_TEST_CASE( create_generic_node_test )
+// {
+//     uut.create_generic_node(4.2f, 7.3f);
 
-    BOOST_CHECK(uut.get_left_split()    == 4.2f);
-    BOOST_CHECK(uut.get_right_split()   == 7.3f);
-}
+//     BOOST_CHECK(uut.get_left_split()    == 4.2f);
+//     BOOST_CHECK(uut.get_right_split()   == 7.3f);
+// }
 
-/* Nearest tests */
-BOOST_AUTO_TEST_CASE( ray_test_leaf_node_nearest )
-{
-    uut.create_leaf_node(2, 5);
+// /* Nearest tests */
+// BOOST_AUTO_TEST_CASE( ray_test_leaf_node_nearest )
+// {
+//     uut.create_leaf_node(2, 5);
 
-    /* A hit */
-    hit_description h0;
-    ray r0(point_t(0.0f, 0.5f, 0.25f), 1.0f);
-    BOOST_CHECK(uut.test_leaf_node_nearest(tris, &r0, &h0) == 4);
-    BOOST_CHECK_CLOSE(h0.d, 1.0f, result_tolerance);
+//     /* A hit */
+//     hit_description h0;
+//     ray r0(point_t(0.0f, 0.5f, 0.25f), 1.0f);
+//     BOOST_CHECK(uut.test_leaf_node_nearest(tris, &r0, &h0) == 4);
+//     BOOST_CHECK_CLOSE(h0.d, 1.0f, result_tolerance);
 
-    /* A miss */
-    hit_description h1;
-    ray r1(point_t(5.0f, 0.5f, 0.25f), 1.0f);
-    BOOST_CHECK(uut.test_leaf_node_nearest(tris, &r1, &h1) == -1);
-    BOOST_CHECK(h1.h == hit_t::miss);
-}
+//     /* A miss */
+//     hit_description h1;
+//     ray r1(point_t(5.0f, 0.5f, 0.25f), 1.0f);
+//     BOOST_CHECK(uut.test_leaf_node_nearest(tris, &r1, &h1) == -1);
+//     BOOST_CHECK(h1.h == hit_t::miss);
+// }
 
-BOOST_AUTO_TEST_CASE( packet_ray_test_leaf_node_nearest )
-{
-    uut.create_leaf_node(2, 5);
+// BOOST_AUTO_TEST_CASE( packet_ray_test_leaf_node_nearest )
+// {
+//     uut.create_leaf_node(2, 5);
 
-    /* Some hits and misses */
-    packet_hit_description h0;
-    vint_t i_o0(-1);
-    packet_ray r0(point_t(0.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f), vfp_t(0.0f, 0.0f, 0.0f, 1.0f));
-    uut.test_leaf_node_nearest(tris, &r0, &i_o0, &h0, 1);
-    BOOST_CHECK(i_o0[0] == 4);
-    BOOST_CHECK(i_o0[1] == 4);
-    BOOST_CHECK(i_o0[2] == 4);
-    BOOST_CHECK(i_o0[3] == -1);
-    BOOST_CHECK_CLOSE(h0.d[0], 1.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h0.d[1], 1.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h0.d[2], 1.0f, result_tolerance);
-}
+//     /* Some hits and misses */
+//     packet_hit_description h0;
+//     vint_t i_o0(-1);
+//     packet_ray r0(point_t(0.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f), vfp_t(0.0f, 0.0f, 0.0f, 1.0f));
+//     uut.test_leaf_node_nearest(tris, &r0, &i_o0, &h0, 1);
+//     BOOST_CHECK(i_o0[0] == 4);
+//     BOOST_CHECK(i_o0[1] == 4);
+//     BOOST_CHECK(i_o0[2] == 4);
+//     BOOST_CHECK(i_o0[3] == -1);
+//     BOOST_CHECK_CLOSE(h0.d[0], 1.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h0.d[1], 1.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h0.d[2], 1.0f, result_tolerance);
+// }
 
-BOOST_AUTO_TEST_CASE( frustrum_test_leaf_node_nearest )
-{
-    uut.create_leaf_node(2, 5);
+// BOOST_AUTO_TEST_CASE( frustrum_test_leaf_node_nearest )
+// {
+//     uut.create_leaf_node(2, 5);
 
-    /* Some hits and misses */
-    packet_hit_description h;
-    vint_t i_o(-1);
-    packet_ray r(point_t(0.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(0.0f, 0.0f, 0.05f, 1.0f));
+//     /* Some hits and misses */
+//     packet_hit_description h;
+//     vint_t i_o(-1);
+//     packet_ray r(point_t(0.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(0.0f, 0.0f, 0.05f, 1.0f));
 
-    /* Build the frustrum and adapt it to the leaf node */
-    /* Note - We have given some generous proportions to the leaf nodes */
-    frustrum f(&r, 1);
-    unsigned int packet_addr[1] = { 0 };
-    f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
+//     /* Build the frustrum and adapt it to the leaf node */
+//     /* Note - We have given some generous proportions to the leaf nodes */
+//     frustrum f(&r, 1);
+//     unsigned int packet_addr[1] = { 0 };
+//     f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
 
-    uut.test_leaf_node_nearest(tris, f, &r, &i_o, &h, packet_addr, 1);
-    BOOST_CHECK(i_o[0] == 4);
-    BOOST_CHECK(i_o[1] == 4);
-    BOOST_CHECK(i_o[2] == 4);
-    BOOST_CHECK(i_o[3] == -1);
-    BOOST_CHECK_CLOSE(h.d[0], 1.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h.d[1], 1.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h.d[2], 1.0f, result_tolerance);
-}
+//     uut.test_leaf_node_nearest(tris, f, &r, &i_o, &h, packet_addr, 1);
+//     BOOST_CHECK(i_o[0] == 4);
+//     BOOST_CHECK(i_o[1] == 4);
+//     BOOST_CHECK(i_o[2] == 4);
+//     BOOST_CHECK(i_o[3] == -1);
+//     BOOST_CHECK_CLOSE(h.d[0], 1.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h.d[1], 1.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h.d[2], 1.0f, result_tolerance);
+// }
 
-BOOST_AUTO_TEST_CASE( tris_culled_frustrum_test_leaf_node_nearest )
-{
-    uut.create_leaf_node(2, 5);
+// BOOST_AUTO_TEST_CASE( tris_culled_frustrum_test_leaf_node_nearest )
+// {
+//     uut.create_leaf_node(2, 5);
 
-    /* Some hits and misses */
-    packet_hit_description h;
-    vint_t i_o(-1);
-    packet_ray r(point_t(0.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(1.0f, 1.0f, 1.05f, 1.0f));
+//     /* Some hits and misses */
+//     packet_hit_description h;
+//     vint_t i_o(-1);
+//     packet_ray r(point_t(0.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(1.0f, 1.0f, 1.05f, 1.0f));
 
-    /* Build the frustrum and adapt it to the leaf node */
-    /* Note - We have given some generous proportions to the leaf nodes */
-    frustrum f(&r, 1);
-    unsigned int packet_addr[1] = { 0 };
-    f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
+//     /* Build the frustrum and adapt it to the leaf node */
+//     /* Note - We have given some generous proportions to the leaf nodes */
+//     frustrum f(&r, 1);
+//     unsigned int packet_addr[1] = { 0 };
+//     f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
 
-    uut.test_leaf_node_nearest(tris, f, &r, &i_o, &h, packet_addr, 1);
-    BOOST_CHECK(i_o[0] == -1);
-    BOOST_CHECK(i_o[1] == -1);
-    BOOST_CHECK(i_o[2] == -1);
-    BOOST_CHECK(i_o[3] == -1);
-}
+//     uut.test_leaf_node_nearest(tris, f, &r, &i_o, &h, packet_addr, 1);
+//     BOOST_CHECK(i_o[0] == -1);
+//     BOOST_CHECK(i_o[1] == -1);
+//     BOOST_CHECK(i_o[2] == -1);
+//     BOOST_CHECK(i_o[3] == -1);
+// }
 
-/* Nearer tests */
-BOOST_AUTO_TEST_CASE( ray_test_leaf_node_nearer )
-{
-    uut.create_leaf_node(0, 5);
+// /* Nearer tests */
+// BOOST_AUTO_TEST_CASE( ray_test_leaf_node_nearer )
+// {
+//     uut.create_leaf_node(0, 5);
 
-    /* Hit */
-    ray r(point_t(-1.0f, 0.5f, 0.25f), 1.0f);
-    BOOST_CHECK(uut.test_leaf_node_nearer(tris, &r, 5.0f));
-}
+//     /* Hit */
+//     ray r(point_t(-1.0f, 0.5f, 0.25f), 1.0f);
+//     BOOST_CHECK(uut.test_leaf_node_nearer(tris, &r, 5.0f));
+// }
 
-BOOST_AUTO_TEST_CASE( ray_hit_light_test_leaf_node_nearer )
-{
-    uut.create_leaf_node(0, 5);
+// BOOST_AUTO_TEST_CASE( ray_hit_light_test_leaf_node_nearer )
+// {
+//     uut.create_leaf_node(0, 5);
 
-    /* Only enough range to hit a light */
-    ray r(point_t(-1.0f, 0.5f, 0.25f), 1.0f);
-    BOOST_CHECK(!uut.test_leaf_node_nearer(tris, &r, 1.5f));
-}
+//     /* Only enough range to hit a light */
+//     ray r(point_t(-1.0f, 0.5f, 0.25f), 1.0f);
+//     BOOST_CHECK(!uut.test_leaf_node_nearer(tris, &r, 1.5f));
+// }
 
-BOOST_AUTO_TEST_CASE( ray_miss_test_leaf_node_nearer )
-{
-    uut.create_leaf_node(0, 5);
+// BOOST_AUTO_TEST_CASE( ray_miss_test_leaf_node_nearer )
+// {
+//     uut.create_leaf_node(0, 5);
 
-    /* Miss */
-    ray r(point_t(5.0f, 0.5f, 0.25f), 1.0f);
-    BOOST_CHECK(!uut.test_leaf_node_nearer(tris, &r, 5.0f));
-}
+//     /* Miss */
+//     ray r(point_t(5.0f, 0.5f, 0.25f), 1.0f);
+//     BOOST_CHECK(!uut.test_leaf_node_nearer(tris, &r, 5.0f));
+// }
 
-BOOST_AUTO_TEST_CASE( packet_ray_test_leaf_node_nearer )
-{
-    uut.create_leaf_node(0, 5);
+// BOOST_AUTO_TEST_CASE( packet_ray_test_leaf_node_nearer )
+// {
+//     uut.create_leaf_node(0, 5);
 
-    /* Some hits and misses */
-    vfp_t closer0(vfp_zero);
-    packet_hit_description h0;
-    packet_ray r0(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f), vfp_t(0.0f, 0.0f, 0.0f, 1.0f));
-    uut.test_leaf_node_nearer(tris, &r0, &closer0, vfp_t(5.0f), &h0);
-    BOOST_CHECK_CLOSE(h0.d[0], 2.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h0.d[1], 2.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h0.d[2], 2.0f, result_tolerance);
-    BOOST_CHECK(move_mask(closer0) == 0x7);
-}
+//     /* Some hits and misses */
+//     vfp_t closer0(vfp_zero);
+//     packet_hit_description h0;
+//     packet_ray r0(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f), vfp_t(0.0f, 0.0f, 0.0f, 1.0f));
+//     uut.test_leaf_node_nearer(tris, &r0, &closer0, vfp_t(5.0f), &h0);
+//     BOOST_CHECK_CLOSE(h0.d[0], 2.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h0.d[1], 2.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h0.d[2], 2.0f, result_tolerance);
+//     BOOST_CHECK(move_mask(closer0) == 0x7);
+// }
 
-BOOST_AUTO_TEST_CASE( packet_ray_hit_light_test_leaf_node_nearer )
-{
-    uut.create_leaf_node(0, 5);
+// BOOST_AUTO_TEST_CASE( packet_ray_hit_light_test_leaf_node_nearer )
+// {
+//     uut.create_leaf_node(0, 5);
 
-    /* Only enough range to hit a light */
-    vfp_t closer(vfp_zero);
-    packet_hit_description h;
-    packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f), vfp_t(0.0f, 0.0f, 0.0f, 1.0f));
-    uut.test_leaf_node_nearer(tris, &r, &closer, vfp_t(1.5f), &h);
-    BOOST_CHECK(move_mask(closer) == 0x0);
-}
+//     /* Only enough range to hit a light */
+//     vfp_t closer(vfp_zero);
+//     packet_hit_description h;
+//     packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f), vfp_t(0.0f, 0.0f, 0.0f, 1.0f));
+//     uut.test_leaf_node_nearer(tris, &r, &closer, vfp_t(1.5f), &h);
+//     BOOST_CHECK(move_mask(closer) == 0x0);
+// }
 
-BOOST_AUTO_TEST_CASE( packet_ray_all_hit_test_leaf_node_nearer )
-{
-    uut.create_leaf_node(0, 5);
+// BOOST_AUTO_TEST_CASE( packet_ray_all_hit_test_leaf_node_nearer )
+// {
+//     uut.create_leaf_node(0, 5);
     
-    /* All hit, early exit */
-    vfp_t closer(vfp_zero);
-    packet_hit_description h;
-    packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f), vfp_t(0.0f));
-    uut.test_leaf_node_nearer(tris, &r, &closer, vfp_t(5.0f), &h);
-    BOOST_CHECK_CLOSE(h.d[0], 3.0f, result_tolerance);  /* Distance is 3 so we didnt bother testing the closer triangle */
-    BOOST_CHECK_CLOSE(h.d[1], 3.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h.d[2], 3.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h.d[3], 3.0f, result_tolerance);
-    BOOST_CHECK(move_mask(closer) == 0xf);
-}
+//     /* All hit, early exit */
+//     vfp_t closer(vfp_zero);
+//     packet_hit_description h;
+//     packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f), vfp_t(0.0f));
+//     uut.test_leaf_node_nearer(tris, &r, &closer, vfp_t(5.0f), &h);
+//     BOOST_CHECK_CLOSE(h.d[0], 3.0f, result_tolerance);  /* Distance is 3 so we didnt bother testing the closer triangle */
+//     BOOST_CHECK_CLOSE(h.d[1], 3.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h.d[2], 3.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h.d[3], 3.0f, result_tolerance);
+//     BOOST_CHECK(move_mask(closer) == 0xf);
+// }
 
-BOOST_AUTO_TEST_CASE( frustrum_test_leaf_node_nearer )
-{
-    uut.create_leaf_node(0, 5);
+// BOOST_AUTO_TEST_CASE( frustrum_test_leaf_node_nearer )
+// {
+//     uut.create_leaf_node(0, 5);
 
-    /* Some hits and misses */
-    packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(0.0f, 0.0f, 0.05f, 1.0f));
+//     /* Some hits and misses */
+//     packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(0.0f, 0.0f, 0.05f, 1.0f));
 
-    /* Build the frustrum and adapt it to the leaf node */
-    /* Note - We have given some generous proportions to the leaf nodes */
-    frustrum f(&r, 1);
-    unsigned int packet_addr[1] = { 0 };
-    f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
+//     /* Build the frustrum and adapt it to the leaf node */
+//     /* Note - We have given some generous proportions to the leaf nodes */
+//     frustrum f(&r, 1);
+//     unsigned int packet_addr[1] = { 0 };
+//     f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
 
-    vfp_t t(5.0f, 2.5f, 2.5f, 5.0f);
-    vfp_t closer(vfp_zero);
-    packet_hit_description h;
-    uut.test_leaf_node_nearer(tris, f, &r, &closer, &t, &h, packet_addr, 1);
-    BOOST_CHECK_CLOSE(h.d[0], 2.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h.d[1], 2.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h.d[2], 2.0f, result_tolerance);
-    BOOST_CHECK(move_mask(closer) == 0x7);
-}
+//     vfp_t t(5.0f, 2.5f, 2.5f, 5.0f);
+//     vfp_t closer(vfp_zero);
+//     packet_hit_description h;
+//     uut.test_leaf_node_nearer(tris, f, &r, &closer, &t, &h, packet_addr, 1);
+//     BOOST_CHECK_CLOSE(h.d[0], 2.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h.d[1], 2.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h.d[2], 2.0f, result_tolerance);
+//     BOOST_CHECK(move_mask(closer) == 0x7);
+// }
 
-BOOST_AUTO_TEST_CASE( frustrum_hit_light_test_leaf_node_nearer )
-{
-    uut.create_leaf_node(0, 5);
+// BOOST_AUTO_TEST_CASE( frustrum_hit_light_test_leaf_node_nearer )
+// {
+//     uut.create_leaf_node(0, 5);
 
-    /* Some hits and misses */
-    packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(1.0f, 1.0f, 1.05f, 1.0f));
+//     /* Some hits and misses */
+//     packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(1.0f, 1.0f, 1.05f, 1.0f));
 
-    /* Build the frustrum and adapt it to the leaf node */
-    /* Note - We have given some generous proportions to the leaf nodes */
-    frustrum f(&r, 1);
-    unsigned int packet_addr[1] = { 0 };
-    f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
+//     /* Build the frustrum and adapt it to the leaf node */
+//     /* Note - We have given some generous proportions to the leaf nodes */
+//     frustrum f(&r, 1);
+//     unsigned int packet_addr[1] = { 0 };
+//     f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
 
-    vfp_t t(1.5f);
-    vfp_t closer(vfp_zero);
-    packet_hit_description h;
-    uut.test_leaf_node_nearer(tris, f, &r, &closer, &t, &h, packet_addr, 1);
-    BOOST_CHECK(move_mask(closer) == 0x0);
-}
+//     vfp_t t(1.5f);
+//     vfp_t closer(vfp_zero);
+//     packet_hit_description h;
+//     uut.test_leaf_node_nearer(tris, f, &r, &closer, &t, &h, packet_addr, 1);
+//     BOOST_CHECK(move_mask(closer) == 0x0);
+// }
 
-BOOST_AUTO_TEST_CASE( frustrum_all_hit_test_leaf_node_nearer )
-{
-    uut.create_leaf_node(0, 5);
+// BOOST_AUTO_TEST_CASE( frustrum_all_hit_test_leaf_node_nearer )
+// {
+//     uut.create_leaf_node(0, 5);
 
-    /* Some hits and misses */
-    packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(0.0f, 0.0f, 0.05f, 0.05f));
+//     /* Some hits and misses */
+//     packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(0.0f, 0.0f, 0.05f, 0.05f));
 
-    /* Build the frustrum and adapt it to the leaf node */
-    /* Note - We have given some generous proportions to the leaf nodes */
-    frustrum f(&r, 1);
-    unsigned int packet_addr[1] = { 0 };
-    f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
+//     /* Build the frustrum and adapt it to the leaf node */
+//     /* Note - We have given some generous proportions to the leaf nodes */
+//     frustrum f(&r, 1);
+//     unsigned int packet_addr[1] = { 0 };
+//     f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
 
-    vfp_t t(5.0f);
-    vfp_t closer(vfp_zero);
-    packet_hit_description h;
-    uut.test_leaf_node_nearer(tris, f, &r, &closer, &t, &h, packet_addr, 1);
-    BOOST_CHECK_CLOSE(h.d[0], 3.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h.d[1], 3.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h.d[2], 3.0f, result_tolerance);
-    BOOST_CHECK_CLOSE(h.d[3], 3.0f, result_tolerance);
-    BOOST_CHECK(move_mask(closer) == 0xf);
-}
+//     vfp_t t(5.0f);
+//     vfp_t closer(vfp_zero);
+//     packet_hit_description h;
+//     uut.test_leaf_node_nearer(tris, f, &r, &closer, &t, &h, packet_addr, 1);
+//     BOOST_CHECK_CLOSE(h.d[0], 3.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h.d[1], 3.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h.d[2], 3.0f, result_tolerance);
+//     BOOST_CHECK_CLOSE(h.d[3], 3.0f, result_tolerance);
+//     BOOST_CHECK(move_mask(closer) == 0xf);
+// }
 
-BOOST_AUTO_TEST_CASE( tris_culled_frustrum_test_leaf_node_nearer )
+// BOOST_AUTO_TEST_CASE( tris_culled_frustrum_test_leaf_node_nearer )
 
-{
-    uut.create_leaf_node(0, 5);
+// {
+//     uut.create_leaf_node(0, 5);
 
-    /* Some hits and misses */
-    packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(1.0f, 1.0f, 1.05f, 1.0f));
+//     /* Some hits and misses */
+//     packet_ray r(point_t(-1.0f, 0.5f, 0.25f), vfp_t(1.0f), vfp_t(0.0f, 0.05f, 0.05f, 0.0f), vfp_t(1.0f, 1.0f, 1.05f, 1.0f));
 
-    /* Build the frustrum and adapt it to the leaf node */
-    /* Note - We have given some generous proportions to the leaf nodes */
-    frustrum f(&r, 1);
-    unsigned int packet_addr[1] = { 0 };
-    f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
+//     /* Build the frustrum and adapt it to the leaf node */
+//     /* Note - We have given some generous proportions to the leaf nodes */
+//     frustrum f(&r, 1);
+//     unsigned int packet_addr[1] = { 0 };
+//     f.adapt_to_leaf(&r, point_t(5.0f, 5.0f, 5.0f), point_t(-5.0f, -5.0f, -5.0f), packet_addr, 1);
 
-    vfp_t t(5.0f);
-    vfp_t closer(vfp_zero);
-    packet_hit_description h;
-    uut.test_leaf_node_nearer(tris, f, &r, &closer, &t, &h, packet_addr, 1);
-    BOOST_CHECK(move_mask(closer) == 0x0);
-}
+//     vfp_t t(5.0f);
+//     vfp_t closer(vfp_zero);
+//     packet_hit_description h;
+//     uut.test_leaf_node_nearer(tris, f, &r, &closer, &t, &h, packet_addr, 1);
+//     BOOST_CHECK(move_mask(closer) == 0x0);
+// }
 
 BOOST_AUTO_TEST_SUITE_END()
 }; /* namespace test */

@@ -84,7 +84,7 @@ struct regression_fixture : private boost::noncopyable
     public :
         /* CTOR */
         regression_fixture(const std::string &test_name, const std::string &input_file, const model_format_t input_format, 
-            const point_t &cam_p = point_t(0.0f, 0.0f, -10.0f), const point_t &x_vec = point_t(1.0f, 0.0f, 0.0f), const point_t &y_vec = point_t(0.0f, 1.0f, 0.0f), const point_t &z_vec = point_t(0.0f, 0.0f, 1.0f),
+            const point_t<> &cam_p = point_t<>(0.0f, 0.0f, -10.0f), const point_t<> &x_vec = point_t<>(1.0f, 0.0f, 0.0f), const point_t<> &y_vec = point_t<>(0.0f, 1.0f, 0.0f), const point_t<> &z_vec = point_t<>(0.0f, 0.0f, 1.0f),
             const ext_colour_t &bg = ext_colour_t(0.0f, 0.0f, 0.0f),
             const float rx = 0.0f, const float ry = 0.0f, const float rz = 0.0f, 
             const unsigned int xr = 640, const unsigned int yr = 480, const unsigned int xa = 1, const unsigned int ya = 1, 
@@ -111,14 +111,14 @@ struct regression_fixture : private boost::noncopyable
                     cfg_parser(input_path.substr(0, path_end), input_stream, _lights, _everything, _materials, &_cam);
 
                     /* Camera is not set in the scene so do it here */
-                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, 0.0f, 0.0f);
                     break;
                 }
                 case model_format_t::mgf :
                     mgf_parser(input_path.c_str(), _lights, _everything, _materials);
                     
                     /* Camera is not set in the scene so do it here */
-                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya);
+                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya, 0.0f, 0.0f);
                     break;
 
                 case model_format_t::nff :
@@ -135,7 +135,7 @@ struct regression_fixture : private boost::noncopyable
                     lwo_parser(input_stream, path, _lights, _everything, _materials, &_cam);
 
                     /* Camera is not set in the scene so do it here */
-                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, 0.0f, 0.0f);
                     break;
                     
                 case model_format_t::obj :
@@ -146,7 +146,7 @@ struct regression_fixture : private boost::noncopyable
                     obj_parser(input_stream, path, _lights, _everything, _materials, &_cam);
                     
                     /* Camera is not set in the scene so do it here */
-                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, 0.0f, 0.0f);
                     break;
                     
                 case model_format_t::off :
@@ -155,7 +155,7 @@ struct regression_fixture : private boost::noncopyable
                     off_parser(input_stream, _lights, _everything, _materials, _cam);
                     
                     /* Camera is not set in the scene so do it here */
-                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, 0.0f, 0.0f);
                     break;
 
                 case model_format_t::ply :
@@ -164,7 +164,7 @@ struct regression_fixture : private boost::noncopyable
                     ply_parser(input_stream, _lights, _everything, _materials, &_cam);
                     
                     /* Camera is not set in the scene so do it here */
-                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, 0.0f, 0.0f);
                     break;
 
                 case model_format_t::vrml :
@@ -173,7 +173,7 @@ struct regression_fixture : private boost::noncopyable
                     vrml_parser(input_stream, _lights, _everything, _materials, _cam, view_point);
                     
                     /* Camera is not set in the scene so do it here */
-                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                    _cam = new camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, 0.0f, 0.0f);
                     break;
 
                 default :
@@ -196,24 +196,24 @@ struct regression_fixture : private boost::noncopyable
             scene_clean(&_materials, _cam);
         }
 
-        regression_fixture& add_light(const ext_colour_t &rgb, const point_t &c, const float d, const float r)
+        regression_fixture& add_light(const ext_colour_t &rgb, const point_t<> &c, const float d, const float r)
         {
             new_light(&_lights, rgb, c, d, r);
 
             return *this;
         }
 
-        regression_fixture& add_spotlight(const ext_colour_t &rgb, const point_t &c, const point_t &a, const float r, const float d, const float s_a, const float s_b)
+        regression_fixture& add_spotlight(const ext_colour_t &rgb, const point_t<> &c, const point_t<> &a, const float r, const float d, const float s_a, const float s_b)
         {
-            const point_t n(normalise(c - a));
+            const point_t<> n(normalise(c - a));
             new_light(&_lights, rgb, c, n, d, s_a, s_b, r);
 
             return *this;
         }
 
-        regression_fixture& add_directional_light(const ext_colour_t &rgb, const point_t &c, const point_t &a, const float d)
+        regression_fixture& add_directional_light(const ext_colour_t &rgb, const point_t<> &c, const point_t<> &a, const float d)
         {
-            const point_t n(normalise(c - a));
+            const point_t<> n(normalise(c - a));
             new_light(&_lights, rgb, n, d);
 
             return *this;

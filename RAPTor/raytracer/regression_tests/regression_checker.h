@@ -46,6 +46,7 @@ class regression_checker : private boost::noncopyable
             /* Write out actual picture */
             const std::string actual_file(test_data_location + _suite + "/" +  _test + "_" + ssd_name + "_act.png");
             c.write_png_file(actual_file);
+            assert(!"Written actual file");
 
             /* Get actual image */
             const unsigned int x_res = c.x_resolution();

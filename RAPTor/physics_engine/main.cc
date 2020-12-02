@@ -9,6 +9,7 @@
 /* Physics headers */
 #include "isosurface.h"
 #include "meta_ball.h"
+#include "particle.h"
 #include "physics_options.h"
 #include "physics_engine.h"
 #include "physics_object.h"
@@ -158,7 +159,7 @@ int main(int argc, char **argv)
     const unsigned ya = 1;                                                                          /* Y anti-aliasing factor   */
     const float screen_width    = 10.0f;                                                            /* Width of screen          */
     const float screen_height   = screen_width * (static_cast<float>(yr) / static_cast<float>(xr)); /* Height of screen         */
-    raptor_raytracer::camera cam(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya);
+    raptor_raytracer::camera cam(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya, 0.0f, 0.0f);
 
     raptor_raytracer::light_list lights;
     new_light(&lights, raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t(0.0f,  0.0f, 100.0f), 0.0f, 0.0f);

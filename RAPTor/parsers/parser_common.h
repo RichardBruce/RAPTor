@@ -3,7 +3,7 @@
 #include "common.h"
 
 
-namespace raptor_raytracer
+namespace raptor_parsers
 {
 /* Parsing functions */
 /* Byte to... conversion */
@@ -329,4 +329,4 @@ inline void find_next_line(const char **c)
     /* Move passed the new line */
     (*c)++;
 }
-}; /* namespace raptor_raytracer */
+} /* namespace raptor_parsers */

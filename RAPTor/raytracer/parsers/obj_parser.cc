@@ -75,12 +75,12 @@ bool is_triplet_delimiter(const char **c)
 }
 
 
-void parse_f_statement(light_list *l, primitive_store *e, std::vector<point_t> &vt, std::vector<point_t> &vn, std::vector<point_t> &v, material *const m, const char **c)
+void parse_f_statement(light_list *l, primitive_store *e, std::vector<point_t<>> &vt, std::vector<point_t<>> &vn, std::vector<point_t<>> &v, material *const m, const char **c)
 {
 //    BOOST_LOG_TRIVIAL(trace) << "face: " << (*c)[0];
-    static std::vector<point_t> face;
-    static std::vector<point_t> face_t;
-    static std::vector<point_t> face_n;
+    static std::vector<point_t<>> face;
+    static std::vector<point_t<>> face_t;
+    static std::vector<point_t<>> face_n;
 
     /* Parse all vextex data for the face */
     find_vertex(c);
@@ -149,9 +149,9 @@ void parse_f_statement(light_list *l, primitive_store *e, std::vector<point_t> &
     if (face.size() == 3)
     {
         /* Check the points show movement in atleast 2 axes  */
-        point_t a(face[0]);
-        point_t b(face[1]);
-        point_t c(face[2]);
+        point_t<> a(face[0]);
+        point_t<> b(face[1]);
+        point_t<> c(face[2]);
 
         if ((a != b) && (a != c) && (b != c))
         {
@@ -171,14 +171,14 @@ void parse_f_statement(light_list *l, primitive_store *e, std::vector<point_t> &
                     else
                     {
                         assert(face_t.size() == 3);
-                        point_t text[3] = { face_t[0], face_t[1], face_t[2] };
+                        point_t<> text[3] = { face_t[0], face_t[1], face_t[2] };
                         new_triangle(e, nullptr, m, face[0], face[1], face[2], false, nullptr, &text[0]);
                     }
                 }
                 else
                 {
                     assert(face_n.size() == 3);
-                    point_t normals[3] = { face_n[0], face_n[1], face_n[2] };
+                    point_t<> normals[3] = { face_n[0], face_n[1], face_n[2] };
                     if (face_t.empty())
                     {
                         new_triangle(e, nullptr, m, face[0], face[1], face[2], false, &normals[0]);
@@ -186,7 +186,7 @@ void parse_f_statement(light_list *l, primitive_store *e, std::vector<point_t> &
                     else
                     {
                         assert(face_t.size() == 3);
-                        point_t text[3] = { face_t[0], face_t[1], face_t[2] };
+                        point_t<> text[3] = { face_t[0], face_t[1], face_t[2] };
                         new_triangle(e, nullptr, m, face[0], face[1], face[2], false, &normals[0], &text[0]);
                     }
                 }
@@ -238,7 +238,7 @@ inline texture_mapper * load_image(std::map<std::string, map_info> *const cache,
     }
 
     const auto &info = cache_iter->second;
-    return new planar_mapper(info.img, point_t(0.0f), point_t(1.0f, 0.0f, 0.0f), point_t(0.0f), info.cpp, info.img_width, info.img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
+    return new planar_mapper(info.img, point_t<>(0.0f), point_t<>(1.0f, 0.0f, 0.0f), point_t<>(0.0f), info.cpp, info.img_width, info.img_height, texture_wrapping_mode_t::mirror, texture_wrapping_mode_t::mirror);
 }
 
 
@@ -714,9 +714,9 @@ void parse_usemtl_statement(std::map<std::string, material *> *const s, material
 }
 
 
-void parse_v_statement(std::vector<point_t> *const vs, const char **c)
+void parse_v_statement(std::vector<point_t<>> *const vs, const char **c)
 {
-    point_t v;
+    point_t<> v;
 
     v.x = raptor_parsers::get_next_float(c);
     v.y = raptor_parsers::get_next_float(c);
@@ -729,9 +729,9 @@ void parse_v_statement(std::vector<point_t> *const vs, const char **c)
 }
 
 
-void parse_vt_statement(std::vector<point_t> *const vs, const char **c)
+void parse_vt_statement(std::vector<point_t<>> *const vs, const char **c)
 {
-    point_t v;
+    point_t<> v;
 
     v.x = raptor_parsers::get_next_float(c);
     v.y = raptor_parsers::get_next_float(c);
@@ -743,9 +743,9 @@ void parse_vt_statement(std::vector<point_t> *const vs, const char **c)
 }
 
 
-void parse_vn_statement(std::vector<point_t> *const vs, const char **c)
+void parse_vn_statement(std::vector<point_t<>> *const vs, const char **c)
 {
-    point_t v;
+    point_t<> v;
 
     v.x = raptor_parsers::get_next_float(c);
     v.y = raptor_parsers::get_next_float(c);
@@ -780,9 +780,9 @@ void obj_parser(
     const char *at = &buffer[0];
     
     /* Vectors of vertice data */
-    std::vector<point_t>    vt;
-    std::vector<point_t>    vn;
-    std::vector<point_t>    v;
+    std::vector<point_t<>>    vt;
+    std::vector<point_t<>>    vn;
+    std::vector<point_t<>>    v;
     
     /* Map of shader names to shader */
     std::map<std::string, material *> shader_map;

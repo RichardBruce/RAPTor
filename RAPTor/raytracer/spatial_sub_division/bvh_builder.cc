@@ -30,8 +30,8 @@ int bvh_builder::build(primitive_store *const primitives, std::vector<bvh_node> 
     std::unique_ptr<int []> morton_codes(new int [_primitives->size()]);
 
     /* Cache primitive min and max */
-    _b = point_t(MAX_DIST, MAX_DIST, MAX_DIST);
-    _t = point_t(-MAX_DIST, -MAX_DIST, -MAX_DIST);
+    _b = point_t<>(MAX_DIST, MAX_DIST, MAX_DIST);
+    _t = point_t<>(-MAX_DIST, -MAX_DIST, -MAX_DIST);
     _bounds.reset(new bvh_bound_data [_primitives->size()]);
     for (int i = 0; i < _primitives->size(); ++i)
     {
@@ -42,9 +42,9 @@ int bvh_builder::build(primitive_store *const primitives, std::vector<bvh_node> 
     }
 
     /* Calculate Morton codes and build histograms */
-    const point_t scene_width(_t - _b);
-    const point_t width(scene_width * (1.00001f / 1024.0f));
-    const point_t width_inv(1.0f / width);
+    const point_t<> scene_width(_t - _b);
+    const point_t<> width(scene_width * (1.00001f / 1024.0f));
+    const point_t<> width_inv(1.0f / width);
     _max_leaf_sah = ((scene_width.x * scene_width.y) + (scene_width.x *  scene_width.z) + (scene_width.y * scene_width.z)) * static_cast<float>(_primitives->size()) * _max_leaf_sah_factor;
 
     unsigned int hist0[histogram_size * 3];
@@ -96,7 +96,7 @@ int bvh_builder::build(primitive_store *const primitives, std::vector<bvh_node> 
     for (int i = (static_cast<int>(_primitives->size()) & ~(SIMD_WIDTH - 1)); i < static_cast<int>(_primitives->size()); ++i)
     {
         /* Calculate morton code*/
-        const point_t t(((_bounds[i].high + _bounds[i].low) * 0.5f) - _b);
+        const point_t<> t(((_bounds[i].high + _bounds[i].low) * 0.5f) - _b);
         morton_codes[i] = morton_code(t.x, t.y, t.z, width_inv.x, width_inv.y, width_inv.z);
 
         /* Build histogram of morton codes */
@@ -192,19 +192,19 @@ float bvh_builder::cost_function(const bvh_node &l, const bvh_node &r) const
     return l.combined_surface_area(r);
 }
 
-float bvh_builder::cost_function(const point_t &low, const point_t &high, const float nodes, const int tri_idx) const
+float bvh_builder::cost_function(const point_t<> &low, const point_t<> &high, const float nodes, const int tri_idx) const
 {
     /* Size of combined node */
-    const point_t bl(min(low, _bounds[_primitives->indirection(tri_idx)].low));
-    const point_t tr(max(high, _bounds[_primitives->indirection(tri_idx)].high));
+    const point_t<> bl(min(low, _bounds[_primitives->indirection(tri_idx)].low));
+    const point_t<> tr(max(high, _bounds[_primitives->indirection(tri_idx)].high));
 
     /* Edges of new node */
-    const point_t dist(tr - bl);
+    const point_t<> dist(tr - bl);
 
     return ((dist.x * dist.y) + (dist.x * dist.z) + (dist.y * dist.z)) * nodes;
 }
 
-axis_t bvh_builder::divide_spatial_bounds(point_t *const bm, point_t *const tm, const point_t &bl, const point_t &tr, const axis_t axis) const
+axis_t bvh_builder::divide_spatial_bounds(point_t<> *const bm, point_t<> *const tm, const point_t<> &bl, const point_t<> &tr, const axis_t axis) const
 {
     switch (axis)
     {
@@ -247,8 +247,8 @@ int bvh_builder::build_leaf_node(int *const cost_b, int *const cost_e, const int
     {
         int node_end = i + 1;
         int layer_top = e;
-        point_t low(_bounds[_primitives->indirection(i)].low);
-        point_t high(_bounds[_primitives->indirection(i)].high);
+        point_t<> low(_bounds[_primitives->indirection(i)].low);
+        point_t<> high(_bounds[_primitives->indirection(i)].high);
         while (node_end < layer_top)
         {
             if (cost_function(low, high, node_end - i + 1, node_end) > _max_leaf_sah)
@@ -333,7 +333,7 @@ void bvh_builder::combine_nodes(int *const cost_b, int *const cost_e, const int 
         const int cost_end_idx  = cost_start_idx + ((cost_end_base * (cost_end_base + 1)) >> 1);
         float lowest_cost       = std::numeric_limits<float>::max();
         const long addr         = min_element(_cost_matrix.data(), &lowest_cost, cost_start_idx, cost_end_idx) - cost_start_idx;
-        const int addr_i        = (static_cast<int>(sqrt(1 + (8 * addr))) - 1) >> 1;
+        const int addr_i        = (static_cast<int>(std::sqrt(1 + (8 * addr))) - 1) >> 1;
         const int lowest_i_base = addr_i + 1;
         const int lowest_j_base = addr - ((addr_i * (addr_i + 1)) >> 1);
         const int lowest_i      = cost_begin + lowest_i_base;
@@ -404,7 +404,7 @@ void bvh_builder::combine_nodes(int *const cost_b, int *const cost_e, const int 
     *cost_b = cost_begin;
 }
 
-int bvh_builder::build_layer(int *const cost_b, int *const cost_e, const point_t &bl, const point_t &tr, const int b, const int e, axis_t axis)
+int bvh_builder::build_layer(int *const cost_b, int *const cost_e, const point_t<> &bl, const point_t<> &tr, const int b, const int e, axis_t axis)
 {
     assert(_depth < _max_down_phase_depth);
     ++_depth;
@@ -432,8 +432,8 @@ int bvh_builder::build_layer(int *const cost_b, int *const cost_e, const point_t
     assert((middle_idx == 0) || (_code_buffer[middle_idx - 1] <  morton_middle));
 
     /* Shrink node bounds */
-    point_t bm(bl);
-    point_t tm(tr);
+    point_t<> bm(bl);
+    point_t<> tm(tr);
     axis = divide_spatial_bounds(&bm, &tm, bl, tr, axis);
 
     /* If some primitives are in the left node then recurse left */
@@ -475,7 +475,7 @@ int bvh_builder::build_layer(int *const cost_b, int *const cost_e, const point_t
     return cost_start_idx;
 }
 
-int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, const point_t &bl, const point_t &tr, const int b, const int e, axis_t axis)
+int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, const point_t<> &bl, const point_t<> &tr, const int b, const int e, axis_t axis)
 {
     assert(_depth < _max_down_phase_depth);
     ++_depth;
@@ -599,8 +599,8 @@ int bvh_builder::build_layer_primitive(int *const cost_b, int *const cost_e, con
     }
 
     /* Shrink node bounds */
-    point_t bm(bl);
-    point_t tm(tr);
+    point_t<> bm(bl);
+    point_t<> tm(tr);
     axis = divide_spatial_bounds(&bm, &tm, bl, tr, axis);
 
     /* If some primitives are in the left node then recurse left */

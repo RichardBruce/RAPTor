@@ -24,7 +24,7 @@ extern "C"
 }
 
 /* Forward declarations */
-class point_t;
+template<class T> class point_t;
 
 namespace raptor_raytracer
 {
@@ -41,7 +41,7 @@ class texture_mapper
         virtual ~texture_mapper() {  };
 
         /* Texture mapping functions. Calls the derived class to sample the texture and the applies fall off */
-        float texture_map(const ray &r, ext_colour_t *const c, const point_t &n, const point_t &vt) const
+        float texture_map(const ray &r, ext_colour_t *const c, const point_t<> &n, const point_t<> &vt) const
         {
             /* Sample image */
             const float opac = sample_texture(r, c, n, vt);
@@ -61,7 +61,7 @@ class texture_mapper
             return opac;
         }
 
-        float texture_map_monochrome(const ray &r, point_t *const p, const point_t &n, const point_t &vt, const int x_off = 0, const int y_off = 0) const
+        float texture_map_monochrome(const ray &r, point_t<> *const p, const point_t<> &n, const point_t<> &vt, const int x_off = 0, const int y_off = 0) const
         {
             /* Sample image */
             const float opac = sample_texture_monochrome(r, p, n, vt, x_off, y_off);
@@ -99,8 +99,8 @@ class texture_mapper
     protected :
         /* Pure virtual texture mapping function. Takes the destination of the incident ray and normal of the hit surface.
            returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        virtual float sample_texture(const ray &r, ext_colour_t *const c, const point_t &n, const point_t &vt) const = 0;
-        virtual float sample_texture_monochrome(const ray &r, point_t *const p, const point_t &n, const point_t &vt, const int x_off = 0, const int y_off = 0) const = 0;
+        virtual float sample_texture(const ray &r, ext_colour_t *const c, const point_t<> &n, const point_t<> &vt) const = 0;
+        virtual float sample_texture_monochrome(const ray &r, point_t<> *const p, const point_t<> &n, const point_t<> &vt, const int x_off = 0, const int y_off = 0) const = 0;
 
     private :
         boost::scoped_ptr<const mapper_falloff> _falloff;
@@ -110,7 +110,7 @@ class texture_mapper
 class image_texture_mapper : public texture_mapper
 {
     public :
-        image_texture_mapper(const boost::shared_array<float> &img, const point_t &c, const point_t &s, const point_t &u, const point_t &v, const float u_ps, const float v_ps,
+        image_texture_mapper(const boost::shared_array<float> &img, const point_t<> &c, const point_t<> &s, const point_t<> &u, const point_t<> &v, const float u_ps, const float v_ps,
             const unsigned int w, const unsigned int h, const unsigned int cpp, const texture_wrapping_mode_t uw, const texture_wrapping_mode_t vw,
             const int u_off = 0, const int v_off = 0, const int u_max = -1, const int v_max = -1) : 
                 texture_mapper(), _img(img), _c(c), _s(s), _u(u), _v(v), _u_ps(std::fabs(dot_product(_s, _u)) * u_ps), _v_ps(std::fabs(dot_product(_s, _v)) * v_ps), _h(h), _w(w), _cpp(cpp), _u_max(u_max < 0 ? w : u_max), _v_max(v_max < 0 ? h : v_max),
@@ -123,11 +123,11 @@ class image_texture_mapper : public texture_mapper
 
     protected :
         /* Virtual function for different image mappers to generate co-ordinates in their own way */
-        virtual void texture_coordinates(float *const u_co, float *const v_co, const point_t &dst, const point_t &n) const = 0;
+        virtual void texture_coordinates(float *const u_co, float *const v_co, const point_t<> &dst, const point_t<> &n) const = 0;
 
         /* Texture mapping function. Takes the destination and direction 
            of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        float sample_texture(const ray &r, ext_colour_t *const c, const point_t &n, const point_t &vt) const override
+        float sample_texture(const ray &r, ext_colour_t *const c, const point_t<> &n, const point_t<> &vt) const override
         {
             /* Use the interpolated texture address */
             float u_co;
@@ -167,7 +167,7 @@ class image_texture_mapper : public texture_mapper
             return 1.0f;
         }
 
-        float sample_texture_monochrome(const ray &r, point_t *const p, const point_t &n, const point_t &vt, const int x_off, const int y_off) const override
+        float sample_texture_monochrome(const ray &r, point_t<> *const p, const point_t<> &n, const point_t<> &vt, const int x_off, const int y_off) const override
         {
             /* Use the interpolated texture address */
             float u_co;
@@ -195,13 +195,13 @@ class image_texture_mapper : public texture_mapper
             assert(_v_max == _h);
             if (!apply_wrapping_mode(&u0, static_cast<int>(_u_max), _uw))
             {
-                *p = point_t(0.0f, x_off, y_off);
+                *p = point_t<>(0.0f, x_off, y_off);
                 return 1.0;
             }
             
             if (!apply_wrapping_mode(&v0, static_cast<int>(_v_max), _vw))
             {
-                *p = point_t(0.0f, x_off, y_off);
+                *p = point_t<>(0.0f, x_off, y_off);
                 return 1.0f;
             }
 
@@ -225,10 +225,10 @@ class image_texture_mapper : public texture_mapper
         }
 
         boost::shared_array<float>      _img;   /* Image data                           */
-        const point_t                   _c;     /* Center of the texture                */
-        const point_t                   _s;     /* Size of the texture                  */
-        point_t                         _u;     /* U vector in the plane of the texture */
-        point_t                         _v;     /* V vector in the plane of the texture */
+        const point_t<>                   _c;     /* Center of the texture                */
+        const point_t<>                   _s;     /* Size of the texture                  */
+        point_t<>                         _u;     /* U vector in the plane of the texture */
+        point_t<>                         _v;     /* V vector in the plane of the texture */
         const float                     _u_ps;  /* The size of 1 pixl in u              */
         const float                     _v_ps;  /* The size of 1 pixl in v              */
         unsigned int                    _h;     /* Image height                         */
@@ -302,26 +302,26 @@ class procedural_texture_mapper : public texture_mapper
 
     protected :
         /* Virtual function for different procedural mappers to generate colours in their own way */
-        virtual float run_procedure(ext_colour_t *const c, const point_t &dst, const point_t &dir, const point_t &n) const = 0;
+        virtual float run_procedure(ext_colour_t *const c, const point_t<> &dst, const point_t<> &dir, const point_t<> &n) const = 0;
 
         /* Texture mapping function. Takes the destination and direction 
            of the incident ray and returns either a fp_t (alpha, kd, ks, t, r....), a colour (rgb) or both */
-        float sample_texture(const ray &r, ext_colour_t *const c, const point_t &n, const point_t &vt) const override
+        float sample_texture(const ray &r, ext_colour_t *const c, const point_t<> &n, const point_t<> &vt) const override
         {
             /* Run procedure */
             const float alpha = run_procedure(c, r.get_dst(), r.get_dir(), n);
             return alpha;
         }
 
-        float sample_texture_monochrome(const ray &r, point_t *const p, const point_t &n, const point_t &vt, const int x_off, const int y_off) const override
+        float sample_texture_monochrome(const ray &r, point_t<> *const p, const point_t<> &n, const point_t<> &vt, const int x_off, const int y_off) const override
         {
             /* Calculate offset distance */
             const float x_off_dist = x_off * _u_ps;
             const float y_off_dist = y_off * _v_ps;
 
-            const point_t u(n.y + n.z, 0.0f, n.x);
-            const point_t v(0.0f, -n.x - n.z, -n.y);
-            const point_t dst(r.get_dst() + (u * x_off_dist) + (v * y_off_dist));
+            const point_t<> u(n.y + n.z, 0.0f, n.x);
+            const point_t<> v(0.0f, -n.x - n.z, -n.y);
+            const point_t<> dst(r.get_dst() + (u * x_off_dist) + (v * y_off_dist));
 
             /* Run procedure */
             ext_colour_t c;
@@ -631,24 +631,24 @@ inline bool apply_wrapping_mode(int *const c, const int s, const texture_wrappin
 /* Takes the object normal, n, and texture heights, x_0, x_1, y_0 and y_1 and the distance between the texture heights */
 /* The texture heights are used to calculate the gradients of the texture in x and y and from that the normal of the texture */
 /* The texture normal is then rotated into the objects co-ordinates using the object normal */
-inline point_t bump_map(const point_t &n, const point_t &x_0, const point_t &x_1, const point_t &y_0, const point_t &y_1)
+inline point_t<> bump_map(const point_t<> &n, const point_t<> &x_0, const point_t<> &x_1, const point_t<> &y_0, const point_t<> &y_1)
 {
     /* Calculate texture normal */
-    const point_t x_d(normalise(x_1 - x_0));
-    const point_t y_d(normalise(y_1 - y_0));
-    const point_t text_n(cross_product(x_d, y_d));
+    const point_t<> x_d(normalise(x_1 - x_0));
+    const point_t<> y_d(normalise(y_1 - y_0));
+    const point_t<> text_n(cross_product(x_d, y_d));
 
     /* Work out rotation */
-    const point_t t(n.z, n.x, n.y);
-    const point_t b(cross_product(n, t));
+    const point_t<> t(n.z, n.x, n.y);
+    const point_t<> b(cross_product(n, t));
 
-    const point_t t_2(t - (n * dot_product(n, t)));
-    const point_t b_2(b - (n * dot_product(n, b)) - (t_2 * dot_product(t_2, b)));
+    const point_t<> t_2(t - (n * dot_product(n, t)));
+    const point_t<> b_2(b - (n * dot_product(n, b)) - (t_2 * dot_product(t_2, b)));
 
     /* Rotate texture normal into objects space */
     const float norm_x = (text_n.x * t_2.x) + (text_n.y * b_2.x) + (text_n.z * n.x);
     const float norm_y = (text_n.x * t_2.y) + (text_n.y * b_2.y) + (text_n.z * n.y);
     const float norm_z = (text_n.x * t_2.z) + (text_n.y * b_2.z) + (text_n.z * n.z);
-    return point_t(norm_x, norm_y, norm_z);
+    return point_t<>(norm_x, norm_y, norm_z);
 }
 }; /* namespace raptor_raytracer */

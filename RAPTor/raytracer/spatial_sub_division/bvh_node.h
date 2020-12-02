@@ -26,7 +26,7 @@ class bvh_node
         /* Allow (almost) default CTOR, DTOR, copy CTOR and assignment operator (for using in vector) */
         
         /* Tree construction */
-        void create_leaf_node(const point_t &high, const point_t &low, const int b, const int e)
+        void create_leaf_node(const point_t<> &high, const point_t<> &low, const int b, const int e)
         {
             _low    = low;
             _high   = high;
@@ -48,23 +48,23 @@ class bvh_node
         float combined_surface_area(const bvh_node &r) const
         {
             /* Size of combined node */
-            const point_t bl(min(_low, r._low));
-            const point_t tr(max(_high, r._high));
+            const point_t<> bl(min(_low, r._low));
+            const point_t<> tr(max(_high, r._high));
 
             /* Edges of new node */
-            const point_t dist(tr - bl);
+            const point_t<> dist(tr - bl);
 
             return (dist.x * dist.y) + (dist.x * dist.z) + (dist.y * dist.z);
         }
         
         /* Tree traversal */        
-        float intersection_distance(const ray &r, const point_t &i_rd) const
+        float intersection_distance(const ray &r, const point_t<> &i_rd) const
         {
             /* Calculate distances to high and low axis aligned planes */
-            point_t low_range(_low - r.get_ogn());
-            point_t high_range(_high - r.get_ogn());
-            point_t low_dist(low_range * i_rd);
-            point_t high_dist(high_range * i_rd);
+            point_t<> low_range(_low - r.get_ogn());
+            point_t<> high_range(_high - r.get_ogn());
+            point_t<> low_dist(low_range * i_rd);
+            point_t<> high_dist(high_range * i_rd);
 
             /* Make sure high is the highest */
             if (low_dist.x > high_dist.x)
@@ -132,8 +132,8 @@ class bvh_node
         }
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
-        const point_t& high_point() const { return _high;   }
-        const point_t& low_point()  const { return _low;    }
+        const point_t<>& high_point() const { return _high;   }
+        const point_t<>& low_point()  const { return _low;    }
         int left_index()            const { return _left;   }
         int right_index()           const { return _right;  }
         bool is_leaf()              const { return _leaf;   }
@@ -305,8 +305,8 @@ class bvh_node
             int     _e;     /* Index of last primitive              */
         };
 
-        point_t _low;       /* Position of the bottom left corner   */
-        point_t _high;      /* Position of the top right corner     */
-        bool    _leaf;      /* Weather this is a leaf node          */
+        point_t<>   _low;       /* Position of the bottom left corner   */
+        point_t<>   _high;      /* Position of the top right corner     */
+        bool        _leaf;      /* Weather this is a leaf node          */
 };
 }; /* namespace raptor_raytracer */

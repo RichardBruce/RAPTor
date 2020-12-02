@@ -327,14 +327,14 @@ class isosurface
         void to_triangles(raptor_raytracer::primitive_store *p);
 
     private :
-        point_t interpolate(const point_t &pa, const point_t &pb, const float va, const float vb) const
+        point_t<> interpolate(const point_t<> &pa, const point_t<> &pb, const float va, const float vb) const
         {
             return pa + ((pb - pa) * ((_threshold - va) / (vb - va)));
         }
 
-        int calculate_grid_value(const int *const grid_begin, const int *const grid_end, const point_t &pos, const int grid_value_offset, const int grid_value_mask);
-        point_t bisect(const int *const grid_begin, const int *const grid_end, const point_t &pa, const point_t &pb, const float va, const float vb) const;
-        point_t normal(const int *const grid_begin, const int *const grid_end, const point_t &pos) const;
+        int calculate_grid_value(const int *const grid_begin, const int *const grid_end, const point_t<> &pos, const int grid_value_offset, const int grid_value_mask);
+        point_t<> bisect(const int *const grid_begin, const int *const grid_end, const point_t<> &pa, const point_t<> &pb, const float va, const float vb) const;
+        point_t<> normal(const int *const grid_begin, const int *const grid_end, const point_t<> &pos) const;
 
         const std::vector<meta_ball> &      _meta_balls;
         raptor_raytracer::material *const   _mat;

@@ -36,8 +36,8 @@ void nff_parser(
     ext_colour_t bg;
 
     /* Vector for face to triangle conversion */
-    std::vector<point_t> points;
-    std::vector<point_t> normals;
+    std::vector<point_t<>> points;
+    std::vector<point_t<>> normals;
 
     /* Parse the file */
     while (at < &buffer[len - 1])
@@ -62,22 +62,22 @@ void nff_parser(
             x  = raptor_parsers::get_next_float(&at);
             y  = raptor_parsers::get_next_float(&at);
             z  = raptor_parsers::get_next_float(&at);
-            point_t from(x, y, z);
+            point_t<> from(x, y, z);
             
             /* Parse view direction */
             raptor_parsers::find_next_line(&at);
             x  = raptor_parsers::get_next_float(&at);
             y  = raptor_parsers::get_next_float(&at);
             z  = raptor_parsers::get_next_float(&at);
-            point_t to(x, y, z);
-            point_t at_vec = to - from;
+            point_t<> to(x, y, z);
+            point_t<> at_vec = to - from;
             
             /* Parse up direction */        
             raptor_parsers::find_next_line(&at);
             x  = raptor_parsers::get_next_float(&at);
             y  = raptor_parsers::get_next_float(&at);
             z  = raptor_parsers::get_next_float(&at);
-            point_t up_vec(x, y, z);
+            point_t<> up_vec(x, y, z);
             
             /* Parse angle of view */        
             raptor_parsers::find_next_line(&at);
@@ -99,7 +99,7 @@ void nff_parser(
             const float x_res  = raptor_parsers::get_next_float(&at);
             const float y_res  = raptor_parsers::get_next_float(&at);
 
-            point_t x_vec(1.0f, 0.0f, 0.0f);
+            point_t<> x_vec(1.0f, 0.0f, 0.0f);
             cross_product(up_vec, at_vec, &x_vec);
             cross_product(at_vec, x_vec, &up_vec);
             normalise(&x_vec);
@@ -129,7 +129,7 @@ void nff_parser(
             
             /* No fall off in intensity with distance is assumed */
             /* A radius of 0.1 is assumed */
-            new_light(&l, ext_colour_t(r, g, b), point_t(x, y, z), 0.0f, 0.1f);
+            new_light(&l, ext_colour_t(r, g, b), point_t<>(x, y, z), 0.0f, 0.1f);
         }
         /* Parse material properties */
         else if (((*at) == 'f') && ((*(at+1)) == ' '))

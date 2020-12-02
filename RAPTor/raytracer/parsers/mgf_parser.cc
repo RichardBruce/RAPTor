@@ -35,8 +35,8 @@ void appply_material()
 
 int mgf_face_handler(int ac, char **av)     /* face handling routine */
 {
-    std::vector<point_t>    points;
-    std::vector<point_t>    normals;
+    std::vector<point_t<>>  points;
+    std::vector<point_t<>>  normals;
     C_VERTEX                *vp;            /* vertex structure pointer */
     FVECT                   vert;           /* vertex point location */
     FVECT                   norm;           /* vertex normal */

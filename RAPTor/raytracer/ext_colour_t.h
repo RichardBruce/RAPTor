@@ -16,9 +16,6 @@ class ext_colour_t
         ext_colour_t(const float r, const float g, const float b) : r(r), g(g), b(b) { };
         ext_colour_t(const float r = 0.0f) : r(r), g(r), b(r) { };
 
-        inline const bool          operator==(const ext_colour_t &rhs)  const   { return ((this->r == rhs.r) && (this->g == rhs.g) && (this->b == rhs.b));  }
-        inline const bool          operator!=(const ext_colour_t &rhs)  const   { return ((this->r != rhs.r) || (this->g != rhs.g) || (this->b != rhs.b));  }
-
         inline const ext_colour_t& operator+=(const float rhs)                  { this->r += rhs;   this->g += rhs;   this->b += rhs;   return *this;       }
         inline const ext_colour_t& operator-=(const float rhs)                  { this->r -= rhs;   this->g -= rhs;   this->b -= rhs;   return *this;       }
         inline const ext_colour_t& operator*=(const float rhs)                  { this->r *= rhs;   this->g *= rhs;   this->b *= rhs;   return *this;       }
@@ -28,6 +25,21 @@ class ext_colour_t
         inline const ext_colour_t& operator-=(const ext_colour_t &rhs)          { this->r -= rhs.r; this->g -= rhs.g; this->b -= rhs.b; return *this;       }
         inline const ext_colour_t& operator*=(const ext_colour_t &rhs)          { this->r *= rhs.r; this->g *= rhs.g; this->b *= rhs.b; return *this;       }
         inline const ext_colour_t& operator/=(const ext_colour_t &rhs)          { this->r /= rhs.r; this->g /= rhs.g; this->b /= rhs.b; return *this;       }
+
+        /* Comparisons */
+        inline bool operator< (const ext_colour_t &rhs) const { return (this->r <  rhs.r) && (this->g <  rhs.g) && (this->b <  rhs.b);  }
+        inline bool operator<=(const ext_colour_t &rhs) const { return (this->r <= rhs.r) && (this->g <= rhs.g) && (this->b <= rhs.b);  }
+        inline bool operator> (const ext_colour_t &rhs) const { return (this->r >  rhs.r) && (this->g >  rhs.g) && (this->b >  rhs.b);  }
+        inline bool operator>=(const ext_colour_t &rhs) const { return (this->r >= rhs.r) && (this->g >= rhs.g) && (this->b >= rhs.b);  }
+        inline bool operator==(const ext_colour_t &rhs) const { return (this->r == rhs.r) && (this->g == rhs.g) && (this->b == rhs.b);  }
+        inline bool operator!=(const ext_colour_t &rhs) const { return (this->r != rhs.r) || (this->g != rhs.g) || (this->b != rhs.b);  }
+
+        inline bool operator< (const float rhs)         const { return (this->r <  rhs) && (this->g <  rhs) && (this->b <  rhs);        }
+        inline bool operator<=(const float rhs)         const { return (this->r <= rhs) && (this->g <= rhs) && (this->b <= rhs);        }
+        inline bool operator> (const float rhs)         const { return (this->r >  rhs) && (this->g >  rhs) && (this->b >  rhs);        }
+        inline bool operator>=(const float rhs)         const { return (this->r >= rhs) && (this->g >= rhs) && (this->b >= rhs);        }
+        inline bool operator==(const float rhs)         const { return (this->r == rhs) && (this->g == rhs) && (this->b == rhs);        }
+        inline bool operator!=(const float rhs)         const { return (this->r != rhs) || (this->g != rhs) || (this->b != rhs);        }
 
     private :
         friend class boost::serialization::access;
@@ -49,42 +61,42 @@ inline std::ostream& operator<<(std::ostream &os, const ext_colour_t &c)
 
 inline const ext_colour_t operator+(const ext_colour_t &lhs, const float rhs)
 {
-   return ext_colour_t(lhs.r + rhs, lhs.g + rhs, lhs.b + rhs);
+    return ext_colour_t(lhs.r + rhs, lhs.g + rhs, lhs.b + rhs);
 }
 
 inline const ext_colour_t operator-(const ext_colour_t &lhs, const float rhs)
 {
-   return ext_colour_t(lhs.r - rhs, lhs.g - rhs, lhs.b - rhs);
+    return ext_colour_t(lhs.r - rhs, lhs.g - rhs, lhs.b - rhs);
 }
 
 inline const ext_colour_t operator*(const ext_colour_t &lhs, const float rhs)
 {
-   return ext_colour_t(lhs.r * rhs, lhs.g * rhs, lhs.b * rhs);
+    return ext_colour_t(lhs.r * rhs, lhs.g * rhs, lhs.b * rhs);
 }
 
 inline const ext_colour_t operator/(const ext_colour_t &lhs, const float rhs)
 {
-   return ext_colour_t(lhs.r / rhs, lhs.g / rhs, lhs.b / rhs);
+    return ext_colour_t(lhs.r / rhs, lhs.g / rhs, lhs.b / rhs);
 }
 
 inline const ext_colour_t operator+(const ext_colour_t &lhs, const ext_colour_t &rhs)
 {
-   return ext_colour_t(lhs.r + rhs.r, lhs.g + rhs.g, lhs.b + rhs.b);
+    return ext_colour_t(lhs.r + rhs.r, lhs.g + rhs.g, lhs.b + rhs.b);
 }
 
 inline const ext_colour_t operator-(const ext_colour_t &lhs, const ext_colour_t &rhs)
 {
-   return ext_colour_t(lhs.r - rhs.r, lhs.g - rhs.g, lhs.b - rhs.b);
+    return ext_colour_t(lhs.r - rhs.r, lhs.g - rhs.g, lhs.b - rhs.b);
 }
 
 inline const ext_colour_t operator*(const ext_colour_t &lhs, const ext_colour_t &rhs)
 {
-   return ext_colour_t(lhs.r * rhs.r, lhs.g * rhs.g, lhs.b * rhs.b);
+    return ext_colour_t(lhs.r * rhs.r, lhs.g * rhs.g, lhs.b * rhs.b);
 }
 
 inline const ext_colour_t operator/(const ext_colour_t &lhs, const ext_colour_t &rhs)
 {
-   return ext_colour_t(lhs.r / rhs.r, lhs.g / rhs.g, lhs.b / rhs.b);
+    return ext_colour_t(lhs.r / rhs.r, lhs.g / rhs.g, lhs.b / rhs.b);
 }
 
 /*****************************************************
@@ -96,5 +108,10 @@ inline const ext_colour_t operator/(const ext_colour_t &lhs, const ext_colour_t 
 inline float magnitude(const ext_colour_t &a)
 {
     return sqrt((a.r * a.r) + (a.g * a.g) + (a.b * a.b));
+}
+
+inline ext_colour_t sqrt(const ext_colour_t &a)
+{
+    return ext_colour_t(std::sqrt(a.r), std::sqrt(a.g), std::sqrt(a.b));
 }
 }; /* namespace raptor_raytracer */

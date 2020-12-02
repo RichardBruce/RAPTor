@@ -42,16 +42,16 @@ class contact_graph_edge
         void calculate_span(const PO &a, const PO &b)
         {
             const auto &simplex_i = _info->get_simplex();
-            const point_t noc(_info->get_normal_of_collision());
+            const point_t<> noc(_info->get_normal_of_collision());
             for (int i = 0; i < simplex_i->contact_manifold_size(); ++i)
             {
                 /* Find relative velocity */
-                const point_t poc(simplex_i->contact_manifold_point(i));
-                const point_t va(a.get_velocity(poc));
-                const point_t vb(b.get_velocity(poc));
-                const point_t rel_vel(va - vb);
+                const point_t<> poc(simplex_i->contact_manifold_point(i));
+                const point_t<> va(a.get_velocity(poc));
+                const point_t<> vb(b.get_velocity(poc));
+                const point_t<> rel_vel(va - vb);
 
-                const point_t tan_vel(rel_vel - (noc * dot_product(noc, rel_vel)));
+                const point_t<> tan_vel(rel_vel - (noc * dot_product(noc, rel_vel)));
                 const float vel_tan_magn = dot_product(tan_vel, tan_vel);
                 if (vel_tan_magn > contact_graph_edge::TANJENT_MOVEMENT_EPSILON)
                 {
@@ -62,11 +62,11 @@ class contact_graph_edge
                 else
                 {
                     _dynamic = false;
-                    const point_t aa(a.get_acceleration(poc));
-                    const point_t ab(b.get_acceleration(poc));
-                    const point_t rel_acc(aa - ab);
+                    const point_t<> aa(a.get_acceleration(poc));
+                    const point_t<> ab(b.get_acceleration(poc));
+                    const point_t<> rel_acc(aa - ab);
 
-                    const point_t tan_acc(rel_acc - (noc * dot_product(noc, rel_acc)));
+                    const point_t<> tan_acc(rel_acc - (noc * dot_product(noc, rel_acc)));
                     const float acc_tan_magn = dot_product(tan_acc, tan_acc);
                     if (acc_tan_magn > contact_graph_edge::TANJENT_MOVEMENT_EPSILON)
                     {
@@ -77,7 +77,7 @@ class contact_graph_edge
                     else
                     {
                         BOOST_LOG_TRIVIAL(trace) << "No tanjent movement (acceleration magnitude: " << acc_tan_magn << ", velocity magnitude: " << vel_tan_magn << ") setting span 0";
-                        _span[i] = point_t(0.0, 0.0, 0.0);
+                        _span[i] = point_t<>(0.0, 0.0, 0.0);
                     }
                 }
             }
@@ -91,7 +91,7 @@ class contact_graph_edge
             _span[3] = -reverse._span[3];
         }
 
-        point_t span_vector(const int i, const int from) const
+        point_t<> span_vector(const int i, const int from) const
         {
             return (from != to()) ? -_span[i] : _span[i];
         }
@@ -103,7 +103,7 @@ class contact_graph_edge
 
     private :
         collision_info<S> *const    _info;
-        point_t                     _span[4];
+        point_t<>                   _span[4];
         const int                   _to;
         const int                   _edge;
         bool                        _dynamic;
@@ -189,11 +189,11 @@ class contact_graph : private boost::noncopyable
                         }
 
                         const auto& s = e.info()->get_simplex();
-                        const point_t noc(e.info()->get_normal_of_collision());
+                        const point_t<> noc(e.info()->get_normal_of_collision());
                         for (int pt = 0; pt < s->contact_manifold_size(); ++pt)
                         {
-                            const point_t poc(s->contact_manifold_point(pt));
-                            const point_t impulse(noc * resting_impulses[force_idx++]);
+                            const point_t<> poc(s->contact_manifold_point(pt));
+                            const point_t<> impulse(noc * resting_impulses[force_idx++]);
                             
                             BOOST_LOG_TRIVIAL(trace) << "Applying impluse: " << impulse << " to contact pair: " << from_idx << ", " << e.to() << " noc: " << noc;
                             v.first->apply_impulse( impulse, poc, false);
@@ -239,18 +239,18 @@ class contact_graph : private boost::noncopyable
 
                         PO *const b = _adj_map[e.to()].first;
                         const auto& s = e.info()->get_simplex();
-                        const point_t noc(e.info()->get_normal_of_collision());
+                        const point_t<> noc(e.info()->get_normal_of_collision());
                         for (int pt = 0; pt < s->contact_manifold_size(); ++pt)
                         {
-                            const point_t poc(s->contact_manifold_point(pt));
-                            const point_t noc_force(noc * resting_forces[force_idx++]);
+                            const point_t<> poc(s->contact_manifold_point(pt));
+                            const point_t<> noc_force(noc * resting_forces[force_idx++]);
                             
                             BOOST_LOG_TRIVIAL(trace) << "Applying reaction force: " << noc_force << " to poc: " << poc << " noc: " << noc;
                             v.first->apply_internal_force(poc - v.first->get_center_of_mass(), noc_force);
                             b->apply_internal_force(poc - b->get_center_of_mass(), -noc_force);
 
-                            const point_t span(e.span_vector(pt, e.to()));
-                            const point_t tan_force(span * resting_forces[fric_idx++]);
+                            const point_t<> span(e.span_vector(pt, e.to()));
+                            const point_t<> tan_force(span * resting_forces[fric_idx++]);
                             BOOST_LOG_TRIVIAL(trace) << "Applying friction force: " << tan_force << " to poc: " << poc << " span: " << span;
                             v.first->apply_internal_force(poc - v.first->get_center_of_mass(), tan_force);
                             b->apply_internal_force(poc - b->get_center_of_mass(), -tan_force);
@@ -396,27 +396,27 @@ class contact_graph : private boost::noncopyable
                     /* Foreach point on a contact manifold */
                     const PO *const b_i = _adj_map[e_i.to()].first;
                     const auto& simplex_i = e_i.info()->get_simplex();
-                    const point_t noc_i(e_i.info()->get_normal_of_collision());
+                    const point_t<> noc_i(e_i.info()->get_normal_of_collision());
                     for (int pt_i = 0; pt_i < simplex_i->contact_manifold_size(); ++pt_i)
                     {
                         /* For everything in contact with a_i find the effects on this contact */
                         const int row_idx = (e_i.edge_id() + pt_i) * matrix_width;
-                        const point_t noc_t(e_i.span_vector(pt_i, e_i.to()));
-                        const point_t poc_i(simplex_i->contact_manifold_point(pt_i));
+                        const point_t<> noc_t(e_i.span_vector(pt_i, e_i.to()));
+                        const point_t<> poc_i(simplex_i->contact_manifold_point(pt_i));
                         for (auto &e_j : _adj_map[from_idx].second)
                         {
                             const auto& simplex_j = e_j.info()->get_simplex();
-                            const point_t noc_j(e_j.info()->get_normal_of_collision());
+                            const point_t<> noc_j(e_j.info()->get_normal_of_collision());
                             for (int pt_j = 0; pt_j < simplex_j->contact_manifold_size(); ++pt_j)
                             {
                                 const int col_idx = (e_j.edge_id() + pt_j) * matrix_width;
-                                const point_t poc_j(simplex_j->contact_manifold_point(pt_j));
+                                const point_t<> poc_j(simplex_j->contact_manifold_point(pt_j));
                                 c[row_idx + e_j.edge_id() + pt_j] += acceleration_effect_on(*a_i, noc_i, noc_j, poc_i, poc_j);
 
                                 /* Add effects of friciton on the reaction force and friction forces on each other */
                                 if (ext)
                                 {
-                                    const point_t noc_f(e_j.span_vector(pt_j, e_j.to()));
+                                    const point_t<> noc_f(e_j.span_vector(pt_j, e_j.to()));
                                     const int sub_mtrix_idx = col_idx + e_i.edge_id() + pt_i;
                                     c[fric_reac_offset + sub_mtrix_idx] += acceleration_effect_on(*a_i, noc_i, noc_f, poc_i, poc_j);
                                     c[fric_fric_offset + sub_mtrix_idx] -= acceleration_effect_on(*a_i, noc_t, noc_f, poc_i, poc_j);
@@ -428,17 +428,17 @@ class contact_graph : private boost::noncopyable
                         for (auto &e_j : _adj_map[e_i.to()].second)
                         {
                             const auto& simplex_j = e_j.info()->get_simplex();
-                            const point_t noc_j(e_j.info()->get_normal_of_collision());
+                            const point_t<> noc_j(e_j.info()->get_normal_of_collision());
                             for (int pt_j = 0; pt_j < simplex_j->contact_manifold_size(); ++pt_j)
                             {
                                 const int col_idx = (e_j.edge_id() + pt_j) * matrix_width;
-                                const point_t poc_j(simplex_j->contact_manifold_point(pt_j));
+                                const point_t<> poc_j(simplex_j->contact_manifold_point(pt_j));
                                 c[row_idx + e_j.edge_id() + pt_j] -= acceleration_effect_on(*b_i, noc_i, noc_j, poc_i, poc_j);
 
                                 /* Add effects of friciton on the reaction force and friction forces on each other */
                                 if (ext)
                                 {
-                                    const point_t noc_f(e_j.span_vector(pt_j, -1));
+                                    const point_t<> noc_f(e_j.span_vector(pt_j, -1));
                                     const int sub_mtrix_idx = col_idx + e_i.edge_id() + pt_i;
                                     c[fric_reac_offset + sub_mtrix_idx] += acceleration_effect_on(*b_i, noc_i, noc_f, poc_i, poc_j);
                                     c[fric_fric_offset + sub_mtrix_idx] -= acceleration_effect_on(*b_i, noc_t, noc_f, poc_i, poc_j);
@@ -486,12 +486,12 @@ class contact_graph : private boost::noncopyable
             return *this;
         }
 
-        float acceleration_effect_on(const PO &po, const point_t &noc_i, const point_t &noc_j, const point_t &poc_i, const point_t &poc_j) const
+        float acceleration_effect_on(const PO &po, const point_t<> &noc_i, const point_t<> &noc_j, const point_t<> &poc_i, const point_t<> &poc_j) const
         {
             const float lin = dot_product(noc_i, noc_j) / po.get_mass();
 
-            const point_t ra_n_i(cross_product(poc_i - po.get_center_of_mass(), noc_i));
-            const point_t ra_n_j(cross_product(poc_j - po.get_center_of_mass(), noc_j));
+            const point_t<> ra_n_i(cross_product(poc_i - po.get_center_of_mass(), noc_i));
+            const point_t<> ra_n_j(cross_product(poc_j - po.get_center_of_mass(), noc_j));
             const float rot = dot_product(ra_n_i, ra_n_j / po.get_orientated_tensor());
             
             return (lin + rot);
@@ -515,16 +515,16 @@ class contact_graph : private boost::noncopyable
                     }
 
                     const PO *const b = _adj_map[e.to()].first;
-                    const point_t noc(e.info()->get_normal_of_collision());
+                    const point_t<> noc(e.info()->get_normal_of_collision());
 
                     /* Foreach contact point calculate the relative velocity */
                     const auto& s = e.info()->get_simplex();
                     for (int pt = 0; pt < s->contact_manifold_size(); ++pt)
                     {
-                        const point_t poc(s->contact_manifold_point(pt));
+                        const point_t<> poc(s->contact_manifold_point(pt));
 
-                        const point_t va(a->get_velocity(poc));
-                        const point_t vb(b->get_velocity(poc));
+                        const point_t<> va(a->get_velocity(poc));
+                        const point_t<> vb(b->get_velocity(poc));
                         v_vec[idx++] = dot_product(noc, va - vb) - RELATIVE_VELOCITY_EPSILON;
                     }
                 }
@@ -547,7 +547,7 @@ class contact_graph : private boost::noncopyable
             {
                 /* For each edge from that vertex */
                 const PO *const a = v.first;
-                const point_t at1(a->get_force() / a->get_mass());
+                const point_t<> at1(a->get_force() / a->get_mass());
                 for (auto &e : v.second)
                 {
                     /* Only consider the "forward" contacts */
@@ -557,31 +557,31 @@ class contact_graph : private boost::noncopyable
                     }
 
                     const PO *const b = _adj_map[e.to()].first;
-                    const point_t noc(e.info()->get_normal_of_collision());
+                    const point_t<> noc(e.info()->get_normal_of_collision());
 
                     /* Foreach contact point */
                     const auto& s = e.info()->get_simplex();
                     for (int pt = 0; pt < s->contact_manifold_size(); ++pt)
                     {
-                        const point_t poc(s->contact_manifold_point(pt));
+                        const point_t<> poc(s->contact_manifold_point(pt));
 
                         /* vg_a accelerations */
-                        const point_t ra(poc - a->get_center_of_mass());
-                        const point_t wa_x_ra(cross_product(a->get_angular_velocity(), ra));
+                        const point_t<> ra(poc - a->get_center_of_mass());
+                        const point_t<> wa_x_ra(cross_product(a->get_angular_velocity(), ra));
 
-                        const point_t at2(cross_product((a->get_torque() + cross_product(a->get_angular_momentum(), a->get_angular_velocity())) / a->get_orientated_tensor(), ra));
-                        const point_t at3(cross_product(a->get_angular_velocity(), wa_x_ra));
-                        const point_t at4(a->get_velocity() + wa_x_ra);
+                        const point_t<> at2(cross_product((a->get_torque() + cross_product(a->get_angular_momentum(), a->get_angular_velocity())) / a->get_orientated_tensor(), ra));
+                        const point_t<> at3(cross_product(a->get_angular_velocity(), wa_x_ra));
+                        const point_t<> at4(a->get_velocity() + wa_x_ra);
                         // BOOST_LOG_TRIVIAL(trace) << "a -> force: " << a->get_force() << ", torque: " << a->get_torque();
 
                         /* vg_b accelerations */
-                        const point_t rb(poc - b->get_center_of_mass());
-                        const point_t wb_x_rb(cross_product(b->get_angular_velocity(), rb));
+                        const point_t<> rb(poc - b->get_center_of_mass());
+                        const point_t<> wb_x_rb(cross_product(b->get_angular_velocity(), rb));
 
-                        const point_t bt1(b->get_force() / b->get_mass());
-                        const point_t bt2(cross_product((b->get_torque() + cross_product(b->get_angular_momentum(), b->get_angular_velocity())) / b->get_orientated_tensor(), rb));
-                        const point_t bt3(cross_product(b->get_angular_velocity(), wb_x_rb));
-                        const point_t bt4(b->get_velocity() + wb_x_rb);
+                        const point_t<> bt1(b->get_force() / b->get_mass());
+                        const point_t<> bt2(cross_product((b->get_torque() + cross_product(b->get_angular_momentum(), b->get_angular_velocity())) / b->get_orientated_tensor(), rb));
+                        const point_t<> bt3(cross_product(b->get_angular_velocity(), wb_x_rb));
+                        const point_t<> bt4(b->get_velocity() + wb_x_rb);
                         // BOOST_LOG_TRIVIAL(trace) << "b -> force: " << b->get_force() << ", torque: " << b->get_torque();
 
                         /* Derivative of contact normal */
@@ -589,7 +589,7 @@ class contact_graph : private boost::noncopyable
                         const auto to_info = find_edge(e.to(), from_idx);
                         assert(to_info != _adj_map[e.to()].second.end());
 
-                        const point_t dn_dt(e.info()->get_simplex()->rate_of_change_of_normal_of_impact(*(to_info->info()->get_simplex()), noc));
+                        const point_t<> dn_dt(e.info()->get_simplex()->rate_of_change_of_normal_of_impact(*(to_info->info()->get_simplex()), noc));
 
                         /* b entry */
                         // BOOST_LOG_TRIVIAL(trace) << "dn_dt: " << dn_dt;
@@ -597,17 +597,17 @@ class contact_graph : private boost::noncopyable
                         // BOOST_LOG_TRIVIAL(trace) << "closing acceleration: " << b_vec[accel_idx - 1] << ", poc: " << poc;
 
                         /* Tanjent force to stop the objects moving relative to eachother */
-                        const point_t span(e.span_vector(pt, e.to()));
+                        const point_t<> span(e.span_vector(pt, e.to()));
                         if (e.dynamic())
                         {
-                            const point_t va(a->get_velocity(poc));
-                            const point_t vb(b->get_velocity(poc));
+                            const point_t<> va(a->get_velocity(poc));
+                            const point_t<> vb(b->get_velocity(poc));
                             const float tan_speed = dot_product(span, vb - va);
                             b_vec[relvel_idx] = tan_speed / t_step;
                         }
 
-                        const point_t aa(a->get_acceleration(poc));
-                        const point_t ab(b->get_acceleration(poc));
+                        const point_t<> aa(a->get_acceleration(poc));
+                        const point_t<> ab(b->get_acceleration(poc));
                         b_vec[relvel_idx++] += dot_product(span, ab - aa);
                     }
                 }

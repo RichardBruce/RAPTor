@@ -8,7 +8,7 @@ namespace raptor_raytracer
   destination of the ray (query point) and returns the colour
   at the location and an alpha value
 ************************************************************/
-float perlin_noise_3d_mapper::run_procedure(ext_colour_t *const c, const point_t &dst, const point_t &dir, const point_t &n) const
+float perlin_noise_3d_mapper::run_procedure(ext_colour_t *const c, const point_t<> &dst, const point_t<> &dir, const point_t<> &n) const
 {
     const float x_co    = dst.x;
     const float y_co    = dst.y;

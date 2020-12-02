@@ -12,7 +12,7 @@ namespace raptor_raytracer
  The 3-D co-ordinate is calculated by substituting the 
  distance d into the equation of a line.
 **********************************************************/
-point_t ray::calculate_destination(const float d)
+point_t<> ray::calculate_destination(const float d)
 {
     this->dst = this->ogn + (this->dir * d);
     this->length = d;
@@ -27,11 +27,11 @@ point_t ray::calculate_destination(const float d)
  A general rotation algorithm is used. The cos_lut is used
  for the sin and cos function calls.
 **********************************************************/
-ray ray::rotate(const vector_t &r, const point_t &c, const float theta) const
+ray ray::rotate(const vector_t &r, const point_t<> &c, const float theta) const
 {
     /* Rotate the origin into the new coordinate system */
-    point_t p = this->ogn;
-    point_t q(0.0f, 0.0f, 0.0f);
+    point_t<> p = this->ogn;
+    point_t<> q(0.0f, 0.0f, 0.0f);
    
     float costheta = cos_lut.get_cos(theta);
     float sintheta = cos_lut.get_sin(theta);
@@ -54,7 +54,7 @@ ray ray::rotate(const vector_t &r, const point_t &c, const float theta) const
     
     
     /* Move the point up a unit distance */
-    point_t q2(0.0f, 0.0f, 0.0);
+    point_t<> q2(0.0f, 0.0f, 0.0);
     p += this->dir;
     
     /* Rotate about r */
@@ -91,7 +91,7 @@ ray ray::rotate(const vector_t &r, const point_t &c, const float theta) const
 float ray::find_rays(ray rays[], const light &l, const hit_t h) const
 {
     /* Adjust the start point of the shadow ray a small distance a long the surface normal */
-    const point_t start(offset_start_point(1));
+    const point_t<> start(offset_start_point(1));
 #ifdef SOFT_SHADOW
     int nr_rays = std::max((static_cast<int>(SOFT_SHADOW / this->componant)), 1);
 #else
@@ -115,7 +115,7 @@ float ray::find_rays(ray rays[], const light &l, const hit_t h) const
  reflection co-efficient dr is greater than 0. dr gives the 
  spread of the rays.
 **********************************************************/
-float ray::reflect(ray rays[], const point_t &n, const float r, const float dr) const
+float ray::reflect(ray rays[], const point_t<> &n, const float r, const float dr) const
 {
     /* Check the ray will be strong enough to continue */
     
@@ -129,10 +129,10 @@ float ray::reflect(ray rays[], const point_t &n, const float r, const float dr) 
     
     /* Cos(angle between normal and the ray) */
     float   ray_dot_normal  = 2.0f * dot_product(this->dir, n);
-    point_t ref             = this->dir - n * ray_dot_normal;
+    point_t<> ref             = this->dir - n * ray_dot_normal;
 
     /* Move a little way along the ray */
-    point_t start_point = offset_start_point(1);
+    point_t<> start_point = offset_start_point(1);
 
 #ifdef DIFFUSE_REFLECTIONS
     /* Check to see if the object has a diffuse reflection */
@@ -146,10 +146,10 @@ float ray::reflect(ray rays[], const point_t &n, const float r, const float dr) 
     int new_comp = this->componant << 2;
 
     /* Orthogonal vector to the reflection */    
-    point_t perpen(perpendicular(ref));
+    point_t<> perpen(perpendicular(ref));
     
     /* Orthogonal vector to the above and the reflection */
-    point_t cross;
+    point_t<> cross;
     cross_product(ref, perpen, &cross);
     
     /* Number of rays to create */
@@ -163,11 +163,11 @@ float ray::reflect(ray rays[], const point_t &n, const float r, const float dr) 
         float y_off = r_off * cos_lut.get_sin(a_off);
 
         /* Scale perpendicular vectors */
-        point_t perpen_scaled = perpen * x_off;
-        point_t cross_scaled  = cross  * y_off;
+        point_t<> perpen_scaled = perpen * x_off;
+        point_t<> cross_scaled  = cross  * y_off;
 
         /* Offset direction */
-        point_t diff = ref + perpen_scaled + cross_scaled;
+        point_t<> diff = ref + perpen_scaled + cross_scaled;
         
         /* Create a new ray */
         rays[i].set_up(start_point, diff.x, diff.y, diff.z, refl_power, new_comp);
@@ -195,7 +195,7 @@ float ray::reflect(ray rays[], const point_t &n, const float r, const float dr) 
  diffuse refraction co-efficient dr is greater than 0. dr 
  gives the spread of the rays.
 **********************************************************/
-float ray::refract(ray rays[], const point_t &n, const float t, float ri, const hit_t h, const float dr) const 
+float ray::refract(ray rays[], const point_t<> &n, const float t, float ri, const hit_t h, const float dr) const 
 {
     /* Check the ray will be strong enough to continue */
     const float refr_power = this->magn * t;
@@ -228,10 +228,10 @@ float ray::refract(ray rays[], const point_t &n, const float t, float ri, const 
 
     /* Convert back to gradients */
 	float offset = (ri * ray_dot_normal - std::sqrt(cosT2));
-    point_t ref = (ri * this->dir) + offset * n;
+    point_t<> ref = (ri * this->dir) + offset * n;
 
     /* Move a little way along the ray */
-    point_t start_point = offset_start_point(-1);
+    point_t<> start_point = offset_start_point(-1);
 
 #ifdef DIFFUSE_REFLECTIONS
     /* Check to see if the object has a diffuse refraction */
@@ -245,10 +245,10 @@ float ray::refract(ray rays[], const point_t &n, const float t, float ri, const 
     int new_comp = this->componant << 2;
 
     /* Orthogonal vector to the refraction */    
-    point_t perpen = perpendicular(ref);
+    point_t<> perpen = perpendicular(ref);
     
     /* Orthogonal vector to the above and the refraction */
-    point_t cross;
+    point_t<> cross;
     cross_product(ref, perpen, &cross);
 
     /* Create a number of rays with a little bit of noise added to their direction */
@@ -262,11 +262,11 @@ float ray::refract(ray rays[], const point_t &n, const float t, float ri, const 
         float y_off = r_off * cos_lut.get_sin(a_off);
 
         /* Scale perpendicular vectors */
-        point_t perpen_scaled = perpen * x_off;
-        point_t cross_scaled  = cross  * y_off;
+        point_t<> perpen_scaled = perpen * x_off;
+        point_t<> cross_scaled  = cross  * y_off;
 
         /* Offset direction */
-        point_t diff = ref + perpen_scaled + cross_scaled;
+        point_t<> diff = ref + perpen_scaled + cross_scaled;
         
         /* Create a new ray */
         rays[i].set_up(start_point, diff.x, diff.y, diff.z, refr_power, new_comp);
@@ -319,7 +319,7 @@ float ray::refract(ray rays[], const point_t &n, const float t, float ri, const 
 //    float z_ref  = (ri * this->z_grad) + offset * n->get_z_grad();
 //
 //    /* Move a little way along the ray */
-//    point_t start_point(this->dst);
+//    point_t<> start_point(this->dst);
 //    start_point.x += 10.0f * this->x_grad * EPSILON;
 //    start_point.y += 10.0f * this->y_grad * EPSILON;
 //    start_point.z += 10.0f * this->z_grad * EPSILON;

@@ -64,7 +64,7 @@ struct regression_fixture : private boost::noncopyable
         }
 
         /* Add objects for testing */
-        physics_object* make_plane(raptor_raytracer::material *m, const point_t &bl, const point_t &br, const point_t &tl, const point_t &tr, const point_t &com, const float density)
+        physics_object* make_plane(raptor_raytracer::material *m, const point_t<> &bl, const point_t<> &br, const point_t<> &tl, const point_t<> &tr, const point_t<> &com, const float density)
         {
             /* Check there is space */
             assert(_objects_idx < max_test_objects);
@@ -76,17 +76,17 @@ struct regression_fixture : private boost::noncopyable
 
 
         /* Routine to make cubes out of triangles */
-        physics_object* make_cube(raptor_raytracer::material *m, const point_t &bl, const point_t &tr, const point_t &com, const float density, const int t = 0)
+        physics_object* make_cube(raptor_raytracer::material *m, const point_t<> &bl, const point_t<> &tr, const point_t<> &com, const float density, const int t = 0)
         {
-            return make_cube(m, bl, tr, com, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), density, t);
+            return make_cube(m, bl, tr, com, point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f), density, t);
         }
 
-        physics_object* make_cube(raptor_raytracer::material *m, const point_t &bl, const point_t &tr, const point_t &com, const point_t &v, const point_t &w, const float density, const int t = 0)
+        physics_object* make_cube(raptor_raytracer::material *m, const point_t<> &bl, const point_t<> &tr, const point_t<> &com, const point_t<> &v, const point_t<> &w, const float density, const int t = 0)
         {
             return make_cube(m, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), bl, tr, com, v, w, density, t);
         }
 
-        physics_object* make_cube(raptor_raytracer::material *m, const quaternion_t &o, const point_t &bl, const point_t &tr, const point_t &com, const point_t &v, const point_t &w, const float density, const int t = 0)
+        physics_object* make_cube(raptor_raytracer::material *m, const quaternion_t &o, const point_t<> &bl, const point_t<> &tr, const point_t<> &com, const point_t<> &v, const point_t<> &w, const float density, const int t = 0)
         {
             /* Check there is space */
             assert(_objects_idx < max_test_objects);

@@ -24,10 +24,10 @@ class mock_physics_object
     public :
         typedef mock_physics_object inner_vg;
 
-        mock_physics_object(inertia_tensor *const i, const point_t &v = point_t(0.0f, 0.0f, 0.0f), const point_t &w = point_t(0.0f, 0.0f, 0.0f), const unsigned int t = 0) :
-            _i(i), _v(v), _w(w), _f(point_t(0.0f, 0.0f, 0.0f)), _tor(point_t(0.0f, 0.0f, 0.0f)), _type(t) {  };
+        mock_physics_object(inertia_tensor *const i, const point_t<> &v = point_t<>(0.0f, 0.0f, 0.0f), const point_t<> &w = point_t<>(0.0f, 0.0f, 0.0f), const unsigned int t = 0) :
+            _i(i), _v(v), _w(w), _f(point_t<>(0.0f, 0.0f, 0.0f)), _tor(point_t<>(0.0f, 0.0f, 0.0f)), _type(t) {  };
 
-        mock_physics_object(inertia_tensor *const i, const unsigned int t) : mock_physics_object(i, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), t) {  };
+        mock_physics_object(inertia_tensor *const i, const unsigned int t) : mock_physics_object(i, point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f), t) {  };
 
 
         ~mock_physics_object()
@@ -36,31 +36,31 @@ class mock_physics_object
         }
 
         /* Setters */
-        mock_physics_object& set_force(const point_t &f)
+        mock_physics_object& set_force(const point_t<> &f)
         {
             _f = f;
             return *this;
         }
 
-        mock_physics_object& set_torque(const point_t &tor)
+        mock_physics_object& set_torque(const point_t<> &tor)
         {
             _tor = tor;
             return *this;
         }
 
-        mock_physics_object& set_velocity(const point_t &v)
+        mock_physics_object& set_velocity(const point_t<> &v)
         {
             _v = v;
             return *this;
         }
 
-        mock_physics_object& set_angular_velocity(const point_t &w)
+        mock_physics_object& set_angular_velocity(const point_t<> &w)
         {
             _w = w;
             return *this;
         }
 
-        mock_physics_object& apply_force(const point_t &at, const point_t &f, const float t)
+        mock_physics_object& apply_force(const point_t<> &at, const point_t<> &f, const float t)
         {
             /* No point pushing an infinite mass object */
             if (get_mass() == std::numeric_limits<float>::infinity())
@@ -72,14 +72,14 @@ class mock_physics_object
             _f += f;
 
             /* Add to the torque */
-            point_t tor;
+            point_t<> tor;
             cross_product(at, f, &tor);
             _tor += tor;
 
             return *this;
         }
 
-        mock_physics_object& apply_internal_force(const point_t &at, const point_t &f)
+        mock_physics_object& apply_internal_force(const point_t<> &at, const point_t<> &f)
         {
             if (get_mass() != std::numeric_limits<float>::infinity())
             {
@@ -90,9 +90,9 @@ class mock_physics_object
             return *this;
         }
 
-        mock_physics_object& apply_impulse(const point_t &impulse, const point_t &poc, const bool)
+        mock_physics_object& apply_impulse(const point_t<> &impulse, const point_t<> &poc, const bool)
         {
-            const point_t l(cross_product(poc - get_center_of_mass(), impulse));
+            const point_t<> l(cross_product(poc - get_center_of_mass(), impulse));
 
             _v += (impulse / _i->mass());
             _w += (l / get_orientated_tensor());
@@ -102,36 +102,36 @@ class mock_physics_object
 
         /* Getters */
         mock_physics_object *   get_vertex_group()                    { return this;                    }
-        point_t                 get_force()                     const { return _f;                      }
-        point_t                 get_torque()                    const { return _tor;                    }
-        point_t                 get_velocity()                  const { return _v;                      }
-        point_t                 get_angular_velocity()          const { return _w;                      }
-        point_t                 get_center_of_mass()            const { return _i->center_of_mass();    }
+        point_t<>               get_force()                     const { return _f;                      }
+        point_t<>               get_torque()                    const { return _tor;                    }
+        point_t<>               get_velocity()                  const { return _v;                      }
+        point_t<>               get_angular_velocity()          const { return _w;                      }
+        point_t<>               get_center_of_mass()            const { return _i->center_of_mass();    }
         inertia_tensor&         get_inertia_tenor()             const { return *_i;                     }
         float                   get_mass()                      const { return _i->mass();              }
         unsigned int            get_physical_type()             const { return _type;                   }
 
-        point_t get_velocity(const point_t &p) const
+        point_t<> get_velocity(const point_t<> &p) const
         {
             return _v + cross_product(_w, p - _i->center_of_mass());
         }
 
-        point_t get_momentum() const
+        point_t<> get_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
             return (_i->mass() == std::numeric_limits<float>::infinity()) ? 0.0f : ( _i->mass() * _v);
         }
 
-        point_t get_angular_momentum() const
+        point_t<> get_angular_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
-            return (_i->mass() == std::numeric_limits<float>::infinity()) ? point_t(0.0f, 0.0f, 0.0f) : (get_orientated_tensor() * _w);
+            return (_i->mass() == std::numeric_limits<float>::infinity()) ? point_t<>(0.0f, 0.0f, 0.0f) : (get_orientated_tensor() * _w);
         }
 
-        point_t get_acceleration(const point_t &poc) const
+        point_t<> get_acceleration(const point_t<> &poc) const
         {
-            const point_t lin(_f / _i->mass());
-            const point_t rot(cross_product(_tor / get_orientated_tensor(), poc - _i->center_of_mass()));
+            const point_t<> lin(_f / _i->mass());
+            const point_t<> rot(cross_product(_tor / get_orientated_tensor(), poc - _i->center_of_mass()));
             return lin + rot;
         }
 
@@ -146,7 +146,7 @@ class mock_physics_object
         }
         
         /* Setters */
-        mock_physics_object& apply_impulse(const point_t &n, const point_t &angular_weight, const float impulse, const bool ob = true)
+        mock_physics_object& apply_impulse(const point_t<> &n, const point_t<> &angular_weight, const float impulse, const bool ob = true)
         {
             _v += (n * (impulse / _i->mass()));
             _w += (angular_weight * impulse);
@@ -159,16 +159,16 @@ class mock_physics_object
         }
 
         /* Result getters */
-        point_t get_collision_normal()
+        point_t<> get_collision_normal()
         {
-            const point_t tmp = _n.front();
+            const point_t<> tmp = _n.front();
             _n.pop_front();
             return tmp;
         }
 
-        point_t get_angular_weight()
+        point_t<> get_angular_weight()
         {
-            const point_t tmp = _angular_weight.front();
+            const point_t<> tmp = _angular_weight.front();
             _angular_weight.pop_front();
             return tmp;
         }
@@ -185,28 +185,28 @@ class mock_physics_object
 
     private :
         inertia_tensor *const   _i;
-        std::deque<point_t>     _n;
-        std::deque<point_t>     _angular_weight;
+        std::deque<point_t<>>   _n;
+        std::deque<point_t<>>   _angular_weight;
         std::deque<float>       _impulse;
-        point_t                 _v;
-        point_t                 _w;
-        point_t                 _f;
-        point_t                 _tor;
+        point_t<>               _v;
+        point_t<>               _w;
+        point_t<>               _f;
+        point_t<>               _tor;
         unsigned int            _type;
 };
 
 /* Build a physics object that is just functional enough to build a simplex with */
-inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t> *const verts)
+inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t<>> *const verts)
 {
-    return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, std::vector<polygon>(), nullptr), point_t(0.0, 0.0, 0.0), 0.0);
+    return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, std::vector<polygon>(), nullptr), point_t<>(0.0, 0.0, 0.0), 0.0);
 }
 
-inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t> *const verts, const quaternion_t &o, const point_t &t)
+inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t<>> *const verts, const quaternion_t &o, const point_t<> &t)
 {
     return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, std::vector<polygon>(), nullptr), o, t, 0.0);
 }
 
-inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t> *const verts, const std::vector<int> &polys, const quaternion_t &o, const point_t &t)
+inline raptor_physics::physics_object* physics_object_for_simplex_testing(const std::vector<point_t<>> *const verts, const std::vector<int> &polys, const quaternion_t &o, const point_t<> &t)
 {
     return new raptor_physics::physics_object(new raptor_physics::vertex_group(verts, { polygon(verts, polys) }, nullptr), o, t, 0.0);
 }

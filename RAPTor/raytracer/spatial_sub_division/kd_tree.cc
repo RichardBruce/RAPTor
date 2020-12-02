@@ -301,8 +301,8 @@ inline bool kd_tree::find_leaf_node(const frustrum &r, kdt_stack_element *const 
 {
     kdt_stack_element *exit_point = *out;
     const kdt_node *current_node = entry_point->n;
-    point_t u   = entry_point->u;
-    point_t l   = entry_point->l;
+    point_t<> u = entry_point->u;
+    point_t<> l = entry_point->l;
     float t_max = entry_point->t_max;
     float t_min = entry_point->t_min;
     
@@ -363,7 +363,7 @@ inline bool kd_tree::find_leaf_node(const frustrum &r, kdt_stack_element *const 
                     exit_point->n       = furthest;
                     exit_point->t_min   = std::max(min_dist, t_min);
                     exit_point->t_max   = t_max;
-                    exit_point->l       = point_t(split_pos, l.y, l.z);
+                    exit_point->l       = point_t<>(split_pos, l.y, l.z);
                     exit_point->u       = u;
 
                     t_max   = std::min(max_dist, t_max);
@@ -412,7 +412,7 @@ inline bool kd_tree::find_leaf_node(const frustrum &r, kdt_stack_element *const 
                     exit_point->n       = furthest;
                     exit_point->t_min   = std::max(min_dist, t_min);
                     exit_point->t_max   = t_max;
-                    exit_point->l       = point_t(l.x, split_pos, l.z);
+                    exit_point->l       = point_t<>(l.x, split_pos, l.z);
                     exit_point->u       = u;
 
                     t_max   = std::min(max_dist, t_max);
@@ -461,7 +461,7 @@ inline bool kd_tree::find_leaf_node(const frustrum &r, kdt_stack_element *const 
                     exit_point->n       = furthest;
                     exit_point->t_min   = std::max(min_dist, t_min);
                     exit_point->t_max   = t_max;
-                    exit_point->l       = point_t(l.x, l.y, split_pos);
+                    exit_point->l       = point_t<>(l.x, l.y, split_pos);
                     exit_point->u       = u;
 
                     t_max   = std::min(max_dist, t_max);
@@ -688,7 +688,7 @@ void kd_tree::frustrum_found_nearer_object(const packet_ray *const r, const vfp_
 //#else
 //    /* Build a reverse frustrum to traverse */
 //    /* The rays are more coherant at the light */
-//    frustrum f(r, point_t(r[0].get_dst(0)[0], r[0].get_dst(1)[0], r[0].get_dst(2)[0]), size);
+//    frustrum f(r, point_t<>(r[0].get_dst(0)[0], r[0].get_dst(1)[0], r[0].get_dst(2)[0]), size);
 //#endif
     
 #ifdef FRUSTRUM_CULLING

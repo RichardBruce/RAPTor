@@ -12,6 +12,7 @@
 #include "quaternion_t.h"
 
 /* Physics headers */
+#include "collision.h"
 #include "vertex_group.h"
 #include "object_bound.h"
 #include "force.h"
@@ -24,34 +25,18 @@ namespace raptor_physics
 class simplex;
 class physics_engine;
 
-/* Enum to show the different ways objects can connect */
-/* Possible is used for rotating object were only a conservative result can be given */
-enum class collision_t : char { NO_COLLISION = 0, SLIDING_COLLISION = 1, COLLISION = 2, POSSIBLE_SLIDING_COLLISION = 5, POSSIBLE_COLLISION = 6 };
-
-/* Check for a POSSIBLY_ prefix */
-inline bool is_uncertain(const collision_t c)
-{
-    return (static_cast<int>(c) & 0x4);
-}
-
-/* Convert to the certain form */
-inline collision_t to_certain(const collision_t c)
-{
-    return static_cast<collision_t>(static_cast<int>(c) & 0x3);
-}
-
 /* Class to wrap a vertex group with the physics engine specific functionality */
 class physics_object : private boost::noncopyable
 {
     public :
         /* Ownership isnt taken of vg */
-        physics_object(vertex_group *const vg, const point_t &com, const float density, const unsigned int t = 0) : 
+        physics_object(vertex_group *const vg, const point_t<> &com, const float density, const unsigned int t = 0) : 
             physics_object(vg, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), com, density, t) {  };
               
-        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t &com, const float density, const unsigned int t = 0) : 
-            physics_object(vg, o, com, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), density, t) {  };
+        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t<> &com, const float density, const unsigned int t = 0) : 
+            physics_object(vg, o, com, point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f), density, t) {  };
 
-        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t &com, const point_t &v, const point_t &w, const float density, const unsigned int t = 0) :
+        physics_object(vertex_group *const vg, const quaternion_t &o, const point_t<> &com, const point_t<> &v, const point_t<> &w, const float density, const unsigned int t = 0) :
             _vg(vg),
             _forces(new std::vector<force *>()),
             _agg_force(*_forces),
@@ -68,8 +53,8 @@ class physics_object : private boost::noncopyable
             _i->move_center_of_mass(com - _i->center_of_mass());
 
             /* Build bounds */
-            point_t hi;
-            point_t lo;
+            point_t<> hi;
+            point_t<> lo;
             get_bounds(&hi, &lo);
 
             _lower_bound[0] = new object_bound(this, lo.x, true);
@@ -126,7 +111,7 @@ class physics_object : private boost::noncopyable
         /* Note -- Technically the force should stop after f.t */
         /*         This is appoximated by weighting the force in proportion to the period it is applied */
         /* TODO - Is it worth checking that the force is applied on the object not in free space? */
-        physics_object& apply_force(const point_t &at, const point_t &f, const float t)
+        physics_object& apply_force(const point_t<> &at, const point_t<> &f, const float t)
         {
             /* No point pushing an infinite mass object */
             if (get_mass() == std::numeric_limits<float>::infinity())
@@ -139,7 +124,7 @@ class physics_object : private boost::noncopyable
             return *this;
         }
 
-        physics_object& apply_internal_force(const point_t &at, const point_t &f)
+        physics_object& apply_internal_force(const point_t<> &at, const point_t<> &f)
         {
             _agg_force.apply_internal_force(at, f);
             return *this;
@@ -152,9 +137,9 @@ class physics_object : private boost::noncopyable
             return *this;
         }
 
-        physics_object& apply_impulse(const point_t &impulse, const point_t &poc, const bool ub = true)
+        physics_object& apply_impulse(const point_t<> &impulse, const point_t<> &poc, const bool ub = true)
         {
-            const point_t l(cross_product(poc - get_center_of_mass(), impulse));
+            const point_t<> l(cross_product(poc - get_center_of_mass(), impulse));
             // BOOST_LOG_TRIVIAL(trace) << "l: " << l;
 
             _v  = _lv + (impulse / _i->mass());
@@ -171,7 +156,7 @@ class physics_object : private boost::noncopyable
             return *this;
         }
 
-        physics_object& apply_impulse(const point_t &n, const point_t &angular_weight, const float impulse, const bool ub = true)
+        physics_object& apply_impulse(const point_t<> &n, const point_t<> &angular_weight, const float impulse, const bool ub = true)
         {
             _v  = _lv + (n * (impulse / _i->mass()));
             _lv = _v;
@@ -189,8 +174,8 @@ class physics_object : private boost::noncopyable
         }
         
         /* Collision detection */
-        bool has_collided(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, point_t *const d, const float t0, const float t1);
-        bool has_collided(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, point_t *const d, const quaternion_t &oa, const quaternion_t &ob, const float t0, const float t1);
+        bool has_collided(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, point_t<> *const d, const float t0, const float t1);
+        bool has_collided(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, point_t<> *const d, const quaternion_t &oa, const quaternion_t &ob, const float t0, const float t1);
         
         /* Check for collisions and separate objects as needed */
         collision_t resolve_collisions(physics_object *const po, simplex **const manifold_a, simplex **const manifold_b, float *const t, const bool sliding)
@@ -219,69 +204,69 @@ class physics_object : private boost::noncopyable
         /* Access functions */
         /* Physics getters */
         unsigned int                get_physical_type()     const { return _type;                                                       }
-        const point_t               get_force()             const { return _agg_force.get_force(*_i, get_center_of_mass(), _lv, 0.0f);  }
-        const point_t               get_torque()            const { return _agg_force.get_torque(*_i, get_center_of_mass(), _lw, 0.0f); }
+        const point_t<>               get_force()             const { return _agg_force.get_force(*_i, get_center_of_mass(), _lv, 0.0f);  }
+        const point_t<>               get_torque()            const { return _agg_force.get_torque(*_i, get_center_of_mass(), _lw, 0.0f); }
         const float                 get_speed()             const { return magnitude(_v);                                               }
         const float                 get_mass()              const { return _i->mass();                                                  }
-        const point_t&              get_center_of_mass()    const { return _i->center_of_mass();                                        }
+        const point_t<>&              get_center_of_mass()    const { return _i->center_of_mass();                                        }
         const quaternion_t&         get_orientation()       const { return _o;                                                          }
         const inertia_tensor&       get_inertia_tenor()     const { return *_i;                                                         }
         const inertia_tensor_view   get_orientated_tensor() const { return inertia_tensor_view(*_i, _o);                                }
 
-        const point_t&  get_velocity_0()                const { return _v;  }
-        const point_t&  get_velocity()                  const { return _lv; }
-        const point_t&  get_angular_velocity_0()        const { return _w;  }
-        const point_t&  get_angular_velocity()          const { return _lw; }
-        point_t         get_velocity(const point_t &p)  const
+        const point_t<>&  get_velocity_0()                const { return _v;  }
+        const point_t<>&  get_velocity()                  const { return _lv; }
+        const point_t<>&  get_angular_velocity_0()        const { return _w;  }
+        const point_t<>&  get_angular_velocity()          const { return _lw; }
+        point_t<>         get_velocity(const point_t<> &p)  const
         {
             /* Get rotational velocity at p */
-            const point_t r(p - _i->center_of_mass());
-            const point_t rot_vel(cross_product(_lw, r));
+            const point_t<> r(p - _i->center_of_mass());
+            const point_t<> rot_vel(cross_product(_lw, r));
 
             return _lv + rot_vel;
         }
 
-        point_t         get_velocity_0(const point_t &p)  const
+        point_t<>         get_velocity_0(const point_t<> &p)  const
         {
             /* Get rotational velocity at p */
-            const point_t r(p - _i->center_of_mass());
-            const point_t rot_vel(cross_product(_w, r));
+            const point_t<> r(p - _i->center_of_mass());
+            const point_t<> rot_vel(cross_product(_w, r));
 
             return _v + rot_vel;
         }
 
-        point_t get_acceleration(const point_t &poc) const
+        point_t<> get_acceleration(const point_t<> &poc) const
         {
-            const point_t lin(get_force() / _i->mass());
-            const point_t rot(cross_product(get_torque() / get_orientated_tensor(), poc - _i->center_of_mass()));
+            const point_t<> lin(get_force() / _i->mass());
+            const point_t<> rot(cross_product(get_torque() / get_orientated_tensor(), poc - _i->center_of_mass()));
             return lin + rot;
         }
 
-        const point_t get_momentum() const
+        const point_t<> get_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
             return (_i->mass() == std::numeric_limits<float>::infinity()) ? 0.0f : ( _i->mass() * _lv);
         }
 
-        const point_t get_angular_momentum() const
+        const point_t<> get_angular_momentum() const
         {
             /* Infinite mass objects shouldnt be moving */
-            return (_i->mass() == std::numeric_limits<float>::infinity()) ? point_t(0.0f, 0.0f, 0.0f) : (get_orientated_tensor() * _lw);
+            return (_i->mass() == std::numeric_limits<float>::infinity()) ? point_t<>(0.0f, 0.0f, 0.0f) : (get_orientated_tensor() * _lw);
         }
 
         /* Vertex getters */
         const std::shared_ptr<vertex_group>& get_vertex_group() const { return _vg; }
-        point_t get_orientated_vertex(const int i) const
+        point_t<> get_orientated_vertex(const int i) const
         {
             return _o.rotate(_vg->get_vertex(i));
         }
 
-        point_t get_global_vertex(const int i) const
+        point_t<> get_global_vertex(const int i) const
         {
             return get_orientated_vertex(i) + get_center_of_mass();
         }
 
-        const physics_object& vertex_to_global(point_t *const p) const
+        const physics_object& vertex_to_global(point_t<> *const p) const
         {
             _o.rotate(p);
             (*p) += get_center_of_mass();
@@ -304,14 +289,14 @@ class physics_object : private boost::noncopyable
 
 
         /* Setters, only used in unit tests */
-        physics_object& set_velocity(const point_t &v) 
+        physics_object& set_velocity(const point_t<> &v) 
         {
             _v  = v;
             _lv = v;
             return *this;
         }
 
-        physics_object& set_angular_velocity(const point_t &w)
+        physics_object& set_angular_velocity(const point_t<> &w)
         {
             _w  = w;
             _lw = w;
@@ -338,14 +323,14 @@ class physics_object : private boost::noncopyable
             const float dt = _t_step - _cur_t;
 
             /* Get the bounds of the stationary object */
-            point_t hi;
-            point_t lo;
+            point_t<> hi;
+            point_t<> lo;
             get_bounds(&hi, &lo);
             BOOST_LOG_TRIVIAL(trace) << "Input vel: " << _v << ", and: " << _w;
 
             /* Get the translation of the object */
             rk4_integrator integ;
-            const point_t trans(integ.project_translation(_agg_force, *_i, _v, dt));
+            const point_t<> trans(integ.project_translation(_agg_force, *_i, _v, dt));
 
             /* Set bounds to current position plus any translation */
             _lower_bound[0]->bound(lo.x + std::min(trans.x, 0.0f));
@@ -372,8 +357,8 @@ class physics_object : private boost::noncopyable
             }
             else
             {
-                _lw = point_t(0.0f, 0.0f, 0.0f);
-                _lv = point_t(0.0f, 0.0f, 0.0f);
+                _lw = point_t<>(0.0f, 0.0f, 0.0f);
+                _lv = point_t<>(0.0f, 0.0f, 0.0f);
             }
 
             return *this;
@@ -381,22 +366,22 @@ class physics_object : private boost::noncopyable
 
     private :
         /* Bounding box */
-        const physics_object& get_bounds(point_t *const hi, point_t *const lo) const
+        const physics_object& get_bounds(point_t<> *const hi, point_t<> *const lo) const
         {
             /* Get the bounds of the vertex group */
-            point_t local_hi;
-            point_t local_lo;
+            point_t<> local_hi;
+            point_t<> local_lo;
             _vg->get_bounds(&local_hi, &local_lo);
 
             /* Move bounds into global co-ordinates, an OOB */
-            const point_t p0(_o.rotate(local_lo) + _i->center_of_mass());
-            const point_t p1(_o.rotate(point_t(local_lo.x, local_lo.y, local_hi.x)) + _i->center_of_mass());
-            const point_t p2(_o.rotate(point_t(local_lo.x, local_hi.y, local_lo.x)) + _i->center_of_mass());
-            const point_t p3(_o.rotate(point_t(local_lo.x, local_hi.y, local_hi.x)) + _i->center_of_mass());
-            const point_t p4(_o.rotate(point_t(local_hi.x, local_lo.y, local_lo.x)) + _i->center_of_mass());
-            const point_t p5(_o.rotate(point_t(local_hi.x, local_lo.y, local_hi.x)) + _i->center_of_mass());
-            const point_t p6(_o.rotate(point_t(local_hi.x, local_hi.y, local_lo.x)) + _i->center_of_mass());
-            const point_t p7(_o.rotate(local_hi) + _i->center_of_mass());
+            const point_t<> p0(_o.rotate(local_lo) + _i->center_of_mass());
+            const point_t<> p1(_o.rotate(point_t<>(local_lo.x, local_lo.y, local_hi.x)) + _i->center_of_mass());
+            const point_t<> p2(_o.rotate(point_t<>(local_lo.x, local_hi.y, local_lo.x)) + _i->center_of_mass());
+            const point_t<> p3(_o.rotate(point_t<>(local_lo.x, local_hi.y, local_hi.x)) + _i->center_of_mass());
+            const point_t<> p4(_o.rotate(point_t<>(local_hi.x, local_lo.y, local_lo.x)) + _i->center_of_mass());
+            const point_t<> p5(_o.rotate(point_t<>(local_hi.x, local_lo.y, local_hi.x)) + _i->center_of_mass());
+            const point_t<> p6(_o.rotate(point_t<>(local_hi.x, local_hi.y, local_lo.x)) + _i->center_of_mass());
+            const point_t<> p7(_o.rotate(local_hi) + _i->center_of_mass());
 
             /* Find the axis aligned bounds of the OOB */
             (*hi) = max(max(max(p0, p1), max(p2, p3)), max(max(p4, p5), max(p6, p7))) + WELD_DISTANCE;
@@ -407,11 +392,11 @@ class physics_object : private boost::noncopyable
         }
         
         /* Find the projection of the largest rotational movement in the direction n */
-        float project_maximum_rotation_onto(const point_t &n, const point_t &p, const float t) const;
+        float project_maximum_rotation_onto(const point_t<> &n, const point_t<> &p, const float t) const;
 
         /* Calculate the longest possible movement, assuming worst case rotation */
         /* of the vertices in the direction n and of v's vertices in the direction of -n */
-        float project_maximum_movement_onto(const physics_object &v, const point_t &p_a, const point_t &p_b, const point_t &n, const float t) const;
+        float project_maximum_movement_onto(const physics_object &v, const point_t<> &p_a, const point_t<> &p_b, const point_t<> &n, const float t) const;
 
         /* Check for collisions when the exact object movement can be calculated */
         collision_t exactly_resolve_collisions(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, float *const t);
@@ -421,13 +406,13 @@ class physics_object : private boost::noncopyable
         collision_t conservatively_resolve_collisions(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, float *const t, const bool sliding);
 
         /* Specialise algorithm for calculating toc when two objects are very close */
-        collision_t close_contact_collision_detection(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, float *const t, const point_t &noc, float min_t, const float d_t0, const bool sliding);
+        collision_t close_contact_collision_detection(physics_object *const vg, simplex **const manifold_a, simplex **const manifold_b, float *const t, const point_t<> &noc, float min_t, const float d_t0, const bool sliding);
 
         /* Get the translation and rotation at a given time */
-        void configuration_at_time(quaternion_t *const o, point_t *const tr, const float t) const;
+        void configuration_at_time(quaternion_t *const o, point_t<> *const tr, const float t) const;
 
         /* Find the point on vg that moves the futhest beyond the plane defined by plane_n and plane_w */
-        int find_deepest_intersection(const vertex_group &vg, const quaternion_t &pl_r, const quaternion_t &ol_r, const point_t &pl_t, const point_t &ol_t, const point_t &plane_n, const point_t &plane_w, float *const d) const;
+        int find_deepest_intersection(const vertex_group &vg, const quaternion_t &pl_r, const quaternion_t &ol_r, const point_t<> &pl_t, const point_t<> &ol_t, const point_t<> &plane_n, const point_t<> &plane_w, float *const d) const;
         
 
         std::shared_ptr<vertex_group>   _vg;
@@ -436,10 +421,10 @@ class physics_object : private boost::noncopyable
         inertia_tensor      *const      _i;                 /* The moment of inertia                                        */
         object_bound *                  _upper_bound[3];    /* The upper bound of the object in this time step              */
         object_bound *                  _lower_bound[3];    /* The lower bound of the object in this time step              */
-        point_t                         _w;                 /* Angular velocity                                             */
-        point_t                         _v;                 /* Velocity                                                     */
-        point_t                         _lw;                /* Descretised angular velocity for this frame                  */
-        point_t                         _lv;                /* Descretised velocity for this frame                          */
+        point_t<>                       _w;                 /* Angular velocity                                             */
+        point_t<>                       _v;                 /* Velocity                                                     */
+        point_t<>                       _lw;                /* Descretised angular velocity for this frame                  */
+        point_t<>                       _lv;                /* Descretised velocity for this frame                          */
         quaternion_t                    _o;                 /* Orientation                                                  */
         float                           _cur_t;             /* The committed time                                           */
         float                           _t_step;            /* The time we are simulating to                                */

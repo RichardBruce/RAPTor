@@ -30,20 +30,20 @@ namespace test
 struct collision_info_fixture
 {
     collision_info_fixture() :
-        data0(physics_object_for_simplex_testing(new std::vector<point_t>(
+        data0(physics_object_for_simplex_testing(new std::vector<point_t<>>(
             {
-                point_t( 1.5f,  1.5f, 1.0f),
-                point_t( 1.5f, -0.5f, 1.0f),
-                point_t(-0.5f, -0.5f, 1.0f),
-                point_t(-0.5f,  1.5f, 1.0f)
-            }), { 0, 1, 2, 3 }, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f))),
-        data1(physics_object_for_simplex_testing(new std::vector<point_t>(
+                point_t<>( 1.5f,  1.5f, 1.0f),
+                point_t<>( 1.5f, -0.5f, 1.0f),
+                point_t<>(-0.5f, -0.5f, 1.0f),
+                point_t<>(-0.5f,  1.5f, 1.0f)
+            }), { 0, 1, 2, 3 }, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f))),
+        data1(physics_object_for_simplex_testing(new std::vector<point_t<>>(
             {
-                point_t( 1.5f,  1.6f,  1.0f),
-                point_t(-1.5f,  0.5f,  5.0f),
-                point_t(-3.5f, -0.8f,  1.0f),
-                point_t(-0.5f,  1.5f, -2.0f)
-            }), { 0, 1, 2, 3 }, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f)))
+                point_t<>( 1.5f,  1.6f,  1.0f),
+                point_t<>(-1.5f,  0.5f,  5.0f),
+                point_t<>(-3.5f, -0.8f,  1.0f),
+                point_t<>(-0.5f,  1.5f, -2.0f)
+            }), { 0, 1, 2, 3 }, quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f)))
     {  };
 
     std::unique_ptr<physics_object> data0;
@@ -67,24 +67,24 @@ BOOST_AUTO_TEST_CASE( ctor_test )
     /* Test certain collision */
     collision_info<> uut0(s0, *s1, 0.1f, collision_t::COLLISION);
     BOOST_CHECK(uut0.get_simplex().get()        == s0);
-    BOOST_CHECK(uut0.get_normal_of_collision()  == point_t(0.0f, -1.0f,  0.0f));
-    BOOST_CHECK(uut0.get_point_of_collision()   == point_t(0.5f,  1.5f, 1.0f));
+    BOOST_CHECK(uut0.get_normal_of_collision()  == point_t<>(0.0f, -1.0f,  0.0f));
+    BOOST_CHECK(uut0.get_point_of_collision()   == point_t<>(0.5f,  1.5f, 1.0f));
     BOOST_CHECK(uut0.get_type()                 == collision_t::COLLISION);
     BOOST_CHECK(fabs(uut0.get_time() - 0.1f) < result_tolerance);
     
     /* Test uncertain collision */
     collision_info<> uut1(s1, *s0, 1.5f, collision_t::POSSIBLE_COLLISION);
     BOOST_CHECK(uut1.get_simplex().get()        == s1);
-    BOOST_CHECK(uut1.get_normal_of_collision()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut1.get_point_of_collision()   == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut1.get_normal_of_collision()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut1.get_point_of_collision()   == point_t<>(0.0f, 0.0f, 0.0f));
     BOOST_CHECK(uut1.get_type()                 == collision_t::POSSIBLE_COLLISION);
     BOOST_CHECK(uut1.get_time()                 == 1.5f);
     
     /* Test certain collision, but with flipped simplices */
     collision_info<> uut2(s2, *s0, 0.5f, collision_t::COLLISION);
     BOOST_CHECK(uut2.get_simplex().get()        == s2);
-    BOOST_CHECK(uut2.get_normal_of_collision()  == point_t(0.0f, 1.0f,  0.0f));
-    BOOST_CHECK(uut2.get_point_of_collision()   == point_t(0.5f, 1.5f, 1.0f));
+    BOOST_CHECK(uut2.get_normal_of_collision()  == point_t<>(0.0f, 1.0f,  0.0f));
+    BOOST_CHECK(uut2.get_point_of_collision()   == point_t<>(0.5f, 1.5f, 1.0f));
     BOOST_CHECK(uut2.get_type()                 == collision_t::COLLISION);
     BOOST_CHECK(uut2.get_time()                 == 0.5f);
 }
@@ -99,8 +99,8 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
     /* Construct and test */
     collision_info<> uut(s0, *s1, 0.1f, collision_t::COLLISION);
     BOOST_CHECK(uut.get_simplex().get()         == s0);
-    BOOST_CHECK(uut.get_normal_of_collision()   == point_t(0.0f, -1.0f, 0.0f));
-    BOOST_CHECK(uut.get_point_of_collision()    == point_t(0.5f,  1.5f, 1.0f));
+    BOOST_CHECK(uut.get_normal_of_collision()   == point_t<>(0.0f, -1.0f, 0.0f));
+    BOOST_CHECK(uut.get_point_of_collision()    == point_t<>(0.5f,  1.5f, 1.0f));
     BOOST_CHECK(uut.get_type()                  == collision_t::COLLISION);
     BOOST_CHECK(fabs(uut.get_time() - 0.1f) < result_tolerance);
 
@@ -109,8 +109,8 @@ BOOST_AUTO_TEST_CASE( void_collsion_test )
 
     /* Checks */
     BOOST_CHECK(uut.get_simplex().get()         == s0);
-    BOOST_CHECK(uut.get_normal_of_collision()   == point_t(0.0f, -1.0f, 0.0f));
-    BOOST_CHECK(uut.get_point_of_collision()    == point_t(0.5f,  1.5f, 1.0f));
+    BOOST_CHECK(uut.get_normal_of_collision()   == point_t<>(0.0f, -1.0f, 0.0f));
+    BOOST_CHECK(uut.get_point_of_collision()    == point_t<>(0.5f,  1.5f, 1.0f));
     BOOST_CHECK(uut.get_type()                  == collision_t::COLLISION);
     BOOST_CHECK(uut.get_time()                  == std::numeric_limits<float>::max());
 }
@@ -126,8 +126,8 @@ BOOST_AUTO_TEST_CASE( successful_retest_update_test )
     /* Construct and test */
     collision_info<> uut(s1, *s0, 1.5f, collision_t::POSSIBLE_COLLISION);
     BOOST_CHECK(uut.get_simplex().get()         == s1);
-    BOOST_CHECK(uut.get_normal_of_collision()   == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.get_point_of_collision()    == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_normal_of_collision()   == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.get_point_of_collision()    == point_t<>(0.0f, 0.0f, 0.0f));
     BOOST_CHECK(uut.get_type()                  == collision_t::POSSIBLE_COLLISION);
     BOOST_CHECK(uut.get_time()                  == 1.5f);
 
@@ -136,8 +136,8 @@ BOOST_AUTO_TEST_CASE( successful_retest_update_test )
 
     /* Checks */
     BOOST_CHECK(uut.get_simplex().get()         == s2);
-    BOOST_CHECK(uut.get_normal_of_collision()   == point_t(0.0f, 1.0f, 0.0f));
-    BOOST_CHECK(uut.get_point_of_collision()    == point_t(0.5f, 1.5f, 1.0f));
+    BOOST_CHECK(uut.get_normal_of_collision()   == point_t<>(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(uut.get_point_of_collision()    == point_t<>(0.5f, 1.5f, 1.0f));
     BOOST_CHECK(uut.get_type()                  == collision_t::COLLISION);
     BOOST_CHECK(uut.get_time()                  == 1.5f);
 }
@@ -154,8 +154,8 @@ BOOST_AUTO_TEST_CASE( update_test )
     /* Construct certain collision and test */
     collision_info<> uut0(s0, *s1, 0.1f, collision_t::COLLISION);
     BOOST_CHECK(uut0.get_simplex().get()        == s0);
-    BOOST_CHECK(uut0.get_normal_of_collision()  == point_t(0.0f, -1.0f, 0.0f));
-    BOOST_CHECK(uut0.get_point_of_collision()   == point_t(0.5f,  1.5f, 1.0f));
+    BOOST_CHECK(uut0.get_normal_of_collision()  == point_t<>(0.0f, -1.0f, 0.0f));
+    BOOST_CHECK(uut0.get_point_of_collision()   == point_t<>(0.5f,  1.5f, 1.0f));
     BOOST_CHECK(uut0.get_type()                 == collision_t::COLLISION);
     BOOST_CHECK(fabs(uut0.get_time() - 0.1f) < result_tolerance);
 
@@ -164,16 +164,16 @@ BOOST_AUTO_TEST_CASE( update_test )
 
     /* Checks */
     BOOST_CHECK(uut0.get_simplex().get()        == s1);
-    BOOST_CHECK(uut0.get_normal_of_collision()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut0.get_point_of_collision()   == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut0.get_normal_of_collision()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut0.get_point_of_collision()   == point_t<>(0.0f, 0.0f, 0.0f));
     BOOST_CHECK(uut0.get_type()                 == collision_t::POSSIBLE_COLLISION);
     BOOST_CHECK(fabs(uut0.get_time() - 0.2f) < result_tolerance);
     
     /* Construct uncertain collsion and test */
     collision_info<> uut1(s2, *s0, 1.5f, collision_t::POSSIBLE_COLLISION);
     BOOST_CHECK(uut1.get_simplex().get()        == s2);
-    BOOST_CHECK(uut1.get_normal_of_collision()  == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut1.get_point_of_collision()   == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut1.get_normal_of_collision()  == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut1.get_point_of_collision()   == point_t<>(0.0f, 0.0f, 0.0f));
     BOOST_CHECK(uut1.get_type()                 == collision_t::POSSIBLE_COLLISION);
     BOOST_CHECK(uut1.get_time()                 == 1.5f);
 
@@ -182,8 +182,8 @@ BOOST_AUTO_TEST_CASE( update_test )
 
     /* Checks */
     BOOST_CHECK(uut1.get_simplex().get()        == s3);
-    BOOST_CHECK(uut1.get_normal_of_collision()  == point_t(0.0f, -1.0f, 0.0f));
-    BOOST_CHECK(uut1.get_point_of_collision()   == point_t(0.5f,  1.5f, 1.0f));
+    BOOST_CHECK(uut1.get_normal_of_collision()  == point_t<>(0.0f, -1.0f, 0.0f));
+    BOOST_CHECK(uut1.get_point_of_collision()   == point_t<>(0.5f,  1.5f, 1.0f));
     BOOST_CHECK(uut1.get_type()                 == collision_t::COLLISION);
     BOOST_CHECK(fabs(uut1.get_time() - 1.2f) < result_tolerance);
     
@@ -200,8 +200,8 @@ BOOST_AUTO_TEST_CASE( switch_to_sliding )
     /* Construct certain collision and test */
     collision_info<> uut(s0, *s1, 0.1f, collision_t::COLLISION);
     BOOST_CHECK(uut.get_simplex().get()         == s0);
-    BOOST_CHECK(uut.get_normal_of_collision()   == point_t(0.0f, -1.0f, 0.0f));
-    BOOST_CHECK(uut.get_point_of_collision()    == point_t(0.5f,  1.5f, 1.0f));
+    BOOST_CHECK(uut.get_normal_of_collision()   == point_t<>(0.0f, -1.0f, 0.0f));
+    BOOST_CHECK(uut.get_point_of_collision()    == point_t<>(0.5f,  1.5f, 1.0f));
     BOOST_CHECK(uut.get_type()                  == collision_t::COLLISION);
     BOOST_CHECK(fabs(uut.get_time() - 0.1f) < result_tolerance);
     BOOST_CHECK(!uut.switch_to_sliding());

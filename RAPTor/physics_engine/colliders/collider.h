@@ -17,7 +17,7 @@ class collider
         /* Virtual DTOR just in case a base class needs a DTOR */
         virtual ~collider() {  };
         
-        virtual const collider& collide(physics_object *const po_a, physics_object *const po_b, const point_t &poc, const point_t &noc, const collision_t type) const = 0;
+        virtual const collider& collide(physics_object *const po_a, physics_object *const po_b, const point_t<> &poc, const point_t<> &noc, const collision_t type) const = 0;
 
         float static_friction()     const { return _mus; }
         float dynamic_friction()    const { return _mud; }

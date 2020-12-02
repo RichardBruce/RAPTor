@@ -23,8 +23,8 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
     int bih_block   = block_index(cur_idx);
     int bih_node    = node_index(cur_idx);
 
-    point_t u   = entry_point->u;
-    point_t l   = entry_point->l;
+    point_t<> u = entry_point->u;
+    point_t<> l = entry_point->l;
     float t_max = entry_point->t_max;
     float t_min = entry_point->t_min;
     while (true)
@@ -127,7 +127,7 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                     /* Stack the far node */
                     ++exit_point;
                     exit_point->idx     = far_idx;
-                    exit_point->l       = point_t(far_split, l.y, l.z);
+                    exit_point->l       = point_t<>(far_split, l.y, l.z);
                     exit_point->u       = u;
                     exit_point->t_max   = t_max;
                     exit_point->t_min   = std::max(t_min, min_far_plane);
@@ -206,7 +206,7 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                     /* Stack the far node */
                     ++exit_point;
                     exit_point->idx     = far_idx;
-                    exit_point->l       = point_t(l.x, far_split, l.z);
+                    exit_point->l       = point_t<>(l.x, far_split, l.z);
                     exit_point->u       = u;
                     exit_point->t_max   = t_max;
                     exit_point->t_min   = std::max(t_min, min_far_plane);
@@ -285,7 +285,7 @@ inline int bih::find_leaf_node(const frustrum &r, bih_stack_element *const entry
                     /* Stack the far node */
                     ++exit_point;
                     exit_point->idx     = far_idx;
-                    exit_point->l       = point_t(l.x, l.y, far_split);
+                    exit_point->l       = point_t<>(l.x, l.y, far_split);
                     exit_point->u       = u;
                     exit_point->t_max   = t_max;
                     exit_point->t_min   = std::max(t_min, min_far_plane);
@@ -514,7 +514,7 @@ void bih::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
 #ifdef SOFT_SHADOW
     frustrum f(r, size);
 #else
-    frustrum f(r, point_t(r[0].get_dst(0)[0], r[0].get_dst(1)[0], r[0].get_dst(2)[0]), size);
+    frustrum f(r, point_t<>(r[0].get_dst(0)[0], r[0].get_dst(1)[0], r[0].get_dst(2)[0]), size);
 #endif
     
 #ifdef FRUSTRUM_CULLING
@@ -1094,7 +1094,7 @@ vfp_t bih::found_nearer_object(const packet_ray *const r, const vfp_t &t) const
 /**********************************************************
  
 **********************************************************/
-inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_point, bih_stack_element **const out, const point_t &i_rd) const
+inline bool bih::find_leaf_node(const ray &r, bih_stack_element *const entry_point, bih_stack_element **const out, const point_t<> &i_rd) const
 {
     bih_stack_element *exit_point = *out;
 
@@ -1383,7 +1383,7 @@ int bih::find_nearest_object(const ray *const r, hit_description *const h) const
         return -1;
     }
     
-    point_t i_ray_dir(i_x_grad, i_y_grad, i_z_grad);
+    point_t<> i_ray_dir(i_x_grad, i_y_grad, i_z_grad);
 
     /* Traverse the whole tree */
     int             hit_object = -1;
@@ -1447,7 +1447,7 @@ bool bih::found_nearer_object(const ray *const r, const float t) const
     entry_point.t_max   = t;
     entry_point.t_min   = 0.0f;
     
-    point_t i_ray_dir(1.0f / r->get_x_grad(), 1.0f / r->get_y_grad(), 1.0f / r->get_z_grad());
+    point_t<> i_ray_dir(1.0f / r->get_x_grad(), 1.0f / r->get_y_grad(), 1.0f / r->get_z_grad());
 
     /* Traverse the whole tree */
     // BOOST_LOG_TRIVIAL(trace) << "Beginning search for nearer object";

@@ -16,13 +16,13 @@ namespace raptor_raytracer
 class checker_board_mapper : public procedural_texture_mapper
 {
     public :
-        checker_board_mapper(const ext_colour_t &rgb, const point_t &cnt, const point_t &grid_size, const float op = 1.0f, const float u_ps = 0.1f, const float v_ps = 0.1f) : 
+        checker_board_mapper(const ext_colour_t &rgb, const point_t<> &cnt, const point_t<> &grid_size, const float op = 1.0f, const float u_ps = 0.1f, const float v_ps = 0.1f) : 
             procedural_texture_mapper(u_ps, v_ps), _rgb(rgb), _cnt(cnt), _grid_size(grid_size), _op(op) {  };
 
         virtual ~checker_board_mapper() { };
 
     protected :
-        float run_procedure(ext_colour_t *const c, const point_t &dst, const point_t &dir, const point_t &n) const override;
+        float run_procedure(ext_colour_t *const c, const point_t<> &dst, const point_t<> &dir, const point_t<> &n) const override;
 
     private :
         friend class boost::serialization::access;
@@ -32,8 +32,8 @@ class checker_board_mapper : public procedural_texture_mapper
         void serialize(Archive &ar, const unsigned int version) { }
 
         const ext_colour_t  _rgb;       /* The colour of the texture    */
-        const point_t       _cnt;       /* Center                       */
-        const point_t       _grid_size; /* The size of the squares      */
+        const point_t<>     _cnt;       /* Center                       */
+        const point_t<>     _grid_size; /* The size of the squares      */
         const float         _op;        /* Opaqueness of the texture    */
 };
 }; /* namespace raptor_raytracer */
@@ -57,8 +57,8 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::checker_board_ma
     /* Retreive the fields */
     raptor_raytracer::mapper_falloff *falloff;
     raptor_raytracer::ext_colour_t rgb;
-    point_t grid_size;
-    point_t cnt;
+    point_t<> grid_size;
+    point_t<> cnt;
     float op;
     ar >> falloff;
     ar >> rgb;

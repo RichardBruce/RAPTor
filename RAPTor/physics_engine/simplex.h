@@ -36,7 +36,7 @@ class simplex
         }
             
         /* Compute the Minkowski difference for the simplex points */
-        const simplex& compute_c_space(const simplex &b, point_t *const c, const quaternion_t &oa, const quaternion_t &ob, const point_t &fixed_rel_disp, const point_t &float_rel_disp) const
+        const simplex& compute_c_space(const simplex &b, point_t<> *const c, const quaternion_t &oa, const quaternion_t &ob, const point_t<> &fixed_rel_disp, const point_t<> &float_rel_disp) const
         {
             /* Simplices must always be the same size */
             assert(_size == b.size());
@@ -55,12 +55,12 @@ class simplex
 #ifndef NDEBUG
             if (_size == 4)
             {
-                const point_t diff_0_1 = c[1] - c[0];
-                const point_t diff_0_2 = c[2] - c[0];
-                const point_t diff_0_3 = normalise(c[3] - c[0]);
-                const point_t diff_1_3 = normalise(c[3] - c[1]);
-                const point_t diff_2_3 = normalise(c[3] - c[2]);
-                const point_t norm_0_1_2 (normalise(cross_product(diff_0_1, diff_0_2)));
+                const point_t<> diff_0_1 = c[1] - c[0];
+                const point_t<> diff_0_2 = c[2] - c[0];
+                const point_t<> diff_0_3 = normalise(c[3] - c[0]);
+                const point_t<> diff_1_3 = normalise(c[3] - c[1]);
+                const point_t<> diff_2_3 = normalise(c[3] - c[2]);
+                const point_t<> norm_0_1_2 (normalise(cross_product(diff_0_1, diff_0_2)));
 
                 assert(dot_product(norm_0_1_2, diff_0_3) < raptor_physics::EPSILON);
                 assert(dot_product(norm_0_1_2, diff_1_3) < raptor_physics::EPSILON);
@@ -139,16 +139,16 @@ class simplex
         }
         
         /* Get the normal of the impact */
-        point_t normal_of_impact(const simplex &s) const;
+        point_t<> normal_of_impact(const simplex &s) const;
         
-        simplex& distance_to_impact(const point_t &dir)
+        simplex& distance_to_impact(const point_t<> &dir)
         {
             _dir = dir;
             return *this;
         }
 
         /* Get the center of an impact. We find the features in contact and take their intersection */
-        point_t center_of_impact(const simplex &s, const point_t &noc);
+        point_t<> center_of_impact(const simplex &s, const point_t<> &noc);
 
         /* Access to the contact manifold created by center_of_impact */
         int contact_manifold_size() const
@@ -156,13 +156,13 @@ class simplex
             return _cm_size;
         }
 
-        const point_t& contact_manifold_point(const int i) const
+        const point_t<>& contact_manifold_point(const int i) const
         {
             return _cm[i];
         }
         
         /* The rate of change of the normal of impact (dN/dt) */
-        point_t rate_of_change_of_normal_of_impact(const simplex &s, const point_t &noc) const
+        point_t<> rate_of_change_of_normal_of_impact(const simplex &s, const point_t<> &noc) const
         {
             // METHOD_LOG;
             // BOOST_LOG_TRIVIAL(trace) << "Finding rate of change of the normal of impact with simplex size: " << _size;
@@ -181,18 +181,18 @@ class simplex
             assert(s._size > 0);
 
             /* Get unique points defining the simplex */
-            std::unique_ptr<std::vector<point_t>> verts_a(get_points_in_contact_plane(noc));
-            std::unique_ptr<std::vector<point_t>> verts_b(s.get_points_in_contact_plane(noc));
+            std::unique_ptr<std::vector<point_t<>>> verts_a(get_points_in_contact_plane(noc));
+            std::unique_ptr<std::vector<point_t<>>> verts_b(s.get_points_in_contact_plane(noc));
             const int a_size = std::min(static_cast<int>(verts_a->size()), 3);
             const int b_size = std::min(static_cast<int>(verts_b->size()), 3);
             // BOOST_LOG_TRIVIAL(trace) << "Found points in plane: " << a_size << ", " << b_size;
 
-            point_t simplex_verts[6];
-            memcpy(&simplex_verts[0], verts_a->data(), a_size * sizeof(point_t));
-            memcpy(&simplex_verts[3], verts_b->data(), b_size * sizeof(point_t));
+            point_t<> simplex_verts[6];
+            memcpy(&simplex_verts[0], verts_a->data(), a_size * sizeof(point_t<>));
+            memcpy(&simplex_verts[3], verts_b->data(), b_size * sizeof(point_t<>));
 
-            point_t *l_points;
-            point_t *s_points;
+            point_t<> *l_points;
+            point_t<> *s_points;
             const physics_object *po_a;
             const physics_object *po_b;
             if (a_size >= b_size)
@@ -210,26 +210,26 @@ class simplex
                 po_b = &_po;
             }
 
-            point_t norm;
+            point_t<> norm;
             switch (std::max(a_size, b_size))
             {
                 case 1 :
                     {
                         po_a->get_orientation().rotate(&l_points[0]);
                         po_b->get_orientation().rotate(&s_points[0]);
-                        const point_t a_cross(cross_product(po_a->get_angular_velocity(), l_points[0]));
-                        const point_t b_cross(cross_product(po_b->get_angular_velocity(), s_points[0]));
+                        const point_t<> a_cross(cross_product(po_a->get_angular_velocity(), l_points[0]));
+                        const point_t<> b_cross(cross_product(po_b->get_angular_velocity(), s_points[0]));
                         // BOOST_LOG_TRIVIAL(trace) << "crosses: " << a_cross << ", " << b_cross;
                         // BOOST_LOG_TRIVIAL(trace) << "magnitude: " << magnitude(l_points[0] - s_points[0]);
-                        const point_t u((a_cross - b_cross) + (po_a->get_velocity() - po_b->get_velocity()));
+                        const point_t<> u((a_cross - b_cross) + (po_a->get_velocity() - po_b->get_velocity()));
                         norm = (u - dot_product(u, noc) * noc) / magnitude((l_points[0] + po_a->get_center_of_mass()) - (s_points[0] + po_b->get_center_of_mass()));
                     }
                     break;
 
                 case 2 :
                     {
-                        point_t ea(normalise(l_points[1] - l_points[0]));
-                        point_t eb(normalise(s_points[1] - s_points[0]));
+                        point_t<> ea(normalise(l_points[1] - l_points[0]));
+                        point_t<> eb(normalise(s_points[1] - s_points[0]));
                         po_a->get_orientation().rotate(&ea);
                         po_b->get_orientation().rotate(&eb);
 
@@ -238,23 +238,23 @@ class simplex
                         {
                             po_a->get_orientation().rotate(&l_points[0]);
                             po_b->get_orientation().rotate(&s_points[0]);
-                            const point_t dea(cross_product(po_a->get_angular_velocity(), ea));
-                            const point_t dpa(cross_product(po_a->get_angular_velocity(), l_points[0]));
-                            const point_t dpb(cross_product(po_b->get_angular_velocity(), s_points[0]));
+                            const point_t<> dea(cross_product(po_a->get_angular_velocity(), ea));
+                            const point_t<> dpa(cross_product(po_a->get_angular_velocity(), l_points[0]));
+                            const point_t<> dpb(cross_product(po_b->get_angular_velocity(), s_points[0]));
                             // BOOST_LOG_TRIVIAL(trace) << "Derivatives: " << dea << " " << dpa << " " << dpb;
 
                             l_points[0] += po_a->get_center_of_mass();
                             s_points[0] += po_b->get_center_of_mass();
-                            const point_t pb_m_pa(s_points[0] - l_points[0]);
-                            const point_t dpb_m_dpa(dpb - dpa);
+                            const point_t<> pb_m_pa(s_points[0] - l_points[0]);
+                            const point_t<> dpb_m_dpa(dpb - dpa);
                             // BOOST_LOG_TRIVIAL(trace) << "Diffs: " << pb_m_pa << " " << dpb_m_dpa;
 
-                            const point_t dea_cross_p(cross_product(dea, pb_m_pa));
-                            const point_t ea_cross_dp(cross_product(ea, dpb_m_dpa));
-                            const point_t ea_cross_p(cross_product(ea, pb_m_pa));
+                            const point_t<> dea_cross_p(cross_product(dea, pb_m_pa));
+                            const point_t<> ea_cross_dp(cross_product(ea, dpb_m_dpa));
+                            const point_t<> ea_cross_p(cross_product(ea, pb_m_pa));
                             // BOOST_LOG_TRIVIAL(trace) << "Cross: " << dea_cross_p << " " << ea_cross_dp << " " << ea_cross_p;
 
-                            const point_t u(cross_product(dea_cross_p + ea_cross_dp, ea) + cross_product(ea_cross_p, dea));
+                            const point_t<> u(cross_product(dea_cross_p + ea_cross_dp, ea) + cross_product(ea_cross_p, dea));
                             // BOOST_LOG_TRIVIAL(trace) << "U: " << u << " magnitude: " << magnitude(cross_product(ea_cross_p, ea));
                             norm = (u - dot_product(u, noc) * noc) / magnitude(cross_product(ea_cross_p, ea));
                         }
@@ -262,9 +262,9 @@ class simplex
                         {
                             assert(fabs(dot_product(ea, eb)) < (1.0 - raptor_physics::EPSILON) || !"Error: Cant find rate of change of normal for (anti-)parallel edges");
 
-                            const point_t a_cross(cross_product(po_a->get_angular_velocity(), ea));
-                            const point_t b_cross(cross_product(po_b->get_angular_velocity(), eb));
-                            const point_t u(cross_product(ea, a_cross) + cross_product(b_cross, eb));
+                            const point_t<> a_cross(cross_product(po_a->get_angular_velocity(), ea));
+                            const point_t<> b_cross(cross_product(po_b->get_angular_velocity(), eb));
+                            const point_t<> u(cross_product(ea, a_cross) + cross_product(b_cross, eb));
 
                             // BOOST_LOG_TRIVIAL(trace) << "Derivatives: " << a_cross << " " << b_cross;
                             // BOOST_LOG_TRIVIAL(trace) << "U: " << u << " top: " <<  (u - dot_product(u, noc) * noc) << " magnitude: " << magnitude(cross_product(ea, eb));
@@ -290,7 +290,7 @@ class simplex
             
         /* Get a vertex from data */
         /* If the vertex is at a negative index then adjust for the relative displacement */
-        const point_t get_displaced_vertex(const quaternion_t &o, const point_t &rel_disp, const int i) const
+        const point_t<> get_displaced_vertex(const quaternion_t &o, const point_t<> &rel_disp, const int i) const
         {
             const int v = _verts_rd[i];
             if (v < 0)
@@ -304,7 +304,7 @@ class simplex
         }
 
         /* Get a vertex from data ignoring any displacement */
-        const point_t get_vertex(const int i) const
+        const point_t<> get_vertex(const int i) const
         {
             return _po.get_vertex_group()->get_vertex(_verts_rd[i] & 0x7fffffff);
         }
@@ -314,14 +314,14 @@ class simplex
         simplex& operator=(const simplex &s) = delete;
 
         /* Get the unique points from the simplex (i.e. ignoring movement) */
-        int get_unique_points(point_t *const points) const;
+        int get_unique_points(point_t<> *const points) const;
 
         /* Get all points on the plane of contact */
-        std::vector<point_t>* get_points_in_contact_plane(const point_t &noc) const;
+        std::vector<point_t<>>* get_points_in_contact_plane(const point_t<> &noc) const;
 
         const physics_object &  _po;        /* The vertices of the objects the simplex is in    */
-        point_t                 _cm[4];     /* The points defining the contact manifold         */
-        point_t                 _dir;       /* Distance between the two simplices               */
+        point_t<>               _cm[4];     /* The points defining the contact manifold         */
+        point_t<>               _dir;       /* Distance between the two simplices               */
         int                     _verts[8];  /* Index of the vertices used by the simplex        */
         int                  *  _verts_rd;  /* Pointer to write new simplex into                */
         int                  *  _verts_wr;  /* Pointer to read current simplex from             */

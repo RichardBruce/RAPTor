@@ -73,10 +73,10 @@ class lwo_bloks : private boost::noncopyable
         std::vector<std::pair<ext_colour_t, float>> _fkey_value;
         lwo_clip *                                  _clip;
         ext_colour_t                                _trgb;
-        point_t                                     _tctr;
-        point_t                                     _tnorm;
-        point_t                                     _tsiz;
-        point_t                                     _fall_grad;
+        point_t<>                                   _tctr;
+        point_t<>                                   _tnorm;
+        point_t<>                                   _tsiz;
+        point_t<>                                   _fall_grad;
         float                                       _tfp[4];
         float                                       _valu[3];
         float                                       _topc;

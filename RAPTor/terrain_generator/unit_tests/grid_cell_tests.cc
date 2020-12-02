@@ -25,26 +25,26 @@ namespace test
 struct grid_cell_fixture : private boost::noncopyable
 {
     grid_cell_fixture() :
-        verts(new point_t [16] {
-            point_t(0.0, 0.0, 0.0),
-            point_t(1.0, 0.0, 0.0),
-            point_t(1.0, 0.0, 1.0),
-            point_t(0.0, 0.0, 1.0),
+        verts(new point_t<> [16] {
+            point_t<>(0.0, 0.0, 0.0),
+            point_t<>(1.0, 0.0, 0.0),
+            point_t<>(1.0, 0.0, 1.0),
+            point_t<>(0.0, 0.0, 1.0),
             
-            point_t(0.0, 0.0, 0.0),
-            point_t(1.0, 2.0, 0.0),
-            point_t(1.0, 2.0, 1.0),
-            point_t(0.0, 0.0, 1.0),
+            point_t<>(0.0, 0.0, 0.0),
+            point_t<>(1.0, 2.0, 0.0),
+            point_t<>(1.0, 2.0, 1.0),
+            point_t<>(0.0, 0.0, 1.0),
             
-            point_t(0.0, 0.0, 0.0),
-            point_t(1.0, 0.5, 0.0),
-            point_t(1.0, 0.5, 1.0),
-            point_t(0.0, 0.0, 1.0),
+            point_t<>(0.0, 0.0, 0.0),
+            point_t<>(1.0, 0.5, 0.0),
+            point_t<>(1.0, 0.5, 1.0),
+            point_t<>(0.0, 0.0, 1.0),
 
-            point_t(0.0, 0.0, 0.0),
-            point_t(1.0, 0.1, 0.0),
-            point_t(1.0, 0.1, 1.0),
-            point_t(0.0, 0.0, 1.0)
+            point_t<>(0.0, 0.0, 0.0),
+            point_t<>(1.0, 0.1, 0.0),
+            point_t<>(1.0, 0.1, 1.0),
+            point_t<>(0.0, 0.0, 1.0)
         }),
         gc(new grid_cell(nullptr, -1, 1, 2, 5, 101, 102, 107, 67)),
         merge_gc0(new grid_cell(verts.get(), -1, 1, 2, 5,  0,  1,  2,  3)),
@@ -52,7 +52,7 @@ struct grid_cell_fixture : private boost::noncopyable
         merge_gc2(new grid_cell(verts.get(), -1, 1, 2, 5,  8,  9, 10, 11)),
         merge_gc3(new grid_cell(verts.get(), -1, 1, 2, 5, 12, 13, 14, 15)) {  };
     
-    std::unique_ptr<point_t []> verts;
+    std::unique_ptr<point_t<> []> verts;
     std::unique_ptr<grid_cell> gc;
     std::unique_ptr<grid_cell> merge_gc0;
     std::unique_ptr<grid_cell> merge_gc1;

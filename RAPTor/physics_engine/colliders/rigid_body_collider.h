@@ -13,7 +13,7 @@
 namespace raptor_physics
 {
 template<class Object>
-void log_collision_state(Object *const po_a, Object *const po_b, const std::string &phase, const point_t &poc)
+void log_collision_state(Object *const po_a, Object *const po_b, const std::string &phase, const point_t<> &poc)
 {
     BOOST_LOG_TRIVIAL(trace) << phase << " v a: " << po_a->get_velocity();
     BOOST_LOG_TRIVIAL(trace) << phase << " v b: " << po_b->get_velocity();
@@ -26,7 +26,7 @@ void log_collision_state(Object *const po_a, Object *const po_b, const std::stri
 /* Function to process an instantaneous, frictionless collision */
 /* The function is templated for testing */
 template<class Object>
-void instantaneous_frictionless_collide(Object *const po_a, Object *const po_b, const point_t &poc, const point_t &noc, const float cor)
+void instantaneous_frictionless_collide(Object *const po_a, Object *const po_b, const point_t<> &poc, const point_t<> &noc, const float cor)
 {
     METHOD_LOG;
 
@@ -47,13 +47,13 @@ void instantaneous_frictionless_collide(Object *const po_a, Object *const po_b, 
     BOOST_LOG_TRIVIAL(trace) << "Closing speed: " << dot_product(po_a->get_velocity(poc) - po_b->get_velocity(poc), noc);
 
     /* Projected velocity */
-    const point_t t_a_abso(po_a->get_velocity(poc));
-    const point_t t_b_abso(po_b->get_velocity(poc));
-    const point_t t_a_proj(project_vector(t_a_abso, -noc));
-    const point_t t_b_proj(project_vector(t_b_abso,  noc));
+    const point_t<> t_a_abso(po_a->get_velocity(poc));
+    const point_t<> t_b_abso(po_b->get_velocity(poc));
+    const point_t<> t_a_proj(project_vector(t_a_abso, -noc));
+    const point_t<> t_b_proj(project_vector(t_b_abso,  noc));
 
     /* The closing speed */
-    const point_t closing_v(t_b_proj - t_a_proj);
+    const point_t<> closing_v(t_b_proj - t_a_proj);
     BOOST_LOG_TRIVIAL(trace) << "Closing velocity: " << closing_v;
 
     /* Inertia matrices */
@@ -61,13 +61,13 @@ void instantaneous_frictionless_collide(Object *const po_a, Object *const po_b, 
     const inertia_tensor_view inertia_b(po_b->get_orientated_tensor());
 
     /* Rotational component of impulse */
-    const point_t ra(poc - po_a->get_center_of_mass());
-    const point_t rb(poc - po_b->get_center_of_mass());
-    const point_t ra_cross_n(cross_product(ra, noc));
-    const point_t rb_cross_n(cross_product(rb, noc));
+    const point_t<> ra(poc - po_a->get_center_of_mass());
+    const point_t<> rb(poc - po_b->get_center_of_mass());
+    const point_t<> ra_cross_n(cross_product(ra, noc));
+    const point_t<> rb_cross_n(cross_product(rb, noc));
 
-    const point_t a_cross_r(cross_product(ra_cross_n / inertia_a, ra));
-    const point_t b_cross_r(cross_product(rb_cross_n / inertia_b, rb));
+    const point_t<> a_cross_r(cross_product(ra_cross_n / inertia_a, ra));
+    const point_t<> b_cross_r(cross_product(rb_cross_n / inertia_b, rb));
     const float rot_comp = dot_product((a_cross_r + b_cross_r), noc);
 
     /* Linear component of impulse */
@@ -81,8 +81,8 @@ void instantaneous_frictionless_collide(Object *const po_a, Object *const po_b, 
     BOOST_LOG_TRIVIAL(trace) << "Impulse: " << impul;
 
     /* Apply the impulse */
-    const point_t a_mult_i(ra_cross_n / inertia_a);
-    const point_t b_mult_i(rb_cross_n / inertia_b);
+    const point_t<> a_mult_i(ra_cross_n / inertia_a);
+    const point_t<> b_mult_i(rb_cross_n / inertia_b);
     po_a->apply_impulse(noc, a_mult_i,  impul);
     po_b->apply_impulse(noc, b_mult_i, -impul);
 
@@ -109,7 +109,7 @@ void instantaneous_frictionless_collide(Object *const po_a, Object *const po_b, 
     i = (vtb - vta).t / ((mu / ma) - (mu / mb) + (cross((cross(rpa, n) / ita) + (cross(rpa, mu * t) / ita), rpa) - cross((cross(rpb, n) / itb) + (cross(rpb, mu * t) / itb), rpb)).t)
 */
 template<class Object>
-void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t &poc, const point_t &noc, const float cor, const float mu)
+void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t<> &poc, const point_t<> &noc, const float cor, const float mu)
 {
     METHOD_LOG;
 
@@ -125,20 +125,20 @@ void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t
     BOOST_LOG_TRIVIAL(trace) << "Coefficient of friction: " << mu;
 
     /* Projected velocity */
-    const point_t t_a_abso(po_a->get_velocity(poc));
-    const point_t t_b_abso(po_b->get_velocity(poc));
-    const point_t t_a_proj(project_vector(t_a_abso, -noc));
-    const point_t t_b_proj(project_vector(t_b_abso,  noc));
+    const point_t<> t_a_abso(po_a->get_velocity(poc));
+    const point_t<> t_b_abso(po_b->get_velocity(poc));
+    const point_t<> t_a_proj(project_vector(t_a_abso, -noc));
+    const point_t<> t_b_proj(project_vector(t_b_abso,  noc));
     BOOST_LOG_TRIVIAL(trace) << "projected a: " << t_a_proj << ", projected b: " << t_b_proj;
-    const point_t t_a_tanj(t_a_abso - t_a_proj);
-    const point_t t_b_tanj(t_b_abso - t_b_proj);
+    const point_t<> t_a_tanj(t_a_abso - t_a_proj);
+    const point_t<> t_b_tanj(t_b_abso - t_b_proj);
 
     /* The closing speeds */
-    const point_t proj_v_close(t_b_proj - t_a_proj);
-    const point_t tanj_v_close(t_b_tanj - t_a_tanj);
+    const point_t<> proj_v_close(t_b_proj - t_a_proj);
+    const point_t<> tanj_v_close(t_b_tanj - t_a_tanj);
     
     /* The tanjent vector */
-    point_t t_noc(tanj_v_close);
+    point_t<> t_noc(tanj_v_close);
     const float tanj_v_magn = magnitude(tanj_v_close);
     if (tanj_v_magn > raptor_physics::EPSILON)
     {
@@ -158,25 +158,25 @@ void instantaneous_collide(Object *const po_a, Object *const po_b, const point_t
     const float mu_mb = mu / po_b->get_mass();
 
     /* Angular contribution */
-    const point_t ra(poc - po_a->get_center_of_mass());
-    const point_t rb(poc - po_b->get_center_of_mass());
-    const point_t ra_cross_n(cross_product(ra, noc));
-    const point_t rb_cross_n(cross_product(rb, noc));
-    const point_t ra_cross_t(cross_product(ra, t_noc));
-    const point_t rb_cross_t(cross_product(rb, t_noc));
-    const point_t a_mult_n(ra_cross_n / inertia_a);
-    const point_t b_mult_n(rb_cross_n / inertia_b);
-    const point_t a_mult_t(ra_cross_t / inertia_a);
-    const point_t b_mult_t(rb_cross_t / inertia_b);
-    const point_t a_mult_t_mu(a_mult_t * mu);
-    const point_t b_mult_t_mu(b_mult_t * mu);
+    const point_t<> ra(poc - po_a->get_center_of_mass());
+    const point_t<> rb(poc - po_b->get_center_of_mass());
+    const point_t<> ra_cross_n(cross_product(ra, noc));
+    const point_t<> rb_cross_n(cross_product(rb, noc));
+    const point_t<> ra_cross_t(cross_product(ra, t_noc));
+    const point_t<> rb_cross_t(cross_product(rb, t_noc));
+    const point_t<> a_mult_n(ra_cross_n / inertia_a);
+    const point_t<> b_mult_n(rb_cross_n / inertia_b);
+    const point_t<> a_mult_t(ra_cross_t / inertia_a);
+    const point_t<> b_mult_t(rb_cross_t / inertia_b);
+    const point_t<> a_mult_t_mu(a_mult_t * mu);
+    const point_t<> b_mult_t_mu(b_mult_t * mu);
 
     /* Max impulse with friction */
     BOOST_LOG_TRIVIAL(trace) << "Expected linear change: " << (mu_ma + mu_mb);
     BOOST_LOG_TRIVIAL(trace) << "Expected rotational change: " << dot_product(cross_product(a_mult_n + a_mult_t_mu, ra) + cross_product(b_mult_n + b_mult_t_mu, rb), t_noc);
     BOOST_LOG_TRIVIAL(trace) << "Expected rotational change normal: " << dot_product(cross_product(a_mult_n, ra) + cross_product(b_mult_n, rb), t_noc);
     BOOST_LOG_TRIVIAL(trace) << "Expected rotational change tangent: " << dot_product(cross_product(a_mult_t_mu, ra) + cross_product(b_mult_t_mu, rb), t_noc);
-    const point_t angular_change(cross_product(a_mult_n + a_mult_t_mu, ra) + cross_product(b_mult_n + b_mult_t_mu, rb));
+    const point_t<> angular_change(cross_product(a_mult_n + a_mult_t_mu, ra) + cross_product(b_mult_n + b_mult_t_mu, rb));
     const float max_fric_i = tanj_v_magn / (mu_ma + mu_mb + dot_product(angular_change, t_noc));
     BOOST_LOG_TRIVIAL(trace) << "Maximum with friction impulse: " << max_fric_i;
     assert((dot_product(cross_product(a_mult_t_mu, ra) + cross_product(b_mult_t_mu, rb), t_noc) >= 0.0f) || !"Error: Rotation caused by tangent impulse became negative");
@@ -254,7 +254,7 @@ class rigid_body_collider : public collider
     public :
         rigid_body_collider(const float cor, const float mus, const float mud) : collider(cor, mus, mud) {  };
         
-        virtual const rigid_body_collider& collide(physics_object *const po_a, physics_object *const po_b, const point_t &poc, const point_t &noc, const collision_t type) const
+        virtual const rigid_body_collider& collide(physics_object *const po_a, physics_object *const po_b, const point_t<> &poc, const point_t<> &noc, const collision_t type) const
         {
             METHOD_LOG;
 

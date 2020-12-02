@@ -54,7 +54,7 @@ class inertia_tensor
 {
     public :
         /* CTOR for objects with known inertia tensors. Takes ownership of it */
-        inertia_tensor(float *const it, const point_t &com, const float m) : _it(it), _inv_it(new float [6]), _com(com), _m(m)
+        inertia_tensor(float *const it, const point_t<> &com, const float m) : _it(it), _inv_it(new float [6]), _com(com), _m(m)
         {
             METHOD_LOG;
             if (m == std::numeric_limits<float>::infinity())
@@ -73,7 +73,7 @@ class inertia_tensor
         };
 
         /* CTOR for objects of arbitary shape with no known inertia tensor */
-        inertia_tensor(const std::vector<point_t> &p, const std::vector<int> &e, const float r = 1.0f)
+        inertia_tensor(const std::vector<point_t<>> &p, const std::vector<int> &e, const float r = 1.0f)
             : _it(new float [6]), _inv_it(new float [6])
         {
             METHOD_LOG;
@@ -120,24 +120,24 @@ class inertia_tensor
             }
 
             /* Actual calculations for finite mass object */
-            point_t g0;
-            point_t g1;
-            point_t g2;
-            point_t f1;
-            point_t f2;
-            point_t f3;
+            point_t<> g0;
+            point_t<> g1;
+            point_t<> g2;
+            point_t<> f1;
+            point_t<> f2;
+            point_t<> f3;
             float integral[10] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
             for (int i = 0; i < static_cast<int>(e.size()); i += 3)
             {
-                const point_t &v0 = p[e[i    ]];
-                const point_t &v1 = p[e[i + 1]];
-                const point_t &v2 = p[e[i + 2]];
+                const point_t<> &v0 = p[e[i    ]];
+                const point_t<> &v1 = p[e[i + 1]];
+                const point_t<> &v2 = p[e[i + 2]];
 
                 surface_integral_subexpressions(&g0.x, &g1.x, &g2.x, &f1.x, &f2.x, &f3.x, v0.x, v1.x, v2.x);   
                 surface_integral_subexpressions(&g0.y, &g1.y, &g2.y, &f1.y, &f2.y, &f3.y, v0.y, v1.y, v2.y);   
                 surface_integral_subexpressions(&g0.z, &g1.z, &g2.z, &f1.z, &f2.z, &f3.z, v0.z, v1.z, v2.z);
 
-                const point_t n(cross_product(v1 - v0, v2 - v0));
+                const point_t<> n(cross_product(v1 - v0, v2 - v0));
 
                 integral[0] += n.x * f1.x;
                 integral[1] += n.x * f2.x;
@@ -167,7 +167,7 @@ class inertia_tensor
             if (_m == 0.0)
             {
                 BOOST_LOG_TRIVIAL(warning) << "Warning: Massless object";
-                _com = point_t(0.0f, 0.0f, 0.0f);
+                _com = point_t<>(0.0f, 0.0f, 0.0f);
             }
             else
             {
@@ -239,11 +239,11 @@ class inertia_tensor
 
         /* Access functions */
         float               mass()              const { return _m;      }
-        const point_t&      center_of_mass()    const { return _com;    }
+        const point_t<>&    center_of_mass()    const { return _com;    }
         const float *const  tensor()            const { return _it;     }
         const float *const  inverse_tensor()    const { return _inv_it; }
 
-        inertia_tensor& move_center_of_mass(const point_t &com)
+        inertia_tensor& move_center_of_mass(const point_t<> &com)
         {
             _com += com;
             return *this;
@@ -267,10 +267,10 @@ class inertia_tensor
             (*g2) = (*f2) + w2 * ((*f1) + w2);
         }
 
-        float * _it;        /* The inertia tensor           */
-        float * _inv_it;    /* The inverse inertia tensor   */
-        point_t _com;       /* The center of mass           */
-        float   _m;         /* The mass                     */
+        float *     _it;        /* The inertia tensor           */
+        float *     _inv_it;    /* The inverse inertia tensor   */
+        point_t<>   _com;       /* The center of mass           */
+        float       _m;         /* The mass                     */
 };
 
 
@@ -332,25 +332,31 @@ class inertia_tensor_view
 
 
 /* operators */
-template<class T>
-inline point_t operator/(const point_t &lhs, const T &rhs)
+inline point_t<> tensor_multiple(const float *const t, const point_t<> &p)
 {
-    const float *const inv_tensor = rhs.inverse_tensor();
-    const float x = (lhs.x * inv_tensor[0]) + (lhs.y * inv_tensor[3]) + (lhs.z * inv_tensor[5]);
-    const float y = (lhs.x * inv_tensor[3]) + (lhs.y * inv_tensor[1]) + (lhs.z * inv_tensor[4]);
-    const float z = (lhs.x * inv_tensor[5]) + (lhs.y * inv_tensor[4]) + (lhs.z * inv_tensor[2]);
-
-    return point_t(x, y, z);
+    const float x = (p.x * t[0]) + (p.y * t[3]) + (p.z * t[5]);
+    const float y = (p.x * t[3]) + (p.y * t[1]) + (p.z * t[4]);
+    const float z = (p.x * t[5]) + (p.y * t[4]) + (p.z * t[2]);
+    return point_t<>(x, y, z);
 }
 
-template<class T>
-inline point_t operator*(const T &lhs, const point_t &rhs)
+inline point_t<> operator/(const point_t<> &lhs, const inertia_tensor &rhs)
 {
-    const float *const tensor = lhs.tensor();
-    const float x = (rhs.x * tensor[0]) + (rhs.y * tensor[3]) + (rhs.z * tensor[5]);
-    const float y = (rhs.x * tensor[3]) + (rhs.y * tensor[1]) + (rhs.z * tensor[4]);
-    const float z = (rhs.x * tensor[5]) + (rhs.y * tensor[4]) + (rhs.z * tensor[2]);
+    return tensor_multiple(rhs.inverse_tensor(), lhs);
+}
 
-    return point_t(x, y, z);
+inline point_t<> operator*(const inertia_tensor &lhs, const point_t<> &rhs)
+{
+    return tensor_multiple(lhs.tensor(), rhs);
+}
+
+inline point_t<> operator/(const point_t<> &lhs, const inertia_tensor_view &rhs)
+{
+    return tensor_multiple(rhs.inverse_tensor(), lhs);
+}
+
+inline point_t<> operator*(const inertia_tensor_view &lhs, const point_t<> &rhs)
+{
+    return tensor_multiple(lhs.tensor(), rhs);
 }
 }; /* namespace raptor_physics */

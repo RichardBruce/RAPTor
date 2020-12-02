@@ -10,7 +10,7 @@
 
 /* Forward declarations */
 class quaternion_t;
-inline point_t cross_product(const quaternion_t &a, const point_t &b);
+inline point_t<> cross_product(const quaternion_t &a, const point_t<> &b);
 
 /* Class representing a quaternion_t */
 class quaternion_t
@@ -22,7 +22,7 @@ class quaternion_t
             : w(w), x(x), y(y), z(z) { };
 
         /* From axis and angle */
-        quaternion_t(const point_t &axis, const float theta)
+        quaternion_t(const point_t<> &axis, const float theta)
             : w(), x(axis.x), y(axis.y), z(axis.z)
             {
                 const float half_theta = theta * 0.5f;
@@ -35,7 +35,7 @@ class quaternion_t
             };
 
         /* From Euler angles */
-        quaternion_t(const point_t &a)
+        explicit quaternion_t(const point_t<> &a)
         {
             const float cos_x = cos(a.x * 0.5f);
             const float cos_y = cos(a.y * 0.5f);
@@ -91,7 +91,7 @@ class quaternion_t
             return *this;
         }
 
-        quaternion_t& operator+=(const point_t &rhs)
+        quaternion_t& operator+=(const point_t<> &rhs)
         {
             x += rhs.x;
             y += rhs.y;
@@ -99,7 +99,7 @@ class quaternion_t
             return *this;
         }
 
-        quaternion_t& operator-=(const point_t &rhs)
+        quaternion_t& operator-=(const point_t<> &rhs)
         {
             x -= rhs.x;
             y -= rhs.y;
@@ -163,12 +163,12 @@ class quaternion_t
             return *this;
         }
 
-        point_t rotate(const point_t &p) const
+        point_t<> rotate(const point_t<> &p) const
         {
             return p + (2.0f * cross_product(*this, cross_product(*this, p))) + (2.0f * w * cross_product(*this, p));
         }
 
-        quaternion_t rotate(point_t *const p) const
+        quaternion_t rotate(point_t<> *const p) const
         {
             (*p) = (*p) + (2.0f * cross_product(*this, cross_product(*this, (*p)))) + (2.0f * w * cross_product(*this, (*p)));
             return *this;
@@ -203,15 +203,15 @@ class quaternion_t
             return *this;
         }
 
-        point_t axis() const
+        point_t<> axis() const
         {
             const float s = sqrt(1.0f - (w * w));
             if (s < 0.001f)
             {
-                return point_t(1.0f, 0.0f, 0.0f);
+                return point_t<>(1.0f, 0.0f, 0.0f);
             }
 
-            return point_t(x, y, z) / s;
+            return point_t<>(x, y, z) / s;
         }
 
         float angle() const
@@ -219,9 +219,9 @@ class quaternion_t
             return 2.0f * acos(w);
         }
 
-        point_t point() const
+        point_t<> point() const
         {
-            return point_t(x, y, z);
+            return point_t<>(x, y, z);
         }
 
         /* Data members */
@@ -330,12 +330,12 @@ inline quaternion_t normalise(quaternion_t a)
     return a;
 }
 
-inline point_t cross_product(const quaternion_t &a, const point_t &b)
+inline point_t<> cross_product(const quaternion_t &a, const point_t<> &b)
 {
-    return point_t((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
+    return point_t<>((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
 }
 
-inline point_t cross_product(const point_t &a, const quaternion_t &b)
+inline point_t<> cross_product(const point_t<> &a, const quaternion_t &b)
 {
-    return point_t((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
+    return point_t<>((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
 }

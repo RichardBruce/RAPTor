@@ -35,21 +35,21 @@ struct spatial_sub_division_fixture : private boost::noncopyable
 {
     spatial_sub_division_fixture()
     : mat( new raptor_raytracer::phong_shader(raptor_raytracer::ext_colour_t(255, 255, 255), 1.0)),
-      po0( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t( 1.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po1( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 2.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po2( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 4.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po3( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 6.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po4( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 8.0, 0.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po5( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t(10.0, 0.0, 0.0), point_t(-1.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po6( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 1.0, 0.0), point_t( 0.0, 1.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po7( new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 1.0, 1.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po8( new physics_object(make_cube(mat, point_t(-1.5, -0.5f, -0.5f), point_t(1.5,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 2.0, 1.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po9( new physics_object(make_cube(mat, point_t(-4.5, -0.5f, -0.5f), point_t(4.5,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 5.0, 1.0, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po10(new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 1.5, 0.0), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po11(new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 0.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po12(new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 0.0, 1.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po13(new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 1.0, 1.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
-      po14(new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t( 1.0, 0.0, 1.5), point_t( 0.0, 0.0, 0.0), point_t(0.0, 0.0, 0.0), 1.0)),
+      po0( new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 0.0, 0.0, 0.0), point_t<>( 1.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po1( new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 2.0, 0.0, 0.0), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po2( new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 4.0, 0.0, 0.0), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po3( new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 6.0, 0.0, 0.0), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po4( new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 8.0, 0.0, 0.0), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po5( new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>(10.0, 0.0, 0.0), point_t<>(-1.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po6( new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 0.0, 1.0, 0.0), point_t<>( 0.0, 1.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po7( new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 1.0, 1.0, 0.0), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po8( new physics_object(make_cube(mat, point_t<>(-1.5, -0.5f, -0.5f), point_t<>(1.5,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 2.0, 1.0, 0.0), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po9( new physics_object(make_cube(mat, point_t<>(-4.5, -0.5f, -0.5f), point_t<>(4.5,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 5.0, 1.0, 0.0), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po10(new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 0.0, 1.5, 0.0), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po11(new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 0.0, 0.0, 1.5), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po12(new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 0.0, 1.0, 1.5), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po13(new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 1.0, 1.0, 1.5), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
+      po14(new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0, 0.0, 0.0, 0.0), point_t<>( 1.0, 0.0, 1.5), point_t<>( 0.0, 0.0, 0.0), point_t<>(0.0, 0.0, 0.0), 1.0)),
       objects0(
         {
             { 0, po0.get() }, { 1, po1.get() }, { 2, po2.get() }, { 3, po3.get() }, { 4, po4.get() }, { 5, po5.get() }
@@ -498,8 +498,8 @@ BOOST_AUTO_TEST_CASE( contruct_performance_test )
     std::unordered_map<int, physics_object*> objects;
     for (int i = 0; i < number_of_objects; ++i)
     {
-        const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
-        auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f);
+        const point_t<> pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+        auto po = new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f), 1.0f);
         objects.emplace(i, po);
     }
 
@@ -526,9 +526,9 @@ BOOST_AUTO_TEST_CASE( update_object_performance_test )
     std::unordered_map<int, physics_object*> objects;
     for (int i = 0; i < number_of_objects; ++i)
     {
-        const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
-        const point_t vel(normalise(-pos) * point_t(normal_dist(generator), normal_dist(generator), normal_dist(generator)));
-        auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, vel, point_t(0.0f, 0.0f, 0.0f), 1.0f);
+        const point_t<> pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+        const point_t<> vel(normalise(-pos) * point_t<>(normal_dist(generator), normal_dist(generator), normal_dist(generator)));
+        auto po = new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, vel, point_t<>(0.0f, 0.0f, 0.0f), 1.0f);
         objects.emplace(i, po);
     }
 
@@ -565,8 +565,8 @@ BOOST_AUTO_TEST_CASE( remove_object_performance_test )
     std::unordered_map<int, physics_object*> objects;
     for (int i = 0; i < number_of_objects; ++i)
     {
-        const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
-        auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f);
+        const point_t<> pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+        auto po = new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f), 1.0f);
         objects.emplace(i, po);
     }
 
@@ -605,8 +605,8 @@ BOOST_AUTO_TEST_CASE( add_object_performance_test )
     int i = 0;
     for ( ; i < static_cast<int>(number_of_objects * 0.9f); ++i)
     {
-        const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
-        auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f);
+        const point_t<> pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+        auto po = new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f), 1.0f);
         objects.emplace(i, po);
     }
 
@@ -615,8 +615,8 @@ BOOST_AUTO_TEST_CASE( add_object_performance_test )
     const auto t0(std::chrono::system_clock::now());
     for ( ; i < number_of_objects; ++i)
     {
-        const point_t pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
-        auto po = new physics_object(make_cube(mat, point_t(-0.5f, -0.5f, -0.5f), point_t(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f);
+        const point_t<> pos(real_uniform_dist(generator), real_uniform_dist(generator), real_uniform_dist(generator));
+        auto po = new physics_object(make_cube(mat, point_t<>(-0.5f, -0.5f, -0.5f), point_t<>(0.5f,  0.5f,  0.5f)), quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), pos, point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f), 1.0f);
         objects.emplace(i, po);
         uut.add_object(*po);
     }

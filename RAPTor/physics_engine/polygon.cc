@@ -7,9 +7,9 @@
 
 namespace raptor_physics
 {
-float world_polygon::intersection(const point_t &a, const point_t &ma, const point_t &b, const point_t &mb) const
+float world_polygon::intersection(const point_t<> &a, const point_t<> &ma, const point_t<> &b, const point_t<> &mb) const
 {
-    const point_t r(a - b);
+    const point_t<> r(a - b);
     const float ma_dot_ma = dot_product(ma, ma);
     const float ma_dot_mb = dot_product(ma, mb);
     const float mb_dot_mb = dot_product(mb, mb);
@@ -36,16 +36,16 @@ float world_polygon::intersection(const point_t &a, const point_t &ma, const poi
     return t;
 }
 
-void world_polygon::intersection(const world_polygon &p, const point_t &n, const point_t &dir)
+void world_polygon::intersection(const world_polygon &p, const point_t<> &n, const point_t<> &dir)
 {
     // BOOST_LOG_TRIVIAL(trace) << "Clipping: ";
-    // BOOST_LOG_TRIVIAL(trace) << array_to_stream(_verts.begin(), _verts.end(), [](std::stringstream *ss, const point_t &p)
+    // BOOST_LOG_TRIVIAL(trace) << array_to_stream(_verts.begin(), _verts.end(), [](std::stringstream *ss, const point_t<> &p)
     // {
     //     (*ss) << "( " << p << " ) ";
     //     return ss;
     // });
     // BOOST_LOG_TRIVIAL(trace) << "Clipping to: ";
-    // BOOST_LOG_TRIVIAL(trace) << array_to_stream(p._verts.begin(), p._verts.end(), [](std::stringstream *ss, const point_t &p)
+    // BOOST_LOG_TRIVIAL(trace) << array_to_stream(p._verts.begin(), p._verts.end(), [](std::stringstream *ss, const point_t<> &p)
     // {
     //     (*ss) << "( " << p << " ) ";
     //     return ss;
@@ -71,14 +71,14 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
     /* Special case of line versus line */
     if ((_verts.size() == 2) && (p._verts.size() == 2))
     {
-        const point_t ma(p._verts[1] - p._verts[0]);
-        const point_t mb(_verts[1] - _verts[0]);
+        const point_t<> ma(p._verts[1] - p._verts[0]);
+        const point_t<> mb(_verts[1] - _verts[0]);
         const float dist = intersection(p._verts[0], ma, _verts[0], mb);
 
         /* Special case parallel lines */
         if (dist == 2.0f)
         {
-            point_t output[2];
+            point_t<> output[2];
             int output_idx = 0;
             const float ma_sq = dot_product(ma, ma);
             const float mb_sq = dot_product(mb, mb);
@@ -142,8 +142,8 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
     }
     
     /* Special case of line versus polygon */
-    const std::vector<point_t> &min_verts = (_verts.size() <= p._verts.size()) ? _verts : p._verts;
-    const std::vector<point_t> &max_verts = (_verts.size() >  p._verts.size()) ? _verts : p._verts;
+    const std::vector<point_t<>> &min_verts = (_verts.size() <= p._verts.size()) ? _verts : p._verts;
+    const std::vector<point_t<>> &max_verts = (_verts.size() >  p._verts.size()) ? _verts : p._verts;
     if ((max_verts.size() > 2) && (min_verts.size() == 2))
     {
         /* Get the polygon normal */
@@ -152,17 +152,17 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
         /* See if the vertices are inside all edges */
         bool inside_0 = true;
         bool inside_1 = true;
-        point_t a(max_verts.back());
+        point_t<> a(max_verts.back());
         for (auto i = max_verts.cbegin(); i != max_verts.cend(); ++i)
         {
-            const point_t ab(*i - a);
+            const point_t<> ab(*i - a);
             inside_0 &= same_side(min_verts[0], a, ab, fn);
             inside_1 &= same_side(min_verts[1], a, ab, fn);
             a = *i;
         }
 
         /* Line is entirely inside the polygon, we are done */
-        const point_t min_adj((&_verts == &min_verts) ? point_t(0.0f, 0.0f, 0.0f) : dir);
+        const point_t<> min_adj((&_verts == &min_verts) ? point_t<>(0.0f, 0.0f, 0.0f) : dir);
         if (inside_0 && inside_1)
         {
             // BOOST_LOG_TRIVIAL(trace) << "Line inside polygon";
@@ -173,10 +173,10 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
         }
 
         /* Intersect line segment versus the polygon edges */
-        const point_t b(min_verts[0]);
-        const point_t mb(min_verts[1] - min_verts[0]);
+        const point_t<> b(min_verts[0]);
+        const point_t<> mb(min_verts[1] - min_verts[0]);
 
-        point_t output[2];
+        point_t<> output[2];
         int output_idx = 0;
         if (inside_0)
         {
@@ -190,7 +190,7 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
         a = max_verts.back();
         for (auto i = max_verts.cbegin(); i != max_verts.cend(); ++i)
         {
-            const point_t ma(*i - a);
+            const point_t<> ma(*i - a);
             const float dist = intersection(a, ma, b, mb);
             if ((dist > -raptor_physics::EPSILON) && (dist < (1.0f + raptor_physics::EPSILON)))
             {
@@ -218,8 +218,8 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
     int ping_size = _verts.size();
     const int buf_size = _verts.size() + p._verts.size();
     _verts.resize(buf_size << 1);
-    point_t *clip_ping = &_verts[0];
-    point_t *clip_pong = &_verts[buf_size];
+    point_t<> *clip_ping = &_verts[0];
+    point_t<> *clip_pong = &_verts[buf_size];
     // BOOST_LOG_TRIVIAL(trace) << "Set up ping pong buffer of size: " << buf_size;
 
     /* For each edge of the the polygon being clipped to */
@@ -228,15 +228,15 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
     {
         /* Build the plane normal, points inwards for a clockwise polygon */
         // BOOST_LOG_TRIVIAL(trace) << "Testing edge: " << (*prev_i) << " to: " << (*i);
-        const point_t edge((*i) - (*prev_i));
-        const point_t norm(cross_product(edge, n));
+        const point_t<> edge((*i) - (*prev_i));
+        const point_t<> norm(cross_product(edge, n));
 
         int pong_size = 0;
-        point_t prev_clip(clip_ping[ping_size - 1]);
+        point_t<> prev_clip(clip_ping[ping_size - 1]);
         bool prev_inside = (is_inside_edge(prev_clip, *i, norm) > 0.0f);
         for (int j = 0; j < ping_size; ++j)
         {
-            const point_t cur_clip(clip_ping[j]);
+            const point_t<> cur_clip(clip_ping[j]);
             // BOOST_LOG_TRIVIAL(trace) << "Testing point: " << cur_clip;
 
             const float num     = is_inside_edge(cur_clip, *i, norm);
@@ -248,8 +248,8 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
             }
             else if ((!prev_inside) & inside)
             {
-                const point_t clip_edge(cur_clip - prev_clip);
-                const point_t intersect(cur_clip - (clip_edge * (num / dot_product(norm, clip_edge))));
+                const point_t<> clip_edge(cur_clip - prev_clip);
+                const point_t<> intersect(cur_clip - (clip_edge * (num / dot_product(norm, clip_edge))));
                 clip_pong[pong_size++] = intersect;
                 // BOOST_LOG_TRIVIAL(trace) << "Outside moving in, adding: " << clip_pong[pong_size - 1] << " at: " << (pong_size - 1);
              
@@ -258,8 +258,8 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
             }
             else if (prev_inside & !inside)
             {
-                const point_t clip_edge(cur_clip - prev_clip);
-                const point_t intersect(cur_clip - (clip_edge * (num / dot_product(norm, clip_edge))));
+                const point_t<> clip_edge(cur_clip - prev_clip);
+                const point_t<> intersect(cur_clip - (clip_edge * (num / dot_product(norm, clip_edge))));
                 clip_pong[pong_size++] = intersect;
                 // BOOST_LOG_TRIVIAL(trace) << "Inside moving out: " << clip_pong[pong_size - 1] << " at: " << (pong_size - 1);
             }
@@ -270,7 +270,7 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
 
         /* Log the new polygon */
         // BOOST_LOG_TRIVIAL(trace) << "New clipped polygon: ";
-        // BOOST_LOG_TRIVIAL(trace) << array_to_stream(clip_pong, clip_pong + pong_size, [](std::stringstream *ss, const point_t &p)
+        // BOOST_LOG_TRIVIAL(trace) << array_to_stream(clip_pong, clip_pong + pong_size, [](std::stringstream *ss, const point_t<> &p)
         // {
         //     (*ss) << "( " << p << " ) ";
         //     return ss;
@@ -308,7 +308,7 @@ void world_polygon::intersection(const world_polygon &p, const point_t &n, const
 
     /* Log the final polygon */
     // BOOST_LOG_TRIVIAL(trace) << "Clipped polygon: ";
-    // BOOST_LOG_TRIVIAL(trace) << array_to_stream(_verts.begin(), _verts.end(), [](std::stringstream *ss, const point_t &p)
+    // BOOST_LOG_TRIVIAL(trace) << array_to_stream(_verts.begin(), _verts.end(), [](std::stringstream *ss, const point_t<> &p)
     // {
     //     (*ss) << "( " << p << " ) ";
     //     return ss;
@@ -323,7 +323,7 @@ void polygon::to_triangles(std::vector<int> *const tris) const
     memset(invalid.get(), 0, sizeof(char) * _verts.size());
 
     /* Find the furthest point from the center */
-    const point_t com(centre());
+    const point_t<> com(centre());
     unsigned max = find_furthest(com);
 
     /* Use the points either side of this point to find the surface normal */
@@ -346,9 +346,9 @@ void polygon::to_triangles(std::vector<int> *const tris) const
         max_p1 = max + 1;
     }
         
-    point_t face_normal;
-    const point_t ab((*_pts)[_verts[max_m1]] - (*_pts)[_verts[max]]);
-    const point_t bc((*_pts)[_verts[max]] - (*_pts)[_verts[max_p1]]);
+    point_t<> face_normal;
+    const point_t<> ab((*_pts)[_verts[max_m1]] - (*_pts)[_verts[max]]);
+    const point_t<> bc((*_pts)[_verts[max]] - (*_pts)[_verts[max_p1]]);
     
     cross_product(ab, bc, &face_normal);
     normalise(&face_normal);
@@ -363,18 +363,18 @@ void polygon::to_triangles(std::vector<int> *const tris) const
         const int vmax_m1   = _verts[max_m1];
         const int vmax      = _verts[max   ];
         const int vmax_p1   = _verts[max_p1];
-        const point_t a((*_pts)[vmax_m1]);
-        const point_t b((*_pts)[vmax   ]);
-        const point_t c((*_pts)[vmax_p1]);
+        const point_t<> a((*_pts)[vmax_m1]);
+        const point_t<> b((*_pts)[vmax   ]);
+        const point_t<> c((*_pts)[vmax_p1]);
         
         /* If the points form a straight line the triangle is invalid */ 
         if (!is_straight_line(a, b, c))
         {
             /* If the triangle has a different normal to the face it is invalid */
-            const point_t ab(a - b);
-            const point_t bc(b - c);
+            const point_t<> ab(a - b);
+            const point_t<> bc(b - c);
     
-            point_t tri_normal;
+            point_t<> tri_normal;
             cross_product(ab, bc, &tri_normal);
             normalise(&tri_normal);
 

@@ -49,6 +49,7 @@ set(UNIT_TESTS
     lcp_solver_tests
     object_bound_tests
     pair_manager_tests
+    particle_tests
     physics_engine_tests
     physics_object_tests
     physics_options_tests

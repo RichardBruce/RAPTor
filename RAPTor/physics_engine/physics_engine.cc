@@ -169,8 +169,8 @@ physics_engine& physics_engine::advance_time(const float t)
             c_type = to_certain(c_type);
 
             /* Process the collision. */
-            const point_t noc = col_a->get_normal_of_collision();
-            const point_t poc = col_a->get_point_of_collision();
+            const point_t<> noc = col_a->get_normal_of_collision();
+            const point_t<> poc = col_a->get_point_of_collision();
             pair_collider(vg_a->get_physical_type(), vg_b->get_physical_type())->collide(vg_a, vg_b, poc, noc, c_type);
 
             /* Void collisions */

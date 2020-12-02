@@ -13,7 +13,7 @@ namespace raptor_raytracer
 class shared_normal
 {
     public :
-        shared_normal(shared_normal **user_0, shared_normal **user_1, const point_t &norm_0, const point_t &norm_1) :
+        shared_normal(shared_normal **user_0, shared_normal **user_1, const point_t<> &norm_0, const point_t<> &norm_1) :
             _normal((norm_0 * 0.5f) + (norm_1 * 0.5f))
         {
             (*user_0) = this;
@@ -31,21 +31,21 @@ class shared_normal
             }
         }
 
-        void add(shared_normal **user_0, const point_t &norm_0);
+        void add(shared_normal **user_0, const point_t<> &norm_0);
         void merge(shared_normal *const merge);
 
-        const point_t & normal() const { return _normal; }
+        const point_t<> & normal() const { return _normal; }
 
     private :
         std::vector<shared_normal **>   _users;
-        point_t                         _normal;
+        point_t<>                         _normal;
 };
 
 struct pol_info
 {
     std::vector<shared_normal *>    pnt_norms;
     std::vector<int>                pnts;
-    point_t                         normal;
+    point_t<>                       normal;
     float                           cos_threshold;
     int                             group;
 };
@@ -53,7 +53,7 @@ struct pol_info
 class normal_calculator
 {
     public :
-        normal_calculator(const std::vector<point_t> &pnts) :
+        normal_calculator(const std::vector<point_t<>> &pnts) :
             _pnts(pnts), _pnt_to_pol(pnts.size()) {  }
 
         ~normal_calculator()
@@ -108,7 +108,7 @@ class normal_calculator
             return _pnt_to_pol[pnt];
         }
 
-        void points_on_polygon(std::vector<point_t> *const pnts, const int pol) const
+        void points_on_polygon(std::vector<point_t<>> *const pnts, const int pol) const
         {
             for (int pnt : _pols[pol].pnts)
             {
@@ -116,7 +116,7 @@ class normal_calculator
             }
         }
 
-        std::vector<point_t>* normals(std::vector<point_t> *const norms, const int pol) const;
+        std::vector<point_t<>>* normals(std::vector<point_t<>> *const norms, const int pol) const;
 
     private :
         int point_index(const pol_info *const info, const int pnt)
@@ -127,7 +127,7 @@ class normal_calculator
             return std::distance(info->pnts.begin(), pnt_pos);
         }
 
-        const std::vector<point_t> &    _pnts;
+        const std::vector<point_t<>> &  _pnts;
         std::vector<pol_info>           _pols;
         std::vector<std::vector<int>>   _pnt_to_pol;
 };

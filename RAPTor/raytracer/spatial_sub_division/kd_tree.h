@@ -50,14 +50,14 @@ class kd_tree : public ssd
             vfp_t               vt_max;
             vfp_t               vt_min;
             vfp_t               m;
-            point_t             u;
-            point_t             l;
+            point_t<>           u;
+            point_t<>           l;
             float               t_max;
             float               t_min;
 #endif
             const kdt_node     *n;
             kdt_stack_element  *s;
-            point_t             p;
+            point_t<>           p;
             float               d;
         };
  

@@ -171,20 +171,20 @@ BOOST_AUTO_TEST_CASE( solve_quadratic_test )
 BOOST_AUTO_TEST_CASE( tetrahedron_distance_test )
 {
     /* Squared distance between two tetrahedron */
-    matrix_3d p0(std::vector<point_t>(
+    matrix_3d p0(std::vector<point_t<>>(
         {
-            point_t(1.0f, 1.0f, 1.0f), 
-            point_t(2.0f, 1.0f, 1.0f),
-            point_t(1.0f, 2.0f, 1.0f),
-            point_t(1.0f, 1.0f, 2.0f)
+            point_t<>(1.0f, 1.0f, 1.0f), 
+            point_t<>(2.0f, 1.0f, 1.0f),
+            point_t<>(1.0f, 2.0f, 1.0f),
+            point_t<>(1.0f, 1.0f, 2.0f)
         }));
 
-    matrix_3d p1(std::vector<point_t>(
+    matrix_3d p1(std::vector<point_t<>>(
         {
-            point_t(3.0f, 1.0f, 1.0f), 
-            point_t(4.0f, 1.0f, 1.0f),
-            point_t(4.0f, 2.0f, 1.0f),
-            point_t(4.0f, 1.0f, 2.0f)
+            point_t<>(3.0f, 1.0f, 1.0f), 
+            point_t<>(4.0f, 1.0f, 1.0f),
+            point_t<>(4.0f, 2.0f, 1.0f),
+            point_t<>(4.0f, 1.0f, 2.0f)
         }));
 
     std::vector<int> e(
@@ -205,28 +205,28 @@ BOOST_AUTO_TEST_CASE( tetrahedron_distance_test )
 BOOST_AUTO_TEST_CASE( cube_distance_test )
 {
     /* Squared distance between two cubes */
-    matrix_3d p0(std::vector<point_t>(
+    matrix_3d p0(std::vector<point_t<>>(
         {
-            point_t(1.0f, 1.0f, 1.0f), 
-            point_t(2.0f, 1.0f, 1.0f),
-            point_t(2.0f, 2.0f, 1.0f),
-            point_t(1.0f, 2.0f, 1.0f),
-            point_t(1.0f, 1.0f, 2.0f), 
-            point_t(2.0f, 1.0f, 2.0f),
-            point_t(2.0f, 2.0f, 2.0f),
-            point_t(1.0f, 2.0f, 2.0f)
+            point_t<>(1.0f, 1.0f, 1.0f), 
+            point_t<>(2.0f, 1.0f, 1.0f),
+            point_t<>(2.0f, 2.0f, 1.0f),
+            point_t<>(1.0f, 2.0f, 1.0f),
+            point_t<>(1.0f, 1.0f, 2.0f), 
+            point_t<>(2.0f, 1.0f, 2.0f),
+            point_t<>(2.0f, 2.0f, 2.0f),
+            point_t<>(1.0f, 2.0f, 2.0f)
         }));
 
-    matrix_3d p1(std::vector<point_t>(
+    matrix_3d p1(std::vector<point_t<>>(
         {
-            point_t(1.0f, 4.0f, 1.0f), 
-            point_t(2.0f, 4.0f, 1.0f),
-            point_t(2.0f, 5.0f, 1.0f),
-            point_t(1.0f, 5.0f, 1.0f),
-            point_t(1.0f, 4.0f, 2.0f), 
-            point_t(2.0f, 4.0f, 2.0f),
-            point_t(2.0f, 5.0f, 2.0f),
-            point_t(1.0f, 5.0f, 2.0f)
+            point_t<>(1.0f, 4.0f, 1.0f), 
+            point_t<>(2.0f, 4.0f, 1.0f),
+            point_t<>(2.0f, 5.0f, 1.0f),
+            point_t<>(1.0f, 5.0f, 1.0f),
+            point_t<>(1.0f, 4.0f, 2.0f), 
+            point_t<>(2.0f, 4.0f, 2.0f),
+            point_t<>(2.0f, 5.0f, 2.0f),
+            point_t<>(1.0f, 5.0f, 2.0f)
         }));
 
 

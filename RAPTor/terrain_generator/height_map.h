@@ -13,9 +13,9 @@ class height_map
         height_map(const NG &noise, const float a, const float z, const float p, const int o, const int x, const int y)
         : _noise(noise), _a(a), _z(z), _p(p), _o(o), _x(x), _y(y) {  };
 
-        point_t* generate(const float xs, const float ys) const
+        point_t<>* generate(const float xs, const float ys) const
         {
-            point_t *verts = new point_t [this->_x * this->_y];
+            point_t<> *verts = new point_t<> [this->_x * this->_y];
             for (int i = 0; i < this->_x; ++i)
             {
                 /* For each cell */
@@ -35,7 +35,7 @@ class height_map
                         amplitude *= this->_p;
                     }
 
-                    verts[(i * this->_y) + j] = point_t(i * xs, total, j * ys);
+                    verts[(i * this->_y) + j] = point_t<>(i * xs, total, j * ys);
                 }
             }
 

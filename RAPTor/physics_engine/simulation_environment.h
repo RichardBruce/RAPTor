@@ -29,10 +29,10 @@
 
 
 /* Camera parameters */
-const point_t cam_p( 0.0f, -5.0f, -25.0f);                                                      /* Position                 */
-const point_t x_vec( 1.0f,  0.0f, 0.0f);                                                        /* Horizontal vector        */
-const point_t y_vec( 0.0f,  1.0f, 0.0f);                                                        /* Virtical vector          */
-const point_t z_vec( 0.0f,  0.0f, 1.0f);                                                        /* Forward vector           */
+const point_t<> cam_p( 0.0f, -5.0f, -25.0f);                                                      /* Position                 */
+const point_t<> x_vec( 1.0f,  0.0f, 0.0f);                                                        /* Horizontal vector        */
+const point_t<> y_vec( 0.0f,  1.0f, 0.0f);                                                        /* Virtical vector          */
+const point_t<> z_vec( 0.0f,  0.0f, 1.0f);                                                        /* Forward vector           */
 const raptor_raytracer::ext_colour_t bg(0.0f, 0.0f, 0.0f);                                      /* Background colour        */
 const unsigned xr = 640;                                                                        /* X resolution             */
 const unsigned yr = 480;                                                                        /* Y resolution             */
@@ -54,7 +54,7 @@ class simulation_environment
         /* CTOR */
         simulation_environment(physics_engine *const pe, physics_options *const po)
         : _po(po), _pe(pe), _window(nullptr), _renderer(nullptr), _texture(nullptr), _load_screen(nullptr), _font(nullptr), 
-          _cam(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya), 
+          _cam(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya, 0.0f, 0.0f), 
           _lights(), _sim_time(clock()), _time_run(0.0), _damped_fps(0.0)
         {
             auto handler_map = get_camera_event_handler(&_cam);
@@ -121,7 +121,7 @@ class simulation_environment
         bool                    font_initialised()          const   { return _font != nullptr;          }
         bool                    load_screen_initialised()   const   { return _load_screen != nullptr;   }
 
-        simulation_environment& add_light(const raptor_raytracer::ext_colour_t &rgb, const point_t &at)
+        simulation_environment& add_light(const raptor_raytracer::ext_colour_t &rgb, const point_t<> &at)
         {
             new_light(&_lights, rgb, at, 0.0f, 0.0f);
             return *this;
@@ -138,7 +138,7 @@ class simulation_environment
         {
             if (gravity)
             {
-                o->register_force(new const_force(point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, -raptor_physics::ACCELERATION_UNDER_GRAVITY * o->get_mass(), 0.0f), std::numeric_limits<float>::infinity()));
+                o->register_force(new const_force(point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, -raptor_physics::ACCELERATION_UNDER_GRAVITY * o->get_mass(), 0.0f), std::numeric_limits<float>::infinity()));
             }
             
             _pe->add_moving_object(o);

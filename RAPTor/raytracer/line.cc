@@ -6,11 +6,11 @@
 
 namespace raptor_raytracer
 {
-void line::rotate(const vector_t &r, const point_t &c, const float theta)
+void line::rotate(const vector_t &r, const point_t<> &c, const float theta)
 {
     /* Rotate the origin into the new coordinate system */
-    point_t p = this->ogn;
-    point_t q(0.0f, 0.0f, 0.0f);
+    point_t<> p = this->ogn;
+    point_t<> q(0.0f, 0.0f, 0.0f);
    
     float costheta = cos(theta);
     float sintheta = sin(theta);
@@ -35,7 +35,7 @@ void line::rotate(const vector_t &r, const point_t &c, const float theta)
     
     
     /* Move the point up a unit distance */
-    point_t q2(0.0f, 0.0f, 0.0f);
+    point_t<> q2(0.0f, 0.0f, 0.0f);
     p += this->dir;
     
     /* Rotate about r */

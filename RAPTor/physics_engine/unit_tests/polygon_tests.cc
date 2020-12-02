@@ -32,19 +32,19 @@ namespace test
 struct polygon_fixture
 {
     polygon_fixture() : 
-        pts{ point_t( 1.5f,  1.5f, 1.0f), point_t( 1.5f, -0.5f, 1.0f), point_t(-0.5f, -0.5f, 1.0f), point_t(-0.5f,  1.5f, 1.0f) },
+        pts{ point_t<>( 1.5f,  1.5f, 1.0f), point_t<>( 1.5f, -0.5f, 1.0f), point_t<>(-0.5f, -0.5f, 1.0f), point_t<>(-0.5f,  1.5f, 1.0f) },
         square_poly(&pts, { 0, 1, 2, 3 })
     {  }
 
-    std::vector<point_t>    pts;
+    std::vector<point_t<>>  pts;
     polygon                 square_poly;
 };
 
 struct world_polygon_fixture
 {
     world_polygon_fixture() : 
-        uut({  point_t( 1.5f,  1.5f, 1.0f), point_t( 1.5f, -0.5f, 1.0f), point_t(-0.5f, -0.5f, 1.0f), point_t(-0.5f,  1.5f,  1.0f),
-               point_t( 1.5f,  3.5f, 1.0f), point_t(-2.5f, -0.5f, 1.0f), point_t(-0.5f, -0.5f, 6.0f), point_t(-0.5f,  1.5f, -3.0f) })
+        uut({  point_t<>( 1.5f,  1.5f, 1.0f), point_t<>( 1.5f, -0.5f, 1.0f), point_t<>(-0.5f, -0.5f, 1.0f), point_t<>(-0.5f,  1.5f,  1.0f),
+               point_t<>( 1.5f,  3.5f, 1.0f), point_t<>(-2.5f, -0.5f, 1.0f), point_t<>(-0.5f, -0.5f, 6.0f), point_t<>(-0.5f,  1.5f, -3.0f) })
     {  }
 
     world_polygon   uut;
@@ -56,68 +56,68 @@ const float result_tolerance = 0.0001;
 
 BOOST_FIXTURE_TEST_CASE( polygon_to_world_polygon_test, polygon_fixture )
 {
-    auto wp(square_poly.to_world_polygon(quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f)));
+    auto wp(square_poly.to_world_polygon(quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f)));
 
     /* Checks */
     BOOST_REQUIRE(wp.number_of_vertices() == 4);
-    BOOST_CHECK(wp.vertex(0) == point_t( 1.5f,  1.5f, 1.0f));
-    BOOST_CHECK(wp.vertex(1) == point_t( 1.5f, -0.5f, 1.0f));
-    BOOST_CHECK(wp.vertex(2) == point_t(-0.5f, -0.5f, 1.0f));
-    BOOST_CHECK(wp.vertex(3) == point_t(-0.5f,  1.5f, 1.0f));
+    BOOST_CHECK(wp.vertex(0) == point_t<>( 1.5f,  1.5f, 1.0f));
+    BOOST_CHECK(wp.vertex(1) == point_t<>( 1.5f, -0.5f, 1.0f));
+    BOOST_CHECK(wp.vertex(2) == point_t<>(-0.5f, -0.5f, 1.0f));
+    BOOST_CHECK(wp.vertex(3) == point_t<>(-0.5f,  1.5f, 1.0f));
 }
 
 BOOST_FIXTURE_TEST_CASE( polygon_to_world_polygon_with_translate_test, polygon_fixture )
 {
-    auto wp(square_poly.to_world_polygon(quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), point_t(-2.0f, 1.0f, 3.0f)));
+    auto wp(square_poly.to_world_polygon(quaternion_t(1.0f, 0.0f, 0.0f, 0.0f), point_t<>(-2.0f, 1.0f, 3.0f)));
 
     /* Checks */
     BOOST_REQUIRE(wp.number_of_vertices() == 4);
-    BOOST_CHECK(wp.vertex(0) == point_t(-0.5f, 2.5f, 4.0f));
-    BOOST_CHECK(wp.vertex(1) == point_t(-0.5f, 0.5f, 4.0f));
-    BOOST_CHECK(wp.vertex(2) == point_t(-2.5f, 0.5f, 4.0f));
-    BOOST_CHECK(wp.vertex(3) == point_t(-2.5f, 2.5f, 4.0f));
+    BOOST_CHECK(wp.vertex(0) == point_t<>(-0.5f, 2.5f, 4.0f));
+    BOOST_CHECK(wp.vertex(1) == point_t<>(-0.5f, 0.5f, 4.0f));
+    BOOST_CHECK(wp.vertex(2) == point_t<>(-2.5f, 0.5f, 4.0f));
+    BOOST_CHECK(wp.vertex(3) == point_t<>(-2.5f, 2.5f, 4.0f));
 }
 
 BOOST_FIXTURE_TEST_CASE( polygon_to_world_polygon_with_rotate_test, polygon_fixture )
 {
-    auto wp0(square_poly.to_world_polygon(quaternion_t(1.0f / std::sqrt(2.0f), 1.0f / std::sqrt(2.0f), 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f)));
+    auto wp0(square_poly.to_world_polygon(quaternion_t(1.0f / std::sqrt(2.0f), 1.0f / std::sqrt(2.0f), 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f)));
 
     /* Checks */
     BOOST_REQUIRE(wp0.number_of_vertices() == 4);
-    BOOST_CHECK(fabs(magnitude(wp0.vertex(0) - point_t( 1.5f, -1.0f,  1.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp0.vertex(1) - point_t( 1.5f, -1.0f, -0.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp0.vertex(2) - point_t(-0.5f, -1.0f, -0.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp0.vertex(3) - point_t(-0.5f, -1.0f,  1.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp0.vertex(0) - point_t<>( 1.5f, -1.0f,  1.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp0.vertex(1) - point_t<>( 1.5f, -1.0f, -0.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp0.vertex(2) - point_t<>(-0.5f, -1.0f, -0.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp0.vertex(3) - point_t<>(-0.5f, -1.0f,  1.5f))) < result_tolerance);
 
-    auto wp1(square_poly.to_world_polygon(quaternion_t(1.0f / std::sqrt(2.0f), -1.0f / std::sqrt(2.0f), 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f)));
+    auto wp1(square_poly.to_world_polygon(quaternion_t(1.0f / std::sqrt(2.0f), -1.0f / std::sqrt(2.0f), 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f)));
 
     /* Checks */
     BOOST_REQUIRE(wp1.number_of_vertices() == 4);
-    BOOST_CHECK(fabs(magnitude(wp1.vertex(0) - point_t( 1.5f, 1.0f, -1.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp1.vertex(1) - point_t( 1.5f, 1.0f,  0.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp1.vertex(2) - point_t(-0.5f, 1.0f,  0.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp1.vertex(3) - point_t(-0.5f, 1.0f, -1.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp1.vertex(0) - point_t<>( 1.5f, 1.0f, -1.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp1.vertex(1) - point_t<>( 1.5f, 1.0f,  0.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp1.vertex(2) - point_t<>(-0.5f, 1.0f,  0.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp1.vertex(3) - point_t<>(-0.5f, 1.0f, -1.5f))) < result_tolerance);
 }
 
 BOOST_FIXTURE_TEST_CASE( polygon_to_world_polygon_with_translate_and_rotate_test, polygon_fixture )
 {
-    auto wp0(square_poly.to_world_polygon(quaternion_t(1.0f / std::sqrt(2.0f), 1.0f / std::sqrt(2.0f), 0.0f, 0.0f), point_t(1.0f, -2.0f, 3.0f)));
+    auto wp0(square_poly.to_world_polygon(quaternion_t(1.0f / std::sqrt(2.0f), 1.0f / std::sqrt(2.0f), 0.0f, 0.0f), point_t<>(1.0f, -2.0f, 3.0f)));
 
     /* Checks */
     BOOST_REQUIRE(wp0.number_of_vertices() == 4);
-    BOOST_CHECK(fabs(magnitude(wp0.vertex(0) - point_t(2.5f, -3.0f, 4.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp0.vertex(1) - point_t(2.5f, -3.0f, 2.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp0.vertex(2) - point_t(0.5f, -3.0f, 2.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp0.vertex(3) - point_t(0.5f, -3.0f, 4.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp0.vertex(0) - point_t<>(2.5f, -3.0f, 4.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp0.vertex(1) - point_t<>(2.5f, -3.0f, 2.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp0.vertex(2) - point_t<>(0.5f, -3.0f, 2.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp0.vertex(3) - point_t<>(0.5f, -3.0f, 4.5f))) < result_tolerance);
 
-    auto wp1(square_poly.to_world_polygon(quaternion_t(1.0f / std::sqrt(2.0f), -1.0f / std::sqrt(2.0f), 0.0f, 0.0f), point_t(-1.0f, -1.0f, 3.0f)));
+    auto wp1(square_poly.to_world_polygon(quaternion_t(1.0f / std::sqrt(2.0f), -1.0f / std::sqrt(2.0f), 0.0f, 0.0f), point_t<>(-1.0f, -1.0f, 3.0f)));
 
     /* Checks */
     BOOST_REQUIRE(wp1.number_of_vertices() == 4);
-    BOOST_CHECK(fabs(magnitude(wp1.vertex(0) - point_t( 0.5f, 0.0f, 1.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp1.vertex(1) - point_t( 0.5f, 0.0f, 3.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp1.vertex(2) - point_t(-1.5f, 0.0f, 3.5f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(wp1.vertex(3) - point_t(-1.5f, 0.0f, 1.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp1.vertex(0) - point_t<>( 0.5f, 0.0f, 1.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp1.vertex(1) - point_t<>( 0.5f, 0.0f, 3.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp1.vertex(2) - point_t<>(-1.5f, 0.0f, 3.5f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(wp1.vertex(3) - point_t<>(-1.5f, 0.0f, 1.5f))) < result_tolerance);
 }
 
 BOOST_FIXTURE_TEST_CASE( polygon_contains_vertices_test, polygon_fixture )
@@ -154,13 +154,13 @@ BOOST_FIXTURE_TEST_CASE( polygon_contains_vertices_test, polygon_fixture )
 BOOST_FIXTURE_TEST_CASE( polygon_normal_test, polygon_fixture )
 {
     polygon rev_square_poly(&pts, { 3, 2, 1, 0 });
-    BOOST_CHECK(square_poly.normal()     == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(rev_square_poly.normal() == point_t(0.0f, 0.0f,  1.0f));
+    BOOST_CHECK(square_poly.normal()     == point_t<>(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(rev_square_poly.normal() == point_t<>(0.0f, 0.0f,  1.0f));
 }
 
 BOOST_AUTO_TEST_CASE( polygon_to_triangles_line_test )
 {
-    std::vector<point_t> pts{ point_t( 1.5f,  1.5f, 1.0f), point_t( 1.5f, -0.5f, 1.0f) };
+    std::vector<point_t<>> pts{ point_t<>( 1.5f,  1.5f, 1.0f), point_t<>( 1.5f, -0.5f, 1.0f) };
     polygon uut(&pts, { 0, 1 });
 
     std::vector<int> tris;
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE( polygon_to_triangles_line_test )
 
 BOOST_AUTO_TEST_CASE( polygon_to_triangles_triangle_test )
 {
-    std::vector<point_t> pts{ point_t( 1.5f,  1.5f, 1.0f), point_t( 1.5f, -0.5f, 1.0f), point_t(-0.5f, -0.5f, 1.0f) };
+    std::vector<point_t<>> pts{ point_t<>( 1.5f,  1.5f, 1.0f), point_t<>( 1.5f, -0.5f, 1.0f), point_t<>(-0.5f, -0.5f, 1.0f) };
     polygon uut(&pts, { 0, 1, 2 });
 
     std::vector<int> tris;
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE( polygon_to_triangles_triangle_test )
 
 BOOST_AUTO_TEST_CASE( polygon_to_triangles_square_test )
 {
-    std::vector<point_t> pts{ point_t( 1.5f,  1.5f, 1.0f), point_t( 1.5f, -0.5f, 1.0f), point_t(-0.5f, -0.5f, 1.0f), point_t(-0.5f,  1.5f, 1.0f) };
+    std::vector<point_t<>> pts{ point_t<>( 1.5f,  1.5f, 1.0f), point_t<>( 1.5f, -0.5f, 1.0f), point_t<>(-0.5f, -0.5f, 1.0f), point_t<>(-0.5f,  1.5f, 1.0f) };
     polygon uut(&pts, { 0, 1, 2, 3 });
 
     std::vector<int> tris;
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE( polygon_to_triangles_square_test )
 
 BOOST_AUTO_TEST_CASE( polygon_to_triangles_obvious_extreme_test )
 {
-    std::vector<point_t> pts{ point_t( 1.5f,  1.5f, 1.0f), point_t( 1.5f, -0.5f, 1.0f), point_t(-0.5f, -0.5f, 1.0f), point_t(-0.5f,  7.5f, 1.0f) };
+    std::vector<point_t<>> pts{ point_t<>( 1.5f,  1.5f, 1.0f), point_t<>( 1.5f, -0.5f, 1.0f), point_t<>(-0.5f, -0.5f, 1.0f), point_t<>(-0.5f,  7.5f, 1.0f) };
     polygon uut(&pts, { 0, 1, 2, 3 });
 
     std::vector<int> tris;
@@ -223,8 +223,8 @@ BOOST_AUTO_TEST_CASE( polygon_to_triangles_obvious_extreme_test )
 
 BOOST_AUTO_TEST_CASE( polygon_to_triangles_octogon_test )
 {
-    std::vector<point_t> pts{   point_t(0.0f, 1.0f, 0.0f), point_t(0.0f, 2.0f, 0.0f), point_t(1.0f, 3.0f, 0.0f), point_t(2.0f, 3.0f, 0.0f),
-                                point_t(3.0f, 2.0f, 0.0f), point_t(3.0f, 1.0f, 0.0f), point_t(2.0f, 0.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f) };
+    std::vector<point_t<>> pts{   point_t<>(0.0f, 1.0f, 0.0f), point_t<>(0.0f, 2.0f, 0.0f), point_t<>(1.0f, 3.0f, 0.0f), point_t<>(2.0f, 3.0f, 0.0f),
+                                point_t<>(3.0f, 2.0f, 0.0f), point_t<>(3.0f, 1.0f, 0.0f), point_t<>(2.0f, 0.0f, 0.0f), point_t<>(1.0f, 0.0f, 0.0f) };
     polygon uut(&pts, { 0, 1, 2, 3, 4, 5, 6, 7 });
 
     std::vector<int> tris;
@@ -254,9 +254,9 @@ BOOST_AUTO_TEST_CASE( polygon_to_triangles_octogon_test )
 
 BOOST_AUTO_TEST_CASE( polygon_to_triangles_e_test )
 {
-    std::vector<point_t> pts{   point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 5.0f, 0.0f), point_t(2.0f, 5.0f, 0.0f), point_t(2.0f, 4.0f, 0.0f),
-                                point_t(1.0f, 4.0f, 0.0f), point_t(1.0f, 3.0f, 0.0f), point_t(2.0f, 3.0f, 0.0f), point_t(2.0f, 2.0f, 0.0f),
-                                point_t(1.0f, 2.0f, 0.0f), point_t(1.0f, 1.0f, 0.0f), point_t(2.0f, 1.0f, 0.0f), point_t(2.0f, 0.0f, 0.0f) };
+    std::vector<point_t<>> pts{   point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 5.0f, 0.0f), point_t<>(2.0f, 5.0f, 0.0f), point_t<>(2.0f, 4.0f, 0.0f),
+                                point_t<>(1.0f, 4.0f, 0.0f), point_t<>(1.0f, 3.0f, 0.0f), point_t<>(2.0f, 3.0f, 0.0f), point_t<>(2.0f, 2.0f, 0.0f),
+                                point_t<>(1.0f, 2.0f, 0.0f), point_t<>(1.0f, 1.0f, 0.0f), point_t<>(2.0f, 1.0f, 0.0f), point_t<>(2.0f, 0.0f, 0.0f) };
     polygon uut(&pts, { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 });
 
     std::vector<int> tris;
@@ -295,9 +295,9 @@ BOOST_AUTO_TEST_CASE( polygon_to_triangles_e_test )
 
 BOOST_AUTO_TEST_CASE( polygon_to_triangles_octogon_hole_in_square_test )
 {
-    std::vector<point_t> pts{   point_t( 0.0f,  1.0f, 0.0f), point_t( 0.0f, 2.0f, 0.0f), point_t(1.0f, 3.0f, 0.0f), point_t(2.0f,  3.0f, 0.0f),
-                                point_t( 3.0f,  2.0f, 0.0f), point_t( 3.0f, 1.0f, 0.0f), point_t(2.0f, 0.0f, 0.0f), point_t(1.0f,  0.0f, 0.0f),
-                                point_t(-1.0f, -1.0f, 0.0f), point_t(-1.0f, 4.0f, 0.0f), point_t(4.0f, 4.0f, 0.0f), point_t(4.0f, -1.0f, 0.0f) };
+    std::vector<point_t<>> pts{   point_t<>( 0.0f,  1.0f, 0.0f), point_t<>( 0.0f, 2.0f, 0.0f), point_t<>(1.0f, 3.0f, 0.0f), point_t<>(2.0f,  3.0f, 0.0f),
+                                point_t<>( 3.0f,  2.0f, 0.0f), point_t<>( 3.0f, 1.0f, 0.0f), point_t<>(2.0f, 0.0f, 0.0f), point_t<>(1.0f,  0.0f, 0.0f),
+                                point_t<>(-1.0f, -1.0f, 0.0f), point_t<>(-1.0f, 4.0f, 0.0f), point_t<>(4.0f, 4.0f, 0.0f), point_t<>(4.0f, -1.0f, 0.0f) };
     polygon uut(&pts, { 8, 9, 10, 11, 8, 7, 6, 5, 4, 3, 2, 1, 0, 7 });
 
     std::vector<int> tris;
@@ -345,9 +345,9 @@ BOOST_AUTO_TEST_CASE( polygon_to_triangles_octogon_hole_in_square_test )
 
 BOOST_AUTO_TEST_CASE( polygon_to_triangles_h_test )
 {
-    std::vector<point_t> pts{   point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 3.0f, 0.0f), point_t(1.0f, 3.0f, 0.0f), point_t(1.0f, 2.0f, 0.0f),
-                                point_t(2.0f, 2.0f, 0.0f), point_t(2.0f, 3.0f, 0.0f), point_t(3.0f, 3.0f, 0.0f), point_t(3.0f, 0.0f, 0.0f),
-                                point_t(2.0f, 0.0f, 0.0f), point_t(2.0f, 1.0f, 0.0f), point_t(1.0f, 1.0f, 0.0f), point_t(1.0f, 0.0f, 0.0f) };
+    std::vector<point_t<>> pts{   point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 3.0f, 0.0f), point_t<>(1.0f, 3.0f, 0.0f), point_t<>(1.0f, 2.0f, 0.0f),
+                                point_t<>(2.0f, 2.0f, 0.0f), point_t<>(2.0f, 3.0f, 0.0f), point_t<>(3.0f, 3.0f, 0.0f), point_t<>(3.0f, 0.0f, 0.0f),
+                                point_t<>(2.0f, 0.0f, 0.0f), point_t<>(2.0f, 1.0f, 0.0f), point_t<>(1.0f, 1.0f, 0.0f), point_t<>(1.0f, 0.0f, 0.0f) };
     polygon uut(&pts, { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 });
 
     std::vector<int> tris;
@@ -380,9 +380,9 @@ BOOST_AUTO_TEST_CASE( polygon_to_triangles_h_test )
 
 BOOST_AUTO_TEST_CASE( polygon_to_triangles_star_test )
 {
-    std::vector<point_t> pts{   point_t(0.0f, 3.0f, 0.0f), point_t(0.0f, 2.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 1.0f, 2.0f),
-                                point_t(0.0f, 0.0f, 3.0f), point_t(0.0f, 2.0f, 3.0f), point_t(0.0f, 3.0f, 4.0f), point_t(0.0f, 4.0f, 3.0f),
-                                point_t(0.0f, 6.0f, 3.0f), point_t(0.0f, 5.0f, 2.0f), point_t(0.0f, 6.0f, 1.0f), point_t(0.0f, 4.0f, 1.0f) };
+    std::vector<point_t<>> pts{   point_t<>(0.0f, 3.0f, 0.0f), point_t<>(0.0f, 2.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 1.0f, 2.0f),
+                                point_t<>(0.0f, 0.0f, 3.0f), point_t<>(0.0f, 2.0f, 3.0f), point_t<>(0.0f, 3.0f, 4.0f), point_t<>(0.0f, 4.0f, 3.0f),
+                                point_t<>(0.0f, 6.0f, 3.0f), point_t<>(0.0f, 5.0f, 2.0f), point_t<>(0.0f, 6.0f, 1.0f), point_t<>(0.0f, 4.0f, 1.0f) };
     polygon uut(&pts, { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 });
 
     std::vector<int> tris;
@@ -418,14 +418,14 @@ BOOST_AUTO_TEST_CASE( polygon_to_triangles_star_test )
 
 BOOST_FIXTURE_TEST_CASE( world_polygon_points_above_plane_x_1_test, world_polygon_fixture )
 {
-    uut.points_above_plane(point_t(1.0f, 0.0f, 0.0f), point_t(-1.0f, 0.0f, 0.0f));
+    uut.points_above_plane(point_t<>(1.0f, 0.0f, 0.0f), point_t<>(-1.0f, 0.0f, 0.0f));
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(-0.5f, -0.5f,  1.0f),
-        point_t(-0.5f,  1.5f,  1.0f),
-        point_t(-2.5f, -0.5f,  1.0f),
-        point_t(-0.5f, -0.5f,  6.0f),
-        point_t(-0.5f,  1.5f, -3.0f) 
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(-0.5f, -0.5f,  1.0f),
+        point_t<>(-0.5f,  1.5f,  1.0f),
+        point_t<>(-2.5f, -0.5f,  1.0f),
+        point_t<>(-0.5f, -0.5f,  6.0f),
+        point_t<>(-0.5f,  1.5f, -3.0f) 
     }));
 
     /* Checks */
@@ -440,13 +440,13 @@ BOOST_FIXTURE_TEST_CASE( world_polygon_points_above_plane_x_1_test, world_polygo
 
 BOOST_FIXTURE_TEST_CASE( world_polygon_points_above_plane_my_1_test, world_polygon_fixture )
 {
-    uut.points_above_plane(point_t(0.0f, 1.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f));
+    uut.points_above_plane(point_t<>(0.0f, 1.0f, 0.0f), point_t<>(0.0f, 1.0f, 0.0f));
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.5f,  1.5f,  1.0f),
-        point_t(-0.5f,  1.5f,  1.0f),
-        point_t( 1.5f,  3.5f,  1.0f),
-        point_t(-0.5f,  1.5f, -3.0f) 
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.5f,  1.5f,  1.0f),
+        point_t<>(-0.5f,  1.5f,  1.0f),
+        point_t<>( 1.5f,  3.5f,  1.0f),
+        point_t<>(-0.5f,  1.5f, -3.0f) 
     }));
 
     /* Checks */
@@ -461,10 +461,10 @@ BOOST_FIXTURE_TEST_CASE( world_polygon_points_above_plane_my_1_test, world_polyg
 
 BOOST_FIXTURE_TEST_CASE( world_polygon_points_above_plane_z_0_test, world_polygon_fixture )
 {
-    uut.points_above_plane(point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, -1.0f));
+    uut.points_above_plane(point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, -1.0f));
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(-0.5f,  1.5f, -3.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(-0.5f,  1.5f, -3.0f)
     }));
 
     /* Checks */
@@ -479,10 +479,10 @@ BOOST_FIXTURE_TEST_CASE( world_polygon_points_above_plane_z_0_test, world_polygo
 
 BOOST_FIXTURE_TEST_CASE( world_polygon_points_above_point_on_plane_test, world_polygon_fixture )
 {
-    uut.points_above_plane(point_t(-0.5f, -0.5f, 6.0f), point_t(0.0f, 0.0f, 1.0f));
+    uut.points_above_plane(point_t<>(-0.5f, -0.5f, 6.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(-0.5f, -0.5f, 6.0f) 
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(-0.5f, -0.5f, 6.0f) 
     }));
 
     /* Checks */
@@ -497,38 +497,38 @@ BOOST_FIXTURE_TEST_CASE( world_polygon_points_above_point_on_plane_test, world_p
 
 BOOST_FIXTURE_TEST_CASE( world_polygon_extreme_vertices_test, world_polygon_fixture )
 {
-    point_t neg_vert;
-    BOOST_CHECK(uut.extreme_vertices(&neg_vert, point_t(1.0f, 0.0f, 0.0f)) == point_t( 1.5f, -0.5f, 1.0f));
-    BOOST_CHECK(neg_vert == point_t(-2.5f, -0.5f, 1.0f));
+    point_t<> neg_vert;
+    BOOST_CHECK(uut.extreme_vertices(&neg_vert, point_t<>(1.0f, 0.0f, 0.0f)) == point_t<>( 1.5f, -0.5f, 1.0f));
+    BOOST_CHECK(neg_vert == point_t<>(-2.5f, -0.5f, 1.0f));
 
-    BOOST_CHECK(uut.extreme_vertices(&neg_vert, point_t(1.0f, 1.0f, 1.0f)) == point_t( 1.5f,  3.5f, 1.0f));
-    BOOST_CHECK(neg_vert == point_t(-2.5f, -0.5f, 1.0f));
+    BOOST_CHECK(uut.extreme_vertices(&neg_vert, point_t<>(1.0f, 1.0f, 1.0f)) == point_t<>( 1.5f,  3.5f, 1.0f));
+    BOOST_CHECK(neg_vert == point_t<>(-2.5f, -0.5f, 1.0f));
 
-    BOOST_CHECK(uut.extreme_vertices(&neg_vert, point_t(-1.0f, -1.0f, -1.0f)) == point_t(-2.5f, -0.5f, 1.0f));
-    BOOST_CHECK(neg_vert == point_t( 1.5f,  3.5f, 1.0f));
+    BOOST_CHECK(uut.extreme_vertices(&neg_vert, point_t<>(-1.0f, -1.0f, -1.0f)) == point_t<>(-2.5f, -0.5f, 1.0f));
+    BOOST_CHECK(neg_vert == point_t<>( 1.5f,  3.5f, 1.0f));
 }
 
 BOOST_FIXTURE_TEST_CASE( world_polygon_center_test, world_polygon_fixture )
 {
-    BOOST_CHECK(uut.center() == point_t(0.0f, 0.75f, 1.125f));
+    BOOST_CHECK(uut.center() == point_t<>(0.0f, 0.75f, 1.125f));
 }
 
 BOOST_AUTO_TEST_CASE( world_polygon_intersection_vertex_vertex_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 0.0f)
+        point_t<>( 1.0f,  1.0f, 0.0f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.0f, 0.5f)
+        point_t<>( 1.0f,  1.0f, 0.5f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.0f, 0.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.0f, 0.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -544,19 +544,19 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_vertex_line_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 0.0f)
+        point_t<>( 1.0f,  1.0f, 0.0f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.0f, 0.5f),
-        point_t( 1.0f,  1.5f, 0.5f)
+        point_t<>( 1.0f,  1.0f, 0.5f),
+        point_t<>( 1.0f,  1.5f, 0.5f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.0f, 0.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.0f, 0.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -572,20 +572,20 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_vertex_polygon_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 0.0f)
+        point_t<>( 1.0f,  1.0f, 0.0f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.0f, 0.5f),
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.5f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  1.0f, 0.5f),
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.5f,  1.5f, 0.5f),
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.0f, 0.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.0f, 0.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -601,19 +601,19 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_vertex_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 0.5f),
-        point_t( 1.0f,  1.5f, 0.5f)
+        point_t<>( 1.0f,  1.0f, 0.5f),
+        point_t<>( 1.0f,  1.5f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.0f, 0.0f)
+        point_t<>( 1.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.0f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.0f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -629,20 +629,20 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_polygon_vertex_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 0.5f),
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.5f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  1.0f, 0.5f),
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.5f,  1.5f, 0.5f),
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.0f, 0.0f)
+        point_t<>( 1.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.0f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.0f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -658,20 +658,20 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_line_skew_0_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 0.5f),
-        point_t( 1.0f,  2.0f, 0.5f)
+        point_t<>( 1.0f,  1.0f, 0.5f),
+        point_t<>( 1.0f,  2.0f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 0.0f,  1.5f, 0.0f),
-        point_t( 2.0f,  1.5f, 0.0f)
+        point_t<>( 0.0f,  1.5f, 0.0f),
+        point_t<>( 2.0f,  1.5f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -687,20 +687,20 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_line_skew_1_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.0f, 0.5f)
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.0f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 0.0f,  1.5f, 0.0f),
-        point_t( 1.0f,  1.5f, 0.0f)
+        point_t<>( 0.0f,  1.5f, 0.0f),
+        point_t<>( 1.0f,  1.5f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -716,20 +716,20 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_line_skew_2_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.0f, 0.5f)
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.0f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 0.0f,  2.0f, 0.0f),
-        point_t( 1.0f,  2.0f, 0.0f)
+        point_t<>( 0.0f,  2.0f, 0.0f),
+        point_t<>( 1.0f,  2.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  2.0f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  2.0f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -745,20 +745,20 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_line_skew_3_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.5f, 0.0f),
-        point_t( 0.0f,  1.5f, 0.0f)
+        point_t<>( 1.0f,  1.5f, 0.0f),
+        point_t<>( 0.0f,  1.5f, 0.0f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.0f, 0.5f)
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.0f, 0.5f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -774,20 +774,20 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_line_skew_4_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  2.0f, 0.0f),
-        point_t( 0.0f,  2.0f, 0.0f)
+        point_t<>( 1.0f,  2.0f, 0.0f),
+        point_t<>( 0.0f,  2.0f, 0.0f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.0f, 0.5f)
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.0f, 0.5f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  2.0f, 0.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  2.0f, 0.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -803,21 +803,21 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_line_parallel_0_overlap_te
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 0.5f),
-        point_t( 1.0f,  2.0f, 0.5f)
+        point_t<>( 1.0f,  1.0f, 0.5f),
+        point_t<>( 1.0f,  2.0f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.5f, 0.0f),
-        point_t( 1.0f,  2.5f, 0.0f)
+        point_t<>( 1.0f,  1.5f, 0.0f),
+        point_t<>( 1.0f,  2.5f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.0f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.0f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -833,21 +833,21 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_line_parallel_1_overlap_te
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 0.5f),
-        point_t( 1.0f,  2.0f, 0.5f)
+        point_t<>( 1.0f,  1.0f, 0.5f),
+        point_t<>( 1.0f,  2.0f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  0.5f, 0.0f),
-        point_t( 1.0f,  1.5f, 0.0f)
+        point_t<>( 1.0f,  0.5f, 0.0f),
+        point_t<>( 1.0f,  1.5f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  1.0f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  1.0f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -863,21 +863,21 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_line_parallel_3_overlap_te
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 0.5f),
-        point_t( 1.0f,  3.0f, 0.5f)
+        point_t<>( 1.0f,  1.0f, 0.5f),
+        point_t<>( 1.0f,  3.0f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.5f, 0.0f),
-        point_t( 1.0f,  2.5f, 0.0f)
+        point_t<>( 1.0f,  1.5f, 0.0f),
+        point_t<>( 1.0f,  2.5f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.5f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.5f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -893,21 +893,21 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_line_parallel_4_overlap_te
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.5f, 0.5f)
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.5f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.0f, 0.0f),
-        point_t( 1.0f,  3.0f, 0.0f)
+        point_t<>( 1.0f,  1.0f, 0.0f),
+        point_t<>( 1.0f,  3.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.5f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.5f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -923,21 +923,21 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_line_parallel_5_overlap_te
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.5f, 0.5f)
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.5f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.5f, 0.0f),
-        point_t( 1.0f,  2.5f, 0.0f)
+        point_t<>( 1.0f,  1.5f, 0.0f),
+        point_t<>( 1.0f,  2.5f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.5f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.5f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -953,23 +953,23 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_polygon_0_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.5f, 0.5f)
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.5f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 0.0f,  1.0f, 0.0f),
-        point_t( 0.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  1.0f, 0.0f)
+        point_t<>( 0.0f,  1.0f, 0.0f),
+        point_t<>( 0.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.5f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.5f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -985,23 +985,23 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_polygon_1_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  3.5f, 0.5f)
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  3.5f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 0.0f,  1.0f, 0.0f),
-        point_t( 0.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  1.0f, 0.0f)
+        point_t<>( 0.0f,  1.0f, 0.0f),
+        point_t<>( 0.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  3.0f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  3.0f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1017,23 +1017,23 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_polygon_2_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  0.5f, 0.5f),
-        point_t( 1.0f,  2.5f, 0.5f)
+        point_t<>( 1.0f,  0.5f, 0.5f),
+        point_t<>( 1.0f,  2.5f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 0.0f,  1.0f, 0.0f),
-        point_t( 0.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  1.0f, 0.0f)
+        point_t<>( 0.0f,  1.0f, 0.0f),
+        point_t<>( 0.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  2.5f, 0.5f),
-        point_t( 1.0f,  1.0f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  2.5f, 0.5f),
+        point_t<>( 1.0f,  1.0f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1049,23 +1049,23 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_polygon_3_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.0f,  0.5f, 0.5f),
-        point_t( 1.0f,  3.5f, 0.5f)
+        point_t<>( 1.0f,  0.5f, 0.5f),
+        point_t<>( 1.0f,  3.5f, 0.5f)
     });
 
     world_polygon p1({
-        point_t( 0.0f,  1.0f, 0.0f),
-        point_t( 0.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  1.0f, 0.0f)
+        point_t<>( 0.0f,  1.0f, 0.0f),
+        point_t<>( 0.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.0f, 0.5f),
-        point_t( 1.0f,  3.0f, 0.5f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.0f, 0.5f),
+        point_t<>( 1.0f,  3.0f, 0.5f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, -1.0f), point_t(0.0f, 0.0f, -0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, -1.0f), point_t<>(0.0f, 0.0f, -0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1083,23 +1083,23 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_polygon_4_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 0.0f,  1.0f, 0.0f),
-        point_t( 0.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  1.0f, 0.0f)
+        point_t<>( 0.0f,  1.0f, 0.0f),
+        point_t<>( 0.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  1.0f, 0.0f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  2.5f, 0.5f)
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  2.5f, 0.5f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.0f),
-        point_t( 1.0f,  2.5f, 0.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.0f),
+        point_t<>( 1.0f,  2.5f, 0.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1115,23 +1115,23 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_polygon_5_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 0.0f,  1.0f, 0.0f),
-        point_t( 0.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  1.0f, 0.0f)
+        point_t<>( 0.0f,  1.0f, 0.0f),
+        point_t<>( 0.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  1.0f, 0.0f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  1.5f, 0.5f),
-        point_t( 1.0f,  3.5f, 0.5f)
+        point_t<>( 1.0f,  1.5f, 0.5f),
+        point_t<>( 1.0f,  3.5f, 0.5f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.5f, 0.0f),
-        point_t( 1.0f,  3.0f, 0.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.5f, 0.0f),
+        point_t<>( 1.0f,  3.0f, 0.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1147,23 +1147,23 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_polygon_6_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 0.0f,  1.0f, 0.0f),
-        point_t( 0.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  1.0f, 0.0f)
+        point_t<>( 0.0f,  1.0f, 0.0f),
+        point_t<>( 0.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  1.0f, 0.0f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  0.5f, 0.5f),
-        point_t( 1.0f,  2.5f, 0.5f)
+        point_t<>( 1.0f,  0.5f, 0.5f),
+        point_t<>( 1.0f,  2.5f, 0.5f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  2.5f, 0.0f),
-        point_t( 1.0f,  1.0f, 0.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  2.5f, 0.0f),
+        point_t<>( 1.0f,  1.0f, 0.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1179,23 +1179,23 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_polygon_7_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 0.0f,  1.0f, 0.0f),
-        point_t( 0.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  1.0f, 0.0f)
+        point_t<>( 0.0f,  1.0f, 0.0f),
+        point_t<>( 0.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  1.0f, 0.0f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  0.5f, 0.5f),
-        point_t( 1.0f,  3.5f, 0.5f)
+        point_t<>( 1.0f,  0.5f, 0.5f),
+        point_t<>( 1.0f,  3.5f, 0.5f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.0f, 0.0f),
-        point_t( 1.0f,  3.0f, 0.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.0f, 0.0f),
+        point_t<>( 1.0f,  3.0f, 0.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1211,23 +1211,23 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_line_polygon_8_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 0.0f,  1.0f, 0.0f),
-        point_t( 0.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  3.0f, 0.0f),
-        point_t( 2.0f,  1.0f, 0.0f)
+        point_t<>( 0.0f,  1.0f, 0.0f),
+        point_t<>( 0.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  3.0f, 0.0f),
+        point_t<>( 2.0f,  1.0f, 0.0f)
     });
 
     world_polygon p1({
-        point_t( 1.0f,  0.5f, 0.5f),
-        point_t( 1.5f,  3.5f, 0.5f)
+        point_t<>( 1.0f,  0.5f, 0.5f),
+        point_t<>( 1.5f,  3.5f, 0.5f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.08333f,  1.0f, 0.0f),
-        point_t( 1.41667f,  3.0f, 0.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.08333f,  1.0f, 0.0f),
+        point_t<>( 1.41667f,  3.0f, 0.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 0.5f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 0.5f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1243,27 +1243,27 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_square0_test )
 {
     /* Square test 0 */
     world_polygon p0({
-        point_t( 1.5f,  1.5f, 1.0f),
-        point_t( 1.5f, -0.5f, 1.0f),
-        point_t(-0.5f, -0.5f, 1.0f),
-        point_t(-0.5f,  1.5f, 1.0f)
+        point_t<>( 1.5f,  1.5f, 1.0f),
+        point_t<>( 1.5f, -0.5f, 1.0f),
+        point_t<>(-0.5f, -0.5f, 1.0f),
+        point_t<>(-0.5f,  1.5f, 1.0f)
     });
 
     world_polygon p1({
-        point_t(-1.0f,  1.0f, 0.0f),
-        point_t(-1.0f, -1.0f, 0.0f),
-        point_t( 1.0f, -1.0f, 0.0f),
-        point_t( 1.0f,  1.0f, 0.0f)
+        point_t<>(-1.0f,  1.0f, 0.0f),
+        point_t<>(-1.0f, -1.0f, 0.0f),
+        point_t<>( 1.0f, -1.0f, 0.0f),
+        point_t<>( 1.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  1.0f, 1.0f),
-        point_t( 1.0f, -0.5f, 1.0f),
-        point_t(-0.5f, -0.5f, 1.0f),
-        point_t(-0.5f,  1.0f, 1.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  1.0f, 1.0f),
+        point_t<>( 1.0f, -0.5f, 1.0f),
+        point_t<>(-0.5f, -0.5f, 1.0f),
+        point_t<>(-0.5f,  1.0f, 1.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1279,27 +1279,27 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_square1_test )
 {
     /* Square test 1 */
     world_polygon p0({
-        point_t( 0.0f,  1.0f, 1.0f),
-        point_t( 0.0f, -1.0f, 1.0f),
-        point_t(-2.0f, -1.0f, 1.0f),
-        point_t(-2.0f,  1.0f, 1.0f)
+        point_t<>( 0.0f,  1.0f, 1.0f),
+        point_t<>( 0.0f, -1.0f, 1.0f),
+        point_t<>(-2.0f, -1.0f, 1.0f),
+        point_t<>(-2.0f,  1.0f, 1.0f)
     });
 
     world_polygon p1({
-        point_t(-1.0f,  1.0f, 0.0f),
-        point_t(-1.0f, -1.0f, 0.0f),
-        point_t( 1.0f, -1.0f, 0.0f),
-        point_t( 1.0f,  1.0f, 0.0f)
+        point_t<>(-1.0f,  1.0f, 0.0f),
+        point_t<>(-1.0f, -1.0f, 0.0f),
+        point_t<>( 1.0f, -1.0f, 0.0f),
+        point_t<>( 1.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(-1.0f,  1.0f, 1.0f),
-        point_t( 0.0f,  1.0f, 1.0f),
-        point_t( 0.0f, -1.0f, 1.0f),
-        point_t(-1.0f, -1.0f, 1.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(-1.0f,  1.0f, 1.0f),
+        point_t<>( 0.0f,  1.0f, 1.0f),
+        point_t<>( 0.0f, -1.0f, 1.0f),
+        point_t<>(-1.0f, -1.0f, 1.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1315,27 +1315,27 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_square2_test )
 {
     /* Square test 2 */
     world_polygon p0({
-        point_t( 0.0f,  1.1f, 1.0f),
-        point_t( 0.0f, -1.1f, 1.0f),
-        point_t(-2.0f, -1.1f, 1.0f),
-        point_t(-2.0f,  1.1f, 1.0f)
+        point_t<>( 0.0f,  1.1f, 1.0f),
+        point_t<>( 0.0f, -1.1f, 1.0f),
+        point_t<>(-2.0f, -1.1f, 1.0f),
+        point_t<>(-2.0f,  1.1f, 1.0f)
     });
 
     world_polygon p1({
-        point_t(-1.0f,  1.0f, 0.0f),
-        point_t(-1.0f, -1.0f, 0.0f),
-        point_t( 1.0f, -1.0f, 0.0f),
-        point_t( 1.0f,  1.0f, 0.0f)
+        point_t<>(-1.0f,  1.0f, 0.0f),
+        point_t<>(-1.0f, -1.0f, 0.0f),
+        point_t<>( 1.0f, -1.0f, 0.0f),
+        point_t<>( 1.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(-1.0f,  1.0f, 1.0f),
-        point_t( 0.0f,  1.0f, 1.0f),
-        point_t( 0.0f, -1.0f, 1.0f),
-        point_t(-1.0f, -1.0f, 1.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(-1.0f,  1.0f, 1.0f),
+        point_t<>( 0.0f,  1.0f, 1.0f),
+        point_t<>( 0.0f, -1.0f, 1.0f),
+        point_t<>(-1.0f, -1.0f, 1.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1351,27 +1351,27 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_square3_test )
 {
     /* Square test 3 */
     world_polygon p0({
-        point_t( 0.5f,  1.5f, 1.0f),
-        point_t( 0.5f, -1.5f, 1.0f),
-        point_t(-0.5f, -1.5f, 1.0f),
-        point_t(-0.5f,  1.5f, 1.0f)
+        point_t<>( 0.5f,  1.5f, 1.0f),
+        point_t<>( 0.5f, -1.5f, 1.0f),
+        point_t<>(-0.5f, -1.5f, 1.0f),
+        point_t<>(-0.5f,  1.5f, 1.0f)
     });
 
     world_polygon p1({
-        point_t(-1.0f,  1.0f, 0.0f),
-        point_t(-1.0f, -1.0f, 0.0f),
-        point_t( 1.0f, -1.0f, 0.0f),
-        point_t( 1.0f,  1.0f, 0.0f)
+        point_t<>(-1.0f,  1.0f, 0.0f),
+        point_t<>(-1.0f, -1.0f, 0.0f),
+        point_t<>( 1.0f, -1.0f, 0.0f),
+        point_t<>( 1.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 0.5f,  1.0f, 1.0f),
-        point_t( 0.5f, -1.0f, 1.0f),
-        point_t(-0.5f, -1.0f, 1.0f),
-        point_t(-0.5f,  1.0f, 1.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 0.5f,  1.0f, 1.0f),
+        point_t<>( 0.5f, -1.0f, 1.0f),
+        point_t<>(-0.5f, -1.0f, 1.0f),
+        point_t<>(-0.5f,  1.0f, 1.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1387,27 +1387,27 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_square4_test )
 {
     /* Square test 4, poly a inside poly b */
     world_polygon p0({
-        point_t( 0.5f,  0.5f, 1.0f),
-        point_t( 0.5f, -0.5f, 1.0f),
-        point_t(-0.5f, -0.5f, 1.0f),
-        point_t(-0.5f,  0.5f, 1.0f)
+        point_t<>( 0.5f,  0.5f, 1.0f),
+        point_t<>( 0.5f, -0.5f, 1.0f),
+        point_t<>(-0.5f, -0.5f, 1.0f),
+        point_t<>(-0.5f,  0.5f, 1.0f)
     });
 
     world_polygon p1({
-        point_t(-1.0f,  1.0f, 0.0f),
-        point_t(-1.0f, -1.0f, 0.0f),
-        point_t( 1.0f, -1.0f, 0.0f),
-        point_t( 1.0f,  1.0f, 0.0f)
+        point_t<>(-1.0f,  1.0f, 0.0f),
+        point_t<>(-1.0f, -1.0f, 0.0f),
+        point_t<>( 1.0f, -1.0f, 0.0f),
+        point_t<>( 1.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 0.5f,  0.5f, 1.0f),
-        point_t( 0.5f, -0.5f, 1.0f),
-        point_t(-0.5f, -0.5f, 1.0f),
-        point_t(-0.5f,  0.5f, 1.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 0.5f,  0.5f, 1.0f),
+        point_t<>( 0.5f, -0.5f, 1.0f),
+        point_t<>(-0.5f, -0.5f, 1.0f),
+        point_t<>(-0.5f,  0.5f, 1.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1423,27 +1423,27 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_square5_test )
 {
     /* Square test 5, poly b inside poly a */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 1.0f),
-        point_t( 1.0f, -1.0f, 1.0f),
-        point_t(-1.0f, -1.0f, 1.0f),
-        point_t(-1.0f,  1.0f, 1.0f)
+        point_t<>( 1.0f,  1.0f, 1.0f),
+        point_t<>( 1.0f, -1.0f, 1.0f),
+        point_t<>(-1.0f, -1.0f, 1.0f),
+        point_t<>(-1.0f,  1.0f, 1.0f)
     });
 
     world_polygon p1({
-        point_t(-0.5f,  0.5f, 0.0f),
-        point_t(-0.5f, -0.5f, 0.0f),
-        point_t( 0.5f, -0.5f, 0.0f),
-        point_t( 0.5f,  0.5f, 0.0f)
+        point_t<>(-0.5f,  0.5f, 0.0f),
+        point_t<>(-0.5f, -0.5f, 0.0f),
+        point_t<>( 0.5f, -0.5f, 0.0f),
+        point_t<>( 0.5f,  0.5f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(-0.5f,  0.5f, 1.0f),
-        point_t( 0.5f,  0.5f, 1.0f),
-        point_t( 0.5f, -0.5f, 1.0f),
-        point_t(-0.5f, -0.5f, 1.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(-0.5f,  0.5f, 1.0f),
+        point_t<>( 0.5f,  0.5f, 1.0f),
+        point_t<>( 0.5f, -0.5f, 1.0f),
+        point_t<>(-0.5f, -0.5f, 1.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1459,31 +1459,31 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_square6_test )
 {
     /* Square test 5, poly b inside poly a */
     world_polygon p0({
-        point_t( 1.0f,  1.0f, 1.0f),
-        point_t( 1.0f, -1.0f, 1.0f),
-        point_t(-1.0f, -1.0f, 1.0f),
-        point_t(-1.0f,  1.0f, 1.0f)
+        point_t<>( 1.0f,  1.0f, 1.0f),
+        point_t<>( 1.0f, -1.0f, 1.0f),
+        point_t<>(-1.0f, -1.0f, 1.0f),
+        point_t<>(-1.0f,  1.0f, 1.0f)
     });
 
     world_polygon p1({
-        point_t(-1.1f,  0.0f, 0.0f),
-        point_t( 0.0f, -1.1f, 0.0f),
-        point_t( 1.1f,  0.0f, 0.0f),
-        point_t( 0.0f,  1.1f, 0.0f)
+        point_t<>(-1.1f,  0.0f, 0.0f),
+        point_t<>( 0.0f, -1.1f, 0.0f),
+        point_t<>( 1.1f,  0.0f, 0.0f),
+        point_t<>( 0.0f,  1.1f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(-0.1f,  1.0f, 1.0f),
-        point_t( 0.1f,  1.0f, 1.0f),
-        point_t( 1.0f,  0.1f, 1.0f),
-        point_t( 1.0f, -0.1f, 1.0f),
-        point_t( 0.1f, -1.0f, 1.0f),
-        point_t(-0.1f, -1.0f, 1.0f),
-        point_t(-1.0f, -0.1f, 1.0f),
-        point_t(-1.0f,  0.1f, 1.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(-0.1f,  1.0f, 1.0f),
+        point_t<>( 0.1f,  1.0f, 1.0f),
+        point_t<>( 1.0f,  0.1f, 1.0f),
+        point_t<>( 1.0f, -0.1f, 1.0f),
+        point_t<>( 0.1f, -1.0f, 1.0f),
+        point_t<>(-0.1f, -1.0f, 1.0f),
+        point_t<>(-1.0f, -0.1f, 1.0f),
+        point_t<>(-1.0f,  0.1f, 1.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1500,25 +1500,25 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_triangle_square0_test )
 {
     /* Square test 3 */
     world_polygon p0({
-        point_t( 0.5f,  1.5f, 1.0f),
-        point_t( 0.5f, -1.5f, 1.0f),
-        point_t(-0.5f, -1.5f, 1.0f),
-        point_t(-0.5f,  1.5f, 1.0f)
+        point_t<>( 0.5f,  1.5f, 1.0f),
+        point_t<>( 0.5f, -1.5f, 1.0f),
+        point_t<>(-0.5f, -1.5f, 1.0f),
+        point_t<>(-0.5f,  1.5f, 1.0f)
     });
 
     world_polygon p1({
-        point_t(-0.5f, -2.0f, 0.0f),
-        point_t( 0.5f, -2.0f, 0.0f),
-        point_t( 0.0f,  1.0f, 0.0f)
+        point_t<>(-0.5f, -2.0f, 0.0f),
+        point_t<>( 0.5f, -2.0f, 0.0f),
+        point_t<>( 0.0f,  1.0f, 0.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(  0.0f,                   1.0f, 1.0f),
-        point_t(  0.5f - (1.0f / 12.0f), -1.5f, 1.0f),
-        point_t( -0.5f + (1.0f / 12.0f), -1.5f, 1.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(  0.0f,                   1.0f, 1.0f),
+        point_t<>(  0.5f - (1.0f / 12.0f), -1.5f, 1.0f),
+        point_t<>( -0.5f + (1.0f / 12.0f), -1.5f, 1.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1534,35 +1534,35 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_octogon0_test )
 {
     /* Octogon test 0 */
     world_polygon p0({
-        point_t( 2.0f,  5.0f, 1.0f),
-        point_t( 3.0f,  4.0f, 1.0f),
-        point_t( 3.0f,  2.0f, 1.0f),
-        point_t( 2.0f,  1.0f, 1.0f),
-        point_t( 0.0f,  1.0f, 1.0f),
-        point_t(-1.0f,  2.0f, 1.0f),
-        point_t(-1.0f,  4.0f, 1.0f),
-        point_t( 0.0f,  5.0f, 1.0f)
+        point_t<>( 2.0f,  5.0f, 1.0f),
+        point_t<>( 3.0f,  4.0f, 1.0f),
+        point_t<>( 3.0f,  2.0f, 1.0f),
+        point_t<>( 2.0f,  1.0f, 1.0f),
+        point_t<>( 0.0f,  1.0f, 1.0f),
+        point_t<>(-1.0f,  2.0f, 1.0f),
+        point_t<>(-1.0f,  4.0f, 1.0f),
+        point_t<>( 0.0f,  5.0f, 1.0f)
     });
 
     world_polygon p1({
-        point_t(-1.0f,  2.0f, 1.0f),
-        point_t(-2.0f,  1.0f, 1.0f),
-        point_t(-2.0f, -1.0f, 1.0f),
-        point_t(-1.0f, -2.0f, 1.0f),
-        point_t( 1.0f, -2.0f, 1.0f), 
-        point_t( 2.0f, -1.0f, 1.0f),
-        point_t( 2.0f,  1.0f, 1.0f),
-        point_t( 1.0f,  2.0f, 1.0f)
+        point_t<>(-1.0f,  2.0f, 1.0f),
+        point_t<>(-2.0f,  1.0f, 1.0f),
+        point_t<>(-2.0f, -1.0f, 1.0f),
+        point_t<>(-1.0f, -2.0f, 1.0f),
+        point_t<>( 1.0f, -2.0f, 1.0f), 
+        point_t<>( 2.0f, -1.0f, 1.0f),
+        point_t<>( 2.0f,  1.0f, 1.0f),
+        point_t<>( 1.0f,  2.0f, 1.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(-1.0f,  2.0f, 1.0f),
-        point_t( 1.0f,  2.0f, 1.0f),
-        point_t( 2.0f,  1.0f, 1.0f),
-        point_t( 0.0f,  1.0f, 1.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(-1.0f,  2.0f, 1.0f),
+        point_t<>( 1.0f,  2.0f, 1.0f),
+        point_t<>( 2.0f,  1.0f, 1.0f),
+        point_t<>( 0.0f,  1.0f, 1.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1578,35 +1578,35 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_octogon1_test )
 {
     /* Octogon test 1 */
     world_polygon p0({
-        point_t( 0.25f,  4.0f, 2.0f), 
-        point_t( 0.50f,  3.0f, 2.0f), 
-        point_t( 0.50f, -3.0f, 2.0f), 
-        point_t( 0.25f, -4.0f, 2.0f),
-        point_t(-0.25f, -4.0f, 2.0f), 
-        point_t(-0.50f, -3.0f, 2.0f), 
-        point_t(-0.50f,  3.0f, 2.0f), 
-        point_t(-0.25f,  4.0f, 2.0f)
+        point_t<>( 0.25f,  4.0f, 2.0f), 
+        point_t<>( 0.50f,  3.0f, 2.0f), 
+        point_t<>( 0.50f, -3.0f, 2.0f), 
+        point_t<>( 0.25f, -4.0f, 2.0f),
+        point_t<>(-0.25f, -4.0f, 2.0f), 
+        point_t<>(-0.50f, -3.0f, 2.0f), 
+        point_t<>(-0.50f,  3.0f, 2.0f), 
+        point_t<>(-0.25f,  4.0f, 2.0f)
     });
 
     world_polygon p1({
-        point_t(-1.0f,  2.0f, 1.0f),
-        point_t(-2.0f,  1.0f, 1.0f), 
-        point_t(-2.0f, -1.0f, 1.0f), 
-        point_t(-1.0f, -2.0f, 1.0f), 
-        point_t( 1.0f, -2.0f, 1.0f),
-        point_t( 2.0f, -1.0f, 1.0f), 
-        point_t( 2.0f,  1.0f, 1.0f), 
-        point_t( 1.0f,  2.0f, 1.0f) 
+        point_t<>(-1.0f,  2.0f, 1.0f),
+        point_t<>(-2.0f,  1.0f, 1.0f), 
+        point_t<>(-2.0f, -1.0f, 1.0f), 
+        point_t<>(-1.0f, -2.0f, 1.0f), 
+        point_t<>( 1.0f, -2.0f, 1.0f),
+        point_t<>( 2.0f, -1.0f, 1.0f), 
+        point_t<>( 2.0f,  1.0f, 1.0f), 
+        point_t<>( 1.0f,  2.0f, 1.0f) 
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 0.5f,  2.0f, 2.0f),
-        point_t( 0.5f, -2.0f, 2.0f),
-        point_t(-0.5f, -2.0f, 2.0f),
-        point_t(-0.5f,  2.0f, 2.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 0.5f,  2.0f, 2.0f),
+        point_t<>( 0.5f, -2.0f, 2.0f),
+        point_t<>(-0.5f, -2.0f, 2.0f),
+        point_t<>(-0.5f,  2.0f, 2.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 2.0f), point_t(0.0f, 0.0f, 2.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 2.0f), point_t<>(0.0f, 0.0f, 2.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1622,37 +1622,37 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_octogon2_test )
 {
     /* Octogon test 2 */
     world_polygon p0({
-        point_t( 4.25f,  4.0f, 2.0f),
-        point_t( 4.50f,  3.0f, 2.0f),
-        point_t( 4.50f, -3.0f, 2.0f),
-        point_t( 4.25f, -4.0f, 2.0f),
-        point_t(-0.25f, -4.0f, 2.0f),
-        point_t(-0.50f, -3.0f, 2.0f),
-        point_t(-0.50f,  3.0f, 2.0f),
-        point_t(-0.25f,  4.0f, 2.0f)
+        point_t<>( 4.25f,  4.0f, 2.0f),
+        point_t<>( 4.50f,  3.0f, 2.0f),
+        point_t<>( 4.50f, -3.0f, 2.0f),
+        point_t<>( 4.25f, -4.0f, 2.0f),
+        point_t<>(-0.25f, -4.0f, 2.0f),
+        point_t<>(-0.50f, -3.0f, 2.0f),
+        point_t<>(-0.50f,  3.0f, 2.0f),
+        point_t<>(-0.25f,  4.0f, 2.0f)
     });
 
     world_polygon p1({
-        point_t(-1.0f,  2.0f, 1.0f),
-        point_t(-2.0f,  1.0f, 1.0f),
-        point_t(-2.0f, -1.0f, 1.0f),
-        point_t(-1.0f, -2.0f, 1.0f),
-        point_t( 1.0f, -2.0f, 1.0f),
-        point_t( 2.0f, -1.0f, 1.0f),
-        point_t( 2.0f,  1.0f, 1.0f),
-        point_t( 1.0f,  2.0f, 1.0f)
+        point_t<>(-1.0f,  2.0f, 1.0f),
+        point_t<>(-2.0f,  1.0f, 1.0f),
+        point_t<>(-2.0f, -1.0f, 1.0f),
+        point_t<>(-1.0f, -2.0f, 1.0f),
+        point_t<>( 1.0f, -2.0f, 1.0f),
+        point_t<>( 2.0f, -1.0f, 1.0f),
+        point_t<>( 2.0f,  1.0f, 1.0f),
+        point_t<>( 1.0f,  2.0f, 1.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 1.0f,  2.0f, 2.0f),
-        point_t( 2.0f,  1.0f, 2.0f),
-        point_t( 2.0f, -1.0f, 2.0f),
-        point_t( 1.0f, -2.0f, 2.0f),
-        point_t(-0.5f, -2.0f, 2.0f),
-        point_t(-0.5f,  2.0f, 2.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 1.0f,  2.0f, 2.0f),
+        point_t<>( 2.0f,  1.0f, 2.0f),
+        point_t<>( 2.0f, -1.0f, 2.0f),
+        point_t<>( 1.0f, -2.0f, 2.0f),
+        point_t<>(-0.5f, -2.0f, 2.0f),
+        point_t<>(-0.5f,  2.0f, 2.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1668,39 +1668,39 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_octogon3_test )
 {
     /* Octogon test 3, poly a inside poly b */
     world_polygon p0({
-        point_t( 4.25f,  4.0f, 2.0f),
-        point_t( 4.50f,  3.0f, 2.0f),
-        point_t( 4.50f, -3.0f, 2.0f),
-        point_t( 4.25f, -4.0f, 2.0f),
-        point_t(-0.25f, -4.0f, 2.0f),
-        point_t(-0.50f, -3.0f, 2.0f),
-        point_t(-0.50f,  3.0f, 2.0f),
-        point_t(-0.25f,  4.0f, 2.0f)
+        point_t<>( 4.25f,  4.0f, 2.0f),
+        point_t<>( 4.50f,  3.0f, 2.0f),
+        point_t<>( 4.50f, -3.0f, 2.0f),
+        point_t<>( 4.25f, -4.0f, 2.0f),
+        point_t<>(-0.25f, -4.0f, 2.0f),
+        point_t<>(-0.50f, -3.0f, 2.0f),
+        point_t<>(-0.50f,  3.0f, 2.0f),
+        point_t<>(-0.25f,  4.0f, 2.0f)
     });
 
     world_polygon p1({
-        point_t(-1.25f,  5.0f, 1.0f),
-        point_t(-1.50f,  4.0f, 1.0f),
-        point_t(-1.50f, -4.0f, 1.0f),
-        point_t(-1.25f, -5.0f, 1.0f),
-        point_t( 5.25f, -5.0f, 1.0f),
-        point_t( 5.50f, -4.0f, 1.0f),
-        point_t( 5.50f,  4.0f, 1.0f),
-        point_t( 5.25f,  5.0f, 1.0f)
+        point_t<>(-1.25f,  5.0f, 1.0f),
+        point_t<>(-1.50f,  4.0f, 1.0f),
+        point_t<>(-1.50f, -4.0f, 1.0f),
+        point_t<>(-1.25f, -5.0f, 1.0f),
+        point_t<>( 5.25f, -5.0f, 1.0f),
+        point_t<>( 5.50f, -4.0f, 1.0f),
+        point_t<>( 5.50f,  4.0f, 1.0f),
+        point_t<>( 5.25f,  5.0f, 1.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 4.25f,  4.0f, 2.0f),
-        point_t( 4.50f,  3.0f, 2.0f),
-        point_t( 4.50f, -3.0f, 2.0f),
-        point_t( 4.25f, -4.0f, 2.0f),
-        point_t(-0.25f, -4.0f, 2.0f),
-        point_t(-0.50f, -3.0f, 2.0f),
-        point_t(-0.50f,  3.0f, 2.0f),
-        point_t(-0.25f,  4.0f, 2.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 4.25f,  4.0f, 2.0f),
+        point_t<>( 4.50f,  3.0f, 2.0f),
+        point_t<>( 4.50f, -3.0f, 2.0f),
+        point_t<>( 4.25f, -4.0f, 2.0f),
+        point_t<>(-0.25f, -4.0f, 2.0f),
+        point_t<>(-0.50f, -3.0f, 2.0f),
+        point_t<>(-0.50f,  3.0f, 2.0f),
+        point_t<>(-0.25f,  4.0f, 2.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1716,39 +1716,39 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_octogon4_test )
 {
     /* Octogon test 4, poly b inside poly a */
     world_polygon p0({
-        point_t( 5.25f,  5.0f, 2.0f),
-        point_t( 5.50f,  4.0f, 2.0f),
-        point_t( 5.50f, -4.0f, 2.0f),
-        point_t( 5.25f, -5.0f, 2.0f),
-        point_t(-1.25f, -5.0f, 2.0f),
-        point_t(-1.50f, -4.0f, 2.0f),
-        point_t(-1.50f,  4.0f, 2.0f),
-        point_t(-1.25f,  5.0f, 2.0f)
+        point_t<>( 5.25f,  5.0f, 2.0f),
+        point_t<>( 5.50f,  4.0f, 2.0f),
+        point_t<>( 5.50f, -4.0f, 2.0f),
+        point_t<>( 5.25f, -5.0f, 2.0f),
+        point_t<>(-1.25f, -5.0f, 2.0f),
+        point_t<>(-1.50f, -4.0f, 2.0f),
+        point_t<>(-1.50f,  4.0f, 2.0f),
+        point_t<>(-1.25f,  5.0f, 2.0f)
     });
 
     world_polygon p1({
-        point_t(-0.25f,  4.0f, 1.0f),
-        point_t(-0.50f,  3.0f, 1.0f),
-        point_t(-0.50f, -3.0f, 1.0f),
-        point_t(-0.25f, -4.0f, 1.0f),
-        point_t( 4.25f, -4.0f, 1.0f),
-        point_t( 4.50f, -3.0f, 1.0f),
-        point_t( 4.50f,  3.0f, 1.0f),
-        point_t( 4.25f,  4.0f, 1.0f)
+        point_t<>(-0.25f,  4.0f, 1.0f),
+        point_t<>(-0.50f,  3.0f, 1.0f),
+        point_t<>(-0.50f, -3.0f, 1.0f),
+        point_t<>(-0.25f, -4.0f, 1.0f),
+        point_t<>( 4.25f, -4.0f, 1.0f),
+        point_t<>( 4.50f, -3.0f, 1.0f),
+        point_t<>( 4.50f,  3.0f, 1.0f),
+        point_t<>( 4.25f,  4.0f, 1.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(-0.50f,  3.0f, 2.0f),
-        point_t(-0.25f,  4.0f, 2.0f),
-        point_t( 4.25f,  4.0f, 2.0f),
-        point_t( 4.50f,  3.0f, 2.0f),
-        point_t( 4.50f, -3.0f, 2.0f),
-        point_t( 4.25f, -4.0f, 2.0f),
-        point_t(-0.25f, -4.0f, 2.0f),
-        point_t(-0.50f, -3.0f, 2.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(-0.50f,  3.0f, 2.0f),
+        point_t<>(-0.25f,  4.0f, 2.0f),
+        point_t<>( 4.25f,  4.0f, 2.0f),
+        point_t<>( 4.50f,  3.0f, 2.0f),
+        point_t<>( 4.50f, -3.0f, 2.0f),
+        point_t<>( 4.25f, -4.0f, 2.0f),
+        point_t<>(-0.25f, -4.0f, 2.0f),
+        point_t<>(-0.50f, -3.0f, 2.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1764,31 +1764,31 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_octogon_square0_test )
 {
     /* Octogon test 4, poly b inside poly a */
     world_polygon p0({
-        point_t( 5.25f,  5.0f, 2.0f),
-        point_t( 5.50f,  4.0f, 2.0f),
-        point_t( 5.50f, -4.0f, 2.0f),
-        point_t( 5.25f, -5.0f, 2.0f),
-        point_t(-1.25f, -5.0f, 2.0f),
-        point_t(-1.50f, -4.0f, 2.0f),
-        point_t(-1.50f,  4.0f, 2.0f),
-        point_t(-1.25f,  5.0f, 2.0f)
+        point_t<>( 5.25f,  5.0f, 2.0f),
+        point_t<>( 5.50f,  4.0f, 2.0f),
+        point_t<>( 5.50f, -4.0f, 2.0f),
+        point_t<>( 5.25f, -5.0f, 2.0f),
+        point_t<>(-1.25f, -5.0f, 2.0f),
+        point_t<>(-1.50f, -4.0f, 2.0f),
+        point_t<>(-1.50f,  4.0f, 2.0f),
+        point_t<>(-1.25f,  5.0f, 2.0f)
     });
 
     world_polygon p1({
-        point_t(-1.0f,  1.0f, 1.0f),
-        point_t(-1.0f, -1.0f, 1.0f),
-        point_t( 1.0f, -1.0f, 1.0f),
-        point_t( 1.0f,  1.0f, 1.0f)
+        point_t<>(-1.0f,  1.0f, 1.0f),
+        point_t<>(-1.0f, -1.0f, 1.0f),
+        point_t<>( 1.0f, -1.0f, 1.0f),
+        point_t<>( 1.0f,  1.0f, 1.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t(-1.0f,  1.0f, 2.0f),
-        point_t( 1.0f,  1.0f, 2.0f),
-        point_t( 1.0f, -1.0f, 2.0f),
-        point_t(-1.0f, -1.0f, 2.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>(-1.0f,  1.0f, 2.0f),
+        point_t<>( 1.0f,  1.0f, 2.0f),
+        point_t<>( 1.0f, -1.0f, 2.0f),
+        point_t<>(-1.0f, -1.0f, 2.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));
@@ -1804,35 +1804,35 @@ BOOST_AUTO_TEST_CASE( world_polygon_intersection_octogon_square1_test )
 {
     /* Octogon test 4, poly b inside poly a */
     world_polygon p0({
-        point_t( 5.25f,  5.0f, 2.0f),
-        point_t( 5.50f,  4.0f, 2.0f),
-        point_t( 5.50f, -4.0f, 2.0f),
-        point_t( 5.25f, -5.0f, 2.0f),
-        point_t(-1.25f, -5.0f, 2.0f),
-        point_t(-1.50f, -4.0f, 2.0f),
-        point_t(-1.50f,  4.0f, 2.0f),
-        point_t(-1.25f,  5.0f, 2.0f)
+        point_t<>( 5.25f,  5.0f, 2.0f),
+        point_t<>( 5.50f,  4.0f, 2.0f),
+        point_t<>( 5.50f, -4.0f, 2.0f),
+        point_t<>( 5.25f, -5.0f, 2.0f),
+        point_t<>(-1.25f, -5.0f, 2.0f),
+        point_t<>(-1.50f, -4.0f, 2.0f),
+        point_t<>(-1.50f,  4.0f, 2.0f),
+        point_t<>(-1.25f,  5.0f, 2.0f)
     });
 
     world_polygon p1({
-        point_t(-6.0f,  6.0f, 1.0f),
-        point_t(-6.0f, -6.0f, 1.0f),
-        point_t( 6.0f, -6.0f, 1.0f),
-        point_t( 6.0f,  6.0f, 1.0f)
+        point_t<>(-6.0f,  6.0f, 1.0f),
+        point_t<>(-6.0f, -6.0f, 1.0f),
+        point_t<>( 6.0f, -6.0f, 1.0f),
+        point_t<>( 6.0f,  6.0f, 1.0f)
     });
 
-    std::unique_ptr<std::vector<point_t>> exp(new std::vector<point_t>({
-        point_t( 5.25f,  5.0f, 2.0f),
-        point_t( 5.50f,  4.0f, 2.0f),
-        point_t( 5.50f, -4.0f, 2.0f),
-        point_t( 5.25f, -5.0f, 2.0f),
-        point_t(-1.25f, -5.0f, 2.0f),
-        point_t(-1.50f, -4.0f, 2.0f),
-        point_t(-1.50f,  4.0f, 2.0f),
-        point_t(-1.25f,  5.0f, 2.0f)
+    std::unique_ptr<std::vector<point_t<>>> exp(new std::vector<point_t<>>({
+        point_t<>( 5.25f,  5.0f, 2.0f),
+        point_t<>( 5.50f,  4.0f, 2.0f),
+        point_t<>( 5.50f, -4.0f, 2.0f),
+        point_t<>( 5.25f, -5.0f, 2.0f),
+        point_t<>(-1.25f, -5.0f, 2.0f),
+        point_t<>(-1.50f, -4.0f, 2.0f),
+        point_t<>(-1.50f,  4.0f, 2.0f),
+        point_t<>(-1.25f,  5.0f, 2.0f)
     }));
 
-    p0.intersection(p1, point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f));
+    p0.intersection(p1, point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
     BOOST_REQUIRE(p0.number_of_vertices() == static_cast<int>(exp->size()));

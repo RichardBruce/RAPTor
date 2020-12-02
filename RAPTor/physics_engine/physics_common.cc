@@ -12,23 +12,23 @@
 namespace raptor_physics
 {
 /* Find the component of v that projects on to n */
-point_t project_vector(const point_t &v, const point_t &n)
+point_t<> project_vector(const point_t<> &v, const point_t<> &n)
 {
     /* Check for 0 v */
     const float vel_magn = magnitude(v);
     if (vel_magn < raptor_physics::EPSILON)
     {
-        return point_t(0.0f, 0.0f, 0.0f);
+        return point_t<>(0.0f, 0.0f, 0.0f);
     }
 
     /* Project */
-    const point_t vel_norm = v / vel_magn;
+    const point_t<> vel_norm = v / vel_magn;
     return n * vel_magn * dot_product(n, vel_norm);
 }
 
 
 /* Find the most extreme vertex in direction d */
-int find_support_vertex(const std::vector<point_t> &m, const point_t &d)
+int find_support_vertex(const std::vector<point_t<>> &m, const point_t<> &d)
 {
     float dummy;
     return find_support_vertex(m, d, &dummy);
@@ -36,7 +36,7 @@ int find_support_vertex(const std::vector<point_t> &m, const point_t &d)
 
 
 /* Find the most extreme vertex in direction d and its projection */
-int find_support_vertex(const std::vector<point_t> &m, const point_t &d, float *const val)
+int find_support_vertex(const std::vector<point_t<>> &m, const point_t<> &d, float *const val)
 {
     /* Search all vertices for the most extreme in the direction d */
     int max_support_vertex = 0;
@@ -55,7 +55,7 @@ int find_support_vertex(const std::vector<point_t> &m, const point_t &d, float *
 }
 
 
-int find_support_vertex(const std::vector<point_t> &m, const point_t &w, const point_t &c, const point_t &p, const point_t &n, float *const val)
+int find_support_vertex(const std::vector<point_t<>> &m, const point_t<> &w, const point_t<> &c, const point_t<> &p, const point_t<> &n, float *const val)
 {
     /* Check there is rotation */
     const float magn_w = magnitude(w);
@@ -66,7 +66,7 @@ int find_support_vertex(const std::vector<point_t> &m, const point_t &w, const p
     }
 
     /* Loop constants */
-    // const point_t n_cross_w(cross_product(n, w));
+    // const point_t<> n_cross_w(cross_product(n, w));
 
     /* Search all vertices for the most extreme in the direction d */
     int max_support_vertex = 0;
@@ -205,8 +205,8 @@ int find_first_positive_real_root(float *const roots, const float a_coeff, const
 /* x0 is the position of the point during the frame                             */
 /* q0 is the orientation of the point at the start of the frame                 */
 /* q1 is the orientation of the point at the end of the frame                   */
-float find_exact_none_translating_collision_time(const point_t &pa, const point_t &pb, const point_t &nb, const point_t &x0, const point_t &q0, 
-    const point_t &q1, const float r0, const float r1)
+float find_exact_none_translating_collision_time(const point_t<> &pa, const point_t<> &pb, const point_t<> &nb, const point_t<> &x0, const point_t<> &q0, 
+    const point_t<> &q1, const float r0, const float r1)
 {
     METHOD_LOG;
     BOOST_LOG_TRIVIAL(trace) << "pa: " << pa;
@@ -218,18 +218,18 @@ float find_exact_none_translating_collision_time(const point_t &pa, const point_
 
     /* Movements */
     const float r1_m_r0 = r1 - r0;
-    const point_t q1_m_q0(q1 - q0);
+    const point_t<> q1_m_q0(q1 - q0);
 
     /* Factors of s inside dot product */
-    const point_t q0_cross_p0(cross_product(q0, pa));
-    const point_t q1_m_q0_cross_p0(cross_product(q1_m_q0, pa));
-    const point_t a(2.0f * (cross_product(q1_m_q0, q1_m_q0_cross_p0) + (r1_m_r0 * q1_m_q0_cross_p0)));
-    const point_t b(2.0f * (
+    const point_t<> q0_cross_p0(cross_product(q0, pa));
+    const point_t<> q1_m_q0_cross_p0(cross_product(q1_m_q0, pa));
+    const point_t<> a(2.0f * (cross_product(q1_m_q0, q1_m_q0_cross_p0) + (r1_m_r0 * q1_m_q0_cross_p0)));
+    const point_t<> b(2.0f * (
                     cross_product(q0, q1_m_q0_cross_p0) + 
                     cross_product(q1_m_q0, q0_cross_p0) + 
                     (r0 * q1_m_q0_cross_p0) + 
                     (r1_m_r0 * q0_cross_p0)));
-    const point_t c(pa + x0 - pb + (2.0f * (cross_product(q0, q0_cross_p0) + (r0 * q0_cross_p0))));
+    const point_t<> c(pa + x0 - pb + (2.0f * (cross_product(q0, q0_cross_p0) + (r0 * q0_cross_p0))));
 
     /* Dot product with the plane normal */
     const float a_dot = dot_product(a, nb);
@@ -251,8 +251,8 @@ float find_exact_none_translating_collision_time(const point_t &pa, const point_
 /* x1 is the position of the point at the end of the frame                      */
 /* q0 is the orientation of the point at the start of the frame                 */
 /* q1 is the orientation of the point at the end of the frame                   */
-float find_exact_collision_time(const point_t &pa, const point_t &pb, const point_t &nb, const point_t &x0, const point_t &x1,
-    const point_t &q0, const point_t &q1, const float r0, const float r1)
+float find_exact_collision_time(const point_t<> &pa, const point_t<> &pb, const point_t<> &nb, const point_t<> &x0, const point_t<> &x1,
+    const point_t<> &q0, const point_t<> &q1, const float r0, const float r1)
 {
     METHOD_LOG;
     BOOST_LOG_TRIVIAL(trace) << "pa: " << pa;
@@ -265,19 +265,19 @@ float find_exact_collision_time(const point_t &pa, const point_t &pb, const poin
 
     /* Movements */
     const float r1_m_r0 = r1 - r0;
-    const point_t q1_m_q0(q1 - q0);
-    const point_t x1_m_x0(x1 - x0);
+    const point_t<> q1_m_q0(q1 - q0);
+    const point_t<> x1_m_x0(x1 - x0);
 
     /* Factors of s inside dot product */
-    const point_t q0_cross_p0(cross_product(q0, pa));
-    const point_t q1_m_q0_cross_p0(cross_product(q1_m_q0, pa));
-    const point_t a(2.0f * (cross_product(q1_m_q0, q1_m_q0_cross_p0) + (r1_m_r0 * q1_m_q0_cross_p0)));
-    const point_t b(x1_m_x0 + (2.0f * (
+    const point_t<> q0_cross_p0(cross_product(q0, pa));
+    const point_t<> q1_m_q0_cross_p0(cross_product(q1_m_q0, pa));
+    const point_t<> a(2.0f * (cross_product(q1_m_q0, q1_m_q0_cross_p0) + (r1_m_r0 * q1_m_q0_cross_p0)));
+    const point_t<> b(x1_m_x0 + (2.0f * (
                     cross_product(q0, q1_m_q0_cross_p0) + 
                     cross_product(q1_m_q0, q0_cross_p0) + 
                     (r0 * q1_m_q0_cross_p0) + 
                     (r1_m_r0 * q0_cross_p0))));
-    const point_t c(pa + x0 - pb + (2.0f * (cross_product(q0, q0_cross_p0) + (r0 * q0_cross_p0))));
+    const point_t<> c(pa + x0 - pb + (2.0f * (cross_product(q0, q0_cross_p0) + (r0 * q0_cross_p0))));
 
     /* Dot product with the plane normal */
     const float a_dot = dot_product(a, nb);
@@ -297,10 +297,10 @@ float find_exact_collision_time(const point_t &pa, const point_t &pb, const poin
 /* q1 is the orientation of the point at the end of the frame   */
 /* r0 is the orientation of the point at the start of the frame */
 /* r1 is the orientation of the point at the end of the frame   */
-point_t interpolated_quaternion_rotate(const point_t &x, const point_t &q0, const point_t &q1, const float r0, const float r1, const float s)
+point_t<> interpolated_quaternion_rotate(const point_t<> &x, const point_t<> &q0, const point_t<> &q1, const float r0, const float r1, const float s)
 {
-    const point_t q_lerp(q0 + (s * (q1 - q0)));
-    const point_t r_lerp(r0 + (s * (r1 - r0)));
+    const point_t<> q_lerp(q0 + (s * (q1 - q0)));
+    const point_t<> r_lerp(r0 + (s * (r1 - r0)));
     return x + (2.0f * cross_product(q_lerp, cross_product(q_lerp, x))) + (2.0f * r_lerp * cross_product(q_lerp, x));
 }
 
@@ -314,30 +314,30 @@ point_t interpolated_quaternion_rotate(const point_t &x, const point_t &q0, cons
 /* x1 is the position of the point at the end of the frame                      */
 /* q0 is the orientation of the point at the start of the frame                 */
 /* q1 is the orientation of the point at the end of the frame                   */
-float find_exact_collision_time(const point_t &pa, const point_t &pb, const point_t &ea, const point_t &eb, const point_t &x0, 
-    const point_t &x1, const point_t &q0, const point_t &q1, const float r0, const float r1)
+float find_exact_collision_time(const point_t<> &pa, const point_t<> &pb, const point_t<> &ea, const point_t<> &eb, const point_t<> &x0, 
+    const point_t<> &x1, const point_t<> &q0, const point_t<> &q1, const float r0, const float r1)
 {
     METHOD_LOG;
 
     /* Movements */
     const float r1_m_r0 = r1 - r0;
-    const point_t q1_m_q0(q1 - q0);
-    const point_t x1_m_x0(x1 - x0);
-    const point_t x0_m_pb(x0 - pb);
+    const point_t<> q1_m_q0(q1 - q0);
+    const point_t<> x1_m_x0(x1 - x0);
+    const point_t<> x0_m_pb(x0 - pb);
 
     /* Common cross products */
-    const point_t pa_x_ea(cross_product(pa, ea));
-    const point_t q0_x_pa_x_ea(cross_product(q0, pa_x_ea));
-    const point_t q1_m_q0_x_pa_x_ea(cross_product(q1_m_q0, pa_x_ea));
+    const point_t<> pa_x_ea(cross_product(pa, ea));
+    const point_t<> q0_x_pa_x_ea(cross_product(q0, pa_x_ea));
+    const point_t<> q1_m_q0_x_pa_x_ea(cross_product(q1_m_q0, pa_x_ea));
 
     /* Part A polynomial */
-    const point_t a_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_pa_x_ea) + (r1_m_r0 * q1_m_q0_x_pa_x_ea)));
-    const point_t a_c(2.0f * (
+    const point_t<> a_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_pa_x_ea) + (r1_m_r0 * q1_m_q0_x_pa_x_ea)));
+    const point_t<> a_c(2.0f * (
                     cross_product(q0, q1_m_q0_x_pa_x_ea) + 
                     cross_product(q1_m_q0, q0_x_pa_x_ea) + 
                     (r0 * q1_m_q0_x_pa_x_ea) + 
                     (r1_m_r0 * q0_x_pa_x_ea)));
-    const point_t a_d(pa_x_ea + (2.0f * (cross_product(q0, q0_x_pa_x_ea) + (r0 * q0_x_pa_x_ea))));
+    const point_t<> a_d(pa_x_ea + (2.0f * (cross_product(q0, q0_x_pa_x_ea) + (r0 * q0_x_pa_x_ea))));
     BOOST_LOG_TRIVIAL(trace) << "Part A factors of s, s^2: " << a_b << ", s:  " << a_c << ", constant: " << a_d;
 
     /* Dot product with the edge of object b */
@@ -346,22 +346,22 @@ float find_exact_collision_time(const point_t &pa, const point_t &pb, const poin
     const float a_d_dot = dot_product(a_d, eb);
     BOOST_LOG_TRIVIAL(trace) << "Part A equation, b: " << a_b_dot << ", c: " << a_c_dot << ", d: " << a_d_dot;
 
-    const point_t q0_x_ea(cross_product(q0, ea));
-    const point_t q1_m_q0_x_ea(cross_product(q1_m_q0, ea));
+    const point_t<> q0_x_ea(cross_product(q0, ea));
+    const point_t<> q1_m_q0_x_ea(cross_product(q1_m_q0, ea));
     
     /* Part B polynomial */
-    const point_t b_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_ea) + (r1_m_r0 * q1_m_q0_x_ea)));
-    const point_t b_c(2.0f * (
+    const point_t<> b_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_ea) + (r1_m_r0 * q1_m_q0_x_ea)));
+    const point_t<> b_c(2.0f * (
                     cross_product(q0, q1_m_q0_x_ea) + 
                     cross_product(q1_m_q0, q0_x_ea) + 
                     (r0 * q1_m_q0_x_ea) + 
                     (r1_m_r0 * q0_x_ea)));
-    const point_t b_d(ea + (2.0f * (cross_product(q0, q0_x_ea) + (r0 * q0_x_ea))));
+    const point_t<> b_d(ea + (2.0f * (cross_product(q0, q0_x_ea) + (r0 * q0_x_ea))));
     BOOST_LOG_TRIVIAL(trace) << "Part B factors of s pre-cross eb, s^2: " << b_b << ", s:  " << b_c << ", constant: " << b_d;
 
-    const point_t b_b_cross(cross_product(b_b, eb));
-    const point_t b_c_cross(cross_product(b_c, eb));
-    const point_t b_d_cross(cross_product(b_d, eb));
+    const point_t<> b_b_cross(cross_product(b_b, eb));
+    const point_t<> b_c_cross(cross_product(b_c, eb));
+    const point_t<> b_d_cross(cross_product(b_d, eb));
     BOOST_LOG_TRIVIAL(trace) << "Part B factors of s, s^2: " << b_b_cross << ", s:  " << b_c_cross << ", constant: " << b_d_cross;
 
     const float b_a_dot = dot_product(b_b_cross, x1_m_x0);
@@ -383,8 +383,8 @@ float find_exact_collision_time(const point_t &pa, const point_t &pb, const poin
     /* Check to see if roots are just parallel lines */
     for (int i = 0; i < nr_roots; ++i)
     {
-        const point_t cfg_ea(interpolated_quaternion_rotate(ea, q0, q1, r0, r1, roots[i]));
-        const point_t eb_cross_ea(cross_product(eb, cfg_ea));
+        const point_t<> cfg_ea(interpolated_quaternion_rotate(ea, q0, q1, r0, r1, roots[i]));
+        const point_t<> eb_cross_ea(cross_product(eb, cfg_ea));
         if (dot_product(eb_cross_ea, eb_cross_ea) > raptor_physics::EPSILON)
         {
             return roots[i];
@@ -409,29 +409,29 @@ float find_exact_collision_time(const point_t &pa, const point_t &pb, const poin
 /* x0 is the position of the point at the start of the frame                    */
 /* q0 is the orientation of the point at the start of the frame                 */
 /* q1 is the orientation of the point at the end of the frame                   */
-float find_exact_none_translating_collision_time(const point_t &pa, const point_t &pb, const point_t &ea, const point_t &eb, const point_t &x0, 
-    const point_t &q0, const point_t &q1, const float r0, const float r1)
+float find_exact_none_translating_collision_time(const point_t<> &pa, const point_t<> &pb, const point_t<> &ea, const point_t<> &eb, const point_t<> &x0, 
+    const point_t<> &q0, const point_t<> &q1, const float r0, const float r1)
 {
     METHOD_LOG;
 
     /* Movements */
     const float r1_m_r0 = r1 - r0;
-    const point_t q1_m_q0(q1 - q0);
-    const point_t x0_m_pb(x0 - pb);
+    const point_t<> q1_m_q0(q1 - q0);
+    const point_t<> x0_m_pb(x0 - pb);
 
     /* Common cross products */
-    const point_t pa_x_ea(cross_product(pa, ea));
-    const point_t q0_x_pa_x_ea(cross_product(q0, pa_x_ea));
-    const point_t q1_m_q0_x_pa_x_ea(cross_product(q1_m_q0, pa_x_ea));
+    const point_t<> pa_x_ea(cross_product(pa, ea));
+    const point_t<> q0_x_pa_x_ea(cross_product(q0, pa_x_ea));
+    const point_t<> q1_m_q0_x_pa_x_ea(cross_product(q1_m_q0, pa_x_ea));
 
     /* Part A polynomial */
-    const point_t a_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_pa_x_ea) + (r1_m_r0 * q1_m_q0_x_pa_x_ea)));
-    const point_t a_c(2.0f * (
+    const point_t<> a_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_pa_x_ea) + (r1_m_r0 * q1_m_q0_x_pa_x_ea)));
+    const point_t<> a_c(2.0f * (
                     cross_product(q0, q1_m_q0_x_pa_x_ea) + 
                     cross_product(q1_m_q0, q0_x_pa_x_ea) + 
                     (r0 * q1_m_q0_x_pa_x_ea) + 
                     (r1_m_r0 * q0_x_pa_x_ea)));
-    const point_t a_d(pa_x_ea + (2.0f * (cross_product(q0, q0_x_pa_x_ea) + (r0 * q0_x_pa_x_ea))));
+    const point_t<> a_d(pa_x_ea + (2.0f * (cross_product(q0, q0_x_pa_x_ea) + (r0 * q0_x_pa_x_ea))));
     BOOST_LOG_TRIVIAL(trace) << "Part A factors of s, s^2: " << a_b << ", s:  " << a_c << ", constant: " << a_d;
 
     /* Dot product with the edge of object b */
@@ -440,22 +440,22 @@ float find_exact_none_translating_collision_time(const point_t &pa, const point_
     const float a_d_dot = dot_product(a_d, eb);
     BOOST_LOG_TRIVIAL(trace) << "Part A equation, b: " << a_b_dot << ", c: " << a_c_dot << ", d: " << a_d_dot;
 
-    const point_t q0_x_ea(cross_product(q0, ea));
-    const point_t q1_m_q0_x_ea(cross_product(q1_m_q0, ea));
+    const point_t<> q0_x_ea(cross_product(q0, ea));
+    const point_t<> q1_m_q0_x_ea(cross_product(q1_m_q0, ea));
     
     /* Part B polynomial */
-    const point_t b_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_ea) + (r1_m_r0 * q1_m_q0_x_ea)));
-    const point_t b_c(2.0f * (
+    const point_t<> b_b(2.0f * (cross_product(q1_m_q0, q1_m_q0_x_ea) + (r1_m_r0 * q1_m_q0_x_ea)));
+    const point_t<> b_c(2.0f * (
                     cross_product(q0, q1_m_q0_x_ea) + 
                     cross_product(q1_m_q0, q0_x_ea) + 
                     (r0 * q1_m_q0_x_ea) + 
                     (r1_m_r0 * q0_x_ea)));
-    const point_t b_d(ea + (2.0f * (cross_product(q0, q0_x_ea) + (r0 * q0_x_ea))));
+    const point_t<> b_d(ea + (2.0f * (cross_product(q0, q0_x_ea) + (r0 * q0_x_ea))));
     BOOST_LOG_TRIVIAL(trace) << "Part B factors of s pre-cross eb, s^2: " << b_b << ", s:  " << b_c << ", constant: " << b_d;
 
-    const point_t b_b_cross(cross_product(b_b, eb));
-    const point_t b_c_cross(cross_product(b_c, eb));
-    const point_t b_d_cross(cross_product(b_d, eb));
+    const point_t<> b_b_cross(cross_product(b_b, eb));
+    const point_t<> b_c_cross(cross_product(b_c, eb));
+    const point_t<> b_d_cross(cross_product(b_d, eb));
     BOOST_LOG_TRIVIAL(trace) << "Part B factors of s, s^2: " << b_b_cross << ", s:  " << b_c_cross << ", constant: " << b_d_cross;
 
     const float b_b_dot = dot_product(b_b_cross, x0_m_pb);
@@ -475,8 +475,8 @@ float find_exact_none_translating_collision_time(const point_t &pa, const point_
     /* Check to see if roots are just parallel lines */
     for (int i = 0; i < nr_roots; ++i)
     {
-        const point_t cfg_ea(interpolated_quaternion_rotate(ea, q0, q1, r0, r1, roots[i]));
-        const point_t eb_cross_ea(cross_product(eb, cfg_ea));
+        const point_t<> cfg_ea(interpolated_quaternion_rotate(ea, q0, q1, r0, r1, roots[i]));
+        const point_t<> eb_cross_ea(cross_product(eb, cfg_ea));
         if (dot_product(eb_cross_ea, eb_cross_ea) > raptor_physics::EPSILON)
         {
             return roots[i];

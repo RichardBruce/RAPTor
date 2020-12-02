@@ -17,10 +17,10 @@ set(SOURCE
     raytracer.cc
     ray.cc
     scene.cc
-    sort.cc
     line.cc
     packet_ray.cc
     camera.cc
+    circle_sampler.cc
     raytracer_event_handler_factory.cc
     ../sdl_wrappers/sdl_wrapper.cc
     ../sdl_wrappers/sdl_event_handler_factory.cc
@@ -69,7 +69,7 @@ set(SOURCE
     parsers/mgflib/xf.c)
 
 # Libraries
-set (LIBS raptor_common::headers raptor_common::static SDL2 SDL2_ttf tbb tbbmalloc jpeg png tga pthread ${Boost_LIBRARIES} fftw3f)
+set (LIBS raptor_common::headers raptor_common::static raptor_parsers::headers SDL2 SDL2_ttf tbb tbbmalloc jpeg png tga pthread ${Boost_LIBRARIES} fftw3f)
 link_directories( 
     $ENV{LIBARYS_PATH}/SDL2-$ENV{SDL_VER}/lib
     $ENV{LIBARYS_PATH}/SDL2_ttf-$ENV{SDLTTF_VER}/lib
@@ -81,6 +81,7 @@ link_directories(
 set(UNIT_TESTS
     bih_block_tests
     bvh_node_tests
+    circle_sampler_tests
     simd_tests
     vint_tests
     bih_builder_tests

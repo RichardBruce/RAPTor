@@ -28,7 +28,7 @@ neighbour_t turn_around(const neighbour_t n)
 class grid_cell
 {
     public :
-        grid_cell(const point_t *const verts, const int n, const int s, const int e, const int w, const int v0, const int v1, const int v2, const int v3)
+        grid_cell(const point_t<> *const verts, const int n, const int s, const int e, const int w, const int v0, const int v1, const int v2, const int v3)
         : _verts(verts), _n(n), _s(s), _e(e), _w(w), _v0(v0), _v1(v1), _v2(v2), _v3(v3) { };
 
         /* Getters */
@@ -42,6 +42,8 @@ class grid_cell
                 case neighbour_t::WEST   : return west();
                 default     : assert(false);
             }
+
+            return -1;
         }
 
         int north() const { return _n; }
@@ -93,6 +95,8 @@ class grid_cell
                     }
                 default : assert(false);
             }
+
+            return -1;
         }
 
         int corner_leaving(const neighbour_t moving, const neighbour_t turning) const
@@ -134,11 +138,13 @@ class grid_cell
                     }
                 default : assert(false);
             }
+
+            return -1;
         }
 
         int furthest_index(const neighbour_t moving) const
         {
-            switch(moving)
+            switch (moving)
             {
                 case neighbour_t::NORTH : return top_right();
                 case neighbour_t::SOUTH : return bottom_left();
@@ -146,6 +152,8 @@ class grid_cell
                 case neighbour_t::WEST  : return top_left();
                 default                 : assert(false);
             }
+
+            return -1;
         }
 
 
@@ -153,14 +161,14 @@ class grid_cell
         /* This function assume that it doesnt matter which way up the grid cell is and that the grid cell has an area */
         bool can_merge(const grid_cell &c, const float min_cos) const
         {
-            const point_t n(normalise(cross_product(_verts[_v1]  - _verts[_v0], _verts[_v3] - _verts[_v0])));
-            const point_t n_c(normalise(cross_product(c._verts[c._v1]  - c._verts[c._v0], c._verts[c._v3] - c._verts[c._v0])));
+            const point_t<> n(normalise(cross_product(_verts[_v1]  - _verts[_v0], _verts[_v3] - _verts[_v0])));
+            const point_t<> n_c(normalise(cross_product(c._verts[c._v1]  - c._verts[c._v0], c._verts[c._v3] - c._verts[c._v0])));
 
             return (fabs(dot_product(n, n_c)) > min_cos);
         }
 
     private :
-        const point_t *const    _verts; /* List of all vertices in the world        */
+        const point_t<> *const  _verts; /* List of all vertices in the world        */
         const int               _n;     /* Neighbouring grid cell to the north      */
         const int               _s;     /* Neighbouring grid cell to the south      */
         const int               _e;     /* Neighbouring grid cell to the east       */
@@ -172,7 +180,7 @@ class grid_cell
 };
 
 
-grid_cell** vertices_to_grid_cells(const point_t *const verts, const int y, const int cell_x, const int cell_y)
+grid_cell** vertices_to_grid_cells(const point_t<> *const verts, const int y, const int cell_x, const int cell_y)
 {
     /* Create grid cells for this set opf vertices */
     grid_cell** raw_grid_cells = new grid_cell *[cell_x * cell_y];

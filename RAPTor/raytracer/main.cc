@@ -47,6 +47,8 @@ void help()
     std::cout << "       -ry         x                                   : x is an angle to rotate about the y axis."         << std::endl;
     std::cout << "       -rz         x                                   : x is an angle to rotate about the z axis."         << std::endl;
     std::cout << "       -bg         r g b                               : r g b is the rgb background colour."               << std::endl;
+    std::cout << "       -focus      a l                                 : a is the aperture size."                           << std::endl;
+    std::cout << "                                                        l is the focal length."                             << std::endl;
     std::cout << "       -light      x y z ra r g b d                    : x y z are the lights co-ordinates."                << std::endl;
     std::cout << "                               	                      ra is the lights radius."                           << std::endl;
     std::cout << "                               	                      r g b is the lights colour."                        << std::endl;
@@ -104,6 +106,8 @@ int main (int argc, char **argv)
     model_format_t  input_format    = model_format_t::code;
     image_format_t  image_format    = image_format_t::tga;
     int             jpg_quality     = 50;
+    float           focal_length    = 0.0f;
+    float           aperture        = 0.0f;
     ext_colour_t    bg;
     std::string     input_file;
     std::string     view_point;
@@ -456,6 +460,19 @@ int main (int argc, char **argv)
                 bg.g = atof(argv[++i]);
                 bg.b = atof(argv[++i]);
             }
+            /* Focus */
+            else if (strcmp(argv[i], "-focus") == 0)
+            {
+                if ((argc - i) < 3)
+                {
+                    std::cout << "Incorrectly specified focal parameters" << std::endl;
+                    help();
+                    return 1;
+                }
+                
+                aperture = atof(argv[++i]);
+                focal_length = atof(argv[++i]);
+            }
             /* Light */
             else if (strcmp(argv[i], "-light") == 0)
             {
@@ -481,14 +498,14 @@ int main (int argc, char **argv)
                 
 //                triangle** light_area = new triangle* [12];
 //                
-//                point_t px0(c.x + (r/2.0), c.y + (r/2.0), c.z + (r/2.0));
-//                point_t px1(c.x + (r/2.0), c.y - (r/2.0), c.z + (r/2.0));
-//                point_t px2(c.x + (r/2.0), c.y - (r/2.0), c.z - (r/2.0));
-//                point_t px3(c.x + (r/2.0), c.y + (r/2.0), c.z - (r/2.0));
-//                point_t mx0(c.x - (r/2.0), c.y + (r/2.0), c.z + (r/2.0));
-//                point_t mx1(c.x - (r/2.0), c.y - (r/2.0), c.z + (r/2.0));
-//                point_t mx2(c.x - (r/2.0), c.y - (r/2.0), c.z - (r/2.0));
-//                point_t mx3(c.x - (r/2.0), c.y + (r/2.0), c.z - (r/2.0));
+//                point_t<> px0(c.x + (r/2.0), c.y + (r/2.0), c.z + (r/2.0));
+//                point_t<> px1(c.x + (r/2.0), c.y - (r/2.0), c.z + (r/2.0));
+//                point_t<> px2(c.x + (r/2.0), c.y - (r/2.0), c.z - (r/2.0));
+//                point_t<> px3(c.x + (r/2.0), c.y + (r/2.0), c.z - (r/2.0));
+//                point_t<> mx0(c.x - (r/2.0), c.y + (r/2.0), c.z + (r/2.0));
+//                point_t<> mx1(c.x - (r/2.0), c.y - (r/2.0), c.z + (r/2.0));
+//                point_t<> mx2(c.x - (r/2.0), c.y - (r/2.0), c.z - (r/2.0));
+//                point_t<> mx3(c.x - (r/2.0), c.y + (r/2.0), c.z - (r/2.0));
 //
 //                material *light_mat = new phong_shader(ext_colour_t(255.0), 1.0);
 //                materials.push_back(light_mat);
@@ -617,7 +634,7 @@ int main (int argc, char **argv)
             /* If camera is not set in the scene so do it here (an nff file would have set the camera) */
             if (cam == nullptr)
             {
-                cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, aperture, focal_length);
             }
             break;
         }
@@ -629,7 +646,7 @@ int main (int argc, char **argv)
             raptor_raytracer::mgf_parser(input_file.c_str(), lights, everything, materials);
             
             /* Camera is not set in the scene so do it here */
-            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya);
+            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 10, xr, yr, xa, ya, aperture, focal_length);
             break;
 
         case model_format_t::nff :
@@ -646,7 +663,7 @@ int main (int argc, char **argv)
             raptor_raytracer::lwo_parser(input_stream, path, lights, everything, materials, &cam);
 
             /* Camera is not set in the scene so do it here */
-            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, aperture, focal_length);
             break;
             
         case model_format_t::obj :
@@ -657,7 +674,7 @@ int main (int argc, char **argv)
             raptor_raytracer::obj_parser(input_stream, path, lights, everything, materials, &cam);
             
             /* Camera is not set in the scene so do it here */
-            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, aperture, focal_length);
             break;
             
         case model_format_t::off :
@@ -666,7 +683,7 @@ int main (int argc, char **argv)
             raptor_raytracer::off_parser(input_stream, lights, everything, materials, cam);
             
             /* Camera is not set in the scene so do it here */
-            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, aperture, focal_length);
             break;
 
         case model_format_t::ply :
@@ -675,13 +692,13 @@ int main (int argc, char **argv)
             raptor_raytracer::ply_parser(input_stream, lights, everything, materials, &cam);
             
             /* Camera is not set in the scene so do it here */
-            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+            cam = new raptor_raytracer::camera(cam_p, x_vec, y_vec, z_vec, bg, screen_width, screen_height, 20, xr, yr, xa, ya, aperture, focal_length);
             break;
 
         case model_format_t::vrml :
             /* Deafult camera set up for vrml -- NOTE negative z axis */
             cam = new raptor_raytracer::camera(cam_p, point_t(1.0f, 0.0f,  0.0f), point_t(0.0f, 1.0f,  0.0f), 
-                                    point_t(0.0f, 0.0f, -1.0f), bg, screen_width, screen_height, 20, xr, yr, xa, ya);
+                                    point_t(0.0f, 0.0f, -1.0f), bg, screen_width, screen_height, 20, xr, yr, xa, ya, aperture, focal_length);
 
             input_stream.open(input_file.c_str());
             assert(input_stream.is_open());

@@ -86,7 +86,7 @@ class object_data
         {
             /* Yukky, but boost serialization cant cope with infinity so convert to an unlikely value */
             const float mass = (_i->mass() == std::numeric_limits<float>::infinity()) ? std::numeric_limits<float>::max() : _i->mass();
-            const point_t com(_i->center_of_mass());
+            const point_t<> com(_i->center_of_mass());
             const float *const tensor = _i->tensor();
 
             ar << BOOST_SERIALIZATION_NVP(mass);
@@ -109,7 +109,7 @@ class object_data
         void load(Archive & ar, const unsigned int version)
         {
             float mass;
-            point_t com;
+            point_t<> com;
             float *tensor = new float[6];
 
             /* Yukky, but boost serialization cant cope with infinity so convert from an unlikely value */
@@ -139,10 +139,10 @@ class object_data
         }
 
         std::unique_ptr<const inertia_tensor>   _i;
-        point_t                                 f;
-        point_t                                 tor;
-        point_t                                 v;
-        point_t                                 w;
+        point_t<>                                 f;
+        point_t<>                                 tor;
+        point_t<>                                 v;
+        point_t<>                                 w;
         quaternion_t                            o;
         int                                     id;
 };
@@ -155,8 +155,8 @@ class collision_data
         collision_data() = default;
 
         collision_data(const collision_info<> &c, const int i, const int j) : 
-            noc((c.get_time() == std::numeric_limits<float>::max()) ? point_t(0.0f, 0.0f, 0.0f) : c.get_normal_of_collision()), 
-            poc((c.get_time() == std::numeric_limits<float>::max()) ? point_t(0.0f, 0.0f, 0.0f) : c.get_point_of_collision()), 
+            noc((c.get_time() == std::numeric_limits<float>::max()) ? point_t<>(0.0f, 0.0f, 0.0f) : c.get_normal_of_collision()), 
+            poc((c.get_time() == std::numeric_limits<float>::max()) ? point_t<>(0.0f, 0.0f, 0.0f) : c.get_point_of_collision()), 
             t(c.get_time()), 
             type(c.get_type()),
             po_i(i),
@@ -192,8 +192,8 @@ class collision_data
             ar & BOOST_SERIALIZATION_NVP(po_j);
         }
 
-        point_t         noc;
-        point_t         poc;
+        point_t<>         noc;
+        point_t<>         poc;
         float           t;
         collision_t     type;
         int             po_i;
@@ -335,7 +335,7 @@ class regression_checker : private boost::noncopyable
 }; /* namespace test */
 }; /* namespace raptor_physics */
 
-BOOST_CLASS_IMPLEMENTATION(point_t, object_serializable);
+BOOST_CLASS_IMPLEMENTATION(point_t<>, object_serializable);
 BOOST_CLASS_IMPLEMENTATION(quaternion_t, object_serializable);
 BOOST_CLASS_IMPLEMENTATION(raptor_physics::test::object_data, object_serializable);
 BOOST_CLASS_IMPLEMENTATION(raptor_physics::test::collision_data, object_serializable);

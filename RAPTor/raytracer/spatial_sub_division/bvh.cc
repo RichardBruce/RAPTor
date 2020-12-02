@@ -264,8 +264,8 @@ void bvh::frustrum_found_nearer_object(const packet_ray *const r, const vfp_t *t
     frustrum f(r, size);
     frustrum trav(r, size);
 #else
-    frustrum f(r, point_t(r[0].get_dst(0)[0], r[0].get_dst(1)[0], r[0].get_dst(2)[0]), size);
-    frustrum trav(r, point_t(r[0].get_dst(0)[0], r[0].get_dst(1)[0], r[0].get_dst(2)[0]), size);
+    frustrum f(r, point_t<>(r[0].get_dst(0)[0], r[0].get_dst(1)[0], r[0].get_dst(2)[0]), size);
+    frustrum trav(r, point_t<>(r[0].get_dst(0)[0], r[0].get_dst(1)[0], r[0].get_dst(2)[0]), size);
 #endif
     trav.adapt_to_leaf(r, _builder.scene_upper_bound(), _builder.scene_lower_bound(), clipped_r, size);
 
@@ -583,7 +583,7 @@ vfp_t bvh::found_nearer_object(const packet_ray *const r, const vfp_t &t, bvh_st
 }
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
-inline bool bvh::find_leaf_node(const ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const point_t &i_rd, const float t_max) const
+inline bool bvh::find_leaf_node(const ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const point_t<> &i_rd, const float t_max) const
 {
     /* Get current state */
     bvh_stack_element *exit_point = *out;
@@ -649,7 +649,7 @@ inline bool bvh::find_leaf_node(const ray &r, bvh_stack_element *const entry_poi
 int bvh::find_nearest_object(const ray *const r, hit_description *const h) const
 {
     /* Check we hit the scene at all */
-    const point_t ray_dir_inv(1.0f / r->get_dir());
+    const point_t<> ray_dir_inv(1.0f / r->get_dir());
     if ((*_bvh_base)[_root_node].intersection_distance(*r, ray_dir_inv) == MAX_DIST)
     {
         return -1;
@@ -720,7 +720,7 @@ bool bvh::found_nearer_object(const ray *const r, const float t) const
     entry_point.t_min   = MAX_DIST;
     
     /* Traverse the whole tree */
-    const point_t ray_dir_inv(1.0f / r->get_dir());
+    const point_t<> ray_dir_inv(1.0f / r->get_dir());
     // BOOST_LOG_TRIVIAL(trace) << "Beginning search for nearer object";
     while (true)
     {

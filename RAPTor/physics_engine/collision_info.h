@@ -62,14 +62,14 @@ class collision_info
             return *this;
         }
 
-        point_t get_normal_of_collision() const
+        point_t<> get_normal_of_collision() const
         {
-            return is_uncertain(_type) ? point_t(0.0f, 0.0f, 0.0f) : _s->normal_of_impact(*_other_s);
+            return is_uncertain(_type) ? point_t<>(0.0f, 0.0f, 0.0f) : _s->normal_of_impact(*_other_s);
         }
 
-        point_t get_point_of_collision() const
+        point_t<> get_point_of_collision() const
         {
-            return is_uncertain(_type) ? point_t(0.0f, 0.0f, 0.0f) : _s->center_of_impact(*_other_s, get_normal_of_collision());
+            return is_uncertain(_type) ? point_t<>(0.0f, 0.0f, 0.0f) : _s->center_of_impact(*_other_s, get_normal_of_collision());
         }
 
         bool switch_to_sliding()

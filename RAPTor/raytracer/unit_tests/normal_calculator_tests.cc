@@ -39,10 +39,10 @@ BOOST_FIXTURE_TEST_CASE( shared_normal_ctor_test, shared_normal_fixture )
     users.resize(2, nullptr);
 
     /* Construct */
-    std::unique_ptr<shared_normal> uut(new shared_normal(&users[0], &users[1], point_t(1.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f)));
+    std::unique_ptr<shared_normal> uut(new shared_normal(&users[0], &users[1], point_t<>(1.0f, 0.0f, 0.0f), point_t<>(0.0f, 1.0f, 0.0f)));
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.5f, 0.5f, 0.0f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.5f, 0.5f, 0.0f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
 }
@@ -51,19 +51,19 @@ BOOST_FIXTURE_TEST_CASE( shared_normal_add_test, shared_normal_fixture )
 {
     /* Test data */
     users.resize(4, nullptr);
-    std::unique_ptr<shared_normal> uut(new shared_normal(&users[0], &users[1], point_t(1.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f)));
+    std::unique_ptr<shared_normal> uut(new shared_normal(&users[0], &users[1], point_t<>(1.0f, 0.0f, 0.0f), point_t<>(0.0f, 1.0f, 0.0f)));
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.5f, 0.5f, 0.0f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.5f, 0.5f, 0.0f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
 
     /* Add a normal */
-    uut->add(&users[2], point_t(0.0f, 0.0f, 1.0f));
-    uut->add(&users[3], point_t(0.0f, 0.0f, 1.0f));
+    uut->add(&users[2], point_t<>(0.0f, 0.0f, 1.0f));
+    uut->add(&users[3], point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.25f, 0.25f, 0.5f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.25f, 0.25f, 0.5f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
     BOOST_CHECK(users[2] == uut.get());
@@ -76,18 +76,18 @@ BOOST_FIXTURE_TEST_CASE( shared_normal_merge_test, shared_normal_fixture )
     users.resize(4, nullptr);
 
     /* Construct */
-    std::unique_ptr<shared_normal> uut(new shared_normal(&users[0], &users[1], point_t(1.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f)));
+    std::unique_ptr<shared_normal> uut(new shared_normal(&users[0], &users[1], point_t<>(1.0f, 0.0f, 0.0f), point_t<>(0.0f, 1.0f, 0.0f)));
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.5f, 0.5f, 0.0f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.5f, 0.5f, 0.0f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
 
     /* Construct */
-    std::unique_ptr<shared_normal> merge(new shared_normal(&users[2], &users[3], point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f)));
+    std::unique_ptr<shared_normal> merge(new shared_normal(&users[2], &users[3], point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f)));
 
     /* Checks */
-    BOOST_CHECK(merge->normal() == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(merge->normal() == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK(users[2] == merge.get());
     BOOST_CHECK(users[3] == merge.get());
 
@@ -95,7 +95,7 @@ BOOST_FIXTURE_TEST_CASE( shared_normal_merge_test, shared_normal_fixture )
     uut->merge(merge.release());
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.25f, 0.25f, 0.5f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.25f, 0.25f, 0.5f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
     BOOST_CHECK(users[2] == uut.get());
@@ -108,38 +108,38 @@ BOOST_FIXTURE_TEST_CASE( shared_normal_add_and_merge_test, shared_normal_fixture
     users.resize(10, nullptr);
 
     /* Construct */
-    std::unique_ptr<shared_normal> uut(new shared_normal(&users[0], &users[1], point_t(1.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f)));
+    std::unique_ptr<shared_normal> uut(new shared_normal(&users[0], &users[1], point_t<>(1.0f, 0.0f, 0.0f), point_t<>(0.0f, 1.0f, 0.0f)));
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.5f, 0.5f, 0.0f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.5f, 0.5f, 0.0f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
 
     /* Add a normal */
-    uut->add(&users[2], point_t(0.0f, 0.0f, 1.0f));
-    uut->add(&users[3], point_t(0.0f, 0.0f, 1.0f));
+    uut->add(&users[2], point_t<>(0.0f, 0.0f, 1.0f));
+    uut->add(&users[3], point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.25f, 0.25f, 0.5f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.25f, 0.25f, 0.5f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
     BOOST_CHECK(users[2] == uut.get());
     BOOST_CHECK(users[3] == uut.get());
 
     /* Construct */
-    std::unique_ptr<shared_normal> merge(new shared_normal(&users[4], &users[5], point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f)));
+    std::unique_ptr<shared_normal> merge(new shared_normal(&users[4], &users[5], point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f)));
 
     /* Checks */
-    BOOST_CHECK(merge->normal() == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(merge->normal() == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK(users[4] == merge.get());
     BOOST_CHECK(users[5] == merge.get());
 
     /* Add a normal */
-    merge->add(&users[6], point_t(0.0f, 1.0f, 0.0f));
-    merge->add(&users[7], point_t(1.0f, 0.0f, 0.0f));
+    merge->add(&users[6], point_t<>(0.0f, 1.0f, 0.0f));
+    merge->add(&users[7], point_t<>(1.0f, 0.0f, 0.0f));
 
     /* Checks */
-    BOOST_CHECK(merge->normal() == point_t(0.25f, 0.25f, 0.5f));
+    BOOST_CHECK(merge->normal() == point_t<>(0.25f, 0.25f, 0.5f));
     BOOST_CHECK(users[4] == merge.get());
     BOOST_CHECK(users[5] == merge.get());
     BOOST_CHECK(users[6] == merge.get());
@@ -149,7 +149,7 @@ BOOST_FIXTURE_TEST_CASE( shared_normal_add_and_merge_test, shared_normal_fixture
     uut->merge(merge.release());
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.25f, 0.25f, 0.5f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.25f, 0.25f, 0.5f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
     BOOST_CHECK(users[2] == uut.get());
@@ -160,11 +160,11 @@ BOOST_FIXTURE_TEST_CASE( shared_normal_add_and_merge_test, shared_normal_fixture
     BOOST_CHECK(users[7] == uut.get());
 
     /* Add again */
-    uut->add(&users[8], point_t(0.0f, 1.0f, 0.0f));
-    uut->add(&users[9], point_t(1.0f, 0.0f, 0.0f));
+    uut->add(&users[8], point_t<>(0.0f, 1.0f, 0.0f));
+    uut->add(&users[9], point_t<>(1.0f, 0.0f, 0.0f));
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.3f, 0.3f, 0.4f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.3f, 0.3f, 0.4f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
     BOOST_CHECK(users[2] == uut.get());
@@ -183,35 +183,35 @@ BOOST_FIXTURE_TEST_CASE( shared_normal_merge_and_merge_test, shared_normal_fixtu
     users.resize(8, nullptr);
 
     /* Construct */
-    std::unique_ptr<shared_normal> uut(new shared_normal(&users[0], &users[1], point_t(1.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f)));
+    std::unique_ptr<shared_normal> uut(new shared_normal(&users[0], &users[1], point_t<>(1.0f, 0.0f, 0.0f), point_t<>(0.0f, 1.0f, 0.0f)));
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.5f, 0.5f, 0.0f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.5f, 0.5f, 0.0f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
 
     /* Construct */
-    std::unique_ptr<shared_normal> merge_0(new shared_normal(&users[2], &users[3], point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f)));
+    std::unique_ptr<shared_normal> merge_0(new shared_normal(&users[2], &users[3], point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f)));
 
     /* Checks */
-    BOOST_CHECK(merge_0->normal() == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(merge_0->normal() == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK(users[2] == merge_0.get());
     BOOST_CHECK(users[3] == merge_0.get());
 
     /* Construct */
-    std::unique_ptr<shared_normal> merge_1(new shared_normal(&users[4], &users[5], point_t(0.0f, 0.0f, 1.0f), point_t(0.0f, 0.0f, 1.0f)));
+    std::unique_ptr<shared_normal> merge_1(new shared_normal(&users[4], &users[5], point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 0.0f, 1.0f)));
 
     /* Checks */
-    BOOST_CHECK(merge_1->normal() == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(merge_1->normal() == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK(users[4] == merge_1.get());
     BOOST_CHECK(users[5] == merge_1.get());
 
     /* Add a normal */
-    merge_1->add(&users[6], point_t(0.0f, 0.0f, 1.0f));
-    merge_1->add(&users[7], point_t(0.0f, 0.0f, 1.0f));
+    merge_1->add(&users[6], point_t<>(0.0f, 0.0f, 1.0f));
+    merge_1->add(&users[7], point_t<>(0.0f, 0.0f, 1.0f));
 
     /* Checks */
-    BOOST_CHECK(merge_1->normal() == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(merge_1->normal() == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK(users[4] == merge_1.get());
     BOOST_CHECK(users[5] == merge_1.get());
     BOOST_CHECK(users[6] == merge_1.get());
@@ -221,7 +221,7 @@ BOOST_FIXTURE_TEST_CASE( shared_normal_merge_and_merge_test, shared_normal_fixtu
     uut->merge(merge_0.release());
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.25f, 0.25f, 0.5f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.25f, 0.25f, 0.5f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
     BOOST_CHECK(users[2] == uut.get());
@@ -231,7 +231,7 @@ BOOST_FIXTURE_TEST_CASE( shared_normal_merge_and_merge_test, shared_normal_fixtu
     uut->merge(merge_1.release());
 
     /* Checks */
-    BOOST_CHECK(uut->normal() == point_t(0.125f, 0.125f, 0.75f));
+    BOOST_CHECK(uut->normal() == point_t<>(0.125f, 0.125f, 0.75f));
     BOOST_CHECK(users[0] == uut.get());
     BOOST_CHECK(users[1] == uut.get());
     BOOST_CHECK(users[2] == uut.get());
@@ -248,28 +248,28 @@ struct normal_calculator_fixture
     normal_calculator_fixture() :
         pnts_0(
         {
-            point_t( 0.0f,  0.0f, 0.0f), point_t( 1.0f, 1.0f, 0.0f), point_t( 2.0f, 0.0f, 0.0f), point_t(1.0f, -1.0f, 0.0f), 
-            point_t(-1.0f, -1.0f, 0.0f), point_t(-2.0f, 0.0f, 0.0f), point_t(-1.0f, 1.0f, 0.0f)
+            point_t<>( 0.0f,  0.0f, 0.0f), point_t<>( 1.0f, 1.0f, 0.0f), point_t<>( 2.0f, 0.0f, 0.0f), point_t<>(1.0f, -1.0f, 0.0f), 
+            point_t<>(-1.0f, -1.0f, 0.0f), point_t<>(-2.0f, 0.0f, 0.0f), point_t<>(-1.0f, 1.0f, 0.0f)
         }),
         pnts_1(
         {
-            point_t( 0.0f,  0.0f, 1.0f), point_t( 1.0f, 1.0f, 0.0f), point_t( 2.0f, 0.0f, 0.0f), point_t(1.0f, -1.0f, 0.0f), 
-            point_t(-1.0f, -1.0f, 0.0f), point_t(-2.0f, 0.0f, 0.0f), point_t(-1.0f, 1.0f, 0.0f)
+            point_t<>( 0.0f,  0.0f, 1.0f), point_t<>( 1.0f, 1.0f, 0.0f), point_t<>( 2.0f, 0.0f, 0.0f), point_t<>(1.0f, -1.0f, 0.0f), 
+            point_t<>(-1.0f, -1.0f, 0.0f), point_t<>(-2.0f, 0.0f, 0.0f), point_t<>(-1.0f, 1.0f, 0.0f)
         }),
         pnts_2(
         {
-            point_t( 0.0f,  0.0f, 0.0f), point_t( 2.415f, 1.0f, 1.0f), point_t( 2.415f, -1.0f, 1.0f), point_t(4.83f, 0.0f, 0.0f)
+            point_t<>( 0.0f,  0.0f, 0.0f), point_t<>( 2.415f, 1.0f, 1.0f), point_t<>( 2.415f, -1.0f, 1.0f), point_t<>(4.83f, 0.0f, 0.0f)
         }),
         pnts_3(
         {
-            point_t(0.0f,  0.0f,  0.0f), point_t(-1.0f, -1.0f, 0.0f), point_t(0.0f, -1.0f, 0.0f), point_t(0.5f, -0.5f, -0.5f), 
-            point_t(0.5f, -0.25f, -1.0f), point_t(0.5f, -0.25f, -2.0f)
+            point_t<>(0.0f,  0.0f,  0.0f), point_t<>(-1.0f, -1.0f, 0.0f), point_t<>(0.0f, -1.0f, 0.0f), point_t<>(0.5f, -0.5f, -0.5f), 
+            point_t<>(0.5f, -0.25f, -1.0f), point_t<>(0.5f, -0.25f, -2.0f)
         }) { }
 
-    std::vector<point_t> pnts_0;
-    std::vector<point_t> pnts_1;
-    std::vector<point_t> pnts_2;
-    std::vector<point_t> pnts_3;
+    std::vector<point_t<>> pnts_0;
+    std::vector<point_t<>> pnts_1;
+    std::vector<point_t<>> pnts_2;
+    std::vector<point_t<>> pnts_3;
 };
 
 BOOST_FIXTURE_TEST_CASE( normal_calculator_add_test, normal_calculator_fixture )
@@ -456,7 +456,7 @@ BOOST_FIXTURE_TEST_CASE( normal_calculator_points_on_polygon_test, normal_calcul
     uut->add_point_usage(std::vector<int>{ 0, 4, 5 }, 3.0f, 0, 3);
     uut->add_point_usage(std::vector<int>{ 0, 5, 6 }, 4.0f, 0, 4);
 
-    std::vector<point_t> pnts;
+    std::vector<point_t<>> pnts;
     uut->points_on_polygon(&pnts, 0);
     BOOST_CHECK(pnts[0] == pnts_0[0]);
     BOOST_CHECK(pnts[1] == pnts_0[1]);
@@ -500,19 +500,19 @@ BOOST_FIXTURE_TEST_CASE( edge_merge_normal_calculator_calculate_test, normal_cal
     uut->calculate();
 
     /* Checks */
-    std::vector<point_t> norms;
+    std::vector<point_t<>> norms;
     BOOST_REQUIRE(uut->normals(&norms, 0) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.382577f, -0.0f, -0.923924f))) < result_tolerance);
-    BOOST_CHECK(norms[1] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.382577f, -0.0f, -0.923924f))) < result_tolerance);
+    BOOST_CHECK(norms[1] == point_t<>(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(norms[2] == point_t<>(0.0f, 0.0f, -1.0f));
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 1) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(norms[0] == point_t(0.0f, 0.0f, -1.0f));
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(-0.382577f, 0.0f, -0.923924f))) < result_tolerance);
-    BOOST_CHECK(norms[2] == point_t(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(norms[0] == point_t<>(0.0f, 0.0f, -1.0f));
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(-0.382577f, 0.0f, -0.923924f))) < result_tolerance);
+    BOOST_CHECK(norms[2] == point_t<>(0.0f, 0.0f, -1.0f));
 }
 
 BOOST_FIXTURE_TEST_CASE( flat_normal_calculator_calculate_test, normal_calculator_fixture )
@@ -531,33 +531,33 @@ BOOST_FIXTURE_TEST_CASE( flat_normal_calculator_calculate_test, normal_calculato
     uut->calculate();
 
     /* Checks */
-    std::vector<point_t> norms;
+    std::vector<point_t<>> norms;
     BOOST_REQUIRE(uut->normals(&norms, 0) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 1) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 2) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 3) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 4) == nullptr);
@@ -579,29 +579,29 @@ BOOST_FIXTURE_TEST_CASE( normal_calculator_calculate_test, normal_calculator_fix
     uut->calculate();
 
     /* Checks */
-    std::vector<point_t> norms;
+    std::vector<point_t<>> norms;
     BOOST_REQUIRE(uut->normals(&norms, 0) == nullptr);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 1) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(-0.0f,      0.545627f, -0.838028f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(-0.408248f, 0.408248f, -0.816497f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(-0.211325f, 0.57735f,  -0.788675f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(-0.0f,      0.545627f, -0.838028f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(-0.408248f, 0.408248f, -0.816497f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(-0.211325f, 0.57735f,  -0.788675f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 2) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(-0.0f,      0.545627f, -0.838028f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(-0.211325f, 0.57735f,  -0.788675f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t( 0.211325f, 0.57735f,  -0.788675f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(-0.0f,      0.545627f, -0.838028f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(-0.211325f, 0.57735f,  -0.788675f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>( 0.211325f, 0.57735f,  -0.788675f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 3) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(-0.0f,      0.545627f, -0.838028f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t( 0.211325f, 0.57735f,  -0.788675f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t( 0.408248f, 0.408248f, -0.816497f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(-0.0f,      0.545627f, -0.838028f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>( 0.211325f, 0.57735f,  -0.788675f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>( 0.408248f, 0.408248f, -0.816497f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 4) == nullptr);
@@ -623,30 +623,30 @@ BOOST_FIXTURE_TEST_CASE( normal_calculator_calculate_mixed_groups_test, normal_c
     uut->calculate();
 
     /* Checks */
-    std::vector<point_t> norms;
+    std::vector<point_t<>> norms;
     BOOST_REQUIRE(uut->normals(&norms, 0) == nullptr);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 1) != nullptr);
     BOOST_CHECK(norms.size() == 3);
 
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 2) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 3) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.0f, 0.0f, -1.0f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 4) == nullptr);
@@ -666,26 +666,26 @@ BOOST_FIXTURE_TEST_CASE( normal_calculator_calculate_with_reverse_add_test, norm
     uut->calculate();
 
     /* Checks */
-    std::vector<point_t> norms;
+    std::vector<point_t<>> norms;
     BOOST_REQUIRE(uut->normals(&norms, 0) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.593638f, 0.210295f, 0.776769f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f,      0.0f,      1.0f     ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.382683f, 0.0f,      0.92388f ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.593638f, 0.210295f, 0.776769f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.0f,      0.0f,      1.0f     ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.382683f, 0.0f,      0.92388f ))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 1) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.593638f, 0.210295f, 0.776769f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.805173f, 0.285232f, 0.519942f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.801784f, 0.534522f, 0.267261f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.593638f, 0.210295f, 0.776769f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.805173f, 0.285232f, 0.519942f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.801784f, 0.534522f, 0.267261f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 2) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.593638f, 0.210295f, 0.776769f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.382683f, 0.0f,      0.92388f ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.805173f, 0.285232f, 0.519942f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.593638f, 0.210295f, 0.776769f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.382683f, 0.0f,      0.92388f ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.805173f, 0.285232f, 0.519942f))) < result_tolerance);
 }
 
 BOOST_FIXTURE_TEST_CASE( normal_calculator_calculate_with_merge_test, normal_calculator_fixture )
@@ -703,33 +703,33 @@ BOOST_FIXTURE_TEST_CASE( normal_calculator_calculate_with_merge_test, normal_cal
     uut->calculate();
 
     /* Checks */
-    std::vector<point_t> norms;
+    std::vector<point_t<>> norms;
     BOOST_REQUIRE(uut->normals(&norms, 0) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.625929f, 0.457246f, 0.631774f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.0f,      0.0f,      1.0f     ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.382683f, 0.0f,      0.92388f ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.625929f, 0.457246f, 0.631774f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.0f,      0.0f,      1.0f     ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.382683f, 0.0f,      0.92388f ))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 1) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.625929f, 0.457246f, 0.631774f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.651677f, 0.745569f, 0.139446f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.447214f, 0.894427f, 0.0f     ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.625929f, 0.457246f, 0.631774f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.651677f, 0.745569f, 0.139446f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.447214f, 0.894427f, 0.0f     ))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 2) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.625929f, 0.457246f, 0.631774f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.382683f, 0.0f,      0.92388f ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.805173f, 0.285232f, 0.519942f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.625929f, 0.457246f, 0.631774f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.382683f, 0.0f,      0.92388f ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.805173f, 0.285232f, 0.519942f))) < result_tolerance);
 
     norms.clear();
     BOOST_REQUIRE(uut->normals(&norms, 2) != nullptr);
     BOOST_CHECK(norms.size() == 3);
-    BOOST_CHECK(fabs(magnitude(norms[0] - point_t(0.625929f, 0.457246f, 0.631774f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[1] - point_t(0.382683f, 0.0f,      0.92388f ))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(norms[2] - point_t(0.805173f, 0.285232f, 0.519942f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[0] - point_t<>(0.625929f, 0.457246f, 0.631774f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[1] - point_t<>(0.382683f, 0.0f,      0.92388f ))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(norms[2] - point_t<>(0.805173f, 0.285232f, 0.519942f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

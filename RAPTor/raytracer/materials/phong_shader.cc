@@ -6,7 +6,7 @@
 
 namespace raptor_raytracer
 {
-void phong_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t *const n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
+void phong_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t<> *const n, const point_t<> &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
@@ -18,7 +18,7 @@ void phong_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t *con
 }
 
 
-void phong_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const
+void phong_shader::shade(const ray_trace_engine &r, ray &i, const point_t<> &n, const hit_t h, ext_colour_t *const c, const point_t<> &vt) const
 {
     /* For each light shade the object */
     unsigned int l = 0;
@@ -37,7 +37,7 @@ void phong_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, co
         }
         
         /* Find the reflection of the light ray */
-        point_t ref_dir;
+        point_t<> ref_dir;
         float shade_x2 = 2.0f * shade;
         ref_dir.x = illum.get_x_grad() - n.x * shade_x2;
         ref_dir.y = illum.get_y_grad() - n.y * shade_x2;

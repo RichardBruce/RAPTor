@@ -30,7 +30,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
         const auto  *const tri = _prims.primitive(tri_idx);
         r.calculate_destination(hit_type.d);
         
-        point_t vt;
+        point_t<> vt;
         this->shader_nr = 0;
         ext_colour_t refl_colour[MAX_SECONDARY_RAYS];
         ext_colour_t refr_colour[MAX_SECONDARY_RAYS];
@@ -38,7 +38,7 @@ void ray_trace_engine::ray_trace(ray &r, ext_colour_t *const c) const
         secondary_ray_data refr;
         refl.colours(&refl_colour[0]);
         refr.colours(&refr_colour[0]);
-        const point_t vn(tri->generate_rays(*this, r, &vt, &hit_type, &refl, &refr));
+        const point_t<> vn(tri->generate_rays(*this, r, &vt, &hit_type, &refl, &refr));
         
         /* Trace shadow rays */
         for (unsigned int i = 0; i < this->lights.size(); ++i)
@@ -233,8 +233,8 @@ void ray_trace_engine::ray_trace(packet_ray *const r, ext_colour_t *const c, con
 
     /* Generate secondary rays */
     const triangle * tri[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
-    point_t vn[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
-    point_t vt[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
+    point_t<> vn[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
+    point_t<> vt[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     ray ray_p[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
     hit_description hit_p[MAXIMUM_PACKET_SIZE << LOG2_SIMD_WIDTH];
 
@@ -487,15 +487,47 @@ void ray_trace_engine::ray_trace_one_packet(const int x, const int y) const
 inline void ray_trace_engine::ray_trace_one_pixel(const int x, const int y) const
 {
     /* Convert to co-ordinate system */
-    point_t ray_dir = this->c.pixel_to_co_ordinate(x, y);
-    normalise(&ray_dir);
+    // point_t<> ray_dir(this->c.pixel_to_co_ordinate(x, y));
+    // normalise(&ray_dir);
 
-    /* Create a ray with this information */
-    ray ray_0(this->c.camera_position(), ray_dir.x, ray_dir.y, ray_dir.z);
+    // /* Create a ray with this information */
+    // ray ray_0(this->c.camera_position(), ray_dir.x, ray_dir.y, ray_dir.z);
 
-    /* Work on the pixel as a float and then saturate back to an unsigned char */
+    // ext_colour_t pixel_colour;
+    // ray_trace(ray_0, &pixel_colour);
+
+    int total_samples = 0;
+    std::vector<ray> rays;
     ext_colour_t pixel_colour;
-    ray_trace(ray_0, &pixel_colour);
+    ext_colour_t sum_sq;
+    ext_colour_t mean;
+    ext_colour_t stderr;
+    const float tolerance = 1.0f;
+    static int max_sample = 0;
+    do
+    {
+        const int samples = c.pixel_to_co_ordinate(&rays, x, y, 1, 1, 16);
+        total_samples += samples;
+
+        /* Work on the pixel as a float and then saturate back to an unsigned char */
+        for (int i = 0; i < samples; ++i)
+        {
+            ext_colour_t c0;
+            ray_trace(rays[i], &c0);
+            pixel_colour += c0;
+            sum_sq += c0 * c0;
+        }
+
+        const float samples_inv = 1.0f / static_cast<float>(total_samples);
+        mean = pixel_colour * samples_inv;
+
+        const ext_colour_t var((sum_sq  * samples_inv) - (mean * mean));
+        stderr = sqrt(var) * (1.96f / std::sqrt(total_samples));
+    } while (stderr > (tolerance * tolerance));
+
+    max_sample = std::max(max_sample, total_samples);
+    std::cout << "pixel " << x << ", " << y << " samples " << total_samples << " max samples so far " << max_sample << std::endl;
+    pixel_colour = mean;
 
     /* Saturate colours and save output */
     this->c.set_pixel(pixel_colour, x, y);

@@ -241,9 +241,9 @@ unsigned parse_element_face(const char **c, unsigned *const pre_skip, unsigned *
  v is a list of vertex locations. m is the current 
  material in use. c is the byte stream to be parsed.
 **********************************************************/
-void parse_binary_face(light_list *l, primitive_store *e, std::vector<point_t> &vn, std::vector<point_t> &v, std::map<int, material *> *const shader_map, const char **c, const bool colour)
+void parse_binary_face(light_list *l, primitive_store *e, std::vector<point_t<>> &vn, std::vector<point_t<>> &v, std::map<int, material *> *const shader_map, const char **c, const bool colour)
 {
-    static std::vector<point_t> face;
+    static std::vector<point_t<>> face;
     
     /* Parse all vextex data for the face */
     unsigned char v_this_f = raptor_parsers::from_byte_stream<unsigned char>(c);
@@ -288,9 +288,9 @@ void parse_binary_face(light_list *l, primitive_store *e, std::vector<point_t> &
     if (face.size() == 3)
     {
         /* Check the points show movement in atleast 2 axes  */
-        point_t a = face[0];
-        point_t b = face[1];
-        point_t c = face[2];
+        point_t<> a = face[0];
+        point_t<> b = face[1];
+        point_t<> c = face[2];
 
         if ((a != b) && (a != c) && (b != c))
         {
@@ -326,9 +326,9 @@ void parse_binary_face(light_list *l, primitive_store *e, std::vector<point_t> &
  v is a list of vertex locations. m is the current 
  material in use. c is the byte stream to be parsed.
 **********************************************************/
-void parse_face(light_list *l, primitive_store *e, std::vector<point_t> &vn, std::vector<point_t> &v, std::map<int, material *> *const shader_map, const char **c, const bool colour)
+void parse_face(light_list *l, primitive_store *e, std::vector<point_t<>> &vn, std::vector<point_t<>> &v, std::map<int, material *> *const shader_map, const char **c, const bool colour)
 {
-    static std::vector<point_t> face;
+    static std::vector<point_t<>> face;
 
     /* Parse all vextex data for the face */
     unsigned v_this_f = atoi(*c);
@@ -372,9 +372,9 @@ void parse_face(light_list *l, primitive_store *e, std::vector<point_t> &vn, std
     if (face.size() == 3)
     {
         /* Check the points show movement in atleast 2 axes  */
-        point_t a = face[0];
-        point_t b = face[1];
-        point_t c = face[2];
+        point_t<> a = face[0];
+        point_t<> b = face[1];
+        point_t<> c = face[2];
 
         if ((a != b) && (a != c) && (b != c))
         {
@@ -406,9 +406,9 @@ void parse_face(light_list *l, primitive_store *e, std::vector<point_t> &vn, std
  vs is a list of vertices to be appended too and c is a 
  pointer to the byte stream to be parsed.
 **********************************************************/
-void parse_binary_vertex(std::vector<point_t> *const vs, std::vector<point_t> *const vn, const char **c, const bool normal, const bool colour)
+void parse_binary_vertex(std::vector<point_t<>> *const vs, std::vector<point_t<>> *const vn, const char **c, const bool normal, const bool colour)
 {
-    point_t v;
+    point_t<> v;
 
     /* Parse the vertex position */
     v.x = raptor_parsers::from_byte_stream<float>(c);
@@ -440,9 +440,9 @@ void parse_binary_vertex(std::vector<point_t> *const vs, std::vector<point_t> *c
  vs is a list of vertices to be appended too and c is a 
  pointer to the byte stream to be parsed.
 **********************************************************/
-void parse_vertex(std::vector<point_t> *const vs, std::vector<point_t> *const vn, const char **c, const bool normal, const bool colour)
+void parse_vertex(std::vector<point_t<>> *const vs, std::vector<point_t<>> *const vn, const char **c, const bool normal, const bool colour)
 {
-    point_t v;
+    point_t<> v;
 
     /* Parse the vertex position */
     v.x = atof(*c);
@@ -490,8 +490,8 @@ void ply_parser(
     const char *at = &buffer[0];
     
     /* Vectors of vertice data */
-    std::vector<point_t>    vn;
-    std::vector<point_t>    v;
+    std::vector<point_t<>>    vn;
+    std::vector<point_t<>>    v;
     
     /* Map of shader names to shader */
     std::map<int, material *> shader_map;

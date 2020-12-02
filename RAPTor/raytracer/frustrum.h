@@ -98,7 +98,7 @@ class frustrum
             return;
         }
         
-        frustrum(const packet_ray *r, const point_t &o, const unsigned s)
+        frustrum(const packet_ray *r, const point_t<> &o, const unsigned s)
         {
             /* Max and min directions */
             vfp_t min_x_dir = r[0].get_x_grad();
@@ -171,7 +171,7 @@ class frustrum
 
 
         /* Adapt the frustrum to a leaf node with upper vertex u and lower vertex l */
-        void adapt_to_leaf(const packet_ray *r, const point_t &u, const point_t &l, const unsigned *c, const unsigned s)
+        void adapt_to_leaf(const packet_ray *r, const point_t<> &u, const point_t<> &l, const unsigned *c, const unsigned s)
         {
             /* I0 - prevalent beam axis */
             const int I0 = this->n & 0x3;
@@ -319,7 +319,7 @@ class frustrum
         }
 
         /* Frustrum-triangle culling */
-        bool cull(const point_t &a, const point_t &b, const point_t &c) const
+        bool cull(const point_t<> &a, const point_t<> &b, const point_t<> &c) const
         {
             /* I0 - prevalent beam axis */
             const int I0 = this->n & 0x3;
@@ -338,7 +338,7 @@ class frustrum
         }
 
         /* Frustrum-aabb culling */
-        bool cull(const point_t &low, const point_t &high) const
+        bool cull(const point_t<> &low, const point_t<> &high) const
         {
             /* I0 - prevalent beam axis */
             const int I0 = this->n & 0x3;
@@ -413,10 +413,10 @@ class frustrum
         float       _x_data[4];
         float       _y_data[4];
         float       _z_data[4];
-        // point_t     n_ogn;          /* Most negative origin                                 */
-        // point_t     p_ogn;          /* Most positive origin                                 */
-        // point_t     n_dir;          /* Most negative direction                              */
-        // point_t     p_dir;          /* Most positive direction                              */
+        // point_t<>     n_ogn;          /* Most negative origin                                 */
+        // point_t<>     p_ogn;          /* Most positive origin                                 */
+        // point_t<>     n_dir;          /* Most negative direction                              */
+        // point_t<>     p_dir;          /* Most positive direction                              */
         int         n;              /* Major direction of the frustrum                      */
 };
 }; /* namespace raptor_raytracer */

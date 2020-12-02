@@ -6,7 +6,7 @@
 
 namespace raptor_raytracer
 {
-void coloured_mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t *const n, const point_t &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
+void coloured_mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, point_t<> *const n, const point_t<> &vt, const hit_t h, secondary_ray_data *const rl, secondary_ray_data *const rf) const
 {
     /* For each light request rays */
     for (unsigned int l = 0; l < r.get_scene_lights().size(); ++l)
@@ -38,7 +38,7 @@ void coloured_mapper_shader::generate_rays(const ray_trace_engine &r, ray &i, po
 }
 
 
-void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const point_t &n, const hit_t h, ext_colour_t *const c, const point_t &vt) const
+void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const point_t<> &n, const hit_t h, ext_colour_t *const c, const point_t<> &vt) const
 {
     /* Get the materials ns */
     ext_colour_t cur_ka;
@@ -90,7 +90,7 @@ void coloured_mapper_shader::shade(const ray_trace_engine &r, ray &i, const poin
         }
         
         /* Find the reflection of the light ray */
-        point_t ref_dir = illum.get_dir() - n * (2.0f * shade);
+        point_t<> ref_dir = illum.get_dir() - n * (2.0f * shade);
     
         /* Cos(angle between refelction and the ray) */
         float ray_dot_reflection = dot_product(i.get_dir(), ref_dir);

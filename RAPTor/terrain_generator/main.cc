@@ -138,12 +138,12 @@ int main()
     unsigned int img_height;
     const raptor_raytracer::ext_colour_t black(0.0f, 0.0f, 0.0f);
     unsigned int cpp = raptor_raytracer::read_jpeg(&img, "./grass-texture-2.jpg", &img_height, &img_width);
-    raptor_raytracer::planar_mapper *tm = new raptor_raytracer::planar_mapper(boost::shared_array<float>(img), point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 1.0f, 0.0f), point_t(10.0f, 0.0f, 10.0f), cpp, img_width, img_height, raptor_raytracer::texture_wrapping_mode_t::tile, raptor_raytracer::texture_wrapping_mode_t::tile);
+    raptor_raytracer::planar_mapper *tm = new raptor_raytracer::planar_mapper(boost::shared_array<float>(img), point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 1.0f, 0.0f), point_t<>(10.0f, 0.0f, 10.0f), cpp, img_width, img_height, raptor_raytracer::texture_wrapping_mode_t::tile, raptor_raytracer::texture_wrapping_mode_t::tile);
     std::unique_ptr<raptor_raytracer::material> grass(new raptor_raytracer::coloured_mapper_shader(black, raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), black, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, nullptr, tm, nullptr, nullptr));
 
     /* Lights */
-    se.add_light(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t( 200.0f,  1500.0f,  200.0f));
-    // se.add_light(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t( 200.0f, -1500.0f,  200.0f));
+    se.add_light(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t<>( 200.0f,  1500.0f,  200.0f));
+    // se.add_light(raptor_raytracer::ext_colour_t(255.0f, 255.0f, 255.0f), point_t<>( 200.0f, -1500.0f,  200.0f));
 
 
     /* Generate height map */
@@ -151,7 +151,7 @@ int main()
     // raptor_terrain::height_map<perlin_noise_2d> hm(noise, 100.0f, 0.05f, 0.4f, 3, x, y);
     simplex_noise_2d noise;
     raptor_terrain::height_map<simplex_noise_2d> hm(noise, 100.0f, 0.01f, 0.4f, 3, x, y);
-    std::unique_ptr<point_t []> verts(hm.generate(xs, ys));
+    std::unique_ptr<point_t<> []> verts(hm.generate(xs, ys));
 
 
     // std::vector< raptor_terrain::Vec3<raptor_terrain::Real> > points;
@@ -210,7 +210,7 @@ int main()
     //     BOOST_LOG_TRIVIAL(trace) << "Number of vertices: " << nPoints;
     //     BOOST_LOG_TRIVIAL(trace) << "Number of triangles: " << nTriangles;
 
-    //     std::vector<point_t> patch_verts;
+    //     std::vector<point_t<>> patch_verts;
     //     for(size_t v = 0; v < nPoints; ++v)
     //     {
     //         patch_verts.emplace_back(pointsCH[v].X(), pointsCH[v].Y(), pointsCH[v].Z());
@@ -227,7 +227,7 @@ int main()
 
     //     /* Add static objects */
     //     raptor_physics::vertex_group *const vg = new raptor_physics::vertex_group(patch_verts, tris, m[c & 0xf].get());
-    //     raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0f, 0.0f, 0.0f), std::numeric_limits<float>::infinity());
+    //     raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t<>(0.0f, 0.0f, 0.0f), std::numeric_limits<float>::infinity());
     //     se.add_object(phy_obj);
     // }
 
@@ -393,7 +393,7 @@ int main()
     {
         /* Collect vertices */
         BOOST_LOG_TRIVIAL(trace) << "Collecting vertices";
-        std::vector<point_t> *const facet_verts = new std::vector<point_t>();
+        std::vector<point_t<>> *const facet_verts = new std::vector<point_t<>>();
         for (int f : facet)
         {
             assert(f >= 0 || !"Vertex index is out of range");
@@ -409,7 +409,7 @@ int main()
         /* Add static objects */
         const std::vector<raptor_physics::polygon> polys{ raptor_physics::polygon(facet_verts, tris) };
         raptor_physics::vertex_group *const vg = new raptor_physics::vertex_group(facet_verts, polys, m[0].get());
-        raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t(0.0f, 0.0f, 0.0f), std::numeric_limits<float>::infinity());
+        raptor_physics::physics_object *const phy_obj = new raptor_physics::physics_object(vg, point_t<>(0.0f, 0.0f, 0.0f), std::numeric_limits<float>::infinity());
         se.add_object(phy_obj);
     }
 

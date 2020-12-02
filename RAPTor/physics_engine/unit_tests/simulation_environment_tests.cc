@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE( add_light_test )
     BOOST_CHECK(uut.font_initialised() == false);
     BOOST_CHECK(uut.load_screen_initialised() == false);
 
-    uut.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t(0.0, 0.0, 1.0));
+    uut.add_light(raptor_raytracer::ext_colour_t(255.0, 255.0, 255.0), point_t<>(0.0, 0.0, 1.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 0);
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE( add_light_test )
     BOOST_CHECK(uut.font_initialised() == false);
     BOOST_CHECK(uut.load_screen_initialised() == false);
 
-    uut.add_light(raptor_raytracer::ext_colour_t(125.0, 0.0, 64.0), point_t(-10.0, 0.0, 5.0));
+    uut.add_light(raptor_raytracer::ext_colour_t(125.0, 0.0, 64.0), point_t<>(-10.0, 0.0, 5.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 0);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE( add_object_test )
     BOOST_CHECK(uut.font_initialised() == false);
     BOOST_CHECK(uut.load_screen_initialised() == false);
 
-    uut.add_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, 9.5, 0.0), std::numeric_limits<float>::infinity()));
+    uut.add_object(new physics_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5)), point_t<>(0.0, 9.5, 0.0), std::numeric_limits<float>::infinity()));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 1);
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( add_object_test )
     BOOST_CHECK(uut.font_initialised() == false);
     BOOST_CHECK(uut.load_screen_initialised() == false);
 
-    uut.add_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, -9.5, 0.0), std::numeric_limits<float>::infinity()));
+    uut.add_object(new physics_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5)), point_t<>(0.0, -9.5, 0.0), std::numeric_limits<float>::infinity()));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 2);
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE( add_moving_object_test )
     BOOST_CHECK(uut.font_initialised() == false);
     BOOST_CHECK(uut.load_screen_initialised() == false);
 
-    uut.add_moving_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, 9.5, 0.0), 10.0));
+    uut.add_moving_object(new physics_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5)), point_t<>(0.0, 9.5, 0.0), 10.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 1);
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE( add_moving_object_test )
     BOOST_CHECK(uut.font_initialised() == false);
     BOOST_CHECK(uut.load_screen_initialised() == false);
 
-    uut.add_moving_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, -9.5, 0.0), 10.0));
+    uut.add_moving_object(new physics_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5)), point_t<>(0.0, -9.5, 0.0), 10.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 2);
@@ -177,8 +177,8 @@ BOOST_AUTO_TEST_CASE( add_moving_object_test )
 BOOST_AUTO_TEST_CASE( run_one_frame_no_fps_limit_test )
 {
     simulation_environment uut(&pe, &po);
-    uut.add_moving_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, 9.5, 0.0), 10.0));
-    uut.add_moving_object(new physics_object(make_cube(m, point_t(-0.5, -0.5, -0.5), point_t(0.5, 0.5, 0.5)), point_t(0.0, -9.5, 0.0), 10.0));
+    uut.add_moving_object(new physics_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5)), point_t<>(0.0, 9.5, 0.0), 10.0));
+    uut.add_moving_object(new physics_object(make_cube(m, point_t<>(-0.5, -0.5, -0.5), point_t<>(0.5, 0.5, 0.5)), point_t<>(0.0, -9.5, 0.0), 10.0));
     BOOST_CHECK(uut.engine() == &pe);
     BOOST_CHECK(uut.time_run() == 0.0);
     BOOST_CHECK(uut.engine()->number_of_objects() == 2);

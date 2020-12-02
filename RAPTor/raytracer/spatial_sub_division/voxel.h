@@ -21,14 +21,14 @@ namespace raptor_raytracer
 /* Forward declarations */
 class kdt_node;
 
-void clip_triangle(const triangle *const tri, point_t *const bl, point_t *const tr, point_t *const t_bl, point_t *const t_tr, const float split, const axis_t axis);
+void clip_triangle(const triangle *const tri, point_t<> *const bl, point_t<> *const tr, point_t<> *const t_bl, point_t<> *const t_tr, const float split, const axis_t axis);
 float approximate_sah_minima(const float cl0, const float cl1, const float cr0, const float cr1, const float x0, const float d, const float xw, const float yw, const float zw);
 void fix_adaptive_samples(float *const nr_samples, float *const widths, float *const samples, const float *const cl, const float *const cr, const float d0, const float dw, const float prims);
 
 struct alignas(32) voxel_aab_data
 {
-    point_t     low;
-    point_t     high;
+    point_t<>   low;
+    point_t<>   high;
     int         prim;
 };
 
@@ -36,14 +36,14 @@ class voxel
 {
     public :
         /* Constructors */
-        voxel(std::vector<voxel_aab_data> *const ping, std::vector<voxel_aab_data> *const pong, const int ping_idx, const int pong_idx, const int nr_prims, const point_t &t, const point_t &b, axis_t n) :
+        voxel(std::vector<voxel_aab_data> *const ping, std::vector<voxel_aab_data> *const pong, const int ping_idx, const int pong_idx, const int nr_prims, const point_t<> &t, const point_t<> &b, axis_t n) :
             _ping(ping), _pong(pong), _t(t), _b(b), _sa_inv(0.0f), _ping_idx(ping_idx), _pong_idx(pong_idx), _nr_prims(nr_prims), _n(n)
         {
-            const point_t scene_width(t - b);
+            const point_t<> scene_width(t - b);
             _sa_inv = 1.0f / ((scene_width.x * scene_width.y) + (scene_width.x * scene_width.z) + (scene_width.y * scene_width.z));
         };
 
-        voxel(std::vector<voxel_aab_data> *const ping, std::vector<voxel_aab_data> *const pong, const float sa_inv, const int ping_idx, const int pong_idx, const int nr_prims, const point_t &t, const point_t &b, axis_t n) :
+        voxel(std::vector<voxel_aab_data> *const ping, std::vector<voxel_aab_data> *const pong, const float sa_inv, const int ping_idx, const int pong_idx, const int nr_prims, const point_t<> &t, const point_t<> &b, axis_t n) :
             _ping(ping), _pong(pong), _t(t), _b(b), _sa_inv(sa_inv), _ping_idx(ping_idx), _pong_idx(pong_idx), _nr_prims(nr_prims), _n(n)
         {  };
 
@@ -75,8 +75,8 @@ class voxel
 
         std::vector<voxel_aab_data> *   _ping;
         std::vector<voxel_aab_data> *   _pong;
-        point_t                         _t;
-        point_t                         _b;
+        point_t<>                         _t;
+        point_t<>                         _b;
         float                           _sa_inv;
         int                             _ping_idx;
         int                             _pong_idx;

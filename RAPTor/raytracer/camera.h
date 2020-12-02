@@ -4,11 +4,12 @@
 #include "boost/archive/text_oarchive.hpp"
 #include "boost/archive/text_iarchive.hpp"
 
-// Common headers
+/* Common headers */
 #include "base_camera.h"
+#include "point_t.h"
 
 /* Ray tracer headers */
-#include "point_t.h"
+#include "circle_sampler.h"
 #include "ext_colour_t.h"
 #include "texture_mapper.h"
 #include "ray.h"
@@ -51,22 +52,22 @@ void read_png_file(const std::string &file_name, unsigned char *png_data, unsign
 class camera : public base_camera
 {
     public :
-        camera(const point_t &c, const point_t &x, const point_t &y, const point_t &z, const ext_colour_t &b, const float w, 
-               const float h, const float t, const unsigned x_res, const unsigned y_res, const unsigned x_a_res = 1, const unsigned y_a_res = 1) :
-                base_camera(c, x, y, z, 1.0f),
-                tm(nullptr), image(new ext_colour_t [ (x_res * x_a_res) * (y_res * y_a_res) ]), scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), temporal_glare_filter(nullptr),
-                u(point_t(0.0f, 0.0f, 0.0f)), l(point_t(0.0f, 0.0f, 0.0f)), b(b), x_m(-w), y_m(-h), x_inc((w * 2.0f)/static_cast<float>(x_res * x_a_res)), y_inc((h * 2.0f)/static_cast<float>(y_res * y_a_res)), 
-                t(t), x_res(x_res * x_a_res), y_res(y_res * y_a_res), out_x_res(x_res), out_y_res(y_res), r_vec(point_t(0.0, 0.0, 0.0)), r_angle(0.0),
-                r_pivot(point_t(0.0, 0.0, 0.0)), time_step(0.0), adatption_level(0.0)
-        { };
+        camera(const point_t<> &c, const point_t<> &x, const point_t<> &y, const point_t<> &z, const ext_colour_t &b, const float w, 
+               const float h, const float t, const unsigned x_res, const unsigned y_res, const unsigned x_a_res, const unsigned y_a_res,
+               const float aperture, const float focal_length) :
+                base_camera(c, x, y, z, 1.0f), tm(nullptr), sampler(point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 1.0f, 0.0f)),
+                image(new ext_colour_t [ (x_res * x_a_res) * (y_res * y_a_res) ]), scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), temporal_glare_filter(nullptr),
+                u(point_t<>(0.0f, 0.0f, 0.0f)), l(point_t<>(0.0f, 0.0f, 0.0f)), b(b), x_m(-w), y_m(-h), x_inc((w * 2.0f)/static_cast<float>(x_res * x_a_res)), y_inc((h * 2.0f)/static_cast<float>(y_res * y_a_res)), 
+                t(t), x_res(x_res * x_a_res), y_res(y_res * y_a_res), out_x_res(x_res), out_y_res(y_res), r_vec(point_t<>(0.0f, 0.0f, 0.0f)), r_angle(0.0f),
+                r_pivot(point_t<>(0.0f, 0.0f, 0.0f)), time_step(0.0f), adatption_level(0.0f), aperture(aperture), focal_length(focal_length) { };
 
-        camera(const std::vector<texture_mapper *>  * const tm, const point_t &u, const point_t &l, const point_t &c, 
-               const point_t &x, const point_t    &y, const point_t    &z, const ext_colour_t     &b, const     float w, 
-               const float  h, const     float  t, const unsigned x_res, const unsigned y_res, 
-               const point_t &r_vec = point_t(0.0, 0.0, 0.0), const float r_angle = 0.0, const point_t &r_pivot = point_t(0.0, 0.0, 0.0),
-               const unsigned  x_a_res = 1, const unsigned y_a_res = 1, const float speed = 1.0, const float time_step = 0.0) :
-            base_camera(c, x, y, z, speed),
-            tm(tm), image(new ext_colour_t [ (x_res * x_a_res) * (y_res * y_a_res) ]), scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), temporal_glare_filter(nullptr),
+        camera(const std::vector<texture_mapper *>  *const tm, const point_t<> &u, const point_t<> &l, const point_t<> &c, 
+               const point_t<> &x, const point_t<> &y, const point_t<> &z, const ext_colour_t &b, const float w, 
+               const float h, const float t, const unsigned x_res, const unsigned y_res, 
+               const point_t<> &r_vec = point_t<>(0.0f, 0.0f, 0.0f), const float r_angle = 0.0f, const point_t<> &r_pivot = point_t<>(0.0f, 0.0f, 0.0f),
+               const unsigned x_a_res = 1, const unsigned y_a_res = 1, const float speed = 1.0f, const float time_step = 0.0f) :
+            base_camera(c, x, y, z, speed), tm(tm), sampler(point_t<>(0.0f, 0.0f, 1.0f), point_t<>(0.0f, 1.0f, 0.0f)), 
+            image(new ext_colour_t [ (x_res * x_a_res) * (y_res * y_a_res) ]), scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), temporal_glare_filter(nullptr),
             u(u), l(l), b(b), x_m(-w), y_m(-h), x_inc((w * 2.0f)/static_cast<float>(x_res * x_a_res)), y_inc((h * 2.0f)/static_cast<float>(y_res * y_a_res)), 
             t(t), x_res(x_res * x_a_res), y_res(y_res * y_a_res), out_x_res(x_res), out_y_res(y_res), r_vec(r_vec), r_angle(r_angle),
             r_pivot(r_pivot), time_step(time_step), adatption_level(0.0)
@@ -113,7 +114,7 @@ class camera : public base_camera
         }
         
         /* Pixel to co-ordinate conversion */
-        point_t pixel_to_co_ordinate(const int x, const int y, const int a_x = 0, const int a_y = 0) const
+        point_t<> pixel_to_co_ordinate(const int x, const int y, const int a_x = 0, const int a_y = 0) const
         {
             /* The camera can be anywhere so these co-ordinates are relative to it */
             /* Calaculate the direction that would pass through x,y */
@@ -123,11 +124,44 @@ class camera : public base_camera
             return (x_axis() * x_t) + (y_axis() * y_t) + (z_axis() * this->t);
         }
 
+        int pixel_to_co_ordinate(std::vector<ray> *const rays, const int x, const int y, const int a_x = 0, const int a_y = 0, const int samples = 0)
+        {
+            /* Find the way the center ray would go */
+            const float x_t = (static_cast<float>(x) * x_inc) + x_m;
+            const float y_t = (static_cast<float>(y) * y_inc) + y_m;
+            
+            /* Work out where the rays should focus, if we dont need depth of focus send it back */
+            const point_t<> screen((x_axis() * x_t) + (y_axis() * y_t) + (z_axis() * this->t));
+            const point_t<> dir(normalise(screen));
+            if ((samples <= 1) || (focal_length <= 0.0f) || (aperture <= 0.0f))
+            {
+                rays->resize(1);
+                rays->at(0).set_up(camera_position(), dir.x, dir.y, dir.z);
+                return 1;
+            }
+
+            const point_t<> focal_point(camera_position() + (dir * focal_length));
+            // circle_sampler_stratified sampler(dir, y_axis() * aperture, samples);
+            // rays->resize(sampler.samples());
+            // for (int i = 0; i < sampler.samples(); ++i)
+            rays->resize(samples);
+            sampler.reset(dir, y_axis() * aperture);
+            for (int i = 0; i < samples; ++i)
+            {
+                const point_t<> o(camera_position() + sampler.sample());
+                const point_t<> adj_dir(normalise(focal_point - o));
+                rays->at(i).set_up(o, adj_dir.x, adj_dir.y, adj_dir.z);
+            }
+
+            // return sampler.samples();
+            return samples;
+        }
+
         /* Convert a line from the origin into a pixel address */
-        inline bool direction_to_pixel(const point_t &d, float *xy) const
+        inline bool direction_to_pixel(const point_t<> &d, float *xy) const
         {
             /* Find the intersection the the line from the origin and the image plane */
-            const float n_dot_d      = dot_product(z_axis(), d);
+            const float n_dot_d = dot_product(z_axis(), d);
             
             /* Direction perphendicular to the image plane */
             if (n_dot_d == 0.0f)
@@ -135,11 +169,11 @@ class camera : public base_camera
                 return false;
             }
             
-            const point_t hit_point = d * (this->t / n_dot_d);
+            const point_t<> hit_point = d * (this->t / n_dot_d);
             
             /* Convert the intersection pont to a co-ordinate */
-            const point_t plane_centre = z_axis() * t;
-            const point_t diff = hit_point - plane_centre;
+            const point_t<> plane_centre = z_axis() * t;
+            const point_t<> diff = hit_point - plane_centre;
             
             xy[0] = (dot_product(x_axis(), diff) - this->x_m) / this->x_inc;
             xy[1] = (dot_product(y_axis(), diff) - this->y_m) / this->y_inc;
@@ -166,8 +200,8 @@ class camera : public base_camera
                 const int ty = y + packet_ray_to_co_ordinate_lut.y_offset(i);
                 
                 /* Calculate the rays direction */
-                vfp_t vx(tx, (tx + 1), tx,      (tx + 1));
-                vfp_t vy(ty,  ty,     (ty + 1), (ty + 1));
+                vfp_t vx(tx, (tx + 1.0f), tx,         (tx + 1.0f));
+                vfp_t vy(ty,  ty,        (ty + 1.0f), (ty + 1.0f));
 
                 vfp_t vx_t((vx * vfp_t(x_inc)) + vfp_t(this->x_m));
                 vfp_t vy_t((vy * vfp_t(y_inc)) + vfp_t(this->y_m));
@@ -191,7 +225,7 @@ class camera : public base_camera
                 vd_z *= vec_len;
              
                 /* Initalise part of the packet */
-                r[i].set_up(this->c, vd_x, vd_y, vd_z);
+                r[i].set_up(camera_position(), vd_x, vd_y, vd_z);
             }
         }
 #endif /* #ifdef SIMD_PACKET_TRACING */
@@ -206,30 +240,30 @@ class camera : public base_camera
             else
             {
                 /* Find the intersection point with the sky box and which plane was hit */
-                point_t p;
+                point_t<> p;
                 const unsigned int tm_nr = this->sky_box_intersection(*r, &p);
                 r->set_dst(p);
 
-                point_t n;
+                point_t<> n;
                 switch(tm_nr)
                 {
                     case 0 :
-                        n = point_t(1.0, 0.0, 0.0);
+                        n = point_t<>(1.0, 0.0, 0.0);
                         break;
                     case 1 :
-                        n = point_t(0.0, 1.0, 0.0);
+                        n = point_t<>(0.0, 1.0, 0.0);
                         break;
                     case 2 :
-                        n = point_t(0.0, 0.0, 1.0);
+                        n = point_t<>(0.0, 0.0, 1.0);
                         break;
                     case 3 :
-                        n = point_t(-1.0, 0.0, 0.0);
+                        n = point_t<>(-1.0, 0.0, 0.0);
                         break;
                     case 4 :
-                        n = point_t(0.0, -1.0, 0.0);
+                        n = point_t<>(0.0, -1.0, 0.0);
                         break;
                     case 5 :
-                        n = point_t(0.0, 0.0, -1.0);
+                        n = point_t<>(0.0, 0.0, -1.0);
                         break;
                     default :
                         assert(!"Sky box texture mapper out of range");
@@ -238,7 +272,7 @@ class camera : public base_camera
                 
                 /* Look up the texture and texture map the pixel */
                 ext_colour_t c;
-                (*this->tm)[tm_nr]->texture_map(*r, &c, n, point_t(MAX_DIST, MAX_DIST, MAX_DIST));
+                (*this->tm)[tm_nr]->texture_map(*r, &c, n, point_t<>(MAX_DIST, MAX_DIST, MAX_DIST));
                 return c;
             }
         }
@@ -371,19 +405,19 @@ class camera : public base_camera
             ar & adatption_level;
         }
 
-        camera(const std::vector<texture_mapper *>  *const tm, const point_t &u, const point_t &l, const ext_colour_t &b,
+        camera(const std::vector<texture_mapper *>  *const tm, const point_t<> &u, const point_t<> &l, const ext_colour_t &b,
             const float x_m, const float y_m, const float x_inc, const float y_inc, const float t, 
             const unsigned x_res, const unsigned y_res, const unsigned out_x_res, const unsigned out_y_res, 
-            const point_t &r_vec, const float r_angle, const point_t &r_pivot) : 
-            base_camera(point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), point_t(0.0f, 0.0f, 0.0f), 1.0f),
-            tm(tm), image(new ext_colour_t[x_res * y_res]),
+            const point_t<> &r_vec, const float r_angle, const point_t<> &r_pivot) : 
+            base_camera(point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f), point_t<>(0.0f, 0.0f, 0.0f), 1.0f),
+            tm(tm), sampler(point_t<>(1.0f, 0.0f, 0.0f), y_axis() * aperture), image(new ext_colour_t[x_res * y_res]),
             scotopic_glare_filter(nullptr), mesopic_glare_filter(nullptr), photopic_glare_filter(nullptr), 
             temporal_glare_filter(nullptr), u(u), l(l), b(b), x_m(x_m), y_m(y_m), x_inc(x_inc), y_inc(y_inc), 
             t(t), x_res(x_res), y_res(y_res), out_x_res(out_x_res), out_y_res(out_y_res), r_vec(r_vec), 
             r_angle(r_angle), r_pivot(r_pivot)
         {  };
 
-        unsigned int sky_box_intersection(const ray &r, point_t *p) const
+        unsigned int sky_box_intersection(const ray &r, point_t<> *p) const
         {
             /* Assert the ray originated inside the sky box */
             assert((r.get_x0() >= this->l.x) && (r.get_x0() <= this->u.x));
@@ -392,8 +426,8 @@ class camera : public base_camera
             
             /* Rotate the ray into the sky boxes co-ordinate system */
             ray rot_r = r.rotate(this->r_vec, this->r_pivot, this->r_angle);
-            const point_t ogn = rot_r.get_ogn();
-            const point_t dir = rot_r.get_dir();
+            const point_t<> ogn = rot_r.get_ogn();
+            const point_t<> dir = rot_r.get_dir();
 
             float x_dist = MAX_DIST;
             float y_dist = MAX_DIST;
@@ -493,14 +527,14 @@ class camera : public base_camera
         void convert_xyz_to_rgb(ext_colour_t *const p, const int x, const int y) const;
 
         const std::vector<texture_mapper *>  * const    tm;                         /* Texture mapper for each face of the sky box                      */
+        circle_sampler_random                           sampler;                    /* Sampler for depth of focus                                       */
         ext_colour_t                    *               image;                      /* The rendered image                                               */
         ext_colour_t                    *               scotopic_glare_filter;      /* Array of colours for glare filter images in scotopic lighting    */
         ext_colour_t                    *               mesopic_glare_filter;       /* Array of colours for glare filter images in mesopic lighting     */
         ext_colour_t                    *               photopic_glare_filter;      /* Array of colours for glare filter images in photopic lighting    */
         ext_colour_t                    *               temporal_glare_filter;      /* Array of colours for temporal glare filter images                */
-        const point_t                                   u;                          /* Upper bounds of the sky box                                      */
-        const point_t                                   l;                          /* Lower bounds of the sky box                                      */
-        point_t                                         c;                          /* Camera position                                                  */
+        const point_t<>                                 u;                          /* Upper bounds of the sky box                                      */
+        const point_t<>                                 l;                          /* Lower bounds of the sky box                                      */
         const ext_colour_t                              b;                          /* Background colour                                                */
         const float                                     x_m;                        /* Minimum X co-ordinate                                            */
         const float                                     y_m;                        /* Minimum y co-ordinate                                            */
@@ -511,11 +545,13 @@ class camera : public base_camera
         const unsigned                                  y_res;                      /* Internal Y resolution                                            */
         const unsigned                                  out_x_res;                  /* Output X resolution                                              */
         const unsigned                                  out_y_res;                  /* Output Y resolution                                              */
-        const point_t                                   r_vec;                      /* Sky box rotation axis                                            */
+        const point_t<>                                 r_vec;                      /* Sky box rotation axis                                            */
         const float                                     r_angle;                    /* Sky box rotation                                                 */
-        const point_t                                   r_pivot;                    /* Sky box pivot point                                              */
+        const point_t<>                                 r_pivot;                    /* Sky box pivot point                                              */
         float                                           time_step;                  /* Time step between last and current frame in seconds              */
         float                                           adatption_level;            /* Current light level that has been adapted to                     */
+        float                                           aperture;                   /* The radius of the aperture                                       */
+        float                                           focal_length;               /* The focal length                                                 */
 };
 }; /* namespace raptor_raytracer */
 
@@ -547,7 +583,7 @@ inline void load_construct_data(Archive & ar, raptor_raytracer::camera *cam, con
 {
     /* Retreive the fields */
     std::vector<raptor_raytracer::texture_mapper *>  *tm;
-    point_t u, l, r_vec, r_pivot;
+    point_t<> u, l, r_vec, r_pivot;
     raptor_raytracer::ext_colour_t b;
     float x_m, y_m, x_inc, y_inc, t, r_angle;
     unsigned int x_res, y_res, out_x_res, out_y_res;

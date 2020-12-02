@@ -17,12 +17,12 @@ class gjk_test_access
             : _gjk(vg_a, vg_b, sim_a, sim_b), _retain{0, 1, 2, 3} {  };
 
         /* Access to functions under test */
-        bool find_minimum_distance(point_t *const dist, const point_t &fixed_rel_disp, const point_t &float_rel_disp, const quaternion_t &a_o, const quaternion_t &b_o)
+        bool find_minimum_distance(point_t<> *const dist, const point_t<> &fixed_rel_disp, const point_t<> &float_rel_disp, const quaternion_t &a_o, const quaternion_t &b_o)
         {
             return _gjk.find_minimum_distance(dist, fixed_rel_disp, float_rel_disp, a_o, b_o);
         }
 
-        int find_closest_feature_to_origin(const point_t *const c_space, int *const verts, point_t *const dir) const
+        int find_closest_feature_to_origin(const point_t<> *const c_space, int *const verts, point_t<> *const dir) const
         {
             return _gjk.find_closest_feature_to_origin(c_space, verts, dir);
         }

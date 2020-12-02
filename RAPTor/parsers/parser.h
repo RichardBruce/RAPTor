@@ -14,7 +14,7 @@
 
 namespace raptor_parsers
 {
-inline bool load_off(const std::string &in_file, std::vector<point_t> *const points, std::vector<point_ti<>> *const triangles)
+inline bool load_off(const std::string &in_file, std::vector<point_t<>> *const points, std::vector<point_ti<>> *const triangles)
 {
     /* Open file */
     std::ifstream off_file(in_file.c_str());
@@ -57,7 +57,7 @@ inline bool load_off(const std::string &in_file, std::vector<point_t> *const poi
     find_next_line(&at);
 
     /* Get vertices */
-    point_t vert;
+    point_t<> vert;
     points->reserve(nr_v);
     for (unsigned int i = 0; i < nr_v; ++i)
     {
@@ -86,7 +86,40 @@ inline bool load_off(const std::string &in_file, std::vector<point_t> *const poi
     return true;
 }
 
-inline bool save_vrml2(std::ofstream &fout, const std::vector<point_t> &points, const std::vector<point_ti<>> &triangles, const float r, const float g, const float b)
+inline bool save_off(const std::vector<point_t<>> &vertices, const std::vector<point_ti<>> &tris, const std::string &out_file)
+{
+    /* Open file */
+    std::ofstream fout(out_file.c_str());
+    if (!fout.is_open())
+    {
+        BOOST_LOG_TRIVIAL(error) << "Can't open file: " << out_file;
+        return false;
+    }
+
+    /* Write header */
+    fout << "OFF" << std::endl;
+    fout << vertices.size() << " " << tris.size() << " " << 0 << std::endl;
+
+    /* For each mesh write points */
+    fout.setf(std::ios::fixed, std::ios::floatfield);
+    fout.setf(std::ios::showpoint);
+    fout.precision(6);
+    for (const auto &pt : vertices)
+    {
+        fout << pt.x << " " << pt.y << " " << pt.z << std::endl;
+    }
+
+    /* For each mesh write triangles */
+    for (const auto &t : tris)
+    {
+        fout << "3 " << t.x << " " << t.y << " " << t.z << std::endl;
+    }
+
+    fout.close();
+    return true;
+}
+
+inline bool save_vrml2(std::ofstream &fout, const std::vector<point_t<>> &points, const std::vector<point_ti<>> &triangles, const float r, const float g, const float b)
 {
     if (!fout.is_open())
     {
@@ -150,5 +183,23 @@ inline bool save_vrml2(std::ofstream &fout, const std::vector<point_t> &points, 
     fout << "}" << std::endl;
 
     return true;
+}
+
+inline bool save_vrml2(const std::string &out_file, const std::vector<point_t<>> &points, const std::vector<point_ti<>> &triangles, const float r, const float g, const float b)
+{
+    /* Open file */
+    std::ofstream fout(out_file.c_str());
+    if (!fout.is_open())
+    {
+        BOOST_LOG_TRIVIAL(error) << "Can't open file: " << out_file;
+        return false;
+    }
+
+    /* Save */
+    const bool ret = save_vrml2(fout, points, triangles, r, g, b);
+
+    /* Close file */
+    fout.close();
+    return ret;
 }
 } /* namespace raptor_parsers */

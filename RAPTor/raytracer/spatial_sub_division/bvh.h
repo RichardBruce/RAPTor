@@ -77,7 +77,7 @@ class bvh : public ssd
         vfp_t       found_nearer_object(const packet_ray *const r, const vfp_t &t, bvh_stack_element entry_point, bvh_stack_element *exit_point) const;
 #endif /* #ifdef SIMD_PACKET_TRACING */
 
-        inline bool find_leaf_node(const ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const point_t &i_rd, const float t_max) const;
+        inline bool find_leaf_node(const ray &r, bvh_stack_element *const entry_point, bvh_stack_element **const out, const point_t<> &i_rd, const float t_max) const;
 
         /* The stack is mutable because it will never be known to a user of this class */
         const primitive_store &                 _prims;

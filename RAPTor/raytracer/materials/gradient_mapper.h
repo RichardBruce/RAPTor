@@ -34,7 +34,7 @@ class gradient_mapper : public procedural_texture_mapper
         virtual ~gradient_mapper() { };
 
     protected :
-        float run_procedure(ext_colour_t *const c, const point_t &dst, const point_t &dir, const point_t &n) const override;
+        float run_procedure(ext_colour_t *const c, const point_t<> &dst, const point_t<> &dir, const point_t<> &n) const override;
 
     private :
         friend class boost::serialization::access;

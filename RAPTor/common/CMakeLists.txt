@@ -12,14 +12,14 @@ set(SOURCE
     simplex_noise_2d.cc
     perlin_noise_2d.cc
     simd.cc
-    simplex_noise_3d.cc)
+    simplex_noise_3d.cc
+    sort.cc)
 
 # Libraries
 set (LIBS)
 link_directories()
 
 # Tests
-
 
 # Generate Outputs
 add_libs("${HEADERS}" "${SOURCE}" "${LIBS}")

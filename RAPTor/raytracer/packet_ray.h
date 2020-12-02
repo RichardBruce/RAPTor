@@ -15,7 +15,7 @@ class packet_ray
 {
     public :
         /* Constructor if we havent intersected anything yet */
-        packet_ray(const point_t &o, const vfp_t &dx, const vfp_t &dy, const vfp_t &dz, float m = 1.0f, int c = 1) : 
+        packet_ray(const point_t<> &o, const vfp_t &dx, const vfp_t &dy, const vfp_t &dz, float m = 1.0f, int c = 1) : 
             magn(m), componant(c) 
             { 
                 this->ogn[0] = o.x;
@@ -29,7 +29,7 @@ class packet_ray
         /* Empty constructor */
         packet_ray() {  };
         
-        void set_up(const point_t &o, const vfp_t &dx, const vfp_t &dy, const vfp_t &dz, const float m = 1.0f, const int c = 1)
+        void set_up(const point_t<> &o, const vfp_t &dx, const vfp_t &dy, const vfp_t &dz, const float m = 1.0f, const int c = 1)
         { 
             magn        = vfp_t(m);
             componant   = vfp_t(static_cast<float>(c));

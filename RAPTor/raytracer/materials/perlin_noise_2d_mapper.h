@@ -6,7 +6,6 @@
 /* Ray tracer headers */
 #include "common.h"
 #include "ext_colour_t.h"
-#include "point_t.h"
 #include "material.h"
 #include "line.h"
 #include "ray.h"

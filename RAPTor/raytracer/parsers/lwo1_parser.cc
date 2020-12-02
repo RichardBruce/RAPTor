@@ -133,9 +133,9 @@ struct texture_info_t
     std::vector<texture_mapper *>   rtex;
     std::string                     filename;
     ext_colour_t                    trgb;
-    point_t                         tctr;
-    point_t                         tnorm;
-    point_t                         tsiz;
+    point_t<>                       tctr;
+    point_t<>                       tnorm;
+    point_t<>                       tsiz;
     float                           tfp[4];
     float                           topc;
     float                           tamp;
@@ -533,7 +533,7 @@ const char * lwo1_parser(
     
     /* Gather all the points */
     std::uint32_t nr_of_verts   = raptor_parsers::from_byte_stream<std::uint32_t>(&at) / 12;
-    std::vector<point_t> all_points(nr_of_verts);
+    std::vector<point_t<>> all_points(nr_of_verts);
     for (std::uint32_t i = 0; i < nr_of_verts; i++)
     {
         all_points[i].x = raptor_parsers::from_byte_stream<float>(&at);
@@ -637,8 +637,8 @@ const char * lwo1_parser(
     nc.calculate();
 
     /* Build polyongs */
-    std::vector<point_t> pol_pnts;
-    std::vector<point_t> pol_norm;
+    std::vector<point_t<>> pol_pnts;
+    std::vector<point_t<>> pol_norm;
     for (int i = 0; i < nc.number_of_polygons(); ++i)
     {
         /* Check we have enough points */
