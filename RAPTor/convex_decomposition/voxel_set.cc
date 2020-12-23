@@ -11,10 +11,10 @@ void voxel_set::compute_bounding_box()
 
     _min_bb_voxels = _voxels[0].coord;
     _max_bb_voxels = _voxels[0].coord;
-    point_t bary(_voxels[0].coord);
+    point_t<> bary(_voxels[0].coord);
     for (int i = 1; i < static_cast<int>(_voxels.size()); ++i)
     {
-        bary += static_cast<point_t>(_voxels[i].coord);
+        bary += static_cast<point_t<>>(_voxels[i].coord);
         _min_bb_voxels = min(_min_bb_voxels, _voxels[i].coord);
         _max_bb_voxels = max(_max_bb_voxels, _voxels[i].coord);
     }
@@ -32,8 +32,8 @@ void voxel_set::compute_convex_hull(convex_mesh *const mesh, const int sampling,
 
     int p = 0;
     int s = 0;
-    std::vector<point_t> cpoints;
-    std::vector<point_t> points(std::ceil(cluster_size / 8.0f) * 8);
+    std::vector<point_t<>> cpoints;
+    std::vector<point_t<>> points(std::ceil(cluster_size / 8.0f) * 8);
     while (p < static_cast<int>(_voxels.size()))
     {
         int qu = 0;
@@ -92,22 +92,22 @@ bool voxel_set::add(const voxel &v)
     return true;
 }
 
-void voxel_set::get_points(const voxel &v, point_t *const pts) const 
+void voxel_set::get_points(const voxel &v, point_t<> *const pts) const 
 {
     const int i = v.coord.x;
     const int j = v.coord.y;
     const int k = v.coord.z;
-    pts[0] = (point_t((i - 0.5f), (j - 0.5f), (k - 0.5f)) * _scale) + _min_bb;
-    pts[1] = (point_t((i + 0.5f), (j - 0.5f), (k - 0.5f)) * _scale) + _min_bb;
-    pts[2] = (point_t((i + 0.5f), (j + 0.5f), (k - 0.5f)) * _scale) + _min_bb;
-    pts[3] = (point_t((i - 0.5f), (j + 0.5f), (k - 0.5f)) * _scale) + _min_bb;
-    pts[4] = (point_t((i - 0.5f), (j - 0.5f), (k + 0.5f)) * _scale) + _min_bb;
-    pts[5] = (point_t((i + 0.5f), (j - 0.5f), (k + 0.5f)) * _scale) + _min_bb;
-    pts[6] = (point_t((i + 0.5f), (j + 0.5f), (k + 0.5f)) * _scale) + _min_bb;
-    pts[7] = (point_t((i - 0.5f), (j + 0.5f), (k + 0.5f)) * _scale) + _min_bb;
+    pts[0] = (point_t<>((i - 0.5f), (j - 0.5f), (k - 0.5f)) * _scale) + _min_bb;
+    pts[1] = (point_t<>((i + 0.5f), (j - 0.5f), (k - 0.5f)) * _scale) + _min_bb;
+    pts[2] = (point_t<>((i + 0.5f), (j + 0.5f), (k - 0.5f)) * _scale) + _min_bb;
+    pts[3] = (point_t<>((i - 0.5f), (j + 0.5f), (k - 0.5f)) * _scale) + _min_bb;
+    pts[4] = (point_t<>((i - 0.5f), (j - 0.5f), (k + 0.5f)) * _scale) + _min_bb;
+    pts[5] = (point_t<>((i + 0.5f), (j - 0.5f), (k + 0.5f)) * _scale) + _min_bb;
+    pts[6] = (point_t<>((i + 0.5f), (j + 0.5f), (k + 0.5f)) * _scale) + _min_bb;
+    pts[7] = (point_t<>((i - 0.5f), (j + 0.5f), (k + 0.5f)) * _scale) + _min_bb;
 }
 
-void voxel_set::intersect(const plane &p, std::vector<point_t> *const pos_pts, std::vector<point_t> *const neg_pts, const int sampling) const
+void voxel_set::intersect(const plane &p, std::vector<point_t<>> *const pos_pts, std::vector<point_t<>> *const neg_pts, const int sampling) const
 {
     if (_voxels.empty())
     {
@@ -116,10 +116,10 @@ void voxel_set::intersect(const plane &p, std::vector<point_t> *const pos_pts, s
 
     int sp = 0;
     int sn = 0;
-    point_t pts[8];
+    point_t<> pts[8];
     for (const auto &v : _voxels)
     {
-        const point_t pt(get_point(v));
+        const point_t<> pt(get_point(v));
         const float d = p.distance(pt);
         if (d >= 0.0f)
         {
@@ -243,7 +243,7 @@ void voxel_set::cut(const plane &p, primitive_set **const pos_part, primitive_se
 
     for (auto v : _voxels)
     {
-        const point_t pt(get_point(v));
+        const point_t<> pt(get_point(v));
         const float d = p.distance(pt);
         if (d >= 0.0f)
         {
@@ -283,7 +283,7 @@ void voxel_set::convert(convex_mesh *const mesh, const voxel_value_t value) cons
         return;
     }
 
-    point_t pts[8];
+    point_t<> pts[8];
     for (const auto &v : _voxels)
     {
         if (v.loc == value)
@@ -319,20 +319,20 @@ void voxel_set::compute_axes_aligned_clipping_planes(std::vector<plane> *const p
     const point_ti<> &max_pt = get_max_bb_voxels();
     for (int i = min_pt.x; i <= max_pt.x; i += downsampling)
     {
-        const point_t pt(get_point(point_t(i + 0.5f, 0.0f, 0.0f)));
-        planes->emplace_back(point_t(1.0f, 0.0f, 0.0f), pt.x, axis_t::x_axis);
+        const point_t<> pt(get_point(point_t<>(i + 0.5f, 0.0f, 0.0f)));
+        planes->emplace_back(point_t<>(1.0f, 0.0f, 0.0f), pt.x, axis_t::x_axis);
     }
 
     for (int i = min_pt.y; i <= max_pt.y; i += downsampling)
     {
-        const point_t pt(get_point(point_t(0.0f, i + 0.5f, 0.0f)));
-        planes->emplace_back(point_t(0.0f, 1.0f, 0.0f), pt.y, axis_t::y_axis);
+        const point_t<> pt(get_point(point_t<>(0.0f, i + 0.5f, 0.0f)));
+        planes->emplace_back(point_t<>(0.0f, 1.0f, 0.0f), pt.y, axis_t::y_axis);
     }
 
     for (int i = min_pt.z; i <= max_pt.z; i += downsampling)
     {
-        const point_t pt(get_point(point_t(0.0f, 0.0f, i + 0.5f)));
-        planes->emplace_back(point_t(0.0f, 0.0f, 1.0f), pt.z, axis_t::z_axis);
+        const point_t<> pt(get_point(point_t<>(0.0f, 0.0f, i + 0.5f)));
+        planes->emplace_back(point_t<>(0.0f, 0.0f, 1.0f), pt.z, axis_t::z_axis);
     }
 }
 
@@ -344,24 +344,24 @@ void voxel_set::refine_axes_aligned_clipping_planes(std::vector<plane> *const pl
     {
         for (int i = std::max(min_pt.x, min_pt.x + index - downsampling); i <= std::min(max_pt.x, min_pt.x + index + downsampling); ++i)
         {
-            const point_t pt(get_point(point_t(i + 0.5f, 0.0f, 0.0f)));
-            planes->emplace_back(plane(point_t(1.0f, 0.0f, 0.0f), pt.x, axis_t::x_axis));
+            const point_t<> pt(get_point(point_t<>(i + 0.5f, 0.0f, 0.0f)));
+            planes->emplace_back(plane(point_t<>(1.0f, 0.0f, 0.0f), pt.x, axis_t::x_axis));
         }
     }
     else if (best.major_axis == axis_t::y_axis)
     {
         for (int i = std::max(min_pt.y, min_pt.y + index - downsampling); i <= std::min(max_pt.y, min_pt.y + index + downsampling); ++i)
         {
-            const point_t pt(get_point(point_t(0.0f, i + 0.5f, 0.0f)));
-            planes->emplace_back(plane(point_t(0.0f, 1.0f, 0.0f), pt.y, axis_t::y_axis));
+            const point_t<> pt(get_point(point_t<>(0.0f, i + 0.5f, 0.0f)));
+            planes->emplace_back(plane(point_t<>(0.0f, 1.0f, 0.0f), pt.y, axis_t::y_axis));
         }
     }
     else
     {
         for (int i = std::max(min_pt.z, min_pt.z + index - downsampling); i <= std::min(max_pt.z, min_pt.z + index + downsampling); ++i)
         {
-            const point_t pt(get_point(point_t(0.0f, 0.0f, i + 0.5f)));
-            planes->emplace_back(plane(point_t(0.0f, 0.0f, 1.0f), pt.z, axis_t::z_axis));
+            const point_t<> pt(get_point(point_t<>(0.0f, 0.0f, i + 0.5f)));
+            planes->emplace_back(plane(point_t<>(0.0f, 0.0f, 1.0f), pt.z, axis_t::z_axis));
         }
     }
 }
@@ -378,7 +378,7 @@ void voxel_set::compute_principal_axes()
                         { 0.0f, 0.0f, 0.0f } };
     for (const auto &v : _voxels)
     {
-        const point_t diff(v.coord - _barycenter);
+        const point_t<> diff(v.coord - _barycenter);
         cov[0][0] += diff.x * diff.x;
         cov[1][1] += diff.y * diff.y;
         cov[2][2] += diff.z * diff.z;

@@ -27,25 +27,25 @@ struct incremental_convex_hull_fixture : private boost::noncopyable
     incremental_convex_hull_fixture() :
         cube_points(
         {
-            point_t(-0.5f, -0.5f,  0.5f),
-            point_t( 0.5f, -0.5f,  0.5f),
-            point_t(-0.5f,  0.5f,  0.5f),
-            point_t( 0.5f,  0.5f,  0.5f),
-            point_t(-0.5f, -0.5f, -0.5f),
-            point_t( 0.5f, -0.5f, -0.5f),
-            point_t(-0.5f,  0.5f, -0.5f),
-            point_t( 0.5f,  0.5f, -0.5f)
+            point_t<>(-0.5f, -0.5f,  0.5f),
+            point_t<>( 0.5f, -0.5f,  0.5f),
+            point_t<>(-0.5f,  0.5f,  0.5f),
+            point_t<>( 0.5f,  0.5f,  0.5f),
+            point_t<>(-0.5f, -0.5f, -0.5f),
+            point_t<>( 0.5f, -0.5f, -0.5f),
+            point_t<>(-0.5f,  0.5f, -0.5f),
+            point_t<>( 0.5f,  0.5f, -0.5f)
         }),
         octagon_points(
         {
-            point_t(1.0f, 0.0f, 0.0f),
-            point_t(0.0f, 1.0f, 0.0f),
-            point_t(0.0f, 2.0f, 0.0f),
-            point_t(1.0f, 3.0f, 0.0f),
-            point_t(2.0f, 3.0f, 0.0f),
-            point_t(3.0f, 2.0f, 0.0f),
-            point_t(3.0f, 1.0f, 0.0f),
-            point_t(2.0f, 0.0f, 0.0f)
+            point_t<>(1.0f, 0.0f, 0.0f),
+            point_t<>(0.0f, 1.0f, 0.0f),
+            point_t<>(0.0f, 2.0f, 0.0f),
+            point_t<>(1.0f, 3.0f, 0.0f),
+            point_t<>(2.0f, 3.0f, 0.0f),
+            point_t<>(3.0f, 2.0f, 0.0f),
+            point_t<>(3.0f, 1.0f, 0.0f),
+            point_t<>(2.0f, 0.0f, 0.0f)
         }),
         cube_uut(cube_points),
         octagon_uut(octagon_points)
@@ -57,8 +57,8 @@ struct incremental_convex_hull_fixture : private boost::noncopyable
         octagon_uut.process();
     }
 
-    const std::vector<point_t>  cube_points;
-    const std::vector<point_t>  octagon_points;
+    const std::vector<point_t<>>  cube_points;
+    const std::vector<point_t<>>  octagon_points;
     incremental_convex_hull     cube_uut;
     incremental_convex_hull     octagon_uut;
 };
@@ -79,13 +79,13 @@ BOOST_AUTO_TEST_CASE( hull_ctor_test )
 BOOST_AUTO_TEST_CASE( hull_add_points_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 2.0f, 3.0f),
-        point_t(2.0f, 3.0f, 7.0f),
-        point_t(3.0f, 4.0f, 8.0f),
-        point_t(4.0f, 5.0f, 9.0f),
-        point_t(5.0f, 6.0f, 8.0f)
+        point_t<>(1.0f, 2.0f, 3.0f),
+        point_t<>(2.0f, 3.0f, 7.0f),
+        point_t<>(3.0f, 4.0f, 8.0f),
+        point_t<>(4.0f, 5.0f, 9.0f),
+        point_t<>(5.0f, 6.0f, 8.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -100,13 +100,13 @@ BOOST_AUTO_TEST_CASE( hull_add_points_test )
 BOOST_AUTO_TEST_CASE( hull_add_point_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 2.0f, 3.0f),
-        point_t(2.0f, 3.0f, 7.0f),
-        point_t(3.0f, 4.0f, 8.0f),
-        point_t(4.0f, 5.0f, 9.0f),
-        point_t(5.0f, 6.0f, 8.0f)
+        point_t<>(1.0f, 2.0f, 3.0f),
+        point_t<>(2.0f, 3.0f, 7.0f),
+        point_t<>(3.0f, 4.0f, 8.0f),
+        point_t<>(4.0f, 5.0f, 9.0f),
+        point_t<>(5.0f, 6.0f, 8.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -125,13 +125,13 @@ BOOST_AUTO_TEST_CASE( hull_add_point_test )
 BOOST_AUTO_TEST_CASE( hull_clear_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 2.0f, 3.0f),
-        point_t(2.0f, 3.0f, 7.0f),
-        point_t(3.0f, 4.0f, 8.0f),
-        point_t(4.0f, 5.0f, 9.0f),
-        point_t(5.0f, 6.0f, 8.0f)
+        point_t<>(1.0f, 2.0f, 3.0f),
+        point_t<>(2.0f, 3.0f, 7.0f),
+        point_t<>(3.0f, 4.0f, 8.0f),
+        point_t<>(4.0f, 5.0f, 9.0f),
+        point_t<>(5.0f, 6.0f, 8.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -154,10 +154,10 @@ BOOST_AUTO_TEST_CASE( hull_clear_test )
 BOOST_AUTO_TEST_CASE( hull_process_not_enough_points_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 2.0f, 3.0f),
-        point_t(2.0f, 3.0f, 7.0f)
+        point_t<>(1.0f, 2.0f, 3.0f),
+        point_t<>(2.0f, 3.0f, 7.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -171,29 +171,29 @@ BOOST_AUTO_TEST_CASE( hull_process_not_enough_points_test )
     BOOST_CHECK(uut.number_of_triangles()   == 0);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(1.0f, 2.0f, 3.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(2.0f, 3.0f, 7.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(1.0f, 2.0f, 3.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(2.0f, 3.0f, 7.0f));
 }
 
 BOOST_AUTO_TEST_CASE( hull_process_no_triangles_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(3.0f, 0.0f, 0.0f),
-        point_t(4.0f, 0.0f, 0.0f),
-        point_t(5.0f, 0.0f, 0.0f),
-        point_t(6.0f, 0.0f, 0.0f),
-        point_t(8.0f, 0.0f, 0.0f),
-        point_t(9.0f, 0.0f, 0.0f),
-        point_t(2.0f, 0.0f, 0.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(3.0f, 0.0f, 0.0f),
+        point_t<>(4.0f, 0.0f, 0.0f),
+        point_t<>(5.0f, 0.0f, 0.0f),
+        point_t<>(6.0f, 0.0f, 0.0f),
+        point_t<>(8.0f, 0.0f, 0.0f),
+        point_t<>(9.0f, 0.0f, 0.0f),
+        point_t<>(2.0f, 0.0f, 0.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -207,30 +207,30 @@ BOOST_AUTO_TEST_CASE( hull_process_no_triangles_test )
     BOOST_CHECK(uut.number_of_triangles()   == 0);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 0] - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 1] - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 2] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 3] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 4] - point_t(3.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 5] - point_t(4.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 6] - point_t(5.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 7] - point_t(6.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 8] - point_t(8.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 9] - point_t(9.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[10] - point_t(2.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 0] - point_t<>(0.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 1] - point_t<>(0.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 2] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 3] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 4] - point_t<>(3.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 5] - point_t<>(4.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 6] - point_t<>(5.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 7] - point_t<>(6.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 8] - point_t<>(8.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 9] - point_t<>(9.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[10] - point_t<>(2.0f, 0.0f, 0.0f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE( hull_process_triangle_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -244,12 +244,12 @@ BOOST_AUTO_TEST_CASE( hull_process_triangle_test )
     BOOST_CHECK(uut.number_of_triangles()   == 2);
     BOOST_CHECK(uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(1.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(0.0f, 1.0f, 0.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 1, 0));
@@ -258,15 +258,15 @@ BOOST_AUTO_TEST_CASE( hull_process_triangle_test )
 BOOST_AUTO_TEST_CASE( hull_process_triangle_co_linear_start_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.2f, 0.0f, 0.0f),
-        point_t(0.4f, 0.0f, 0.0f),
-        point_t(0.6f, 0.0f, 0.0f),
-        point_t(0.8f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.2f, 0.0f, 0.0f),
+        point_t<>(0.4f, 0.0f, 0.0f),
+        point_t<>(0.6f, 0.0f, 0.0f),
+        point_t<>(0.8f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -280,13 +280,13 @@ BOOST_AUTO_TEST_CASE( hull_process_triangle_co_linear_start_test )
     BOOST_REQUIRE(uut.number_of_triangles() == 4);
     BOOST_CHECK(uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t(0.8f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t(0.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t<>(0.8f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t<>(0.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t<>(0.0f, 0.0f, 0.0f))) < result_tolerance);
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -297,16 +297,16 @@ BOOST_AUTO_TEST_CASE( hull_process_triangle_co_linear_start_test )
 BOOST_AUTO_TEST_CASE( hull_process_octagon_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 2.0f, 0.0f),
-        point_t(1.0f, 3.0f, 0.0f),
-        point_t(2.0f, 3.0f, 0.0f),
-        point_t(3.0f, 2.0f, 0.0f),
-        point_t(3.0f, 1.0f, 0.0f),
-        point_t(2.0f, 0.0f, 0.0f)
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 2.0f, 0.0f),
+        point_t<>(1.0f, 3.0f, 0.0f),
+        point_t<>(2.0f, 3.0f, 0.0f),
+        point_t<>(3.0f, 2.0f, 0.0f),
+        point_t<>(3.0f, 1.0f, 0.0f),
+        point_t<>(2.0f, 0.0f, 0.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -320,17 +320,17 @@ BOOST_AUTO_TEST_CASE( hull_process_octagon_test )
     BOOST_REQUIRE(uut.number_of_triangles() == 12);
     BOOST_CHECK(uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t(0.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t(0.0f, 2.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t(1.0f, 3.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t(2.0f, 3.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[5] - point_t(3.0f, 2.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[6] - point_t(3.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[7] - point_t(2.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t<>(0.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t<>(0.0f, 2.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t<>(1.0f, 3.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t<>(2.0f, 3.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[5] - point_t<>(3.0f, 2.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[6] - point_t<>(3.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[7] - point_t<>(2.0f, 0.0f, 0.0f))) < result_tolerance);
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(2, 0, 3));
@@ -349,12 +349,12 @@ BOOST_AUTO_TEST_CASE( hull_process_octagon_test )
 BOOST_AUTO_TEST_CASE( hull_process_tetrahedron_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -368,13 +368,13 @@ BOOST_AUTO_TEST_CASE( hull_process_tetrahedron_test )
     BOOST_REQUIRE(uut.number_of_triangles()   == 4);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>     mesh_points;
+    std::vector<point_t<>>     mesh_points;
     std::vector<point_ti<>>  mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(1.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(0.0f, 1.0f, 0.0f));
-    BOOST_CHECK(mesh_points[3] == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(0.0f, 0.0f, 1.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -385,16 +385,16 @@ BOOST_AUTO_TEST_CASE( hull_process_tetrahedron_test )
 BOOST_AUTO_TEST_CASE( hull_process_tetrahedron_co_linear_start_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.2f, 0.0f, 0.0f),
-        point_t(0.4f, 0.0f, 0.0f),
-        point_t(0.6f, 0.0f, 0.0f),
-        point_t(0.8f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.2f, 0.0f, 0.0f),
+        point_t<>(0.4f, 0.0f, 0.0f),
+        point_t<>(0.6f, 0.0f, 0.0f),
+        point_t<>(0.8f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -408,14 +408,14 @@ BOOST_AUTO_TEST_CASE( hull_process_tetrahedron_co_linear_start_test )
     BOOST_CHECK(uut.number_of_triangles()   == 6);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t(0.8f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t(0.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t(0.0f, 0.0f, 1.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t<>(0.8f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t<>(0.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t<>(0.0f, 0.0f, 1.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t<>(0.0f, 0.0f, 0.0f))) < result_tolerance);
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(0, 1, 3));
@@ -428,13 +428,13 @@ BOOST_AUTO_TEST_CASE( hull_process_tetrahedron_co_linear_start_test )
 BOOST_AUTO_TEST_CASE( hull_process_pyramid_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.0f),
-        point_t(-0.5f,  0.5f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.0f),
-        point_t( 0.0f,  0.0f,  1.0f)
+        point_t<>(-0.5f, -0.5f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.0f),
+        point_t<>(-0.5f,  0.5f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.0f),
+        point_t<>( 0.0f,  0.0f,  1.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -448,14 +448,14 @@ BOOST_AUTO_TEST_CASE( hull_process_pyramid_test )
     BOOST_CHECK(uut.number_of_triangles()   == 6);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.5f, -0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.5f, -0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.5f,  0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[3] == point_t( 0.0f,  0.0f,  1.0f));
-    BOOST_CHECK(mesh_points[4] == point_t( 0.5f,  0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.5f, -0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.5f, -0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.5f,  0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>( 0.0f,  0.0f,  1.0f));
+    BOOST_CHECK(mesh_points[4] == point_t<>( 0.5f,  0.5f,  0.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -468,14 +468,14 @@ BOOST_AUTO_TEST_CASE( hull_process_pyramid_test )
 BOOST_AUTO_TEST_CASE( hull_process_triangular_prism_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.0f),
-        point_t(-0.5f,  0.5f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.0f),
-        point_t(-0.5f,  0.0f,  1.0f),
-        point_t( 0.5f,  0.0f,  1.0f)
+        point_t<>(-0.5f, -0.5f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.0f),
+        point_t<>(-0.5f,  0.5f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.0f),
+        point_t<>(-0.5f,  0.0f,  1.0f),
+        point_t<>( 0.5f,  0.0f,  1.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -489,15 +489,15 @@ BOOST_AUTO_TEST_CASE( hull_process_triangular_prism_test )
     BOOST_CHECK(uut.number_of_triangles()   == 8);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.5f, -0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.5f, -0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.5f,  0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[3] == point_t(-0.5f,  0.0f,  1.0f));
-    BOOST_CHECK(mesh_points[4] == point_t( 0.5f,  0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[5] == point_t( 0.5f,  0.0f,  1.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.5f, -0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.5f, -0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.5f,  0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(-0.5f,  0.0f,  1.0f));
+    BOOST_CHECK(mesh_points[4] == point_t<>( 0.5f,  0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[5] == point_t<>( 0.5f,  0.0f,  1.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -512,16 +512,16 @@ BOOST_AUTO_TEST_CASE( hull_process_triangular_prism_test )
 BOOST_AUTO_TEST_CASE( hull_process_cube_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
     incremental_convex_hull uut(points);
 
@@ -535,17 +535,17 @@ BOOST_AUTO_TEST_CASE( hull_process_cube_test )
     BOOST_CHECK(uut.number_of_triangles()   == 12);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[3] == point_t(-0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[4] == point_t( 0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[5] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[6] == point_t(-0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[7] == point_t( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[4] == point_t<>( 0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[5] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[6] == point_t<>(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[7] == point_t<>( 0.5f,  0.5f, -0.5f));
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(0, 2, 3));
@@ -572,16 +572,16 @@ BOOST_AUTO_TEST_CASE( hull_clear_and_process_cube_test )
     BOOST_CHECK(!cube_uut.flat());
 
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
 
     cube_uut.add_points(points);
@@ -594,17 +594,17 @@ BOOST_AUTO_TEST_CASE( hull_clear_and_process_cube_test )
     BOOST_CHECK(cube_uut.number_of_triangles()   == 12);
     BOOST_CHECK(!cube_uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     cube_uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[3] == point_t(-0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[4] == point_t( 0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[5] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[6] == point_t(-0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[7] == point_t( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[4] == point_t<>( 0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[5] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[6] == point_t<>(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[7] == point_t<>( 0.5f,  0.5f, -0.5f));
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(0, 2, 3));
@@ -623,19 +623,19 @@ BOOST_AUTO_TEST_CASE( hull_clear_and_process_cube_test )
 BOOST_AUTO_TEST_CASE( hull_process_cube_points_inside_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.0f,  0.0f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.0f,  0.0f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.0f,  0.0f,  0.0f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.0f,  0.0f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.0f,  0.0f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.0f,  0.0f,  0.0f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
     incremental_convex_hull uut(points);
 
@@ -649,17 +649,17 @@ BOOST_AUTO_TEST_CASE( hull_process_cube_points_inside_test )
     BOOST_CHECK(uut.number_of_triangles()   == 12);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[3] == point_t( 0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[4] == point_t(-0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[5] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[6] == point_t(-0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[7] == point_t( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[3] == point_t<>( 0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[4] == point_t<>(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[5] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[6] == point_t<>(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[7] == point_t<>( 0.5f,  0.5f, -0.5f));
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(2, 1, 3));
@@ -678,12 +678,12 @@ BOOST_AUTO_TEST_CASE( hull_process_cube_points_inside_test )
 BOOST_AUTO_TEST_CASE( hull_process_tetrahedron_2_stage_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -710,13 +710,13 @@ BOOST_AUTO_TEST_CASE( hull_process_tetrahedron_2_stage_test )
     BOOST_CHECK(uut.number_of_triangles()   == 4);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(1.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(0.0f, 1.0f, 0.0f));
-    BOOST_CHECK(mesh_points[3] == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(0.0f, 0.0f, 1.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -727,17 +727,17 @@ BOOST_AUTO_TEST_CASE( hull_process_tetrahedron_2_stage_test )
 BOOST_AUTO_TEST_CASE( hull_process_octagon_pyramid_2_stages_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 2.0f, 0.0f),
-        point_t(1.0f, 3.0f, 0.0f),
-        point_t(2.0f, 3.0f, 0.0f),
-        point_t(3.0f, 2.0f, 0.0f),
-        point_t(3.0f, 1.0f, 0.0f),
-        point_t(2.0f, 0.0f, 0.0f),
-        point_t(1.5f, 2.5f, 0.5f)
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 2.0f, 0.0f),
+        point_t<>(1.0f, 3.0f, 0.0f),
+        point_t<>(2.0f, 3.0f, 0.0f),
+        point_t<>(3.0f, 2.0f, 0.0f),
+        point_t<>(3.0f, 1.0f, 0.0f),
+        point_t<>(2.0f, 0.0f, 0.0f),
+        point_t<>(1.5f, 2.5f, 0.5f)
     });
     incremental_convex_hull uut(points);
 
@@ -769,18 +769,18 @@ BOOST_AUTO_TEST_CASE( hull_process_octagon_pyramid_2_stages_test )
     BOOST_CHECK(uut.number_of_triangles()   == 14);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t( 1.0f,  0.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t( 0.0f,  1.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t( 0.0f,  2.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t( 1.5f,  2.5f,  0.5f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t( 1.0f,  3.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[5] - point_t( 2.0f,  3.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[6] - point_t( 3.0f,  2.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[7] - point_t( 3.0f,  1.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[8] - point_t( 2.0f,  0.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t<>( 1.0f,  0.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t<>( 0.0f,  1.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t<>( 0.0f,  2.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t<>( 1.5f,  2.5f,  0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t<>( 1.0f,  3.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[5] - point_t<>( 2.0f,  3.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[6] - point_t<>( 3.0f,  2.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[7] - point_t<>( 3.0f,  1.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[8] - point_t<>( 2.0f,  0.0f,  0.0f))) < result_tolerance);
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(1, 0, 3));
@@ -801,22 +801,22 @@ BOOST_AUTO_TEST_CASE( hull_process_octagon_pyramid_2_stages_test )
 BOOST_AUTO_TEST_CASE( hull_process_cube_2_stages_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.0f),
-        point_t(-0.5f,  0.5f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.0f),
-        point_t(-0.5f,  0.0f,  0.5f),
-        point_t( 0.5f,  0.0f,  0.5f),
-        point_t(-0.6f, -0.6f,  0.6f),
-        point_t( 0.6f, -0.6f,  0.6f),
-        point_t(-0.6f,  0.6f,  0.6f),
-        point_t( 0.6f,  0.6f,  0.6f),
-        point_t(-0.6f, -0.6f, -0.6f),
-        point_t( 0.6f, -0.6f, -0.6f),
-        point_t(-0.6f,  0.6f, -0.6f),
-        point_t( 0.6f,  0.6f, -0.6f)
+        point_t<>(-0.5f, -0.5f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.0f),
+        point_t<>(-0.5f,  0.5f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.0f),
+        point_t<>(-0.5f,  0.0f,  0.5f),
+        point_t<>( 0.5f,  0.0f,  0.5f),
+        point_t<>(-0.6f, -0.6f,  0.6f),
+        point_t<>( 0.6f, -0.6f,  0.6f),
+        point_t<>(-0.6f,  0.6f,  0.6f),
+        point_t<>( 0.6f,  0.6f,  0.6f),
+        point_t<>(-0.6f, -0.6f, -0.6f),
+        point_t<>( 0.6f, -0.6f, -0.6f),
+        point_t<>(-0.6f,  0.6f, -0.6f),
+        point_t<>( 0.6f,  0.6f, -0.6f)
     });
     incremental_convex_hull uut(points);
 
@@ -853,17 +853,17 @@ BOOST_AUTO_TEST_CASE( hull_process_cube_2_stages_test )
     BOOST_CHECK(uut.number_of_triangles()   == 12);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.6f, -0.6f,  0.6f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.6f, -0.6f,  0.6f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.6f,  0.6f,  0.6f));
-    BOOST_CHECK(mesh_points[3] == point_t( 0.6f,  0.6f,  0.6f));
-    BOOST_CHECK(mesh_points[4] == point_t(-0.6f, -0.6f, -0.6f));
-    BOOST_CHECK(mesh_points[5] == point_t( 0.6f, -0.6f, -0.6f));
-    BOOST_CHECK(mesh_points[6] == point_t(-0.6f,  0.6f, -0.6f));
-    BOOST_CHECK(mesh_points[7] == point_t( 0.6f,  0.6f, -0.6f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.6f, -0.6f,  0.6f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.6f, -0.6f,  0.6f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.6f,  0.6f,  0.6f));
+    BOOST_CHECK(mesh_points[3] == point_t<>( 0.6f,  0.6f,  0.6f));
+    BOOST_CHECK(mesh_points[4] == point_t<>(-0.6f, -0.6f, -0.6f));
+    BOOST_CHECK(mesh_points[5] == point_t<>( 0.6f, -0.6f, -0.6f));
+    BOOST_CHECK(mesh_points[6] == point_t<>(-0.6f,  0.6f, -0.6f));
+    BOOST_CHECK(mesh_points[7] == point_t<>( 0.6f,  0.6f, -0.6f));
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(2, 1, 3));
@@ -882,10 +882,10 @@ BOOST_AUTO_TEST_CASE( hull_process_cube_2_stages_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_not_enough_points_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 2.0f, 3.0f),
-        point_t(2.0f, 3.0f, 7.0f)
+        point_t<>(1.0f, 2.0f, 3.0f),
+        point_t<>(2.0f, 3.0f, 7.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -899,23 +899,23 @@ BOOST_AUTO_TEST_CASE( hull_min_process_not_enough_points_test )
     BOOST_CHECK(uut.number_of_triangles()   == 0);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(1.0f, 2.0f, 3.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(2.0f, 3.0f, 7.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(1.0f, 2.0f, 3.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(2.0f, 3.0f, 7.0f));
 }
 
 BOOST_AUTO_TEST_CASE( hull_min_process_not_enough_points_requested_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 2.0f, 3.0f),
-        point_t(1.0f, 2.0f, 3.0f),
-        point_t(1.0f, 2.0f, 3.0f),
-        point_t(1.0f, 2.0f, 3.0f),
-        point_t(2.0f, 3.0f, 7.0f)
+        point_t<>(1.0f, 2.0f, 3.0f),
+        point_t<>(1.0f, 2.0f, 3.0f),
+        point_t<>(1.0f, 2.0f, 3.0f),
+        point_t<>(1.0f, 2.0f, 3.0f),
+        point_t<>(2.0f, 3.0f, 7.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -929,32 +929,32 @@ BOOST_AUTO_TEST_CASE( hull_min_process_not_enough_points_requested_test )
     BOOST_CHECK(uut.number_of_triangles()   == 0);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(1.0f, 2.0f, 3.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(1.0f, 2.0f, 3.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(1.0f, 2.0f, 3.0f));
-    BOOST_CHECK(mesh_points[3] == point_t(1.0f, 2.0f, 3.0f));
-    BOOST_CHECK(mesh_points[4] == point_t(2.0f, 3.0f, 7.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(1.0f, 2.0f, 3.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(1.0f, 2.0f, 3.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(1.0f, 2.0f, 3.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(1.0f, 2.0f, 3.0f));
+    BOOST_CHECK(mesh_points[4] == point_t<>(2.0f, 3.0f, 7.0f));
 }
 
 BOOST_AUTO_TEST_CASE( hull_min_process_no_triangles_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(3.0f, 0.0f, 0.0f),
-        point_t(4.0f, 0.0f, 0.0f),
-        point_t(5.0f, 0.0f, 0.0f),
-        point_t(6.0f, 0.0f, 0.0f),
-        point_t(8.0f, 0.0f, 0.0f),
-        point_t(9.0f, 0.0f, 0.0f),
-        point_t(2.0f, 0.0f, 0.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(3.0f, 0.0f, 0.0f),
+        point_t<>(4.0f, 0.0f, 0.0f),
+        point_t<>(5.0f, 0.0f, 0.0f),
+        point_t<>(6.0f, 0.0f, 0.0f),
+        point_t<>(8.0f, 0.0f, 0.0f),
+        point_t<>(9.0f, 0.0f, 0.0f),
+        point_t<>(2.0f, 0.0f, 0.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -968,30 +968,30 @@ BOOST_AUTO_TEST_CASE( hull_min_process_no_triangles_test )
     BOOST_CHECK(uut.number_of_triangles()   == 0);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 0] - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 1] - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 2] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 3] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 4] - point_t(3.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 5] - point_t(4.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 6] - point_t(5.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 7] - point_t(6.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 8] - point_t(8.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 9] - point_t(9.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[10] - point_t(2.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 0] - point_t<>(0.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 1] - point_t<>(0.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 2] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 3] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 4] - point_t<>(3.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 5] - point_t<>(4.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 6] - point_t<>(5.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 7] - point_t<>(6.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 8] - point_t<>(8.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 9] - point_t<>(9.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[10] - point_t<>(2.0f, 0.0f, 0.0f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE( hull_min_process_triangle_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -1005,12 +1005,12 @@ BOOST_AUTO_TEST_CASE( hull_min_process_triangle_test )
     BOOST_CHECK(uut.number_of_triangles()   == 2);
     BOOST_CHECK(uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(1.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(0.0f, 1.0f, 0.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 1, 0));
@@ -1019,15 +1019,15 @@ BOOST_AUTO_TEST_CASE( hull_min_process_triangle_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_triangle_co_linear_start_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.2f, 0.0f, 0.0f),
-        point_t(0.4f, 0.0f, 0.0f),
-        point_t(0.6f, 0.0f, 0.0f),
-        point_t(0.8f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.2f, 0.0f, 0.0f),
+        point_t<>(0.4f, 0.0f, 0.0f),
+        point_t<>(0.6f, 0.0f, 0.0f),
+        point_t<>(0.8f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -1041,13 +1041,13 @@ BOOST_AUTO_TEST_CASE( hull_min_process_triangle_co_linear_start_test )
     BOOST_CHECK(uut.number_of_triangles()   == 4);
     BOOST_CHECK(uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t(0.8f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t(0.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t<>(0.8f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t<>(0.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t<>(0.0f, 0.0f, 0.0f))) < result_tolerance);
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -1058,16 +1058,16 @@ BOOST_AUTO_TEST_CASE( hull_min_process_triangle_co_linear_start_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_octagon_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 2.0f, 0.0f),
-        point_t(1.0f, 3.0f, 0.0f),
-        point_t(2.0f, 3.0f, 0.0f),
-        point_t(3.0f, 2.0f, 0.0f),
-        point_t(3.0f, 1.0f, 0.0f),
-        point_t(2.0f, 0.0f, 0.0f)
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 2.0f, 0.0f),
+        point_t<>(1.0f, 3.0f, 0.0f),
+        point_t<>(2.0f, 3.0f, 0.0f),
+        point_t<>(3.0f, 2.0f, 0.0f),
+        point_t<>(3.0f, 1.0f, 0.0f),
+        point_t<>(2.0f, 0.0f, 0.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -1081,17 +1081,17 @@ BOOST_AUTO_TEST_CASE( hull_min_process_octagon_test )
     BOOST_CHECK(uut.number_of_triangles()   == 12);
     BOOST_CHECK(uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t(0.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t(0.0f, 2.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t(3.0f, 2.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t(1.0f, 3.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[5] - point_t(3.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[6] - point_t(2.0f, 3.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[7] - point_t(2.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t<>(0.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t<>(0.0f, 2.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t<>(3.0f, 2.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t<>(1.0f, 3.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[5] - point_t<>(3.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[6] - point_t<>(2.0f, 3.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[7] - point_t<>(2.0f, 0.0f, 0.0f))) < result_tolerance);
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(2, 0, 3));
@@ -1110,12 +1110,12 @@ BOOST_AUTO_TEST_CASE( hull_min_process_octagon_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -1129,13 +1129,13 @@ BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_test )
     BOOST_CHECK(uut.number_of_triangles()   == 4);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(1.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(0.0f, 1.0f, 0.0f));
-    BOOST_CHECK(mesh_points[3] == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(0.0f, 0.0f, 1.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -1146,16 +1146,16 @@ BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_co_linear_start_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.2f, 0.0f, 0.0f),
-        point_t(0.4f, 0.0f, 0.0f),
-        point_t(0.6f, 0.0f, 0.0f),
-        point_t(0.8f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.2f, 0.0f, 0.0f),
+        point_t<>(0.4f, 0.0f, 0.0f),
+        point_t<>(0.6f, 0.0f, 0.0f),
+        point_t<>(0.8f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -1169,14 +1169,14 @@ BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_co_linear_start_test )
     BOOST_CHECK(uut.number_of_triangles()   == 6);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t(0.8f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t(0.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t(0.0f, 0.0f, 1.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t(0.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t<>(0.8f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t<>(0.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t<>(0.0f, 0.0f, 1.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t<>(0.0f, 0.0f, 0.0f))) < result_tolerance);
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(0, 1, 3));
@@ -1189,13 +1189,13 @@ BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_co_linear_start_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_pyramid_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.0f),
-        point_t(-0.5f,  0.5f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.0f),
-        point_t( 0.0f,  0.0f,  1.0f)
+        point_t<>(-0.5f, -0.5f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.0f),
+        point_t<>(-0.5f,  0.5f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.0f),
+        point_t<>( 0.0f,  0.0f,  1.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -1209,14 +1209,14 @@ BOOST_AUTO_TEST_CASE( hull_min_process_pyramid_test )
     BOOST_CHECK(uut.number_of_triangles()   == 6);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.5f, -0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.5f, -0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.5f,  0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[3] == point_t( 0.0f,  0.0f,  1.0f));
-    BOOST_CHECK(mesh_points[4] == point_t( 0.5f,  0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.5f, -0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.5f, -0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.5f,  0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>( 0.0f,  0.0f,  1.0f));
+    BOOST_CHECK(mesh_points[4] == point_t<>( 0.5f,  0.5f,  0.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -1229,14 +1229,14 @@ BOOST_AUTO_TEST_CASE( hull_min_process_pyramid_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_triangular_prism_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.0f),
-        point_t(-0.5f,  0.5f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.0f),
-        point_t(-0.5f,  0.0f,  1.0f),
-        point_t( 0.5f,  0.0f,  1.0f)
+        point_t<>(-0.5f, -0.5f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.0f),
+        point_t<>(-0.5f,  0.5f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.0f),
+        point_t<>(-0.5f,  0.0f,  1.0f),
+        point_t<>( 0.5f,  0.0f,  1.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -1250,15 +1250,15 @@ BOOST_AUTO_TEST_CASE( hull_min_process_triangular_prism_test )
     BOOST_CHECK(uut.number_of_triangles()   == 8);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.5f, -0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.5f, -0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.5f,  0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[3] == point_t(-0.5f,  0.0f,  1.0f));
-    BOOST_CHECK(mesh_points[4] == point_t( 0.5f,  0.5f,  0.0f));
-    BOOST_CHECK(mesh_points[5] == point_t( 0.5f,  0.0f,  1.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.5f, -0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.5f, -0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.5f,  0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(-0.5f,  0.0f,  1.0f));
+    BOOST_CHECK(mesh_points[4] == point_t<>( 0.5f,  0.5f,  0.0f));
+    BOOST_CHECK(mesh_points[5] == point_t<>( 0.5f,  0.0f,  1.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -1273,16 +1273,16 @@ BOOST_AUTO_TEST_CASE( hull_min_process_triangular_prism_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_cube_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
     incremental_convex_hull uut(points);
 
@@ -1296,17 +1296,17 @@ BOOST_AUTO_TEST_CASE( hull_min_process_cube_test )
     BOOST_CHECK(uut.number_of_triangles()   == 12);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[3] == point_t(-0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[4] == point_t( 0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[5] == point_t( 0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[6] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[7] == point_t(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[4] == point_t<>( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[5] == point_t<>( 0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[6] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[7] == point_t<>(-0.5f,  0.5f, -0.5f));
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(0, 2, 3));
@@ -1333,16 +1333,16 @@ BOOST_AUTO_TEST_CASE( hull_clear_and_min_process_cube_test )
     BOOST_CHECK(!cube_uut.flat());
 
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
 
     cube_uut.add_points(points);
@@ -1355,17 +1355,17 @@ BOOST_AUTO_TEST_CASE( hull_clear_and_min_process_cube_test )
     BOOST_CHECK(cube_uut.number_of_triangles()   == 12);
     BOOST_CHECK(!cube_uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     cube_uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[3] == point_t(-0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[4] == point_t( 0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[5] == point_t( 0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[6] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[7] == point_t(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[4] == point_t<>( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[5] == point_t<>( 0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[6] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[7] == point_t<>(-0.5f,  0.5f, -0.5f));
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(0, 2, 3));
@@ -1384,19 +1384,19 @@ BOOST_AUTO_TEST_CASE( hull_clear_and_min_process_cube_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_cube_points_inside_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.0f,  0.0f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.0f,  0.0f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.0f,  0.0f,  0.0f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.0f,  0.0f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.0f,  0.0f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.0f,  0.0f,  0.0f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
     incremental_convex_hull uut(points);
 
@@ -1410,17 +1410,17 @@ BOOST_AUTO_TEST_CASE( hull_min_process_cube_points_inside_test )
     BOOST_CHECK(uut.number_of_triangles()   == 12);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[3] == point_t(-0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[4] == point_t( 0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[5] == point_t( 0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(mesh_points[6] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(mesh_points[7] == point_t(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[4] == point_t<>( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[5] == point_t<>( 0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(mesh_points[6] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(mesh_points[7] == point_t<>(-0.5f,  0.5f, -0.5f));
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(1, 0, 3));
@@ -1439,12 +1439,12 @@ BOOST_AUTO_TEST_CASE( hull_min_process_cube_points_inside_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_2_stage_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f)
     });
     incremental_convex_hull uut(points);
 
@@ -1472,13 +1472,13 @@ BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_2_stage_test )
     BOOST_CHECK(uut.number_of_triangles()   == 4);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(1.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(0.0f, 1.0f, 0.0f));
-    BOOST_CHECK(mesh_points[3] == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(0.0f, 0.0f, 1.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -1489,17 +1489,17 @@ BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_2_stage_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_octagon_pyramid_2_stages_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 2.0f, 0.0f),
-        point_t(1.0f, 3.0f, 0.0f),
-        point_t(2.0f, 3.0f, 0.0f),
-        point_t(3.0f, 2.0f, 0.0f),
-        point_t(3.0f, 1.0f, 0.0f),
-        point_t(2.0f, 0.0f, 0.0f),
-        point_t(1.5f, 2.5f, 0.5f)
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 2.0f, 0.0f),
+        point_t<>(1.0f, 3.0f, 0.0f),
+        point_t<>(2.0f, 3.0f, 0.0f),
+        point_t<>(3.0f, 2.0f, 0.0f),
+        point_t<>(3.0f, 1.0f, 0.0f),
+        point_t<>(2.0f, 0.0f, 0.0f),
+        point_t<>(1.5f, 2.5f, 0.5f)
     });
     incremental_convex_hull uut(points);
 
@@ -1531,18 +1531,18 @@ BOOST_AUTO_TEST_CASE( hull_min_process_octagon_pyramid_2_stages_test )
     BOOST_CHECK(uut.number_of_triangles()   == 14);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t( 1.0f,  0.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t( 0.0f,  1.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t( 0.0f,  2.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t( 1.5f,  2.5f,  0.5f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t( 3.0f,  2.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[5] - point_t( 1.0f,  3.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[6] - point_t( 3.0f,  1.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[7] - point_t( 2.0f,  3.0f,  0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[8] - point_t( 2.0f,  0.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[0] - point_t<>( 1.0f,  0.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[1] - point_t<>( 0.0f,  1.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[2] - point_t<>( 0.0f,  2.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[3] - point_t<>( 1.5f,  2.5f,  0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[4] - point_t<>( 3.0f,  2.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[5] - point_t<>( 1.0f,  3.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[6] - point_t<>( 3.0f,  1.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[7] - point_t<>( 2.0f,  3.0f,  0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[8] - point_t<>( 2.0f,  0.0f,  0.0f))) < result_tolerance);
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(1, 0, 3));
@@ -1563,22 +1563,22 @@ BOOST_AUTO_TEST_CASE( hull_min_process_octagon_pyramid_2_stages_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_cube_2_stages_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.0f),
-        point_t(-0.5f,  0.5f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.0f),
-        point_t(-0.5f,  0.0f,  0.5f),
-        point_t( 0.5f,  0.0f,  0.5f),
-        point_t(-0.6f, -0.6f,  0.6f),
-        point_t( 0.6f, -0.6f,  0.6f),
-        point_t(-0.6f,  0.6f,  0.6f),
-        point_t( 0.6f,  0.6f,  0.6f),
-        point_t(-0.6f, -0.6f, -0.6f),
-        point_t( 0.6f, -0.6f, -0.6f),
-        point_t(-0.6f,  0.6f, -0.6f),
-        point_t( 0.6f,  0.6f, -0.6f)
+        point_t<>(-0.5f, -0.5f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.0f),
+        point_t<>(-0.5f,  0.5f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.0f),
+        point_t<>(-0.5f,  0.0f,  0.5f),
+        point_t<>( 0.5f,  0.0f,  0.5f),
+        point_t<>(-0.6f, -0.6f,  0.6f),
+        point_t<>( 0.6f, -0.6f,  0.6f),
+        point_t<>(-0.6f,  0.6f,  0.6f),
+        point_t<>( 0.6f,  0.6f,  0.6f),
+        point_t<>(-0.6f, -0.6f, -0.6f),
+        point_t<>( 0.6f, -0.6f, -0.6f),
+        point_t<>(-0.6f,  0.6f, -0.6f),
+        point_t<>( 0.6f,  0.6f, -0.6f)
     });
     incremental_convex_hull uut(points);
 
@@ -1615,17 +1615,17 @@ BOOST_AUTO_TEST_CASE( hull_min_process_cube_2_stages_test )
     BOOST_CHECK(uut.number_of_triangles()   == 12);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(-0.6f, -0.6f, -0.6f));
-    BOOST_CHECK(mesh_points[1] == point_t( 0.6f,  0.6f, -0.6f));
-    BOOST_CHECK(mesh_points[2] == point_t(-0.6f, -0.6f,  0.6f));
-    BOOST_CHECK(mesh_points[3] == point_t(-0.6f,  0.6f,  0.6f));
-    BOOST_CHECK(mesh_points[4] == point_t(-0.6f,  0.6f, -0.6f));
-    BOOST_CHECK(mesh_points[5] == point_t( 0.6f, -0.6f, -0.6f));
-    BOOST_CHECK(mesh_points[6] == point_t( 0.6f, -0.6f,  0.6f));
-    BOOST_CHECK(mesh_points[7] == point_t( 0.6f,  0.6f,  0.6f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(-0.6f, -0.6f, -0.6f));
+    BOOST_CHECK(mesh_points[1] == point_t<>( 0.6f,  0.6f, -0.6f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(-0.6f, -0.6f,  0.6f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(-0.6f,  0.6f,  0.6f));
+    BOOST_CHECK(mesh_points[4] == point_t<>(-0.6f,  0.6f, -0.6f));
+    BOOST_CHECK(mesh_points[5] == point_t<>( 0.6f, -0.6f, -0.6f));
+    BOOST_CHECK(mesh_points[6] == point_t<>( 0.6f, -0.6f,  0.6f));
+    BOOST_CHECK(mesh_points[7] == point_t<>( 0.6f,  0.6f,  0.6f));
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>(0, 2, 3));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>(1, 0, 4));
@@ -1644,16 +1644,16 @@ BOOST_AUTO_TEST_CASE( hull_min_process_cube_2_stages_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_point_limit_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f),
-        point_t(1.0f, 0.0f, 0.5f),
-        point_t(0.0f, 1.0f, 0.5f),
-        point_t(1.0f, 0.0f, 0.6f),
-        point_t(0.0f, 1.0f, 0.6f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f),
+        point_t<>(1.0f, 0.0f, 0.5f),
+        point_t<>(0.0f, 1.0f, 0.5f),
+        point_t<>(1.0f, 0.0f, 0.6f),
+        point_t<>(0.0f, 1.0f, 0.6f)
     });
     incremental_convex_hull uut(points);
 
@@ -1667,13 +1667,13 @@ BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_point_limit_test )
     BOOST_CHECK(uut.number_of_triangles()   == 4);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(1.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(0.0f, 1.0f, 0.0f));
-    BOOST_CHECK(mesh_points[3] == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(0.0f, 0.0f, 1.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -1684,16 +1684,16 @@ BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_point_limit_test )
 BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_volume_limit_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f),
-        point_t(1.0f, 0.0f, 0.5f),
-        point_t(0.0f, 1.0f, 0.5f),
-        point_t(1.0f, 0.0f, 0.6f),
-        point_t(0.0f, 1.0f, 0.6f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f),
+        point_t<>(1.0f, 0.0f, 0.5f),
+        point_t<>(0.0f, 1.0f, 0.5f),
+        point_t<>(1.0f, 0.0f, 0.6f),
+        point_t<>(0.0f, 1.0f, 0.6f)
     });
     incremental_convex_hull uut(points);
 
@@ -1707,13 +1707,13 @@ BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_volume_limit_test )
     BOOST_CHECK(uut.number_of_triangles()   == 4);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(mesh_points[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[1] == point_t(1.0f, 0.0f, 0.0f));
-    BOOST_CHECK(mesh_points[2] == point_t(0.0f, 1.0f, 0.0f));
-    BOOST_CHECK(mesh_points[3] == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(mesh_points[0] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[1] == point_t<>(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(mesh_points[2] == point_t<>(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(mesh_points[3] == point_t<>(0.0f, 0.0f, 1.0f));
 
     BOOST_CHECK(mesh_triangles[0] == point_ti<>(2, 1, 0));
     BOOST_CHECK(mesh_triangles[1] == point_ti<>(2, 0, 3));
@@ -1724,33 +1724,33 @@ BOOST_AUTO_TEST_CASE( hull_min_process_tetrahedron_volume_limit_test )
 BOOST_AUTO_TEST_CASE( process_regression_fail_0_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0559701f, -0.15963f,  -0.238758f),
-        point_t(0.0559701f, -0.15963f,  -0.231284f),
-        point_t(0.0559701f, -0.107412f, -0.238758f),
-        point_t(0.212687f,  -0.107412f, -0.238758f),
-        point_t(0.138041f,  -0.107412f, -0.179056f),
-        point_t(0.182819f,  -0.15963f,  -0.179056f),
-        point_t(0.19776f,   -0.159635f, -0.238758f),
-        point_t(0.212687f,  -0.107412f, -0.186537f),
-        point_t(0.108235f,  -0.15963f,  -0.186531f),
-        point_t(0.182834f,  -0.159635f, -0.238758f),
-        point_t(0.0634409f, -0.15963f,  -0.223827f),
-        point_t(0.0559701f, -0.107412f, -0.231284f),
-        point_t(0.182834f,  -0.159635f, -0.186537f),
-        point_t(0.0709116f, -0.15963f,  -0.216376f),
-        point_t(0.0634409f, -0.107412f, -0.223827f),
-        point_t(0.19029f,   -0.159635f, -0.186537f),
-        point_t(0.138041f,  -0.15963f,  -0.179056f),
-        point_t(0.212687f,  -0.114876f, -0.238758f),
-        point_t(0.19776f,   -0.159635f, -0.193982f),
-        point_t(0.0709116f, -0.107412f, -0.216376f),
-        point_t(0.108235f,  -0.107412f, -0.186531f),
-        point_t(0.212687f,  -0.114876f, -0.186537f),
-        point_t(0.19776f,   -0.107412f, -0.179056f),
-        point_t(0.19776f,   -0.152166f, -0.186537f),
-        point_t(0.19776f,   -0.114876f, -0.179056f)
+        point_t<>(0.0559701f, -0.15963f,  -0.238758f),
+        point_t<>(0.0559701f, -0.15963f,  -0.231284f),
+        point_t<>(0.0559701f, -0.107412f, -0.238758f),
+        point_t<>(0.212687f,  -0.107412f, -0.238758f),
+        point_t<>(0.138041f,  -0.107412f, -0.179056f),
+        point_t<>(0.182819f,  -0.15963f,  -0.179056f),
+        point_t<>(0.19776f,   -0.159635f, -0.238758f),
+        point_t<>(0.212687f,  -0.107412f, -0.186537f),
+        point_t<>(0.108235f,  -0.15963f,  -0.186531f),
+        point_t<>(0.182834f,  -0.159635f, -0.238758f),
+        point_t<>(0.0634409f, -0.15963f,  -0.223827f),
+        point_t<>(0.0559701f, -0.107412f, -0.231284f),
+        point_t<>(0.182834f,  -0.159635f, -0.186537f),
+        point_t<>(0.0709116f, -0.15963f,  -0.216376f),
+        point_t<>(0.0634409f, -0.107412f, -0.223827f),
+        point_t<>(0.19029f,   -0.159635f, -0.186537f),
+        point_t<>(0.138041f,  -0.15963f,  -0.179056f),
+        point_t<>(0.212687f,  -0.114876f, -0.238758f),
+        point_t<>(0.19776f,   -0.159635f, -0.193982f),
+        point_t<>(0.0709116f, -0.107412f, -0.216376f),
+        point_t<>(0.108235f,  -0.107412f, -0.186531f),
+        point_t<>(0.212687f,  -0.114876f, -0.186537f),
+        point_t<>(0.19776f,   -0.107412f, -0.179056f),
+        point_t<>(0.19776f,   -0.152166f, -0.186537f),
+        point_t<>(0.19776f,   -0.114876f, -0.179056f)
     });
     incremental_convex_hull uut(points);
 
@@ -1764,34 +1764,34 @@ BOOST_AUTO_TEST_CASE( process_regression_fail_0_test )
     BOOST_CHECK(uut.number_of_triangles()   == 46);
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 0] - point_t(0.0559701f, -0.15963f,  -0.238758f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 1] - point_t(0.0559701f, -0.15963f,  -0.231284f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 2] - point_t(0.0559701f, -0.107412f, -0.238758f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 3] - point_t(0.212687f,  -0.107412f, -0.238758f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 4] - point_t(0.138041f,  -0.107412f, -0.179056f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 5] - point_t(0.182819f,  -0.15963f,  -0.179056f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 6] - point_t(0.19776f,   -0.159635f, -0.238758f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 7] - point_t(0.212687f,  -0.107412f, -0.186537f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 8] - point_t(0.108235f,  -0.15963f,  -0.186531f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 9] - point_t(0.182834f,  -0.159635f, -0.238758f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[10] - point_t(0.0634409f, -0.15963f,  -0.223827f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[11] - point_t(0.0559701f, -0.107412f, -0.231284f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[12] - point_t(0.182834f,  -0.159635f, -0.186537f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[13] - point_t(0.0709116f, -0.15963f,  -0.216376f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[14] - point_t(0.0634409f, -0.107412f, -0.223827f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[15] - point_t(0.19029f,   -0.159635f, -0.186537f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[16] - point_t(0.138041f,  -0.15963f,  -0.179056f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[17] - point_t(0.212687f,  -0.114876f, -0.238758f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[18] - point_t(0.19776f,   -0.159635f, -0.193982f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[19] - point_t(0.0709116f, -0.107412f, -0.216376f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[20] - point_t(0.108235f,  -0.107412f, -0.186531f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[21] - point_t(0.212687f,  -0.114876f, -0.186537f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[22] - point_t(0.19776f,   -0.107412f, -0.179056f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[23] - point_t(0.19776f,   -0.152166f, -0.186537f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[24] - point_t(0.19776f,   -0.114876f, -0.179056f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 0] - point_t<>(0.0559701f, -0.15963f,  -0.238758f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 1] - point_t<>(0.0559701f, -0.15963f,  -0.231284f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 2] - point_t<>(0.0559701f, -0.107412f, -0.238758f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 3] - point_t<>(0.212687f,  -0.107412f, -0.238758f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 4] - point_t<>(0.138041f,  -0.107412f, -0.179056f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 5] - point_t<>(0.182819f,  -0.15963f,  -0.179056f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 6] - point_t<>(0.19776f,   -0.159635f, -0.238758f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 7] - point_t<>(0.212687f,  -0.107412f, -0.186537f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 8] - point_t<>(0.108235f,  -0.15963f,  -0.186531f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 9] - point_t<>(0.182834f,  -0.159635f, -0.238758f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[10] - point_t<>(0.0634409f, -0.15963f,  -0.223827f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[11] - point_t<>(0.0559701f, -0.107412f, -0.231284f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[12] - point_t<>(0.182834f,  -0.159635f, -0.186537f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[13] - point_t<>(0.0709116f, -0.15963f,  -0.216376f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[14] - point_t<>(0.0634409f, -0.107412f, -0.223827f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[15] - point_t<>(0.19029f,   -0.159635f, -0.186537f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[16] - point_t<>(0.138041f,  -0.15963f,  -0.179056f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[17] - point_t<>(0.212687f,  -0.114876f, -0.238758f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[18] - point_t<>(0.19776f,   -0.159635f, -0.193982f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[19] - point_t<>(0.0709116f, -0.107412f, -0.216376f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[20] - point_t<>(0.108235f,  -0.107412f, -0.186531f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[21] - point_t<>(0.212687f,  -0.114876f, -0.186537f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[22] - point_t<>(0.19776f,   -0.107412f, -0.179056f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[23] - point_t<>(0.19776f,   -0.152166f, -0.186537f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[24] - point_t<>(0.19776f,   -0.114876f, -0.179056f))) < result_tolerance);
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>( 0,  1,  2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>( 0,  2,  3));
@@ -1844,24 +1844,24 @@ BOOST_AUTO_TEST_CASE( process_regression_fail_0_test )
 BOOST_AUTO_TEST_CASE( process_regression_fail_1_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-2.7423725f, 38.2191810f, 20.7063713f),
-        point_t(-3.5658187f, 38.2191810f, 20.7063713f),
-        point_t(-2.7423725f, 11.1007184f, 20.7063713f),
-        point_t(15.3382873f, 38.2191810f,  1.8022613f),
-        point_t(13.6913948f,  8.6301374f,  1.8022613f),
-        point_t(15.3382873f,  8.6301374f,  2.6257076f),
-        point_t(-3.5658187f, 38.2191810f, 19.0613288f),
-        point_t(-3.5658187f, 11.1007184f, 19.0613288f),
-        point_t(13.6932449f, 38.2191810f,  1.8022613f),
-        point_t(15.3382873f, 38.2191810f,  2.6257076f),
-        point_t(-1.0991806f,  8.6301374f, 18.2397327f),
-        point_t(-1.0991806f,  8.6301374f, 16.5946903f),
-        point_t(15.3382873f,  8.6301374f,  1.8022613f),
-        point_t(-3.5658187f, 11.1007184f, 20.7063713f),
-        point_t(-0.2757344f,  8.6301374f, 18.2397327f),
-        point_t(13.6913948f, 11.0978221f,  1.8022613f)
+        point_t<>(-2.7423725f, 38.2191810f, 20.7063713f),
+        point_t<>(-3.5658187f, 38.2191810f, 20.7063713f),
+        point_t<>(-2.7423725f, 11.1007184f, 20.7063713f),
+        point_t<>(15.3382873f, 38.2191810f,  1.8022613f),
+        point_t<>(13.6913948f,  8.6301374f,  1.8022613f),
+        point_t<>(15.3382873f,  8.6301374f,  2.6257076f),
+        point_t<>(-3.5658187f, 38.2191810f, 19.0613288f),
+        point_t<>(-3.5658187f, 11.1007184f, 19.0613288f),
+        point_t<>(13.6932449f, 38.2191810f,  1.8022613f),
+        point_t<>(15.3382873f, 38.2191810f,  2.6257076f),
+        point_t<>(-1.0991806f,  8.6301374f, 18.2397327f),
+        point_t<>(-1.0991806f,  8.6301374f, 16.5946903f),
+        point_t<>(15.3382873f,  8.6301374f,  1.8022613f),
+        point_t<>(-3.5658187f, 11.1007184f, 20.7063713f),
+        point_t<>(-0.2757344f,  8.6301374f, 18.2397327f),
+        point_t<>(13.6913948f, 11.0978221f,  1.8022613f)
     });
     incremental_convex_hull uut(points);
 
@@ -1875,24 +1875,24 @@ BOOST_AUTO_TEST_CASE( process_regression_fail_1_test )
     BOOST_REQUIRE_MESSAGE(uut.number_of_triangles()   == 26, uut.number_of_triangles());
     BOOST_CHECK(!uut.flat());
 
-    std::vector<point_t>    mesh_points;
+    std::vector<point_t<>>    mesh_points;
     std::vector<point_ti<>> mesh_triangles;
     uut.mesh().points_and_triangles(&mesh_points, &mesh_triangles);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 0] - point_t(-2.74236f,  38.2192f,  20.7064f ))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 1] - point_t(-3.56582f,  38.2192f,  20.7064f ))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 2] - point_t(-2.74236f,  11.1007f,  20.7064f ))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 3] - point_t(15.3383f,   38.2192f,   1.80226f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 4] - point_t(13.6914f,    8.63014f,  1.80226f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 5] - point_t(15.3383f,    8.63014f,  2.62572f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 6] - point_t(-3.56582f,  38.2192f,  19.0613f ))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 7] - point_t(-3.56582f,  11.1007f,  19.0613f ))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 8] - point_t(13.6932f,   38.2192f,   1.80226f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 9] - point_t(15.3383f,   38.2192f,   2.62572f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[10] - point_t(-1.09918f,   8.63014f, 18.2397f ))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[11] - point_t(-1.09918f,   8.63014f, 16.5947f ))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[12] - point_t(15.3383f,    8.63014f,  1.80226f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[13] - point_t(-3.56582f,  11.1007f,  20.7064f ))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(mesh_points[14] - point_t(-0.275733f,  8.63014f, 18.2397f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 0] - point_t<>(-2.74236f,  38.2192f,  20.7064f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 1] - point_t<>(-3.56582f,  38.2192f,  20.7064f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 2] - point_t<>(-2.74236f,  11.1007f,  20.7064f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 3] - point_t<>(15.3383f,   38.2192f,   1.80226f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 4] - point_t<>(13.6914f,    8.63014f,  1.80226f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 5] - point_t<>(15.3383f,    8.63014f,  2.62572f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 6] - point_t<>(-3.56582f,  38.2192f,  19.0613f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 7] - point_t<>(-3.56582f,  11.1007f,  19.0613f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 8] - point_t<>(13.6932f,   38.2192f,   1.80226f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[ 9] - point_t<>(15.3383f,   38.2192f,   2.62572f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[10] - point_t<>(-1.09918f,   8.63014f, 18.2397f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[11] - point_t<>(-1.09918f,   8.63014f, 16.5947f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[12] - point_t<>(15.3383f,    8.63014f,  1.80226f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[13] - point_t<>(-3.56582f,  11.1007f,  20.7064f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(mesh_points[14] - point_t<>(-0.275733f,  8.63014f, 18.2397f ))) < result_tolerance);
 
     BOOST_CHECK(mesh_triangles[ 0] == point_ti<>( 0,  1,  2));
     BOOST_CHECK(mesh_triangles[ 1] == point_ti<>( 1,  0,  3));
@@ -1930,7 +1930,7 @@ BOOST_AUTO_TEST_CASE( process_hull_performance_test )
     const int number_points = 100000;
 
     /* Memory to hold points */
-    std::vector<point_t> points;
+    std::vector<point_t<>> points;
     points.reserve(number_points);
 
     /* Generate points */

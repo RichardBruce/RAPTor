@@ -22,20 +22,20 @@ struct tetrahedron
     public :
         tetrahedron() = default;
 
-        tetrahedron(const point_t &a, const point_t &b, const point_t &c, const point_t &d, const voxel_value_t vv = voxel_value_t::primitive_undefined) : 
+        tetrahedron(const point_t<> &a, const point_t<> &b, const point_t<> &c, const point_t<> &d, const voxel_value_t vv = voxel_value_t::primitive_undefined) : 
             pts{ a, b, c, d},
             loc(vv)
 
         {  };
 
-        point_t         pts[4];
+        point_t<>       pts[4];
         voxel_value_t   loc;
 };
 
 class tetrahedron_set : public primitive_set
 {            
     public :
-        tetrahedron_set(const std::vector<tetrahedron> &tetrahedra, const point_t &min_bb, const float scale) : 
+        tetrahedron_set(const std::vector<tetrahedron> &tetrahedra, const point_t<> &min_bb, const float scale) : 
             _tetrahedra(tetrahedra),
             _min_bb(min_bb),
             _scale(scale),
@@ -45,11 +45,11 @@ class tetrahedron_set : public primitive_set
             memset(_q, 0, sizeof(float) * 9);
         }
 
-        tetrahedron_set() : tetrahedron_set(std::vector<tetrahedron>(), point_t(0.0f, 0.0f, 0.0f), 1.0f) {  }
+        tetrahedron_set() : tetrahedron_set(std::vector<tetrahedron>(), point_t<>(0.0f, 0.0f, 0.0f), 1.0f) {  }
 
-        const point_t & get_min_bb()                        const { return _min_bb;                 }
-        const point_t & get_max_bb()                        const { return _max_bb;                 }
-        const point_t & get_barycenter()                    const { return _barycenter;             }
+        const point_t<> & get_min_bb()                        const { return _min_bb;                 }
+        const point_t<> & get_max_bb()                        const { return _max_bb;                 }
+        const point_t<> & get_barycenter()                    const { return _barycenter;             }
         float           get_scale()                         const { return _scale;                  }
         int             number_of_primitives()              const { return _tetrahedra.size();      }
         int             number_of_primitives_on_surface()   const { return _prim_on_surface;        }
@@ -79,7 +79,7 @@ class tetrahedron_set : public primitive_set
         void                align_to_principal_axes();
         void                revert_align_to_principal_axes();
         void                cut(const plane &p, primitive_set **const pos_part, primitive_set **const neg_part)                                                 const;
-        void                intersect(const plane &p, std::vector<point_t> *const pos_pts, std::vector<point_t> *const neg_pts, const int sampling)             const;
+        void                intersect(const plane &p, std::vector<point_t<>> *const pos_pts, std::vector<point_t<>> *const neg_pts, const int sampling)             const;
         void                compute_cut_volumes(const plane &p, float *const pos_volume, float *const neg_volume)                                               const;
         void                compute_bounding_box();
         void                convert(convex_mesh *const mesh, const voxel_value_t value)                                                                         const;
@@ -88,12 +88,12 @@ class tetrahedron_set : public primitive_set
         bool                add(tetrahedron t);
 
     private :
-        void    add_clipped_tetrahedra(const point_t (&pts) [10], const int size);
+        void    add_clipped_tetrahedra(const point_t<> (&pts) [10], const int size);
 
         std::vector<tetrahedron>    _tetrahedra;
-        point_t                     _min_bb;
-        point_t                     _max_bb;
-        point_t                     _barycenter;
+        point_t<>                     _min_bb;
+        point_t<>                     _max_bb;
+        point_t<>                     _barycenter;
         float                       _scale;
         float                       _q[3][3];
         int                         _prim_on_surface;

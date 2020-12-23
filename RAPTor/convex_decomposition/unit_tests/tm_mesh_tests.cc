@@ -31,7 +31,7 @@ struct tm_mesh_fixture : private boost::noncopyable
         e2(triangles.end(), triangles.end(), triangles.end(), ++(++vertices.begin()), vertices.begin()),
         t0(edges.end(), edges.end(), edges.end(), vertices.end(), vertices.end(), vertices.end()),
         t1(edges.end(), edges.end(), edges.end(), vertices.begin(), ++vertices.begin(), ++(++vertices.begin())),
-        mesh(point_t(-1.0f, 2.1f, 3.3f), point_t(2.3f, 1.2f, 3.7f))
+        mesh(point_t<>(-1.0f, 2.1f, 3.3f), point_t<>(2.3f, 1.2f, 3.7f))
     {
         edges.push_back(e0);
         edges.push_back(e1);
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE( mesh_const_get_triangles_test )
 BOOST_AUTO_TEST_CASE( mesh_add_vertex_test )
 {
     /* Add vertex */
-    mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
+    mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
     BOOST_REQUIRE(mesh.number_of_vertices() == 1);
     BOOST_CHECK(mesh.number_of_edges()      == 0);
     BOOST_CHECK(mesh.number_of_triangles()  == 0);
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE( mesh_add_vertex_test )
     BOOST_CHECK(v_iter->on_hull()   == false);
 
     /* Add vertex */
-    mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
+    mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
     BOOST_REQUIRE(mesh.number_of_vertices() == 2);
     BOOST_CHECK(mesh.number_of_edges()      == 0);
     BOOST_CHECK(mesh.number_of_triangles()  == 0);
@@ -298,9 +298,9 @@ BOOST_AUTO_TEST_CASE( mesh_add_integer_vertex_test )
 BOOST_AUTO_TEST_CASE( mesh_add_edge_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edge */
     mesh.add_edge(v0, v1);
@@ -338,9 +338,9 @@ BOOST_AUTO_TEST_CASE( mesh_add_edge_test )
 BOOST_AUTO_TEST_CASE( mesh_add_triangle_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add triangle */
     mesh.add_triangle(v0, v1, v2);
@@ -384,9 +384,9 @@ BOOST_AUTO_TEST_CASE( mesh_add_triangle_test )
 BOOST_AUTO_TEST_CASE( mesh_add_triangle_with_edges_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0 = mesh.add_edge(v0, v1);
@@ -435,9 +435,9 @@ BOOST_AUTO_TEST_CASE( mesh_add_triangle_with_edges_test )
 BOOST_AUTO_TEST_CASE( mesh_clear_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0 = mesh.add_edge(v0, v1);
@@ -465,9 +465,9 @@ BOOST_AUTO_TEST_CASE( mesh_clear_test )
 BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0 = mesh.add_edge(v0, v1);
@@ -478,12 +478,12 @@ BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_test )
     mesh.add_triangle(e0, e1, e2, v0, v1, v2);
     mesh.add_triangle(e2, e1, e0, v2, v1, v0);
 
-    std::vector<point_t>    points;
+    std::vector<point_t<>>    points;
     std::vector<point_ti<>> triangles;
     mesh.points_and_triangles(&points, &triangles);
-    BOOST_CHECK(std::fabs(magnitude(points[0] - point_t(-0.130435f, 0.433333f, 0.0567567f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(points[1] - point_t( 1.6087f,   4.6f,      3.84054f  ))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(points[2] - point_t( 1.6087f,   0.433333f, 0.056756f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(points[0] - point_t<>(-0.130435f, 0.433333f, 0.0567567f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(points[1] - point_t<>( 1.6087f,   4.6f,      3.84054f  ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(points[2] - point_t<>( 1.6087f,   0.433333f, 0.056756f ))) < result_tolerance);
 
     BOOST_CHECK(triangles[0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(triangles[1] == point_ti<>(2, 1, 0));
@@ -492,14 +492,14 @@ BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_test )
 BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_after_erase_test )
 {
     /* Add vertices */
-    const auto ve0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto ve1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto ve2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto ve3 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto ve4 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto ve0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto ve1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto ve2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto ve3 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto ve4 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0 = mesh.add_edge(v0, v1);
@@ -517,12 +517,12 @@ BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_after_erase_test )
     mesh.get_vertices().erase(ve3);
     mesh.get_vertices().erase(ve4);
 
-    std::vector<point_t>    points;
+    std::vector<point_t<>>    points;
     std::vector<point_ti<>> triangles;
     mesh.points_and_triangles(&points, &triangles);
-    BOOST_CHECK(std::fabs(magnitude(points[0] - point_t(-0.130435f, 0.433333f, 0.0567567f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(points[1] - point_t( 1.6087f,   4.6f,      3.84054f  ))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(points[2] - point_t( 1.6087f,   0.433333f, 0.056756f ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(points[0] - point_t<>(-0.130435f, 0.433333f, 0.0567567f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(points[1] - point_t<>( 1.6087f,   4.6f,      3.84054f  ))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(points[2] - point_t<>( 1.6087f,   0.433333f, 0.056756f ))) < result_tolerance);
 
     BOOST_CHECK(triangles[0] == point_ti<>(0, 1, 2));
     BOOST_CHECK(triangles[1] == point_ti<>(2, 1, 0));
@@ -531,9 +531,9 @@ BOOST_AUTO_TEST_CASE( mesh_points_and_triangles_after_erase_test )
 BOOST_AUTO_TEST_CASE( mesh_check_consistency_edge_with_no_triangles_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0 = mesh.add_edge(v0, v1);
@@ -567,9 +567,9 @@ BOOST_AUTO_TEST_CASE( mesh_check_consistency_edge_with_no_triangles_test )
 BOOST_AUTO_TEST_CASE( mesh_check_consistency_no_t0_reference_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0 = mesh.add_edge(v0, v1);
@@ -595,9 +595,9 @@ BOOST_AUTO_TEST_CASE( mesh_check_consistency_no_t0_reference_test )
 BOOST_AUTO_TEST_CASE( mesh_check_consistency_two_t0_reference_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0 = mesh.add_edge(v0, v1);
@@ -623,9 +623,9 @@ BOOST_AUTO_TEST_CASE( mesh_check_consistency_two_t0_reference_test )
 BOOST_AUTO_TEST_CASE( mesh_check_consistency_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0 = mesh.add_edge(v0, v1);
@@ -651,9 +651,9 @@ BOOST_AUTO_TEST_CASE( mesh_check_consistency_test )
 BOOST_AUTO_TEST_CASE( mesh_make_face_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add face */
     const auto t0 = mesh.make_face(v0, v1, v2, mesh.get_triangles().end());
@@ -693,9 +693,9 @@ BOOST_AUTO_TEST_CASE( mesh_make_face_test )
 BOOST_AUTO_TEST_CASE( mesh_make_back_face_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add face */
     const auto t0 = mesh.make_face(v0, v1, v2, mesh.get_triangles().end());
@@ -777,9 +777,9 @@ BOOST_AUTO_TEST_CASE( mesh_make_back_face_test )
 BOOST_AUTO_TEST_CASE( mesh_clean_triangles_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0 = mesh.add_edge(v0, v1);
@@ -811,9 +811,9 @@ BOOST_AUTO_TEST_CASE( mesh_clean_triangles_test )
 BOOST_AUTO_TEST_CASE( mesh_clean_edges_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0   = mesh.add_edge(v0, v1);
@@ -866,13 +866,13 @@ BOOST_AUTO_TEST_CASE( mesh_clean_edges_test )
 BOOST_AUTO_TEST_CASE( mesh_clean_vertices_test )
 {
     /* Add vertices */
-    const auto v0   = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 1);
-    const auto v1   = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 2);
-    mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 3);
-    const auto v2   = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 4);
-    const auto vd2  = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 5);
-    const auto vd3  = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 6);
+    const auto v0   = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 1);
+    const auto v1   = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 2);
+    mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 3);
+    const auto v2   = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 4);
+    const auto vd2  = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 5);
+    const auto vd3  = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 6);
 
     /* Add edges */
     const auto e0 = mesh.add_edge(v0, v1);
@@ -899,12 +899,12 @@ BOOST_AUTO_TEST_CASE( mesh_clean_vertices_test )
 BOOST_AUTO_TEST_CASE( mesh_clean_test )
 {
     /* Add vertices */
-    const auto v0   = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1   = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto v2   = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
-    const auto vd0  = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto vd1  = mesh.add_vertex(point_t(2.0f, 5.0f, 4.0f), 1);
-    const auto vd2  = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 2);
+    const auto v0   = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1   = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto v2   = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
+    const auto vd0  = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto vd1  = mesh.add_vertex(point_t<>(2.0f, 5.0f, 4.0f), 1);
+    const auto vd2  = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 2);
 
     /* Add edges */
     const auto e0   = mesh.add_edge( v0,  v1);
@@ -976,10 +976,10 @@ BOOST_AUTO_TEST_CASE( mesh_clean_test )
 BOOST_AUTO_TEST_CASE( mesh_make_cone_face_test )
 {
     /* Add vertices */
-    const auto v0 = mesh.add_vertex(point_t(0.0f, 0.0f, 0.0f), 0);
-    const auto v1 = mesh.add_vertex(point_t(2.0f, 0.0f, 0.0f), 1);
-    const auto v2 = mesh.add_vertex(point_t(0.0f, 2.0f, 0.0f), 2);
-    const auto v3 = mesh.add_vertex(point_t(1.0f, 1.0f, 2.0f), 3);
+    const auto v0 = mesh.add_vertex(point_t<>(0.0f, 0.0f, 0.0f), 0);
+    const auto v1 = mesh.add_vertex(point_t<>(2.0f, 0.0f, 0.0f), 1);
+    const auto v2 = mesh.add_vertex(point_t<>(0.0f, 2.0f, 0.0f), 2);
+    const auto v3 = mesh.add_vertex(point_t<>(1.0f, 1.0f, 2.0f), 3);
 
     /* Add egdes */
     const auto e0 = mesh.add_edge(v0, v2);

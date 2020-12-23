@@ -19,12 +19,12 @@
 
 namespace raptor_convex_decomposition
 {
-bool triangle_box_overlap(const point_t &boxcenter, const point_t &boxhalfsize, const point_t &triver0, const point_t &triver1, const point_t &triver2);
+bool triangle_box_overlap(const point_t<> &boxcenter, const point_t<> &boxhalfsize, const point_t<> &triver0, const point_t<> &triver1, const point_t<> &triver2);
 
-inline point_t compute_aligned_point(const point_t &pt, const point_t &barycenter, const float (& rot)[3][3])
+inline point_t<> compute_aligned_point(const point_t<> &pt, const point_t<> &barycenter, const float (& rot)[3][3])
 {
-    point_t ret;
-    point_t diff(pt - barycenter);
+    point_t<> ret;
+    point_t<> diff(pt - barycenter);
     ret.x = (rot[0][0] * diff.x) + (rot[1][0] * diff.y) + (rot[2][0] * diff.z);
     ret.y = (rot[0][1] * diff.x) + (rot[1][1] * diff.y) + (rot[2][1] * diff.z);
     ret.z = (rot[0][2] * diff.x) + (rot[1][2] * diff.y) + (rot[2][2] * diff.z);
@@ -35,7 +35,7 @@ inline point_t compute_aligned_point(const point_t &pt, const point_t &barycente
 class volume
 {            
     public :
-        volume(const std::vector<point_t> &points, const std::vector<point_ti<>> &triangles, const int dim, const point_t &barycenter, const float (& rot)[3][3]) :
+        volume(const std::vector<point_t<>> &points, const std::vector<point_ti<>> &triangles, const int dim, const point_t<> &barycenter, const float (& rot)[3][3]) :
             _scale(1.0f),
             _dim{ 0, 0, 0 },
             _prim_on_surface(0),
@@ -52,7 +52,7 @@ class volume
 
             /* Divide into regions proportional to the dim */
             float r;
-            const point_t d(_max_bb - _min_bb);
+            const point_t<> d(_max_bb - _min_bb);
             if ((d.x > d.y) && (d.x > d.z))
             {
                 r = d.x;
@@ -80,15 +80,15 @@ class volume
             const float scale_inv = (dim - 1) / r;
             _loc.resize((_dim[0] * _dim[1] * _dim[2]), voxel_value_t::primitive_undefined);
 
-            point_t p[3];
+            point_t<> p[3];
             int i0 = -1, j0 = -1, k0 = -1;
             int i1 = -1, j1 = -1, k1 = -1;
-            const point_t boxhalfsize(0.5f, 0.5f, 0.5f);
+            const point_t<> boxhalfsize(0.5f, 0.5f, 0.5f);
             for (int ti = 0; ti < static_cast<int>(triangles.size()); ++ti)
             {
                 for (int c = 0; c < 3; ++c)
                 {
-                    const point_t pt(compute_aligned_point(points[triangles[ti][c]], barycenter, rot));
+                    const point_t<> pt(compute_aligned_point(points[triangles[ti][c]], barycenter, rot));
                     p[c] = (pt - _min_bb) * scale_inv;
                     const int i = static_cast<int>(p[c].x + 0.5f);
                     const int j = static_cast<int>(p[c].y + 0.5f);
@@ -119,7 +119,7 @@ class volume
                 if (j1 < _dim[1]) ++j1;
                 if (k1 < _dim[2]) ++k1;
 
-                point_t boxcenter;
+                point_t<> boxcenter;
                 for (int i = i0; i < i1; ++i)
                 {
                     boxcenter.x = static_cast<float>(i);
@@ -194,9 +194,9 @@ class volume
         void fill_inside_surface();
         void fill_outside_surface(const int i0, const int j0, const int k0, const int i1, const int j1, const int k1);
 
-        void compute_bounding_box(const std::vector<point_t> &points, const point_t &barycenter, const float (& rot)[3][3])
+        void compute_bounding_box(const std::vector<point_t<>> &points, const point_t<> &barycenter, const float (& rot)[3][3])
         {
-            point_t pt(compute_aligned_point(points[0], barycenter, rot));
+            point_t<> pt(compute_aligned_point(points[0], barycenter, rot));
             _max_bb = pt;
             _min_bb = pt;
             for (int v = 1; v < static_cast<int>(points.size()); ++v)
@@ -208,8 +208,8 @@ class volume
         }
 
         std::vector<voxel_value_t>  _loc;
-        point_t                     _min_bb;
-        point_t                     _max_bb;
+        point_t<>                     _min_bb;
+        point_t<>                     _max_bb;
         float                       _scale;
         int                         _dim[3];
         int                         _prim_on_surface;

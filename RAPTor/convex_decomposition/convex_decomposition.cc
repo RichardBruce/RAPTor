@@ -19,10 +19,10 @@ inline float compute_concavity(const float volume, const float ch_volume, const 
     return std::fabs(ch_volume - volume) / volume_0;
 }
 
-int convex_decomposition::compute_best_clipping_plane(const std::unique_ptr<primitive_set> &pset, const float volume, const std::vector<plane> &planes, const point_t &cut_dir, const float alpha, const float beta, const int dn_samp, plane *const best_plane)
+int convex_decomposition::compute_best_clipping_plane(const std::unique_ptr<primitive_set> &pset, const float volume, const std::vector<plane> &planes, const point_t<> &cut_dir, const float alpha, const float beta, const int dn_samp, plane *const best_plane)
 {
-    std::unique_ptr<convex_mesh          []> chs(new convex_mesh[2]);
-    std::unique_ptr<std::vector<point_t> []> pts(new std::vector<point_t>[2]);
+    std::unique_ptr<convex_mesh             []> chs(new convex_mesh[2]);
+    std::unique_ptr<std::vector<point_t<>>  []> pts(new std::vector<point_t<>>[2]);
     std::unique_ptr<primitive_set> on_surf(pset->select_on_surface());
 
     std::unique_ptr<primitive_set *[]> psets(nullptr);
@@ -53,8 +53,8 @@ int convex_decomposition::compute_best_clipping_plane(const std::unique_ptr<prim
         left_hull.clear();
         if (_params.approx_hulls)
         {
-            std::vector<point_t> &left_pts  = pts[0];
-            std::vector<point_t> &right_pts = pts[1];
+            std::vector<point_t<>> &left_pts  = pts[0];
+            std::vector<point_t<>> &right_pts = pts[1];
             right_pts.clear();
             left_pts.clear();
             on_surf->intersect(p, &right_pts, &left_pts, dn_samp * 32);
@@ -137,7 +137,7 @@ void convex_decomposition::compute_acd()
             if ((concavity > _params.concavity) && (concavity > error)) 
             {
                 planes.clear();
-                point_t cut_dir;
+                point_t<> cut_dir;
                 const float w = pset->compute_preferred_cutting_direction(&cut_dir);
                 pset->compute_axes_aligned_clipping_planes(&planes, _params.plane_down_sampling);
 
@@ -192,7 +192,7 @@ void convex_decomposition::compute_acd()
     parts.clear();
 }
 
-void compute_convex_hull(const std::unique_ptr<convex_mesh> &ch1, const std::unique_ptr<convex_mesh> &ch2, std::vector<point_t> *const pts, convex_mesh *const combine_hull)
+void compute_convex_hull(const std::unique_ptr<convex_mesh> &ch1, const std::unique_ptr<convex_mesh> &ch2, std::vector<point_t<>> *const pts, convex_mesh *const combine_hull)
 {
     pts->clear();
     pts->insert(pts->end(), ch1->points().begin(), ch1->points().end());
@@ -228,7 +228,7 @@ void convex_decomposition::merge_convex_hulls()
     /* Populate the cost matrix */
     int idx = 0;
     convex_mesh combine_hull;
-    std::vector<point_t> pts;
+    std::vector<point_t<>> pts;
     std::vector<float> cost_matrix(((_convex_hulls.size() * _convex_hulls.size()) - _convex_hulls.size()) >> 1);
     for (int p1 = 1; p1 < static_cast<int>(_convex_hulls.size()); ++p1)
     {

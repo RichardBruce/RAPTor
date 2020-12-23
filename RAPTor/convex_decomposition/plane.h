@@ -19,14 +19,14 @@ struct plane
     plane() = default;
 
     /* Ctor */
-    plane(const point_t &n, const float p, const axis_t major_axis) : n(n), p(p), major_axis(major_axis) {  }
+    plane(const point_t<> &n, const float p, const axis_t major_axis) : n(n), p(p), major_axis(major_axis) {  }
 
-    float distance(const point_t &pt) const
+    float distance(const point_t<> &pt) const
     {
         return dot_product(pt, n) - p;
     }
 
-    point_t n;
+    point_t<> n;
     float   p;
     axis_t  major_axis;
 };

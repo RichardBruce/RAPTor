@@ -8,6 +8,7 @@
 /* Boost headers */
 
 /* Common headers */
+#include "logging.h"
 #include "point_t.h"
 #include "parser_common.h"
 

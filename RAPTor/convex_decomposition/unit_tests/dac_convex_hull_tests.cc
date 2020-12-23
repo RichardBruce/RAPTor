@@ -35,7 +35,7 @@ const float result_tolerance = 0.0005f;
 /* Test Ctor */
 BOOST_AUTO_TEST_CASE( empty_ctor_test )
 {
-    const std::vector<point_t> points;
+    const std::vector<point_t<>> points;
 
     const dac_convex_hull uut(points);
     BOOST_REQUIRE(uut.vertices().size() == 0);
@@ -45,27 +45,27 @@ BOOST_AUTO_TEST_CASE( empty_ctor_test )
 BOOST_AUTO_TEST_CASE( line_x_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(3.0f, 0.0f, 0.0f),
-        point_t(4.0f, 0.0f, 0.0f),
-        point_t(5.0f, 0.0f, 0.0f),
-        point_t(6.0f, 0.0f, 0.0f),
-        point_t(8.0f, 0.0f, 0.0f),
-        point_t(9.0f, 0.0f, 0.0f),
-        point_t(2.0f, 0.0f, 0.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(3.0f, 0.0f, 0.0f),
+        point_t<>(4.0f, 0.0f, 0.0f),
+        point_t<>(5.0f, 0.0f, 0.0f),
+        point_t<>(6.0f, 0.0f, 0.0f),
+        point_t<>(8.0f, 0.0f, 0.0f),
+        point_t<>(9.0f, 0.0f, 0.0f),
+        point_t<>(2.0f, 0.0f, 0.0f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 2);
-    BOOST_CHECK(uut.vertices()[0] == point_t(9.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.vertices()[1] == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>(9.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>(0.0f, 0.0f, 0.0f));
 
     BOOST_REQUIRE(uut.faces().size() == 1);
 
@@ -77,27 +77,27 @@ BOOST_AUTO_TEST_CASE( line_x_ctor_test )
 BOOST_AUTO_TEST_CASE( line_y_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 3.0f, 0.0f),
-        point_t(0.0f, 4.0f, 0.0f),
-        point_t(0.0f, 5.0f, 0.0f),
-        point_t(0.0f, 6.0f, 0.0f),
-        point_t(0.0f, 8.0f, 0.0f),
-        point_t(0.0f, 9.0f, 0.0f),
-        point_t(0.0f, 2.0f, 0.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 3.0f, 0.0f),
+        point_t<>(0.0f, 4.0f, 0.0f),
+        point_t<>(0.0f, 5.0f, 0.0f),
+        point_t<>(0.0f, 6.0f, 0.0f),
+        point_t<>(0.0f, 8.0f, 0.0f),
+        point_t<>(0.0f, 9.0f, 0.0f),
+        point_t<>(0.0f, 2.0f, 0.0f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 2);
-    BOOST_CHECK(uut.vertices()[0] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.vertices()[1] == point_t(0.0f, 9.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>(0.0f, 9.0f, 0.0f));
 
     BOOST_REQUIRE(uut.faces().size() == 1);
 
@@ -109,27 +109,27 @@ BOOST_AUTO_TEST_CASE( line_y_ctor_test )
 BOOST_AUTO_TEST_CASE( line_z_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f),
-        point_t(0.0f, 0.0f, 1.0f),
-        point_t(0.0f, 0.0f, 3.0f),
-        point_t(0.0f, 0.0f, 4.0f),
-        point_t(0.0f, 0.0f, 5.0f),
-        point_t(0.0f, 0.0f, 6.0f),
-        point_t(0.0f, 0.0f, 8.0f),
-        point_t(0.0f, 0.0f, 9.0f),
-        point_t(0.0f, 0.0f, 2.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f),
+        point_t<>(0.0f, 0.0f, 1.0f),
+        point_t<>(0.0f, 0.0f, 3.0f),
+        point_t<>(0.0f, 0.0f, 4.0f),
+        point_t<>(0.0f, 0.0f, 5.0f),
+        point_t<>(0.0f, 0.0f, 6.0f),
+        point_t<>(0.0f, 0.0f, 8.0f),
+        point_t<>(0.0f, 0.0f, 9.0f),
+        point_t<>(0.0f, 0.0f, 2.0f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 2);
-    BOOST_CHECK(uut.vertices()[0] == point_t(0.0f, 0.0f, 9.0f));
-    BOOST_CHECK(uut.vertices()[1] == point_t(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>(0.0f, 0.0f, 9.0f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>(0.0f, 0.0f, 0.0f));
 
     BOOST_REQUIRE(uut.faces().size() == 1);
 
@@ -141,20 +141,20 @@ BOOST_AUTO_TEST_CASE( line_z_ctor_test )
 BOOST_AUTO_TEST_CASE( triangle_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 3);
-    BOOST_CHECK(uut.vertices()[0] == point_t(0.0f, 1.0f, 0.0f));
-    BOOST_CHECK(uut.vertices()[1] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.vertices()[2] == point_t(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[2] == point_t<>(1.0f, 0.0f, 0.0f));
 
     BOOST_REQUIRE(uut.faces().size() == 2);
 
@@ -172,28 +172,28 @@ BOOST_AUTO_TEST_CASE( triangle_ctor_test )
 BOOST_AUTO_TEST_CASE( co_linear_edge_triangle_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(0.2f, 0.0f, 0.0f),
-        point_t(0.4f, 0.0f, 0.0f),
-        point_t(0.6f, 0.0f, 0.0f),
-        point_t(0.8f, 0.0f, 0.0f),
-        point_t(0.0f, 0.2f, 0.0f),
-        point_t(0.0f, 0.4f, 0.0f),
-        point_t(0.0f, 0.6f, 0.0f),
-        point_t(0.0f, 0.8f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(0.2f, 0.0f, 0.0f),
+        point_t<>(0.4f, 0.0f, 0.0f),
+        point_t<>(0.6f, 0.0f, 0.0f),
+        point_t<>(0.8f, 0.0f, 0.0f),
+        point_t<>(0.0f, 0.2f, 0.0f),
+        point_t<>(0.0f, 0.4f, 0.0f),
+        point_t<>(0.0f, 0.6f, 0.0f),
+        point_t<>(0.0f, 0.8f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 3);
-    BOOST_CHECK(uut.vertices()[0] == point_t(0.0f, 1.0f, 0.0f));
-    BOOST_CHECK(uut.vertices()[1] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.vertices()[2] == point_t(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[2] == point_t<>(1.0f, 0.0f, 0.0f));
 
     BOOST_REQUIRE(uut.faces().size() == 2);
 
@@ -211,30 +211,30 @@ BOOST_AUTO_TEST_CASE( co_linear_edge_triangle_ctor_test )
 BOOST_AUTO_TEST_CASE( octagon_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 2.0f, 0.0f),
-        point_t(1.0f, 3.0f, 0.0f),
-        point_t(2.0f, 3.0f, 0.0f),
-        point_t(3.0f, 2.0f, 0.0f),
-        point_t(3.0f, 1.0f, 0.0f),
-        point_t(2.0f, 0.0f, 0.0f)
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 2.0f, 0.0f),
+        point_t<>(1.0f, 3.0f, 0.0f),
+        point_t<>(2.0f, 3.0f, 0.0f),
+        point_t<>(3.0f, 2.0f, 0.0f),
+        point_t<>(3.0f, 1.0f, 0.0f),
+        point_t<>(2.0f, 0.0f, 0.0f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 8);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[0] - point_t(2.0f, 3.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[1] - point_t(3.0f, 2.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[2] - point_t(1.0f, 3.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[3] - point_t(3.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[4] - point_t(0.0f, 2.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[5] - point_t(2.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[6] - point_t(0.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[7] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[0] - point_t<>(2.0f, 3.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[1] - point_t<>(3.0f, 2.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[2] - point_t<>(1.0f, 3.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[3] - point_t<>(3.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[4] - point_t<>(0.0f, 2.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[5] - point_t<>(2.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[6] - point_t<>(0.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[7] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
 
     BOOST_REQUIRE(uut.faces().size() == 2);
 
@@ -262,22 +262,22 @@ BOOST_AUTO_TEST_CASE( octagon_ctor_test )
 BOOST_AUTO_TEST_CASE( tetrahedron_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 4);
-    BOOST_CHECK(uut.vertices()[0] == point_t(0.0f, 1.0f, 0.0f));
-    BOOST_CHECK(uut.vertices()[1] == point_t(1.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.vertices()[2] == point_t(0.0f, 0.0f, 0.0f));
-    BOOST_CHECK(uut.vertices()[3] == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[2] == point_t<>(0.0f, 0.0f, 0.0f));
+    BOOST_CHECK(uut.vertices()[3] == point_t<>(0.0f, 0.0f, 1.0f));
 
     BOOST_REQUIRE(uut.faces().size() == 4);
 
@@ -305,24 +305,24 @@ BOOST_AUTO_TEST_CASE( tetrahedron_ctor_test )
 BOOST_AUTO_TEST_CASE( pyramid_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.0f),
-        point_t(-0.5f,  0.5f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.0f),
-        point_t( 0.0f,  0.0f,  1.0f)
+        point_t<>(-0.5f, -0.5f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.0f),
+        point_t<>(-0.5f,  0.5f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.0f),
+        point_t<>( 0.0f,  0.0f,  1.0f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 5);
-    BOOST_CHECK(uut.vertices()[0] == point_t( 0.5f,  0.5f, 0.0f));
-    BOOST_CHECK(uut.vertices()[1] == point_t( 0.5f, -0.5f, 0.0f));
-    BOOST_CHECK(uut.vertices()[2] == point_t(-0.5f,  0.5f, 0.0f));
-    BOOST_CHECK(uut.vertices()[3] == point_t( 0.0f,  0.0f, 1.0f));
-    BOOST_CHECK(uut.vertices()[4] == point_t(-0.5f, -0.5f, 0.0f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>( 0.5f,  0.5f, 0.0f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>( 0.5f, -0.5f, 0.0f));
+    BOOST_CHECK(uut.vertices()[2] == point_t<>(-0.5f,  0.5f, 0.0f));
+    BOOST_CHECK(uut.vertices()[3] == point_t<>( 0.0f,  0.0f, 1.0f));
+    BOOST_CHECK(uut.vertices()[4] == point_t<>(-0.5f, -0.5f, 0.0f));
 
     BOOST_REQUIRE(uut.faces().size() == 5);
 
@@ -356,26 +356,26 @@ BOOST_AUTO_TEST_CASE( pyramid_ctor_test )
 BOOST_AUTO_TEST_CASE( triangular_prism_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.0f),
-        point_t(-0.5f,  0.5f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.0f),
-        point_t(-0.5f,  0.0f,  1.0f),
-        point_t( 0.5f,  0.0f,  1.0f)
+        point_t<>(-0.5f, -0.5f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.0f),
+        point_t<>(-0.5f,  0.5f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.0f),
+        point_t<>(-0.5f,  0.0f,  1.0f),
+        point_t<>( 0.5f,  0.0f,  1.0f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 6);
-    BOOST_CHECK(uut.vertices()[0] == point_t( 0.5f,  0.5f, 0.0f));
-    BOOST_CHECK(uut.vertices()[1] == point_t( 0.5f, -0.5f, 0.0f));
-    BOOST_CHECK(uut.vertices()[2] == point_t(-0.5f,  0.5f, 0.0f));
-    BOOST_CHECK(uut.vertices()[3] == point_t( 0.5f,  0.0f, 1.0f));
-    BOOST_CHECK(uut.vertices()[4] == point_t(-0.5f, -0.5f, 0.0f));
-    BOOST_CHECK(uut.vertices()[5] == point_t(-0.5f,  0.0f, 1.0f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>( 0.5f,  0.5f, 0.0f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>( 0.5f, -0.5f, 0.0f));
+    BOOST_CHECK(uut.vertices()[2] == point_t<>(-0.5f,  0.5f, 0.0f));
+    BOOST_CHECK(uut.vertices()[3] == point_t<>( 0.5f,  0.0f, 1.0f));
+    BOOST_CHECK(uut.vertices()[4] == point_t<>(-0.5f, -0.5f, 0.0f));
+    BOOST_CHECK(uut.vertices()[5] == point_t<>(-0.5f,  0.0f, 1.0f));
 
     BOOST_REQUIRE(uut.faces().size() == 5);
 
@@ -411,32 +411,32 @@ BOOST_AUTO_TEST_CASE( triangular_prism_ctor_test )
 BOOST_AUTO_TEST_CASE( octagon_pyramid_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 2.0f, 0.0f),
-        point_t(1.0f, 3.0f, 0.0f),
-        point_t(2.0f, 3.0f, 0.0f),
-        point_t(3.0f, 2.0f, 0.0f),
-        point_t(3.0f, 1.0f, 0.0f),
-        point_t(1.5f, 2.5f, 0.5f),
-        point_t(2.0f, 0.0f, 0.0f)
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 2.0f, 0.0f),
+        point_t<>(1.0f, 3.0f, 0.0f),
+        point_t<>(2.0f, 3.0f, 0.0f),
+        point_t<>(3.0f, 2.0f, 0.0f),
+        point_t<>(3.0f, 1.0f, 0.0f),
+        point_t<>(1.5f, 2.5f, 0.5f),
+        point_t<>(2.0f, 0.0f, 0.0f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 9);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[0] - point_t(2.0f, 3.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[1] - point_t(3.0f, 2.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[2] - point_t(1.0f, 3.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[3] - point_t(1.5f, 2.5f, 0.5f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[4] - point_t(3.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[5] - point_t(0.0f, 2.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[6] - point_t(0.0f, 1.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[7] - point_t(1.0f, 0.0f, 0.0f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[8] - point_t(2.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[0] - point_t<>(2.0f, 3.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[1] - point_t<>(3.0f, 2.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[2] - point_t<>(1.0f, 3.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[3] - point_t<>(1.5f, 2.5f, 0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[4] - point_t<>(3.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[5] - point_t<>(0.0f, 2.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[6] - point_t<>(0.0f, 1.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[7] - point_t<>(1.0f, 0.0f, 0.0f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[8] - point_t<>(2.0f, 0.0f, 0.0f))) < result_tolerance);
 
     BOOST_REQUIRE(uut.faces().size() == 9);
 
@@ -493,30 +493,30 @@ BOOST_AUTO_TEST_CASE( octagon_pyramid_ctor_test )
 
 BOOST_AUTO_TEST_CASE( cube_ctor_test )
 {
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 8);
-    BOOST_CHECK(uut.vertices()[0] == point_t( 0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[1] == point_t( 0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[2] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[3] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[4] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[5] == point_t(-0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[6] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[7] == point_t(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>( 0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[2] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[3] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[4] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[5] == point_t<>(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[6] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[7] == point_t<>(-0.5f, -0.5f, -0.5f));
 
     BOOST_REQUIRE(uut.faces().size() == 6);
 
@@ -559,38 +559,38 @@ BOOST_AUTO_TEST_CASE( cube_ctor_test )
 
 BOOST_AUTO_TEST_CASE( cube_points_twice_ctor_test )
 {
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f),
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f),
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 8);
-    BOOST_CHECK(uut.vertices()[0] == point_t( 0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[1] == point_t( 0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[2] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[3] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[4] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[5] == point_t(-0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[6] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[7] == point_t(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>( 0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[2] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[3] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[4] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[5] == point_t<>(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[6] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[7] == point_t<>(-0.5f, -0.5f, -0.5f));
 
     BOOST_REQUIRE(uut.faces().size() == 6);
 
@@ -633,36 +633,36 @@ BOOST_AUTO_TEST_CASE( cube_points_twice_ctor_test )
 
 BOOST_AUTO_TEST_CASE( co_planar_face_cube_ctor_test )
 {
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t( 0.5f,  0.0f,  0.0f),
-        point_t( 0.0f,  0.5f,  0.0f),
-        point_t( 0.0f,  0.0f,  0.5f),
-        point_t(-0.5f,  0.0f,  0.0f),
-        point_t( 0.0f, -0.5f,  0.0f),
-        point_t( 0.0f,  0.0f, -0.5f),
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>( 0.5f,  0.0f,  0.0f),
+        point_t<>( 0.0f,  0.5f,  0.0f),
+        point_t<>( 0.0f,  0.0f,  0.5f),
+        point_t<>(-0.5f,  0.0f,  0.0f),
+        point_t<>( 0.0f, -0.5f,  0.0f),
+        point_t<>( 0.0f,  0.0f, -0.5f),
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 8);
-    BOOST_CHECK(uut.vertices()[0] == point_t( 0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[1] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[2] == point_t( 0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[3] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[4] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[5] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[6] == point_t(-0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[7] == point_t(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>( 0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[2] == point_t<>( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[3] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[4] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[5] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[6] == point_t<>(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[7] == point_t<>(-0.5f, -0.5f, -0.5f));
 
     BOOST_REQUIRE(uut.faces().size() == 6);
 
@@ -706,33 +706,33 @@ BOOST_AUTO_TEST_CASE( co_planar_face_cube_ctor_test )
 BOOST_AUTO_TEST_CASE( cube_points_inside_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.0f,  0.0f,  0.0f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.0f,  0.0f,  0.0f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.0f,  0.0f,  0.0f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.0f,  0.0f,  0.0f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.0f,  0.0f,  0.0f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.0f,  0.0f,  0.0f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 8);
-    BOOST_CHECK(uut.vertices()[0] == point_t( 0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[1] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[2] == point_t( 0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[3] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[4] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[5] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[6] == point_t(-0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[7] == point_t(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[0] == point_t<>( 0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[1] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[2] == point_t<>( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[3] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[4] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[5] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[6] == point_t<>(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[7] == point_t<>(-0.5f, -0.5f, -0.5f));
 
     BOOST_REQUIRE(uut.faces().size() == 6);
 
@@ -775,45 +775,45 @@ BOOST_AUTO_TEST_CASE( cube_points_inside_ctor_test )
 
 BOOST_AUTO_TEST_CASE( cube_pair_ctor_test )
 {
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f),
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f),
 
-        point_t( 2.5f,  2.5f,  3.5f),
-        point_t( 3.5f,  2.5f,  3.5f),
-        point_t( 2.5f,  3.5f,  3.5f),
-        point_t( 3.5f,  3.5f,  3.5f),
-        point_t( 2.5f,  2.5f,  2.5f),
-        point_t( 3.5f,  2.5f,  2.5f),
-        point_t( 2.5f,  3.5f,  2.5f),
-        point_t( 3.5f,  3.5f,  2.5f)
+        point_t<>( 2.5f,  2.5f,  3.5f),
+        point_t<>( 3.5f,  2.5f,  3.5f),
+        point_t<>( 2.5f,  3.5f,  3.5f),
+        point_t<>( 3.5f,  3.5f,  3.5f),
+        point_t<>( 2.5f,  2.5f,  2.5f),
+        point_t<>( 3.5f,  2.5f,  2.5f),
+        point_t<>( 2.5f,  3.5f,  2.5f),
+        point_t<>( 3.5f,  3.5f,  2.5f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE_MESSAGE(uut.vertices().size() == 14, uut.vertices().size());
-    BOOST_CHECK(uut.vertices()[ 0] == point_t( 3.5f,  3.5f,  3.5f));
-    BOOST_CHECK(uut.vertices()[ 1] == point_t( 3.5f,  3.5f,  2.5f));
-    BOOST_CHECK(uut.vertices()[ 2] == point_t( 2.5f,  3.5f,  3.5f));
-    BOOST_CHECK(uut.vertices()[ 3] == point_t( 3.5f,  2.5f,  3.5f));
-    BOOST_CHECK(uut.vertices()[ 4] == point_t( 3.5f,  2.5f,  2.5f));
-    BOOST_CHECK(uut.vertices()[ 5] == point_t( 0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[ 6] == point_t( 2.5f,  3.5f,  2.5f));
-    BOOST_CHECK(uut.vertices()[ 7] == point_t(-0.5f,  0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[ 8] == point_t( 2.5f,  2.5f,  3.5f));
-    BOOST_CHECK(uut.vertices()[ 9] == point_t( 0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[10] == point_t( 0.5f, -0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[11] == point_t(-0.5f,  0.5f, -0.5f));
-    BOOST_CHECK(uut.vertices()[12] == point_t(-0.5f, -0.5f,  0.5f));
-    BOOST_CHECK(uut.vertices()[13] == point_t(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[ 0] == point_t<>( 3.5f,  3.5f,  3.5f));
+    BOOST_CHECK(uut.vertices()[ 1] == point_t<>( 3.5f,  3.5f,  2.5f));
+    BOOST_CHECK(uut.vertices()[ 2] == point_t<>( 2.5f,  3.5f,  3.5f));
+    BOOST_CHECK(uut.vertices()[ 3] == point_t<>( 3.5f,  2.5f,  3.5f));
+    BOOST_CHECK(uut.vertices()[ 4] == point_t<>( 3.5f,  2.5f,  2.5f));
+    BOOST_CHECK(uut.vertices()[ 5] == point_t<>( 0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[ 6] == point_t<>( 2.5f,  3.5f,  2.5f));
+    BOOST_CHECK(uut.vertices()[ 7] == point_t<>(-0.5f,  0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[ 8] == point_t<>( 2.5f,  2.5f,  3.5f));
+    BOOST_CHECK(uut.vertices()[ 9] == point_t<>( 0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[10] == point_t<>( 0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[11] == point_t<>(-0.5f,  0.5f, -0.5f));
+    BOOST_CHECK(uut.vertices()[12] == point_t<>(-0.5f, -0.5f,  0.5f));
+    BOOST_CHECK(uut.vertices()[13] == point_t<>(-0.5f, -0.5f, -0.5f));
 
     BOOST_REQUIRE_MESSAGE(uut.faces().size() == 12, uut.faces().size());
 
@@ -893,34 +893,34 @@ BOOST_AUTO_TEST_CASE( cube_pair_ctor_test )
 BOOST_AUTO_TEST_CASE( tetrahedron_triple_ctor_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 5.5f,  0.5f, -0.5f),
-        point_t( 4.5f,  0.5f, -0.5f),
-        point_t( 5.5f,  0.5f,  0.5f),
-        point_t( 1.5f, -0.5f,  0.5f),
-        point_t( 1.5f, -0.5f, -0.5f),
-        point_t( 1.5f,  0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t( 5.5f, -0.5f, -0.5f)
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 5.5f,  0.5f, -0.5f),
+        point_t<>( 4.5f,  0.5f, -0.5f),
+        point_t<>( 5.5f,  0.5f,  0.5f),
+        point_t<>( 1.5f, -0.5f,  0.5f),
+        point_t<>( 1.5f, -0.5f, -0.5f),
+        point_t<>( 1.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>( 5.5f, -0.5f, -0.5f)
     });
 
     const dac_convex_hull uut(points);
 
     /* Checks */
     BOOST_REQUIRE(uut.vertices().size() == 8);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[0] - point_t( 5.5f,  0.5f,  0.5f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[1] - point_t( 1.5f, -0.5f,  0.5f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[2] - point_t( 5.5f, -0.5f, -0.5f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[3] - point_t( 5.5f,  0.5f, -0.5f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[4] - point_t( 0.5f,  0.5f,  0.5f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[5] - point_t(-0.5f, -0.5f,  0.5f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[6] - point_t( 0.5f, -0.5f, -0.5f))) < result_tolerance);
-    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[7] - point_t(-0.5f,  0.5f, -0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[0] - point_t<>( 5.5f,  0.5f,  0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[1] - point_t<>( 1.5f, -0.5f,  0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[2] - point_t<>( 5.5f, -0.5f, -0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[3] - point_t<>( 5.5f,  0.5f, -0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[4] - point_t<>( 0.5f,  0.5f,  0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[5] - point_t<>(-0.5f, -0.5f,  0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[6] - point_t<>( 0.5f, -0.5f, -0.5f))) < result_tolerance);
+    BOOST_CHECK(std::fabs(magnitude(uut.vertices()[7] - point_t<>(-0.5f,  0.5f, -0.5f))) < result_tolerance);
 
     BOOST_REQUIRE(uut.faces().size() == 8);
 
@@ -973,12 +973,12 @@ BOOST_AUTO_TEST_CASE( tetrahedron_triple_ctor_test )
 BOOST_AUTO_TEST_CASE( tetrahedron_volume_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(0.0f, 0.0f, 0.0f),
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 0.0f, 1.0f)
+        point_t<>(0.0f, 0.0f, 0.0f),
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 0.0f, 1.0f)
     });
 
     const dac_convex_hull uut(points);
@@ -989,16 +989,16 @@ BOOST_AUTO_TEST_CASE( tetrahedron_volume_test )
 
 BOOST_AUTO_TEST_CASE( cube_volume_test )
 {
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(-0.5f, -0.5f,  0.5f),
-        point_t( 0.5f, -0.5f,  0.5f),
-        point_t(-0.5f,  0.5f,  0.5f),
-        point_t( 0.5f,  0.5f,  0.5f),
-        point_t(-0.5f, -0.5f, -0.5f),
-        point_t( 0.5f, -0.5f, -0.5f),
-        point_t(-0.5f,  0.5f, -0.5f),
-        point_t( 0.5f,  0.5f, -0.5f)
+        point_t<>(-0.5f, -0.5f,  0.5f),
+        point_t<>( 0.5f, -0.5f,  0.5f),
+        point_t<>(-0.5f,  0.5f,  0.5f),
+        point_t<>( 0.5f,  0.5f,  0.5f),
+        point_t<>(-0.5f, -0.5f, -0.5f),
+        point_t<>( 0.5f, -0.5f, -0.5f),
+        point_t<>(-0.5f,  0.5f, -0.5f),
+        point_t<>( 0.5f,  0.5f, -0.5f)
     });
 
     const dac_convex_hull uut(points);
@@ -1010,17 +1010,17 @@ BOOST_AUTO_TEST_CASE( cube_volume_test )
 BOOST_AUTO_TEST_CASE( octagon_pyramid_volume_test )
 {
     /* Add points */
-    const std::vector<point_t> points(
+    const std::vector<point_t<>> points(
     {
-        point_t(1.0f, 0.0f, 0.0f),
-        point_t(0.0f, 1.0f, 0.0f),
-        point_t(0.0f, 2.0f, 0.0f),
-        point_t(1.0f, 3.0f, 0.0f),
-        point_t(2.0f, 3.0f, 0.0f),
-        point_t(3.0f, 2.0f, 0.0f),
-        point_t(3.0f, 1.0f, 0.0f),
-        point_t(1.5f, 2.5f, 0.5f),
-        point_t(2.0f, 0.0f, 0.0f)
+        point_t<>(1.0f, 0.0f, 0.0f),
+        point_t<>(0.0f, 1.0f, 0.0f),
+        point_t<>(0.0f, 2.0f, 0.0f),
+        point_t<>(1.0f, 3.0f, 0.0f),
+        point_t<>(2.0f, 3.0f, 0.0f),
+        point_t<>(3.0f, 2.0f, 0.0f),
+        point_t<>(3.0f, 1.0f, 0.0f),
+        point_t<>(1.5f, 2.5f, 0.5f),
+        point_t<>(2.0f, 0.0f, 0.0f)
     });
 
     const dac_convex_hull uut(points);
@@ -1036,7 +1036,7 @@ BOOST_AUTO_TEST_CASE( performance_ctor_test )
     const int number_points = 100000;
 
     /* Memory to hold points */
-    std::vector<point_t> points;
+    std::vector<point_t<>> points;
     points.reserve(number_points);
 
     /* Generate points */

@@ -158,7 +158,7 @@ class tmm_triangle
 class tm_mesh : private boost::noncopyable
 {
     public :
-        tm_mesh(const point_t &offset, const point_t &scale_inv) : _offset(offset), _scale_inv(scale_inv) {  }
+        tm_mesh(const point_t<> &offset, const point_t<> &scale_inv) : _offset(offset), _scale_inv(scale_inv) {  }
 
         int                             number_of_vertices()    const { return _vertices.size();    }
         int                             number_of_edges()       const { return _edges.size();       }
@@ -171,7 +171,7 @@ class tm_mesh : private boost::noncopyable
         std::list<tmm_edge, allocator<tmm_edge>> &                  get_edges()     { return _edges;        }
         std::list<tmm_triangle, allocator<tmm_triangle>> &          get_triangles() { return _triangles;    }
 
-        tmm_vertex_iter add_vertex(const point_t &pt, const int id)
+        tmm_vertex_iter add_vertex(const point_t<> &pt, const int id)
         {
             _vertices.push_back(tmm_vertex(_edges.end(), point_ti<std::int64_t>((pt - _offset) * _scale_inv), id));
             return --_vertices.end();
@@ -208,7 +208,7 @@ class tm_mesh : private boost::noncopyable
             _triangles.clear();
         }
 
-        void points_and_triangles(std::vector<point_t> *const points, std::vector<point_ti<>> *const triangles)
+        void points_and_triangles(std::vector<point_t<>> *const points, std::vector<point_ti<>> *const triangles)
         {
             /* Reserve space */
             points->reserve(_vertices.size());
@@ -218,7 +218,7 @@ class tm_mesh : private boost::noncopyable
             int idx = 0;
             for (auto &v : _vertices)
             {
-                points->push_back((point_t(v.position()) / _scale_inv) + _offset);
+                points->push_back((point_t<>(v.position()) / _scale_inv) + _offset);
                 v.id(idx++);
             }
 
@@ -449,7 +449,7 @@ class tm_mesh : private boost::noncopyable
         std::list<tmm_vertex, allocator<tmm_vertex>>        _vertices;
         std::list<tmm_edge, allocator<tmm_edge>>            _edges;
         std::list<tmm_triangle, allocator<tmm_triangle>>    _triangles;
-        const point_t                                       _offset;
-        const point_t                                       _scale_inv;
+        const point_t<>                                       _offset;
+        const point_t<>                                       _scale_inv;
 };
 }; /* namespace raptor_convex_decomposition */

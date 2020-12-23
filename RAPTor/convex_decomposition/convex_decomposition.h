@@ -17,7 +17,7 @@ namespace raptor_convex_decomposition
 class convex_decomposition
 {
     public :
-        convex_decomposition(const std::vector<point_t> &points, const std::vector<point_ti<>> &triangles, const convex_decomposition_options &params) :
+        convex_decomposition(const std::vector<point_t<>> &points, const std::vector<point_ti<>> &triangles, const convex_decomposition_options &params) :
             _params(params),
             _rot{{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }},
             _volume_hull(0.0f),
@@ -48,9 +48,9 @@ class convex_decomposition
         void compute_acd();
         void merge_convex_hulls();
         void simplify_convex_hulls();
-        int compute_best_clipping_plane(const std::unique_ptr<primitive_set> &pset, const float volume, const std::vector<plane> &planes, const point_t &cut_dir, const float alpha, const float beta, const int dn_samp, plane *const best_plane);
+        int compute_best_clipping_plane(const std::unique_ptr<primitive_set> &pset, const float volume, const std::vector<plane> &planes, const point_t<> &cut_dir, const float alpha, const float beta, const int dn_samp, plane *const best_plane);
 
-        void align_mesh(const std::vector<point_t> &points, const std::vector<point_ti<>> &triangles)
+        void align_mesh(const std::vector<point_t<>> &points, const std::vector<point_ti<>> &triangles)
         {
             if (!_params.pca)
             {
@@ -62,7 +62,7 @@ class convex_decomposition
             v.compute_principal_axes(_rot);
         }
 
-        void voxelise_mesh(const std::vector<point_t> &points, const std::vector<point_ti<>> &triangles)
+        void voxelise_mesh(const std::vector<point_t<>> &points, const std::vector<point_ti<>> &triangles)
         {
             int iter = 0;
             const int max_iter = 5;
@@ -88,7 +88,7 @@ class convex_decomposition
         std::vector<std::unique_ptr<convex_mesh>>   _convex_hulls;
         std::unique_ptr<volume>                     _volume;
         std::unique_ptr<primitive_set>              _pset;
-        point_t                                     _barycenter;
+        point_t<>                                     _barycenter;
         float                                       _rot[3][3];
         float                                       _volume_hull;
         int                                         _dim;

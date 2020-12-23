@@ -22,7 +22,7 @@ namespace test
 struct primitive_set_fixture : private boost::noncopyable
 {
     primitive_set_fixture() :
-        cube(    { voxel(point_ti<>(3, 4, 2)) }, point_t( 3.5f, -2.7f, 1.6f), 1.0f),
+        cube(    { voxel(point_ti<>(3, 4, 2)) }, point_t<>( 3.5f, -2.7f, 1.6f), 1.0f),
         diagonal(
         {
             voxel(point_ti<>(3, 4,   2)),
@@ -31,7 +31,7 @@ struct primitive_set_fixture : private boost::noncopyable
             voxel(point_ti<>(6, 10, 16)),
             voxel(point_ti<>(7, 12, 32)),
             voxel(point_ti<>(8, 14, 64))
-        }, point_t(-7.8f,  3.9f, 4.6f), 2.0f),
+        }, point_t<>(-7.8f,  3.9f, 4.6f), 2.0f),
         row(
         {
             voxel(point_ti<>(0, 0, 0)),
@@ -42,7 +42,7 @@ struct primitive_set_fixture : private boost::noncopyable
             voxel(point_ti<>(5, 0, 0)),
             voxel(point_ti<>(6, 0, 0)),
             voxel(point_ti<>(7, 0, 0))
-        }, point_t(1.0f, 2.0f, 3.0f), 1.0f),
+        }, point_t<>(1.0f, 2.0f, 3.0f), 1.0f),
         stack(
         {
             voxel(point_ti<>(0, 0, 0)),
@@ -53,14 +53,14 @@ struct primitive_set_fixture : private boost::noncopyable
             voxel(point_ti<>(0, 5, 0)),
             voxel(point_ti<>(0, 6, 0)),
             voxel(point_ti<>(0, 7, 0))
-        }, point_t(1.0f, 2.0f, 3.0f), 1.0f)
+        }, point_t<>(1.0f, 2.0f, 3.0f), 1.0f)
     {  }
 
     voxel_set   cube;
     voxel_set   diagonal;
     voxel_set   row;
     voxel_set   stack;
-    point_t     dir;
+    point_t<>     dir;
 };
 
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( cube_compute_preferred_cutting_direction_test )
     BOOST_CHECK(cube.eigen_value(axis_t::z_axis) == 0.0f);
 
     BOOST_CHECK(cube.compute_preferred_cutting_direction(&dir) == 0.0f);
-    BOOST_CHECK(dir == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(dir == point_t<>(0.0f, 0.0f, 1.0f));
 }
 
 BOOST_AUTO_TEST_CASE( row_compute_preferred_cutting_direction_test )
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE( row_compute_preferred_cutting_direction_test )
     BOOST_CHECK(row.eigen_value(axis_t::z_axis) == 0.0f);
 
     BOOST_CHECK(row.compute_preferred_cutting_direction(&dir) == 0.0f);
-    BOOST_CHECK(dir == point_t(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(dir == point_t<>(1.0f, 0.0f, 0.0f));
 }
 
 BOOST_AUTO_TEST_CASE( stack_compute_preferred_cutting_direction_test )
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE( stack_compute_preferred_cutting_direction_test )
     BOOST_CHECK(stack.eigen_value(axis_t::z_axis) == 0.0f);
 
     BOOST_CHECK(stack.compute_preferred_cutting_direction(&dir) == 0.0f);
-    BOOST_CHECK(dir == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(dir == point_t<>(0.0f, 1.0f, 0.0f));
 }
 
 BOOST_AUTO_TEST_CASE( diagonal_compute_preferred_cutting_direction_test )
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE( diagonal_compute_preferred_cutting_direction_test )
     BOOST_CHECK(fabs(diagonal.eigen_value(axis_t::z_axis) - 481.031f)       < result_tolerance);
 
     BOOST_CHECK_CLOSE(diagonal.compute_preferred_cutting_direction(&dir), 0.149518f, result_tolerance);
-    BOOST_CHECK(dir == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(dir == point_t<>(0.0f, 0.0f, 1.0f));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

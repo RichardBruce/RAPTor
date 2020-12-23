@@ -6,7 +6,7 @@
 #include "boost/noncopyable.hpp"
 
 /* Convex decomposition headers */
-#include "parser.h"
+#include "hull_parser.h"
 
 
 namespace raptor_convex_decomposition
@@ -18,7 +18,7 @@ const float result_tolerance = 0.0005f;
 #define LOAD_TEST_DATA(FILE)   const std::string test_name(boost::unit_test::framework::current_test_case().p_name); \
     BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << test_name; \
     const std::string data_dir(getenv("RAPTOR_DATA")); \
-    BOOST_REQUIRE(load_off(data_dir + "/" + (FILE), &points, &triangles));
+    BOOST_REQUIRE(raptor_parsers::load_off(data_dir + "/" + (FILE), &points, &triangles));
 
 
 struct regression_fixture : private boost::noncopyable
@@ -66,9 +66,9 @@ struct regression_fixture : private boost::noncopyable
         save_off(*uut, "test_data/" + file + "_act.off", nr_pts, nr_tri);
 
         /* Load expected data */
-        std::vector<point_t>    points_exp;
+        std::vector<point_t<>>    points_exp;
         std::vector<point_ti<>> triangles_exp;
-        BOOST_REQUIRE(load_off("test_data/" + file + "_exp.off", &points_exp, &triangles_exp));
+        BOOST_REQUIRE(raptor_parsers::load_off("test_data/" + file + "_exp.off", &points_exp, &triangles_exp));
 
         /* Check points */
         BOOST_REQUIRE(nr_pts == static_cast<int>(points_exp.size()));
@@ -103,7 +103,7 @@ struct regression_fixture : private boost::noncopyable
 
     convex_decomposition_options            options;
     std::unique_ptr<convex_decomposition>   uut;
-    std::vector<point_t>                    points;
+    std::vector<point_t<>>                  points;
     std::vector<point_ti<>>                 triangles;
 };
 }; /* namespace test */

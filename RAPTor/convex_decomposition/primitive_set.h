@@ -35,7 +35,7 @@ class primitive_set : private boost::noncopyable
         convex_mesh &       convex_hull()                           { return _convex_hull; };
         float               eigen_value(const axis_t axis)  const   { return _d[static_cast<int>(axis)][static_cast<int>(axis)];  }
         
-        float compute_preferred_cutting_direction(point_t *const dir)
+        float compute_preferred_cutting_direction(point_t<> *const dir)
         {
             const float ex = eigen_value(axis_t::x_axis);
             const float ey = eigen_value(axis_t::y_axis);
@@ -46,26 +46,26 @@ class primitive_set : private boost::noncopyable
             if ((vx < vy) && (vx < vz))
             {
                 const float e = (ey * ey) + (ez * ez);
-                (*dir) = point_t(1.0f, 0.0f, 0.0f);
+                (*dir) = point_t<>(1.0f, 0.0f, 0.0f);
                 return (e == 0.0f) ? 0.0f : (1.0f - vx / e);
             }
             else if ((vy < vx) && (vy < vz))
             {
                 const float e = (ex * ex) + (ez * ez);
-                (*dir) = point_t(0.0f, 1.0f, 0.0f);
+                (*dir) = point_t<>(0.0f, 1.0f, 0.0f);
                 return (e == 0.0f) ? 0.0f : (1.0f - vy / e);
             }
             else
             {
                 const float e = (ex * ex) + (ey * ey);
-                (*dir) = point_t(0.0f, 0.0f, 1.0f);
+                (*dir) = point_t<>(0.0f, 0.0f, 1.0f);
                 return (e == 0.0f) ? 0.0f : (1.0f - vz / e);
             }
         }
         
         virtual primitive_set * select_on_surface()                                                                                                                 const = 0;
         virtual void            cut(const plane &p, primitive_set **const pos_part, primitive_set **const neg_part)                                                 const = 0;
-        virtual void            intersect(const plane &p, std::vector<point_t> *const pos_pts, std::vector<point_t> *const neg_pts, const int sampling)             const = 0;
+        virtual void            intersect(const plane &p, std::vector<point_t<>> *const pos_pts, std::vector<point_t<>> *const neg_pts, const int sampling)             const = 0;
         virtual void            compute_cut_volumes(const plane &p, float *const pos_volume, float *const neg_volume)                                               const = 0;
         virtual void            compute_convex_hull(convex_mesh *const mesh, const int sampling = 1, const int cluster_size = 65536)                                const = 0;
         virtual void            compute_bounding_box()                                                                                                              = 0;

@@ -19,15 +19,15 @@ class convex_mesh
         convex_mesh() = default;
 
         /* CTOR */
-        convex_mesh(const std::vector<point_t> &points, const std::vector<point_ti<>> &triangles) : _points(points), _triangles(triangles) {  }
+        convex_mesh(const std::vector<point_t<>> &points, const std::vector<point_ti<>> &triangles) : _points(points), _triangles(triangles) {  }
 
         /* Access functions */
         int number_of_points()      const { return _points.size();      }
         int number_of_triangles()   const { return _triangles.size();   }
-        const point_t &                 get_point(const int i)  const { return _points[i];  }
-              point_t &                 get_point(const int i)        { return _points[i];  }
-        const std::vector<point_t> &    points()                const { return _points;     }
-              std::vector<point_t> &    points()                      { return _points;     }
+        const point_t<> &                 get_point(const int i)  const { return _points[i];  }
+              point_t<> &                 get_point(const int i)        { return _points[i];  }
+        const std::vector<point_t<>> &    points()                const { return _points;     }
+              std::vector<point_t<>> &    points()                      { return _points;     }
         const std::vector<point_ti<>> & triangles()             const { return _triangles;  }
               std::vector<point_ti<>> & triangles()                   { return _triangles;  }
 
@@ -40,7 +40,7 @@ class convex_mesh
         }
 
         /* Add a point */
-        convex_mesh& add_point(const point_t &p)
+        convex_mesh& add_point(const point_t<> &p)
         {
             _points.push_back(p);
             return *this;
@@ -61,7 +61,7 @@ class convex_mesh
             }
 
             /* Find center */
-            point_t com(0.0f, 0.0f, 0.0f);
+            point_t<> com(0.0f, 0.0f, 0.0f);
             for (int i = 0; i < static_cast<int>(_points.size()); ++i)
             {
                 com += _points[i];
@@ -78,7 +78,7 @@ class convex_mesh
             return vol * (1.0f / 6.0f);
         }
 
-        void compute_convex_hull(const std::vector<point_t> &pts)
+        void compute_convex_hull(const std::vector<point_t<>> &pts)
         {
             /* Compute convex hull */
             const dac_convex_hull ch(pts);
@@ -102,7 +102,7 @@ class convex_mesh
             }
         }
 
-        void cut(std::vector<point_t> *const pos_cut, std::vector<point_t> *const neg_cut, const point_t &n, const float p) const
+        void cut(std::vector<point_t<>> *const pos_cut, std::vector<point_t<>> *const neg_cut, const point_t<> &n, const float p) const
         {
             if (_points.size() == 0)
             {
@@ -112,7 +112,7 @@ class convex_mesh
             /* Partition points above and below */
             for (int i = 0; i < static_cast<int>(_points.size()); ++i)
             {
-                const point_t &pt = _points[i];
+                const point_t<> &pt = _points[i];
                 const float d = dot_product(n, pt) - p;
                 if (d > 0.0f)
                 {
@@ -130,7 +130,7 @@ class convex_mesh
             }
         }
 
-        bool is_inside(const point_t &pt) const
+        bool is_inside(const point_t<> &pt) const
         {
             if (_triangles.empty())
             {
@@ -158,8 +158,8 @@ class convex_mesh
             }
 
             /* Find bounding box */
-            point_t min_box(_points[0]);
-            point_t max_box(_points[0]);
+            point_t<> min_box(_points[0]);
+            point_t<> max_box(_points[0]);
             for (int i = 1; i < static_cast<int>(_points.size()); ++i)
             {
                 min_box = min(min_box, _points[i]);
@@ -171,7 +171,7 @@ class convex_mesh
         }
 
     private :
-        std::vector<point_t>    _points;
+        std::vector<point_t<>>    _points;
         std::vector<point_ti<>> _triangles;
 };
 } /* namespace raptor_convex_decomposition */

@@ -58,10 +58,10 @@ namespace raptor_convex_decomposition
     rad = (fa * boxhalfsize.x) + (fb * boxhalfsize.y);                  \
     if ((min > rad) || (max < -rad)) return false;
 
-bool plane_box_overlap(const point_t &normal, const point_t &vert, const point_t &maxbox)
+bool plane_box_overlap(const point_t<> &normal, const point_t<> &vert, const point_t<> &maxbox)
 {
-    point_t vmin;
-    point_t vmax;
+    point_t<> vmin;
+    point_t<> vmax;
     if (normal.x > 0.0f)
     {
         vmin.x = -maxbox.x - vert.x;
@@ -108,16 +108,16 @@ bool plane_box_overlap(const point_t &normal, const point_t &vert, const point_t
     return false;
 }
 
-bool triangle_box_overlap(const point_t &boxcenter, const point_t &boxhalfsize, const point_t &triver0, const point_t &triver1, const point_t &triver2)
+bool triangle_box_overlap(const point_t<> &boxcenter, const point_t<> &boxhalfsize, const point_t<> &triver0, const point_t<> &triver1, const point_t<> &triver2)
 {
-    const point_t v0(triver0 - boxcenter);
-    const point_t v1(triver1 - boxcenter);
-    const point_t v2(triver2 - boxcenter);
+    const point_t<> v0(triver0 - boxcenter);
+    const point_t<> v1(triver1 - boxcenter);
+    const point_t<> v2(triver2 - boxcenter);
 
     /* Compute triangle edges */
-    const point_t e0(v1 - v0);
-    const point_t e1(v2 - v1);
-    const point_t e2(v0 - v2);
+    const point_t<> e0(v1 - v0);
+    const point_t<> e1(v2 - v1);
+    const point_t<> e2(v0 - v2);
 
     float min,max,p0,p1,p2,rad;
     float fex = std::fabs(e0.x);
@@ -165,7 +165,7 @@ bool triangle_box_overlap(const point_t &boxcenter, const point_t &boxhalfsize, 
         return false;
     }
 
-    const point_t normal(cross_product(e0, e1));
+    const point_t<> normal(cross_product(e0, e1));
     if (!plane_box_overlap(normal, v0, boxhalfsize))
     {
         return false;
@@ -254,14 +254,14 @@ convex_mesh* volume::convert_to_convex_mesh(const voxel_value_t value) const
                 const voxel_value_t &v = get_voxel(i, j, k);
                 if (v == value)
                 {
-                    const point_t p0(point_t((i - 0.5f), (j - 0.5f), (k - 0.5f)) * _scale);
-                    const point_t p1(point_t((i + 0.5f), (j - 0.5f), (k - 0.5f)) * _scale);
-                    const point_t p2(point_t((i + 0.5f), (j + 0.5f), (k - 0.5f)) * _scale);
-                    const point_t p3(point_t((i - 0.5f), (j + 0.5f), (k - 0.5f)) * _scale);
-                    const point_t p4(point_t((i - 0.5f), (j - 0.5f), (k + 0.5f)) * _scale);
-                    const point_t p5(point_t((i + 0.5f), (j - 0.5f), (k + 0.5f)) * _scale);
-                    const point_t p6(point_t((i + 0.5f), (j + 0.5f), (k + 0.5f)) * _scale);
-                    const point_t p7(point_t((i - 0.5f), (j + 0.5f), (k + 0.5f)) * _scale);
+                    const point_t<> p0(point_t<>((i - 0.5f), (j - 0.5f), (k - 0.5f)) * _scale);
+                    const point_t<> p1(point_t<>((i + 0.5f), (j - 0.5f), (k - 0.5f)) * _scale);
+                    const point_t<> p2(point_t<>((i + 0.5f), (j + 0.5f), (k - 0.5f)) * _scale);
+                    const point_t<> p3(point_t<>((i - 0.5f), (j + 0.5f), (k - 0.5f)) * _scale);
+                    const point_t<> p4(point_t<>((i - 0.5f), (j - 0.5f), (k + 0.5f)) * _scale);
+                    const point_t<> p5(point_t<>((i + 0.5f), (j - 0.5f), (k + 0.5f)) * _scale);
+                    const point_t<> p6(point_t<>((i + 0.5f), (j + 0.5f), (k + 0.5f)) * _scale);
+                    const point_t<> p7(point_t<>((i - 0.5f), (j + 0.5f), (k + 0.5f)) * _scale);
                     const int s = static_cast<int>(mesh->number_of_points());
                     mesh->add_point(p0 + _min_bb);
                     mesh->add_point(p1 + _min_bb);
@@ -329,14 +329,14 @@ tetrahedron_set* volume::convert_to_tetrahedron_set() const
                 const voxel_value_t &value = get_voxel(i, j, k);
                 if ((value == voxel_value_t::primitive_inside_surface) || (value == voxel_value_t::primitive_on_surface))
                 {
-                    const point_t p1((point_t((i - 0.5f), (j - 0.5f), (k - 0.5f)) * _scale) + _min_bb);
-                    const point_t p2((point_t((i + 0.5f), (j - 0.5f), (k - 0.5f)) * _scale) + _min_bb);
-                    const point_t p3((point_t((i + 0.5f), (j + 0.5f), (k - 0.5f)) * _scale) + _min_bb);
-                    const point_t p4((point_t((i - 0.5f), (j + 0.5f), (k - 0.5f)) * _scale) + _min_bb);
-                    const point_t p5((point_t((i - 0.5f), (j - 0.5f), (k + 0.5f)) * _scale) + _min_bb);
-                    const point_t p6((point_t((i + 0.5f), (j - 0.5f), (k + 0.5f)) * _scale) + _min_bb);
-                    const point_t p7((point_t((i + 0.5f), (j + 0.5f), (k + 0.5f)) * _scale) + _min_bb);
-                    const point_t p8((point_t((i - 0.5f), (j + 0.5f), (k + 0.5f)) * _scale) + _min_bb);
+                    const point_t<> p1((point_t<>((i - 0.5f), (j - 0.5f), (k - 0.5f)) * _scale) + _min_bb);
+                    const point_t<> p2((point_t<>((i + 0.5f), (j - 0.5f), (k - 0.5f)) * _scale) + _min_bb);
+                    const point_t<> p3((point_t<>((i + 0.5f), (j + 0.5f), (k - 0.5f)) * _scale) + _min_bb);
+                    const point_t<> p4((point_t<>((i - 0.5f), (j + 0.5f), (k - 0.5f)) * _scale) + _min_bb);
+                    const point_t<> p5((point_t<>((i - 0.5f), (j - 0.5f), (k + 0.5f)) * _scale) + _min_bb);
+                    const point_t<> p6((point_t<>((i + 0.5f), (j - 0.5f), (k + 0.5f)) * _scale) + _min_bb);
+                    const point_t<> p7((point_t<>((i + 0.5f), (j + 0.5f), (k + 0.5f)) * _scale) + _min_bb);
+                    const point_t<> p8((point_t<>((i - 0.5f), (j + 0.5f), (k + 0.5f)) * _scale) + _min_bb);
                     tset->add(tetrahedron(p2, p4, p7, p5, value));
                     tset->add(tetrahedron(p6, p2, p7, p5, value));
                     tset->add(tetrahedron(p3, p4, p7, p2, value));
@@ -354,7 +354,7 @@ void volume::compute_principal_axes(float (&rot)[3][3]) const
 {
     /* Find center */
     int cnt = 0;
-    point_t barycenter(0.0f, 0.0f, 0.0f);
+    point_t<> barycenter(0.0f, 0.0f, 0.0f);
     for (int i = 0; i < _dim[0]; ++i)
     {
         for (int j = 0; j < _dim[1]; ++j)

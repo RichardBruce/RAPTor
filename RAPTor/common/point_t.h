@@ -606,7 +606,7 @@ class point_ti
         /* Unary operators */
         const point_ti   operator-()                            const   { return point_ti<T>(-this->x, -this->y, -this->z);                         }
         template<class S> 
-        explicit operator point_t<S>()                          const   { return { x, y, z };                                                       }
+        explicit operator point_t<S>()                          const   { return { static_cast<S>(x), static_cast<S>(y), static_cast<S>(z) };       }
 
         /* With Point_t */
         const bool           operator==(const point_ti &rhs)    const   { return ((this->x == rhs.x) && (this->y == rhs.y) && (this->z == rhs.z));  }

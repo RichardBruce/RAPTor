@@ -851,17 +851,17 @@ void dac_convex_hull::merge(intermediate_hull *const h0, intermediate_hull *cons
     }
 }
 
-void dac_convex_hull::compute(const std::vector<point_t> &coords)
+void dac_convex_hull::compute(const std::vector<point_t<>> &coords)
 {
-    point_t min_pt(coords[0]);
-    point_t max_pt(coords[0]);
+    point_t<> min_pt(coords[0]);
+    point_t<> max_pt(coords[0]);
     for (int i = 1; i < static_cast<int>(coords.size()); ++i)
     {
         min_pt = min(min_pt, coords[i]);
         max_pt = max(max_pt, coords[i]);
     }
 
-    point_t s(max_pt - min_pt);
+    point_t<> s(max_pt - min_pt);
     _max_axis = s.max_axis();
     _min_axis = s.min_axis();
     if (_min_axis == _max_axis)
@@ -896,7 +896,7 @@ void dac_convex_hull::compute(const std::vector<point_t> &coords)
     points.resize(coords.size());
     for (int i = 0; i < static_cast<int>(coords.size()); ++i)
     {
-        const point_t p((coords[i] - _center) * s);
+        const point_t<> p((coords[i] - _center) * s);
         points[i].x = static_cast<std::int32_t>(p[_med_axis]);
         points[i].y = static_cast<std::int32_t>(p[_max_axis]);
         points[i].z = static_cast<std::int32_t>(p[_min_axis]);
@@ -919,9 +919,9 @@ void dac_convex_hull::compute(const std::vector<point_t> &coords)
     _vertex_list = hull.minXy;
 }
 
-point_t dac_convex_hull::get_coordinates(const vertex* v)
+point_t<> dac_convex_hull::get_coordinates(const vertex* v)
 {
-    point_t p;
+    point_t<> p;
     p[_med_axis] = v->xvalue();
     p[_max_axis] = v->yvalue();
     p[_min_axis] = v->zvalue();

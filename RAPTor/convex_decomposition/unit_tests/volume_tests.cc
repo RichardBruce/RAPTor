@@ -23,58 +23,58 @@ struct volume_fixture : private boost::noncopyable
     volume_fixture() :
         cube_points(
             {
-                point_t(-0.5f, -0.5f, -0.5f),
-                point_t( 0.5f, -0.5f, -0.5f),
-                point_t( 0.5f,  0.5f, -0.5f),
-                point_t(-0.5f,  0.5f, -0.5f),
-                point_t(-0.5f, -0.5f,  0.5f),
-                point_t( 0.5f, -0.5f,  0.5f),
-                point_t( 0.5f,  0.5f,  0.5f),
-                point_t(-0.5f,  0.5f,  0.5f)
+                point_t<>(-0.5f, -0.5f, -0.5f),
+                point_t<>( 0.5f, -0.5f, -0.5f),
+                point_t<>( 0.5f,  0.5f, -0.5f),
+                point_t<>(-0.5f,  0.5f, -0.5f),
+                point_t<>(-0.5f, -0.5f,  0.5f),
+                point_t<>( 0.5f, -0.5f,  0.5f),
+                point_t<>( 0.5f,  0.5f,  0.5f),
+                point_t<>(-0.5f,  0.5f,  0.5f)
             }),
         cubiod_x_points(
             {
-                point_t(-1.0f, -0.5f, -0.5f),
-                point_t( 1.0f, -0.5f, -0.5f),
-                point_t( 1.0f,  0.5f, -0.5f),
-                point_t(-1.0f,  0.5f, -0.5f),
-                point_t(-1.0f, -0.5f,  0.5f),
-                point_t( 1.0f, -0.5f,  0.5f),
-                point_t( 1.0f,  0.5f,  0.5f),
-                point_t(-1.0f,  0.5f,  0.5f)
+                point_t<>(-1.0f, -0.5f, -0.5f),
+                point_t<>( 1.0f, -0.5f, -0.5f),
+                point_t<>( 1.0f,  0.5f, -0.5f),
+                point_t<>(-1.0f,  0.5f, -0.5f),
+                point_t<>(-1.0f, -0.5f,  0.5f),
+                point_t<>( 1.0f, -0.5f,  0.5f),
+                point_t<>( 1.0f,  0.5f,  0.5f),
+                point_t<>(-1.0f,  0.5f,  0.5f)
             }),
         cubiod_y_points(
             {
-                point_t(-0.5f, -1.0f, -0.5f),
-                point_t( 0.5f, -1.0f, -0.5f),
-                point_t( 0.5f,  1.0f, -0.5f),
-                point_t(-0.5f,  1.0f, -0.5f),
-                point_t(-0.5f, -1.0f,  0.5f),
-                point_t( 0.5f, -1.0f,  0.5f),
-                point_t( 0.5f,  1.0f,  0.5f),
-                point_t(-0.5f,  1.0f,  0.5f)
+                point_t<>(-0.5f, -1.0f, -0.5f),
+                point_t<>( 0.5f, -1.0f, -0.5f),
+                point_t<>( 0.5f,  1.0f, -0.5f),
+                point_t<>(-0.5f,  1.0f, -0.5f),
+                point_t<>(-0.5f, -1.0f,  0.5f),
+                point_t<>( 0.5f, -1.0f,  0.5f),
+                point_t<>( 0.5f,  1.0f,  0.5f),
+                point_t<>(-0.5f,  1.0f,  0.5f)
             }),
         cubiod_z_points(
             {
-                point_t(-0.5f, -0.5f, -2.0f),
-                point_t( 0.5f, -0.5f, -2.0f),
-                point_t( 0.5f,  0.5f, -2.0f),
-                point_t(-0.5f,  0.5f, -2.0f),
-                point_t(-0.5f, -0.5f,  2.0f),
-                point_t( 0.5f, -0.5f,  2.0f),
-                point_t( 0.5f,  0.5f,  2.0f),
-                point_t(-0.5f,  0.5f,  2.0f)
+                point_t<>(-0.5f, -0.5f, -2.0f),
+                point_t<>( 0.5f, -0.5f, -2.0f),
+                point_t<>( 0.5f,  0.5f, -2.0f),
+                point_t<>(-0.5f,  0.5f, -2.0f),
+                point_t<>(-0.5f, -0.5f,  2.0f),
+                point_t<>( 0.5f, -0.5f,  2.0f),
+                point_t<>( 0.5f,  0.5f,  2.0f),
+                point_t<>(-0.5f,  0.5f,  2.0f)
             }),
         cube2x_points(
             {
-                point_t(-1.0f, -1.0f, -1.0f),
-                point_t( 1.0f, -1.0f, -1.0f),
-                point_t( 1.0f,  1.0f, -1.0f),
-                point_t(-1.0f,  1.0f, -1.0f),
-                point_t(-1.0f, -1.0f,  1.0f),
-                point_t( 1.0f, -1.0f,  1.0f),
-                point_t( 1.0f,  1.0f,  1.0f),
-                point_t(-1.0f,  1.0f,  1.0f)
+                point_t<>(-1.0f, -1.0f, -1.0f),
+                point_t<>( 1.0f, -1.0f, -1.0f),
+                point_t<>( 1.0f,  1.0f, -1.0f),
+                point_t<>(-1.0f,  1.0f, -1.0f),
+                point_t<>(-1.0f, -1.0f,  1.0f),
+                point_t<>( 1.0f, -1.0f,  1.0f),
+                point_t<>( 1.0f,  1.0f,  1.0f),
+                point_t<>(-1.0f,  1.0f,  1.0f)
             }),
         cube_triangles(
             {
@@ -87,10 +87,10 @@ struct volume_fixture : private boost::noncopyable
             })
     {  }
 
-    std::vector<point_t> make_cube_pair_points() const
+    std::vector<point_t<>> make_cube_pair_points() const
     {
         auto shifted_points(cube_points);
-        std::transform(shifted_points.begin(), shifted_points.end(), shifted_points.begin(), [](const point_t &p){ return p + 2.0f; });
+        std::transform(shifted_points.begin(), shifted_points.end(), shifted_points.begin(), [](const point_t<> &p){ return p + 2.0f; });
         shifted_points.insert(shifted_points.end(), cube2x_points.begin(), cube2x_points.end());
         return shifted_points;
     }
@@ -103,11 +103,11 @@ struct volume_fixture : private boost::noncopyable
         return shifted_triangles;
     }
 
-    const std::vector<point_t>      cube_points;
-    const std::vector<point_t>      cubiod_x_points;
-    const std::vector<point_t>      cubiod_y_points;
-    const std::vector<point_t>      cubiod_z_points;
-    const std::vector<point_t>      cube2x_points;
+    const std::vector<point_t<>>      cube_points;
+    const std::vector<point_t<>>      cubiod_x_points;
+    const std::vector<point_t<>>      cubiod_y_points;
+    const std::vector<point_t<>>      cubiod_z_points;
+    const std::vector<point_t<>>      cube2x_points;
     const std::vector<point_ti<>>   cube_triangles;
 };
 
@@ -120,7 +120,7 @@ const float result_tolerance = 0.0005f;
 /* Test Ctor */
 BOOST_AUTO_TEST_CASE( cube_ctor_test )
 {
-    volume cube(cube_points, cube_triangles, 2, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cube(cube_points, cube_triangles, 2, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     BOOST_CHECK(cube.number_of_primitives_on_surface()  == 8);
     BOOST_CHECK(cube.number_of_primitives_inside()      == 0);
     BOOST_CHECK(cube.number_of_primitives_outside()     == 24);
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE( cube_ctor_test )
 
 BOOST_AUTO_TEST_CASE( cube_with_inside_ctor_test )
 {
-    volume cube(cube_points, cube_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cube(cube_points, cube_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     BOOST_CHECK(cube.number_of_primitives_on_surface()  == 26);
     BOOST_CHECK(cube.number_of_primitives_inside()      == 1);
     BOOST_CHECK(cube.number_of_primitives_outside()     == 48);
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE( cube_pair_ctor_test )
     const auto shifted_points(make_cube_pair_points());
     const auto shifted_triangles(make_cube_pair_triangles());
 
-    volume cubes(shifted_points, shifted_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cubes(shifted_points, shifted_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     BOOST_CHECK(cubes.number_of_primitives_on_surface() == 15);
     BOOST_CHECK(cubes.number_of_primitives_inside()     == 0);
     BOOST_CHECK(cubes.number_of_primitives_outside()    == 60);
@@ -329,7 +329,7 @@ BOOST_AUTO_TEST_CASE( cube_pair_ctor_test )
 
 BOOST_AUTO_TEST_CASE( cubiod_x_ctor_test )
 {
-    volume cubiod(cubiod_x_points, cube_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cubiod(cubiod_x_points, cube_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     BOOST_CHECK(cubiod.number_of_primitives_on_surface() == 12);
     BOOST_CHECK(cubiod.number_of_primitives_inside()     == 0);
     BOOST_CHECK(cubiod.number_of_primitives_outside()    == 15);
@@ -364,7 +364,7 @@ BOOST_AUTO_TEST_CASE( cubiod_x_ctor_test )
 
 BOOST_AUTO_TEST_CASE( cubiod_y_ctor_test )
 {
-    volume cubiod(cubiod_y_points, cube_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cubiod(cubiod_y_points, cube_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     BOOST_CHECK(cubiod.number_of_primitives_on_surface() == 12);
     BOOST_CHECK(cubiod.number_of_primitives_inside()     == 0);
     BOOST_CHECK(cubiod.number_of_primitives_outside()    == 15);
@@ -399,7 +399,7 @@ BOOST_AUTO_TEST_CASE( cubiod_y_ctor_test )
 
 BOOST_AUTO_TEST_CASE( cubiod_z_ctor_test )
 {
-    volume cubiod(cubiod_z_points, cube_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cubiod(cubiod_z_points, cube_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     BOOST_CHECK(cubiod.number_of_primitives_on_surface() == 12);
     BOOST_CHECK(cubiod.number_of_primitives_inside()     == 0);
     BOOST_CHECK(cubiod.number_of_primitives_outside()    == 0);
@@ -421,7 +421,7 @@ BOOST_AUTO_TEST_CASE( cubiod_z_ctor_test )
 BOOST_AUTO_TEST_CASE( convert_cube_with_inside_voxel_set_test )
 {
     /* Convert */
-    volume cube(cube_points, cube_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cube(cube_points, cube_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     std::unique_ptr<voxel_set> vset(static_cast<voxel_set *>(cube.convert(discretisation_type_t::voxel)));
 
     /* Checks */
@@ -429,7 +429,7 @@ BOOST_AUTO_TEST_CASE( convert_cube_with_inside_voxel_set_test )
     BOOST_CHECK(vset->number_of_primitives()             == 27);
     BOOST_CHECK(vset->number_of_primitives_on_surface()  == 26);
     BOOST_CHECK(vset->number_of_primitives_inside()      == 1);
-    BOOST_CHECK(vset->get_min_bb()                       == point_t(-0.5f, -0.5f, -0.5f));
+    BOOST_CHECK(vset->get_min_bb()                       == point_t<>(-0.5f, -0.5f, -0.5f));
     BOOST_CHECK(vset->get_min_bb_voxels()                == point_ti<>(0, 0, 0));
     BOOST_CHECK(vset->get_max_bb_voxels()                == point_ti<>(2, 2, 2));
     BOOST_CHECK(vset->get_barycenter()                   == point_ti<>(1, 1, 1));
@@ -444,7 +444,7 @@ BOOST_AUTO_TEST_CASE( convert_cube_pair_voxel_set_test )
     const auto shifted_triangles(make_cube_pair_triangles());
     
     /* Convert */
-    volume cubes(shifted_points, shifted_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cubes(shifted_points, shifted_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     std::unique_ptr<voxel_set> vset(static_cast<voxel_set *>(cubes.convert(discretisation_type_t::voxel)));
 
     /* Checks */
@@ -452,7 +452,7 @@ BOOST_AUTO_TEST_CASE( convert_cube_pair_voxel_set_test )
     BOOST_CHECK(vset->number_of_primitives()             == 15);
     BOOST_CHECK(vset->number_of_primitives_on_surface()  == 15);
     BOOST_CHECK(vset->number_of_primitives_inside()      == 0);
-    BOOST_CHECK(vset->get_min_bb()                       == point_t(-1.0f, -1.0f, -1.0f));
+    BOOST_CHECK(vset->get_min_bb()                       == point_t<>(-1.0f, -1.0f, -1.0f));
     BOOST_CHECK(vset->get_min_bb_voxels()                == point_ti<>(0, 0, 0));
     BOOST_CHECK(vset->get_max_bb_voxels()                == point_ti<>(2, 2, 2));
     BOOST_CHECK(vset->get_barycenter()                   == point_ti<>(1, 1, 1));
@@ -465,7 +465,7 @@ BOOST_AUTO_TEST_CASE( convert_cube_pair_voxel_set_test )
 BOOST_AUTO_TEST_CASE( convert_cube_with_inside_tetrahedron_set_test )
 {
     /* Convert */
-    volume cube(cube_points, cube_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cube(cube_points, cube_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     std::unique_ptr<tetrahedron_set> tset(static_cast<tetrahedron_set *>(cube.convert(discretisation_type_t::tetrahedron)));
 
     /* Checks */
@@ -473,8 +473,8 @@ BOOST_AUTO_TEST_CASE( convert_cube_with_inside_tetrahedron_set_test )
     BOOST_CHECK(tset->number_of_primitives()             == 135);
     BOOST_CHECK(tset->number_of_primitives_on_surface()  == 130);
     BOOST_CHECK(tset->number_of_primitives_inside()      == 5);
-    BOOST_CHECK(tset->get_min_bb()                       == point_t(-0.75f, -0.75f, -0.75f));
-    BOOST_CHECK(tset->get_barycenter()                   == point_t( 0.0f,   0.0f,   0.0f));
+    BOOST_CHECK(tset->get_min_bb()                       == point_t<>(-0.75f, -0.75f, -0.75f));
+    BOOST_CHECK(tset->get_barycenter()                   == point_t<>( 0.0f,   0.0f,   0.0f));
     BOOST_CHECK(tset->get_scale()                        == 0.5f);
     BOOST_CHECK_CLOSE(tset->compute_volume(), 3.375f, result_tolerance);
 }
@@ -485,7 +485,7 @@ BOOST_AUTO_TEST_CASE( convert_cube_pair_tetrahedron_set_test )
     const auto shifted_triangles(make_cube_pair_triangles());
     
     /* Convert */
-    volume cubes(shifted_points, shifted_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cubes(shifted_points, shifted_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     std::unique_ptr<tetrahedron_set> tset(static_cast<tetrahedron_set *>(cubes.convert(discretisation_type_t::tetrahedron)));
 
     /* Checks */
@@ -493,8 +493,8 @@ BOOST_AUTO_TEST_CASE( convert_cube_pair_tetrahedron_set_test )
     BOOST_CHECK(tset->number_of_primitives()             == 75);
     BOOST_CHECK(tset->number_of_primitives_on_surface()  == 75);
     BOOST_CHECK(tset->number_of_primitives_inside()      == 0);
-    BOOST_CHECK(tset->get_min_bb()                       == point_t(-1.875f, -1.875f, -1.875f));
-    BOOST_CHECK(tset->get_barycenter()                   == point_t( 0.75f,   0.75f,   0.75f));
+    BOOST_CHECK(tset->get_min_bb()                       == point_t<>(-1.875f, -1.875f, -1.875f));
+    BOOST_CHECK(tset->get_barycenter()                   == point_t<>( 0.75f,   0.75f,   0.75f));
     BOOST_CHECK(tset->get_scale()                        == 1.75f);
     BOOST_CHECK_CLOSE(tset->compute_volume(), 80.3906f, result_tolerance);
 }
@@ -503,7 +503,7 @@ BOOST_AUTO_TEST_CASE( convert_cube_pair_tetrahedron_set_test )
 BOOST_AUTO_TEST_CASE( convert_cube_with_inside_mesh_test )
 {
     /* Convert */
-    volume cube(cube_points, cube_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cube(cube_points, cube_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     std::unique_ptr<convex_mesh> mesh(cube.convert_to_convex_mesh(voxel_value_t::primitive_on_surface));
 
     /* Checks */
@@ -518,7 +518,7 @@ BOOST_AUTO_TEST_CASE( convert_cube_pair_mesh_test )
     const auto shifted_triangles(make_cube_pair_triangles());
     
     /* Convert */
-    volume cubes(shifted_points, shifted_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cubes(shifted_points, shifted_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     std::unique_ptr<convex_mesh> mesh(cubes.convert_to_convex_mesh(voxel_value_t::primitive_on_surface));
 
     /* Checks */
@@ -530,7 +530,7 @@ BOOST_AUTO_TEST_CASE( convert_cube_pair_mesh_test )
 /* Test compute principal aces */
 BOOST_AUTO_TEST_CASE( cube_compute_principal_axes_test )
 {
-    volume cube(cube_points, cube_triangles, 2, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cube(cube_points, cube_triangles, 2, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
 
     /* Compute principal axes */
     float rot[3][3];
@@ -550,7 +550,7 @@ BOOST_AUTO_TEST_CASE( cube_compute_principal_axes_test )
 
 BOOST_AUTO_TEST_CASE( cube2x_compute_principal_axes_test )
 {
-    volume cube(cube2x_points, cube_triangles, 2, point_t(1.0f, 5.0f, -7.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cube(cube2x_points, cube_triangles, 2, point_t<>(1.0f, 5.0f, -7.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
 
     /* Compute principal axes */
     float rot[3][3];
@@ -570,7 +570,7 @@ BOOST_AUTO_TEST_CASE( cube2x_compute_principal_axes_test )
 
 BOOST_AUTO_TEST_CASE( cubiod_y_compute_principal_axes_test )
 {
-    volume cube(cubiod_y_points, cube_triangles, 2, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cube(cubiod_y_points, cube_triangles, 2, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
 
     /* Compute principal axes */
     float rot[3][3];
@@ -595,7 +595,7 @@ BOOST_AUTO_TEST_CASE( cube_pair_compute_principal_axes_test )
     
     /* Compute principal axes */
     float rot[3][3];
-    volume cubes(shifted_points, shifted_triangles, 3, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cubes(shifted_points, shifted_triangles, 3, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
     cubes.compute_principal_axes(rot);
 
     /* Checks */
@@ -613,7 +613,7 @@ BOOST_AUTO_TEST_CASE( cube_pair_compute_principal_axes_test )
 /* Test const get voxel */
 BOOST_AUTO_TEST_CASE( const_get_voxel_test )
 {
-    volume cube(cube_points, cube_triangles, 2, point_t(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
+    volume cube(cube_points, cube_triangles, 2, point_t<>(0.0f, 0.0f, 0.0f), {{ 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }});
 
     const auto *const const_cube = &cube;
     BOOST_CHECK(const_cube->get_voxel(0, 0, 0) == voxel_value_t::primitive_on_surface);

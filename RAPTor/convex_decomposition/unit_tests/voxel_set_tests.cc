@@ -21,10 +21,10 @@ namespace test
 struct voxel_set_fixture : private boost::noncopyable
 {
     voxel_set_fixture() :
-        empty(   {  }, point_t( 3.5f, -2.7f, 1.6f), 1.0f),
-        cube(    { voxel(point_ti<>(3, 4, 2)) }, point_t( 3.5f, -2.7f, 1.6f), 1.0f),
-        cube2_5x({ voxel(point_ti<>(3, 4, 2)) }, point_t(-7.8f,  3.9f, 4.6f), 2.5f),
-        cube3x(  { voxel(point_ti<>(3, 4, 2)) }, point_t(-7.8f,  3.9f, 4.6f), 3.0f),
+        empty(   {  }, point_t<>( 3.5f, -2.7f, 1.6f), 1.0f),
+        cube(    { voxel(point_ti<>(3, 4, 2)) }, point_t<>( 3.5f, -2.7f, 1.6f), 1.0f),
+        cube2_5x({ voxel(point_ti<>(3, 4, 2)) }, point_t<>(-7.8f,  3.9f, 4.6f), 2.5f),
+        cube3x(  { voxel(point_ti<>(3, 4, 2)) }, point_t<>(-7.8f,  3.9f, 4.6f), 3.0f),
         diagonal(
         {
             voxel(point_ti<>(3, 4,   2)),
@@ -33,7 +33,7 @@ struct voxel_set_fixture : private boost::noncopyable
             voxel(point_ti<>(6, 10, 16)),
             voxel(point_ti<>(7, 12, 32)),
             voxel(point_ti<>(8, 14, 64))
-        }, point_t(-7.8f,  3.9f, 4.6f), 2.0f),
+        }, point_t<>(-7.8f,  3.9f, 4.6f), 2.0f),
         row(
         {
             voxel(point_ti<>(0, 0, 0)),
@@ -44,7 +44,7 @@ struct voxel_set_fixture : private boost::noncopyable
             voxel(point_ti<>(5, 0, 0)),
             voxel(point_ti<>(6, 0, 0)),
             voxel(point_ti<>(7, 0, 0))
-        }, point_t(1.0f, 2.0f, 3.0f), 1.0f),
+        }, point_t<>(1.0f, 2.0f, 3.0f), 1.0f),
         on_surface(
         {
             voxel(point_ti<>(0, 0, 0), voxel_value_t::primitive_on_surface),
@@ -55,7 +55,7 @@ struct voxel_set_fixture : private boost::noncopyable
             voxel(point_ti<>(5, 0, 0), voxel_value_t::primitive_on_surface),
             voxel(point_ti<>(6, 0, 0), voxel_value_t::primitive_undefined),
             voxel(point_ti<>(7, 0, 0), voxel_value_t::primitive_undefined)
-        }, point_t(1.0f, 2.0f, 3.0f), 1.0f)
+        }, point_t<>(1.0f, 2.0f, 3.0f), 1.0f)
     {  }
 
     voxel_set   empty;
@@ -75,7 +75,7 @@ const float result_tolerance = 0.0005f;
 /* Test Ctor */
 BOOST_AUTO_TEST_CASE( ctor_test )
 {
-    BOOST_CHECK(cube.get_min_bb()                           == point_t(3.5f, -2.7f, 1.6f));
+    BOOST_CHECK(cube.get_min_bb()                           == point_t<>(3.5f, -2.7f, 1.6f));
     BOOST_CHECK(cube.get_barycenter()                       == point_ti<>(0, 0, 0));
     BOOST_CHECK(cube.compute_volume()                       == 1.0f);
     BOOST_CHECK(cube.max_volume_error()                     == 0.0f);
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE( ctor_test )
     BOOST_CHECK(cube.number_of_primitives_on_surface()      == 0);
     BOOST_CHECK(cube.number_of_primitives_inside()          == 0);
 
-    BOOST_CHECK(cube3x.get_min_bb()                         == point_t(-7.8f, 3.9f, 4.6f));
+    BOOST_CHECK(cube3x.get_min_bb()                         == point_t<>(-7.8f, 3.9f, 4.6f));
     BOOST_CHECK(cube3x.get_barycenter()                     == point_ti<>(0, 0, 0));
     BOOST_CHECK(cube3x.compute_volume()                     == 27.0f);
     BOOST_CHECK(cube3x.max_volume_error()                   == 0.0f);
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE( ctor_test )
     BOOST_CHECK(cube3x.number_of_primitives_on_surface()    == 0);
     BOOST_CHECK(cube3x.number_of_primitives_inside()        == 0);
 
-    BOOST_CHECK(diagonal.get_min_bb()                       == point_t(-7.8f, 3.9f, 4.6f));
+    BOOST_CHECK(diagonal.get_min_bb()                       == point_t<>(-7.8f, 3.9f, 4.6f));
     BOOST_CHECK(diagonal.get_barycenter()                   == point_ti<>(0, 0, 0));
     BOOST_CHECK(diagonal.compute_volume()                   == 48.0f);
     BOOST_CHECK(diagonal.max_volume_error()                 == 0.0f);
@@ -148,14 +148,14 @@ BOOST_AUTO_TEST_CASE( set_scale_test )
 /* Test set min bb */
 BOOST_AUTO_TEST_CASE( set_min_bb_test )
 {
-    cube.set_min_bb(point_t(-9.0f, 1.4f, 5.0f));
-    BOOST_CHECK(cube.get_min_bb()       == point_t(-9.0f, 1.4f, 5.0f));
+    cube.set_min_bb(point_t<>(-9.0f, 1.4f, 5.0f));
+    BOOST_CHECK(cube.get_min_bb()       == point_t<>(-9.0f, 1.4f, 5.0f));
 
-    cube3x.set_min_bb(point_t(-9.4f, 2.4f, 4.0f));
-    BOOST_CHECK(cube3x.get_min_bb()     == point_t(-9.4f, 2.4f, 4.0f));
+    cube3x.set_min_bb(point_t<>(-9.4f, 2.4f, 4.0f));
+    BOOST_CHECK(cube3x.get_min_bb()     == point_t<>(-9.4f, 2.4f, 4.0f));
 
-    diagonal.set_min_bb(point_t(-9.8f, 6.4f, 2.0f));
-    BOOST_CHECK(diagonal.get_min_bb()   == point_t(-9.8f, 6.4f, 2.0f));
+    diagonal.set_min_bb(point_t<>(-9.8f, 6.4f, 2.0f));
+    BOOST_CHECK(diagonal.get_min_bb()   == point_t<>(-9.8f, 6.4f, 2.0f));
 }
 
 /* Test reserve */
@@ -169,84 +169,84 @@ BOOST_AUTO_TEST_CASE( reserve_test )
 /* Test get point */
 BOOST_AUTO_TEST_CASE( get_point_point_test )
 {
-    BOOST_CHECK(fabs(magnitude(cube3x.get_point(point_t(0.0f,  0.0f, 0.0f)) - point_t(-7.8f,  3.9f,  4.6f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(cube3x.get_point(point_t(1.0f,  1.0f, 1.0f)) - point_t(-4.8f,  6.9f,  7.6f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(cube3x.get_point(point_t(1.7f, -3.6f, 8.6f)) - point_t(-2.7f, -6.9f, 30.4f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube3x.get_point(point_t<>(0.0f,  0.0f, 0.0f)) - point_t<>(-7.8f,  3.9f,  4.6f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube3x.get_point(point_t<>(1.0f,  1.0f, 1.0f)) - point_t<>(-4.8f,  6.9f,  7.6f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube3x.get_point(point_t<>(1.7f, -3.6f, 8.6f)) - point_t<>(-2.7f, -6.9f, 30.4f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE( get_point_voxel_test )
 {
-    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti<>(0,  0, 0))) - point_t(-7.8f,  3.9f,  4.6f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti<>(1,  1, 1))) - point_t(-4.8f,  6.9f,  7.6f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti<>(2, -4, 9))) - point_t(-1.8f, -8.1f, 31.6f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti<>(0,  0, 0))) - point_t<>(-7.8f,  3.9f,  4.6f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti<>(1,  1, 1))) - point_t<>(-4.8f,  6.9f,  7.6f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube3x.get_point(voxel(point_ti<>(2, -4, 9))) - point_t<>(-1.8f, -8.1f, 31.6f))) < result_tolerance);
 
-    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti<>(0,  0, 0))) - point_t(-7.8f,  3.9f,  4.6f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti<>(1,  1, 1))) - point_t(-5.3f,  6.4f,  7.1f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti<>(2, -4, 9))) - point_t(-2.8f, -6.1f, 27.1f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti<>(0,  0, 0))) - point_t<>(-7.8f,  3.9f,  4.6f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti<>(1,  1, 1))) - point_t<>(-5.3f,  6.4f,  7.1f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(cube2_5x.get_point(voxel(point_ti<>(2, -4, 9))) - point_t<>(-2.8f, -6.1f, 27.1f))) < result_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE( get_points_test )
 {
-    point_t pts[8];
+    point_t<> pts[8];
     cube.get_points(voxel(point_ti<>(0,  0, 0)), &pts[0]);
-    BOOST_CHECK(pts[0] == point_t(3.0f, -3.2f,  1.1f));
-    BOOST_CHECK(pts[1] == point_t(4.0f, -3.2f,  1.1f));
-    BOOST_CHECK(pts[2] == point_t(4.0f, -2.2f,  1.1f));
-    BOOST_CHECK(pts[3] == point_t(3.0f, -2.2f,  1.1f));
-    BOOST_CHECK(pts[4] == point_t(3.0f, -3.2f,  2.1f));
-    BOOST_CHECK(pts[5] == point_t(4.0f, -3.2f,  2.1f));
-    BOOST_CHECK(pts[6] == point_t(4.0f, -2.2f,  2.1f));
-    BOOST_CHECK(pts[7] == point_t(3.0f, -2.2f,  2.1f));
+    BOOST_CHECK(pts[0] == point_t<>(3.0f, -3.2f,  1.1f));
+    BOOST_CHECK(pts[1] == point_t<>(4.0f, -3.2f,  1.1f));
+    BOOST_CHECK(pts[2] == point_t<>(4.0f, -2.2f,  1.1f));
+    BOOST_CHECK(pts[3] == point_t<>(3.0f, -2.2f,  1.1f));
+    BOOST_CHECK(pts[4] == point_t<>(3.0f, -3.2f,  2.1f));
+    BOOST_CHECK(pts[5] == point_t<>(4.0f, -3.2f,  2.1f));
+    BOOST_CHECK(pts[6] == point_t<>(4.0f, -2.2f,  2.1f));
+    BOOST_CHECK(pts[7] == point_t<>(3.0f, -2.2f,  2.1f));
 
     cube.get_points(voxel(point_ti<>(1,  1, 1)), &pts[0]);
-    BOOST_CHECK(pts[0] == point_t(4.0f, -2.2f,  2.1f));
-    BOOST_CHECK(pts[1] == point_t(5.0f, -2.2f,  2.1f));
-    BOOST_CHECK(pts[2] == point_t(5.0f, -1.2f,  2.1f));
-    BOOST_CHECK(pts[3] == point_t(4.0f, -1.2f,  2.1f));
-    BOOST_CHECK(pts[4] == point_t(4.0f, -2.2f,  3.1f));
-    BOOST_CHECK(pts[5] == point_t(5.0f, -2.2f,  3.1f));
-    BOOST_CHECK(pts[6] == point_t(5.0f, -1.2f,  3.1f));
-    BOOST_CHECK(pts[7] == point_t(4.0f, -1.2f,  3.1f));
+    BOOST_CHECK(pts[0] == point_t<>(4.0f, -2.2f,  2.1f));
+    BOOST_CHECK(pts[1] == point_t<>(5.0f, -2.2f,  2.1f));
+    BOOST_CHECK(pts[2] == point_t<>(5.0f, -1.2f,  2.1f));
+    BOOST_CHECK(pts[3] == point_t<>(4.0f, -1.2f,  2.1f));
+    BOOST_CHECK(pts[4] == point_t<>(4.0f, -2.2f,  3.1f));
+    BOOST_CHECK(pts[5] == point_t<>(5.0f, -2.2f,  3.1f));
+    BOOST_CHECK(pts[6] == point_t<>(5.0f, -1.2f,  3.1f));
+    BOOST_CHECK(pts[7] == point_t<>(4.0f, -1.2f,  3.1f));
 
     cube.get_points(voxel(point_ti<>(2, -4, 9)), &pts[0]);
-    BOOST_CHECK(pts[0] == point_t(5.0f, -7.2f, 10.1f));
-    BOOST_CHECK(pts[1] == point_t(6.0f, -7.2f, 10.1f));
-    BOOST_CHECK(pts[2] == point_t(6.0f, -6.2f, 10.1f));
-    BOOST_CHECK(pts[3] == point_t(5.0f, -6.2f, 10.1f));
-    BOOST_CHECK(pts[4] == point_t(5.0f, -7.2f, 11.1f));
-    BOOST_CHECK(pts[5] == point_t(6.0f, -7.2f, 11.1f));
-    BOOST_CHECK(pts[6] == point_t(6.0f, -6.2f, 11.1f));
-    BOOST_CHECK(pts[7] == point_t(5.0f, -6.2f, 11.1f));
+    BOOST_CHECK(pts[0] == point_t<>(5.0f, -7.2f, 10.1f));
+    BOOST_CHECK(pts[1] == point_t<>(6.0f, -7.2f, 10.1f));
+    BOOST_CHECK(pts[2] == point_t<>(6.0f, -6.2f, 10.1f));
+    BOOST_CHECK(pts[3] == point_t<>(5.0f, -6.2f, 10.1f));
+    BOOST_CHECK(pts[4] == point_t<>(5.0f, -7.2f, 11.1f));
+    BOOST_CHECK(pts[5] == point_t<>(6.0f, -7.2f, 11.1f));
+    BOOST_CHECK(pts[6] == point_t<>(6.0f, -6.2f, 11.1f));
+    BOOST_CHECK(pts[7] == point_t<>(5.0f, -6.2f, 11.1f));
 
     cube2_5x.get_points(voxel(point_ti<>(0,  0, 0)), &pts[0]);
-    BOOST_CHECK(pts[0] == point_t(-9.05f, 2.65f, 3.35f));
-    BOOST_CHECK(pts[1] == point_t(-6.55f, 2.65f, 3.35f));
-    BOOST_CHECK(pts[2] == point_t(-6.55f, 5.15f, 3.35f));
-    BOOST_CHECK(pts[3] == point_t(-9.05f, 5.15f, 3.35f));
-    BOOST_CHECK(pts[4] == point_t(-9.05f, 2.65f, 5.85f));
-    BOOST_CHECK(pts[5] == point_t(-6.55f, 2.65f, 5.85f));
-    BOOST_CHECK(pts[6] == point_t(-6.55f, 5.15f, 5.85f));
-    BOOST_CHECK(pts[7] == point_t(-9.05f, 5.15f, 5.85f));
+    BOOST_CHECK(pts[0] == point_t<>(-9.05f, 2.65f, 3.35f));
+    BOOST_CHECK(pts[1] == point_t<>(-6.55f, 2.65f, 3.35f));
+    BOOST_CHECK(pts[2] == point_t<>(-6.55f, 5.15f, 3.35f));
+    BOOST_CHECK(pts[3] == point_t<>(-9.05f, 5.15f, 3.35f));
+    BOOST_CHECK(pts[4] == point_t<>(-9.05f, 2.65f, 5.85f));
+    BOOST_CHECK(pts[5] == point_t<>(-6.55f, 2.65f, 5.85f));
+    BOOST_CHECK(pts[6] == point_t<>(-6.55f, 5.15f, 5.85f));
+    BOOST_CHECK(pts[7] == point_t<>(-9.05f, 5.15f, 5.85f));
 
     cube2_5x.get_points(voxel(point_ti<>(1,  1, 1)), &pts[0]);
-    BOOST_CHECK(pts[0] == point_t(-6.55f, 5.15f, 5.85f));
-    BOOST_CHECK(pts[1] == point_t(-4.05f, 5.15f, 5.85f));
-    BOOST_CHECK(pts[2] == point_t(-4.05f, 7.65f, 5.85f));
-    BOOST_CHECK(pts[3] == point_t(-6.55f, 7.65f, 5.85f));
-    BOOST_CHECK(pts[4] == point_t(-6.55f, 5.15f, 8.35f));
-    BOOST_CHECK(pts[5] == point_t(-4.05f, 5.15f, 8.35f));
-    BOOST_CHECK(pts[6] == point_t(-4.05f, 7.65f, 8.35f));
-    BOOST_CHECK(pts[7] == point_t(-6.55f, 7.65f, 8.35f));
+    BOOST_CHECK(pts[0] == point_t<>(-6.55f, 5.15f, 5.85f));
+    BOOST_CHECK(pts[1] == point_t<>(-4.05f, 5.15f, 5.85f));
+    BOOST_CHECK(pts[2] == point_t<>(-4.05f, 7.65f, 5.85f));
+    BOOST_CHECK(pts[3] == point_t<>(-6.55f, 7.65f, 5.85f));
+    BOOST_CHECK(pts[4] == point_t<>(-6.55f, 5.15f, 8.35f));
+    BOOST_CHECK(pts[5] == point_t<>(-4.05f, 5.15f, 8.35f));
+    BOOST_CHECK(pts[6] == point_t<>(-4.05f, 7.65f, 8.35f));
+    BOOST_CHECK(pts[7] == point_t<>(-6.55f, 7.65f, 8.35f));
 
     cube2_5x.get_points(voxel(point_ti<>(2, -4, 9)), &pts[0]);
-    BOOST_CHECK(fabs(magnitude(pts[0] - point_t(-4.05f, -7.35f, 25.85f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(pts[1] - point_t(-1.55f, -7.35f, 25.85f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(pts[2] - point_t(-1.55f, -4.85f, 25.85f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(pts[3] - point_t(-4.05f, -4.85f, 25.85f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(pts[4] - point_t(-4.05f, -7.35f, 28.35f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(pts[5] - point_t(-1.55f, -7.35f, 28.35f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(pts[6] - point_t(-1.55f, -4.85f, 28.35f))) < result_tolerance);
-    BOOST_CHECK(fabs(magnitude(pts[7] - point_t(-4.05f, -4.85f, 28.35f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(pts[0] - point_t<>(-4.05f, -7.35f, 25.85f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(pts[1] - point_t<>(-1.55f, -7.35f, 25.85f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(pts[2] - point_t<>(-1.55f, -4.85f, 25.85f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(pts[3] - point_t<>(-4.05f, -4.85f, 25.85f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(pts[4] - point_t<>(-4.05f, -7.35f, 28.35f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(pts[5] - point_t<>(-1.55f, -7.35f, 28.35f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(pts[6] - point_t<>(-1.55f, -4.85f, 28.35f))) < result_tolerance);
+    BOOST_CHECK(fabs(magnitude(pts[7] - point_t<>(-4.05f, -4.85f, 28.35f))) < result_tolerance);
 }
 
 /* Test compute bounding box */
@@ -271,10 +271,10 @@ BOOST_AUTO_TEST_CASE( compute_bounding_box_test )
 /* Test intersect */
 BOOST_AUTO_TEST_CASE( intersect_clean_test )
 {
-    point_t pts[8];
-    std::vector<point_t> pos_pts;
-    std::vector<point_t> neg_pts;
-    diagonal.intersect(plane(point_t(1.0f, 0.0f, 0.0f), 3.2f, axis_t::x_axis), &pos_pts, &neg_pts, 1);
+    point_t<> pts[8];
+    std::vector<point_t<>> pos_pts;
+    std::vector<point_t<>> neg_pts;
+    diagonal.intersect(plane(point_t<>(1.0f, 0.0f, 0.0f), 3.2f, axis_t::x_axis), &pos_pts, &neg_pts, 1);
 
     BOOST_REQUIRE(pos_pts.size() == 24);
     diagonal.get_points(voxel(point_ti<>(6, 10, 16)), &pts[0]);
@@ -337,10 +337,10 @@ BOOST_AUTO_TEST_CASE( intersect_clean_test )
 
 BOOST_AUTO_TEST_CASE( intersect_pos_sampling_test )
 {
-    point_t pts[8];
-    std::vector<point_t> pos_pts;
-    std::vector<point_t> neg_pts;
-    row.intersect(plane(point_t(0.0f, 1.0f, 0.0f), 0.9f, axis_t::x_axis), &pos_pts, &neg_pts, 3);
+    point_t<> pts[8];
+    std::vector<point_t<>> pos_pts;
+    std::vector<point_t<>> neg_pts;
+    row.intersect(plane(point_t<>(0.0f, 1.0f, 0.0f), 0.9f, axis_t::x_axis), &pos_pts, &neg_pts, 3);
 
     BOOST_REQUIRE(pos_pts.size() == 16);
     row.get_points(voxel(point_ti<>(2, 0, 0)), &pts[0]);
@@ -367,10 +367,10 @@ BOOST_AUTO_TEST_CASE( intersect_pos_sampling_test )
 
 BOOST_AUTO_TEST_CASE( intersect_neg_sampling_test )
 {
-    point_t pts[8];
-    std::vector<point_t> pos_pts;
-    std::vector<point_t> neg_pts;
-    row.intersect(plane(point_t(0.0f, -1.0f, 0.0f), 3.1f, axis_t::x_axis), &pos_pts, &neg_pts, 3);
+    point_t<> pts[8];
+    std::vector<point_t<>> pos_pts;
+    std::vector<point_t<>> neg_pts;
+    row.intersect(plane(point_t<>(0.0f, -1.0f, 0.0f), 3.1f, axis_t::x_axis), &pos_pts, &neg_pts, 3);
 
     BOOST_REQUIRE(pos_pts.size() == 0);
 
@@ -445,7 +445,7 @@ BOOST_AUTO_TEST_CASE( cut_diagonal_test )
 {
     primitive_set *pos_part_p = nullptr;
     primitive_set *neg_part_p = nullptr;
-    diagonal.cut(plane(point_t(1.0f, 0.0f, 0.0f), 3.1f, axis_t::x_axis), &pos_part_p, &neg_part_p);
+    diagonal.cut(plane(point_t<>(1.0f, 0.0f, 0.0f), 3.1f, axis_t::x_axis), &pos_part_p, &neg_part_p);
     voxel_set* pos_part = static_cast<voxel_set *>(pos_part_p);
     voxel_set* neg_part = static_cast<voxel_set *>(neg_part_p);
 
@@ -474,7 +474,7 @@ BOOST_AUTO_TEST_CASE( cut_on_surface_test )
 {
     primitive_set *pos_part_p = nullptr;
     primitive_set *neg_part_p = nullptr;
-    on_surface.cut(plane(point_t(1.0f, 0.0f, 0.0f), 1.25f, axis_t::x_axis), &pos_part_p, &neg_part_p);
+    on_surface.cut(plane(point_t<>(1.0f, 0.0f, 0.0f), 1.25f, axis_t::x_axis), &pos_part_p, &neg_part_p);
     voxel_set* pos_part = static_cast<voxel_set *>(pos_part_p);
     voxel_set* neg_part = static_cast<voxel_set *>(neg_part_p);
 
@@ -506,15 +506,15 @@ BOOST_AUTO_TEST_CASE( cut_volumes_test )
 {
     float pos_vol;
     float neg_vol;
-    diagonal.compute_cut_volumes(plane(point_t(1.0f, 0.0f, 0.0f), 3.1f, axis_t::x_axis), &pos_vol, &neg_vol);
+    diagonal.compute_cut_volumes(plane(point_t<>(1.0f, 0.0f, 0.0f), 3.1f, axis_t::x_axis), &pos_vol, &neg_vol);
     BOOST_CHECK(pos_vol == 24.0f);
     BOOST_CHECK(neg_vol == 24.0f);
 
-    on_surface.compute_cut_volumes(plane(point_t(1.0f, 0.0f, 0.0f), 1.25f, axis_t::x_axis), &pos_vol, &neg_vol);
+    on_surface.compute_cut_volumes(plane(point_t<>(1.0f, 0.0f, 0.0f), 1.25f, axis_t::x_axis), &pos_vol, &neg_vol);
     BOOST_CHECK(pos_vol == 7.0f);
     BOOST_CHECK(neg_vol == 1.0f);
 
-    empty.compute_cut_volumes(plane(point_t(1.0f, 0.0f, 0.0f), 2.25f, axis_t::x_axis), &pos_vol, &neg_vol);
+    empty.compute_cut_volumes(plane(point_t<>(1.0f, 0.0f, 0.0f), 2.25f, axis_t::x_axis), &pos_vol, &neg_vol);
     BOOST_CHECK(pos_vol == 0.0f);
     BOOST_CHECK(neg_vol == 0.0f);
 }
@@ -547,34 +547,34 @@ BOOST_AUTO_TEST_CASE( compute_axes_aligned_clipping_planes_test )
     diagonal.compute_axes_aligned_clipping_planes(&planes, 9);
 
     BOOST_REQUIRE(planes.size() == 10);
-    BOOST_CHECK(planes[0].n             == point_t(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(planes[0].n             == point_t<>(1.0f, 0.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[0].p, -0.8f, result_tolerance);
     BOOST_CHECK(planes[0].major_axis    == axis_t::x_axis);
-    BOOST_CHECK(planes[1].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[1].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[1].p, 12.9f, result_tolerance);
     BOOST_CHECK(planes[1].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[2].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[2].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[2].p, 30.9f, result_tolerance);
     BOOST_CHECK(planes[2].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[3].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[3].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[3].p, 9.6f, result_tolerance);
     BOOST_CHECK(planes[3].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[4].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[4].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[4].p, 27.6f, result_tolerance);
     BOOST_CHECK(planes[4].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[5].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[5].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[5].p, 45.6f, result_tolerance);
     BOOST_CHECK(planes[5].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[6].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[6].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[6].p, 63.6f, result_tolerance);
     BOOST_CHECK(planes[6].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[7].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[7].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[7].p, 81.6f, result_tolerance);
     BOOST_CHECK(planes[7].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[8].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[8].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[8].p, 99.6f, result_tolerance);
     BOOST_CHECK(planes[8].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[9].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[9].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[9].p, 117.6f, result_tolerance);
     BOOST_CHECK(planes[9].major_axis    == axis_t::z_axis);
 }
@@ -585,24 +585,24 @@ BOOST_AUTO_TEST_CASE( refine_axes_aligned_clipping_planes_x_test )
     std::vector<plane> planes;
     diagonal.compute_bounding_box();
 
-    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t(0.0f, 0.0f, 0.0f), 0.0f, axis_t::x_axis), 9, 1);
+    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t<>(0.0f, 0.0f, 0.0f), 0.0f, axis_t::x_axis), 9, 1);
     BOOST_REQUIRE(planes.size() == 6);
-    BOOST_CHECK(planes[0].n             == point_t(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(planes[0].n             == point_t<>(1.0f, 0.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[0].p, -0.8f, result_tolerance);
     BOOST_CHECK(planes[0].major_axis    == axis_t::x_axis);
-    BOOST_CHECK(planes[1].n             == point_t(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(planes[1].n             == point_t<>(1.0f, 0.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[1].p, 1.2f, result_tolerance);
     BOOST_CHECK(planes[1].major_axis    == axis_t::x_axis);
-    BOOST_CHECK(planes[2].n             == point_t(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(planes[2].n             == point_t<>(1.0f, 0.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[2].p, 3.2f, result_tolerance);
     BOOST_CHECK(planes[2].major_axis    == axis_t::x_axis);
-    BOOST_CHECK(planes[3].n             == point_t(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(planes[3].n             == point_t<>(1.0f, 0.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[3].p, 5.2f, result_tolerance);
     BOOST_CHECK(planes[3].major_axis    == axis_t::x_axis);
-    BOOST_CHECK(planes[4].n             == point_t(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(planes[4].n             == point_t<>(1.0f, 0.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[4].p, 7.2f, result_tolerance);
     BOOST_CHECK(planes[4].major_axis    == axis_t::x_axis);
-    BOOST_CHECK(planes[5].n             == point_t(1.0f, 0.0f, 0.0f));
+    BOOST_CHECK(planes[5].n             == point_t<>(1.0f, 0.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[5].p, 9.2f, result_tolerance);
     BOOST_CHECK(planes[5].major_axis    == axis_t::x_axis);
 }
@@ -612,39 +612,39 @@ BOOST_AUTO_TEST_CASE( refine_axes_aligned_clipping_planes_y_test )
     std::vector<plane> planes;
     diagonal.compute_bounding_box();
 
-    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t(0.0f, 0.0f, 0.0f), 0.0f, axis_t::y_axis), 9, 6);
+    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t<>(0.0f, 0.0f, 0.0f), 0.0f, axis_t::y_axis), 9, 6);
     BOOST_REQUIRE(planes.size() == 11);
-    BOOST_CHECK(planes[0].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[0].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[0].p, 12.9f, result_tolerance);
     BOOST_CHECK(planes[0].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[1].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[1].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[1].p, 14.9f, result_tolerance);
     BOOST_CHECK(planes[1].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[2].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[2].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[2].p, 16.9f, result_tolerance);
     BOOST_CHECK(planes[2].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[3].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[3].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[3].p, 18.9f, result_tolerance);
     BOOST_CHECK(planes[3].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[4].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[4].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[4].p, 20.9f, result_tolerance);
     BOOST_CHECK(planes[4].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[5].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[5].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[5].p, 22.9f, result_tolerance);
     BOOST_CHECK(planes[5].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[6].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[6].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[6].p, 24.9f, result_tolerance);
     BOOST_CHECK(planes[6].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[7].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[7].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[7].p, 26.9f, result_tolerance);
     BOOST_CHECK(planes[7].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[8].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[8].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[8].p, 28.9f, result_tolerance);
     BOOST_CHECK(planes[8].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[9].n             == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[9].n             == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[9].p, 30.9f, result_tolerance);
     BOOST_CHECK(planes[9].major_axis    == axis_t::y_axis);
-    BOOST_CHECK(planes[10].n            == point_t(0.0f, 1.0f, 0.0f));
+    BOOST_CHECK(planes[10].n            == point_t<>(0.0f, 1.0f, 0.0f));
     BOOST_CHECK_CLOSE(planes[10].p, 32.9f, result_tolerance);
     BOOST_CHECK(planes[10].major_axis   == axis_t::y_axis);
 }
@@ -654,33 +654,33 @@ BOOST_AUTO_TEST_CASE( refine_axes_aligned_clipping_planes_z_test )
     std::vector<plane> planes;
     diagonal.compute_bounding_box();
 
-    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t(0.0f, 0.0f, 0.0f), 0.0f, axis_t::z_axis), 4, 30);
+    diagonal.refine_axes_aligned_clipping_planes(&planes, plane(point_t<>(0.0f, 0.0f, 0.0f), 0.0f, axis_t::z_axis), 4, 30);
     BOOST_REQUIRE(planes.size() == 9);
-    BOOST_CHECK(planes[0].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[0].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[0].p, 61.6f, result_tolerance);
     BOOST_CHECK(planes[0].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[1].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[1].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[1].p, 63.6f, result_tolerance);
     BOOST_CHECK(planes[1].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[2].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[2].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[2].p, 65.6f, result_tolerance);
     BOOST_CHECK(planes[2].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[3].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[3].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[3].p, 67.6f, result_tolerance);
     BOOST_CHECK(planes[3].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[4].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[4].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[4].p, 69.6f, result_tolerance);
     BOOST_CHECK(planes[4].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[5].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[5].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[5].p, 71.6f, result_tolerance);
     BOOST_CHECK(planes[5].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[6].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[6].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[6].p, 73.6f, result_tolerance);
     BOOST_CHECK(planes[6].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[7].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[7].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[7].p, 75.6f, result_tolerance);
     BOOST_CHECK(planes[7].major_axis    == axis_t::z_axis);
-    BOOST_CHECK(planes[8].n             == point_t(0.0f, 0.0f, 1.0f));
+    BOOST_CHECK(planes[8].n             == point_t<>(0.0f, 0.0f, 1.0f));
     BOOST_CHECK_CLOSE(planes[8].p, 77.6f, result_tolerance);
     BOOST_CHECK(planes[8].major_axis    == axis_t::z_axis);
 }
@@ -713,14 +713,14 @@ BOOST_AUTO_TEST_CASE( on_surface_compute_convex_hull_test )
 
     /* Checks */
     BOOST_REQUIRE(mesh.number_of_points() == 8);
-    BOOST_CHECK(mesh.points()[0] == point_t(6.5f, 2.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[1] == point_t(6.5f, 2.5f, 2.5f));
-    BOOST_CHECK(mesh.points()[2] == point_t(0.5f, 2.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[3] == point_t(6.5f, 1.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[4] == point_t(6.5f, 1.5f, 2.5f));
-    BOOST_CHECK(mesh.points()[5] == point_t(0.5f, 2.5f, 2.5f));
-    BOOST_CHECK(mesh.points()[6] == point_t(0.5f, 1.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[7] == point_t(0.5f, 1.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[0] == point_t<>(6.5f, 2.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[1] == point_t<>(6.5f, 2.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[2] == point_t<>(0.5f, 2.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[3] == point_t<>(6.5f, 1.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[4] == point_t<>(6.5f, 1.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[5] == point_t<>(0.5f, 2.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[6] == point_t<>(0.5f, 1.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[7] == point_t<>(0.5f, 1.5f, 2.5f));
 
     BOOST_REQUIRE(mesh.number_of_triangles() == 12);
     BOOST_CHECK(mesh.triangles()[ 0].x == 1);
@@ -768,14 +768,14 @@ BOOST_AUTO_TEST_CASE( on_surface_down_sampling_compute_convex_hull_test )
 
     /* Checks */
     BOOST_REQUIRE(mesh.number_of_points() == 8);
-    BOOST_CHECK(mesh.points()[0] == point_t(6.5f, 2.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[1] == point_t(6.5f, 2.5f, 2.5f));
-    BOOST_CHECK(mesh.points()[2] == point_t(5.5f, 2.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[3] == point_t(6.5f, 1.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[4] == point_t(6.5f, 1.5f, 2.5f));
-    BOOST_CHECK(mesh.points()[5] == point_t(5.5f, 2.5f, 2.5f));
-    BOOST_CHECK(mesh.points()[6] == point_t(5.5f, 1.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[7] == point_t(5.5f, 1.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[0] == point_t<>(6.5f, 2.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[1] == point_t<>(6.5f, 2.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[2] == point_t<>(5.5f, 2.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[3] == point_t<>(6.5f, 1.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[4] == point_t<>(6.5f, 1.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[5] == point_t<>(5.5f, 2.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[6] == point_t<>(5.5f, 1.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[7] == point_t<>(5.5f, 1.5f, 2.5f));
 
     BOOST_REQUIRE(mesh.number_of_triangles() == 12);
     BOOST_CHECK(mesh.triangles()[ 0].x == 1);
@@ -823,14 +823,14 @@ BOOST_AUTO_TEST_CASE( low_cluster_size_on_surface_compute_convex_hull_test )
 
     /* Checks */
     BOOST_REQUIRE(mesh.number_of_points() == 8);
-    BOOST_CHECK(mesh.points()[0] == point_t(6.5f, 2.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[1] == point_t(6.5f, 1.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[2] == point_t(6.5f, 2.5f, 2.5f));
-    BOOST_CHECK(mesh.points()[3] == point_t(0.5f, 2.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[4] == point_t(6.5f, 1.5f, 2.5f));
-    BOOST_CHECK(mesh.points()[5] == point_t(0.5f, 1.5f, 3.5f));
-    BOOST_CHECK(mesh.points()[6] == point_t(0.5f, 2.5f, 2.5f));
-    BOOST_CHECK(mesh.points()[7] == point_t(0.5f, 1.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[0] == point_t<>(6.5f, 2.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[1] == point_t<>(6.5f, 1.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[2] == point_t<>(6.5f, 2.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[3] == point_t<>(0.5f, 2.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[4] == point_t<>(6.5f, 1.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[5] == point_t<>(0.5f, 1.5f, 3.5f));
+    BOOST_CHECK(mesh.points()[6] == point_t<>(0.5f, 2.5f, 2.5f));
+    BOOST_CHECK(mesh.points()[7] == point_t<>(0.5f, 1.5f, 2.5f));
 
     BOOST_REQUIRE(mesh.number_of_triangles() == 12);
     BOOST_CHECK(mesh.triangles()[ 0].x == 1);

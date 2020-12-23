@@ -20,7 +20,7 @@ class dac_convex_hull : private boost::noncopyable
 {
     public :
         /* Ctor */
-        dac_convex_hull(const std::vector<point_t> &coords) : _edge_pool(6 * coords.size())
+        dac_convex_hull(const std::vector<point_t<>> &coords) : _edge_pool(6 * coords.size())
         {
             if (coords.empty())
             {
@@ -93,7 +93,7 @@ class dac_convex_hull : private boost::noncopyable
             for (const auto &f : _faces)
             {
                 /* Break face into triangles */
-                const point_t a(_vertices[f[0]]);
+                const point_t<> a(_vertices[f[0]]);
                 for (int i = 1; i < static_cast<int>(f.size() - 1); ++i)
                 {
                     /* Find volume as sum of simplices */
@@ -105,7 +105,7 @@ class dac_convex_hull : private boost::noncopyable
         }
 
         /* Access functions */
-        const std::vector<point_t>&             vertices()  const { return _vertices;   }
+        const std::vector<point_t<>>&             vertices()  const { return _vertices;   }
         const std::vector<std::vector<int>>&    faces()     const { return _faces;      }
 
     private :
@@ -272,8 +272,8 @@ class dac_convex_hull : private boost::noncopyable
         void compute_internal(intermediate_hull *const result, const int start, const int end);
         bool merge_projection(intermediate_hull *const h0, intermediate_hull *const h1, vertex*& c0, vertex*& c1);
         void merge(intermediate_hull *const h0, intermediate_hull *const h1);
-        void compute(const std::vector<point_t> &coords);
-        point_t get_coordinates(const vertex* v);
+        void compute(const std::vector<point_t<>> &coords);
+        point_t<> get_coordinates(const vertex* v);
 
         static orientation_t get_orientation(const edge &prev, const edge *const next, const point_ti<std::int64_t> &s, const point_ti<std::int64_t> &t);
         edge* find_max_angle(Rational64 *const min_cot, const vertex &start, const point_ti<std::int64_t> &s, const point_ti<std::int64_t> &rxs, const point_ti<std::int64_t> &sxrxs, const bool ccw);
@@ -281,11 +281,11 @@ class dac_convex_hull : private boost::noncopyable
 
         edge* new_edge_pair(vertex* from, vertex* to);
 
-        std::vector<point_t>            _vertices;      /* Vertices of the output hull                                                                                                      */
+        std::vector<point_t<>>            _vertices;      /* Vertices of the output hull                                                                                                      */
         std::vector<std::vector<int>>   _faces;         /* Faces of the convex hull. Each entry is an index into the "edges" array pointing to an edge of the face. Faces are planar n-gons */
         vertex*                         _vertex_list;
-        point_t                         _scaling;
-        point_t                         _center;
+        point_t<>                         _scaling;
+        point_t<>                         _center;
         boost::object_pool<edge>        _edge_pool;
         std::vector<vertex>             _original_vertices;
         int                             _merge_stamp;

@@ -12,7 +12,7 @@
 #include "convex_decomposition.h"
 #include "convex_decomposition_options.h"
 #include "discretisation_type.h"
-#include "parser.h"
+#include "hull_parser.h"
 
 
 namespace po = boost::program_options;
@@ -66,9 +66,9 @@ int main(int argc, char const *argv[])
     }
 
     /* Load input */
-    std::vector<point_t>    points;
+    std::vector<point_t<>>  points;
     std::vector<point_ti<>> triangles;
-    if (!raptor_convex_decomposition::load_off(input, &points, &triangles))
+    if (!raptor_parsers::load_off(input, &points, &triangles))
     {
         return 2;
     }

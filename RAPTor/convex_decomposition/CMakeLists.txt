@@ -16,7 +16,7 @@ set(SOURCE
     volume.cc)
 
 # Libraries
-set(LIBS raptor_raytracer::shared raptor_raytracer::headers SDL2 SDL2_ttf tbb ${Boost_LIBRARIES} fftw3f)
+set(LIBS raptor_raytracer::shared raptor_raytracer::headers raptor_parsers::headers  SDL2 SDL2_ttf tbb ${Boost_LIBRARIES} fftw3f)
 link_directories( 
     $ENV{LIBARYS_PATH}/SDL2-$ENV{SDL_VER}/lib
     $ENV{LIBARYS_PATH}/SDL2_ttf-$ENV{SDLTTF_VER}/lib
@@ -29,6 +29,8 @@ set(UNIT_TESTS
     convex_decomposition_tests
     convex_mesh_tests
     dac_convex_hull_tests
+    dac_convex_hull_2d_tests
+    dac_convex_hull_3d_tests
     incremental_convex_hull_tests
     primitive_set_tests
     tetrahedron_set_tests

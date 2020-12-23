@@ -13,7 +13,7 @@ void tetrahedron_set::compute_bounding_box()
 
     _min_bb     = _tetrahedra[0].pts[0];
     _max_bb     = _tetrahedra[0].pts[0];
-    _barycenter = point_t(0.0f, 0.0f, 0.0f);
+    _barycenter = point_t<>(0.0f, 0.0f, 0.0f);
     for (const auto &t : _tetrahedra)
     {
         for (int i = 0; i < 4; ++i)
@@ -35,8 +35,8 @@ void tetrahedron_set::compute_convex_hull(convex_mesh *const mesh, const int sam
 
     int p = 0;
     int s = 0;
-    std::vector<point_t> cpoints;
-    std::vector<point_t> points(std::ceil(cluster_size / 5.0f) * 5);
+    std::vector<point_t<>> cpoints;
+    std::vector<point_t<>> points(std::ceil(cluster_size / 5.0f) * 5);
     while (p < static_cast<int>(_tetrahedra.size()))
     {
         int qu = 0;
@@ -107,7 +107,7 @@ bool tetrahedron_set::add(tetrahedron t)
     return true;
 }
 
-void tetrahedron_set::add_clipped_tetrahedra(const point_t (&pts) [10], const int size)
+void tetrahedron_set::add_clipped_tetrahedra(const point_t<> (&pts) [10], const int size)
 {
     assert((size == 4) || (size == 6) || !"Error: Wrong number of points to create a clipped tetrahedron");
 
@@ -239,7 +239,7 @@ void tetrahedron_set::add_clipped_tetrahedra(const point_t (&pts) [10], const in
     }
 }
 
-void tetrahedron_set::intersect(const plane &p, std::vector<point_t> *const pos_pts, std::vector<point_t> *const neg_pts, const int sampling) const
+void tetrahedron_set::intersect(const plane &p, std::vector<point_t<>> *const pos_pts, std::vector<point_t<>> *const neg_pts, const int sampling) const
 {
     if (_tetrahedra.empty())
     {
@@ -412,8 +412,8 @@ void tetrahedron_set::cut(const plane &p, primitive_set **const pos_part, primit
     memcpy(pos_cut->_d, _d, 9 * sizeof(float));
 
     int sign[4];
-    point_t pos_pts[10];
-    point_t neg_pts[10];
+    point_t<> pos_pts[10];
+    point_t<> neg_pts[10];
     const int edges [6][2]= {{0, 1}, {0, 2}, {0, 3}, {1, 2}, {1, 3}, {2, 3}};
     for (const auto &t : _tetrahedra)
     {
@@ -454,13 +454,13 @@ void tetrahedron_set::cut(const plane &p, primitive_set **const pos_part, primit
             {
                 if ((sign[edges[j][0]] * sign[edges[j][1]]) == -1)
                 {
-                    const point_t p0(t.pts[edges[j][0]]);
-                    const point_t p1(t.pts[edges[j][1]]);
+                    const point_t<> p0(t.pts[edges[j][0]]);
+                    const point_t<> p1(t.pts[edges[j][1]]);
                     const float delta = dot_product((p1 - p0), p.n);
                     const float alpha = p.distance(p1) / delta;
                     assert(alpha >= 0.0f && alpha <= 1.0f);
 
-                    const point_t s((alpha * p0) + ((1.0f - alpha) * p1));
+                    const point_t<> s((alpha * p0) + ((1.0f - alpha) * p1));
                     pos_pts[npos++] = s;
                     neg_pts[nneg++] = s;
                 }
@@ -498,32 +498,32 @@ void tetrahedron_set::convert(convex_mesh *const mesh, const voxel_value_t value
 
 void tetrahedron_set::compute_axes_aligned_clipping_planes(std::vector<plane> *const planes, const int downsampling) const
 {
-    const point_t   &min_pt = get_min_bb();
-    const point_t   &max_pt = get_max_bb();
+    const point_t<>   &min_pt = get_min_bb();
+    const point_t<>   &max_pt = get_max_bb();
     const float     scale   = get_scale();
     for (int i = 0; i <= static_cast<int>((max_pt.x - min_pt.x) / scale + 0.5f); i += downsampling)
     {
         const float x = min_pt.x + (scale * i);
-        planes->emplace_back(plane(point_t(1.0f, 0.0f, 0.0f), x, axis_t::x_axis));
+        planes->emplace_back(plane(point_t<>(1.0f, 0.0f, 0.0f), x, axis_t::x_axis));
     }
 
     for (int j = 0; j <= static_cast<int>((max_pt.y - min_pt.y) / scale + 0.5f); j += downsampling)
     {
         const float y = min_pt.y + (scale * j);
-        planes->emplace_back(plane(point_t(0.0f, 1.0f, 0.0f), y, axis_t::y_axis));
+        planes->emplace_back(plane(point_t<>(0.0f, 1.0f, 0.0f), y, axis_t::y_axis));
     }
 
     for (int k = 0; k <= static_cast<int>((max_pt.z - min_pt.z) / scale + 0.5f); k += downsampling)
     {
         const float z = min_pt.z + (scale * k);
-        planes->emplace_back(plane(point_t(0.0f, 0.0f, 1.0f), z, axis_t::z_axis));
+        planes->emplace_back(plane(point_t<>(0.0f, 0.0f, 1.0f), z, axis_t::z_axis));
     }
 }
 
 void tetrahedron_set::refine_axes_aligned_clipping_planes(std::vector<plane> *const planes, const plane &best, const int downsampling, const int index) const
 {
-    const point_t   &min_pt = get_min_bb();
-    const point_t   &max_pt = get_max_bb();
+    const point_t<>   &min_pt = get_min_bb();
+    const point_t<>   &max_pt = get_max_bb();
     const float     scale   = get_scale();
     if (best.major_axis == axis_t::x_axis)
     {
@@ -532,7 +532,7 @@ void tetrahedron_set::refine_axes_aligned_clipping_planes(std::vector<plane> *co
         for (int i = i0; i <= i1; ++i)
         {
             const float x = min_pt.x + (scale * i);
-            planes->emplace_back(plane(point_t(1.0f, 0.0f, 0.0f), x, axis_t::x_axis));
+            planes->emplace_back(plane(point_t<>(1.0f, 0.0f, 0.0f), x, axis_t::x_axis));
         }
     }
     else if (best.major_axis == axis_t::y_axis)
@@ -542,7 +542,7 @@ void tetrahedron_set::refine_axes_aligned_clipping_planes(std::vector<plane> *co
         for (int j = j0; j <= j1; ++j)
         {
             const float y = min_pt.y + (scale * j);
-            planes->emplace_back(plane(point_t(0.0f, 1.0f, 0.0f), y, axis_t::y_axis));
+            planes->emplace_back(plane(point_t<>(0.0f, 1.0f, 0.0f), y, axis_t::y_axis));
         }
     }
     else
@@ -552,7 +552,7 @@ void tetrahedron_set::refine_axes_aligned_clipping_planes(std::vector<plane> *co
         for (int k = k0; k <= k1; ++k)
         {
             const float z = min_pt.z + (scale * k);
-            planes->emplace_back(plane(point_t(0.0f, 0.0f, 1.0f), z, axis_t::z_axis));
+            planes->emplace_back(plane(point_t<>(0.0f, 0.0f, 1.0f), z, axis_t::z_axis));
         }
     }
 }
@@ -606,7 +606,7 @@ void tetrahedron_set::compute_principal_axes()
     {
         for (int i = 0; i < 4; ++i)
         {
-            const point_t diff(t.pts[i] - _barycenter);
+            const point_t<> diff(t.pts[i] - _barycenter);
             cov[0][0] += diff.x * diff.x;
             cov[1][1] += diff.y * diff.y;
             cov[2][2] += diff.z * diff.z;
@@ -640,7 +640,7 @@ void tetrahedron_set::align_to_principal_axes()
     {
         for (int i = 0; i < 4; ++i)
         {
-            const point_t diff(t.pts[i] - _barycenter);
+            const point_t<> diff(t.pts[i] - _barycenter);
             t.pts[i].x = (_q[0][0] * diff.x) + (_q[1][0] * diff.y) + (_q[2][0] * diff.z) + _barycenter.x;
             t.pts[i].y = (_q[0][1] * diff.x) + (_q[1][1] * diff.y) + (_q[2][1] * diff.z) + _barycenter.y;
             t.pts[i].z = (_q[0][2] * diff.x) + (_q[1][2] * diff.y) + (_q[2][2] * diff.z) + _barycenter.z;
@@ -662,7 +662,7 @@ void tetrahedron_set::revert_align_to_principal_axes()
     {
         for (int i = 0; i < 4; ++i)
         {
-            const point_t diff(t.pts[i] - _barycenter);
+            const point_t<> diff(t.pts[i] - _barycenter);
             t.pts[i].x = (_q[0][0] * diff.x) + (_q[0][1] * diff.y) + (_q[0][2] * diff.z) + _barycenter.x;
             t.pts[i].y = (_q[1][0] * diff.x) + (_q[1][1] * diff.y) + (_q[1][2] * diff.z) + _barycenter.y;
             t.pts[i].z = (_q[2][0] * diff.x) + (_q[2][1] * diff.y) + (_q[2][2] * diff.z) + _barycenter.z;

@@ -22,7 +22,7 @@ class incremental_convex_hull : private boost::noncopyable
 {
     public :
         /* Ctor */
-        incremental_convex_hull(const std::vector<point_t> &points) : _mesh(compute_offset_and_scale(points), _scale_inv), _last_processed(_mesh.get_vertices().end()), _flat(false) {  }
+        incremental_convex_hull(const std::vector<point_t<>> &points) : _mesh(compute_offset_and_scale(points), _scale_inv), _last_processed(_mesh.get_vertices().end()), _flat(false) {  }
 
         /* Access functions */
         tm_mesh&    mesh()                        { return _mesh;                       }
@@ -30,7 +30,7 @@ class incremental_convex_hull : private boost::noncopyable
         int         number_of_triangles()   const { return _mesh.number_of_triangles(); }
         bool        flat()                  const { return _flat;                       }
 
-        void add_points(const std::vector<point_t> &points)
+        void add_points(const std::vector<point_t<>> &points)
         {
             for (int i = 0; i < static_cast<int>(points.size()); ++i)
             {
@@ -38,7 +38,7 @@ class incremental_convex_hull : private boost::noncopyable
             }
         }
 
-        void add_point(const point_t &pt, const int id)
+        void add_point(const point_t<> &pt, const int id)
         {
             _mesh.add_vertex(pt, id);
         }
@@ -177,17 +177,17 @@ class incremental_convex_hull : private boost::noncopyable
         }
 
     private :
-        point_t compute_offset_and_scale(const std::vector<point_t> &points)
+        point_t<> compute_offset_and_scale(const std::vector<point_t<>> &points)
         {
             /* Check for data */
             if (points.empty())
             {
-                return point_t(0.0f, 0.0f, 0.0f);
+                return point_t<>(0.0f, 0.0f, 0.0f);
             }
 
             /* Find bounds of the points */
-            point_t min_pt(points[0]);
-            point_t max_pt(points[0]);
+            point_t<> min_pt(points[0]);
+            point_t<> max_pt(points[0]);
             for (int i = 1; i < static_cast<int>(points.size()); ++i)
             {
                 min_pt = min(min_pt, points[i]);
@@ -195,7 +195,7 @@ class incremental_convex_hull : private boost::noncopyable
             }
 
             /* Find the center */
-            const point_t offset((min_pt + max_pt) * 0.5f);
+            const point_t<> offset((min_pt + max_pt) * 0.5f);
 
             /* Calculate scale */
             _scale_inv = max_pt - min_pt;
@@ -511,7 +511,7 @@ class incremental_convex_hull : private boost::noncopyable
             return true;
         }
 
-        point_t                         _scale_inv;
+        point_t<>                       _scale_inv;
         tm_mesh                         _mesh;
         std::vector<tmm_edge_iter>      _delete_edges;
         std::vector<tmm_edge_iter>      _update_edges;
