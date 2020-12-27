@@ -24,6 +24,8 @@
 const raptor_physics::init_logger init_logger;
 
 
+int dac_convex_hull_3d::_merge_num = 0;
+
 namespace test
 {
 struct edge_compare
@@ -344,6 +346,8 @@ struct dac_convex_hull_3d_fixture : private boost::noncopyable
     std::vector<std::shared_ptr<edge>>                  wrapping_edges;
     std::set<std::shared_ptr<edge>>                     added_edges;
     std::set<std::shared_ptr<face>>                     added_faces;
+    vertex *                                            l_iter;
+    vertex *                                            r_iter;
 };
 
 BOOST_FIXTURE_TEST_SUITE( dac_convex_hull_3d_tests, dac_convex_hull_3d_fixture );
@@ -519,7 +523,9 @@ BOOST_AUTO_TEST_CASE( wrap_points_test )
     vertices.emplace_back(point_ti<long>(-1, 0, 0));
     vertices.emplace_back(point_ti<long>( 1, 0, 0));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[1]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[1];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_CHECK(edges.empty());
 }
 
@@ -528,7 +534,9 @@ BOOST_AUTO_TEST_CASE( wrap_points_reverse_test )
     vertices.emplace_back(point_ti<long>(-1, 0, 0));
     vertices.emplace_back(point_ti<long>( 1, 0, 0));
 
-    const auto &edges = uut->wrap(&vertices[1], &vertices[0]);
+    l_iter = &vertices[1];
+    r_iter = &vertices[0];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_CHECK(edges.empty());
 }
 
@@ -539,7 +547,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_edge_test )
     vertices.emplace_back(point_ti<long>( 1,  1, 0));
     const auto &e0 = create_edge(1, 2);
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[1]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[1];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 2);
     BOOST_CHECK(edges[0] == e0);
     BOOST_CHECK(edges[1] == e0);
@@ -552,7 +562,9 @@ BOOST_AUTO_TEST_CASE( wrap_edge_point_test )
     vertices.emplace_back(point_ti<long>( 1,  1, 0));
     const auto &e0 = create_edge(1, 2);
 
-    const auto &edges = uut->wrap(&vertices[1], &vertices[0]);
+    l_iter = &vertices[1];
+    r_iter = &vertices[0];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 2);
     BOOST_CHECK(edges[0] == e0);
     BOOST_CHECK(edges[1] == e0);
@@ -565,7 +577,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_reverse_edge_test )
     vertices.emplace_back(point_ti<long>( 1, -1, 0));
     const auto &e0 = create_edge(1, 2);
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[1]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[1];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 2);
     BOOST_CHECK(edges[0] == e0);
     BOOST_CHECK(edges[1] == e0);
@@ -578,7 +592,9 @@ BOOST_AUTO_TEST_CASE( wrap_reverse_edge_point_test )
     vertices.emplace_back(point_ti<long>( 1, -1, 0));
     const auto &e0 = create_edge(1, 2);
 
-    const auto &edges = uut->wrap(&vertices[1], &vertices[0]);
+    l_iter = &vertices[1];
+    r_iter = &vertices[0];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 2);
     BOOST_CHECK(edges[0] == e0);
     BOOST_CHECK(edges[1] == e0);
@@ -593,7 +609,9 @@ BOOST_AUTO_TEST_CASE( wrap_edges_test )
     const auto &e0 = create_edge(0, 1);
     const auto &e1 = create_edge(2, 3);
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[2]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[2];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 4);
     BOOST_CHECK(edges[0] == e0);
     BOOST_CHECK(edges[1] == e1);
@@ -610,7 +628,9 @@ BOOST_AUTO_TEST_CASE( wrap_edges_reverse_both_test )
     const auto &e0 = create_edge(0, 1);
     const auto &e1 = create_edge(2, 3);
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[2]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[2];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 4);
     BOOST_CHECK(edges[0] == e0);
     BOOST_CHECK(edges[1] == e1);
@@ -628,7 +648,9 @@ BOOST_AUTO_TEST_CASE( wrap_edges_reverse_both_test )
 //     const auto &e0 = create_edge(0, 1);
 //     const auto &e1 = create_edge(2, 3);
 
-//     const auto &edges = uut->wrap(&vertices[0], &vertices[2]);
+    // l_iter = &vertices[0];
+    // r_iter = &vertices[2];
+//     const auto &edges = uut->wrap(&l_iter, &r_iter);
 //     BOOST_REQUIRE(edges.size() == 4);
 //     BOOST_CHECK(edges[0] == e0);
 //     BOOST_CHECK(edges[1] == e0);
@@ -645,7 +667,9 @@ BOOST_AUTO_TEST_CASE( wrap_edges_reverse_both_test )
 //     const auto &e0 = create_edge(0, 1);
 //     const auto &e1 = create_edge(2, 3);
 
-//     const auto &edges = uut->wrap(&vertices[0], &vertices[2]);
+    // l_iter = &vertices[0];
+    // r_iter = &vertices[2];
+//     const auto &edges = uut->wrap(&l_iter, &r_iter);
 //     BOOST_REQUIRE(edges.size() == 4);
 //     BOOST_CHECK(edges[0] == e0);
 //     BOOST_CHECK(edges[1] == e0);
@@ -664,7 +688,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_triangle1_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[1]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[1];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 3);
     BOOST_CHECK(edges[0] == lookup_edge(1, 3));
     BOOST_CHECK(edges[1] == lookup_edge(3, 2));
@@ -680,7 +706,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_triangle2_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[2]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[2];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 3);
     BOOST_CHECK(edges[0] == lookup_edge(2, 1));
     BOOST_CHECK(edges[1] == lookup_edge(1, 3));
@@ -696,7 +724,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_triangle3_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[3]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[3];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 3);
     BOOST_CHECK(edges[0] == lookup_edge(3, 2));
     BOOST_CHECK(edges[1] == lookup_edge(2, 1));
@@ -713,7 +743,9 @@ BOOST_AUTO_TEST_CASE( wrap_triangle_point_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[1], &vertices[0]);
+    l_iter = &vertices[1];
+    r_iter = &vertices[0];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 3);
     BOOST_CHECK(edges[0] == lookup_edge(1, 2));
     BOOST_CHECK(edges[1] == lookup_edge(2, 3));
@@ -730,7 +762,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_reverse_triangle_test )
     create_face(point_ti<>(1, 3, 2));
     create_face(point_ti<>(1, 2, 3));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[1]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[1];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 3);
     BOOST_CHECK(edges[0] == lookup_edge(1, 3));
     BOOST_CHECK(edges[1] == lookup_edge(3, 2));
@@ -746,7 +780,9 @@ BOOST_AUTO_TEST_CASE( wrap_reverse_triangle_point_test )
     create_face(point_ti<>(1, 3, 2));
     create_face(point_ti<>(1, 2, 3));
 
-    const auto &edges = uut->wrap(&vertices[1], &vertices[0]);
+    l_iter = &vertices[1];
+    r_iter = &vertices[0];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 3);
     BOOST_CHECK(edges[0] == lookup_edge(1, 2));
     BOOST_CHECK(edges[1] == lookup_edge(2, 3));
@@ -763,7 +799,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_triangle_far_point_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[1]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[1];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 3);
     BOOST_CHECK(edges[0] == lookup_edge(1, 2));
     BOOST_CHECK(edges[1] == lookup_edge(2, 3));
@@ -781,7 +819,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_triangle2_co_planar_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[2], &vertices[0]);
+    l_iter = &vertices[2];
+    r_iter = &vertices[0];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 3);
     BOOST_CHECK(edges[0] == lookup_edge(2, 1));
     BOOST_CHECK(edges[1] == lookup_edge(1, 3));
@@ -797,7 +837,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_triangle3_co_planar_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[3], &vertices[0]);
+    l_iter = &vertices[3];
+    r_iter = &vertices[0];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 3);
     BOOST_CHECK(edges[0] == lookup_edge(3, 2));
     BOOST_CHECK(edges[1] == lookup_edge(2, 1));
@@ -814,7 +856,9 @@ BOOST_AUTO_TEST_CASE( wrap_triangle_point_co_planar_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[2]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[2];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 3);
     BOOST_CHECK(edges[0] == lookup_edge(2, 1));
     BOOST_CHECK(edges[1] == lookup_edge(1, 3));
@@ -831,7 +875,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_reverse_triangle_co_planar_test )
     create_face(point_ti<>(1, 3, 2));
     create_face(point_ti<>(1, 2, 3));
 
-    const auto &edges = uut->wrap(&vertices[3], &vertices[0]);
+    l_iter = &vertices[3];
+    r_iter = &vertices[0];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 4);
     BOOST_CHECK(edges[0] == lookup_edge(3, 1));
     BOOST_CHECK(edges[1] == lookup_edge(1, 2));
@@ -848,7 +894,9 @@ BOOST_AUTO_TEST_CASE( wrap_reverse_triangle_point_co_planar_test )
     create_face(point_ti<>(1, 3, 2));
     create_face(point_ti<>(1, 2, 3));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[2]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[2];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 4);
     BOOST_CHECK(edges[0] == lookup_edge(2, 1));
     BOOST_CHECK(edges[1] == lookup_edge(1, 3));
@@ -867,7 +915,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_triangle1_co_linear_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[1]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[1];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 2);
     BOOST_CHECK(edges[0] == lookup_edge(1, 3));
     BOOST_CHECK(edges[1] == lookup_edge(3, 1));
@@ -882,7 +932,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_triangle3_co_linear_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[3]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[3];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 2);
     BOOST_CHECK(edges[0] == lookup_edge(3, 1));
     BOOST_CHECK(edges[1] == lookup_edge(1, 3));
@@ -898,7 +950,9 @@ BOOST_AUTO_TEST_CASE( wrap_triangle_point_co_linear_test )
     create_face(point_ti<>(1, 2, 3));
     create_face(point_ti<>(1, 3, 2));
 
-    const auto &edges = uut->wrap(&vertices[1], &vertices[0]);
+    l_iter = &vertices[1];
+    r_iter = &vertices[0];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 2);
     BOOST_CHECK(edges[0] == lookup_edge(1, 3));
     BOOST_CHECK(edges[1] == lookup_edge(3, 1));
@@ -914,7 +968,9 @@ BOOST_AUTO_TEST_CASE( wrap_point_reverse_triangle_co_linear_test )
     create_face(point_ti<>(1, 3, 2));
     create_face(point_ti<>(1, 2, 3));
 
-    const auto &edges = uut->wrap(&vertices[0], &vertices[3]);
+    l_iter = &vertices[0];
+    r_iter = &vertices[3];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 2);
     BOOST_CHECK(edges[0] == lookup_edge(3, 1));
     BOOST_CHECK(edges[1] == lookup_edge(1, 3));
@@ -930,7 +986,9 @@ BOOST_AUTO_TEST_CASE( wrap_reverse_triangle_point_co_linear_test )
     create_face(point_ti<>(1, 3, 2));
     create_face(point_ti<>(1, 2, 3));
 
-    const auto &edges = uut->wrap(&vertices[1], &vertices[0]);
+    l_iter = &vertices[1];
+    r_iter = &vertices[0];
+    const auto &edges = uut->wrap(&l_iter, &r_iter);
     BOOST_REQUIRE(edges.size() == 2);
     BOOST_CHECK(edges[0] == lookup_edge(1, 3));
     BOOST_CHECK(edges[1] == lookup_edge(3, 1));
@@ -1609,7 +1667,7 @@ BOOST_AUTO_TEST_CASE( triangle_point_merge_test )
 
 BOOST_AUTO_TEST_CASE( point_triangle_co_planar_merge_test )
 {
-    vertices.emplace_back(point_ti<long>(-1, -1, 0));
+    vertices.emplace_back(point_ti<long>(-1,  0, 0));
     vertices.emplace_back(point_ti<long>( 1, -1, 0));
     vertices.emplace_back(point_ti<long>( 1,  1, 0));
     vertices.emplace_back(point_ti<long>( 2,  1, 0)); // point
@@ -1951,16 +2009,162 @@ BOOST_AUTO_TEST_CASE( sqaure_edges_merge_test )
     check_removals(__LINE__, {&vertices[2], &vertices[3], &vertices[4], &vertices[5]});
 }
 
+BOOST_AUTO_TEST_CASE( y_triangles_merge_test )
+{
+    vertices.emplace_back(point_ti<long>(-1,  5, -6));
+    vertices.emplace_back(point_ti<long>(-1,  1, -6));
+    vertices.emplace_back(point_ti<long>(-1,  7,  4));
+    vertices.emplace_back(point_ti<long>(-1, -1, -2));
+    vertices.emplace_back(point_ti<long>(-1, -4,  0));
+    vertices.emplace_back(point_ti<long>(-1, -5,  3));
+    create_face(point_ti<>(0, 1, 2));
+    create_face(point_ti<>(0, 2, 1));
+    create_face(point_ti<>(3, 4, 5));
+    create_face(point_ti<>(3, 5, 4));
+
+    auto [l, r] = make_hulls(3);
+    l->merge(*r);
+
+    BOOST_CHECK(l->is_convex());
+    collect_edges_and_faces();
+    consistency_check_edges(__LINE__, 9);
+    consistency_check_faces(__LINE__, 6);
+    check_removals(__LINE__, {&vertices[3]});
+}
+
+BOOST_AUTO_TEST_CASE( y_triangles_reverse_merge_test )
+{
+    vertices.emplace_back(point_ti<long>(-1, -1, -2));
+    vertices.emplace_back(point_ti<long>(-1, -4,  0));
+    vertices.emplace_back(point_ti<long>(-1, -5,  3));
+    vertices.emplace_back(point_ti<long>(-1,  5, -6));
+    vertices.emplace_back(point_ti<long>(-1,  1, -6));
+    vertices.emplace_back(point_ti<long>(-1,  7,  4));
+    create_face(point_ti<>(0, 1, 2));
+    create_face(point_ti<>(0, 2, 1));
+    create_face(point_ti<>(3, 4, 5));
+    create_face(point_ti<>(3, 5, 4));
+
+    auto [l, r] = make_hulls(3);
+    l->merge(*r);
+
+    BOOST_CHECK(l->is_convex());
+    collect_edges_and_faces();
+    consistency_check_edges(__LINE__, 9);
+    consistency_check_faces(__LINE__, 6);
+    check_removals(__LINE__, {&vertices[0]});
+}
 
 /* Performance tests */
-BOOST_AUTO_TEST_CASE( square_point_cloud_performance_test )
+BOOST_AUTO_TEST_CASE( small_low_density_cube_point_cloud_performance_test )
 {
     const long size_x = 10;
     const long size_y = 10;
     const long size_z = 10;
-    const int number_points = 70;
 
-    BOOST_LOG_TRIVIAL(fatal) << "input vertices";
+    std::uniform_int_distribution<long> dist_x(-size_x, size_x);
+    std::uniform_int_distribution<long> dist_y(-size_y, size_y);
+    std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+    for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            const long x = dist_x(random);
+            const long y = dist_y(random);
+            const long z = dist_z(random);
+            vertices.emplace_back(point_ti<long>(x, y, z));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        const auto hull_vertices(hull.hull_vertices());
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+        BOOST_CHECK(hull.is_convex());
+        BOOST_CHECK(save_vrml(hull));
+    }
+}
+
+BOOST_AUTO_TEST_CASE( small_medium_density_cube_point_cloud_performance_test )
+{
+    const long size_x = 10;
+    const long size_y = 10;
+    const long size_z = 10;    
+
+    std::uniform_int_distribution<long> dist_x(-size_x, size_x);
+    std::uniform_int_distribution<long> dist_y(-size_y, size_y);
+    std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            const long x = dist_x(random);
+            const long y = dist_y(random);
+            const long z = dist_z(random);
+            vertices.emplace_back(point_ti<long>(x, y, z));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        const auto hull_vertices(hull.hull_vertices());
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+        BOOST_CHECK(hull.is_convex());
+        BOOST_CHECK(save_vrml(hull));
+    }
+}
+
+BOOST_AUTO_TEST_CASE( small_high_density_cube_point_cloud_performance_test )
+{
+    const long size_x = 10;
+    const long size_y = 10;
+    const long size_z = 10;    
+
+    std::uniform_int_distribution<long> dist_x(-size_x, size_x);
+    std::uniform_int_distribution<long> dist_y(-size_y, size_y);
+    std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            const long x = dist_x(random);
+            const long y = dist_y(random);
+            const long z = dist_z(random);
+            vertices.emplace_back(point_ti<long>(x, y, z));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        const auto hull_vertices(hull.hull_vertices());
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+        BOOST_CHECK(hull.is_convex());
+        BOOST_CHECK(save_vrml(hull));
+    }
+}
+
+BOOST_AUTO_TEST_CASE( small_extreme_density_cube_point_cloud_performance_test )
+{
+    const long size_x = 10;
+    const long size_y = 10;
+    const long size_z = 10;    
+    const int number_points = 1000000;
+
     std::uniform_int_distribution<long> dist_x(-size_x, size_x);
     std::uniform_int_distribution<long> dist_y(-size_y, size_y);
     std::uniform_int_distribution<long> dist_z(-size_z, size_z);
@@ -1970,28 +2174,273 @@ BOOST_AUTO_TEST_CASE( square_point_cloud_performance_test )
         const long y = dist_y(random);
         const long z = dist_z(random);
         vertices.emplace_back(point_ti<long>(x, y, z));
-        BOOST_LOG_TRIVIAL(fatal) << "    " << vertices.back().position();
     }
 
-    std::vector<projected_vertex> proj_vertices;
-    std::cout << "building" << std::endl;
     auto t0(std::chrono::system_clock::now());
-    const auto hull(build(proj_vertices, vertices));
+    const auto hull(build(*proj_vertices, vertices));
     auto t1(std::chrono::system_clock::now());
 
     const auto hull_vertices(hull.hull_vertices());
-    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: square_point_cloud_performance_test " << vertices.size() << " hull size " << hull_vertices.size();
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
     BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
     BOOST_CHECK(hull.is_convex());
     BOOST_CHECK(save_vrml(hull));
+}
 
-    BOOST_LOG_TRIVIAL(fatal) << "hull vertices";
-    for (const auto &v : hull_vertices)
+BOOST_AUTO_TEST_CASE( small_low_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 20.0;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 10; number_points < 210; number_points += 10)
     {
-        BOOST_LOG_TRIVIAL(fatal) << "    " << v.position();
+        vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        const auto hull_vertices(hull.hull_vertices());
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+        BOOST_CHECK(hull.is_convex());
+        BOOST_CHECK(save_vrml(hull));
     }
 }
+
+BOOST_AUTO_TEST_CASE( small_medium_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 20.0;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        const auto hull_vertices(hull.hull_vertices());
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+        BOOST_CHECK(hull.is_convex());
+        BOOST_CHECK(save_vrml(hull));
+    }
+}
+
+BOOST_AUTO_TEST_CASE( small_high_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 20.0;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        const auto hull_vertices(hull.hull_vertices());
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+        BOOST_CHECK(hull.is_convex());
+        BOOST_CHECK(save_vrml(hull));
+    }
+}
+
+BOOST_AUTO_TEST_CASE( small_extreme_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 20.0;
+    const int number_points = 1000000;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+
+    for (int i = 0; i < number_points; ++i)
+    {
+        const float r = dist_r(random);
+        const float pi = dist_pi(random);
+        const float theta = dist_pi(random);
+        vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+    }
+
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
+
+    const auto hull_vertices(hull.hull_vertices());
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+    BOOST_CHECK(hull.is_convex());
+    BOOST_CHECK(save_vrml(hull));
+}
+
+BOOST_AUTO_TEST_CASE( small_low_density_xy_plane_point_cloud_performance_test )
+{
+    const long size_x = 10;
+    const long size_y = 10;
+    const long size_z = 0;
+
+    std::uniform_int_distribution<long> dist_x(-size_x, size_x);
+    std::uniform_int_distribution<long> dist_y(-size_y, size_y);
+    std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+    // for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        proj_vertices->clear();
+        int number_points = 6;
+        for (int i = 0; i < number_points; ++i)
+        {
+            const long x = dist_x(random);
+            const long y = dist_y(random);
+            const long z = dist_z(random);
+            vertices.emplace_back(point_ti<long>(x, y, z));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        const auto hull_vertices(hull.hull_vertices());
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+        BOOST_CHECK(hull.is_convex());
+        BOOST_CHECK(save_vrml(hull));
+    }
+}
+
+// BOOST_AUTO_TEST_CASE( small_medium_density_xy_plane_point_cloud_performance_test )
+// {
+//     const long size_x = 10;
+//     const long size_y = 10;
+//     const long size_z = 0;
+
+//     std::uniform_int_distribution<long> dist_x(-size_x, size_x);
+//     std::uniform_int_distribution<long> dist_y(-size_y, size_y);
+//     std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+//     for (int number_points = 200; number_points < 2100; number_points += 100)
+//     {
+//         vertices.clear();
+//         proj_vertices->clear();
+//         for (int i = 0; i < number_points; ++i)
+//         {
+//             const long x = dist_x(random);
+//             const long y = dist_y(random);
+//             const long z = dist_z(random);
+//             vertices.emplace_back(point_ti<long>(x, y, z));
+//         }
+
+//         auto t0(std::chrono::system_clock::now());
+//         const auto hull(build(*proj_vertices, vertices));
+//         auto t1(std::chrono::system_clock::now());
+
+//         const auto hull_vertices(hull.hull_vertices());
+//         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+//         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+//         BOOST_CHECK(hull.is_convex());
+//         BOOST_CHECK(save_vrml(hull));
+//     }
+// }
+
+// BOOST_AUTO_TEST_CASE( small_high_density_xy_plane_point_cloud_performance_test )
+// {
+//     const long size_x = 10;
+//     const long size_y = 10;
+//     const long size_z = 0;
+
+//     std::uniform_int_distribution<long> dist_x(-size_x, size_x);
+//     std::uniform_int_distribution<long> dist_y(-size_y, size_y);
+//     std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+//     for (int number_points = 3000; number_points < 21000; number_points += 1000)
+//     {
+//         vertices.clear();
+//         proj_vertices->clear();
+//         for (int i = 0; i < number_points; ++i)
+//         {
+//             const long x = dist_x(random);
+//             const long y = dist_y(random);
+//             const long z = dist_z(random);
+//             vertices.emplace_back(point_ti<long>(x, y, z));
+//         }
+
+//         auto t0(std::chrono::system_clock::now());
+//         const auto hull(build(*proj_vertices, vertices));
+//         auto t1(std::chrono::system_clock::now());
+
+//         const auto hull_vertices(hull.hull_vertices());
+//         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+//         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+//         BOOST_CHECK(hull.is_convex());
+//         BOOST_CHECK(save_vrml(hull));
+//     }
+// }
+
+// BOOST_AUTO_TEST_CASE( small_extreme_density_xy_plane_point_cloud_performance_test )
+// {
+//     const long size_x = 10;
+//     const long size_y = 10;
+//     const long size_z = 0;
+//     const int number_points = 1000000;
+
+//     std::uniform_int_distribution<long> dist_x(-size_x, size_x);
+//     std::uniform_int_distribution<long> dist_y(-size_y, size_y);
+//     std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+//     for (int i = 0; i < number_points; ++i)
+//     {
+//         const long x = dist_x(random);
+//         const long y = dist_y(random);
+//         const long z = dist_z(random);
+//         vertices.emplace_back(point_ti<long>(x, y, z));
+//     }
+
+//     auto t0(std::chrono::system_clock::now());
+//     const auto hull(build(*proj_vertices, vertices));
+//     auto t1(std::chrono::system_clock::now());
+
+//     const auto hull_vertices(hull.hull_vertices());
+//     BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
+//     BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+//     BOOST_CHECK(hull.is_convex());
+//     BOOST_CHECK(save_vrml(hull));
+// }
 
 BOOST_AUTO_TEST_SUITE_END()
 }; /* namespace test */
