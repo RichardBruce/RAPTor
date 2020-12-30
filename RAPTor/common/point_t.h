@@ -39,6 +39,16 @@ class point_t
             return x < y ? (y < z ? 2 : 1) : (x < z ? 2 : 0);
         }
 
+        T max() const 
+        {
+            return std::max(x, std::max(y, z));
+        }
+
+        T min() const 
+        {
+            return std::min(x, std::min(y, z));
+        }
+
         bool close(const point_t &rhs, const T tolerance) const
         {
             return fabs(magnitude(*this - rhs)) < tolerance;

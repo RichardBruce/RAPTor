@@ -2,8 +2,10 @@
 
 /* Standard Headers */
 #include <cmath>
+#include <fstream>
 #include <iostream>
 #include <numeric>
+#include <set>
 #include <vector>
 
 /* Boost headers */
@@ -11,8 +13,10 @@
 
 /* Common headers */
 #include "point2d.h"
+#include "point_t.h"
 
-
+namespace raptor_convex_decomposition
+{
 class dac_convex_hull_3d;
 bool save_vrml(const dac_convex_hull_3d &hull, const std::string &file = "test.wrl");
 
@@ -34,6 +38,11 @@ class projected_vertex
         bool operator==(const projected_vertex &rhs) const
         {
             return _p == rhs._p;
+        }
+
+        void vertex_swap(projected_vertex &rhs)
+        {
+            std::swap(_i, rhs._i);
         }
 
         const point2d<long> &position() const { return _p; }
@@ -60,30 +69,30 @@ class projected_hull
 
         projected_hull& merge(const projected_hull &rhs)
         {
-            std::cout << "Merging 2d hull " << std::endl;
+            // std::cout << "Merging 2d hull " << std::endl;
             for (size_t i = 0; i < size(); ++i)
             {
-                std::cout << at(i).position() << std::endl;
+                // std::cout << at(i).position() << std::endl;
             }
 
-            std::cout << "Versus " << std::endl;
+            // std::cout << "Versus " << std::endl;
             for (size_t i = 0; i < rhs.size(); ++i)
             {
-                std::cout << rhs.at(i).position() << std::endl;
+                // std::cout << rhs.at(i).position() << std::endl;
             }
 
             /* Find the closest points */
             const size_t a_idx = std::distance(_begin, std::max_element(_begin, _end, [](const auto &l, const auto &r){ return (l.position().x < r.position().x) || ((l.position().x == r.position().x) && (l.position().y < r.position().y));}));
             const size_t b_idx = std::distance(rhs._begin, std::min_element(rhs._begin, rhs._end, [](const auto &l, const auto &r){ return l.position().x < r.position().x;}));
-            std::cout << "Starting from left " << at(a_idx).position() << ", right " << rhs.at(b_idx).position() << std::endl;
+            // std::cout << "Starting from left " << at(a_idx).position() << ", right " << rhs.at(b_idx).position() << std::endl;
 
             /* Move line up to find top tangent */
             auto [a_top, b_top] = find_tangent_top(rhs, a_idx, b_idx);
-            std::cout << "Got top tangent left " << at(a_top).position() << ", right " << rhs.at(b_top).position() << std::endl;
+            // std::cout << "Got top tangent left " << at(a_top).position() << ", right " << rhs.at(b_top).position() << std::endl;
 
             /* Move line down to find bottom tangent */
             auto [a_bot, b_bot] = find_tangent_bottom(rhs, a_idx, b_idx);
-            std::cout << "Got bottom tangent left " << at(a_bot).position() << ", right " << rhs.at(b_bot).position() << std::endl;
+            // std::cout << "Got bottom tangent left " << at(a_bot).position() << ", right " << rhs.at(b_bot).position() << std::endl;
 
             /* Merge vertices */
             /* Copy what I can into space left in a */
@@ -95,7 +104,7 @@ class projected_hull
                 do
                 {
                     at(a_top) = rhs.at(b_top);
-                    std::cout << "Copied " << at(a_top).position() << std::endl;
+                    // std::cout << "Copied " << at(a_top).position() << std::endl;
                     wrote_last_b = (b_top == b_bot);
                     a_top = increment(a_top);
                     b_top = rhs.increment(b_top);
@@ -106,15 +115,15 @@ class projected_hull
             if ((a_top == a_bot) && !wrote_last_b)
             {
                 const size_t scratch_size = std::distance(_begin + a_top, _end);
-                std::cout << "Need more space, scratch size " << scratch_size << std::endl;
+                // std::cout << "Need more space, scratch size " << scratch_size << std::endl;
                 std::move(_begin + a_top, _end, _scratch->begin());  /* Make space, it all needs shuffling up anyway */
                 if (b_top <= b_bot)
                 {
-                    std::cout << "No wrap around required, moving " << (b_bot - b_top) << std::endl;
+                    // std::cout << "No wrap around required, moving " << (b_bot - b_top) << std::endl;
                     std::move(rhs._begin + b_top, rhs._begin + b_bot + 1, _begin + a_top);                  /* Move down new data   */
                     for (auto *i = (rhs._begin + b_top); i < (rhs._begin + b_bot); ++i)
                     {
-                        std::cout << "Moving down " << i->position() << std::endl;
+                        // std::cout << "Moving down " << i->position() << std::endl;
                     }
 
                     projected_vertex *move_end = _begin + a_top + (b_bot - b_top) + 1;
@@ -125,7 +134,7 @@ class projected_hull
                 else if (b_top > b_bot)
                 {
                     /* Oh dear, need to move out the lower data as well */
-                    std::cout << "Wrap around required" << std::endl;
+                    // std::cout << "Wrap around required" << std::endl;
                     std::move(rhs._begin, rhs._begin + b_end, _scratch->begin() + scratch_size);
 
                     std::move(rhs._begin + b_top, rhs._end, _begin + a_top);                            /* Move down new data   */
@@ -152,28 +161,28 @@ class projected_hull
                 }
             }
 
-            std::cout << "Merged " << std::endl;
+            // std::cout << "Merged " << std::endl;
             for (size_t i = 0; i < size(); ++i)
             {
-                std::cout << at(i).position() << std::endl;
+                // std::cout << at(i).position() << std::endl;
             }
-            std::cout << std::endl;
+            // std::cout << std::endl;
 
             return *this;
         }
 
         std::pair<size_t, size_t> find_tangent(const projected_hull &rhs, const long dir) const
         {
-            std::cout << "Finding tangent " << std::endl;
+            // std::cout << "Finding tangent " << std::endl;
             for (size_t i = 0; i < size(); ++i)
             {
-                std::cout << at(i).position() << std::endl;
+                // std::cout << at(i).position() << std::endl;
             }
 
-            std::cout << "Versus " << std::endl;
+            // std::cout << "Versus " << std::endl;
             for (size_t i = 0; i < rhs.size(); ++i)
             {
-                std::cout << rhs.at(i).position() << std::endl;
+                // std::cout << rhs.at(i).position() << std::endl;
             }
 
             const size_t a_idx = std::distance(_begin, std::max_element(_begin, _end, [](const auto &l, const auto &r){ return (l.position().x < r.position().x) || ((l.position().x == r.position().x) && (l.position().y < r.position().y));}));
@@ -404,6 +413,9 @@ class vertex
         point_ti<long> position() const { return _p; }
         void position(const point_ti<long> &p) { _p = p; }
 
+        void relocate(const int r) { _relocated = r; }
+        int relocated() const { return _relocated; }
+
         bool done() const { return _done; }
         void done(const bool d) { _done = d; }
 
@@ -443,6 +455,7 @@ class vertex
     private:
         point_ti<long>                      _p;
         std::vector<std::shared_ptr<edge>>  _edges;
+        int                                 _relocated;
         bool                                _done;
         bool                                _removed;
 };
@@ -450,7 +463,10 @@ class vertex
 class face
 {
     public:
-        face(vertex *v0, vertex *v1, vertex *v2) : _vertices{v0, v1, v2} { }
+        face(vertex *v0, vertex *v1, vertex *v2) : _vertices{v0, v1, v2}, _done(false) { }
+
+        bool done() const { return _done; }
+        void done(const bool d) { _done = d; }
 
         vertex * vertice(const int i) { return _vertices[i]; }
         void vertice(vertex *v, const int i) { _vertices[i] = v; }
@@ -516,6 +532,7 @@ class face
     private:
         vertex *                _vertices[3];
         std::shared_ptr<edge>   _edges[3];
+        bool                    _done;
 };
 
 class dac_convex_hull_3d
@@ -526,70 +543,67 @@ class dac_convex_hull_3d
             _vertices(vertices),
             _begin(begin),
             _end(end)
+            // _is_flat(true)
         { }
 
-        std::vector<vertex> all_vertices() const
+        int size() const
         {
-            return _vertices;
+            return std::count_if(&_vertices[_begin], &_vertices[_end], [](const auto &v) { return !v.removed(); });
         }
 
-        std::vector<vertex> hull_vertices() const
-        {
-            std::vector<vertex> ret;
-            for (int i = _begin; i < _end; ++i)
-            {
-                if (const auto &v = _vertices[i]; !v.removed())
-                {
-                    ret.emplace_back(v);
-                }
-            }
-
-            return ret;
-        }
-
-        std::vector<std::tuple<int, int, int>> hull_face_indices() const
+        void compact_output(std::vector<const vertex *> &vertices, std::vector<point_ti<>> &faces) const
         {
             /* Find remaining vertices */
-            std::vector<const vertex *> verts;
             for (int i = _begin; i < _end; ++i)
             {
-                if (const auto &v = _vertices[i]; !v.removed())
+                if (auto &v = _vertices[i]; !v.removed())
                 {
-                    verts.emplace_back(&v);
-                }
-            }
-
-            /* Find their faces */
-            std::set<std::shared_ptr<face>> faces;
-            for (const auto &v : verts)
-            {
-                for (int i = 0; i < v->edges(); ++i)
-                {
-                    faces.emplace(v->edge_at(i)->left_face(v));
-                    faces.emplace(v->edge_at(i)->right_face(v));
+                    v.relocate(vertices.size());
+                    vertices.emplace_back(&v);
                 }
             }
 
             /* Build indices */
-            std::vector<std::tuple<int, int, int>> ret;
-            ret.reserve(faces.size());
-            for (const auto &f : faces)
+            for (const auto &v : vertices)
             {
-                if (f == nullptr)
+                for (int i = 0; i < v->edges(); ++i)
                 {
-                    continue;
-                }
+                    if (const auto f = v->edge_at(i)->left_face(v); (f != nullptr) && !f->done())
+                    {
+                        f->done(true);
+                        faces.emplace_back(f->vertice(0)->relocated(), f->vertice(1)->relocated(), f->vertice(2)->relocated());
+                    }
 
-                ret.emplace_back(std::distance(&_vertices[0], f->vertice(0)), std::distance(&_vertices[0], f->vertice(1)), std::distance(&_vertices[0], f->vertice(2)));
+                    if (const auto f = v->edge_at(i)->right_face(v); (f != nullptr) && !f->done())
+                    {
+                        f->done(true);
+                        faces.emplace_back(f->vertice(0)->relocated(), f->vertice(1)->relocated(), f->vertice(2)->relocated());
+                    }
+                }
             }
 
-            return ret;
+            /* Clear done status */
+            for (const auto &v : vertices)
+            {
+                for (int i = 0; i < v->edges(); ++i)
+                {
+                    if (const auto f = v->edge_at(i)->left_face(v); f != nullptr)
+                    {
+                        f->done(false);
+                    }
+
+                    if (const auto f = v->edge_at(i)->right_face(v); f != nullptr)
+                    {
+                        f->done(false);
+                    }
+                }
+            }
         }
 
         bool is_convex() const
         {
             /* Find remaining vertices */
-            std::cout << "Is convex" << std::endl;
+            // std::cout << "Is convex" << std::endl;
             std::vector<const vertex *> verts;
             for (int i = _begin; i < _end; ++i)
             {
@@ -600,57 +614,68 @@ class dac_convex_hull_3d
             }
 
             /* Find their faces */
-            std::set<std::shared_ptr<face>> faces;
+            std::vector<std::shared_ptr<face>> faces;
             for (const auto &v : verts)
             {
                 for (int i = 0; i < v->edges(); ++i)
                 {
-                    faces.emplace(v->edge_at(i)->left_face(v));
-                    faces.emplace(v->edge_at(i)->right_face(v));
+                    if (const auto f = v->edge_at(i)->left_face(v); (f != nullptr) && !f->done())
+                    {
+                        f->done(true);
+                        faces.emplace_back(f);
+                    }
+
+                    if (const auto f = v->edge_at(i)->right_face(v); (f != nullptr) && !f->done())
+                    {
+                        f->done(true);
+                        faces.emplace_back(f);
+                    }
                 }
             }
 
-            /*Check all faces versus all vertices for exhaustive test */
+            for (auto &f : faces)
+            {
+                f->done(false);
+            }
+
+            /* Check all faces versus all vertices for exhaustive test */
             for (const auto &f : faces)
             {
-                if (f == nullptr)
-                {
-                    continue;
-                }
-
                 const point_ti<long> normal(f->normal());
                 const point_ti<long> a(f->vertice(0)->position());
-                std::cout << "Face normal " << normal << ", from edges " << (f->vertice(1)->position() - a) << " - " << (f->vertice(2)->position() - a) << std::endl;
-                for (const auto *v : verts)
-                {                    
-                    const long dot = dot_product(normal, v->position() - a);
+                // std::cout << "Face normal " << normal << ", from edges " << (f->vertice(1)->position() - a) << " - " << (f->vertice(2)->position() - a) << std::endl;
+                for (int i = _begin; i < _end; ++i)
+                {
+                    const auto &v = _vertices[i];
+                    const long dot = dot_product(normal, v.position() - a);
                     if (dot > 0)
                     {
-                        std::cout << "Face " << a << " - " << f->vertice(1)->position() << " - " << f->vertice(2)->position() << " failed versus " << v->position() << std::endl << std::endl;
+                        // std::cout << "Face " << a << " - " << f->vertice(1)->position() << " - " << f->vertice(2)->position() << " failed versus " << v->position() << std::endl << std::endl;
                         return false;
                     }
                 }
             }
 
-            std::cout << std::endl;
+            // std::cout << std::endl;
             return true;
         }
 
         dac_convex_hull_3d& merge(const dac_convex_hull_3d &rhs)
         {
             /* Save input hulls */
-            std::cout << "Merge " << _merge_num << std::endl;
-            save_vrml(*this, "left_" + std::to_string(_merge_num) + ".wrl");
-            save_vrml(rhs, "right_" + std::to_string(_merge_num) + ".wrl");
+            // std::cout << "Merge " << _merge_num << std::endl;
+            // save_vrml(*this, "left_" + std::to_string(_merge_num) + ".wrl");
+            // save_vrml(rhs, "right_" + std::to_string(_merge_num) + ".wrl");
 
             /* Get top tangent from 2d hull */
             const auto [a_top_idx, b_top_idx] = _proj_hull.find_tangent(rhs._proj_hull, 1);
             auto *l = &_vertices[a_top_idx];
             auto *r = &_vertices[b_top_idx];
-            std::cout << "Found top vertices " << a_top_idx << " (" << l->position() << "), " << b_top_idx << " (" << r->position() << ")" << std::endl;
+            // std::cout << "Found top vertices " << a_top_idx << " (" << l->position() << "), " << b_top_idx << " (" << r->position() << ")" << std::endl;
 
             /* Wrap */
             std::vector<std::shared_ptr<edge>> wrapping_edges(wrap(&l, &r));
+            assert((wrapping_edges.size() > 0) || ((size() == 1) && (rhs.size() == 1)) || !"No wrapping vertex found");
 
             /* Remove hidden faces */
             remove_hidden_features(wrapping_edges, l, r);
@@ -663,7 +688,7 @@ class dac_convex_hull_3d
             _end = std::max(_end, rhs._end);
             _begin = std::min(_begin, rhs._begin);
 
-            save_vrml(*this, "out_" + std::to_string(_merge_num) + ".wrl");
+            // save_vrml(*this, "out_" + std::to_string(_merge_num) + ".wrl");
             ++_merge_num;
             return *this;
         }
@@ -687,55 +712,68 @@ class dac_convex_hull_3d
                 boost::optional<long> area_right;
                 if (!done_left)
                 {
-                    std::cout << "Searching for edge on left, done " << done_left << ", " << done_right << std::endl;
+                    // std::cout << "Searching for edge on left, done " << done_left << ", " << done_right << std::endl;
                     next_left = find_wrapping_edge(area_left, *l, *r, l_iter, r_iter, normal_left, 1, done_right);
                     if ((next_left == nullptr) || area_left)
                     {
-                        std::cout << "Searching for edge on right, done " << done_left << ", " << done_right << std::endl;
+                        // std::cout << "Searching for edge on right, done " << done_left << ", " << done_right << std::endl;
                         next_right = find_wrapping_edge(area_right, *r, *l, r_iter, l_iter, normal_right, -1, done_left);
                     }
                 }
                 else
                 {
-                    std::cout << "Searching for edge on right, done " << done_left << ", " << done_right << std::endl;
+                    // std::cout << "Searching for edge on right, done " << done_left << ", " << done_right << std::endl;
                     next_right = find_wrapping_edge(area_right, *r, *l, r_iter, l_iter, normal_right, -1, done_left);
                     if ((next_right == nullptr) || area_right)
                     {
-                        std::cout << "Searching for edge on left, done " << done_left << ", " << done_right << std::endl;
+                        // std::cout << "Searching for edge on left, done " << done_left << ", " << done_right << std::endl;
                         next_left = find_wrapping_edge(area_left, *l, *r, l_iter, r_iter, normal_left, 1, done_right);
                     }
                 }
                 
+                if ((next_left == nullptr) && (next_right == nullptr))
+                {
+                    // std::cout << "No wrapping vertex found" << std::endl;
+                    break;
+                }
+
                 std::shared_ptr<edge> nxt;
-                assert((next_left != nullptr) || (next_right != nullptr) || !"No wrapping vertex found");
                 if ((next_right != nullptr) && (!area_right || (area_right > area_left)))
                 {
                     nxt = next_right;
                     normal_left = normal_right;
                     r_iter = nxt->next_vertex(r_iter);
-                    std::cout << "Wrapped on right to " << r_iter->position() << ", updating normal " << normal_right << std::endl;
+                    // std::cout << "Wrapped on right to " << r_iter->position() << ", updating normal " << normal_right << std::endl;
                     done_right = (r_iter == (*r));
+                    // _is_flat &= (area_right != boost::none);
                 }
                 else
                 {
                     nxt = next_left;
                     normal_right = normal_left;
                     l_iter = nxt->next_vertex(l_iter);
-                    std::cout << "Wrapped on left to " << l_iter->position() << ", updating normal " << normal_left << std::endl;
+                    // std::cout << "Wrapped on left to " << l_iter->position() << ", updating normal " << normal_left << std::endl;
                     done_left = (l_iter == (*l));
+                    // _is_flat &= (area_left != boost::none);
                 }
 
                 ret.push_back(nxt);
-                assert(++iter < 100);
+                assert(++iter < 1000);
                 visited.emplace_back(l_iter, r_iter);
+            // } while ((_is_flat && ((visited[0].first != l_iter) || (visited[0].second != r_iter))) ||
+            //     (!_is_flat && (std::count_if(visited.begin(), visited.end(), [&l_iter, &r_iter](const auto &p) { return (p.first == l_iter) && (p.second == r_iter); }) < 2)));
             } while (std::count_if(visited.begin(), visited.end(), [&l_iter, &r_iter](const auto &p) { return (p.first == l_iter) && (p.second == r_iter); }) < 2);
 
-            std::cout << "Loop created at " << std::distance(visited.begin(), std::find(visited.begin(), visited.end(), std::make_pair(l_iter, r_iter))) << std::endl;
-            ret.erase(ret.begin(), ret.begin() + std::distance(visited.begin(), std::find(visited.begin(), visited.end(), std::make_pair(l_iter, r_iter))));
-            *l = l_iter;
-            *r = r_iter;
+            // if (!_is_flat)
+            if (const auto &it = std::find(visited.begin(), visited.end(), std::make_pair(l_iter, r_iter)); it != visited.end())
+            {
+                // std::cout << "Loop created at " << std::distance(visited.begin(), std::find(visited.begin(), visited.end(), std::make_pair(l_iter, r_iter))) << std::endl;
+                ret.erase(ret.begin(), ret.begin() + std::distance(visited.begin(), it));
+                *l = l_iter;
+                *r = r_iter;
+            }
 
-            std::cout << std::endl;
+            // std::cout << std::endl;
             return ret;
         }
 
@@ -748,7 +786,7 @@ class dac_convex_hull_3d
             }
 
             /* Flag the boundary as done */
-            std::cout << "Removing hidden features" << std::endl;
+            // std::cout << "Removing hidden features" << std::endl;
             for (auto &e : edges)
             {
                 e->done(true);
@@ -768,9 +806,9 @@ class dac_convex_hull_3d
                     l_wrapped = true;
                     if (e->left_face(l) != nullptr)
                     {
-                        std::cout << std::distance(&_vertices[0], l) << " Left face " << e->left_face(l)->vertice(0)->position() << " to " << e->left_face(l)->vertice(1)->position() << " to " << e->left_face(l)->vertice(2)->position() << std::endl;
+                        // std::cout << std::distance(&_vertices[0], l) << " Left face " << e->left_face(l)->vertice(0)->position() << " to " << e->left_face(l)->vertice(1)->position() << " to " << e->left_face(l)->vertice(2)->position() << std::endl;
                         l_start = e->left_face(l)->next_live_edge(e);
-                        (l_start != nullptr) && std::cout << "Got left interior edge " << l_start->start()->position() << " to " << l_start->end()->position() << std::endl;
+                        // (l_start != nullptr) && std::cout << "Got left interior edge " << l_start->start()->position() << " to " << l_start->end()->position() << std::endl;
                     }
                 }
                 else if (!r_wrapped && e->contains(r))
@@ -779,7 +817,7 @@ class dac_convex_hull_3d
                     if (e->right_face(r) != nullptr)
                     {
                         r_start = e->right_face(r)->next_live_edge(e);
-                        (r_start != nullptr) && std::cout << "Got right interior edge " << r_start->start()->position() << " to " << r_start->end()->position() << std::endl;
+                        // (r_start != nullptr) && std::cout << "Got right interior edge " << r_start->start()->position() << " to " << r_start->end()->position() << std::endl;
                     }
                 }
             }
@@ -789,7 +827,7 @@ class dac_convex_hull_3d
             {
                 if (l->edges() > 0)
                 {
-                    std::cout << "No wrapping on left selecting arbitary vertex for removal" << std::endl;
+                    // std::cout << "No wrapping on left selecting arbitary vertex for removal" << std::endl;
                     l_start = l->edge_at(0);
                     l->clear_edges();
                     l->done(true);
@@ -800,7 +838,7 @@ class dac_convex_hull_3d
             {
                 if (r->edges() > 0)
                 {
-                    std::cout << "No wrapping on right selecting arbitary vertex for removal" << std::endl;
+                    // std::cout << "No wrapping on right selecting arbitary vertex for removal" << std::endl;
                     r_start = r->edge_at(0);
                     r->clear_edges();
                     r->done(true);
@@ -810,13 +848,13 @@ class dac_convex_hull_3d
             /* Clean region with a start point */
             if (l_start != nullptr)
             {
-                std::cout << "Removing hidden features on left" << std::endl;
+                // std::cout << "Removing hidden features on left" << std::endl;
                 remove_hidden_features(l_start);
             }
 
             if (r_start != nullptr)
             {
-                std::cout << "Removing hidden features on right" << std::endl;
+                // std::cout << "Removing hidden features on right" << std::endl;
                 remove_hidden_features(r_start);                
             }
 
@@ -829,13 +867,13 @@ class dac_convex_hull_3d
                 e->end()->done(false);
                 e->start()->done(false);
             }
-            std::cout << std::endl;
+            // std::cout << std::endl;
         }
 
         void add_new_faces(const std::vector<std::shared_ptr<edge>> &edges, vertex *l, vertex *r)
         {
             /* No edges wrapped means point hull that we join with an edges */
-            std::cout << "Adding new faces" << std::endl;
+            // std::cout << "Adding new faces" << std::endl;
             if (edges.empty())
             {
                 assert(l->edges() == 0);
@@ -843,7 +881,7 @@ class dac_convex_hull_3d
                 auto e = std::make_shared<edge>(l, r);
                 l->add_edge(e);
                 r->add_edge(e);
-                std::cout << "    Nothing to do" << std::endl;
+                // std::cout << "    Nothing to do" << std::endl;
                 return;
             }
 
@@ -858,7 +896,7 @@ class dac_convex_hull_3d
                 auto &e = edges[i];
                 if (e->contains(l))
                 {
-                    std::cout << "    Edge add advanced on left " << std::distance(&_vertices[0], l) << " to " << std::distance(&_vertices[0], e->next_vertex(l)) << " with right " << std::distance(&_vertices[0], r) << std::endl;
+                    // std::cout << "    Edge add advanced on left " << std::distance(&_vertices[0], l) << " to " << std::distance(&_vertices[0], e->next_vertex(l)) << " with right " << std::distance(&_vertices[0], r) << std::endl;
                     new_face = std::make_shared<face>(r, l, e->next_vertex(l));
                     e->left_face(l, new_face);
                     last_edge->right_face(l, new_face);
@@ -867,7 +905,7 @@ class dac_convex_hull_3d
                 else
                 {
                     assert(e->contains(r) || !"Edge not advancing on either polygon");
-                    std::cout << "    Edge add advanced on right " << std::distance(&_vertices[0], r) << " to " << std::distance(&_vertices[0], e->next_vertex(r)) << " with left " << std::distance(&_vertices[0], l) << std::endl;
+                    // std::cout << "    Edge add advanced on right " << std::distance(&_vertices[0], r) << " to " << std::distance(&_vertices[0], e->next_vertex(r)) << " with left " << std::distance(&_vertices[0], l) << std::endl;
                     new_face = std::make_shared<face>(r, l, e->next_vertex(r));
                     e->right_face(r, new_face);
                     last_edge->right_face(l, new_face);
@@ -917,7 +955,12 @@ class dac_convex_hull_3d
                 assert(new_face->check() || !"Poorly constructed face edges");
             }
 
-            std::cout << std::endl;
+            // std::cout << std::endl;
+        }
+
+        static void reset_merge_number()
+        {
+            dac_convex_hull_3d::_merge_num = 0;
         }
 
     private:
@@ -926,13 +969,13 @@ class dac_convex_hull_3d
             /* If the vertex is a wrapping vertex it need to live, but not connect to hidden feature */
             if (v->done())
             {
-                std::cout << "        Erase from " << v->position() << std::endl;
+                // std::cout << "        Erase from " << v->position() << std::endl;
                 v->erase_edge(e);
             }
             /* Remove interior vertices we didnt get all ready */
             else if (!v->removed())
             {
-                std::cout << "        Removing hidden features from " << v->position() << std::endl;
+                // std::cout << "        Removing hidden features from " << v->position() << std::endl;
                 v->remove();
                 v->clear_edges();
             }
@@ -940,7 +983,7 @@ class dac_convex_hull_3d
         void remove_hidden_features(const std::shared_ptr<edge> &e)
         {
             /* Kill vertices or at least unlink from removed edges */
-            std::cout << "    Removing with edge " << e->start()->position() << " to " << e->end()->position() << std::endl;
+            // std::cout << "    Removing with edge " << e->start()->position() << " to " << e->end()->position() << std::endl;
             remove_vertex(e, e->end());
             remove_vertex(e, e->start());
 
@@ -998,7 +1041,7 @@ class dac_convex_hull_3d
                 const auto &e = l->edge_at(guess_idx);
                 const auto *const guess = e->next_vertex(l);
                 const point_ti<long> &gp = guess->position();
-                std::cout << "    Guessing vertex " << std::distance(&_vertices[0], e->next_vertex(l)) << " at " << gp << std::endl;
+                // std::cout << "    Guessing vertex " << std::distance(&_vertices[0], e->next_vertex(l)) << " at " << gp << std::endl;
                 for (int i = 0; i < l->edges(); ++i)
                 {
                     if (i == guess_idx)
@@ -1009,8 +1052,8 @@ class dac_convex_hull_3d
                     const auto &te = l->edge_at(i);
                     const auto *const test = te->next_vertex(l);
                     const point_ti<long> &tp = test->position();
-                    std::cout << "    Testing this vertex " << std::distance(&_vertices[0], l->edge_at(i)->next_vertex(l)) << " at " << tp << std::endl;
-                    if (!can_wrap(area, e, te, lp, rp, gp, tp, normal, sign, test == l_top, guess == l_top))
+                    // std::cout << "    Testing this vertex " << std::distance(&_vertices[0], l->edge_at(i)->next_vertex(l)) << " at " << tp << std::endl;
+                    if (!can_wrap(area, l, l, e, te, lp, rp, gp, tp, normal, sign, sign, test == l_top, guess == l_top))
                     {
                         failed = true;
                         ++guess_idx;
@@ -1026,8 +1069,8 @@ class dac_convex_hull_3d
                         const auto &te = r->edge_at(i);
                         const auto *const test = te->next_vertex(r);
                         const point_ti<long> &tp = test->position();
-                        std::cout << "    Testing that vertex " << std::distance(&_vertices[0], r->edge_at(i)->next_vertex(r)) << " at " << tp << std::endl;
-                        if (!can_wrap(area, e, te, lp, rp, gp, tp, normal, sign, test == r_top, guess == l_top))
+                        // std::cout << "    Testing that vertex " << std::distance(&_vertices[0], r->edge_at(i)->next_vertex(r)) << " at " << tp << std::endl;
+                        if (!can_wrap(area, l, r, e, te, lp, rp, gp, tp, normal, sign, sign * -1, test == r_top, guess == l_top))
                         {
                             failed = true;
                             ++guess_idx;
@@ -1065,36 +1108,53 @@ class dac_convex_hull_3d
             return nullptr;
         }
 
-        bool can_wrap(long &area, const std::shared_ptr<edge> &ge, const std::shared_ptr<edge> &te, const point_ti<long> &l, const point_ti<long> &r, const point_ti<long> &guess, const point_ti<long> &test, const point_ti<long> &normal, const long sign, const bool fail_area_check, const bool succeed_area_check) const
+        bool can_wrap(long &area, const vertex *const left, const vertex *const right, const std::shared_ptr<edge> &ge, const std::shared_ptr<edge> &te, const point_ti<long> &l, const point_ti<long> &r, const point_ti<long> &guess, const point_ti<long> &test, const point_ti<long> &normal, const long sign, const long test_sign, const bool fail_area_check, const bool succeed_area_check) const
         {
             /* Try to exclude by point outside face */
             const long volume = tetrahedron_volume(l, r, guess, test) * sign;
             if (volume < 0)
             {
-                std::cout << "        Negative volume " << volume << ", cant wrap" << std::endl;
+                // std::cout << "        Negative volume " << volume << ", cant wrap" << std::endl;
                 return false;
             }
             /* Tie break for flat meshes */
             else if (volume == 0)
             {
                 /* Reject edge if its faces face the opposite way to the new face */
-                std::cout << "        Zero volume, extra tests left " << l << ", right " << r << ", guess " << guess << ", test " << test << std::endl;
+                // std::cout << "        Zero volume, extra tests left " << l << ", right " << r << ", guess " << guess << ", test " << test << std::endl;
 
                 const point_ti<long> guess_normal(cross_product(l - r, l - guess) * sign);
-                std::cout << "        Normal " << normal << ", Guess normal " << guess_normal << std::endl;
+                // std::cout << "        Normal " << normal << ", Guess normal " << guess_normal << std::endl;
                 if (const auto &[lf, rf] = std::tuple{ ge->left_face(ge->start()), ge->right_face(ge->start()) }; (lf != nullptr) && (rf != nullptr))
                 {
                     const point_ti<long> lf_normal(lf->normal());
                     const point_ti<long> rf_normal(rf->normal());
 
-                    std::cout << "        Guess left face normal " << lf_normal << std::endl;
-                    std::cout << "        Guess right face normal "<< rf_normal << std::endl;
+                    // std::cout << "        Guess left face normal " << lf_normal << std::endl;
+                    // std::cout << "        Guess right face normal "<< rf_normal << std::endl;
                     if ((dot_product(guess_normal, lf_normal) < 0) && (dot_product(guess_normal, rf_normal) < 0))
                     {
-                        std::cout << "        Zero volume, edge used in wrong direction, cant wrap" << std::endl;
+                        // std::cout << "        Zero volume, edge used in wrong direction, cant wrap" << std::endl;
                         return false;
                     }
                 }
+                // if (const auto &lf = ge->left_face(left); (sign > 0) && (lf != nullptr))
+                // {
+                //     const point_ti<long> lf_normal(lf->normal());
+                //     if (dot_product(guess_normal, lf_normal) < 0)
+                //     {
+                //         return false;
+                //     }
+                // }
+
+                // if (const auto &rf = ge->right_face(left); (sign < 0) && (rf != nullptr))
+                // {
+                //     const point_ti<long> rf_normal(rf->normal());
+                //     if (dot_product(guess_normal, rf_normal) < 0)
+                //     {
+                //         return false;
+                //     }
+                // }
 
                 const point_ti<long> test_normal(cross_product(l - r, l - test) * sign);
                 if (const auto &[lf, rf] = std::tuple{ te->left_face(te->start()), te->right_face(te->start()) }; (lf != nullptr) && (rf != nullptr))
@@ -1102,24 +1162,41 @@ class dac_convex_hull_3d
                     const point_ti<long> lf_normal(lf->normal());
                     const point_ti<long> rf_normal(rf->normal());
 
-                    std::cout << "        Test left face normal " << lf_normal << std::endl;
-                    std::cout << "        Test right face normal "<< rf_normal << std::endl;
+                    // std::cout << "        Test left face normal " << lf_normal << std::endl;
+                    // std::cout << "        Test right face normal "<< rf_normal << std::endl;
                     if ((dot_product(test_normal, lf_normal) < 0) && (dot_product(test_normal, rf_normal) < 0))
                     {
-                        std::cout << "        Zero volume, test edge using in wrong direction, can wrap" << std::endl;
+                        // std::cout << "        Zero volume, test edge using in wrong direction, can wrap" << std::endl;
                         return true;
                     }
                 }
+                // if (const auto &lf = te->left_face(right); (test_sign > 0) && (lf != nullptr))
+                // {
+                //     const point_ti<long> lf_normal(lf->normal());
+                //     if (dot_product(test_normal, lf_normal) < 0)
+                //     {
+                //         return true;
+                //     }
+                // }
+
+                // if (const auto &rf = te->right_face(right); (test_sign < 0) && (rf != nullptr))
+                // {
+                //     const point_ti<long> rf_normal(rf->normal());
+                //     if (dot_product(test_normal, rf_normal) < 0)
+                //     {
+                //         return true;
+                //     }
+                // }
 
                 /* Reject if normal is flipped, but we can find a test vertex that doesnt flip the normal */
                 const bool test_flip = dot_product(test_normal, normal) <= 0;
                 const bool guess_flip = dot_product(guess_normal, normal) <= 0;
-                std::cout << "        Normal " << normal << ", Test normal " << test_normal << std::endl;
+                // std::cout << "        Normal " << normal << ", Test normal " << test_normal << std::endl;
                 if (guess_flip)
                 {
                     if (!test_flip)
                     {
-                        std::cout << "        Zero volume, normal flipped when test normal not, cant wrap" << std::endl;
+                        // std::cout << "        Zero volume, normal flipped when test normal not, cant wrap" << std::endl;
                         return false;
                     }
                 }
@@ -1127,29 +1204,26 @@ class dac_convex_hull_3d
                 /* Reject if we can find a bigger area triangle that has the same normal */
                 const long test_area = triangle_area22(l, r, test);
                 const long guess_area = triangle_area22(l, r, guess);
-                std::cout << "        Zero volume, guess area " << guess_area << ", updating area " << area << ", test area " << test_area << std::endl;
+                // std::cout << "        Zero volume, guess area " << guess_area << ", updating area " << area << ", test area " << test_area << std::endl;
                 // if (!no_area_check && (guess_flip == test_flip))
                 // {
                 //     const long test_area = triangle_area22(l, r, test);
                 //     const long guess_area = triangle_area22(l, r, guess);
-                //     std::cout << "        Test area " << test_area << ", guess area " << guess_area << std::endl;
                 //     if (test_area > guess_area)
                 //     {
-                //         std::cout << "        Zero volume, larger test area, cant wrap" << std::endl;
                 //         return false;
                 //     }
                 // }
 
-                if (fail_area_check && !succeed_area_check  && (guess_flip == test_flip))
-                {
-                    std::cout << "        Zero volume, force fail area test, cant wrap" << std::endl;
-                    return false;
-                }
+                // if (fail_area_check && !succeed_area_check  && (guess_flip == test_flip))
+                // {
+                //     return false;
+                // }
 
                 area = std::min(area, guess_area);
             }
 
-            std::cout << "        Positive volume " << volume << ", can wrap" << std::endl;
+            // std::cout << "        Positive volume " << volume << ", can wrap" << std::endl;
             return true;
         }
 
@@ -1157,6 +1231,7 @@ class dac_convex_hull_3d
         std::vector<vertex> &   _vertices;
         int                     _begin;
         int                     _end;
+        // bool                    _is_flat;
         static int              _merge_num;
 };
 
@@ -1169,17 +1244,17 @@ bool save_vrml(const dac_convex_hull_3d &hull, const std::string &file)
         std::cout << "Couldnt open file" << std::endl;
         return false;
     }
-
-    // const auto hull_vertices(hull.hull_vertices());
-    const auto hull_vertices(hull.all_vertices());
+    
+    std::vector<point_ti<>>     hull_faces;
+    std::vector<const vertex *> hull_vertices;
+    hull.compact_output(hull_vertices, hull_faces);
     if (hull_vertices.empty())
     {
         std::cout << "No vertices" << std::endl;
         return false;
     }
 
-    const auto hull_face_indices(hull.hull_face_indices());
-    if (hull_face_indices.empty())
+    if (hull_faces.empty())
     {
         std::cout << "No faces" << std::endl;
         return false;
@@ -1191,7 +1266,7 @@ bool save_vrml(const dac_convex_hull_3d &hull, const std::string &file)
     fout << "#VRML V2.0 utf8" << std::endl;
     fout << "" << std::endl;
     fout << "# Vertices: " << hull_vertices.size() << std::endl;
-    fout << "# Triangles: " << hull_face_indices.size() << std::endl;
+    fout << "# Triangles: " << hull_faces.size() << std::endl;
     fout << "" << std::endl;
     fout << "Group {" << std::endl;
     fout << "    children [" << std::endl;
@@ -1214,13 +1289,13 @@ bool save_vrml(const dac_convex_hull_3d &hull, const std::string &file)
     fout << "                    point [" << std::endl;
     for (const auto &v : hull_vertices)
     {
-        fout << "                        " << v.position() << "," << std::endl;
+        fout << "                        " << v->position() << "," << std::endl;
     }
     fout << "                    ]" << std::endl;
     fout << "                }" << std::endl;
 
     fout << "                coordIndex [ " << std::endl;
-    for (const auto &[v0, v1, v2] : hull_face_indices)
+    for (const auto &[v0, v1, v2] : hull_faces)
     {
         fout << "                        " << v0 << ", "<< v1 << ", "<< v2 << ", -1," << std::endl;
     }
@@ -1261,7 +1336,7 @@ void project_points(std::vector<projected_vertex> &proj_vertices, std::vector<ve
     {
         const auto &lp = lowest->position();
         const auto &p = vertices[i].position();
-        std::cout << "Sorted to " << p << std::endl;
+        // std::cout << "Sorted to " << p << std::endl;
         if ((p.x == lp.x) && (p.y == lp.y))
         {
             if (p.z != lp.z)
@@ -1295,7 +1370,7 @@ void project_points(std::vector<projected_vertex> &proj_vertices, std::vector<ve
     proj_vertices.reserve(vertices.size());
     std::transform(vertices.begin(), vertices.end(), std::back_inserter(proj_vertices), [&idx](const auto &v)
     {
-        std::cout << "Projecting from " << v.position() << ", to " << v.position().x << ", " << v.position().y << std::endl;
+        // std::cout << "Projecting from " << v.position() << ", to " << v.position().x << ", " << v.position().y << std::endl;
         return projected_vertex(point2d<long>(v.position().x, v.position().y), idx++);
     });
 }
@@ -1382,7 +1457,16 @@ dac_convex_hull_3d build(std::shared_ptr<std::vector<projected_vertex>> &scratch
     {
         if (size > 2)
         {
+            /* Check winding in x-y */
+            const long w = winding(proj_vertices[begin].position(), proj_vertices[begin + 1].position(), proj_vertices[begin + 2].position());
+            if (w < 0)
+            {
+                std::swap(vertices[begin], vertices[begin + 1]);
+                proj_vertices[begin].vertex_swap(proj_vertices[begin + 1]);
+            }
+
             /* Create triangle */
+            // std::cout << "Building start hull " << vertices[begin].position() << " to " << vertices[begin + 1].position() << " to " << vertices[begin + 2].position() << std::endl;
             create_triangles(&vertices[begin], &vertices[begin + 1], &vertices[begin + 2]);
         }
         else if (size > 1)
@@ -1414,7 +1498,6 @@ dac_convex_hull_3d build(std::shared_ptr<std::vector<projected_vertex>> &scratch
         {
             if (proj_vertices[proj_begin] == proj_vertices[proj_begin + 1])
             {
-                // proj_vertices[proj_begin] = proj_vertices[proj_begin + 1];
                 --proj_end;
             }
         }
@@ -1427,10 +1510,10 @@ dac_convex_hull_3d build(std::shared_ptr<std::vector<projected_vertex>> &scratch
     {
         /* Reproject to y-z */
         int idx = begin;
-        std::cout << std::endl << "Building reprojected 2d hull" << std::endl;
+        // std::cout << std::endl << "Building reprojected 2d hull" << std::endl;
         std::transform(&vertices[begin], &vertices[end], &proj_vertices[begin], [&idx](const auto &v)
         {
-            std::cout << "Re-projecting from " << v.position() << ", to " << v.position().y << ", " << v.position().z << std::endl;
+            // std::cout << "Re-projecting from " << v.position() << ", to " << v.position().y << ", " << v.position().z << std::endl;
             return projected_vertex(point2d<long>(v.position().y, v.position().z), idx++);
         });
 
@@ -1475,7 +1558,7 @@ dac_convex_hull_3d build(std::shared_ptr<std::vector<projected_vertex>> &scratch
             /* Create edges */
             vertex *v1 = &vertices[begin + 1];
             vertex *v2 = &vertices[begin + 2];
-            std::cout << "Building first face " << v0->position() << " to " << v1->position() << " to " << v2->position() << std::endl;
+            // std::cout << "Building first face " << v0->position() << " to " << v1->position() << " to " << v2->position() << std::endl;
             const auto &e0 = create_edge(v0, v1);
             const auto &e1 = create_edge(v1, v2);
             front_last = create_edge(v2, v0);
@@ -1500,7 +1583,7 @@ dac_convex_hull_3d build(std::shared_ptr<std::vector<projected_vertex>> &scratch
             /* Create edges */
             vertex *const v_last = &vertices[i - 1];
             vertex *const v_next = &vertices[i];
-            std::cout << "Building middle face " << v0->position() << " to " << v_last->position() << " to " << v_next->position() << std::endl;
+            // std::cout << "Building middle face " << v0->position() << " to " << v_last->position() << " to " << v_next->position() << std::endl;
 
             const auto &e0 = create_edge(v_last, v_next);
             const auto &e1 = create_edge(v_next, v0);
@@ -1520,7 +1603,7 @@ dac_convex_hull_3d build(std::shared_ptr<std::vector<projected_vertex>> &scratch
             /* Create edges */
             vertex *const vm2 = &vertices[begin + (yz_hull.size() - 2)];
             vertex *const vm1 = &vertices[begin + (yz_hull.size() - 1)];
-            std::cout << "Building last face from " << v0->position() << " to " << vm2->position() << " to " << vm1->position() << std::endl;
+            // std::cout << "Building last face from " << v0->position() << " to " << vm2->position() << " to " << vm1->position() << std::endl;
 
             const auto &e0 = create_edge(vm2, vm1);
             const auto &e1 = create_edge(vm1, v0);
@@ -1563,3 +1646,45 @@ dac_convex_hull_3d build(std::vector<projected_vertex> &proj_vertices, std::vect
     auto scratch(std::make_shared<std::vector<projected_vertex>>(vertices.size(), projected_vertex(point2d<long>(0, 0), 0)));
     return build(scratch, vertices, proj_vertices, 0, proj_vertices.size());
 }
+
+std::vector<point_ti<>> build(const std::vector<point_t<>> &points, std::vector<point_t<>> *const hull_points)
+{
+    /* Rescale points into vertices */
+    const float hull_scale = 70000.0f;
+    point_t<> max_bound(points[0]);
+    point_t<> min_bound(points[0]);
+    for (const auto &p : points)
+    {
+        max_bound = max(max_bound, p);
+        min_bound = min(min_bound, p);
+    }
+    const point_t<> offset((max_bound + min_bound) * 0.5f);
+    const point_t<> scale(max_bound - min_bound);
+    const float max_scale = hull_scale / scale.max();
+    
+    std::vector<vertex> vertices;
+    vertices.reserve(points.size());
+    for (const auto &p : points)
+    {
+        const point_ti<long> local((p - offset) * max_scale);
+        vertices.emplace_back(local);
+    }
+
+    /* Build */
+    std::vector<projected_vertex> proj_vertices;
+    const auto hull(build(proj_vertices, vertices));
+
+    /* Rescale output, leave centered */
+    std::vector<point_ti<>>     hull_faces;
+    std::vector<const vertex *> hull_vertices;
+    hull.compact_output(hull_vertices, hull_faces);
+
+    const float max_scale_inv = scale.max() / hull_scale;
+    for (const auto &v : hull_vertices)
+    {
+        hull_points->emplace_back(static_cast<point_t<>>(v->position()) * max_scale_inv);
+    }
+
+    return hull_faces;
+}
+}; /* namespace raptor_convex_decomposition */

@@ -40,6 +40,7 @@ set(UNIT_TESTS
 add_unit_test("${UNIT_TESTS}")
 
 set(REGRESSION_TESTS
+    dac_convex_hull_3d_regression_tests
     tetrahedron_no_pca_no_hull_approx_tests
     tetrahedron_no_pca_hull_approx_tests
     tetrahedron_pca_hull_approx_tests

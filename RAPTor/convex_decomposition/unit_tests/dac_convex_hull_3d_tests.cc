@@ -4,7 +4,6 @@
 
 /* Standard headers */
 #include <chrono>
-#include <fstream>
 #include <random>
 #include <set>
 
@@ -14,7 +13,6 @@
 
 /* Common headers */
 #include "logging.h"
-#include "point_t.h"
 
 /* Convex decomposition headers */
 #include "dac_convex_hull_3d.h"
@@ -23,11 +21,21 @@
 /* Initialise logger */
 const raptor_physics::init_logger init_logger;
 
-
+namespace raptor_convex_decomposition
+{
 int dac_convex_hull_3d::_merge_num = 0;
 
 namespace test
 {
+#define LOG_PERFORMANCE_OUTPUT() \
+    hull.compact_output(hull_vertices, hull_faces); \
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name; \
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count(); \
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 2 - Unique vertices: " << vertices.size(); \
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 3 - Hull vertices: " << hull_vertices.size(); \
+    BOOST_LOG_TRIVIAL(fatal) << "PERF 4 - Hull faces: " << hull_faces.size(); \
+    BOOST_CHECK(save_vrml(hull));
+
 struct edge_compare
 {
     bool operator()(const std::shared_ptr<edge> &l, const std::shared_ptr<edge> &r)
@@ -339,6 +347,8 @@ struct dac_convex_hull_3d_fixture : private boost::noncopyable
     std::shared_ptr<std::vector<projected_vertex>>      proj_vertices;
     std::shared_ptr<std::vector<projected_vertex>>      scratch;
     std::vector<vertex>                                 vertices;
+    std::vector<const vertex *>                         hull_vertices;
+    std::vector<point_ti<>>                             hull_faces;
     std::unique_ptr<dac_convex_hull_3d>                 uut;
     std::default_random_engine                          random;
     std::map<std::shared_ptr<edge>, int, edge_compare>  edges;
@@ -2056,139 +2066,368 @@ BOOST_AUTO_TEST_CASE( y_triangles_reverse_merge_test )
 }
 
 /* Performance tests */
-BOOST_AUTO_TEST_CASE( small_low_density_cube_point_cloud_performance_test )
+BOOST_AUTO_TEST_CASE( small_size_low_density_cube_point_cloud_performance_test )
 {
-    const long size_x = 10;
-    const long size_y = 10;
-    const long size_z = 10;
-
-    std::uniform_int_distribution<long> dist_x(-size_x, size_x);
-    std::uniform_int_distribution<long> dist_y(-size_y, size_y);
-    std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+    const long size = 10;
+    std::uniform_int_distribution<long> dist(-size, size);
     for (int number_points = 10; number_points < 210; number_points += 10)
     {
         vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
         proj_vertices->clear();
         for (int i = 0; i < number_points; ++i)
         {
-            const long x = dist_x(random);
-            const long y = dist_y(random);
-            const long z = dist_z(random);
-            vertices.emplace_back(point_ti<long>(x, y, z));
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
         }
 
         auto t0(std::chrono::system_clock::now());
         const auto hull(build(*proj_vertices, vertices));
         auto t1(std::chrono::system_clock::now());
 
-        const auto hull_vertices(hull.hull_vertices());
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-
+        LOG_PERFORMANCE_OUTPUT();
         BOOST_CHECK(hull.is_convex());
-        BOOST_CHECK(save_vrml(hull));
     }
 }
 
-BOOST_AUTO_TEST_CASE( small_medium_density_cube_point_cloud_performance_test )
+BOOST_AUTO_TEST_CASE( small_size_medium_density_cube_point_cloud_performance_test )
 {
-    const long size_x = 10;
-    const long size_y = 10;
-    const long size_z = 10;    
-
-    std::uniform_int_distribution<long> dist_x(-size_x, size_x);
-    std::uniform_int_distribution<long> dist_y(-size_y, size_y);
-    std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+    const long size = 10;
+    std::uniform_int_distribution<long> dist(-size, size);
     for (int number_points = 200; number_points < 2100; number_points += 100)
     {
         vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
         proj_vertices->clear();
         for (int i = 0; i < number_points; ++i)
         {
-            const long x = dist_x(random);
-            const long y = dist_y(random);
-            const long z = dist_z(random);
-            vertices.emplace_back(point_ti<long>(x, y, z));
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
         }
 
         auto t0(std::chrono::system_clock::now());
         const auto hull(build(*proj_vertices, vertices));
         auto t1(std::chrono::system_clock::now());
 
-        const auto hull_vertices(hull.hull_vertices());
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-
+        LOG_PERFORMANCE_OUTPUT();
         BOOST_CHECK(hull.is_convex());
-        BOOST_CHECK(save_vrml(hull));
     }
 }
 
-BOOST_AUTO_TEST_CASE( small_high_density_cube_point_cloud_performance_test )
+BOOST_AUTO_TEST_CASE( small_size_high_density_cube_point_cloud_performance_test )
 {
-    const long size_x = 10;
-    const long size_y = 10;
-    const long size_z = 10;    
-
-    std::uniform_int_distribution<long> dist_x(-size_x, size_x);
-    std::uniform_int_distribution<long> dist_y(-size_y, size_y);
-    std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+    const long size = 10;
+    std::uniform_int_distribution<long> dist(-size, size);
     for (int number_points = 3000; number_points < 21000; number_points += 1000)
     {
         vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
         proj_vertices->clear();
         for (int i = 0; i < number_points; ++i)
         {
-            const long x = dist_x(random);
-            const long y = dist_y(random);
-            const long z = dist_z(random);
-            vertices.emplace_back(point_ti<long>(x, y, z));
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
         }
 
         auto t0(std::chrono::system_clock::now());
         const auto hull(build(*proj_vertices, vertices));
         auto t1(std::chrono::system_clock::now());
 
-        const auto hull_vertices(hull.hull_vertices());
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-
+        LOG_PERFORMANCE_OUTPUT();
         BOOST_CHECK(hull.is_convex());
-        BOOST_CHECK(save_vrml(hull));
     }
 }
 
-BOOST_AUTO_TEST_CASE( small_extreme_density_cube_point_cloud_performance_test )
+BOOST_AUTO_TEST_CASE( small_size_extreme_density_cube_point_cloud_performance_test )
 {
-    const long size_x = 10;
-    const long size_y = 10;
-    const long size_z = 10;    
+    const long size = 10;
     const int number_points = 1000000;
-
-    std::uniform_int_distribution<long> dist_x(-size_x, size_x);
-    std::uniform_int_distribution<long> dist_y(-size_y, size_y);
-    std::uniform_int_distribution<long> dist_z(-size_z, size_z);
+    std::uniform_int_distribution<long> dist(-size, size);
     for (int i = 0; i < number_points; ++i)
     {
-        const long x = dist_x(random);
-        const long y = dist_y(random);
-        const long z = dist_z(random);
-        vertices.emplace_back(point_ti<long>(x, y, z));
+        vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
     }
 
     auto t0(std::chrono::system_clock::now());
     const auto hull(build(*proj_vertices, vertices));
     auto t1(std::chrono::system_clock::now());
 
-    const auto hull_vertices(hull.hull_vertices());
-    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-
+    LOG_PERFORMANCE_OUTPUT();
     BOOST_CHECK(hull.is_convex());
-    BOOST_CHECK(save_vrml(hull));
 }
 
-BOOST_AUTO_TEST_CASE( small_low_density_sphere_point_cloud_performance_test )
+BOOST_AUTO_TEST_CASE( medium_size_low_density_cube_point_cloud_performance_test )
+{
+    const long size = 2000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( medium_size_medium_density_cube_point_cloud_performance_test )
+{
+    const long size = 2000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( medium_size_high_density_cube_point_cloud_performance_test )
+{
+    const long size = 2000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( medium_size_extreme_density_cube_point_cloud_performance_test )
+{
+    const long size = 2000;
+    const int number_points = 1000000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int i = 0; i < number_points; ++i)
+    {
+        vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+    }
+
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
+
+    LOG_PERFORMANCE_OUTPUT();
+    BOOST_CHECK(hull.is_convex());
+}
+
+BOOST_AUTO_TEST_CASE( large_size_low_density_cube_point_cloud_performance_test )
+{
+    const long size = 200000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( large_size_medium_density_cube_point_cloud_performance_test )
+{
+    const long size = 200000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( large_size_high_density_cube_point_cloud_performance_test )
+{
+    const long size = 200000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( large_size_extreme_density_cube_point_cloud_performance_test )
+{
+    const long size = 20000;
+    const int number_points = 1000000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int i = 0; i < number_points; ++i)
+    {
+        vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+    }
+
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
+
+    LOG_PERFORMANCE_OUTPUT();
+    BOOST_CHECK(hull.is_convex());
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_low_density_cube_point_cloud_performance_test )
+{
+    const long size = 1100000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_medium_density_cube_point_cloud_performance_test )
+{
+    const long size = 1100000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_high_density_cube_point_cloud_performance_test )
+{
+    const long size = 250000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+/* Forms very large triangles, this is actually slightly larger than the expected worst case size */
+BOOST_AUTO_TEST_CASE( extreme_size_extreme_density_cube_point_cloud_performance_test )
+{
+    const long size = 40000;
+    const int number_points = 1000000;
+    std::uniform_int_distribution<long> dist(-size, size);
+    for (int i = 0; i < number_points; ++i)
+    {
+        vertices.emplace_back(point_ti<long>(dist(random), dist(random), dist(random)));
+    }
+
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
+
+    LOG_PERFORMANCE_OUTPUT();
+    BOOST_CHECK(hull.is_convex());
+}
+
+BOOST_AUTO_TEST_CASE( small_size_low_density_sphere_point_cloud_performance_test )
 {
     const float size_r = 20.0;
 
@@ -2197,6 +2436,8 @@ BOOST_AUTO_TEST_CASE( small_low_density_sphere_point_cloud_performance_test )
     for (int number_points = 10; number_points < 210; number_points += 10)
     {
         vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
         proj_vertices->clear();        
         for (int i = 0; i < number_points; ++i)
         {
@@ -2210,16 +2451,12 @@ BOOST_AUTO_TEST_CASE( small_low_density_sphere_point_cloud_performance_test )
         const auto hull(build(*proj_vertices, vertices));
         auto t1(std::chrono::system_clock::now());
 
-        const auto hull_vertices(hull.hull_vertices());
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-
+        LOG_PERFORMANCE_OUTPUT();
         BOOST_CHECK(hull.is_convex());
-        BOOST_CHECK(save_vrml(hull));
     }
 }
 
-BOOST_AUTO_TEST_CASE( small_medium_density_sphere_point_cloud_performance_test )
+BOOST_AUTO_TEST_CASE( small_size_medium_density_sphere_point_cloud_performance_test )
 {
     const float size_r = 20.0;
 
@@ -2228,6 +2465,8 @@ BOOST_AUTO_TEST_CASE( small_medium_density_sphere_point_cloud_performance_test )
     for (int number_points = 200; number_points < 2100; number_points += 100)
     {
         vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
         proj_vertices->clear();        
         for (int i = 0; i < number_points; ++i)
         {
@@ -2241,16 +2480,12 @@ BOOST_AUTO_TEST_CASE( small_medium_density_sphere_point_cloud_performance_test )
         const auto hull(build(*proj_vertices, vertices));
         auto t1(std::chrono::system_clock::now());
 
-        const auto hull_vertices(hull.hull_vertices());
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-
+        LOG_PERFORMANCE_OUTPUT();
         BOOST_CHECK(hull.is_convex());
-        BOOST_CHECK(save_vrml(hull));
     }
 }
 
-BOOST_AUTO_TEST_CASE( small_high_density_sphere_point_cloud_performance_test )
+BOOST_AUTO_TEST_CASE( small_size_high_density_sphere_point_cloud_performance_test )
 {
     const float size_r = 20.0;
 
@@ -2259,6 +2494,8 @@ BOOST_AUTO_TEST_CASE( small_high_density_sphere_point_cloud_performance_test )
     for (int number_points = 3000; number_points < 21000; number_points += 1000)
     {
         vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
         proj_vertices->clear();        
         for (int i = 0; i < number_points; ++i)
         {
@@ -2272,16 +2509,12 @@ BOOST_AUTO_TEST_CASE( small_high_density_sphere_point_cloud_performance_test )
         const auto hull(build(*proj_vertices, vertices));
         auto t1(std::chrono::system_clock::now());
 
-        const auto hull_vertices(hull.hull_vertices());
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-
+        LOG_PERFORMANCE_OUTPUT();
         BOOST_CHECK(hull.is_convex());
-        BOOST_CHECK(save_vrml(hull));
     }
 }
 
-BOOST_AUTO_TEST_CASE( small_extreme_density_sphere_point_cloud_performance_test )
+BOOST_AUTO_TEST_CASE( small_size_extreme_density_sphere_point_cloud_performance_test )
 {
     const float size_r = 20.0;
     const int number_points = 1000000;
@@ -2301,146 +2534,687 @@ BOOST_AUTO_TEST_CASE( small_extreme_density_sphere_point_cloud_performance_test 
     const auto hull(build(*proj_vertices, vertices));
     auto t1(std::chrono::system_clock::now());
 
-    const auto hull_vertices(hull.hull_vertices());
-    BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-    BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-
+    LOG_PERFORMANCE_OUTPUT();
     BOOST_CHECK(hull.is_convex());
-    BOOST_CHECK(save_vrml(hull));
 }
 
-BOOST_AUTO_TEST_CASE( small_low_density_xy_plane_point_cloud_performance_test )
+BOOST_AUTO_TEST_CASE( medium_size_low_density_sphere_point_cloud_performance_test )
 {
-    const long size_x = 10;
-    const long size_y = 10;
-    const long size_z = 0;
+    const float size_r = 20000.0;
 
-    std::uniform_int_distribution<long> dist_x(-size_x, size_x);
-    std::uniform_int_distribution<long> dist_y(-size_y, size_y);
-    std::uniform_int_distribution<long> dist_z(-size_z, size_z);
-    // for (int number_points = 10; number_points < 210; number_points += 10)
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 10; number_points < 210; number_points += 10)
     {
         vertices.clear();
-        proj_vertices->clear();
-        int number_points = 6;
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();        
         for (int i = 0; i < number_points; ++i)
         {
-            const long x = dist_x(random);
-            const long y = dist_y(random);
-            const long z = dist_z(random);
-            vertices.emplace_back(point_ti<long>(x, y, z));
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
         }
 
         auto t0(std::chrono::system_clock::now());
         const auto hull(build(*proj_vertices, vertices));
         auto t1(std::chrono::system_clock::now());
 
-        const auto hull_vertices(hull.hull_vertices());
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-        BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-
+        LOG_PERFORMANCE_OUTPUT();
         BOOST_CHECK(hull.is_convex());
-        BOOST_CHECK(save_vrml(hull));
     }
 }
 
-// BOOST_AUTO_TEST_CASE( small_medium_density_xy_plane_point_cloud_performance_test )
-// {
-//     const long size_x = 10;
-//     const long size_y = 10;
-//     const long size_z = 0;
+BOOST_AUTO_TEST_CASE( medium_size_medium_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 20000.0;
 
-//     std::uniform_int_distribution<long> dist_x(-size_x, size_x);
-//     std::uniform_int_distribution<long> dist_y(-size_y, size_y);
-//     std::uniform_int_distribution<long> dist_z(-size_z, size_z);
-//     for (int number_points = 200; number_points < 2100; number_points += 100)
-//     {
-//         vertices.clear();
-//         proj_vertices->clear();
-//         for (int i = 0; i < number_points; ++i)
-//         {
-//             const long x = dist_x(random);
-//             const long y = dist_y(random);
-//             const long z = dist_z(random);
-//             vertices.emplace_back(point_ti<long>(x, y, z));
-//         }
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
 
-//         auto t0(std::chrono::system_clock::now());
-//         const auto hull(build(*proj_vertices, vertices));
-//         auto t1(std::chrono::system_clock::now());
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
 
-//         const auto hull_vertices(hull.hull_vertices());
-//         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-//         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
 
-//         BOOST_CHECK(hull.is_convex());
-//         BOOST_CHECK(save_vrml(hull));
-//     }
-// }
+BOOST_AUTO_TEST_CASE( medium_size_high_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 20000.0;
 
-// BOOST_AUTO_TEST_CASE( small_high_density_xy_plane_point_cloud_performance_test )
-// {
-//     const long size_x = 10;
-//     const long size_y = 10;
-//     const long size_z = 0;
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
 
-//     std::uniform_int_distribution<long> dist_x(-size_x, size_x);
-//     std::uniform_int_distribution<long> dist_y(-size_y, size_y);
-//     std::uniform_int_distribution<long> dist_z(-size_z, size_z);
-//     for (int number_points = 3000; number_points < 21000; number_points += 1000)
-//     {
-//         vertices.clear();
-//         proj_vertices->clear();
-//         for (int i = 0; i < number_points; ++i)
-//         {
-//             const long x = dist_x(random);
-//             const long y = dist_y(random);
-//             const long z = dist_z(random);
-//             vertices.emplace_back(point_ti<long>(x, y, z));
-//         }
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
 
-//         auto t0(std::chrono::system_clock::now());
-//         const auto hull(build(*proj_vertices, vertices));
-//         auto t1(std::chrono::system_clock::now());
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
 
-//         const auto hull_vertices(hull.hull_vertices());
-//         BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-//         BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+BOOST_AUTO_TEST_CASE( medium_size_extreme_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 20000.0;
+    const int number_points = 1000000;
 
-//         BOOST_CHECK(hull.is_convex());
-//         BOOST_CHECK(save_vrml(hull));
-//     }
-// }
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
 
-// BOOST_AUTO_TEST_CASE( small_extreme_density_xy_plane_point_cloud_performance_test )
-// {
-//     const long size_x = 10;
-//     const long size_y = 10;
-//     const long size_z = 0;
-//     const int number_points = 1000000;
+    for (int i = 0; i < number_points; ++i)
+    {
+        const float r = dist_r(random);
+        const float pi = dist_pi(random);
+        const float theta = dist_pi(random);
+        vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+    }
 
-//     std::uniform_int_distribution<long> dist_x(-size_x, size_x);
-//     std::uniform_int_distribution<long> dist_y(-size_y, size_y);
-//     std::uniform_int_distribution<long> dist_z(-size_z, size_z);
-//     for (int i = 0; i < number_points; ++i)
-//     {
-//         const long x = dist_x(random);
-//         const long y = dist_y(random);
-//         const long z = dist_z(random);
-//         vertices.emplace_back(point_ti<long>(x, y, z));
-//     }
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
 
-//     auto t0(std::chrono::system_clock::now());
-//     const auto hull(build(*proj_vertices, vertices));
-//     auto t1(std::chrono::system_clock::now());
+    LOG_PERFORMANCE_OUTPUT();
+    BOOST_CHECK(hull.is_convex());
+}
 
-//     const auto hull_vertices(hull.hull_vertices());
-//     BOOST_LOG_TRIVIAL(fatal) << "PERF 0 - Test: " << boost::unit_test::framework::current_test_case().p_name << " " << vertices.size() << " hull size " << hull_vertices.size();
-//     BOOST_LOG_TRIVIAL(fatal) << "PERF 1 - Runtime us: " << std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+BOOST_AUTO_TEST_CASE( large_size_low_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 200000.0;
 
-//     BOOST_CHECK(hull.is_convex());
-//     BOOST_CHECK(save_vrml(hull));
-// }
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( large_size_medium_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 200000.0;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( large_size_high_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 200000.0;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( large_size_extreme_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 200000.0;
+    const int number_points = 1000000;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+
+    for (int i = 0; i < number_points; ++i)
+    {
+        const float r = dist_r(random);
+        const float pi = dist_pi(random);
+        const float theta = dist_pi(random);
+        vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+    }
+
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
+
+    LOG_PERFORMANCE_OUTPUT();
+    BOOST_CHECK(hull.is_convex());
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_low_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 1000000.0;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_medium_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 1000000.0;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_high_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 2000000.0;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();        
+        for (int i = 0; i < number_points; ++i)
+        {
+            const float r = dist_r(random);
+            const float pi = dist_pi(random);
+            const float theta = dist_pi(random);
+            vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_extreme_density_sphere_point_cloud_performance_test )
+{
+    const float size_r = 5000000.0;
+    const int number_points = 1000000;
+
+    std::uniform_real_distribution<float> dist_r(0, size_r);
+    std::uniform_real_distribution<float> dist_pi(0, 2.0 * M_PI);
+
+    for (int i = 0; i < number_points; ++i)
+    {
+        const float r = dist_r(random);
+        const float pi = dist_pi(random);
+        const float theta = dist_pi(random);
+        vertices.emplace_back(point_ti<long>(r * sin(pi) * cos(theta), r * sin(pi) * sin(theta), r * cos(pi)));
+    }
+
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
+
+    LOG_PERFORMANCE_OUTPUT();
+    BOOST_CHECK(hull.is_convex());
+}
+
+BOOST_AUTO_TEST_CASE( small_size_low_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-10, 10);
+    for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( small_size_medium_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-10, 10);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( small_size_high_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-10, 10);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( small_size_extreme_density_yz_plane_point_cloud_performance_test )
+{
+    const int number_points = 1000000;
+    std::uniform_int_distribution<long> dist(-10, 10);
+    for (int i = 0; i < number_points; ++i)
+    {
+        vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+    }
+
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
+
+    LOG_PERFORMANCE_OUTPUT();
+    BOOST_CHECK(hull.is_convex());
+}
+
+BOOST_AUTO_TEST_CASE( medium_size_low_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-2000, 2000);
+    for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( medium_size_medium_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-2000, 2000);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( medium_size_high_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-2000, 2000);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( medium_size_extreme_density_yz_plane_point_cloud_performance_test )
+{
+    const int number_points = 1000000;
+    std::uniform_int_distribution<long> dist(-2000, 2000);
+    for (int i = 0; i < number_points; ++i)
+    {
+        vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+    }
+
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
+
+    LOG_PERFORMANCE_OUTPUT();
+    BOOST_CHECK(hull.is_convex());
+}
+
+BOOST_AUTO_TEST_CASE( large_size_low_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-200000, 200000);
+    for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( large_size_medium_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-200000, 200000);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( large_size_high_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-200000, 200000);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( large_size_extreme_density_yz_plane_point_cloud_performance_test )
+{
+    const int number_points = 1000000;
+    std::uniform_int_distribution<long> dist(-200000, 200000);
+    for (int i = 0; i < number_points; ++i)
+    {
+        vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+    }
+
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
+
+    LOG_PERFORMANCE_OUTPUT();
+    BOOST_CHECK(hull.is_convex());
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_low_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-2000000000, 2000000000);
+    for (int number_points = 10; number_points < 210; number_points += 10)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_medium_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-5000000000, 5000000000);
+    for (int number_points = 200; number_points < 2100; number_points += 100)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_high_density_yz_plane_point_cloud_performance_test )
+{
+    std::uniform_int_distribution<long> dist(-15000000000, 15000000000);
+    for (int number_points = 3000; number_points < 21000; number_points += 1000)
+    {
+        vertices.clear();
+        hull_faces.clear();
+        hull_vertices.clear();
+        proj_vertices->clear();
+        for (int i = 0; i < number_points; ++i)
+        {
+            vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+        }
+
+        auto t0(std::chrono::system_clock::now());
+        const auto hull(build(*proj_vertices, vertices));
+        auto t1(std::chrono::system_clock::now());
+
+        LOG_PERFORMANCE_OUTPUT();
+        BOOST_CHECK(hull.is_convex());
+    }
+}
+
+BOOST_AUTO_TEST_CASE( extreme_size_extreme_density_yz_plane_point_cloud_performance_test )
+{
+    const int number_points = 1000000;
+    std::uniform_int_distribution<long> dist(-140000000000, 140000000000);
+    for (int i = 0; i < number_points; ++i)
+    {
+        vertices.emplace_back(point_ti<long>(0, dist(random), dist(random)));
+    }
+
+    auto t0(std::chrono::system_clock::now());
+    const auto hull(build(*proj_vertices, vertices));
+    auto t1(std::chrono::system_clock::now());
+
+    LOG_PERFORMANCE_OUTPUT();
+    BOOST_CHECK(hull.is_convex());
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 }; /* namespace test */
+}; /* namespace raptor_convex_decomposition */
